@@ -6,7 +6,14 @@
  * Per CLAUDE.md: No silent fallbacks - throws on invalid input.
  */
 
-import type { BuildingFloor, Material, BuilderSpecies } from '@ai-village/building-designer';
+import type {
+  BuildingFloor,
+  Material,
+  BuilderSpecies,
+  DimensionalConfig,
+  RealmPocketConfig,
+  ClarkeTechTier
+} from '@ai-village/building-designer';
 import {
   SMALL_HOUSE,
   COZY_COTTAGE,
@@ -127,6 +134,11 @@ export interface BuildingBlueprint {
   floors?: BuildingFloor[];  // Multi-floor layouts
   species?: BuilderSpecies;   // Target species (affects ceiling heights)
   capacity?: number;          // Occupants/storage slots/beds
+
+  // Dimensional features (4D/5D/6D buildings)
+  dimensional?: DimensionalConfig;      // W-axis, V-axis, U-axis configurations
+  realmPocket?: RealmPocketConfig;      // Bigger on inside (TARDIS-like)
+  clarkeTechTier?: ClarkeTechTier;      // Tech requirements (0-8)
 }
 
 /**

@@ -99,8 +99,8 @@ export class NavySystem extends BaseSystem {
    * Update navy aggregate statistics from armadas and reserve fleets
    * PERF: Uses cached entity lookups and reusable working objects
    *
-   * NOTE: Navy doesn't store armadaIds/reserveFleetIds at top level.
-   * Instead, we query for all armadas/fleets belonging to this navy via factionId.
+   * Navy explicitly tracks armadaIds and reserveFleetIds in assets.
+   * Only counts ships/crew from linked armadas and reserve fleets.
    */
   private updateNavyStats(
     world: World,
@@ -121,29 +121,43 @@ export class NavySystem extends BaseSystem {
     let armadaCount = 0;
     let fleetCount = 0;
 
-    // Gather stats from all armadas belonging to this faction
-    for (const [armadaId, armadaEntity] of this.armadaCache) {
+    // Gather stats from armadas explicitly linked to this navy
+    for (const armadaId of navy.assets.armadaIds) {
+      const armadaEntity = this.armadaCache.get(armadaId);
+      if (!armadaEntity) {
+        // Armada missing - emit warning event
+        world.eventBus.emit({
+          type: 'navy:armada_missing',
+          source: navyEntity.id,
+          data: {
+            navyId: navy.navyId,
+            missingArmadaId: armadaId,
+          },
+        });
+        continue;
+      }
+
       const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
       if (!armada) continue;
 
-      // TODO: Match armadas to navy - for now, just aggregate all armadas
-      // In future, add navy reference to ArmadaComponent or use factionId matching
       armadaCount++;
-
       stats.totalShips += armada.fleets.totalShips;
       stats.totalCrew += armada.fleets.totalCrew;
       stats.totalStrength += armada.strength.effectiveCombatPower;
     }
 
-    // Gather stats from reserve fleets (fleets not in any armada)
-    for (const [fleetId, fleetEntity] of this.fleetCache) {
+    // Gather stats from reserve fleets (fleets not assigned to any armada)
+    for (const fleetId of navy.assets.reserveFleetIds) {
+      const fleetEntity = this.fleetCache.get(fleetId);
+      if (!fleetEntity) {
+        // Reserve fleet missing - could have been assigned to armada or destroyed
+        continue;
+      }
+
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
-      // TODO: Determine if fleet is a reserve (not assigned to armada)
-      // For now, just count all fleets
       fleetCount++;
-
       stats.totalShips += fleet.squadrons.totalShips;
       stats.totalCrew += fleet.squadrons.totalCrew;
       stats.totalStrength += fleet.combat.offensiveRating;
@@ -227,9 +241,8 @@ export class NavySystem extends BaseSystem {
 /**
  * Add an armada to a navy
  *
- * NOTE: Navy component doesn't have armadaIds array.
- * Armadas are linked to navies via factionId or should be queried.
- * This function is a placeholder for future implementation.
+ * Links an armada to a navy by adding its ID to the navy's armadaIds array.
+ * Prevents duplicate additions.
  */
 export function addArmadaToNavy(
   world: World,
@@ -253,13 +266,34 @@ export function addArmadaToNavy(
     return { success: false, reason: 'Entity is not a navy' };
   }
 
-  // TODO: Implement armada-navy linking
-  // Options:
-  // 1. Add navyId field to ArmadaComponent
-  // 2. Add armadaIds array to NavyComponent.assets
-  // 3. Use separate relationship entity/component
+  // Verify armada exists
+  const armadaEntity = world.query()
+    .with(CT.Armada)
+    .executeEntities()
+    .find(e => {
+      const a = e.getComponent<ArmadaComponent>(CT.Armada);
+      return a?.armadaId === armadaId;
+    });
 
-  // For now, just emit event to track the relationship
+  if (!armadaEntity) {
+    return { success: false, reason: 'Armada not found' };
+  }
+
+  // Prevent duplicate additions
+  if (navy.assets.armadaIds.includes(armadaId)) {
+    return { success: false, reason: 'Armada already in navy' };
+  }
+
+  // Add armada to navy
+  (navyEntity as EntityImpl).updateComponent<NavyComponent>(CT.Navy, (n: NavyComponent) => ({
+    ...n,
+    assets: {
+      ...n.assets,
+      armadaIds: [...n.assets.armadaIds, armadaId],
+    },
+  }));
+
+  // Emit event
   world.eventBus.emit({
     type: 'navy:armada_joined',
     source: navyEntity.id,
@@ -275,13 +309,14 @@ export function addArmadaToNavy(
 /**
  * Remove an armada from a navy
  *
- * NOTE: Navy component doesn't have armadaIds array.
- * This function is a placeholder for future implementation.
+ * Unlinks an armada from a navy by removing its ID from the navy's armadaIds array.
+ * Optionally moves the armada's fleets to navy reserves.
  */
 export function removeArmadaFromNavy(
   world: World,
   navyId: string,
-  armadaId: string
+  armadaId: string,
+  moveFleetToReserves: boolean = true
 ): { success: boolean; reason?: string } {
   const navyEntity = world.query()
     .with(CT.Navy)
@@ -300,7 +335,41 @@ export function removeArmadaFromNavy(
     return { success: false, reason: 'Entity is not a navy' };
   }
 
-  // TODO: Implement armada-navy unlinking (see addArmadaToNavy)
+  // Verify armada is in navy
+  if (!navy.assets.armadaIds.includes(armadaId)) {
+    return { success: false, reason: 'Armada not in navy' };
+  }
+
+  // Get armada fleets if we need to move them to reserves
+  let fleetsToReserve: string[] = [];
+  if (moveFleetToReserves) {
+    const armadaEntity = world.query()
+      .with(CT.Armada)
+      .executeEntities()
+      .find(e => {
+        const a = e.getComponent<ArmadaComponent>(CT.Armada);
+        return a?.armadaId === armadaId;
+      });
+
+    if (armadaEntity) {
+      const armada = armadaEntity.getComponent<ArmadaComponent>(CT.Armada);
+      if (armada) {
+        fleetsToReserve = armada.fleets.fleetIds;
+      }
+    }
+  }
+
+  // Remove armada from navy and add fleets to reserves
+  (navyEntity as EntityImpl).updateComponent<NavyComponent>(CT.Navy, (n: NavyComponent) => ({
+    ...n,
+    assets: {
+      ...n.assets,
+      armadaIds: n.assets.armadaIds.filter((id: string) => id !== armadaId),
+      reserveFleetIds: moveFleetToReserves
+        ? [...n.assets.reserveFleetIds, ...fleetsToReserve.filter((fid: string) => !n.assets.reserveFleetIds.includes(fid))]
+        : n.assets.reserveFleetIds,
+    },
+  }));
 
   // Emit event
   world.eventBus.emit({
@@ -318,8 +387,8 @@ export function removeArmadaFromNavy(
 /**
  * Add a fleet to navy reserves
  *
- * NOTE: Navy component doesn't have reserveFleetIds array.
- * This function is a placeholder for future implementation.
+ * Adds a fleet to the navy's reserve pool by adding its ID to the reserveFleetIds array.
+ * Prevents duplicate additions.
  */
 export function addFleetToReserves(
   world: World,
@@ -343,11 +412,32 @@ export function addFleetToReserves(
     return { success: false, reason: 'Entity is not a navy' };
   }
 
-  // TODO: Implement fleet reserve tracking
-  // Options:
-  // 1. Add reserveFleetIds array to NavyComponent.assets
-  // 2. Add isReserve flag to FleetComponent
-  // 3. Use separate ReserveFleet component
+  // Verify fleet exists
+  const fleetEntity = world.query()
+    .with(CT.Fleet)
+    .executeEntities()
+    .find(e => {
+      const f = e.getComponent<FleetComponent>(CT.Fleet);
+      return f?.fleetId === fleetId;
+    });
+
+  if (!fleetEntity) {
+    return { success: false, reason: 'Fleet not found' };
+  }
+
+  // Prevent duplicate additions
+  if (navy.assets.reserveFleetIds.includes(fleetId)) {
+    return { success: false, reason: 'Fleet already in reserves' };
+  }
+
+  // Add fleet to reserves
+  (navyEntity as EntityImpl).updateComponent<NavyComponent>(CT.Navy, (n: NavyComponent) => ({
+    ...n,
+    assets: {
+      ...n.assets,
+      reserveFleetIds: [...n.assets.reserveFleetIds, fleetId],
+    },
+  }));
 
   // Emit event
   world.eventBus.emit({

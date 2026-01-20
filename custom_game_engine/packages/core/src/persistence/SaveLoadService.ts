@@ -436,12 +436,64 @@ export class SaveLoadService {
       // Restore multiverse state
       multiverseCoordinator.loadFromSnapshot(saveFile.multiverse.time);
 
-      // TODO: Restore passages (need to recreate passage connections)
-      // For now, passages are stored but not restored
-
-      // Deserialize universe(s)
+      // Deserialize universe(s) BEFORE restoring passages
+      // (passages need universes to exist first)
       for (const universeSnapshot of saveFile.universes) {
         await worldSerializer.deserializeWorld(universeSnapshot, world);
+      }
+
+      // Restore passage connections between universes
+      for (const passageSnapshot of saveFile.passages) {
+        // Recreate passage connection in multiverse coordinator
+        multiverseCoordinator.createPassage(
+          passageSnapshot.id,
+          passageSnapshot.sourceUniverseId,
+          passageSnapshot.targetUniverseId,
+          passageSnapshot.type
+        );
+
+        // Find the source universe world
+        const sourceUniverse = multiverseCoordinator.getUniverse(passageSnapshot.sourceUniverseId);
+        if (!sourceUniverse) {
+          console.warn(
+            `[SaveLoad] Source universe ${passageSnapshot.sourceUniverseId} not found for passage ${passageSnapshot.id}, skipping entity creation`
+          );
+          continue;
+        }
+
+        // Create passage entity in source universe
+        const passageEntity = sourceUniverse.world.createEntity();
+
+        // Cast to EntityImpl to access addComponent (internal mutable interface)
+        const { EntityImpl } = await import('../ecs/Entity.js');
+        const passageEntityImpl = passageEntity as typeof EntityImpl.prototype;
+
+        // Add PassageComponent with restored data
+        const { createPassageComponent } = await import('../components/PassageComponent.js');
+        const passageComponent = createPassageComponent(
+          passageSnapshot.id,
+          passageSnapshot.sourceUniverseId,
+          passageSnapshot.targetUniverseId,
+          passageSnapshot.type
+        );
+
+        // Set active state from snapshot
+        passageComponent.active = passageSnapshot.active;
+        passageComponent.state = passageSnapshot.active ? 'active' : 'dormant';
+
+        passageEntityImpl.addComponent(passageComponent);
+
+        // Add PassageExtendedComponent with default values
+        // (Extended data not currently saved, will use defaults based on type)
+        const { createPassageExtended } = await import('../components/PassageExtendedComponent.js');
+        const passageExtended = createPassageExtended(
+          passageSnapshot.id,
+          passageSnapshot.type,
+          undefined, // No discoverer on load
+          Number(sourceUniverse.universeTick)
+        );
+
+        passageEntityImpl.addComponent(passageExtended);
       }
 
       // Restore play time

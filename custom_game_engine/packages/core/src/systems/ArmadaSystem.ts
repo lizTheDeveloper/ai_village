@@ -40,7 +40,10 @@ export class ArmadaSystem extends BaseSystem {
   protected readonly throttleInterval = 60; // Every 3 seconds at 20 TPS
 
   // PERF: Cache fleet lookups to avoid repeated world.getEntity() calls
-  private fleetCache: Map<string, EntityImpl> = new Map();
+  // Object literal faster than Map for lookups
+  private fleetCache: Record<string, EntityImpl | null> = Object.create(null);
+  private cacheValidTick = -1;
+  private readonly CACHE_LIFETIME = 60; // 3 seconds
 
   // PERF: Reusable objects to avoid allocations in hot paths
   private workingStats = {
@@ -50,14 +53,20 @@ export class ArmadaSystem extends BaseSystem {
     totalStrength: 0,
   };
 
-  // PERF: Reuse Map for ship type breakdown
-  private shipTypeMap: Map<string, number> = new Map();
+  // PERF: Object literal for ship type breakdown
+  private shipTypeMap: Record<string, number> = Object.create(null);
+
+  // PERF: Dirty tracking to skip unchanged armadas
+  private lastArmadaHash: Record<string, number> = Object.create(null);
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
 
-    // PERF: Build fleet cache once per update
-    this.rebuildFleetCache(ctx.world);
+    // PERF: Rebuild fleet cache only when expired
+    if (tick - this.cacheValidTick > this.CACHE_LIFETIME) {
+      this.rebuildFleetCache(ctx.world);
+      this.cacheValidTick = tick;
+    }
 
     // Process each armada
     for (const armadaEntity of ctx.activeEntities) {
@@ -79,14 +88,14 @@ export class ArmadaSystem extends BaseSystem {
   }
 
   /**
-   * PERF: Rebuild fleet entity cache once per update
+   * PERF: Rebuild fleet entity cache
    * Avoids repeated world.getEntity() lookups
    */
   private rebuildFleetCache(world: World): void {
-    this.fleetCache.clear();
+    this.fleetCache = Object.create(null);
     const fleetEntities = world.query().with(CT.Fleet).executeEntities();
     for (const entity of fleetEntities) {
-      this.fleetCache.set(entity.id, entity as EntityImpl);
+      this.fleetCache[entity.id] = entity as EntityImpl;
     }
   }
 
@@ -107,13 +116,15 @@ export class ArmadaSystem extends BaseSystem {
     stats.weightedCoherence = 0;
     stats.totalStrength = 0;
 
-    // PERF: Clear and reuse Map instead of allocating object
-    this.shipTypeMap.clear();
+    // GC: Clear existing object keys instead of allocating new object
+    for (const key in this.shipTypeMap) {
+      delete this.shipTypeMap[key];
+    }
 
     // Gather stats from all fleets
     for (const fleetId of armada.fleets.fleetIds) {
       // PERF: Use cached fleet lookup
-      const fleetEntity = this.fleetCache.get(fleetId);
+      const fleetEntity = this.fleetCache[fleetId];
       if (!fleetEntity) {
         // Fleet missing - emit warning
         world.eventBus.emit({
@@ -139,22 +150,23 @@ export class ArmadaSystem extends BaseSystem {
       // Sum combat strength
       stats.totalStrength += fleet.combat.offensiveRating;
 
-      // PERF: Aggregate ship types using Map (faster than object literal)
+      // PERF: Aggregate ship types using object literal
       for (const [shipType, count] of Object.entries(fleet.squadrons.shipTypeBreakdown)) {
-        this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + (count as number));
+        this.shipTypeMap[shipType] = (this.shipTypeMap[shipType] ?? 0) + (count as number);
       }
     }
 
     // Calculate average coherence weighted by fleet size
     const armadaCoherence = stats.totalShips > 0 ? stats.weightedCoherence / stats.totalShips : 0;
 
-    // PERF: Convert Map to object only once at the end
-    const shipTypeBreakdown: Record<string, number> = {};
-    for (const [type, count] of this.shipTypeMap) {
-      shipTypeBreakdown[type] = count;
-    }
+    // PERF: Dirty tracking - skip update if nothing changed
+    const currentHash = stats.totalShips + stats.totalCrew * 100 + Math.floor(armadaCoherence * 1000);
+    const lastHash = this.lastArmadaHash[armada.armadaId] ?? -1;
+    if (currentHash === lastHash) return; // Skip update if unchanged
+    this.lastArmadaHash[armada.armadaId] = currentHash;
 
     // PERF: Batch all component updates in single call
+    // Use shipTypeMap directly without conversion
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
       ...a,
       fleets: {

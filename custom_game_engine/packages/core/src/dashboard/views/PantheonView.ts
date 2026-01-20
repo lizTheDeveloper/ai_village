@@ -12,6 +12,7 @@ import type {
   RenderTheme,
 } from '../types.js';
 import type { DeityComponent } from '../../components/DeityComponent.js';
+import { calculateInitialRelationship } from '../../divinity/DeityRelations.js';
 
 /**
  * Deity summary information
@@ -140,8 +141,76 @@ export const PantheonView: DashboardView<PantheonViewData> = {
       // Sort by belief (most powerful first)
       deities.sort((a, b) => b.belief - a.belief);
 
-      // TODO: Get deity relationships when relationship system is implemented
+      // Calculate deity relationships
       const relationships: Array<{ from: string; to: string; type: string }> = [];
+
+      // Only calculate relationships if there are multiple deities
+      if (deities.length > 1) {
+        // Build a map of deity entities for quick lookup
+        const deityEntities = new Map<string, { entity: any; component: DeityComponent }>();
+        for (const entity of world.entities.values()) {
+          if (!entity.components.has(CT.Deity)) continue;
+          const deityComp = entity.components.get(CT.Deity) as DeityComponent;
+          if (deityComp) {
+            deityEntities.set(entity.id, { entity, component: deityComp });
+          }
+        }
+
+        // Calculate relationships between all pairs of deities
+        const deityIds = Array.from(deityEntities.keys());
+        for (let i = 0; i < deityIds.length; i++) {
+          for (let j = i + 1; j < deityIds.length; j++) {
+            const deity1Id = deityIds[i];
+            const deity2Id = deityIds[j];
+
+            if (!deity1Id || !deity2Id) continue;
+
+            const deity1Data = deityEntities.get(deity1Id);
+            const deity2Data = deityEntities.get(deity2Id);
+
+            if (!deity1Data || !deity2Data) continue;
+
+            const deity1Comp = deity1Data.component;
+            const deity2Comp = deity2Data.component;
+
+            // Skip if either deity lacks a domain (not fully formed)
+            if (!deity1Comp.identity?.domain || !deity2Comp.identity?.domain) continue;
+
+            // Calculate relationship from deity1's perspective
+            const relation = calculateInitialRelationship(
+              {
+                id: deity1Id,
+                domain: deity1Comp.identity.domain,
+                secondaryDomains: deity1Comp.identity.secondaryDomains || [],
+                personality: {
+                  benevolence: deity1Comp.identity.perceivedPersonality.benevolence,
+                  interventionism: deity1Comp.identity.perceivedPersonality.interventionism,
+                  wrathfulness: deity1Comp.identity.perceivedPersonality.wrathfulness,
+                },
+              },
+              {
+                id: deity2Id,
+                domain: deity2Comp.identity.domain,
+                secondaryDomains: deity2Comp.identity.secondaryDomains || [],
+                personality: {
+                  benevolence: deity2Comp.identity.perceivedPersonality.benevolence,
+                  interventionism: deity2Comp.identity.perceivedPersonality.interventionism,
+                  wrathfulness: deity2Comp.identity.perceivedPersonality.wrathfulness,
+                },
+              }
+            );
+
+            // Add relationship if it's significant (not neutral)
+            if (relation.status !== 'neutral') {
+              relationships.push({
+                from: deity1Id,
+                to: deity2Id,
+                type: relation.status,
+              });
+            }
+          }
+        }
+      }
 
       return {
         timestamp: Date.now(),

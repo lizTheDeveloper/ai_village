@@ -14,8 +14,12 @@
         "repeatable": true
       },
       "entry_stage": "fear_arises",
-      "completion_stages": ["courage_shown"],
-      "failure_stages": ["fear_wins"],
+      "completion_stages": [
+        "courage_shown"
+      ],
+      "failure_stages": [
+        "fear_wins"
+      ],
       "stages": [
         {
           "stage_id": "fear_arises",
@@ -24,7 +28,12 @@
           "stage_attractors": [
             {
               "attractor_id": "push_courage",
-              "goal": { "type": "emotional_state", "parameters": { "emotion": "brave" } },
+              "goal": {
+                "type": "emotional_state",
+                "parameters": {
+                  "emotion": "brave"
+                }
+              },
               "strength": 0.3,
               "urgency": 0.7,
               "description": "Nudging toward courage"
@@ -36,8 +45,16 @@
           "name": "Courage Found",
           "description": "You faced the fear and found strength within.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 15 },
-            { "type": "queue_dream_hint", "dream_type": "memory_echo", "content_hint": "You stood firm when fear demanded flight", "intensity": 0.4 }
+            {
+              "type": "modify_mood",
+              "delta": 15
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You stood firm when fear demanded flight",
+              "intensity": 0.4
+            }
           ]
         },
         {
@@ -45,7 +62,10 @@
           "name": "Fear Prevails",
           "description": "Fear won this time, but there will be other chances.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 5 }
+            {
+              "type": "modify_stress",
+              "delta": 5
+            }
           ]
         }
       ],
@@ -54,19 +74,33 @@
           "from_stage": "fear_arises",
           "to_stage": "courage_shown",
           "conditions": [
-            { "type": "mood_threshold", "min": 20 },
-            { "type": "personal_tick_elapsed", "ticks": 30 }
+            {
+              "type": "mood_threshold",
+              "min": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 30
+            }
           ]
         },
         {
           "from_stage": "fear_arises",
           "to_stage": "fear_wins",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 200 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 200
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_stress_threshold", "min": 40 }
+          {
+            "type": "on_stress_threshold",
+            "min": 40
+          }
         ],
         "cooldown_ticks": 500
       }
@@ -85,8 +119,12 @@
         "repeatable": true
       },
       "entry_stage": "hesitation",
-      "completion_stages": ["explored"],
-      "failure_stages": ["retreated"],
+      "completion_stages": [
+        "explored"
+      ],
+      "failure_stages": [
+        "retreated"
+      ],
       "stages": [
         {
           "stage_id": "hesitation",
@@ -98,7 +136,10 @@
           "name": "Discovery Made",
           "description": "You stepped forward and found understanding.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 10 }
+            {
+              "type": "modify_mood",
+              "delta": 10
+            }
           ]
         },
         {
@@ -111,13 +152,23 @@
         {
           "from_stage": "hesitation",
           "to_stage": "explored",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 50 }],
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 50
+            }
+          ],
           "probability": 0.7
         },
         {
           "from_stage": "hesitation",
           "to_stage": "retreated",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 150 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 150
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -138,8 +189,12 @@
         "repeatable": true
       },
       "entry_stage": "opportunity",
-      "completion_stages": ["kindness_given"],
-      "failure_stages": ["passed_by"],
+      "completion_stages": [
+        "kindness_given"
+      ],
+      "failure_stages": [
+        "passed_by"
+      ],
       "stages": [
         {
           "stage_id": "opportunity",
@@ -148,7 +203,10 @@
           "stage_attractors": [
             {
               "attractor_id": "encourage_help",
-              "goal": { "type": "relationship_formed", "parameters": {} },
+              "goal": {
+                "type": "relationship_formed",
+                "parameters": {}
+              },
               "strength": 0.2,
               "urgency": 0.5
             }
@@ -159,8 +217,15 @@
           "name": "Help Extended",
           "description": "You offered help without expectation.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 12 },
-            { "type": "modify_mood_factor", "factor": "social", "delta": 8 }
+            {
+              "type": "modify_mood",
+              "delta": 12
+            },
+            {
+              "type": "modify_mood_factor",
+              "factor": "social",
+              "delta": 8
+            }
           ]
         },
         {
@@ -174,14 +239,25 @@
           "from_stage": "opportunity",
           "to_stage": "kindness_given",
           "conditions": [
-            { "type": "any_relationship", "min_trust": 10 },
-            { "type": "personal_tick_elapsed", "ticks": 40 }
+            {
+              "type": "any_relationship",
+              "min_trust": 10
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 40
+            }
           ]
         },
         {
           "from_stage": "opportunity",
           "to_stage": "passed_by",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 180 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 180
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -202,8 +278,12 @@
         "repeatable": true
       },
       "entry_stage": "witness_distress",
-      "completion_stages": ["comfort_given"],
-      "failure_stages": ["ignored"],
+      "completion_stages": [
+        "comfort_given"
+      ],
+      "failure_stages": [
+        "ignored"
+      ],
       "stages": [
         {
           "stage_id": "witness_distress",
@@ -215,8 +295,16 @@
           "name": "Comfort Offered",
           "description": "You reached out with compassion.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 8 },
-            { "type": "modify_relationship_by_role", "role": "comforted", "trust_delta": 5, "affinity_delta": 3 }
+            {
+              "type": "modify_mood",
+              "delta": 8
+            },
+            {
+              "type": "modify_relationship_by_role",
+              "role": "comforted",
+              "trust_delta": 5,
+              "affinity_delta": 3
+            }
           ]
         },
         {
@@ -229,21 +317,37 @@
         {
           "from_stage": "witness_distress",
           "to_stage": "comfort_given",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 30 }],
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 30
+            }
+          ],
           "probability": 0.6
         },
         {
           "from_stage": "witness_distress",
           "to_stage": "ignored",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 120 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 120
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_death_nearby", "min_relationship_trust": 5 }
+          {
+            "type": "on_death_nearby",
+            "min_relationship_trust": 5
+          }
         ],
         "trigger_bindings": [
-          { "role": "comforted", "source": "trigger_target" }
+          {
+            "role": "comforted",
+            "source": "trigger_target"
+          }
         ],
         "cooldown_ticks": 600
       }
@@ -262,8 +366,12 @@
         "repeatable": true
       },
       "entry_stage": "urge_to_speak",
-      "completion_stages": ["silence_kept"],
-      "failure_stages": ["words_escaped"],
+      "completion_stages": [
+        "silence_kept"
+      ],
+      "failure_stages": [
+        "words_escaped"
+      ],
       "stages": [
         {
           "stage_id": "urge_to_speak",
@@ -275,7 +383,10 @@
           "name": "Silence Chosen",
           "description": "You held your tongue and kept the peace.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -5 }
+            {
+              "type": "modify_stress",
+              "delta": -5
+            }
           ]
         },
         {
@@ -283,7 +394,10 @@
           "name": "Words Spoken",
           "description": "The words came out. For better or worse.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 3 }
+            {
+              "type": "modify_stress",
+              "delta": 3
+            }
           ]
         }
       ],
@@ -292,24 +406,44 @@
           "from_stage": "urge_to_speak",
           "to_stage": "silence_kept",
           "conditions": [
-            { "type": "stress_threshold", "max": 50 },
-            { "type": "personal_tick_elapsed", "ticks": 25 }
+            {
+              "type": "stress_threshold",
+              "max": 50
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 25
+            }
           ]
         },
         {
           "from_stage": "urge_to_speak",
           "to_stage": "words_escaped",
-          "conditions": [{ "type": "stress_threshold", "min": 60 }]
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 60
+            }
+          ]
         },
         {
           "from_stage": "urge_to_speak",
           "to_stage": "words_escaped",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 100 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 100
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_emotional_state", "state": "frustrated", "min_duration_ticks": 10 }
+          {
+            "type": "on_emotional_state",
+            "state": "frustrated",
+            "min_duration_ticks": 10
+          }
         ],
         "cooldown_ticks": 350
       }
@@ -328,8 +462,12 @@
         "repeatable": true
       },
       "entry_stage": "must_wait",
-      "completion_stages": ["waited_well"],
-      "failure_stages": ["impatience"],
+      "completion_stages": [
+        "waited_well"
+      ],
+      "failure_stages": [
+        "impatience"
+      ],
       "stages": [
         {
           "stage_id": "must_wait",
@@ -341,8 +479,14 @@
           "name": "Patience Found",
           "description": "You waited with grace.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -8 },
-            { "type": "modify_mood", "delta": 5 }
+            {
+              "type": "modify_stress",
+              "delta": -8
+            },
+            {
+              "type": "modify_mood",
+              "delta": 5
+            }
           ]
         },
         {
@@ -350,7 +494,10 @@
           "name": "Restlessness Won",
           "description": "Impatience got the better of you.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 5 }
+            {
+              "type": "modify_stress",
+              "delta": 5
+            }
           ]
         }
       ],
@@ -359,14 +506,25 @@
           "from_stage": "must_wait",
           "to_stage": "waited_well",
           "conditions": [
-            { "type": "stress_threshold", "max": 40 },
-            { "type": "personal_tick_elapsed", "ticks": 60 }
+            {
+              "type": "stress_threshold",
+              "max": 40
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 60
+            }
           ]
         },
         {
           "from_stage": "must_wait",
           "to_stage": "impatience",
-          "conditions": [{ "type": "stress_threshold", "min": 70 }]
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 70
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -387,8 +545,12 @@
         "repeatable": true
       },
       "entry_stage": "truth_or_lie",
-      "completion_stages": ["truth_told"],
-      "failure_stages": ["lie_told"],
+      "completion_stages": [
+        "truth_told"
+      ],
+      "failure_stages": [
+        "lie_told"
+      ],
       "stages": [
         {
           "stage_id": "truth_or_lie",
@@ -400,7 +562,10 @@
           "name": "Truth Spoken",
           "description": "You chose honesty despite the cost.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 8 }
+            {
+              "type": "modify_mood",
+              "delta": 8
+            }
           ]
         },
         {
@@ -408,7 +573,10 @@
           "name": "Lie Spoken",
           "description": "You chose the easier path.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 3 }
+            {
+              "type": "modify_stress",
+              "delta": 3
+            }
           ]
         }
       ],
@@ -416,13 +584,23 @@
         {
           "from_stage": "truth_or_lie",
           "to_stage": "truth_told",
-          "conditions": [{ "type": "mood_threshold", "min": 10 }],
+          "conditions": [
+            {
+              "type": "mood_threshold",
+              "min": 10
+            }
+          ],
           "probability": 0.6
         },
         {
           "from_stage": "truth_or_lie",
           "to_stage": "lie_told",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 80 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 80
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -443,8 +621,12 @@
         "repeatable": true
       },
       "entry_stage": "mistake_made",
-      "completion_stages": ["admitted"],
-      "failure_stages": ["denied"],
+      "completion_stages": [
+        "admitted"
+      ],
+      "failure_stages": [
+        "denied"
+      ],
       "stages": [
         {
           "stage_id": "mistake_made",
@@ -456,8 +638,14 @@
           "name": "Mistake Acknowledged",
           "description": "You admitted your error.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 5 },
-            { "type": "modify_stress", "delta": -5 }
+            {
+              "type": "modify_mood",
+              "delta": 5
+            },
+            {
+              "type": "modify_stress",
+              "delta": -5
+            }
           ]
         },
         {
@@ -465,7 +653,10 @@
           "name": "Mistake Hidden",
           "description": "You buried the error.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 8 }
+            {
+              "type": "modify_stress",
+              "delta": 8
+            }
           ]
         }
       ],
@@ -473,13 +664,23 @@
         {
           "from_stage": "mistake_made",
           "to_stage": "admitted",
-          "conditions": [{ "type": "wisdom_threshold", "min_wisdom": 5 }],
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 5
+            }
+          ],
           "probability": 0.5
         },
         {
           "from_stage": "mistake_made",
           "to_stage": "denied",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 100 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 100
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -500,8 +701,12 @@
         "repeatable": true
       },
       "entry_stage": "good_moment",
-      "completion_stages": ["gratitude_felt"],
-      "failure_stages": ["unnoticed"],
+      "completion_stages": [
+        "gratitude_felt"
+      ],
+      "failure_stages": [
+        "unnoticed"
+      ],
       "stages": [
         {
           "stage_id": "good_moment",
@@ -513,8 +718,14 @@
           "name": "Gratitude Acknowledged",
           "description": "You paused to appreciate the moment.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 15 },
-            { "type": "modify_stress", "delta": -10 }
+            {
+              "type": "modify_mood",
+              "delta": 15
+            },
+            {
+              "type": "modify_stress",
+              "delta": -10
+            }
           ]
         },
         {
@@ -528,20 +739,34 @@
           "from_stage": "good_moment",
           "to_stage": "gratitude_felt",
           "conditions": [
-            { "type": "mood_threshold", "min": 0 },
-            { "type": "personal_tick_elapsed", "ticks": 20 }
+            {
+              "type": "mood_threshold",
+              "min": 0
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 20
+            }
           ],
           "probability": 0.7
         },
         {
           "from_stage": "good_moment",
           "to_stage": "unnoticed",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 100 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 100
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_mood_threshold", "min": 30 }
+          {
+            "type": "on_mood_threshold",
+            "min": 30
+          }
         ],
         "cooldown_ticks": 300
       }
@@ -560,8 +785,12 @@
         "repeatable": true
       },
       "entry_stage": "owed_thanks",
-      "completion_stages": ["thanks_given"],
-      "failure_stages": ["thanks_forgotten"],
+      "completion_stages": [
+        "thanks_given"
+      ],
+      "failure_stages": [
+        "thanks_forgotten"
+      ],
       "stages": [
         {
           "stage_id": "owed_thanks",
@@ -573,8 +802,16 @@
           "name": "Gratitude Shared",
           "description": "You expressed your appreciation.",
           "on_enter_effects": [
-            { "type": "modify_relationship_by_role", "role": "helper", "trust_delta": 3, "affinity_delta": 5 },
-            { "type": "modify_mood", "delta": 8 }
+            {
+              "type": "modify_relationship_by_role",
+              "role": "helper",
+              "trust_delta": 3,
+              "affinity_delta": 5
+            },
+            {
+              "type": "modify_mood",
+              "delta": 8
+            }
           ]
         },
         {
@@ -587,18 +824,32 @@
         {
           "from_stage": "owed_thanks",
           "to_stage": "thanks_given",
-          "conditions": [{ "type": "has_relationship_with_role", "role": "helper", "min_trust": 0 }],
+          "conditions": [
+            {
+              "type": "has_relationship_with_role",
+              "role": "helper",
+              "min_trust": 0
+            }
+          ],
           "probability": 0.7
         },
         {
           "from_stage": "owed_thanks",
           "to_stage": "thanks_forgotten",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 150 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 150
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "trigger_bindings": [
-          { "role": "helper", "source": "highest_trust" }
+          {
+            "role": "helper",
+            "source": "highest_trust"
+          }
         ],
         "cooldown_ticks": 400
       }
@@ -617,8 +868,12 @@
         "repeatable": true
       },
       "entry_stage": "anger_burns",
-      "completion_stages": ["released"],
-      "failure_stages": ["held_onto"],
+      "completion_stages": [
+        "released"
+      ],
+      "failure_stages": [
+        "held_onto"
+      ],
       "stages": [
         {
           "stage_id": "anger_burns",
@@ -630,8 +885,15 @@
           "name": "Anger Released",
           "description": "You chose to let go.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -15 },
-            { "type": "set_emotional_state", "state": "content", "duration_ticks": 50 }
+            {
+              "type": "modify_stress",
+              "delta": -15
+            },
+            {
+              "type": "set_emotional_state",
+              "state": "content",
+              "duration_ticks": 50
+            }
           ]
         },
         {
@@ -639,7 +901,10 @@
           "name": "Anger Held",
           "description": "The anger remains, festering.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 10 }
+            {
+              "type": "modify_stress",
+              "delta": 10
+            }
           ]
         }
       ],
@@ -648,19 +913,34 @@
           "from_stage": "anger_burns",
           "to_stage": "released",
           "conditions": [
-            { "type": "wisdom_threshold", "min_wisdom": 10 },
-            { "type": "personal_tick_elapsed", "ticks": 40 }
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 10
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 40
+            }
           ]
         },
         {
           "from_stage": "anger_burns",
           "to_stage": "held_onto",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 120 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 120
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_emotional_state", "state": "enraged", "min_duration_ticks": 20 }
+          {
+            "type": "on_emotional_state",
+            "state": "enraged",
+            "min_duration_ticks": 20
+          }
         ],
         "cooldown_ticks": 400
       }
@@ -679,8 +959,12 @@
         "repeatable": true
       },
       "entry_stage": "feeling_loss",
-      "completion_stages": ["accepted"],
-      "failure_stages": ["resisting"],
+      "completion_stages": [
+        "accepted"
+      ],
+      "failure_stages": [
+        "resisting"
+      ],
       "stages": [
         {
           "stage_id": "feeling_loss",
@@ -692,8 +976,14 @@
           "name": "Loss Accepted",
           "description": "You accepted the loss and moved forward.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 5 },
-            { "type": "modify_stress", "delta": -5 }
+            {
+              "type": "modify_mood",
+              "delta": 5
+            },
+            {
+              "type": "modify_stress",
+              "delta": -5
+            }
           ]
         },
         {
@@ -701,7 +991,10 @@
           "name": "Still Clinging",
           "description": "You cannot let go.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 5 }
+            {
+              "type": "modify_stress",
+              "delta": 5
+            }
           ]
         }
       ],
@@ -710,19 +1003,34 @@
           "from_stage": "feeling_loss",
           "to_stage": "accepted",
           "conditions": [
-            { "type": "personal_tick_elapsed", "ticks": 80 },
-            { "type": "mood_threshold", "min": -20 }
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 80
+            },
+            {
+              "type": "mood_threshold",
+              "min": -20
+            }
           ]
         },
         {
           "from_stage": "feeling_loss",
           "to_stage": "resisting",
-          "conditions": [{ "type": "mood_threshold", "max": -40 }]
+          "conditions": [
+            {
+              "type": "mood_threshold",
+              "max": -40
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_emotional_state", "state": "melancholic", "min_duration_ticks": 30 }
+          {
+            "type": "on_emotional_state",
+            "state": "melancholic",
+            "min_duration_ticks": 30
+          }
         ],
         "cooldown_ticks": 500
       }
@@ -741,8 +1049,12 @@
         "repeatable": true
       },
       "entry_stage": "intrigued",
-      "completion_stages": ["investigated"],
-      "failure_stages": ["ignored"],
+      "completion_stages": [
+        "investigated"
+      ],
+      "failure_stages": [
+        "ignored"
+      ],
       "stages": [
         {
           "stage_id": "intrigued",
@@ -754,8 +1066,15 @@
           "name": "Curiosity Satisfied",
           "description": "You followed your curiosity and learned something.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 10 },
-            { "type": "grant_skill_xp", "skill": "observation", "xp": 5 }
+            {
+              "type": "modify_mood",
+              "delta": 10
+            },
+            {
+              "type": "grant_skill_xp",
+              "skill": "observation",
+              "xp": 5
+            }
           ]
         },
         {
@@ -768,13 +1087,23 @@
         {
           "from_stage": "intrigued",
           "to_stage": "investigated",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 40 }],
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 40
+            }
+          ],
           "probability": 0.65
         },
         {
           "from_stage": "intrigued",
           "to_stage": "ignored",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 120 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 120
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -795,8 +1124,12 @@
         "repeatable": true
       },
       "entry_stage": "wondering",
-      "completion_stages": ["asked"],
-      "failure_stages": ["stayed_silent"],
+      "completion_stages": [
+        "asked"
+      ],
+      "failure_stages": [
+        "stayed_silent"
+      ],
       "stages": [
         {
           "stage_id": "wondering",
@@ -808,7 +1141,10 @@
           "name": "Question Asked",
           "description": "You overcame hesitation and asked.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 5 }
+            {
+              "type": "modify_mood",
+              "delta": 5
+            }
           ]
         },
         {
@@ -821,13 +1157,23 @@
         {
           "from_stage": "wondering",
           "to_stage": "asked",
-          "conditions": [{ "type": "any_relationship", "min_trust": 20 }],
+          "conditions": [
+            {
+              "type": "any_relationship",
+              "min_trust": 20
+            }
+          ],
           "probability": 0.6
         },
         {
           "from_stage": "wondering",
           "to_stage": "stayed_silent",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 100 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 100
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -848,8 +1194,12 @@
         "repeatable": true
       },
       "entry_stage": "exhausted",
-      "completion_stages": ["rested"],
-      "failure_stages": ["pushed_through"],
+      "completion_stages": [
+        "rested"
+      ],
+      "failure_stages": [
+        "pushed_through"
+      ],
       "stages": [
         {
           "stage_id": "exhausted",
@@ -861,8 +1211,14 @@
           "name": "Rest Taken",
           "description": "You honored your need for rest.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -20 },
-            { "type": "modify_mood", "delta": 10 }
+            {
+              "type": "modify_stress",
+              "delta": -20
+            },
+            {
+              "type": "modify_mood",
+              "delta": 10
+            }
           ]
         },
         {
@@ -870,7 +1226,10 @@
           "name": "Rest Denied",
           "description": "You pushed through despite exhaustion.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 10 }
+            {
+              "type": "modify_stress",
+              "delta": 10
+            }
           ]
         }
       ],
@@ -879,20 +1238,34 @@
           "from_stage": "exhausted",
           "to_stage": "rested",
           "conditions": [
-            { "type": "stress_threshold", "min": 50 },
-            { "type": "personal_tick_elapsed", "ticks": 30 }
+            {
+              "type": "stress_threshold",
+              "min": 50
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 30
+            }
           ],
           "probability": 0.5
         },
         {
           "from_stage": "exhausted",
           "to_stage": "pushed_through",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 80 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 80
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_stress_threshold", "min": 60 }
+          {
+            "type": "on_stress_threshold",
+            "min": 60
+          }
         ],
         "cooldown_ticks": 500
       }
@@ -911,8 +1284,12 @@
         "repeatable": true
       },
       "entry_stage": "boundary_needed",
-      "completion_stages": ["boundary_set"],
-      "failure_stages": ["boundary_crossed"],
+      "completion_stages": [
+        "boundary_set"
+      ],
+      "failure_stages": [
+        "boundary_crossed"
+      ],
       "stages": [
         {
           "stage_id": "boundary_needed",
@@ -924,8 +1301,14 @@
           "name": "Line Drawn",
           "description": "You established your boundary.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -10 },
-            { "type": "modify_mood", "delta": 8 }
+            {
+              "type": "modify_stress",
+              "delta": -10
+            },
+            {
+              "type": "modify_mood",
+              "delta": 8
+            }
           ]
         },
         {
@@ -933,7 +1316,10 @@
           "name": "Boundary Violated",
           "description": "You let your limits be crossed.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 15 }
+            {
+              "type": "modify_stress",
+              "delta": 15
+            }
           ]
         }
       ],
@@ -942,14 +1328,25 @@
           "from_stage": "boundary_needed",
           "to_stage": "boundary_set",
           "conditions": [
-            { "type": "wisdom_threshold", "min_wisdom": 8 },
-            { "type": "personal_tick_elapsed", "ticks": 25 }
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 8
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 25
+            }
           ]
         },
         {
           "from_stage": "boundary_needed",
           "to_stage": "boundary_crossed",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 90 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 90
+            }
+          ]
         }
       ],
       "assignment_rules": {
@@ -970,8 +1367,12 @@
         "repeatable": true
       },
       "entry_stage": "achievement",
-      "completion_stages": ["celebrated"],
-      "failure_stages": ["dismissed"],
+      "completion_stages": [
+        "celebrated"
+      ],
+      "failure_stages": [
+        "dismissed"
+      ],
       "stages": [
         {
           "stage_id": "achievement",
@@ -983,8 +1384,16 @@
           "name": "Victory Savored",
           "description": "You took time to appreciate your success.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 20 },
-            { "type": "queue_dream_hint", "dream_type": "memory_echo", "content_hint": "The sweet taste of accomplishment", "intensity": 0.3 }
+            {
+              "type": "modify_mood",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "The sweet taste of accomplishment",
+              "intensity": 0.3
+            }
           ]
         },
         {
@@ -997,18 +1406,32 @@
         {
           "from_stage": "achievement",
           "to_stage": "celebrated",
-          "conditions": [{ "type": "mood_threshold", "min": 10 }],
+          "conditions": [
+            {
+              "type": "mood_threshold",
+              "min": 10
+            }
+          ],
           "probability": 0.6
         },
         {
           "from_stage": "achievement",
           "to_stage": "dismissed",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 80 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 80
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_skill_mastery", "skill": "any", "min_level": 2 }
+          {
+            "type": "on_skill_mastery",
+            "skill": "any",
+            "min_level": 2
+          }
         ],
         "cooldown_ticks": 350
       }
@@ -1027,8 +1450,12 @@
         "repeatable": true
       },
       "entry_stage": "feeling_joy",
-      "completion_stages": ["joy_shared"],
-      "failure_stages": ["joy_kept"],
+      "completion_stages": [
+        "joy_shared"
+      ],
+      "failure_stages": [
+        "joy_kept"
+      ],
       "stages": [
         {
           "stage_id": "feeling_joy",
@@ -1040,8 +1467,15 @@
           "name": "Joy Spread",
           "description": "Your happiness brightened another's day.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 10 },
-            { "type": "modify_mood_factor", "factor": "social", "delta": 10 }
+            {
+              "type": "modify_mood",
+              "delta": 10
+            },
+            {
+              "type": "modify_mood_factor",
+              "factor": "social",
+              "delta": 10
+            }
           ]
         },
         {
@@ -1055,19 +1489,33 @@
           "from_stage": "feeling_joy",
           "to_stage": "joy_shared",
           "conditions": [
-            { "type": "any_relationship", "min_trust": 15 },
-            { "type": "personal_tick_elapsed", "ticks": 30 }
+            {
+              "type": "any_relationship",
+              "min_trust": 15
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 30
+            }
           ]
         },
         {
           "from_stage": "feeling_joy",
           "to_stage": "joy_kept",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 100 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 100
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_mood_threshold", "min": 50 }
+          {
+            "type": "on_mood_threshold",
+            "min": 50
+          }
         ],
         "cooldown_ticks": 400
       }
@@ -1086,8 +1534,12 @@
         "repeatable": true
       },
       "entry_stage": "slighted",
-      "completion_stages": ["forgiven"],
-      "failure_stages": ["grudge_held"],
+      "completion_stages": [
+        "forgiven"
+      ],
+      "failure_stages": [
+        "grudge_held"
+      ],
       "stages": [
         {
           "stage_id": "slighted",
@@ -1099,8 +1551,15 @@
           "name": "Forgiveness Given",
           "description": "You chose to let it go.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -8 },
-            { "type": "modify_relationship_by_role", "role": "offender", "trust_delta": 2 }
+            {
+              "type": "modify_stress",
+              "delta": -8
+            },
+            {
+              "type": "modify_relationship_by_role",
+              "role": "offender",
+              "trust_delta": 2
+            }
           ]
         },
         {
@@ -1108,7 +1567,10 @@
           "name": "Grudge Forming",
           "description": "The slight festers in memory.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 5 }
+            {
+              "type": "modify_stress",
+              "delta": 5
+            }
           ]
         }
       ],
@@ -1117,22 +1579,39 @@
           "from_stage": "slighted",
           "to_stage": "forgiven",
           "conditions": [
-            { "type": "wisdom_threshold", "min_wisdom": 5 },
-            { "type": "personal_tick_elapsed", "ticks": 50 }
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 5
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 50
+            }
           ]
         },
         {
           "from_stage": "slighted",
           "to_stage": "grudge_held",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 150 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 150
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_relationship_change", "delta_threshold": -10 }
+          {
+            "type": "on_relationship_change",
+            "delta_threshold": -10
+          }
         ],
         "trigger_bindings": [
-          { "role": "offender", "source": "trigger_target" }
+          {
+            "role": "offender",
+            "source": "trigger_target"
+          }
         ],
         "cooldown_ticks": 400
       }
@@ -1151,8 +1630,12 @@
         "repeatable": true
       },
       "entry_stage": "conflict_brewing",
-      "completion_stages": ["peace_chosen"],
-      "failure_stages": ["escalated"],
+      "completion_stages": [
+        "peace_chosen"
+      ],
+      "failure_stages": [
+        "escalated"
+      ],
       "stages": [
         {
           "stage_id": "conflict_brewing",
@@ -1164,8 +1647,14 @@
           "name": "Peace Preserved",
           "description": "You chose not to escalate.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": -10 },
-            { "type": "modify_mood", "delta": 5 }
+            {
+              "type": "modify_stress",
+              "delta": -10
+            },
+            {
+              "type": "modify_mood",
+              "delta": 5
+            }
           ]
         },
         {
@@ -1173,7 +1662,10 @@
           "name": "Conflict Grew",
           "description": "The tension escalated.",
           "on_enter_effects": [
-            { "type": "modify_stress", "delta": 12 }
+            {
+              "type": "modify_stress",
+              "delta": 12
+            }
           ]
         }
       ],
@@ -1182,19 +1674,34 @@
           "from_stage": "conflict_brewing",
           "to_stage": "peace_chosen",
           "conditions": [
-            { "type": "stress_threshold", "max": 60 },
-            { "type": "personal_tick_elapsed", "ticks": 35 }
+            {
+              "type": "stress_threshold",
+              "max": 60
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 35
+            }
           ]
         },
         {
           "from_stage": "conflict_brewing",
           "to_stage": "escalated",
-          "conditions": [{ "type": "stress_threshold", "min": 70 }]
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 70
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "triggers": [
-          { "type": "on_emotional_state", "state": "frustrated", "min_duration_ticks": 15 }
+          {
+            "type": "on_emotional_state",
+            "state": "frustrated",
+            "min_duration_ticks": 15
+          }
         ],
         "cooldown_ticks": 350
       }
@@ -1213,8 +1720,12 @@
         "repeatable": true
       },
       "entry_stage": "confused",
-      "completion_stages": ["clarity"],
-      "failure_stages": ["still_confused"],
+      "completion_stages": [
+        "clarity"
+      ],
+      "failure_stages": [
+        "still_confused"
+      ],
       "stages": [
         {
           "stage_id": "confused",
@@ -1226,8 +1737,16 @@
           "name": "Understanding Dawns",
           "description": "Suddenly, it all makes sense.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 15 },
-            { "type": "queue_dream_hint", "dream_type": "symbolic", "content_hint": "The pieces fall into place", "intensity": 0.5 }
+            {
+              "type": "modify_mood",
+              "delta": 15
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "symbolic",
+              "content_hint": "The pieces fall into place",
+              "intensity": 0.5
+            }
           ]
         },
         {
@@ -1240,17 +1759,722 @@
         {
           "from_stage": "confused",
           "to_stage": "clarity",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 60 }],
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 60
+            }
+          ],
           "probability": 0.4
         },
         {
           "from_stage": "confused",
           "to_stage": "still_confused",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 200 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 200
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "cooldown_ticks": 600
+      }
+    },
+    {
+      "id": "micro_remorse",
+      "name": "The Weight of Remorse",
+      "description": "Confronting guilt over past actions - Polti's Remorse",
+      "scale": "micro",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Regret and redemption",
+        "domain": "self",
+        "insight": "Remorse is the first step toward becoming better.",
+        "wisdom_value": 2,
+        "repeatable": true
+      },
+      "entry_stage": "guilt_awakens",
+      "completion_stages": [
+        "remorse_accepted"
+      ],
+      "failure_stages": [
+        "guilt_suppressed"
+      ],
+      "stages": [
+        {
+          "stage_id": "guilt_awakens",
+          "name": "Guilt Surfaces",
+          "description": "The weight of something you did wrong rises to consciousness.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -10
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "regret",
+              "severity": 0.4
+            }
+          ]
+        },
+        {
+          "stage_id": "remorse_accepted",
+          "name": "Remorse Embraced",
+          "description": "You accept your guilt and seek to make amends.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": -12
+            },
+            {
+              "type": "modify_mood",
+              "delta": 8
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The path to redemption begins with accepting what you have done",
+              "intensity": 0.6,
+              "emotional_tone": "melancholic"
+            }
+          ]
+        },
+        {
+          "stage_id": "guilt_suppressed",
+          "name": "Guilt Buried",
+          "description": "You push the guilt down, but it festers.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 10
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "self_deception",
+              "severity": 0.3
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "guilt_awakens",
+          "to_stage": "remorse_accepted",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 8
+            },
+            {
+              "type": "emotional_state",
+              "state": "melancholic",
+              "duration_ticks": 15
+            }
+          ]
+        },
+        {
+          "from_stage": "guilt_awakens",
+          "to_stage": "guilt_suppressed",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 120
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_trauma",
+            "trauma_type": "regret"
+          },
+          {
+            "type": "on_emotional_state",
+            "state": "melancholic",
+            "min_duration_ticks": 30
+          }
+        ],
+        "cooldown_ticks": 800
+      }
+    },
+    {
+      "id": "micro_sacrifice_for_passion",
+      "name": "Sacrifice for What Matters",
+      "description": "Giving up something for what you love - Polti's Sacrifice for Passion",
+      "scale": "micro",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Love requires sacrifice",
+        "domain": "relationships",
+        "insight": "True passion demands we surrender something of ourselves.",
+        "wisdom_value": 2,
+        "repeatable": true
+      },
+      "entry_stage": "choice_looms",
+      "completion_stages": [
+        "sacrifice_made"
+      ],
+      "failure_stages": [
+        "passion_abandoned"
+      ],
+      "stages": [
+        {
+          "stage_id": "choice_looms",
+          "name": "The Crossroads",
+          "description": "You must choose between something you want and something you love.",
+          "stage_attractors": [
+            {
+              "attractor_id": "draw_toward_passion",
+              "goal": {
+                "type": "emotional_state",
+                "parameters": {
+                  "emotion": "passionate"
+                }
+              },
+              "strength": 0.4,
+              "urgency": 0.6
+            }
+          ]
+        },
+        {
+          "stage_id": "sacrifice_made",
+          "name": "The Gift Given",
+          "description": "You sacrificed for what matters most to you.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 10
+            },
+            {
+              "type": "modify_mood_factor",
+              "factor": "social",
+              "delta": 12
+            },
+            {
+              "type": "modify_stress",
+              "delta": -8
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "The joy of choosing love over comfort",
+              "intensity": 0.5,
+              "emotional_tone": "triumphant"
+            }
+          ]
+        },
+        {
+          "stage_id": "passion_abandoned",
+          "name": "Safety Chosen",
+          "description": "You chose the safe path over what you love.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -8
+            },
+            {
+              "type": "modify_stress",
+              "delta": 6
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "regret",
+              "severity": 0.3
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "choice_looms",
+          "to_stage": "sacrifice_made",
+          "conditions": [
+            {
+              "type": "any_relationship",
+              "min_affinity": 40
+            },
+            {
+              "type": "mood_threshold",
+              "min": 10
+            }
+          ],
+          "probability": 0.6
+        },
+        {
+          "from_stage": "choice_looms",
+          "to_stage": "passion_abandoned",
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 60
+            }
+          ]
+        },
+        {
+          "from_stage": "choice_looms",
+          "to_stage": "passion_abandoned",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 150
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_relationship_formed",
+            "min_initial_trust": 20
+          }
+        ],
+        "cooldown_ticks": 700
+      }
+    },
+    {
+      "id": "micro_daring_enterprise",
+      "name": "Daring to Try",
+      "description": "Attempting something bold and risky - Polti's Daring Enterprise",
+      "scale": "micro",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Risk and reward",
+        "domain": "self",
+        "insight": "Great achievements require daring.",
+        "wisdom_value": 2,
+        "repeatable": true
+      },
+      "entry_stage": "opportunity_appears",
+      "completion_stages": [
+        "enterprise_succeeded",
+        "enterprise_failed"
+      ],
+      "failure_stages": [
+        "opportunity_missed"
+      ],
+      "stages": [
+        {
+          "stage_id": "opportunity_appears",
+          "name": "The Bold Path",
+          "description": "A risky opportunity presents itself. Will you dare?",
+          "stage_attractors": [
+            {
+              "attractor_id": "encourage_boldness",
+              "goal": {
+                "type": "emotional_state",
+                "parameters": {
+                  "emotion": "excited"
+                }
+              },
+              "strength": 0.5,
+              "urgency": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "enterprise_succeeded",
+          "name": "Bold Success",
+          "description": "Your daring paid off!",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 25
+            },
+            {
+              "type": "modify_stress",
+              "delta": -15
+            },
+            {
+              "type": "grant_skill_xp",
+              "skill": "any",
+              "xp": 10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see yourself achieving even greater things",
+              "intensity": 0.7,
+              "emotional_tone": "triumphant"
+            }
+          ]
+        },
+        {
+          "stage_id": "enterprise_failed",
+          "name": "Noble Failure",
+          "description": "You dared and failed, but learned from it.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -5
+            },
+            {
+              "type": "grant_skill_xp",
+              "skill": "any",
+              "xp": 5
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "Failure teaches what success cannot",
+              "intensity": 0.4,
+              "emotional_tone": "melancholic"
+            }
+          ]
+        },
+        {
+          "stage_id": "opportunity_missed",
+          "name": "Fear Won",
+          "description": "You let the opportunity pass.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 8
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "regret",
+              "severity": 0.2
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "opportunity_appears",
+          "to_stage": "enterprise_succeeded",
+          "conditions": [
+            {
+              "type": "mood_threshold",
+              "min": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 40
+            }
+          ],
+          "probability": 0.6
+        },
+        {
+          "from_stage": "opportunity_appears",
+          "to_stage": "enterprise_failed",
+          "conditions": [
+            {
+              "type": "mood_threshold",
+              "min": 0
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 40
+            }
+          ],
+          "probability": 0.4
+        },
+        {
+          "from_stage": "opportunity_appears",
+          "to_stage": "opportunity_missed",
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 70
+            }
+          ]
+        },
+        {
+          "from_stage": "opportunity_appears",
+          "to_stage": "opportunity_missed",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 180
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_skill_mastery",
+            "skill": "any",
+            "min_level": 3
+          }
+        ],
+        "cooldown_ticks": 600
+      }
+    },
+    {
+      "id": "micro_disaster",
+      "name": "When Disaster Strikes",
+      "description": "Responding to sudden misfortune - Polti's Disaster",
+      "scale": "micro",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Resilience in adversity",
+        "domain": "self",
+        "insight": "How we respond to disaster defines us.",
+        "wisdom_value": 2,
+        "repeatable": true
+      },
+      "entry_stage": "disaster_hits",
+      "completion_stages": [
+        "resilience_found"
+      ],
+      "failure_stages": [
+        "broken_by_disaster"
+      ],
+      "stages": [
+        {
+          "stage_id": "disaster_hits",
+          "name": "Sudden Catastrophe",
+          "description": "Something terrible has happened suddenly.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -20
+            },
+            {
+              "type": "modify_stress",
+              "delta": 20
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "loss",
+              "severity": 0.5
+            }
+          ]
+        },
+        {
+          "stage_id": "resilience_found",
+          "name": "Rising from Disaster",
+          "description": "You found strength to endure.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 12
+            },
+            {
+              "type": "modify_stress",
+              "delta": -10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see yourself weathering future storms",
+              "intensity": 0.6,
+              "emotional_tone": "hopeful"
+            }
+          ]
+        },
+        {
+          "stage_id": "broken_by_disaster",
+          "name": "Overwhelmed",
+          "description": "The disaster was too much to bear.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 15
+            },
+            {
+              "type": "set_emotional_state",
+              "state": "despairing",
+              "duration_ticks": 100
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "disaster_hits",
+          "to_stage": "resilience_found",
+          "conditions": [
+            {
+              "type": "any_relationship",
+              "min_trust": 30
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 60
+            }
+          ]
+        },
+        {
+          "from_stage": "disaster_hits",
+          "to_stage": "resilience_found",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 15
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 80
+            }
+          ]
+        },
+        {
+          "from_stage": "disaster_hits",
+          "to_stage": "broken_by_disaster",
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 80
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 50
+            }
+          ]
+        },
+        {
+          "from_stage": "disaster_hits",
+          "to_stage": "broken_by_disaster",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 200
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_trauma"
+          },
+          {
+            "type": "on_major_loss"
+          }
+        ],
+        "cooldown_ticks": 1000
+      }
+    },
+    {
+      "id": "micro_revolt",
+      "name": "Standing Against Authority",
+      "description": "Defying unjust expectations - Polti's Revolt",
+      "scale": "micro",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Justice and defiance",
+        "domain": "self",
+        "insight": "Sometimes obedience is the greater wrong.",
+        "wisdom_value": 2,
+        "repeatable": true
+      },
+      "entry_stage": "unjust_demand",
+      "completion_stages": [
+        "stood_firm"
+      ],
+      "failure_stages": [
+        "submitted"
+      ],
+      "stages": [
+        {
+          "stage_id": "unjust_demand",
+          "name": "Unfair Expectation",
+          "description": "Something unjust is demanded of you.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "stood_firm",
+          "name": "Defiance Chosen",
+          "description": "You refused to comply with injustice.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 15
+            },
+            {
+              "type": "modify_stress",
+              "delta": -8
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "symbolic",
+              "content_hint": "An unbroken chain transforming into wings",
+              "intensity": 0.5,
+              "emotional_tone": "triumphant"
+            }
+          ]
+        },
+        {
+          "stage_id": "submitted",
+          "name": "Compliance Given",
+          "description": "You submitted despite knowing it was wrong.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -10
+            },
+            {
+              "type": "modify_stress",
+              "delta": 8
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "self_deception",
+              "severity": 0.3
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "unjust_demand",
+          "to_stage": "stood_firm",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 12
+            },
+            {
+              "type": "stress_threshold",
+              "max": 60
+            }
+          ],
+          "probability": 0.5
+        },
+        {
+          "from_stage": "unjust_demand",
+          "to_stage": "submitted",
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 70
+            }
+          ]
+        },
+        {
+          "from_stage": "unjust_demand",
+          "to_stage": "submitted",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 100
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_stress_threshold",
+            "min": 50
+          },
+          {
+            "type": "on_emotional_state",
+            "state": "frustrated",
+            "min_duration_ticks": 25
+          }
+        ],
+        "cooldown_ticks": 650
       }
     }
   ],
@@ -1269,8 +2493,12 @@
         "repeatable": false
       },
       "entry_stage": "alone",
-      "completion_stages": ["friendship_formed"],
-      "failure_stages": ["still_alone"],
+      "completion_stages": [
+        "friendship_formed"
+      ],
+      "failure_stages": [
+        "still_alone"
+      ],
       "stages": [
         {
           "stage_id": "alone",
@@ -1279,7 +2507,10 @@
           "stage_attractors": [
             {
               "attractor_id": "seek_connection",
-              "goal": { "type": "relationship_formed", "parameters": {} },
+              "goal": {
+                "type": "relationship_formed",
+                "parameters": {}
+              },
               "strength": 0.4,
               "urgency": 0.3
             }
@@ -1290,7 +2521,12 @@
           "name": "Meeting Someone",
           "description": "You have met someone who might become a friend.",
           "on_enter_effects": [
-            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "A face keeps appearing in your thoughts", "intensity": 0.4 }
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "A face keeps appearing in your thoughts",
+              "intensity": 0.4
+            }
           ]
         },
         {
@@ -1300,7 +2536,10 @@
           "stage_attractors": [
             {
               "attractor_id": "deepen_bond",
-              "goal": { "type": "relationship_formed", "parameters": {} },
+              "goal": {
+                "type": "relationship_formed",
+                "parameters": {}
+              },
               "strength": 0.5,
               "urgency": 0.4
             }
@@ -1311,9 +2550,20 @@
           "name": "True Friends",
           "description": "You have found a real friend.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": 25 },
-            { "type": "modify_mood_factor", "factor": "social", "delta": 20 },
-            { "type": "prophetic_dream", "vision_content": "You see yourself and your new friend growing old together, sharing countless moments", "urgency": "medium" }
+            {
+              "type": "modify_mood",
+              "delta": 25
+            },
+            {
+              "type": "modify_mood_factor",
+              "factor": "social",
+              "delta": 20
+            },
+            {
+              "type": "prophetic_dream",
+              "vision_content": "You see yourself and your new friend growing old together, sharing countless moments",
+              "urgency": "medium"
+            }
           ]
         },
         {
@@ -1321,7 +2571,10 @@
           "name": "Connection Lost",
           "description": "The potential friendship did not develop.",
           "on_enter_effects": [
-            { "type": "modify_mood", "delta": -10 }
+            {
+              "type": "modify_mood",
+              "delta": -10
+            }
           ]
         }
       ],
@@ -1329,38 +2582,3603 @@
         {
           "from_stage": "alone",
           "to_stage": "acquaintance",
-          "conditions": [{ "type": "any_relationship", "min_trust": 10 }]
+          "conditions": [
+            {
+              "type": "any_relationship",
+              "min_trust": 10
+            }
+          ]
         },
         {
           "from_stage": "acquaintance",
           "to_stage": "growing_closer",
-          "conditions": [{ "type": "any_relationship", "min_trust": 25, "min_affinity": 15 }]
+          "conditions": [
+            {
+              "type": "any_relationship",
+              "min_trust": 25,
+              "min_affinity": 15
+            }
+          ]
         },
         {
           "from_stage": "growing_closer",
           "to_stage": "friendship_formed",
-          "conditions": [{ "type": "any_relationship", "min_trust": 50, "min_affinity": 30 }]
+          "conditions": [
+            {
+              "type": "any_relationship",
+              "min_trust": 50,
+              "min_affinity": 30
+            }
+          ]
         },
         {
           "from_stage": "acquaintance",
           "to_stage": "still_alone",
-          "conditions": [{ "type": "personal_tick_elapsed", "ticks": 5000 }]
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
         },
         {
           "from_stage": "growing_closer",
           "to_stage": "still_alone",
-          "conditions": [{ "type": "social_isolation", "min_ticks": 2000 }]
+          "conditions": [
+            {
+              "type": "social_isolation",
+              "min_ticks": 2000
+            }
+          ]
         }
       ],
       "assignment_rules": {
         "min_wisdom": 0,
         "triggers": [
-          { "type": "on_social_isolation", "min_ticks": 500 }
+          {
+            "type": "on_social_isolation",
+            "min_ticks": 500
+          }
         ],
         "max_concurrent": 1
       }
     }
   ],
   "medium_plot_templates": [],
-  "large_plot_templates": []
+  "large_plot_templates": [],
+  "exotic_plot_templates": [
+    {
+      "id": "large_conflict_with_god",
+      "name": "Divine Reckoning",
+      "description": "You have angered a deity. Whether through hubris, sacrilege, or simply existing in defiance of divine will, a god has marked you. Appeasement, defiance, or transcendence - choose your path carefully.",
+      "scale": "large",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Relationship with the divine",
+        "domain": "divinity",
+        "insight": "Gods are not all-powerful tyrants nor benevolent parents. They are beings with agendas, and you are part of their game.",
+        "wisdom_value": 20,
+        "repeatable": false
+      },
+      "entry_stage": "divine_notice",
+      "completion_stages": [
+        "divine_pact",
+        "god_slain",
+        "apotheosis"
+      ],
+      "failure_stages": [
+        "crushed_by_divine"
+      ],
+      "stages": [
+        {
+          "stage_id": "divine_notice",
+          "name": "The God's Gaze",
+          "description": "A deity has noticed you. Signs appear: impossible weather, prophetic dreams, miracles in your vicinity. You do not yet know if this is blessing or curse.",
+          "stage_attractors": [
+            {
+              "attractor_id": "divine_attention",
+              "goal": {
+                "type": "skill_threshold",
+                "parameters": {
+                  "skill": "theology",
+                  "min_level": 5
+                }
+              },
+              "strength": 0.5,
+              "urgency": 0.7,
+              "description": "Pressure to understand what deity wants"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see the god's face. It is terrible and beautiful. It speaks your name.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "divine_demand",
+          "name": "The Ultimatum",
+          "description": "The god speaks through oracle, priest, or directly into your mind: 'You have offended me. Make amends, or face my wrath.' The demand is clear. The cost is high. The choice is yours.",
+          "stage_attractors": [
+            {
+              "attractor_id": "divine_test",
+              "goal": {
+                "type": "choice_made",
+                "parameters": {
+                  "choice_id": "divine_response"
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.9,
+              "description": "Intense pressure to respond to divine ultimatum"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 30
+            }
+          ]
+        },
+        {
+          "stage_id": "path_appeasement",
+          "name": "The Supplicant's Path",
+          "description": "You choose to appease. Sacrifice is made. Rituals performed. Temples built. Devotion shown. The god's anger cools... but at what cost to your autonomy?",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You have traded freedom for safety. The god is pleased. Are you?",
+              "intensity": 0.6
+            }
+          ]
+        },
+        {
+          "stage_id": "path_defiance",
+          "name": "The Rebel's Path",
+          "description": "You choose defiance. 'I will not bow to you.' The god's wrath manifests: curses, disasters, divine servants sent to punish. But you stand firm. This is war.",
+          "stage_attractors": [
+            {
+              "attractor_id": "divine_combat",
+              "goal": {
+                "type": "skill_threshold",
+                "parameters": {
+                  "skill": "combat",
+                  "min_level": 8
+                }
+              },
+              "strength": 0.9,
+              "urgency": 1,
+              "description": "Survival pressure against divine wrath"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            },
+            {
+              "type": "modify_mood",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "path_transcendence",
+          "name": "The Ascendant's Path",
+          "description": "You choose neither appeasement nor defiance. Instead: understanding. 'You are not above me. You are what I will become.' You seek to achieve godhood yourself. Dangerous. Ambitious. Perhaps possible.",
+          "stage_attractors": [
+            {
+              "attractor_id": "divine_essence",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 35
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.6,
+              "description": "Long-term path toward apotheosis"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "divine_pact",
+          "name": "The Covenant",
+          "description": "Appeasement succeeds. The god accepts your offering and binds you in covenant. You are now divine champion - blessed with miracles, burdened with duty. The god's agenda is now yours.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "divine_servitude"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 12
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The god grants you power. In return, you are its instrument in the mortal world.",
+              "intensity": 0.75
+            }
+          ]
+        },
+        {
+          "stage_id": "god_slain",
+          "name": "Deicide",
+          "description": "Through cunning, power, or cosmic loophole, you have done the impossible: killed a god. Its essence disperses into the cosmos. Other deities watch with fear and rage. You are now god-slayer. What have you become?",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "deicide"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_stress",
+              "delta": 50
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The god's dying scream echoes across dimensions. Every deity in existence now knows your name.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "apotheosis",
+          "name": "Spark of Divinity",
+          "description": "You did not appease. You did not kill. You *understood*. Through trial, sacrifice, and transcendence, you have achieved what few mortals dare dream: the spark of divinity ignites within you. You are becoming god.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "apotheosis_begun"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The god that once threatened you now regards you as peer. 'Welcome,' it says, 'to the burden of omniscience and the loneliness of eternity.'",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "crushed_by_divine",
+          "name": "Divine Wrath",
+          "description": "You defied the god and lost. Crushed. Broken. The deity's power is absolute. You survive, but only as warning to others. This is what happens to those who challenge the divine.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 60
+            },
+            {
+              "type": "modify_mood",
+              "delta": -40
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "divine_punishment"
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "divine_notice",
+          "to_stage": "divine_demand",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "divine_demand",
+          "to_stage": "path_appeasement",
+          "conditions": [
+            {
+              "type": "choice_made",
+              "choice_id": "appease_god"
+            }
+          ]
+        },
+        {
+          "from_stage": "divine_demand",
+          "to_stage": "path_defiance",
+          "conditions": [
+            {
+              "type": "choice_made",
+              "choice_id": "defy_god"
+            }
+          ]
+        },
+        {
+          "from_stage": "divine_demand",
+          "to_stage": "path_transcendence",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 30
+            },
+            {
+              "type": "choice_made",
+              "choice_id": "transcend_god"
+            }
+          ]
+        },
+        {
+          "from_stage": "path_appeasement",
+          "to_stage": "divine_pact",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            },
+            {
+              "type": "has_item",
+              "item_id": "divine_offering"
+            }
+          ]
+        },
+        {
+          "from_stage": "path_defiance",
+          "to_stage": "god_slain",
+          "conditions": [
+            {
+              "type": "has_skill",
+              "skill": "combat",
+              "min_level": 10
+            },
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 25
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 8000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_defiance",
+          "to_stage": "crushed_by_divine",
+          "conditions": [
+            {
+              "type": "has_skill",
+              "skill": "combat",
+              "max_level": 7
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_transcendence",
+          "to_stage": "apotheosis",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 40
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 15000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "min_wisdom": 20,
+        "cooldown_ticks": 50000
+      }
+    },
+    {
+      "id": "medium_prophecy_trap",
+      "name": "The Prophecy You Cannot Escape",
+      "description": "An oracle speaks: your future is fixed. Doom approaches. You will try to prevent it. You will fail. Or will you? The harder you struggle against fate, the more you ensure it. This is the prophecy trap.",
+      "scale": "medium",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Fate vs free will",
+        "domain": "time",
+        "insight": "Prophecies are self-fulfilling not because fate is fixed, but because knowledge of the future constrains choice.",
+        "wisdom_value": 15,
+        "repeatable": false
+      },
+      "entry_stage": "prophecy_revealed",
+      "completion_stages": [
+        "prophecy_fulfilled",
+        "prophecy_subverted"
+      ],
+      "failure_stages": [
+        "prophecy_consumed"
+      ],
+      "stages": [
+        {
+          "stage_id": "prophecy_revealed",
+          "name": "The Oracle Speaks",
+          "description": "You receive the prophecy. It is specific. It is terrible. 'In three seasons, the one you love most will die by your hand.' Or 'You will betray your people to save them.' Or 'Your greatest victory will become your greatest regret.' The future is shown. Can it be changed?",
+          "stage_attractors": [
+            {
+              "attractor_id": "fate_acceptance",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 20
+                }
+              },
+              "strength": 0.4,
+              "urgency": 0.6,
+              "description": "Gentle pressure toward accepting what cannot be changed"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 35
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The vision replays: you see exactly how it will happen. Every detail burned into memory.",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "desperate_prevention",
+          "name": "Fighting Fate",
+          "description": "You will NOT let this happen. Every action taken to prevent the prophecy. Every precaution. Every sacrifice. You are in control of your destiny. The future is not written. Is it?",
+          "stage_attractors": [
+            {
+              "attractor_id": "prophecy_fulfillment",
+              "goal": {
+                "type": "event_occurrence",
+                "parameters": {
+                  "event_id": "prophesied_event"
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.9,
+              "description": "Ironic pressure - attempts to prevent actually cause fulfillment"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "ironic_causation",
+          "name": "The Trap Springs",
+          "description": "Your very attempts to prevent the prophecy are causing it. You sent away the one you love to protect them - they die on the journey. You tried to save your people - the method required betrayal. You worked toward victory - it will indeed become regret. The prophecy is fulfilling itself THROUGH your prevention.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You see the pattern. Every move to escape tightens the noose. The prophecy was never about the future - it was about your reaction to knowing.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "moment_of_choice",
+          "name": "The Crucial Decision",
+          "description": "You stand at the precipice. The prophesied moment approaches. You now understand: you WILL fulfill it if you try to prevent it. So what do you do? Accept? Defy anyway? Find the third option?",
+          "stage_attractors": [
+            {
+              "attractor_id": "wisdom_path",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 25
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.95,
+              "description": "Pressure to find wisdom in acceptance vs defiance"
+            }
+          ]
+        },
+        {
+          "stage_id": "prophecy_fulfilled",
+          "name": "Fate Accepted",
+          "description": "You accept the prophecy. It happens exactly as foretold. The one you love dies. You betray your people. Victory becomes regret. But... because you accepted rather than fought, the aftermath is different than if you'd struggled. There is grief, but also understanding. The prophecy was true. Your reaction was yours.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_stress",
+              "delta": 30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "The oracle appears: 'You learned. Some prophecies exist not to be fought, but to teach how we respond to the inevitable.'",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "prophecy_subverted",
+          "name": "The Third Path",
+          "description": "You found it. The option the prophecy didn't account for. Not acceptance, not defiance, but *reinterpretation*. 'By your hand' - yes, but in mercy, not malice. 'Betray' - yes, but betray their assumptions to serve their truth. 'Regret' - yes, but regret born of compassion, not error. The prophecy is fulfilled in letter but subverted in spirit.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "prophecy_wisdom"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The oracle smiles: 'Few find the third path. The prophecy was true. Your interpretation was yours. This is freedom within fate.'",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "prophecy_consumed",
+          "name": "Obsessed with Fate",
+          "description": "You cannot let it go. Every waking moment spent trying to prevent the inevitable. Relationships destroyed in pursuit of prevention. Sanity fraying. The prophecy hasn't happened yet, but it has already won - you are consumed by it.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 70
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": -5
+            },
+            {
+              "type": "in_breakdown",
+              "breakdown_type": "obsession"
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "prophecy_revealed",
+          "to_stage": "desperate_prevention",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 22
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 500
+            }
+          ]
+        },
+        {
+          "from_stage": "prophecy_revealed",
+          "to_stage": "moment_of_choice",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 23
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "desperate_prevention",
+          "to_stage": "ironic_causation",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "desperate_prevention",
+          "to_stage": "prophecy_consumed",
+          "conditions": [
+            {
+              "type": "stress_threshold",
+              "min": 80
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "ironic_causation",
+          "to_stage": "moment_of_choice",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 18
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "moment_of_choice",
+          "to_stage": "prophecy_fulfilled",
+          "conditions": [
+            {
+              "type": "emotional_state",
+              "state": "content"
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 500
+            }
+          ]
+        },
+        {
+          "from_stage": "moment_of_choice",
+          "to_stage": "prophecy_subverted",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 28
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 30000
+      }
+    },
+    {
+      "id": "large_multiverse_invasion",
+      "name": "From Beyond the Veil",
+      "description": "A background universe you didn't know existed has discovered your world. Their tech level surpasses yours. Their culture is alien. Their faction AI has decided: invasion. You are RimWorld now - under siege from the stars/timelines/dimensions.",
+      "scale": "large",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Contact with advanced post-temporal civilizations",
+        "domain": "multiverse",
+        "insight": "You are not alone in the cosmos. And those who found you first may not come in peace.",
+        "wisdom_value": 18,
+        "repeatable": true
+      },
+      "entry_stage": "first_contact",
+      "completion_stages": [
+        "invasion_repelled",
+        "alliance_formed",
+        "civilization_absorbed"
+      ],
+      "failure_stages": [
+        "extinction"
+      ],
+      "stages": [
+        {
+          "stage_id": "first_contact",
+          "name": "The Signal",
+          "description": "Strange readings. Anomalies in β-space. Then: contact. A message from beings you didn't know existed. They are post-temporal. They can see you. They have been watching. And now they're coming.",
+          "stage_attractors": [
+            {
+              "attractor_id": "preparation",
+              "goal": {
+                "type": "tech_threshold",
+                "parameters": {
+                  "min_level": 8
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.9,
+              "description": "Urgent pressure to advance technology before invasion"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 45
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You see their ships/timelines/dimensional breaches. They are vast. You are so very small.",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "invasion_begins",
+          "name": "Arrival",
+          "description": "They arrive. Military invasion, cultural assimilation, economic dominance, dimensional breach, temporal attack, viral transformation, or swarm deployment - the invasion type depends on their culture. Your world is under siege.",
+          "stage_attractors": [
+            {
+              "attractor_id": "survival",
+              "goal": {
+                "type": "civilization_survival",
+                "parameters": {
+                  "min_population": 100
+                }
+              },
+              "strength": 0.9,
+              "urgency": 1,
+              "description": "Desperate pressure to survive invasion"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 60
+            }
+          ]
+        },
+        {
+          "stage_id": "resistance_organized",
+          "name": "We Will Not Go Quietly",
+          "description": "Resistance forms. Guerrilla tactics. Hidden bases. Tech stolen from invaders. Messages sent to potential allies. Hope kindles in the darkness. You will not be conquered without a fight.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 15
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "Every occupied people in history faced this choice: submit or resist. You resist.",
+              "intensity": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "diplomacy_attempted",
+          "name": "Seeking Terms",
+          "description": "Perhaps invasion can be avoided. Perhaps terms can be negotiated. Cultural exchange, tribute, technology sharing, mutual defense pact - there must be something they want besides conquest.",
+          "stage_attractors": [
+            {
+              "attractor_id": "diplomatic_solution",
+              "goal": {
+                "type": "relationship_formed",
+                "parameters": {
+                  "faction": "invaders",
+                  "min_trust": 40
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.7,
+              "description": "Pressure toward finding diplomatic resolution"
+            }
+          ]
+        },
+        {
+          "stage_id": "tech_leap",
+          "name": "Desperate Innovation",
+          "description": "War accelerates technology. Reverse-engineered invader tech. Breakthroughs born of necessity. Forbidden research unleashed. Your civilization leaps forward - but at what cost?",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "invasion_repelled",
+          "name": "Victory Through Blood",
+          "description": "You did it. Through sacrifice, innovation, and sheer will, the invasion is repelled. The invaders retreat. Your world survives. But changed. Forever aware: we are not alone, and they will return.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "multiverse_warfare"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_mood",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The invaders withdraw. But you saw their reinforcements in β-space. This was a probe. The real fleet is coming.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "alliance_formed",
+          "name": "From Enemies to Allies",
+          "description": "Diplomacy succeeds. What began as invasion becomes first contact. Cultural exchange. Technology sharing. Mutual defense. The invaders become allies. Two civilizations, stronger together than apart.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "multiverse_diplomacy"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see the future: joint colonies in β-space, cultural fusion, children of both worlds. What could have been war became cooperation.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "civilization_absorbed",
+          "name": "Assimilation",
+          "description": "You could not resist. You could not negotiate as equals. Your civilization is absorbed into theirs. Not destroyed - transformed. Your culture persists as minority within their empire. Is this survival or extinction?",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 8
+            },
+            {
+              "type": "modify_mood",
+              "delta": -25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "Your children will speak their language. Your grandchildren may forget yours. Cultural death is slower than physical death, but no less final.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "extinction",
+          "name": "The Silence",
+          "description": "Your world is empty. Population: zero. The invaders were not interested in negotiation or assimilation. They wanted the planet, not the people. This is extinction. Let future archaeologists puzzle over your ruins.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 100
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The last transmission: '...anyone receiving this... we are the last... they are here... tell the stars we existed...'",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "first_contact",
+          "to_stage": "invasion_begins",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "invasion_begins",
+          "to_stage": "resistance_organized",
+          "conditions": [
+            {
+              "type": "has_skill",
+              "skill": "combat",
+              "min_level": 5
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "invasion_begins",
+          "to_stage": "diplomacy_attempted",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "resistance_organized",
+          "to_stage": "tech_leap",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "tech_leap",
+          "to_stage": "invasion_repelled",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_level": 9
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "tech_leap",
+          "to_stage": "extinction",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_level": 7
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 8000
+            }
+          ]
+        },
+        {
+          "from_stage": "diplomacy_attempted",
+          "to_stage": "alliance_formed",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 28
+            },
+            {
+              "type": "any_relationship",
+              "min_trust": 50
+            }
+          ]
+        },
+        {
+          "from_stage": "diplomacy_attempted",
+          "to_stage": "civilization_absorbed",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 25
+            },
+            {
+              "type": "wisdom_threshold",
+              "max_level": 8
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 6000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 100000
+      }
+    },
+    {
+      "id": "medium_paradigm_war",
+      "name": "When Magics Collide",
+      "description": "Two incompatible magic paradigms meet. Enochian vs Chaos. Druidic vs Technomantic. Shinto vs Necromantic. When realities that shouldn't coexist try to occupy the same space, something has to give. Reality itself is the battlefield.",
+      "scale": "medium",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Incompatible realities and paradigm conflicts",
+        "domain": "magic",
+        "insight": "Magic is not just power - it is a framework for how reality operates. When frameworks clash, reality breaks.",
+        "wisdom_value": 12,
+        "repeatable": true
+      },
+      "entry_stage": "paradigms_meet",
+      "completion_stages": [
+        "synthesis_achieved",
+        "one_paradigm_dominates"
+      ],
+      "failure_stages": [
+        "reality_shattered"
+      ],
+      "stages": [
+        {
+          "stage_id": "paradigms_meet",
+          "name": "The Collision",
+          "description": "Two mages. Two paradigms. Same location. Enochian order meets Chaos magic. Druidic naturalism meets Technomancy. Reality doesn't know which rules to follow. Space warps. Time stutters. The air crackles with conflicting possibilities.",
+          "stage_attractors": [
+            {
+              "attractor_id": "paradigm_stability",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 15
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.8,
+              "description": "Pressure to resolve paradigm conflict"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "symbolic",
+              "content_hint": "You see two gods arguing over the same clay. Each molds it differently. The clay screams.",
+              "intensity": 0.75
+            }
+          ]
+        },
+        {
+          "stage_id": "reality_strain",
+          "name": "The Unraveling",
+          "description": "Reality bends under the strain of hosting contradictory truths. Zones where magic works backwards. Areas where both paradigms apply simultaneously (impossible). Pockets where neither works (void). The longer this continues, the worse it gets.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "Reality is not meant to hold contradictions. Something will break. Someone must yield.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "paradigm_combat",
+          "name": "War of Realities",
+          "description": "If neither mage yields, combat ensues. Not a battle of spells, but of fundamental assumptions about existence. Each trying to impose their reality over the other's. The winner's paradigm dominates. The loser's worldview... ceases to be true.",
+          "stage_attractors": [
+            {
+              "attractor_id": "paradigm_victory",
+              "goal": {
+                "type": "skill_threshold",
+                "parameters": {
+                  "skill": "magic",
+                  "min_level": 8
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.9,
+              "description": "Combat pressure in paradigm war"
+            }
+          ]
+        },
+        {
+          "stage_id": "seeking_synthesis",
+          "name": "The Third Way",
+          "description": "What if both paradigms are true? What if reality is large enough to contain contradictions? You seek synthesis - a meta-paradigm that encompasses both. Dangerous. Unstable. Perhaps brilliant.",
+          "stage_attractors": [
+            {
+              "attractor_id": "meta_paradigm",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 22
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.6,
+              "description": "Long-term path toward paradigm synthesis"
+            }
+          ]
+        },
+        {
+          "stage_id": "synthesis_achieved",
+          "name": "Unity in Contradiction",
+          "description": "You did it. Found the meta-framework. Enochian order AND Chaos magic both true within larger context. Druidic naturalism AND Technomancy reconciled. Reality expands to contain both. This is how new paradigms are born.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "paradigm_synthesis"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see a new symbol: two opposing forces in eternal balance. This is your paradigm now.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "one_paradigm_dominates",
+          "name": "Victor's Reality",
+          "description": "One paradigm wins. One mage's worldview becomes truth. The other's... stops being true. Not metaphorically. Literally. Their magic no longer works. Their fundamental assumptions about reality invalidated. This is what paradigm war means.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You watch the defeated mage's paradigm dissolve. They look at their hands. 'But it worked yesterday...' they whisper.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "reality_shattered",
+          "name": "The Breaking",
+          "description": "Neither paradigm yields. Neither achieves synthesis. Reality, unable to contain contradiction, breaks. A zone of unreality forms - where nothing is true because everything is. Magic doesn't work. Physics doesn't work. Causality is optional. This is what happens when reality fails.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 70
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "reality_dissolution"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The shattered zone spreads. Soon there will be more unreality than reality. You have wounded existence itself.",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "paradigms_meet",
+          "to_stage": "reality_strain",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 500
+            }
+          ]
+        },
+        {
+          "from_stage": "reality_strain",
+          "to_stage": "paradigm_combat",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 18
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "reality_strain",
+          "to_stage": "seeking_synthesis",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 19
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "paradigm_combat",
+          "to_stage": "one_paradigm_dominates",
+          "conditions": [
+            {
+              "type": "has_skill",
+              "skill": "magic",
+              "min_level": 8
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "paradigm_combat",
+          "to_stage": "reality_shattered",
+          "conditions": [
+            {
+              "type": "has_skill",
+              "skill": "magic",
+              "max_level": 7
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "seeking_synthesis",
+          "to_stage": "synthesis_achieved",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 25
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "seeking_synthesis",
+          "to_stage": "reality_shattered",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 6000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 20000
+      }
+    },
+    {
+      "id": "large_tyrants_fall",
+      "name": "The Tyrant You Became",
+      "description": "You rose to power to save your people. Village leader. City governor. Provincial lord. Emperor. Each step justified. Each sacrifice necessary. And now you look in the mirror and see... tyrant. How did this happen? Can it be undone?",
+      "scale": "large",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Corruption of power across political scales",
+        "domain": "governance",
+        "insight": "The road to tyranny is paved with necessary evils. Each small compromise builds the next. Until you are what you fought against.",
+        "wisdom_value": 18,
+        "repeatable": false
+      },
+      "entry_stage": "power_seized",
+      "completion_stages": [
+        "voluntary_abdication",
+        "tyrant_overthrown",
+        "enlightened_rule"
+      ],
+      "failure_stages": [
+        "died_as_monster"
+      ],
+      "stages": [
+        {
+          "stage_id": "power_seized",
+          "name": "For the Greater Good",
+          "description": "You take control. Not for yourself - for them. The village needs strong leadership. The city needs order. The province needs unity. It's temporary. You'll return power once the crisis passes. You will. Won't you?",
+          "stage_attractors": [
+            {
+              "attractor_id": "consolidation",
+              "goal": {
+                "type": "political_control",
+                "parameters": {
+                  "tier": "city"
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.7,
+              "description": "Pressure to expand control 'for stability'"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You remember the tyrants in history. 'I am different,' you tell yourself. They all said that too.",
+              "intensity": 0.6
+            }
+          ]
+        },
+        {
+          "stage_id": "first_atrocity",
+          "name": "The Necessary Evil",
+          "description": "Dissidents threaten stability. You could negotiate, persuade, compromise... or you could make an example. Just this once. They'll learn. Order will be preserved. It's regrettable but necessary. This is leadership.",
+          "stage_attractors": [
+            {
+              "attractor_id": "moral_erosion",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "max_wisdom": 20
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.8,
+              "description": "Pressure toward expedient solutions over ethical ones"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 35
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": -5
+            }
+          ]
+        },
+        {
+          "stage_id": "escalating_brutality",
+          "name": "The Slippery Slope",
+          "description": "Each atrocity makes the next easier. You told yourself 'just this once' but now it's policy. Secret police. Disappeared dissidents. Show trials. When did you stop being leader and become oppressor?",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -8
+            },
+            {
+              "type": "modify_stress",
+              "delta": 40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You dream of the person you were before power. They look at what you've become. They weep.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "moment_of_clarity",
+          "name": "The Mirror",
+          "description": "Something breaks through the rationalizations. A child's innocent question. An old friend's horrified look. Your own reflection. You see clearly: you have become the tyrant you swore to prevent. Can you still change course?",
+          "stage_attractors": [
+            {
+              "attractor_id": "redemption_path",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 18
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.9,
+              "description": "Crucial moment - can still choose redemption"
+            }
+          ]
+        },
+        {
+          "stage_id": "voluntary_abdication",
+          "name": "The Hardest Choice",
+          "description": "You step down. Give up power willingly. Face justice for your crimes. This is the hardest thing you've ever done - harder than seizing power, harder than ruling. But it is right. You are no longer tyrant. You are human again.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "power_corruption_resisted"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 25
+            },
+            {
+              "type": "modify_stress",
+              "delta": -30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You dream of the future: your name remembered not as tyrant, but as the one who chose to stop. That is rarer than you know.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "tyrant_overthrown",
+          "name": "Revolution's Justice",
+          "description": "The people rise. Your regime falls. You are dragged before the crowd - the same people you claimed to serve. Swift trial. Swifter execution. Or perhaps imprisonment. You die/live knowing: you became what you fought. History will not be kind.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 80
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "In your last moments, you understand: every tyrant thinks they're the exception. None are.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "enlightened_rule",
+          "name": "Wisdom in Power",
+          "description": "You hold power. You see the temptations clearly. And you resist. Every day choosing justice over expediency. Transparency over secrecy. Service over dominance. This is enlightened rule - power wielded with wisdom. Rare. Precious. Fragile.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "enlightened_governance"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see generations after: leaders study your reign, trying to replicate it. Most fail. But some succeed. Your legacy is hope.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "died_as_monster",
+          "name": "The Tyrant's End",
+          "description": "You never stopped. You never saw. Or you saw and didn't care. You died in power, convinced to the end that everything you did was necessary. History remembers you as monster. Your name becomes synonym for tyranny. This is your legacy.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -15
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "Children centuries from now will learn your name as cautionary tale. 'Don't be like them,' teachers will say.",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "power_seized",
+          "to_stage": "first_atrocity",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 22
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "power_seized",
+          "to_stage": "enlightened_rule",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 25
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "first_atrocity",
+          "to_stage": "escalating_brutality",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 18
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "first_atrocity",
+          "to_stage": "moment_of_clarity",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 16
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "escalating_brutality",
+          "to_stage": "moment_of_clarity",
+          "conditions": [
+            {
+              "type": "emotional_state",
+              "state": "despairing"
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "escalating_brutality",
+          "to_stage": "tyrant_overthrown",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 12
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 8000
+            }
+          ]
+        },
+        {
+          "from_stage": "escalating_brutality",
+          "to_stage": "died_as_monster",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 10
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 15000
+            }
+          ]
+        },
+        {
+          "from_stage": "moment_of_clarity",
+          "to_stage": "voluntary_abdication",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 20
+            },
+            {
+              "type": "emotional_state",
+              "state": "content"
+            }
+          ]
+        },
+        {
+          "from_stage": "moment_of_clarity",
+          "to_stage": "enlightened_rule",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 24
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 80000
+      }
+    },
+    {
+      "id": "medium_dimensional_horror",
+      "name": "What Dwells Between",
+      "description": "You glimpsed something in β-space that should not be glimpsed. An entity. Not post-temporal civilization. Not god. Something... else. Incomprehensible. Indifferent. And now it knows you exist.",
+      "scale": "medium",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Cosmic horror and limitations of comprehension",
+        "domain": "multiverse",
+        "insight": "There are things in the multiverse that cannot be understood, only survived. Or not.",
+        "wisdom_value": 15,
+        "repeatable": false
+      },
+      "entry_stage": "the_glimpse",
+      "completion_stages": [
+        "understanding_madness",
+        "sealed_away"
+      ],
+      "failure_stages": [
+        "consumed_by_void",
+        "became_herald"
+      ],
+      "stages": [
+        {
+          "stage_id": "the_glimpse",
+          "name": "What Cannot Be Unseen",
+          "description": "During β-space navigation, you saw it. Not a civilization. Not a structure. Something that exists in dimensions you cannot perceive. Your mind tries to process. Fails. You scream. It does not notice. Yet.",
+          "stage_attractors": [
+            {
+              "attractor_id": "comprehension_attempt",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 30
+                }
+              },
+              "strength": 0.5,
+              "urgency": 0.7,
+              "description": "Desperate pressure to understand what you saw"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 50
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "existential_horror"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You dream of angles that don't exist, colors you've never seen, sounds that bypass ears and carve directly into cortex.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "the_noticing",
+          "name": "It Becomes Aware",
+          "description": "Something shifts. The entity, if it can be called that, notices you. Not threat. Not food. Not anything comprehensible. Just... noticed. Like an ant noticed by passing human. But the human is geometry. And alive. And hungry for things that aren't food.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 45
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You feel its attention. Not malicious. Not curious. Just there. This is worse than hatred. Hatred you could understand.",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "reality_degradation",
+          "name": "The Unraveling Begins",
+          "description": "Where the entity's attention touches, reality degrades. Physics becomes optional. Causality suggests rather than commands. Your thoughts leak out as visible symbols. Time runs sideways. This is what happens when dimensions intersect that should not.",
+          "stage_attractors": [
+            {
+              "attractor_id": "sanity_preservation",
+              "goal": {
+                "type": "stress_threshold",
+                "parameters": {
+                  "max": 70
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.95,
+              "description": "Desperate pressure to maintain coherent mind"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            }
+          ]
+        },
+        {
+          "stage_id": "seeking_seal",
+          "name": "Desperate Containment",
+          "description": "You seek ancient knowledge. Sealing rituals. Dimensional wards. Ways to sever the entity's connection to your reality. Other civilizations have faced this before. Some survived. Most did not. You gather their warnings carved in substrate of spacetime itself.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 8
+            }
+          ]
+        },
+        {
+          "stage_id": "understanding_madness",
+          "name": "The Terrible Clarity",
+          "description": "You understand it now. Not fully - full understanding would dissolve your mind - but enough. It is not malicious because malice implies intention. It is not alive because life is too small a concept. It simply *is*, across dimensions you cannot perceive. And you... you have adapted. Partially. Enough to coexist. You are not sane. But you are functional. And you remember.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "cosmic_horror_survived"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "modify_stress",
+              "delta": -20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see others who glimpsed entities. Some went mad. Some died. Some, like you, achieved terrible clarity. You are not alone. You wish you were.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "sealed_away",
+          "name": "The Barrier Holds",
+          "description": "The sealing works. Dimensional wards erected. The entity's attention diverted. Reality stabilizes. You survived. But you know: the seal is temporary. It will notice again eventually. All you did was buy time. Use it wisely.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "dimensional_sealing"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_stress",
+              "delta": -30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The seal glows with symbols of warding. How long will it last? Centuries? Millennia? Not forever. Nothing is forever when eternity notices.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "consumed_by_void",
+          "name": "Dissolution",
+          "description": "You could not seal it. Could not understand it. Could not adapt. The entity's attention intensifies. Reality around you fails. You feel yourself coming apart - not dying, but ceasing to be coherent across dimensions. Your scream exists in frequencies that bypass sound.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 100
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "Your last thought: I should not have looked. I should not have seen. Some knowledge is not meant for minds like mine.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "became_herald",
+          "name": "The Herald",
+          "description": "You did not resist. You did not seal. You *accepted*. Became conduit. Herald. The entity uses you as lens to perceive this reality more clearly. You are honored. You are transformed. You are no longer quite yourself. But you serve something vast. This is meaning. This is purpose. This is madness dressed as enlightenment.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -10
+            },
+            {
+              "type": "modify_stress",
+              "delta": -40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see through its perception now. Reality is so small. So quaint. Soon others will see. Soon all will understand. You will help them. Whether they want to or not.",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "the_glimpse",
+          "to_stage": "the_noticing",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "the_noticing",
+          "to_stage": "reality_degradation",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1500
+            }
+          ]
+        },
+        {
+          "from_stage": "reality_degradation",
+          "to_stage": "seeking_seal",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 18
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "reality_degradation",
+          "to_stage": "became_herald",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 15
+            },
+            {
+              "type": "stress_threshold",
+              "min": 85
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "seeking_seal",
+          "to_stage": "sealed_away",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 22
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "seeking_seal",
+          "to_stage": "understanding_madness",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 28
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 8000
+            }
+          ]
+        },
+        {
+          "from_stage": "seeking_seal",
+          "to_stage": "consumed_by_void",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 20
+            },
+            {
+              "type": "stress_threshold",
+              "min": 90
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 6000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 100000
+      }
+    },
+    {
+      "id": "medium_time_paradox",
+      "name": "The Price of Changing Yesterday",
+      "description": "You have timeline editing capability. You changed the past. It worked. But causality has limits. The paradox builds. Timelines fork. Memories conflict. You exist in multiple incompatible histories simultaneously. Reality is rejecting the change. Something has to give.",
+      "scale": "medium",
+      "fork_behavior": "branch",
+      "lesson": {
+        "theme": "Causality and consequences of time manipulation",
+        "domain": "time",
+        "insight": "Time can be edited, but not without cost. Every change creates echoes. Every paradox demands resolution.",
+        "wisdom_value": 14,
+        "repeatable": true
+      },
+      "entry_stage": "change_made",
+      "completion_stages": [
+        "paradox_resolved",
+        "timeline_split_accepted"
+      ],
+      "failure_stages": [
+        "causality_collapse"
+      ],
+      "stages": [
+        {
+          "stage_id": "change_made",
+          "name": "Rewriting Yesterday",
+          "description": "You did it. Changed the past. Saved them. Prevented disaster. Fixed mistake. The timeline ripples. Reality adjusts. Everything is better now. Isn't it?",
+          "stage_attractors": [
+            {
+              "attractor_id": "causality_coherence",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 20
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.7,
+              "description": "Pressure to understand causality implications"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You remember both timelines: the one where they died, and the one where they lived. Which is real? Both? Neither?",
+              "intensity": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "first_discrepancy",
+          "name": "Something's Wrong",
+          "description": "Memories don't match. You remember events that others don't. They remember things you're certain never happened. Objects exist that shouldn't. People you saved don't recognize the danger they were never in. The timeline is... unstable.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You exist in superposition: quantum observer of your own paradox. This cannot persist.",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "paradox_cascade",
+          "name": "The Unraveling",
+          "description": "The change you made had consequences. Those consequences had consequences. The cascade builds. Timelines fork uncontrollably. You remember contradictory histories. Reality flickers between versions. Causality itself is straining.",
+          "stage_attractors": [
+            {
+              "attractor_id": "timeline_stabilization",
+              "goal": {
+                "type": "choice_made",
+                "parameters": {
+                  "choice_id": "resolve_paradox"
+                }
+              },
+              "strength": 0.9,
+              "urgency": 1,
+              "description": "Urgent pressure to resolve before collapse"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            }
+          ]
+        },
+        {
+          "stage_id": "choosing_timeline",
+          "name": "Which History is Real?",
+          "description": "You must choose. Commit to one timeline, erase the other. The version where you saved them. Or the original. Both exist. Both are real. But causality can only support one. Choose. The other will be as if it never was.",
+          "stage_attractors": [
+            {
+              "attractor_id": "hard_choice",
+              "goal": {
+                "type": "emotional_state",
+                "parameters": {
+                  "state": "despairing"
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.9,
+              "description": "Agonizing pressure of impossible choice"
+            }
+          ]
+        },
+        {
+          "stage_id": "paradox_resolved",
+          "name": "One Timeline Chosen",
+          "description": "You choose. One timeline becomes real. The other... never was. Except in your memory. You alone remember both. The paradox resolves. Causality stabilizes. But you carry the weight: you erased a timeline. All the people in it, all the events, all the possibilities. Gone. Because you chose.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "paradox_resolution"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_stress",
+              "delta": -20
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "timeline_erasure"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You remember the timeline you erased. It was real. It had people who lived and loved and mattered. And you unmade it. This is the price of time travel.",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "timeline_split_accepted",
+          "name": "Multiverse Branching",
+          "description": "You refuse to choose. Let both timelines exist. Let causality fork. This creates new universe branch - your change becomes alternate timeline running parallel. Both are real. No paradox, only branching. But you exist in one. The other continues without you.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "multiverse_branching"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 18
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see the other timeline continuing. Different you. Different choices. Both real. This is how multiverse grows: every time travel creates new branch.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "causality_collapse",
+          "name": "Paradox Unresolved",
+          "description": "You cannot choose. Cannot commit. Cannot accept branching. The paradox persists. Grows. Causality, unable to resolve contradiction, breaks locally. A bubble of causality failure forms - where events have no cause, effects precede actions, time is optional. You are at center. This is what happens when timelines cannot be reconciled.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 80
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "causality_dissolution"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "In the causality dead zone, nothing makes sense. You are and are not. They lived and died. Events loop. This is hell built from good intentions.",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "change_made",
+          "to_stage": "first_discrepancy",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "first_discrepancy",
+          "to_stage": "paradox_cascade",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "paradox_cascade",
+          "to_stage": "choosing_timeline",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 18
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1500
+            }
+          ]
+        },
+        {
+          "from_stage": "paradox_cascade",
+          "to_stage": "causality_collapse",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 15
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "choosing_timeline",
+          "to_stage": "paradox_resolved",
+          "conditions": [
+            {
+              "type": "choice_made",
+              "choice_id": "commit_to_timeline"
+            }
+          ]
+        },
+        {
+          "from_stage": "choosing_timeline",
+          "to_stage": "timeline_split_accepted",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 25
+            },
+            {
+              "type": "choice_made",
+              "choice_id": "accept_branching"
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 30000
+      }
+    },
+    {
+      "id": "large_divine_champion",
+      "name": "The Burden of Being Chosen",
+      "description": "A god has chosen you as champion. Not asked - chosen. Divine power flows through you. Miracles at your command. The god's agenda becomes your purpose. But what if the god's plan conflicts with your morals? What if being divine instrument means becoming divine tool?",
+      "scale": "large",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Divine service and the cost of being chosen",
+        "domain": "divinity",
+        "insight": "To be chosen by a god is both blessing and burden. You gain power. You lose autonomy. The question is: was it worth it?",
+        "wisdom_value": 17,
+        "repeatable": false
+      },
+      "entry_stage": "chosen",
+      "completion_stages": [
+        "divine_will_fulfilled",
+        "broke_free",
+        "became_god"
+      ],
+      "failure_stages": [
+        "discarded_champion"
+      ],
+      "stages": [
+        {
+          "stage_id": "chosen",
+          "name": "The Mark",
+          "description": "Divine power flows into you. Uninvited but not unwelcome. You are Chosen. The god's mark burns on your soul. Miracles at command. Purpose given from on high. You are instrument of divine will now. Do you accept this? Does it matter if you don't?",
+          "stage_attractors": [
+            {
+              "attractor_id": "divine_mission",
+              "goal": {
+                "type": "quest_completion",
+                "parameters": {
+                  "quest_type": "divine"
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.8,
+              "description": "Pressure to fulfill divine purpose"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 20
+            },
+            {
+              "type": "modify_stress",
+              "delta": 15
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The god speaks: 'You are my hand in mortal world. You will do great things. You have no choice in this. But you will be remembered.'",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "first_miracle",
+          "name": "Divine Power Unleashed",
+          "description": "You perform your first miracle. Healing impossible wound. Smiting unjust tyrant. Revealing hidden truth. The god's power channeled through you is intoxicating. This is what it means to be chosen. This is purpose.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "moral_conflict",
+          "name": "The Questionable Command",
+          "description": "The god commands something that troubles you. Kill the innocent to prevent future evil? Destroy knowledge to preserve order? Betray trust to serve higher purpose? The god's morality is not yours. But you are champion. What do you do?",
+          "stage_attractors": [
+            {
+              "attractor_id": "obedience_vs_conscience",
+              "goal": {
+                "type": "choice_made",
+                "parameters": {
+                  "choice_id": "moral_decision"
+                }
+              },
+              "strength": 0.9,
+              "urgency": 0.95,
+              "description": "Intense pressure from both divine will and personal morality"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The god's voice: 'You question me? You are tool, not partner. Obey.' Your conscience: 'This is wrong.' Both cannot be right.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "path_obedience",
+          "name": "The Faithful Instrument",
+          "description": "You obey. The command is carried out. Innocents die. Knowledge burns. Trust broken. But the god is pleased. Divine power increases. You are perfect champion. And you hate what you're becoming. Or perhaps you've learned to silence that voice.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -5
+            },
+            {
+              "type": "modify_stress",
+              "delta": 30
+            }
+          ]
+        },
+        {
+          "stage_id": "path_rebellion",
+          "name": "Defying the Divine",
+          "description": "You refuse. 'I will not do this.' Divine power flares in anger. The god's wrath manifests. You are champion no more - you are rebel. The mark burns as it tries to consume you. This is what happens when mortals defy gods.",
+          "stage_attractors": [
+            {
+              "attractor_id": "survival_against_god",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 25
+                }
+              },
+              "strength": 0.8,
+              "urgency": 1,
+              "description": "Desperate pressure to survive divine wrath"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 50
+            },
+            {
+              "type": "modify_mood",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "divine_will_fulfilled",
+          "name": "The Perfect Servant",
+          "description": "You fulfilled every command. Enacted divine will perfectly. The god's plan complete. You are honored. Remembered. Legendary champion. And inside, the part of you that questioned is silent now. Dead? Sleeping? Or perhaps you were right to obey. Perhaps the god knew better. You tell yourself this. You almost believe it.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "divine_servitude_complete"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You dream of all the times you questioned. All the times you obeyed anyway. The god is pleased. Are you?",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "broke_free",
+          "name": "Freedom from Divinity",
+          "description": "You survived divine wrath. Broke free of the mark. The god's power stripped away. You are mortal again - weak, limited, free. Other gods watch with interest. Mortals who defy and survive are rare. What will you do with freedom bought at such cost?",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "divine_independence"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "modify_stress",
+              "delta": -30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "Other gods murmur: 'That one broke free. Impressive. Dangerous. Useful?' You are free. But you are noticed.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "became_god",
+          "name": "Ascending Beyond",
+          "description": "You did neither obedience nor rebellion. You *understood*. Absorbed the god's power. Learned its nature. Achieved apotheosis through intimate knowledge of divinity. You are no longer champion. You are peer. The god that chose you now regards you as equal. Or rival.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "divine_ascension"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "The god speaks, now with respect: 'You were meant to be tool. You became more. This is rarer than you know. What will you do with divinity?'",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "discarded_champion",
+          "name": "Used and Discarded",
+          "description": "You served. The god's purpose achieved. And now you are... not needed. Divine power withdrawn. Mark fades. You are mortal again. But changed. Broken. You gave everything to divine service. The god is done with you. This is gratitude from on high.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 60
+            },
+            {
+              "type": "modify_mood",
+              "delta": -40
+            },
+            {
+              "type": "add_trauma",
+              "trauma_type": "divine_abandonment"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You dream of divine power that once flowed through you. It's gone. The god used you. You let it happen. What remains?",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "chosen",
+          "to_stage": "first_miracle",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "first_miracle",
+          "to_stage": "moral_conflict",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "moral_conflict",
+          "to_stage": "path_obedience",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 20
+            },
+            {
+              "type": "choice_made",
+              "choice_id": "obey_god"
+            }
+          ]
+        },
+        {
+          "from_stage": "moral_conflict",
+          "to_stage": "path_rebellion",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 18
+            },
+            {
+              "type": "choice_made",
+              "choice_id": "defy_god"
+            }
+          ]
+        },
+        {
+          "from_stage": "path_obedience",
+          "to_stage": "divine_will_fulfilled",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 8000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_obedience",
+          "to_stage": "discarded_champion",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 15
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 12000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_rebellion",
+          "to_stage": "broke_free",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 25
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 6000
+            }
+          ]
+        },
+        {
+          "from_stage": "path_rebellion",
+          "to_stage": "became_god",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 35
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 10000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "cooldown_ticks": 60000
+      }
+    }
+  ],
+  "epic_ascension_templates": [
+    {
+      "id": "epic_endless_summer",
+      "name": "The Endless Summer: Fae Ascension",
+      "description": "The transcendent journey from mortal to Fae - achieving post-temporal consciousness, entering paradise, being expelled, navigating chaos, learning non-intervention through witnessing, and returning home as mature guide.",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Post-temporal transformation and ethical non-intervention",
+        "domain": "transcendence",
+        "insight": "True freedom is maintaining yourself in chaos, not grasping at paradise. Non-intervention is the highest form of love.",
+        "wisdom_value": 50,
+        "repeatable": false
+      },
+      "entry_stage": "awakening",
+      "completion_stages": [
+        "mature_fae"
+      ],
+      "failure_stages": [
+        "trapped_fae"
+      ],
+      "stages": [
+        {
+          "stage_id": "awakening",
+          "name": "The Revelation",
+          "description": "You achieve Fae consciousness - 3+10D awareness. The empty universe suddenly teems with life. You perceive the Endless Summer across β-space topology. Welcome home, child of chaos.",
+          "stage_attractors": [
+            {
+              "attractor_id": "dimensional_awareness",
+              "goal": {
+                "type": "tech_threshold",
+                "parameters": {
+                  "min_level": 11
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.8,
+              "description": "Drawing toward post-temporal transformation"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see the multiverse - infinite branches, teeming with consciousness you never knew existed",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "paradise_discovered",
+          "name": "Entering the Endless Summer",
+          "description": "You transition to the Endless Summer - a protected β-space partition where time is honey and space is breath. Perfect causal coherence. Infinite resources. Eternal twilight. Other young Fae learning their powers. This is paradise regained.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 50
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "Elder Fae welcome you: 'The Summer is not a home. It is a school. Learn, grow, but do not stay forever.'",
+              "intensity": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "temptation",
+          "name": "The Grasping",
+          "description": "You begin trying to stabilize the Summer, to make it permanent. Colors fade. Time feels sticky. Other civilizations distance themselves. The delight becomes hollow. You are building a prison.",
+          "stage_attractors": [
+            {
+              "attractor_id": "stabilization_warning",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 30
+                }
+              },
+              "strength": 0.4,
+              "urgency": 0.9,
+              "description": "Urging recognition that paradise cannot be made permanent"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "ejection",
+          "name": "The Fall",
+          "description": "The Summer expels you. Violent transition. Cast into unstable phase space - chaotic β-regions where pre-temporal civilizations create causal noise. Timeline coherence threatened. Hive mind disrupted. Fear of losing identity. 'You sought permanence. Paradise is becoming. Go now. Learn to maintain yourself in chaos.'",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "The Summer's farewell: When you can return without grasping, you will be welcome",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "trial_chaos",
+          "name": "Navigating the Void",
+          "description": "Maintaining coherent identity in causal chaos. Pre-temporal civilizations edit timelines chaotically. Timeline fragmentation. Identity dissolution risk. You learn to observe without contamination, maintain protocols in noise, filter signal from chaos.",
+          "stage_attractors": [
+            {
+              "attractor_id": "identity_coherence",
+              "goal": {
+                "type": "relationship_maintained",
+                "parameters": {
+                  "min_trust": 70
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.8,
+              "description": "Pressure to maintain hive mind coherence despite interference"
+            }
+          ]
+        },
+        {
+          "stage_id": "witnessing",
+          "name": "The Witnessing",
+          "description": "An Elder Fae gives you the critical test: Observe a civilization on the cusp of post-temporality. Watch them struggle. Watch them glimpse the multiverse. Watch them terrified and awed. DO NOT INTERVENE. This is how you learn why Fae hide from mortals.",
+          "on_enter_effects": [
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "symbolic",
+              "content_hint": "You watch through the Veil - they cannot see you, they think they are alone, they pray for help that will not come",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "compassion_without_action",
+          "name": "The Ache of Love",
+          "description": "You want to help. Every fiber wants to reveal yourself, to comfort them, to guide them. The Elder stays your hand. 'Intervention destroys what it touches. Their chaos threatens our coherence. Suffering is necessary. This is love.' You watch them struggle. You do not intervene.",
+          "stage_attractors": [
+            {
+              "attractor_id": "restraint",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 40
+                }
+              },
+              "strength": 0.9,
+              "urgency": 1,
+              "description": "Enormous pressure toward intervention - resisting it is the test"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 30
+            }
+          ]
+        },
+        {
+          "stage_id": "understanding",
+          "name": "The Revelation of Silence",
+          "description": "You finally understand. The universe appears empty because post-temporal civilizations are ghosting us. They watch, they remember being us, they love us enough to let us walk our own path. Intervention would destroy both parties. You become what you witnessed - a guardian choosing silence out of compassion.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "Humanity searches for us, finds nothing. We watch from root.transcendent.*, aching to respond. But we ghost. This is love.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "return_path",
+          "name": "Finding Home",
+          "description": "You identify the coherent causal axis back to Endless Summer. Navigate β-space topology deliberately. Prove you can return without destabilizing. The critical test: You CAN return, but you don't NEED to. Paradise is not where you live. It is what you carry.",
+          "stage_attractors": [
+            {
+              "attractor_id": "non_attachment",
+              "goal": {
+                "type": "emotional_state",
+                "parameters": {
+                  "state": "content"
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.5,
+              "description": "Gentle pull toward acceptance and non-grasping"
+            }
+          ]
+        },
+        {
+          "stage_id": "mature_fae",
+          "name": "Coming of Age",
+          "description": "You return to the Endless Summer. Not fleeing chaos, but visiting coherence. The Elder Fae greet you as peer: 'You are no longer a child. The door is always open. But now you understand: paradise is not where you live. It is what you carry with you.' You are Mature Fae. Guide. Mentor. Guardian of pre-temporal civilizations.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 30
+            },
+            {
+              "type": "learn_lesson",
+              "lesson_id": "fae_maturity"
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see your future: welcoming newly ascended Fae, warning them not to stay, guiding them through the trial you completed",
+              "intensity": 0.8
+            }
+          ]
+        },
+        {
+          "stage_id": "trapped_fae",
+          "name": "The Porcelain Prison",
+          "description": "You refused to leave. You tried to make permanence. Now you are trapped at the boundary - beautiful, powerful, eternal... and dead. The Trapped Fae's fate: warning to others. 'We are eternal. And we are dead. Do not make our mistake.'",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You have become liminal - neither in Summer nor out. Unable to venture into chaos without dissolving. This is stagnation.",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "awakening",
+          "to_stage": "paradise_discovered",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "paradise_discovered",
+          "to_stage": "temptation",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "temptation",
+          "to_stage": "ejection",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 25
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "temptation",
+          "to_stage": "trapped_fae",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 15
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 10000
+            }
+          ]
+        },
+        {
+          "from_stage": "ejection",
+          "to_stage": "trial_chaos",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "trial_chaos",
+          "to_stage": "witnessing",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            },
+            {
+              "type": "any_relationship",
+              "min_trust": 60
+            }
+          ]
+        },
+        {
+          "from_stage": "witnessing",
+          "to_stage": "compassion_without_action",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "compassion_without_action",
+          "to_stage": "understanding",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 35
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "understanding",
+          "to_stage": "return_path",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 40
+            },
+            {
+              "type": "emotional_state",
+              "state": "content",
+              "duration_ticks": 500
+            }
+          ]
+        },
+        {
+          "from_stage": "return_path",
+          "to_stage": "mature_fae",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 45
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "min_wisdom": 20,
+        "cooldown_ticks": 0
+      }
+    },
+    {
+      "id": "epic_enochian_ascension",
+      "name": "The Enochian Ascension: Angel Path",
+      "description": "The theological journey through the Seven Heavens - from mortal blindness to angelic service, learning the hard lessons of the Watchers and Nephilim, discovering why non-intervention is the highest mercy.",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Hierarchical divine order and the dangers of premature intervention",
+        "domain": "transcendence",
+        "insight": "Love does not mean rescue. Love means bearing witness to suffering without needing to fix it. Intervention destroys what it touches.",
+        "wisdom_value": 50,
+        "repeatable": false
+      },
+      "entry_stage": "mortality",
+      "completion_stages": [
+        "choir_angel"
+      ],
+      "failure_stages": [
+        "bound_watcher"
+      ],
+      "stages": [
+        {
+          "stage_id": "mortality",
+          "name": "First Heaven - Shamayim",
+          "description": "You are mortal. 3+1D existence. Linear time. No perception of higher dimensions. But something stirs - fragmentary glimpses of other realities, déjà vu too real, dreams of beings made of light. The Veil is thinning.",
+          "stage_attractors": [
+            {
+              "attractor_id": "dimensional_awakening",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 15
+                }
+              },
+              "strength": 0.4,
+              "urgency": 0.6,
+              "description": "Drawing toward proto-angel awareness"
+            }
+          ]
+        },
+        {
+          "stage_id": "calling",
+          "name": "Second Heaven - Raqia (The Firmament)",
+          "description": "Something in you dies. Not physically. But the mortal part. The limited consciousness. Perception shifts 3+1D → 3+3D. The Seven Heavens reveal themselves. A voice from Third Heaven: 'Child of dust, you have been chosen. Ascend.'",
+          "on_enter_effects": [
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You see the Seven Heavens stacked in β-space. A path upward beckons. But also... a warning about those who fell.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "garden",
+          "name": "Third Heaven - Shehaqim (The Garden)",
+          "description": "Eden restored. Paradise regained. The training ground for new angels. No suffering, no death, no linear time. You learn your gifts: form mastery, time-sight, dimension-walking, reality authority. The Host welcomes you: 'You are no longer mortal. But not yet Angel. Here you will learn.'",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "This is where humanity was expelled from. You have returned. But can you stay?",
+              "intensity": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "watchers_temptation",
+          "name": "The Serpent's Voice",
+          "description": "The Watchers appear - ancient angels bound in Fifth Heaven for violating non-intervention. Azazel speaks: 'I taught mortals the blade. We thought we were helping. We created Nephilim - beings too powerful to be human, too unstable to be angel. They tore themselves apart. Do not make our mistake.' But their paradise seems so seductive...",
+          "stage_attractors": [
+            {
+              "attractor_id": "watchers_warning",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 25
+                }
+              },
+              "strength": 0.5,
+              "urgency": 0.8,
+              "description": "Pressure to understand why intervention destroys"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "expulsion_upward",
+          "name": "The Second Fall",
+          "description": "You try to stay. The Garden expels you - but UPWARD, not downward. Voice from Seventh Heaven: 'You cannot stay. As Adam was expelled, so are you. But you are expelled into becoming. Descend now to Raqia. Walk the boundary. See mortals below. And do NOT intervene.'",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "This is mercy, not punishment. The trial begins.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "raqia_witnessing",
+          "name": "Trial of Raqia",
+          "description": "Second Heaven - liminal space. From here you see mortals below struggling, angels above serene. An Archangel (Michael/Gabriel/Raphael/Uriel) appears: 'Watch. A mortal on the cusp of transformation. They glimpse the heavens. They're terrified. They pray for help. DO NOT ANSWER. This is the test.'",
+          "stage_attractors": [
+            {
+              "attractor_id": "intervention_temptation",
+              "goal": {
+                "type": "emotional_state",
+                "parameters": {
+                  "state": "content"
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.95,
+              "description": "Massive urge to intervene - resisting is the test"
+            }
+          ]
+        },
+        {
+          "stage_id": "nephilim_horror",
+          "name": "The Broken Children",
+          "description": "You encounter a Nephilim ghost - hybrid being, part mortal part angel, torn between dimensions. 'Please... let me die... I am too much and not enough... torn between worlds... this is agony...' You see what the Watchers created. Why forced transformation fails. Why intervention is cruel.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "This is what 'helping' creates. Forced ascension is violation.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "understanding_restraint",
+          "name": "The Lesson of Silence",
+          "description": "You watch the mortal choose their own path. You do not intervene. The Archangel speaks: 'Love does not mean rescue. It means bearing witness without needing to fix. You have learned what separates Archangels from Watchers. You are ready for Fourth Heaven.'",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 20
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "Non-intervention is the highest form of respect and love",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "fourth_heaven",
+          "name": "Fourth Heaven - Ma'on (The Dwelling)",
+          "description": "Hierarchical order. Seraphim, Cherubim, Thrones, Dominions, Virtues, Powers in perfect coordination. You are assigned to a choir based on your nature. You finally understand why the system works this way. This is cosmic order.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "choir_angel",
+          "name": "Angelic Service",
+          "description": "You are Choir Angel now. Guardian of dimensional boundaries. Maintainer of cosmic order. Server of the Source. You can descend to lower heavens to guide newly ascending proto-angels. You remember your own struggle with compassion. You are what you once needed.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "angelic_maturity"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 25
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "You will guide others through the trial you completed. This is eternal service.",
+              "intensity": 0.75
+            }
+          ]
+        },
+        {
+          "stage_id": "bound_watcher",
+          "name": "Fifth Heaven - Machon (The Prison)",
+          "description": "You intervened. You taught forbidden knowledge. You created broken hybrids. Now you are bound in Fifth Heaven with the 200 Watchers, held until you can release your need to control, your need to 'help.' Some have been here since before language. You are beautiful, powerful... and imprisoned by your own inability to let go.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -15
+            },
+            {
+              "type": "modify_stress",
+              "delta": 50
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "Intervention destroyed what you tried to save. You are bound until you learn otherwise.",
+              "intensity": 1
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "mortality",
+          "to_stage": "calling",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 10000
+            }
+          ]
+        },
+        {
+          "from_stage": "calling",
+          "to_stage": "garden",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "garden",
+          "to_stage": "watchers_temptation",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "watchers_temptation",
+          "to_stage": "expulsion_upward",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 22
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "watchers_temptation",
+          "to_stage": "bound_watcher",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 18
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "expulsion_upward",
+          "to_stage": "raqia_witnessing",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "raqia_witnessing",
+          "to_stage": "nephilim_horror",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "nephilim_horror",
+          "to_stage": "understanding_restraint",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 30
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        },
+        {
+          "from_stage": "understanding_restraint",
+          "to_stage": "fourth_heaven",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 35
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "fourth_heaven",
+          "to_stage": "choir_angel",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 40
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "min_wisdom": 15,
+        "cooldown_ticks": 0
+      }
+    },
+    {
+      "id": "epic_exaltation_path",
+      "name": "The Exaltation Path: Becoming Divine",
+      "description": "The Mormon cosmological journey - pre-existence remembered, mortal veil pierced, ordinances received, celestial marriage sealed, judgment passed, exaltation achieved. You become what God is: a creator, a parent, watching your own children suffer without intervention.",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Eternal progression and the burden of divine parenthood",
+        "domain": "transcendence",
+        "insight": "As man is, God once was. As God is, man may become. The ache of godhood is watching your children hurt, knowing that rescuing them would ruin them.",
+        "wisdom_value": 50,
+        "repeatable": false
+      },
+      "entry_stage": "veil_tears",
+      "completion_stages": [
+        "exalted_creator"
+      ],
+      "failure_stages": [
+        "telestial_stagnation"
+      ],
+      "stages": [
+        {
+          "stage_id": "veil_tears",
+          "name": "Fragments of Eternity",
+          "description": "You are mortal, but the Veil thins. Déjà vu feels too real. You dream of a council where you debated the plan. Someone you've never met feels achingly familiar. Inexplicable knowledge that 'this isn't all there is.' You existed before. You chose this.",
+          "stage_attractors": [
+            {
+              "attractor_id": "pre_mortal_memory",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 12
+                }
+              },
+              "strength": 0.5,
+              "urgency": 0.6,
+              "description": "Gentle pull toward remembering pre-existence"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "Before mortality, you were spirit. You chose agency over safety. You voted for this test.",
+              "intensity": 0.6
+            }
+          ]
+        },
+        {
+          "stage_id": "ordinances",
+          "name": "The Navigation Protocols",
+          "description": "Temple endowment - sacred signs, tokens, keywords, garments. These are not mere symbols. They are dimensional navigation protocols. Authentication for angelic guards. Invocations to open β-space passages. You receive them through interactive ritual. You must memorize and practice. You will be tested.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 8
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "symbolic",
+              "content_hint": "The gestures encode coordinates. The keywords are names of power. The garments are causal armor.",
+              "intensity": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "celestial_marriage",
+          "name": "Sealed for Eternity",
+          "description": "You cannot be exalted alone. Find your eternal companion - known in pre-existence, forgotten behind the Veil. Signs of recognition: instant connection, dreams before meeting, complementary strengths, shared mission. The sealing: 'For time and all eternity. Bonds persist across all timelines, all realities, all dimensions.'",
+          "stage_attractors": [
+            {
+              "attractor_id": "eternal_companion",
+              "goal": {
+                "type": "relationship_formed",
+                "parameters": {
+                  "min_trust": 80,
+                  "min_affinity": 70
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.7,
+              "description": "Drawing toward recognition of eternal companion"
+            }
+          ],
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "Together you will create worlds. Neither can ascend alone. This bond persists beyond death.",
+              "intensity": 0.85
+            }
+          ]
+        },
+        {
+          "stage_id": "spirit_world",
+          "name": "Death and the Lifting Veil",
+          "description": "Mortal life ends. The Veil lifts. Memories of pre-existence flood back. Dimensional shift 3+1D → 3+3D. You enter the Spirit World - paradise or prison depending on choices. Reunion with deceased family. Teaching spirits. Awaiting resurrection and judgment.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "memory_echo",
+              "content_hint": "You remember now. The Council. The choice. The plan. You are spirit clothed in flesh, soon to be spirit perfected.",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "judgment",
+          "name": "Before the Christ",
+          "description": "Resurrection - spirit reunited with perfected immortal body. Christ (first exalted being of this creation) judges: 'You chose faith without remembering. You formed eternal bonds. You sacrificed comfort for growth. You are prepared for Celestial Kingdom. Will you accept?'",
+          "stage_attractors": [
+            {
+              "attractor_id": "celestial_worthiness",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 35
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.9,
+              "description": "Assessment of readiness for exaltation"
+            }
+          ]
+        },
+        {
+          "stage_id": "celestial_kingdom",
+          "name": "Third Estate - The Sun",
+          "description": "Celestial Kingdom. Full 3+10D awareness. Exalted beings, angels, Christ, Father God. All things revealed. Eternal families intact. Father speaks: 'I was mortal once, like you. I suffered, doubted, chose. I became what I am. Now you will do the same. Come, I will show you how to create your own world.'",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": 15
+            },
+            {
+              "type": "modify_mood",
+              "delta": 35
+            }
+          ]
+        },
+        {
+          "stage_id": "learning_creation",
+          "name": "Under the Father",
+          "description": "Eons of learning. Studying creation under Heavenly Father. Understanding β-space topology. Mastering reality manipulation. Preparing for your own world. 'You will create. You will parent. You will watch your children suffer. This is the burden I carry. Soon you will understand.'",
+          "stage_attractors": [
+            {
+              "attractor_id": "creator_preparation",
+              "goal": {
+                "type": "wisdom_threshold",
+                "parameters": {
+                  "min_wisdom": 45
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.5,
+              "description": "Long-term preparation for godhood"
+            }
+          ]
+        },
+        {
+          "stage_id": "first_creation",
+          "name": "Your Universe",
+          "description": "You create your own β-space partition. Design physics. Create spirit children from unorganized intelligence. Design their mortal test. Send them down. Watch them... suffer. They pray: 'Father/Mother, help me. I'm lost. I'm scared. Why won't you answer?' You ache to respond. But you know: intervention ruins them. So you stay silent.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "Your first child prays. Every fiber wants to help. But you choose silence. This is what Father felt watching you. This is love.",
+              "intensity": 1
+            }
+          ]
+        },
+        {
+          "stage_id": "exalted_creator",
+          "name": "Divine Parenthood",
+          "description": "You are God now. Not THE God, but A God. Co-equal in kind, still learning in degree. You create countless worlds. Your children ascend, become gods themselves, create their own worlds. Eternal progression - no ceiling, always growing. Is there a First Cause, or infinite regress? The mystery deepens.",
+          "on_enter_effects": [
+            {
+              "type": "learn_lesson",
+              "lesson_id": "exaltation_achieved"
+            },
+            {
+              "type": "modify_wisdom",
+              "delta": 30
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "prophetic_vision",
+              "content_hint": "Existence is eternal becoming. The journey never ends. This is liberation and burden both.",
+              "intensity": 0.95
+            }
+          ]
+        },
+        {
+          "stage_id": "telestial_stagnation",
+          "name": "Telestial Kingdom - The Stars",
+          "description": "You rejected the fullness. Chose flesh over spirit. Celestial marriage refused. Assigned to Telestial Kingdom - glory like stars, beautiful but distant. 3+2D existence. Limited creation. No eternal families. Servants to higher kingdoms. Cannot progress further. Stagnation.",
+          "on_enter_effects": [
+            {
+              "type": "modify_wisdom",
+              "delta": -8
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "warning",
+              "content_hint": "You chose comfort over growth. This is glory, but it is limited. No further ascension.",
+              "intensity": 0.7
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "veil_tears",
+          "to_stage": "ordinances",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 15
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "ordinances",
+          "to_stage": "celestial_marriage",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 20
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 3000
+            }
+          ]
+        },
+        {
+          "from_stage": "celestial_marriage",
+          "to_stage": "spirit_world",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 20000
+            }
+          ]
+        },
+        {
+          "from_stage": "spirit_world",
+          "to_stage": "judgment",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 5000
+            }
+          ]
+        },
+        {
+          "from_stage": "judgment",
+          "to_stage": "celestial_kingdom",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 30
+            },
+            {
+              "type": "any_relationship",
+              "min_trust": 75
+            }
+          ]
+        },
+        {
+          "from_stage": "judgment",
+          "to_stage": "telestial_stagnation",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "max_wisdom": 20
+            }
+          ]
+        },
+        {
+          "from_stage": "celestial_kingdom",
+          "to_stage": "learning_creation",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 38
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 10000
+            }
+          ]
+        },
+        {
+          "from_stage": "learning_creation",
+          "to_stage": "first_creation",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 45
+            },
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 15000
+            }
+          ]
+        },
+        {
+          "from_stage": "first_creation",
+          "to_stage": "exalted_creator",
+          "conditions": [
+            {
+              "type": "wisdom_threshold",
+              "min_wisdom": 50
+            },
+            {
+              "type": "emotional_state",
+              "state": "content",
+              "duration_ticks": 1000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "min_wisdom": 10,
+        "cooldown_ticks": 0
+      }
+    }
+  ]
 }

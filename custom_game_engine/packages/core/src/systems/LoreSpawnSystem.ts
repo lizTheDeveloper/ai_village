@@ -17,6 +17,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
+import { ComponentType } from '../types/ComponentType.js';
 import {
   LORE_FRAGMENTS,
   type LoreFragmentComponent,
@@ -146,9 +147,38 @@ export class LoreSpawnSystem extends BaseSystem {
    * Update metrics by scanning current world state
    * (for things like marked sinners, silenced entities, banned spells)
    */
-  private updateMetricsFromWorld(_world: World): void {
-    // TODO: When CreatorInterventionSystem is available, scan for marks/silence
-    // For now, these are only updated via events
+  private updateMetricsFromWorld(world: World): void {
+    // Get CreatorInterventionSystem to check for marks/silence/bans
+    const interventionSystem = world.getSystem('creator_intervention');
+    if (!interventionSystem) {
+      return;
+    }
+
+    // Use type assertion since we know this is the CreatorInterventionSystem
+    const creatorIntervention = interventionSystem as any;
+
+    // Count entities with Mark of the Sinner
+    let markedCount = 0;
+    let silencedCount = 0;
+
+    // Iterate through all entities to check for marks and silence
+    for (const entity of world.entities.values()) {
+      if (creatorIntervention.hasMarkOfSinner && creatorIntervention.hasMarkOfSinner(entity.id)) {
+        markedCount++;
+      }
+      if (creatorIntervention.hasDivineSilence && creatorIntervention.hasDivineSilence(entity.id)) {
+        silencedCount++;
+      }
+    }
+
+    // Update metrics
+    this.metrics.markedSinners = markedCount;
+    this.metrics.silencedEntities = silencedCount;
+
+    // Count banned spells
+    if (creatorIntervention.bannedSpells) {
+      this.metrics.bannedSpells = creatorIntervention.bannedSpells.size || 0;
+    }
   }
 
   /**
@@ -273,15 +303,15 @@ export class LoreSpawnSystem extends BaseSystem {
       createRenderableComponent(glyphByCategory[fragment.category] || '📄')
     );
 
-    // Emit event (generic since lore events not yet in EventMap)
-    this.events.emitGeneric('lore:spawned', {
+    // Emit typed event
+    this.events.emit('lore:spawned', {
       fragmentId: fragment.fragmentId,
       title: fragment.title,
       importance: fragment.importance,
       category: fragment.category,
       entityId: entity.id,
       position: { x, y },
-    });
+    }, entity.id);
   }
 
   // ============ Public API ============
@@ -303,9 +333,9 @@ export class LoreSpawnSystem extends BaseSystem {
   /**
    * Get all spawned fragment entities
    */
-  public getSpawnedFragments(_world: World): string[] {
-    // TODO: Implement proper entity query when available
-    // For now, return empty array
-    return [];
+  public getSpawnedFragments(world: World): string[] {
+    // Query for all entities with lore_frag component
+    const loreEntities = world.query().with(ComponentType.LoreFrag).executeEntities();
+    return loreEntities.map((entity) => entity.id);
   }
 }

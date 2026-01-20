@@ -2772,6 +2772,1051 @@ function sendCrossUniverseShipment(
 
 ---
 
+## Background Universe Simulation (Plot System Integration)
+
+### Overview
+
+The **Background Universe System** enables Dwarf Fortress-style world generation and RimWorld-style faction invasions across multiple dimensions. While the player explores their visible universe, hidden background universes simulate at **1000x-100,000x speed** using **statistical O(1) simulation** at the AbstractPlanet tier.
+
+**Purpose:**
+- Enable invasions from other planets, futures, pasts, and parallel universes
+- Provide plot-driven narrative events (alien empires discovering player's world)
+- Support time travel destinations (simulated future/past of player's world)
+- Create emergent threats that develop autonomously
+
+**Performance:**
+- 5-10 background universes: ~0.2-0.5ms/tick total
+- O(1) statistical simulation per universe (no entity iteration)
+- Scales to 20+ universes with <1ms/tick overhead
+
+**Key Insight:** Background universes remain abstract (AbstractPlanet tier) until player discovers them, then seamlessly instantiate full ECS matching statistical data.
+
+---
+
+### Architecture Components
+
+```
+BackgroundUniverseManager (Orchestrator)
+├─ MultiverseCoordinator (Universe forking/management)
+├─ AbstractPlanet (Statistical planet simulation, O(1))
+├─ PlanetFactionAI (Autonomous invasion decisions)
+└─ BackgroundUniverseSystem (Game loop integration)
+```
+
+**Files:**
+- `packages/core/src/multiverse/BackgroundUniverseTypes.ts` - Type definitions
+- `packages/core/src/multiverse/PlanetFactionAI.ts` - AI decision maker
+- `packages/core/src/multiverse/BackgroundUniverseManager.ts` - Main orchestrator
+- `packages/core/src/systems/BackgroundUniverseSystem.ts` - ECS system
+- `packages/core/src/multiverse/BACKGROUND_UNIVERSES.md` - Full documentation
+
+---
+
+### Background Universe Types
+
+```typescript
+type BackgroundUniverseType =
+  | 'other_planet'        // Alien world in different solar system
+  | 'future_timeline'     // Player's world N years in the future
+  | 'past_timeline'       // Player's world N years in the past
+  | 'parallel_universe'   // Alternate timeline (diverged from player's history)
+  | 'pocket_dimension'    // Small isolated reality (magical realm, simulation)
+  | 'extradimensional';   // Reality with different physical laws
+```
+
+**Universe Type Characteristics:**
+
+| Type | Use Case | Time Scale | Default Culture |
+|------|----------|------------|-----------------|
+| **other_planet** | Alien invasion from 50 LY away | 1000x-2000x | Aggressive, expansionist |
+| **future_timeline** | Time travel destination | 10,000x | Inherits player culture |
+| **past_timeline** | Historical exploration | 5,000x | Traditional, low tech |
+| **parallel_universe** | Multiverse crossover | 5,000x | Similar to player |
+| **pocket_dimension** | Magical realm | 1,000x | High mysticism |
+| **extradimensional** | Lovecraftian horror | 2,000x | Alien mindset |
+
+---
+
+### BackgroundUniverseManager API
+
+#### Spawning Background Universes
+
+```typescript
+/**
+ * Spawn a background universe for hidden simulation
+ * Returns universe ID for tracking
+ */
+async function spawnBackgroundUniverse(
+  params: BackgroundUniverseParams
+): Promise<string>;
+
+interface BackgroundUniverseParams {
+  /** Type of universe */
+  type: BackgroundUniverseType;
+
+  /** Human-readable description */
+  description: string;
+
+  /** Base universe to fork from (optional) */
+  baseUniverseId?: string;
+
+  /** Starting tech level bias (0-10) */
+  techBias?: number;
+
+  /** Cultural traits for AI decision-making */
+  culturalTraits: CulturalTraits;
+
+  /** Time scale multiplier (1000 = 1 year per second) */
+  timeScale?: number;
+
+  /** When AI decides to invade (0-1, higher = more aggressive) */
+  invasionThreshold?: number;
+
+  /** Stop conditions for simulation */
+  stopConditions?: SimulationStopConditions;
+
+  /** For timelines: year offset from player's timeline */
+  timeOffset?: number;
+
+  /** For planets: distance in light-years */
+  distanceLightYears?: number;
+
+  /** Initial population override */
+  initialPopulation?: number;
+
+  /** Deterministic seed */
+  seed?: number;
+}
+```
+
+**Example: Spawn Alien Empire**
+
+```typescript
+const bgManager = world.getSystem('background_universe').getManager();
+
+const alienEmpireId = await bgManager.spawnBackgroundUniverse({
+  type: 'other_planet',
+  description: 'Aggressive reptilian empire 50 light-years away',
+
+  // Start primitive, let them evolve
+  techBias: 3,
+
+  // Cultural traits drive AI behavior
+  culturalTraits: {
+    aggressiveness: 0.9,   // Very hostile
+    expansionism: 0.8,     // Want to conquer
+    xenophobia: 0.7,       // Hate aliens
+    collectivism: 0.9,     // Hive-mind
+    technophilia: 0.7,     // Tech-focused
+    mysticism: 0.3,        // Low magic
+    cooperation: 0.2,      // Competitive
+  },
+
+  // Simulate at 1000x speed
+  timeScale: 1000,
+
+  // Invade when aggression score >0.7
+  invasionThreshold: 0.7,
+
+  // Stop after invasion or reaching tech 9
+  stopConditions: {
+    maxTechLevel: 9,
+    invasionTriggered: true,
+    maxSimulatedYears: 1000,
+  }
+});
+
+console.log(`Alien empire spawned: ${alienEmpireId}`);
+// Simulation runs in background...
+// ~16 minutes real-time later: INVASION TRIGGERED!
+```
+
+#### Query Methods
+
+```typescript
+/**
+ * Get background universe by ID
+ */
+function getBackgroundUniverse(id: string): BackgroundUniverse | undefined;
+
+/**
+ * Get all background universes
+ */
+function getAllBackgroundUniverses(): ReadonlyMap<string, BackgroundUniverse>;
+
+/**
+ * Get statistics
+ */
+function getStats(): {
+  totalSpawned: number;
+  totalInvasions: number;
+  totalDiscovered: number;
+  totalStopped: number;
+};
+
+/**
+ * Remove background universe (cleanup)
+ */
+function removeBackgroundUniverse(id: string): void;
+```
+
+#### Portal Registration
+
+```typescript
+/**
+ * Register that player has opened portal to universe
+ * Triggers full ECS instantiation on next update
+ */
+function registerPlayerPortal(universeId: string): void;
+
+/**
+ * Unregister portal (portal closed)
+ */
+function unregisterPlayerPortal(universeId: string): void;
+```
+
+---
+
+### Cultural Traits System
+
+Cultural traits determine how PlanetFactionAI makes decisions. Each trait is 0-1 scale.
+
+```typescript
+interface CulturalTraits {
+  /** How likely to initiate conflict (0-1) */
+  aggressiveness: number;
+
+  /** Desire to expand territory (0-1) */
+  expansionism: number;
+
+  /** Hostility toward aliens/outsiders (0-1) */
+  xenophobia: number;
+
+  /** Collectivism vs individualism (0=individual, 1=collective) */
+  collectivism: number;
+
+  /** Tech focus vs tradition (0=tradition, 1=tech) */
+  technophilia: number;
+
+  /** Mystical/magical focus (0-1) */
+  mysticism: number;
+
+  /** Economic cooperation vs competition (0=competitive, 1=cooperative) */
+  cooperation: number;
+}
+```
+
+**Cultural Trait Guide:**
+
+| Trait | 0.0 | 0.5 | 1.0 |
+|-------|-----|-----|-----|
+| **aggressiveness** | Pacifist | Defensive | Warlike |
+| **expansionism** | Isolationist | Moderate growth | Manifest destiny |
+| **xenophobia** | Cosmopolitan | Cautious | Hostile to aliens |
+| **collectivism** | Individualist | Mixed | Hive mind |
+| **technophilia** | Traditional | Balanced | Tech-worship |
+| **mysticism** | Rational | Agnostic | Magic-dominated |
+| **cooperation** | Competitive | Pragmatic | Utopian |
+
+**Example Faction Profiles:**
+
+```typescript
+// Borg-like collective
+const borgTraits: CulturalTraits = {
+  aggressiveness: 0.85,
+  expansionism: 0.95,
+  xenophobia: 0.9,
+  collectivism: 1.0,    // Perfect hive mind
+  technophilia: 0.95,
+  mysticism: 0.05,
+  cooperation: 0.1,
+};
+
+// Peaceful traders
+const traderTraits: CulturalTraits = {
+  aggressiveness: 0.2,
+  expansionism: 0.6,
+  xenophobia: 0.1,
+  collectivism: 0.4,
+  technophilia: 0.8,
+  mysticism: 0.2,
+  cooperation: 0.9,    // Love trade deals
+};
+
+// Mystical isolationists
+const mysticTraits: CulturalTraits = {
+  aggressiveness: 0.3,
+  expansionism: 0.1,
+  xenophobia: 0.8,     // Distrust outsiders
+  collectivism: 0.6,
+  technophilia: 0.2,
+  mysticism: 0.95,     // Magic-dominated
+  cooperation: 0.5,
+};
+```
+
+---
+
+### PlanetFactionAI Decision System
+
+The **PlanetFactionAI** makes autonomous strategic decisions for entire civilizations. It runs at O(1) cost per tick using only planet-wide statistics.
+
+#### Decision Flow
+
+```
+1. Check Civilization Status
+   ├─ Collapsed (stability <0.1)? → Retreat
+   └─ Stable? → Continue
+
+2. Check Tech Level
+   ├─ < Tech 7? → Develop (can't reach space)
+   └─ ≥ Tech 7? → Continue
+
+3. Check Player Discovery
+   ├─ Not discovered? → Explore (0.001% chance/tick to discover)
+   └─ Discovered? → Continue
+
+4. Calculate Invasion Score
+   Factors:
+   - Aggressiveness (40% weight)
+   - Population pressure (30% weight)
+   - Military power (20% weight)
+   - Tech advantage (10% weight)
+   - Penalties: Active wars, low stability
+
+5. Make Decision
+   ├─ Score ≥ threshold? → Invade
+   ├─ Score ≥ 70% threshold? → Prepare
+   ├─ High cooperation? → Negotiate
+   └─ Otherwise → Develop
+```
+
+#### Decision Types
+
+```typescript
+type FactionDecisionType =
+  | 'develop'              // Continue internal development
+  | 'explore'              // Search for other worlds
+  | 'discovered_player'    // Just discovered player's world
+  | 'prepare'              // Building forces for invasion
+  | 'invade'               // Launch invasion
+  | 'retreat'              // Pull back forces
+  | 'negotiate'            // Attempt diplomacy
+  | 'trade';               // Establish trade routes
+
+interface FactionDecision {
+  /** Type of decision */
+  type: FactionDecisionType;
+
+  /** Reasoning for decision */
+  reason: string;
+
+  /** For invasions: invasion type */
+  invasionType?: InvasionType;
+
+  /** For invasions: size of invasion force */
+  fleetSize?: number;
+
+  /** For invasions: estimated arrival time in ticks */
+  estimatedTicks?: bigint;
+
+  /** For invasions: which faction is invading */
+  factionId?: string;
+
+  /** Confidence in decision (0-1) */
+  confidence?: number;
+}
+```
+
+#### Invasion Types
+
+Faction AI selects invasion type based on cultural traits:
+
+```typescript
+type InvasionType =
+  | 'military'             // Direct military assault
+  | 'cultural'             // Cultural assimilation (soft power)
+  | 'economic'             // Economic takeover
+  | 'dimensional'          // Portal/wormhole invasion
+  | 'temporal'             // Time paradox attack
+  | 'viral'                // Biological/memetic warfare
+  | 'swarm';               // Overwhelming numbers
+```
+
+**Invasion Type Selection:**
+
+| Type | Tech Required | Cultural Bias |
+|------|---------------|---------------|
+| **military** | 7+ | Aggressiveness + Technophilia |
+| **cultural** | 7+ | Cooperation + Low Xenophobia |
+| **economic** | 7+ | Cooperation + Technophilia |
+| **dimensional** | 9+ | Mysticism + Technophilia |
+| **temporal** | 8+ | Mysticism + Technophilia |
+| **viral** | 7+ | Xenophobia + Collectivism |
+| **swarm** | 7+ | Collectivism + Aggressiveness |
+
+**Example Selection Logic:**
+
+```typescript
+// High mysticism (0.9) + Tech 9 → Dimensional invasion
+// High collectivism (0.9) + Tech 7 → Swarm invasion
+// High cooperation (0.9) + Low xenophobia (0.2) → Cultural invasion
+```
+
+#### Invasion Score Calculation
+
+```typescript
+/**
+ * Calculate invasion score (0-1)
+ *
+ * Invasion occurs when score >= invasionThreshold (default 0.7)
+ */
+function calculateInvasionScore(): number {
+  let score = 0;
+
+  // 1. Aggressiveness (40% weight)
+  score += culturalTraits.aggressiveness * 0.4;
+
+  // 2. Population pressure (30% weight)
+  // Overpopulation drives expansion
+  const pressureScore = Math.max(0, populationPressure - 0.8);
+  score += pressureScore * 0.3;
+
+  // 3. Military power (20% weight)
+  score += militaryPower * 0.2;
+
+  // 4. Tech advantage (10% weight)
+  // Assumes player at tech level 5
+  const assumedPlayerTech = 5;
+  if (techLevel > assumedPlayerTech) {
+    const techAdvantage = (techLevel - assumedPlayerTech) / 5;
+    score += techAdvantage * 0.1;
+  }
+
+  // 5. Penalties
+
+  // Active wars reduce invasion (spread too thin)
+  if (activeWars > 0) {
+    score -= activeWars * 0.1;
+  }
+
+  // Low stability reduces invasion
+  if (stability < 0.5) {
+    score -= (0.5 - stability) * 0.2;
+  }
+
+  // Cooperative cultures less likely to invade
+  score -= culturalTraits.cooperation * 0.15;
+
+  // Mysticism reduces tech-based invasion
+  score -= culturalTraits.mysticism * 0.1;
+
+  return Math.max(0, Math.min(1.0, score));
+}
+```
+
+**Example Invasion Score:**
+
+```
+Alien Empire Stats:
+- Aggressiveness: 0.9 → +0.36
+- Population Pressure: 0.95 (95% of carrying capacity) → +0.045
+- Military Power: 0.7 → +0.14
+- Tech Level: 8 (vs player's 5) → +0.06
+- Active Wars: 0 → +0
+- Stability: 0.8 → +0
+- Cooperation: 0.2 → -0.03
+- Mysticism: 0.3 → -0.03
+
+Total Score: 0.555
+Threshold: 0.7
+Decision: PREPARE (building forces, not yet invading)
+
+... 100 ticks later ...
+
+Population Pressure: 1.05 → +0.075
+Military Power: 0.85 → +0.17
+
+Total Score: 0.755
+Decision: INVADE! 🚀
+```
+
+---
+
+### Planet State Tracking
+
+```typescript
+interface PlanetState {
+  /** Current population */
+  population: number;
+
+  /** Current tech level (0-10) */
+  techLevel: number;
+
+  /** Population pressure (0-1, based on carrying capacity) */
+  populationPressure: number;
+
+  /** Military power (relative score 0-1) */
+  militaryPower: number;
+
+  /** Economic strength (0-1) */
+  economicStrength: number;
+
+  /** Stability (0-1) */
+  stability: number;
+
+  /** Resource stockpiles */
+  resources: {
+    food: number;
+    metal: number;
+    energy: number;
+  };
+
+  /** Active wars count */
+  activeWars: number;
+
+  /** Has discovered player's world */
+  hasDiscoveredPlayer: boolean;
+
+  /** Has interstellar travel capability */
+  hasInterstellarTech: boolean;
+
+  /** Current tick */
+  currentTick: bigint;
+}
+```
+
+**State is extracted from AbstractPlanet:**
+
+```typescript
+function extractStateFromPlanet(planet: AbstractPlanet): PlanetState {
+  const pressure = planet.population.total / planet.population.carryingCapacity;
+
+  const militaryPower =
+    (planet.population.distribution.military / planet.population.total) *
+    (planet.tech.level / 10);
+
+  const economicStrength = planet.civilizationStats.industrialization / 10;
+
+  return {
+    population: planet.population.total,
+    techLevel: planet.tech.level,
+    populationPressure: pressure,
+    militaryPower,
+    economicStrength,
+    stability: planet.stability.overall,
+    resources: {
+      food: planet.economy.resourceStockpiles.get('food') ?? 0,
+      metal: planet.economy.resourceStockpiles.get('metal') ?? 0,
+      energy: planet.economy.resourceStockpiles.get('energy') ?? 0,
+    },
+    activeWars: planet.majorCivilizations.reduce(
+      (sum, civ) => sum + civ.activeWars.length,
+      0
+    ),
+    hasDiscoveredPlayer: false,
+    hasInterstellarTech: planet.tech.level >= 7,
+    currentTick: 0n,
+  };
+}
+```
+
+---
+
+### Invasion Event Integration
+
+When faction AI decides to invade, it emits an event:
+
+```typescript
+interface InvasionTriggeredEvent {
+  /** ID of invading universe */
+  invaderUniverse: string;
+
+  /** ID of invading faction */
+  invaderFaction: string;
+
+  /** ID of target universe (usually 'player_universe') */
+  targetUniverse: string;
+
+  /** Type of invasion */
+  invasionType: InvasionType;
+
+  /** Size of invasion force */
+  fleetSize: number;
+
+  /** Tech level of invaders */
+  techLevel: number;
+
+  /** Estimated arrival time in ticks */
+  estimatedArrival: bigint;
+
+  /** Cultural traits of invaders */
+  culturalTraits: CulturalTraits;
+
+  /** Distance to target (light-years, if applicable) */
+  distance?: number;
+}
+```
+
+**Listening for Invasions:**
+
+```typescript
+// In plot system or invasion handler
+eventBus.on('multiverse:invasion_triggered', (invasion: InvasionTriggeredEvent) => {
+  console.log(`
+    🚨 INVASION ALERT! 🚨
+    From: ${invasion.invaderUniverse}
+    Type: ${invasion.invasionType}
+    Fleet Size: ${invasion.fleetSize}
+    Tech Level: ${invasion.techLevel}
+    ETA: ${invasion.estimatedArrival} ticks
+  `);
+
+  // Spawn invasion fleet
+  const fleet = createInvasionFleet({
+    count: invasion.fleetSize,
+    techLevel: invasion.techLevel,
+    culturalTraits: invasion.culturalTraits,
+    invasionType: invasion.invasionType,
+  });
+
+  // Create portal at edge of map
+  const portal = createPortal({
+    from: invasion.invaderUniverse,
+    to: 'player_universe',
+    location: { x: 9999, y: 5000 },
+    type: 'gate',
+  });
+
+  // Alert player
+  ui.showWarning(`Portal detected! ${invasion.fleetSize} hostiles incoming!`);
+
+  // Schedule arrival
+  scheduleEvent(invasion.estimatedArrival, () => {
+    spawnFleetAtPortal(fleet, portal);
+  });
+});
+```
+
+---
+
+### Stop Conditions
+
+Background universes can stop simulating when conditions are met:
+
+```typescript
+interface SimulationStopConditions {
+  /** Stop after reaching this tech level */
+  maxTechLevel?: number;
+
+  /** Stop after this many years simulated */
+  maxSimulatedYears?: number;
+
+  /** Stop after invasion is triggered */
+  invasionTriggered?: boolean;
+
+  /** Stop if population drops below this */
+  minPopulation?: number;
+
+  /** Stop if population exceeds this */
+  maxPopulation?: number;
+
+  /** Stop if civilization collapses */
+  civilizationCollapse?: boolean;
+}
+```
+
+**Example: Stop After Invasion**
+
+```typescript
+await bgManager.spawnBackgroundUniverse({
+  type: 'other_planet',
+  description: 'Alien threat',
+  culturalTraits: { aggressiveness: 0.9, /* ... */ },
+
+  stopConditions: {
+    invasionTriggered: true,  // Stop after invasion launches
+    maxSimulatedYears: 2000,  // Or after 2000 years
+  }
+});
+
+// Universe simulates until invasion triggers
+// Then stops (no more CPU overhead)
+// Player must now deal with invasion!
+```
+
+---
+
+### Complete Usage Example
+
+```typescript
+/**
+ * Plot System: Spawn alien threat that discovers player
+ */
+class AlienInvasionPlot {
+  private bgManager: BackgroundUniverseManager;
+  private alienUniverseId: string | null = null;
+
+  constructor(world: World) {
+    const bgSystem = world.getSystem('background_universe');
+    this.bgManager = bgSystem.getManager();
+  }
+
+  async initiatePlot(): Promise<void> {
+    // Spawn alien empire in background
+    this.alienUniverseId = await this.bgManager.spawnBackgroundUniverse({
+      type: 'other_planet',
+      description: 'Insectoid hive empire from Proxima Centauri',
+
+      // Start at medieval tech, let them advance
+      techBias: 4,
+
+      // Hive-mind characteristics
+      culturalTraits: {
+        aggressiveness: 0.85,
+        expansionism: 0.9,
+        xenophobia: 0.9,
+        collectivism: 0.95,  // Hive mind
+        technophilia: 0.8,
+        mysticism: 0.1,
+        cooperation: 0.1,
+      },
+
+      // Fast simulation (2000 years/second)
+      timeScale: 2000,
+
+      // Lower threshold for faster invasion
+      invasionThreshold: 0.6,
+
+      // Stop after invasion
+      stopConditions: {
+        invasionTriggered: true,
+        maxTechLevel: 9,
+      },
+
+      // Distance from player
+      distanceLightYears: 50,
+    });
+
+    // Listen for invasion
+    eventBus.on('multiverse:invasion_triggered', (invasion) => {
+      if (invasion.invaderUniverse === this.alienUniverseId) {
+        this.handleInvasion(invasion);
+      }
+    });
+
+    console.log(`Alien plot initiated. Universe ID: ${this.alienUniverseId}`);
+    console.log('Aliens will discover player in ~10-20 minutes real-time...');
+  }
+
+  private handleInvasion(invasion: InvasionTriggeredEvent): void {
+    // Invasion type determined by cultural traits
+    // High collectivism → swarm invasion
+
+    console.log(`Swarm invasion incoming!`);
+    console.log(`Fleet size: ${invasion.fleetSize}`);
+    console.log(`ETA: ${invasion.estimatedArrival} ticks`);
+
+    // Create swarm portal
+    const portal = this.createSwarmPortal();
+
+    // Spawn insectoid swarm
+    const swarm = this.createInsectoidSwarm(
+      invasion.fleetSize,
+      invasion.techLevel
+    );
+
+    // Schedule arrival
+    this.scheduleSwarmArrival(swarm, portal, invasion.estimatedArrival);
+  }
+
+  private createSwarmPortal(): Portal {
+    // Create portal at random edge location
+    const edge = this.getRandomMapEdge();
+
+    return createPortal({
+      from: this.alienUniverseId!,
+      to: 'player_universe',
+      location: edge,
+      type: 'gate',
+      metadata: {
+        stability: 0.9,
+        invasionGate: true,
+      },
+    });
+  }
+
+  private createInsectoidSwarm(
+    count: number,
+    techLevel: number
+  ): Entity[] {
+    // Generate insectoid agents with hive-mind AI
+    const swarm: Entity[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const bug = createAgent({
+        species: 'insectoid',
+        techLevel,
+        hiveMind: true,
+        culturalTraits: {
+          collectivism: 0.95,
+          aggressiveness: 0.85,
+        },
+      });
+
+      swarm.push(bug);
+    }
+
+    return swarm;
+  }
+
+  private scheduleSwarmArrival(
+    swarm: Entity[],
+    portal: Portal,
+    eta: bigint
+  ): void {
+    // Schedule portal opening and swarm spawn
+    scheduleEvent(eta, () => {
+      portal.active = true;
+
+      // Spawn swarm near portal
+      for (const bug of swarm) {
+        spawnEntityNear(bug, portal.location, 50);
+      }
+
+      // UI alert
+      ui.showCriticalAlert(
+        'SWARM INVASION',
+        `${swarm.length} insectoid hostiles detected!`
+      );
+    });
+  }
+}
+
+// Use in game initialization
+const alienPlot = new AlienInvasionPlot(world);
+await alienPlot.initiatePlot();
+```
+
+---
+
+### Universe Discovery and Instantiation
+
+When player discovers a background universe (via portal, time machine, etc.), it transitions from abstract to full ECS:
+
+```typescript
+// Player opens portal to background universe
+bgManager.registerPlayerPortal(universeId);
+
+// On next update (within 10 seconds), universe becomes visible
+// Full ECS instantiated from statistical data
+
+// Event emitted
+eventBus.on('multiverse:universe_discovered', (event: BackgroundUniverseDiscoveredEvent) => {
+  console.log(`
+    Universe discovered!
+    Type: ${event.type}
+    Method: ${event.discoveryMethod}
+    Population: ${event.state.population}
+    Tech Level: ${event.state.techLevel}
+  `);
+
+  // Player can now visit, full ECS running
+});
+
+interface BackgroundUniverseDiscoveredEvent {
+  /** Universe ID that was discovered */
+  universeId: string;
+
+  /** Type of universe */
+  type: BackgroundUniverseType;
+
+  /** How player discovered it */
+  discoveryMethod: 'portal' | 'time_machine' | 'wormhole' | 'telescope' | 'magic';
+
+  /** Player entity that discovered it */
+  discoveredBy?: string;
+
+  /** Current state of discovered universe */
+  state: PlanetState;
+}
+```
+
+**Instantiation Constraints:**
+
+When background universe becomes visible, it generates full ECS world matching statistical data:
+
+```typescript
+interface WorldInstantiationConstraints {
+  /** Target population to generate */
+  targetPopulation: number;
+
+  /** Number of cities to generate */
+  cityCount: number;
+
+  /** Belief distribution (deity ID → follower count) */
+  beliefDistribution: Map<string, number>;
+
+  /** Average tech level */
+  avgTechLevel: number;
+
+  /** Average skill level */
+  avgSkillLevel: number;
+
+  /** Building type distribution (building type → count) */
+  buildingDistribution: Map<string, number>;
+
+  /** Named NPCs that must be included */
+  namedNPCs: Array<{
+    id: string;
+    name: string;
+    role: string;
+    location?: { x: number; y: number };
+  }>;
+
+  /** Major structures that must be included */
+  majorStructures: Array<{
+    type: string;
+    location: { x: number; y: number };
+  }>;
+
+  /** Faction relationships */
+  factions: Array<{
+    id: string;
+    name: string;
+    population: number;
+    hostility: number; // -1 to 1 (toward player)
+  }>;
+}
+```
+
+---
+
+### Integration with Plot System
+
+Background universes enable plot-driven invasions:
+
+```typescript
+/**
+ * Plot system can spawn threats dynamically
+ */
+class DynamicPlotSystem extends BaseSystem {
+  async createRetaliationPlot(
+    playerAction: 'destroyed_planet' | 'killed_civilization'
+  ): Promise<void> {
+    const bgManager = this.getBgManager();
+
+    // Spawn retribution fleet from survivors
+    const retributionId = await bgManager.spawnBackgroundUniverse({
+      type: 'parallel_universe',
+      description: 'Survivors seeking revenge',
+
+      // Already advanced (survivors escaped with tech)
+      techBias: playerTechLevel + 2,
+
+      // Extremely hostile
+      culturalTraits: {
+        aggressiveness: 0.99,
+        xenophobia: 0.95,
+        expansionism: 0.8,
+        collectivism: 0.7,
+        technophilia: 0.8,
+        mysticism: 0.2,
+        cooperation: 0.1,
+      },
+
+      // Will invade VERY quickly
+      invasionThreshold: 0.3,
+      timeScale: 5000,
+    });
+
+    // Track for narrative
+    this.activePlots.set('retribution', retributionId);
+  }
+}
+```
+
+---
+
+### Performance Considerations
+
+**Background Simulation Cost:**
+
+```typescript
+// Per background universe per tick:
+// - AbstractPlanet.update(): O(1) differential equations
+// - PlanetFactionAI.makeDecision(): O(1) score calculation
+// - Total: ~0.05ms/tick per universe
+
+// 10 background universes: 0.5ms/tick
+// Compared to main universe (full ECS): 11ms/tick
+// Total: 11.5ms/tick = 87 TPS ✅
+```
+
+**Scaling:**
+
+| Background Universes | Cost/tick | TPS Impact |
+|---------------------|-----------|------------|
+| 1 | 0.05ms | ~0.5% |
+| 5 | 0.25ms | ~2% |
+| 10 | 0.50ms | ~4% |
+| 20 | 1.00ms | ~8% |
+
+**Recommendation:** 5-10 background universes is optimal for rich gameplay without significant overhead.
+
+---
+
+### Type Definitions
+
+```typescript
+/**
+ * Background universe state
+ */
+interface BackgroundUniverse {
+  id: string;
+  type: BackgroundUniverseType;
+  universe: UniverseInstance;
+  planet: AbstractPlanet;
+  factionAI: PlanetFactionAI;
+  worker: any | null;
+  visible: boolean;
+  ticksSimulated: bigint;
+  lastUpdateTime: number;
+  stopConditions?: SimulationStopConditions;
+  stopped: boolean;
+  stopReason?: string;
+}
+
+/**
+ * Faction AI decision maker
+ */
+class PlanetFactionAI {
+  constructor(
+    planet: AbstractPlanet,
+    personality: CulturalTraits,
+    invasionThreshold: number = 0.7,
+    seed?: number
+  );
+
+  /** Update internal state from planet statistics */
+  updateState(newState: Partial<PlanetState>): void;
+
+  /** Make strategic decision based on current state */
+  makeDecision(): FactionDecision;
+
+  /** Get current planet state */
+  getState(): Readonly<PlanetState>;
+
+  /** Get cultural personality */
+  getPersonality(): Readonly<CulturalTraits>;
+
+  /** Get decision history */
+  getDecisionHistory(): ReadonlyArray<FactionDecision>;
+}
+```
+
+---
+
 ## Summary
 
 This spec defines **multiverse mechanics** for universe forking, travel, and invasion:
@@ -2809,15 +3854,29 @@ This spec defines **multiverse mechanics** for universe forking, travel, and inv
 - Merge conflicts (agent state, buildings, items, terrain)
 - Merger ships collapse branches to reduce proliferation
 
+**Background Universe Simulation:**
+- Dwarf Fortress-style hidden world generation
+- 6 universe types (other planets, timelines, dimensions)
+- O(1) statistical simulation at 1000x-100,000x speed
+- PlanetFactionAI makes autonomous invasion decisions
+- Cultural traits (7 traits) drive AI behavior
+- Invasion types: military, cultural, economic, dimensional, temporal, viral, swarm
+- Event-based invasion triggers (InvasionTriggeredEvent)
+- Seamless transition from abstract to full ECS on discovery
+- Plot system integration for narrative-driven threats
+- Performance: 5-10 universes = ~0.5ms/tick overhead
+
 **Integration:**
 - Extends PassageSnapshot with metadata
 - Uses Hilbert-Time for causal ordering
 - Supports cross_universe TradeScope
 - Snapshots enable time travel for forking
+- BackgroundUniverseSystem integrates with game loop
+- Event bus for invasion notifications
 
 ---
 
-**Document Version:** 1.0.0
-**Last Updated:** 2026-01-17
-**Total Lines:** ~950
+**Document Version:** 1.1.0
+**Last Updated:** 2026-01-19
+**Total Lines:** ~1,900
 **Status:** Complete design document

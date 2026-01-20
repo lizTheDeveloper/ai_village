@@ -64,3 +64,10 @@ export const sharingJoy = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_sharing
 export const smallForgiveness = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_small_forgiveness')!;
 export const choosingPeace = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_choosing_peace')!;
 export const momentOfClarity = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_moment_clarity')!;
+
+// Polti's 36 Dramatic Situations (Phase 1 expansion)
+export const remorse = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_remorse')!;
+export const sacrificeForPassion = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_sacrifice_for_passion')!;
+export const daringEnterprise = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_daring_enterprise')!;
+export const disaster = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_disaster')!;
+export const revolt = MICRO_PLOT_TEMPLATES.find(t => t.id === 'micro_revolt')!;

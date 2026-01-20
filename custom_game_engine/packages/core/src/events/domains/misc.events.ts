@@ -229,35 +229,8 @@ export interface MiscEvents {
     attackersRepelled: number;
   };
 
-  'village:election_completed': {
-    villageId: string;
-    villageName: string;
-    newElders: string[];
-    tick: number;
-  };
-
-  'village:council_meeting': {
-    villageId: string;
-    villageName: string;
-    tick: number;
-  };
-
-  'village:proposal_passed': {
-    villageId: string;
-    villageName: string;
-    proposal: string;
-    type: string;
-    tick: number;
-  };
-
-  'village:proposal_rejected': {
-    villageId: string;
-    villageName: string;
-    proposal: string;
-    tick: number;
-  };
-
   // === Weather Events ===
+  // Note: Village governance events moved to governance.events.ts
   'weather:changed': {
     weatherType: string;
     intensity?: string | number;
@@ -267,7 +240,11 @@ export interface MiscEvents {
   };
 
   'weather:rain': {
-    intensity?: 'light' | 'moderate' | 'heavy';
+    intensity?: 'light' | 'moderate' | 'heavy' | number;
+  };
+
+  'weather:snow': {
+    intensity?: 'light' | 'moderate' | 'heavy' | number;
   };
 
   'weather:frost': {
@@ -484,6 +461,29 @@ export interface MiscEvents {
     mythTitle: string;
     originalDeityId: EntityId;
     newDeityId: EntityId;
+    timestamp: number;
+  };
+
+  'mythology:myth_created': {
+    mythId: string;
+    title: string;
+    deityId: EntityId;
+    deityName?: string;
+    category: 'origin' | 'miracle' | 'moral' | 'prophecy' | 'parable' | 'heroic_deed' | 'cosmic_event' | 'political' | 'disaster';
+    eventType: string;
+    originalWitnessId?: string;
+    protagonistIds?: string[];
+    timestamp: number;
+  };
+
+  'mythology:legend_formed': {
+    legendId: string;
+    title: string;
+    heroId: EntityId;
+    heroName: string;
+    achievement: string;
+    difficulty: 'minor' | 'notable' | 'heroic' | 'legendary' | 'mythic';
+    witnessCount: number;
     timestamp: number;
   };
 
@@ -736,6 +736,32 @@ export interface MiscEvents {
     speciesName: string;
     programId: string;
     sourceSpeciesId: string;
+  };
+
+  // === Empire Governance Events ===
+  'empire:annual_update': {
+    empireName: string;
+    totalPopulation: number;
+    totalGDP: number;
+    vassalLoyalty: number;
+    separatistMovements: number;
+    tick: number;
+  };
+
+  'empire:separatist_movement_active': {
+    empireName: string;
+    movementId: string;
+    movementName: string;
+    strength: number;
+    tick: number;
+  };
+
+  'empire:nation_added': {
+    empireName: string;
+    nationId: string;
+    isCore: boolean;
+    autonomy: number;
+    tick: number;
   };
 
   // === Test Events ===

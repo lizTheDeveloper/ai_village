@@ -1,0 +1,65 @@
+[
+  {
+    "id": "coral_beach_house",
+    "name": "Coral Beach Cottage",
+    "description": "A tier-2 coastal dwelling with coral walls and ocean views",
+    "category": "residential",
+    "width": 6,
+    "height": 5,
+    "resourceCost": [
+      {
+        "resourceId": "wood",
+        "amountRequired": 61
+      },
+      {
+        "resourceId": "glass",
+        "amountRequired": 3
+      }
+    ],
+    "techRequired": [],
+    "terrainRequired": [],
+    "terrainForbidden": [
+      "water"
+    ],
+    "unlocked": true,
+    "buildTime": 120,
+    "tier": 2,
+    "functionality": [
+      {
+        "type": "sleeping",
+        "params": {
+          "beds": 1
+        }
+      },
+      {
+        "type": "work",
+        "params": {
+          "tables": 1
+        }
+      }
+    ],
+    "canRotate": true,
+    "rotationAngles": [
+      0,
+      90,
+      180,
+      270
+    ],
+    "snapToGrid": true,
+    "requiresFoundation": false,
+    "layout": [
+      "######",
+      "#B..W#",
+      "#.T..D",
+      "#....#",
+      "######"
+    ],
+    "materials": {
+      "wall": "coral",
+      "floor": "wood",
+      "door": "wood",
+      "window": "glass"
+    },
+    "capacity": 2
+  }
+]

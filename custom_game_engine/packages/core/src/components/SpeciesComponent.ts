@@ -105,6 +105,9 @@ export class SpeciesComponent extends ComponentBase {
   public sapient: boolean;           // Intelligent/self-aware
   public socialStructure?: string;   // 'tribal', 'feudal', 'democratic', etc.
 
+  // Language (Phase 4D integration)
+  public nativeLanguageId?: string;  // Reference to species' native language
+
   constructor(
     speciesId: string,
     speciesName: string,
@@ -135,6 +138,7 @@ export class SpeciesComponent extends ComponentBase {
     this.sapient = options.sapient ?? true;
     this.socialStructure = options.socialStructure;
     this.commonName = options.commonName ?? speciesName;
+    this.nativeLanguageId = options.nativeLanguageId;
   }
 
   /**
@@ -321,6 +325,7 @@ export class SpeciesComponent extends ComponentBase {
         sapient: this.sapient,
         socialStructure: this.socialStructure,
         commonName: this.commonName,
+        nativeLanguageId: this.nativeLanguageId,
       }
     );
   }

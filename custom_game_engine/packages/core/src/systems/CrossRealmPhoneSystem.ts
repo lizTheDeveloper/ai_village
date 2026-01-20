@@ -25,6 +25,7 @@ import {
   type CrossRealmMessage,
   type CrossRealmAddress,
 } from '../communication/CrossRealmCommunication.js';
+import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
 
 export interface CrossRealmPhoneSystemConfig {
   /** Charge rate for phones on charging stations (per tick) */
@@ -57,6 +58,12 @@ export class CrossRealmPhoneSystem extends BaseSystem {
   /** Configuration */
   private config: CrossRealmPhoneSystemConfig;
 
+  /** Universe ID for this system instance */
+  private universeId: string = 'universe:main';
+
+  /** Sigma counter for sync events (increments on cross-universe communication) */
+  private sigmaCounter: number = 0;
+
   constructor(config: Partial<CrossRealmPhoneSystemConfig> = {}) {
     super();
     this.config = {
@@ -66,6 +73,14 @@ export class CrossRealmPhoneSystem extends BaseSystem {
       debug: false,
       ...config,
     };
+  }
+
+  /**
+   * Set the universe ID for this phone system.
+   * Used to get proper Hilbert time coordinates from MultiverseCoordinator.
+   */
+  setUniverseId(universeId: string): void {
+    this.universeId = universeId;
   }
 
   protected onUpdate(ctx: SystemContext): void {
@@ -408,15 +423,64 @@ export class CrossRealmPhoneSystem extends BaseSystem {
   private getCurrentHilbertTime(world: World): HilbertTimeCoordinate {
     const currentTick = this.getCurrentTick(world);
 
-    // TODO: Get actual Hilbert time from multiverse coordinator
-    // For now, use simple coordinate
+    // Get universe from multiverse coordinator
+    const universe = multiverseCoordinator.getUniverse(this.universeId);
+
+    if (!universe) {
+      // Fallback if universe not registered with coordinator
+      return {
+        tau: currentTick,
+        beta: 'root',
+        sigma: this.sigmaCounter,
+        origin: this.universeId,
+        causalParents: [],
+      };
+    }
+
+    // Build beta branch path by walking up the parent chain
+    const beta = this.getBranchPath(universe);
+
     return {
       tau: currentTick,
-      beta: 'root.material.earth',
-      sigma: 0,
-      origin: 'universe_main',
+      beta,
+      sigma: this.sigmaCounter,
+      origin: universe.config.id,
       causalParents: [],
     };
+  }
+
+  /**
+   * Build the beta branch path for a universe by walking up its parent chain.
+   * Returns format like "root" or "root.fork1.fork2"
+   */
+  private getBranchPath(startUniverse: NonNullable<ReturnType<typeof multiverseCoordinator.getUniverse>>): string {
+    const segments: string[] = [];
+    let currentId: string | undefined = startUniverse.config.id;
+
+    // Walk up parent chain to build path segments
+    while (currentId) {
+      const current = multiverseCoordinator.getUniverse(currentId);
+      if (!current) {
+        // Universe not found, assume we're at root
+        segments.unshift('root');
+        break;
+      }
+
+      const parentId = current.config.parentId;
+      if (!parentId) {
+        // Root universe
+        segments.unshift('root');
+        break;
+      }
+
+      // Add this fork's name segment
+      segments.unshift(current.config.id);
+
+      // Move to parent
+      currentId = parentId;
+    }
+
+    return segments.join('.');
   }
 }
 

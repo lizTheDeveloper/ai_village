@@ -227,6 +227,52 @@ function tryRenderAnimatedCampfire(
   return true;
 }
 
+/**
+ * Render a simple placeholder while sprite is loading
+ */
+function renderPlaceholderSprite(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  spriteId: string
+): void {
+  // Draw a simple shape based on sprite type
+  const centerX = x + size / 2;
+  const centerY = y + size / 2;
+
+  // Determine color and shape based on sprite ID
+  if (spriteId.includes('tree')) {
+    // Tree: green circle for foliage, brown rectangle for trunk
+    ctx.fillStyle = '#2d5016';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY - size * 0.15, size * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#4a3520';
+    ctx.fillRect(centerX - size * 0.1, centerY + size * 0.1, size * 0.2, size * 0.3);
+  } else if (spriteId.includes('bush') || spriteId.includes('grass') || spriteId.includes('flower')) {
+    // Plants: green/colored mound
+    ctx.fillStyle = spriteId.includes('flower') ? '#9b5fb5' : '#3d7c47';
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY, size * 0.4, size * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (spriteId.includes('rock') || spriteId.includes('stone')) {
+    // Rock: gray irregular shape
+    ctx.fillStyle = '#6b6b6b';
+    ctx.fillRect(x + size * 0.2, y + size * 0.2, size * 0.6, size * 0.6);
+  } else if (spriteId.includes('animal') || spriteId.includes('creature')) {
+    // Animal: brown oval
+    ctx.fillStyle = '#8b6f47';
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY, size * 0.4, size * 0.25, 0, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    // Generic: gray square
+    ctx.fillStyle = '#888888';
+    ctx.fillRect(x + size * 0.25, y + size * 0.25, size * 0.5, size * 0.5);
+  }
+}
+
 export function renderSprite(
   ctx: CanvasRenderingContext2D,
   spriteId: string,
@@ -250,6 +296,17 @@ export function renderSprite(
   if (mapObjectImg) {
     // Render the pixel art sprite centered
     ctx.drawImage(mapObjectImg, x, y, size, size);
+    ctx.restore();
+    return;
+  }
+
+  // If sprite is currently loading, render a blurred placeholder
+  if (loadingImages.has(spriteId)) {
+    ctx.filter = 'blur(4px)';
+    ctx.globalAlpha = 0.6;
+    renderPlaceholderSprite(ctx, x, y, size, spriteId);
+    ctx.filter = 'none';
+    ctx.globalAlpha = 1.0;
     ctx.restore();
     return;
   }

@@ -13,8 +13,25 @@ This tool allows LLMs to:
 
 ## Quick Start
 
+### Dimensional Building Generation (NEW)
+
+Generate species-specific and higher-dimensional buildings using LLM:
+
 ```bash
 cd custom_game_engine/tools/llm-building-designer
+
+# Simple species buildings (2D layouts)
+GROQ_API_KEY=your_key npx ts-node generate-species-standalone.ts
+
+# Advanced dimensional buildings (3D/4D/5D/6D)
+GROQ_API_KEY=your_key npx ts-node generate-dimensional-buildings.ts
+```
+
+**See [DIMENSIONAL_BUILDINGS.md](./DIMENSIONAL_BUILDINGS.md) for comprehensive guide.**
+
+### Validation and Testing
+
+```bash
 npm install
 npm test      # Run validation tests
 npm run demo  # See example buildings and validation
@@ -244,6 +261,57 @@ function toGameBlueprint(building: VoxelBuildingDefinition): TileBasedBlueprint 
     // ... additional game-specific fields
   };
 }
+```
+
+## Higher-Dimensional Buildings
+
+This tool now supports generating buildings across multiple dimensions:
+
+### 3D Multi-Floor Buildings
+Standard vertical architecture with floors connected by stairs.
+- **Species**: Elven (organic treehouses), Angelic (prayer spires)
+- **Example**: 3-floor treehouse with spiral growth
+
+### 4D W-Axis Buildings
+Buildings that exist across multiple spatial slices along the W-axis.
+- **Species**: High Fae 10D
+- **Example**: Folded Manor with impossible geometry across W-slices
+- **Feature**: `dimensional.w_axis.sliceLayouts` = array of 2D layouts per slice
+
+### 5D V-Axis Buildings
+Phase-shifting structures that morph between configurations.
+- **Species**: High Fae 10D
+- **Example**: Chronodream Spire cycling through time phases
+- **Feature**: `dimensional.v_axis.phaseLayouts` = array of transitioning layouts
+
+### 6D U-Axis Buildings
+Quantum superposition structures with multiple simultaneous states.
+- **Species**: High Fae 10D
+- **Example**: Tesseract Court (throne room + war room + garden coexist)
+- **Feature**: `dimensional.u_axis.stateLayouts` + probability weights
+
+### Scripts
+
+| Script | Purpose | Output |
+|--------|---------|--------|
+| `generate-species-standalone.ts` | Simple 2D species buildings | 18 buildings, basic layouts |
+| `generate-dimensional-buildings.ts` | Advanced 3D/4D/5D/6D buildings | 13 buildings with dimensional features |
+
+**Full documentation**: [DIMENSIONAL_BUILDINGS.md](./DIMENSIONAL_BUILDINGS.md)
+
+## File Organization
+
+```
+tools/llm-building-designer/
+├── README.md                           # This file
+├── DIMENSIONAL_BUILDINGS.md            # Dimensional building guide (NEW)
+├── generate-species-standalone.ts      # Simple 2D generator
+├── generate-dimensional-buildings.ts   # Advanced dimensional generator (NEW)
+├── src/
+│   ├── exotic-buildings.ts            # Algorithmic reference implementation
+│   ├── import-to-game.ts              # Game format conversion
+│   └── types.ts                       # Building type definitions
+└── [output files]                     # Generated JSON files
 ```
 
 ## License

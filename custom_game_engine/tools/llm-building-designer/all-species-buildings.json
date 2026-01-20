@@ -1,0 +1,620 @@
+{
+  "elven": [
+    {
+      "id": "elven_treehouse",
+      "name": "Moonlit Treehouse",
+      "description": "A serene treehouse blending with nature, using living wood and crystal",
+      "category": "residential",
+      "tier": 1,
+      "layout": [
+        "#####",
+        "#W.D#",
+        "#.B.#",
+        "#S.#W",
+        "#####"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "living_wood",
+        "door": "crystal"
+      },
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 1
+          }
+        }
+      ],
+      "capacity": 2,
+      "species": "elven"
+    },
+    {
+      "id": "elven_meditationbower",
+      "name": "Crystal Meditation Bower",
+      "description": "A serene meditation space with crystal floors and living wood walls, infused with moonlight.",
+      "category": "residential",
+      "tier": 1,
+      "layout": [
+        "#####",
+        "#W..#",
+        "#.T.#",
+        "#...#",
+        "#D###"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "crystal",
+        "door": "living_wood"
+      },
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "capacity": 2
+          }
+        }
+      ],
+      "capacity": 2,
+      "species": "elven"
+    },
+    {
+      "id": "elven_library",
+      "name": "Elven Living Wood Library",
+      "description": "A serene library woven from living wood and crystal, filled with ancient tomes and bathed in natural light.",
+      "category": "public",
+      "tier": 2,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.S.#",
+        "#W.K#",
+        "#.D.#"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "living_wood",
+        "door": "living_wood",
+        "window": "crystal"
+      },
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {
+            "shelves": 4
+          }
+        },
+        {
+          "type": "reading",
+          "params": {
+            "tables": 1
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "elven"
+    },
+    {
+      "id": "enchanted_forge",
+      "name": "Enchanted Elven Forge",
+      "description": "A mystical workshop blending nature and magic, carved from living wood and crystal",
+      "category": "industrial",
+      "tier": 2,
+      "layout": [
+        "######",
+        "#....#",
+        "#W.SK#",
+        "#B..T#",
+        "#....#",
+        "D#####"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "crystal",
+        "door": "living_wood"
+      },
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "specialty": "magic_smithing"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 12
+          }
+        },
+        {
+          "type": "table",
+          "params": {
+            "type": "crafting"
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "elven"
+    },
+    {
+      "id": "starlight_sanctuary",
+      "name": "Starlight Sanctuary",
+      "description": "An elven sanctuary infused with celestial energy, using living wood and crystal for harmony with nature.",
+      "category": "spiritual",
+      "tier": 3,
+      "layout": [
+        "#######",
+        "#W...W#",
+        "#.B.K.#",
+        "#...T.#",
+        "#.....#",
+        "#S...D#",
+        "#######"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "moonlight",
+        "door": "crystal",
+        "window": "vines"
+      },
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "workstations": 1
+          }
+        },
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 1
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "shelves": 3
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "elven"
+    }
+  ],
+  "centaur": [
+    {
+      "id": "centaur_stable",
+      "name": "Centaurs' Stable",
+      "description": "A spacious single-story stable with open design for centaurs",
+      "category": "residential",
+      "tier": 1,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#.S...#",
+        "#.K...#",
+        "######D"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        },
+        {
+          "type": "workstation",
+          "params": {
+            "type": "crafting"
+          }
+        }
+      ],
+      "capacity": 2,
+      "species": "centaur"
+    },
+    {
+      "id": "centaur_meeting_hall",
+      "name": "Centaur Clan Hall",
+      "description": "Spacious meeting hall with open design and ramps",
+      "category": "public",
+      "tier": 1,
+      "layout": [
+        "#######",
+        "#W...W#",
+        "#.T...#",
+        "#.S...#",
+        "#.K...#",
+        "#W...W#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "functionality": [
+        {
+          "type": "meeting",
+          "params": {
+            "capacity": 10
+          }
+        }
+      ],
+      "capacity": 10,
+      "species": "centaur"
+    },
+    {
+      "id": "centaur_smithy",
+      "name": "Open Smithy",
+      "description": "A spacious workshop for centaur smiths with open work areas and storage",
+      "category": "commercial",
+      "tier": 2,
+      "layout": [
+        "#######",
+        "D....W#",
+        "#K...W#",
+        "#T...S#",
+        "#######"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "clay",
+        "door": "wood"
+      },
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "count": 1
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        },
+        {
+          "type": "table",
+          "params": {
+            "count": 1
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "centaur"
+    },
+    {
+      "id": "centaur_training_shelter",
+      "name": "Centaurs' Training Hall",
+      "description": "Spacious single-story training facility with ramps and open movement areas",
+      "category": "training",
+      "tier": 2,
+      "layout": [
+        "#####",
+        "#W..D",
+        "#K...#",
+        "#T.S.#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "wood",
+        "roof": "thatch"
+      },
+      "functionality": [
+        {
+          "type": "training",
+          "params": {
+            "stations": 2
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "centaur"
+    },
+    {
+      "id": "centaur_war_council",
+      "name": "Centaur War Council Chamber",
+      "description": "A spacious chamber for strategic meetings.",
+      "category": "military",
+      "tier": 3,
+      "layout": [
+        "#####",
+        "#D...",
+        "#...W",
+        "#.T.K.",
+        "#####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "clay",
+        "door": "wood"
+      },
+      "functionality": [
+        {
+          "type": "meeting",
+          "params": {
+            "table": 1,
+            "workstations": 2
+          }
+        }
+      ],
+      "capacity": 10,
+      "species": "centaur"
+    }
+  ],
+  "angelic": [
+    {
+      "id": "celestial_prayer_spire",
+      "name": "Celestial Prayer Spire",
+      "description": "A vertical sanctuary for divine communion with radiant light.",
+      "category": "religious",
+      "tier": 1,
+      "layout": [
+        "#####",
+        "#D#W#",
+        "#.#.#",
+        "#...#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "crystal",
+        "door": "gold"
+      },
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "type": "prayer"
+          }
+        }
+      ],
+      "capacity": 1,
+      "species": "angelic"
+    },
+    {
+      "id": "choir_tower",
+      "name": "Choir Tower",
+      "description": "A vertical tower with sacred geometry and divine light",
+      "category": "religious",
+      "tier": 1,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#.T.#",
+        "#...#",
+        "###D#"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "marble",
+        "door": "gold",
+        "window": "crystal"
+      },
+      "functionality": [
+        {
+          "type": "gathering",
+          "params": {
+            "capacity": 4
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "angelic"
+    },
+    {
+      "id": "celestial_archives",
+      "name": "Celestial Archives",
+      "description": "A sacred vault for storing divine knowledge, illuminated by starlight.",
+      "category": "commercial",
+      "tier": 2,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#...#",
+        "#..D#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "marble",
+        "door": "gold"
+      },
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 10
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "angelic"
+    },
+    {
+      "id": "meditation_sanctum_angelic",
+      "name": "Celestial Meditation Sanctum",
+      "description": "A towering meditative space with divine light and sacred geometry.",
+      "category": "spiritual",
+      "tier": 3,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#.WWW.#",
+        "#.T..S#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "crystal",
+        "door": "gold"
+      },
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "spots": 4
+          }
+        },
+        {
+          "type": "divine_light",
+          "params": {
+            "source": "starlight"
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "angelic"
+    }
+  ],
+  "high_fae_10d": [
+    {
+      "id": "folded_manor",
+      "name": "Folded Manor",
+      "description": "A reality-bending structure with impossible geometry",
+      "category": "residential",
+      "tier": 1,
+      "layout": [
+        "#####",
+        "#D..#",
+        "#.K.#",
+        "#S..#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "crystallized_dreams",
+        "floor": "starlight",
+        "door": "frozen_time"
+      },
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "type": "dimensional_folding"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "capacity": 2,
+      "species": "high_fae_10d"
+    },
+    {
+      "id": "high_fae_impossible_tower",
+      "name": "Chronodream Spire",
+      "description": "A non-Euclidean tower folding reality into itself, constructed from frozen time and crystallized dreams",
+      "category": "residential",
+      "tier": 1,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#.B.#",
+        "#.S.#",
+        "D####"
+      ],
+      "materials": {
+        "wall": "frozen_time",
+        "floor": "crystallized_dreams",
+        "door": "starlight"
+      },
+      "functionality": [
+        {
+          "type": "time_manipulation",
+          "params": {
+            "temporal_shift": true
+          }
+        },
+        {
+          "type": "dream_storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "capacity": 1,
+      "species": "high_fae_10d"
+    },
+    {
+      "id": "tesseract_court",
+      "name": "Tesseract Court of Dimensional Weave",
+      "description": "A non-Euclidean court with impossible geometry and dimensional folding.",
+      "category": "public",
+      "tier": 2,
+      "layout": [
+        "#####",
+        "#W..#",
+        "#.K.#",
+        "#..W#",
+        "D...#"
+      ],
+      "materials": {
+        "wall": "frozen_time",
+        "floor": "crystallized_dreams",
+        "door": "starlight"
+      },
+      "functionality": [
+        {
+          "type": "governing",
+          "params": {
+            "seats": 4
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "high_fae_10d"
+    },
+    {
+      "id": "high_fae_workshop",
+      "name": "Between-Space Workshop",
+      "description": "A workshop existing in folded dimensions, allowing crafting across realities",
+      "category": "workshop",
+      "tier": 2,
+      "layout": [
+        "#####",
+        "#W.K#",
+        "#.S.#",
+        "#D..#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "frozen_time",
+        "floor": "crystallized_dreams",
+        "door": "starlight"
+      },
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "crafting": "dimensional_folding"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "capacity": 4,
+      "species": "high_fae_10d"
+    }
+  ]
+}

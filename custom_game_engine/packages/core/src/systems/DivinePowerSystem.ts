@@ -1,12 +1,25 @@
 /**
- * DivinePowerSystem - Executes divine powers and manages their effects
+ * DivinePowerSystem - Execute divine powers and manage active effects
  *
- * Allows deities to spend belief to perform divine actions:
- * - Visions/dreams sent to believers
- * - Miracles (physical effects)
- * - Blessings/curses
- * - Angel creation
- * - Avatar manifestation
+ * Phase 27: Divinity System - Divine Power Execution
+ * Priority: 120 (between DeityEmergenceSystem at 115 and PrayerSystem at 130)
+ *
+ * Responsibilities:
+ * - Energy regeneration from belief income
+ * - Active effect maintenance (drain energy/belief for sustained effects)
+ * - Cooldown management for power usage
+ * - Power cleanup (remove expired blessings/curses)
+ * - Cost validation (check if deity can afford power execution)
+ *
+ * Related Systems:
+ * - DeityEmergenceSystem (115): Creates deities
+ * - PrayerSystem (130): Generates prayers that trigger power usage
+ * - PrayerAnsweringSystem: May use this system to execute powers in response to prayers
+ * - PossessionSystem: Player-controlled deities use this to execute powers
+ *
+ * Integration:
+ * - DeityComponent: Tracks belief reserves and believers
+ * - DivineAbilityComponent: Tracks available powers, active effects, cooldowns
  */
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
@@ -14,6 +27,7 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import type { DivineAbilityComponent } from '../components/DivineAbilityComponent.js';
 import type { SpiritualComponent, Vision } from '../components/SpiritualComponent.js';
 import { receiveVision, answerPrayer } from '../components/SpiritualComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
@@ -33,7 +47,16 @@ import {
   calculateEffectivePowerCost,
   type PowerConfig,
 } from '../divinity/UniverseConfig.js';
-import type { DivinePowerType } from '../divinity/DivinePowerTypes.js';
+import type {
+  DivinePower,
+  DivinePowerType,
+  PowerUseRequest,
+  PowerUseResult,
+  ActiveBlessing,
+  ActiveCurse,
+} from '../divinity/DivinePowerTypes.js';
+import { getTierForBelief, canUsePower } from '../divinity/DivinePowerTypes.js';
+import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * Simplified presence data for crossing calculations.
@@ -65,15 +88,15 @@ export interface DivinePowerRequest {
 }
 
 /**
- * DivinePowerSystem - Processes divine power executions
+ * DivinePowerSystem - Manages divine power execution and active effects
  */
 export class DivinePowerSystem extends BaseSystem {
   public readonly id = 'divine_power';
-  public readonly priority: number = 120; // After belief generation
-  public readonly requiredComponents = [] as const;
-  // Only run when deity components exist (O(1) activation check)
-  public readonly activationComponents = ['deity'] as const;
-  protected readonly throttleInterval = 100; // SLOW - 5 seconds
+  public readonly priority: number = 120; // After DeityEmergence (115), before Prayer (130)
+  public readonly requiredComponents = [CT.Deity, CT.DivineAbility] as const;
+  // Lazy activation: only run when deities with divine abilities exist
+  public readonly activationComponents = ['deity', 'divine_ability'] as const;
+  protected readonly throttleInterval = THROTTLE.FAST; // Every tick (20 TPS)
 
   private pendingPowers: DivinePowerRequest[] = [];
 
@@ -88,6 +111,25 @@ export class DivinePowerSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Process active deities with divine abilities
+    for (const entity of ctx.activeEntities) {
+      if (!entity.components.has(CT.Deity) || !entity.components.has(CT.DivineAbility)) {
+        continue;
+      }
+
+      const deity = entity.components.get(CT.Deity) as DeityComponent;
+      const divineAbility = entity.components.get(CT.DivineAbility) as DivineAbilityComponent;
+
+      // Update divine energy pool
+      this._regenerateEnergy(deity, divineAbility, ctx.tick);
+
+      // Apply maintenance costs for active effects
+      this._applyMaintenanceCosts(ctx, entity.id, deity, divineAbility, ctx.tick);
+
+      // Cleanup expired effects
+      this._cleanupExpiredEffects(ctx, entity.id, deity, divineAbility, ctx.tick);
+    }
+
     // Process pending power requests
     while (this.pendingPowers.length > 0) {
       const request = this.pendingPowers.shift();
@@ -102,6 +144,199 @@ export class DivinePowerSystem extends BaseSystem {
    */
   public queuePower(request: DivinePowerRequest): void {
     this.pendingPowers.push(request);
+  }
+
+  /**
+   * Regenerate divine energy pool based on belief income
+   */
+  private _regenerateEnergy(
+    deity: DeityComponent,
+    divineAbility: DivineAbilityComponent,
+    currentTick: number
+  ): void {
+    // Base regen from belief income (1% of belief per tick becomes energy)
+    const beliefRegen = deity.belief.beliefPerTick * 0.01;
+
+    // Apply regen rate multiplier from component
+    const totalRegen = beliefRegen + divineAbility.energyRegenRate;
+
+    divineAbility.regenerateEnergy(totalRegen);
+
+    // Update the component's regen rate for display
+    divineAbility.energyRegenRate = totalRegen;
+  }
+
+  /**
+   * Apply maintenance costs for active blessings and curses
+   */
+  private _applyMaintenanceCosts(
+    ctx: SystemContext,
+    deityId: string,
+    deity: DeityComponent,
+    divineAbility: DivineAbilityComponent,
+    currentTick: number
+  ): void {
+    const totalCost = divineAbility.getTotalMaintenanceCost();
+
+    if (totalCost === 0) {
+      return; // No maintenance costs
+    }
+
+    // Try to pay from energy pool first
+    if (divineAbility.spendEnergy(totalCost)) {
+      return; // Paid from energy
+    }
+
+    // Not enough energy, try to pay from belief reserves
+    if (deity.spendBelief(totalCost)) {
+      return; // Paid from belief
+    }
+
+    // Cannot afford maintenance - start dropping effects
+    this.events.emit('divine:maintenance_failed', {
+      deityId,
+      deityName: deity.identity.primaryName,
+      maintenanceCost: totalCost,
+      currentBelief: deity.belief.currentBelief,
+      currentEnergy: divineAbility.divineEnergyPool,
+      activeEffects: divineAbility.getActiveEffectCount(),
+    });
+
+    // Drop lowest-cost effects first (player should have warning)
+    this._dropCheapestEffects(ctx, deityId, deity, divineAbility, totalCost, currentTick);
+  }
+
+  /**
+   * Drop cheapest active effects when maintenance cannot be afforded
+   */
+  private _dropCheapestEffects(
+    ctx: SystemContext,
+    deityId: string,
+    deity: DeityComponent,
+    divineAbility: DivineAbilityComponent,
+    totalCost: number,
+    currentTick: number
+  ): void {
+    // Collect all effects with costs
+    const effects: Array<{
+      type: 'blessing' | 'curse';
+      id: string;
+      cost: number;
+      data: ActiveBlessing | ActiveCurse;
+    }> = [];
+
+    for (const [id, blessing] of divineAbility.activeBlessings) {
+      effects.push({ type: 'blessing', id, cost: blessing.maintenanceCost, data: blessing });
+    }
+
+    for (const [id, curse] of divineAbility.activeCurses) {
+      effects.push({ type: 'curse', id, cost: curse.maintenanceCost, data: curse });
+    }
+
+    // Sort by cost (cheapest first)
+    effects.sort((a, b) => a.cost - b.cost);
+
+    // Drop effects until we can afford remaining ones
+    let saved = 0;
+    for (const effect of effects) {
+      if (saved >= totalCost) {
+        break;
+      }
+
+      // Remove the effect
+      if (effect.type === 'blessing') {
+        divineAbility.removeBlessing(effect.id);
+        divineAbility.removeActivePower(effect.id);
+
+        this.events.emit('divine:blessing_expired', {
+          deityId,
+          deityName: deity.identity.primaryName,
+          blessingId: effect.id,
+          targetId: effect.data.targetId,
+          blessingType: (effect.data as ActiveBlessing).blessingType,
+          reason: 'maintenance_failure',
+          tick: currentTick,
+        });
+      } else {
+        divineAbility.removeCurse(effect.id);
+        divineAbility.removeActivePower(effect.id);
+
+        this.events.emit('divine:curse_expired', {
+          deityId,
+          deityName: deity.identity.primaryName,
+          curseId: effect.id,
+          targetId: effect.data.targetId,
+          curseType: (effect.data as ActiveCurse).curseType,
+          reason: 'maintenance_failure',
+          tick: currentTick,
+        });
+      }
+
+      saved += effect.cost;
+    }
+  }
+
+  /**
+   * Cleanup expired blessings and curses
+   */
+  private _cleanupExpiredEffects(
+    ctx: SystemContext,
+    deityId: string,
+    deity: DeityComponent,
+    divineAbility: DivineAbilityComponent,
+    currentTick: number
+  ): void {
+    // Check blessings
+    const expiredBlessings: string[] = [];
+    for (const [id, blessing] of divineAbility.activeBlessings) {
+      if (blessing.expiresAt !== -1 && blessing.expiresAt <= currentTick) {
+        expiredBlessings.push(id);
+      }
+    }
+
+    for (const id of expiredBlessings) {
+      const blessing = divineAbility.activeBlessings.get(id);
+      if (!blessing) continue;
+
+      divineAbility.removeBlessing(id);
+      divineAbility.removeActivePower(id);
+
+      this.events.emit('divine:blessing_expired', {
+        deityId,
+        deityName: deity.identity.primaryName,
+        blessingId: id,
+        targetId: blessing.targetId,
+        blessingType: blessing.blessingType,
+        reason: 'duration_ended',
+        tick: currentTick,
+      });
+    }
+
+    // Check curses
+    const expiredCurses: string[] = [];
+    for (const [id, curse] of divineAbility.activeCurses) {
+      if (curse.expiresAt !== -1 && curse.expiresAt <= currentTick) {
+        expiredCurses.push(id);
+      }
+    }
+
+    for (const id of expiredCurses) {
+      const curse = divineAbility.activeCurses.get(id);
+      if (!curse) continue;
+
+      divineAbility.removeCurse(id);
+      divineAbility.removeActivePower(id);
+
+      this.events.emit('divine:curse_expired', {
+        deityId,
+        deityName: deity.identity.primaryName,
+        curseId: id,
+        targetId: curse.targetId,
+        curseType: curse.curseType,
+        reason: 'duration_ended',
+        tick: currentTick,
+      });
+    }
   }
 
   /**
@@ -1136,5 +1371,178 @@ export class DivinePowerSystem extends BaseSystem {
    */
   getPassage(passageId: string): MultiversePassage | undefined {
     return this.passages.get(passageId);
+  }
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Execute a divine power
+ * @param ctx - System context
+ * @param deityId - Deity entity ID
+ * @param power - Divine power definition
+ * @param request - Power use request
+ * @returns Power use result
+ */
+export function executeDivinePower(
+  ctx: SystemContext,
+  deityId: string,
+  power: DivinePower,
+  request: PowerUseRequest
+): PowerUseResult {
+  const deityEntity = ctx.world.getEntity(deityId);
+  if (!deityEntity) {
+    throw new Error(`Deity entity ${deityId} not found`);
+  }
+
+  const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
+  const divineAbility = deityEntity.components.get(CT.DivineAbility) as DivineAbilityComponent | undefined;
+
+  if (!deity || !divineAbility) {
+    throw new Error(`Deity ${deityId} missing required components`);
+  }
+
+  // Check if power is on cooldown
+  if (!divineAbility.isPowerAvailable(power.type, ctx.tick)) {
+    return {
+      success: false,
+      beliefSpent: 0,
+      effects: [],
+      witnessed: false,
+      witnessIds: [],
+      mythWorthy: false,
+      identityImplications: [],
+      cooldownUntil: divineAbility.powerCooldowns.get(power.type) || ctx.tick,
+      failureReason: 'on_cooldown',
+    };
+  }
+
+  // Calculate actual cost (with domain modifiers and specialization)
+  const { canAfford, actualCost } = canAffordPower(deity, divineAbility, power);
+
+  if (!canAfford) {
+    return {
+      success: false,
+      beliefSpent: 0,
+      effects: [],
+      witnessed: false,
+      witnessIds: [],
+      mythWorthy: false,
+      identityImplications: [],
+      cooldownUntil: ctx.tick,
+      failureReason: 'insufficient_belief',
+    };
+  }
+
+  // Spend belief
+  if (!deity.spendBelief(actualCost)) {
+    return {
+      success: false,
+      beliefSpent: 0,
+      effects: [],
+      witnessed: false,
+      witnessIds: [],
+      mythWorthy: false,
+      identityImplications: [],
+      cooldownUntil: ctx.tick,
+      failureReason: 'insufficient_belief',
+    };
+  }
+
+  // Calculate cooldown (in ticks: hours * 1200 ticks/hour at 20 TPS)
+  const cooldownTicks = power.cooldown * 1200;
+  const cooldownUntil = ctx.tick + cooldownTicks;
+
+  // Create power use result
+  const result: PowerUseResult = {
+    success: true,
+    beliefSpent: actualCost,
+    effects: [],
+    witnessed: false,
+    witnessIds: [],
+    mythWorthy: power.mythogenic,
+    identityImplications: [],
+    cooldownUntil,
+  };
+
+  // Record power use
+  divineAbility.recordPowerUse(power.type, ctx.tick, actualCost, request.targets[0]?.id || '', result);
+
+  return result;
+}
+
+/**
+ * Check if deity can afford a power
+ * @param deity - Deity component
+ * @param divineAbility - Divine ability component
+ * @param power - Power definition
+ * @returns Whether deity can afford the power and the actual cost
+ */
+export function canAffordPower(
+  deity: DeityComponent,
+  divineAbility: DivineAbilityComponent,
+  power: DivinePower
+): { canAfford: boolean; actualCost: number } {
+  // Get deity's current tier
+  const deityTier = getTierForBelief(deity.belief.currentBelief);
+
+  // Check tier requirement
+  const tierCheck = canUsePower(power.requiredTier, deity.belief.currentBelief, power.baseCost);
+  if (!tierCheck.canUse) {
+    return { canAfford: false, actualCost: power.baseCost };
+  }
+
+  // Calculate domain cost modifier
+  let domainModifier = 1.0;
+  const isInDomain = power.nativeDomains.includes(deity.identity.domain || 'mystery');
+  const isInSecondaryDomain = deity.identity.secondaryDomains.some(d => power.nativeDomains.includes(d));
+
+  if (isInDomain) {
+    domainModifier = 1.0; // Native domain - no modifier
+  } else if (isInSecondaryDomain) {
+    domainModifier = 1.25; // Secondary domain - slight penalty
+  } else {
+    domainModifier = power.offDomainMultiplier; // Off-domain - full penalty
+  }
+
+  // Apply specialization bonus (reduces cost)
+  const specializationBonus = divineAbility.getSpecializationBonus(power.type);
+  const specializationModifier = 1.0 - (specializationBonus * 0.5); // Max 50% reduction at full specialization
+
+  // Calculate final cost
+  const actualCost = Math.ceil(power.baseCost * domainModifier * specializationModifier);
+
+  // Check if deity has enough belief
+  const canAfford = deity.belief.currentBelief >= actualCost;
+
+  return { canAfford, actualCost };
+}
+
+/**
+ * Apply maintenance costs for active effects (called by system update)
+ * @param ctx - System context
+ * @param deity - Deity component
+ * @param divineAbility - Divine ability component
+ * @param tick - Current tick
+ */
+export function applyMaintenanceCosts(
+  ctx: SystemContext,
+  deity: DeityComponent,
+  divineAbility: DivineAbilityComponent,
+  tick: number
+): void {
+  // Maintenance is applied per tick in the system update
+  // This helper is for external use if needed
+  const totalCost = divineAbility.getTotalMaintenanceCost();
+
+  if (totalCost === 0) {
+    return;
+  }
+
+  // Try energy first, then belief
+  if (!divineAbility.spendEnergy(totalCost)) {
+    deity.spendBelief(totalCost);
   }
 }

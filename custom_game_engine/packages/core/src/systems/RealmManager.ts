@@ -6,6 +6,7 @@ import type { RealmComponent } from '../components/RealmComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { RealmProperties } from '../realms/RealmTypes.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 /**
@@ -148,6 +149,9 @@ export class RealmManager extends BaseSystem {
     const realm = this.getRealm(realmId, world);
     if (!realm) return;
 
+    const inhabitantCount = realm.inhabitants.length;
+    const subRealmIds = realm.properties.subRealms || [];
+
     // Eject all inhabitants back to mortal world
     for (const inhabitantId of realm.inhabitants) {
       const entity = world.getEntity(inhabitantId);
@@ -164,13 +168,108 @@ export class RealmManager extends BaseSystem {
       }
     }
 
+    // Handle sub-realms before marking realm inactive
+    this.handleSubRealmCollapse(realmId, realm.properties.name, subRealmIds, world);
+
     // Mark realm as inactive
     realm.active = false;
     realm.inhabitants = [];
 
-    // TODO: Trigger realm collapse events
-    // TODO: Notify ruler (if any)
-    // TODO: Handle sub-realms
+    // Emit realm collapse event
+    world.eventBus.emit({
+      type: 'realm:collapsed',
+      source: realmId,
+      data: {
+        realmId,
+        realmName: realm.properties.name,
+        reason: 'maintenance_depleted',
+        rulerId: realm.properties.ruler,
+        rulerName: realm.properties.ruler ? this.getRulerName(realm.properties.ruler, world) : undefined,
+        subRealmIds,
+        inhabitantCount,
+        timeSinceCreation: realm.timeSinceCreation,
+      },
+    });
+
+    // Notify ruler if one exists
+    if (realm.properties.ruler) {
+      this.notifyRuler(realm.properties.ruler, realmId, realm.properties.name, world);
+    }
+  }
+
+  /**
+   * Handle sub-realms when parent realm collapses
+   */
+  private handleSubRealmCollapse(parentRealmId: string, parentRealmName: string, subRealmIds: string[], world: World): void {
+    for (const subRealmId of subRealmIds) {
+      const subRealm = this.getRealm(subRealmId, world);
+      if (!subRealm) continue;
+
+      // Determine fate of sub-realm based on its properties
+      const isStable = subRealm.properties.stability > 0.5;
+      const isSelfSustaining = subRealm.properties.selfSustaining;
+
+      let newStatus: 'independent' | 'unstable' | 'cascading_collapse';
+
+      if (isSelfSustaining && isStable) {
+        // Sub-realm becomes independent
+        newStatus = 'independent';
+        // Remove parent reference if it exists in properties
+        // (Note: RealmProperties doesn't have parentRealmId, but MythologicalRealms does)
+      } else if (isSelfSustaining || isStable) {
+        // Sub-realm becomes unstable but survives
+        newStatus = 'unstable';
+        subRealm.properties.stability = Math.max(0.1, subRealm.properties.stability - 0.3);
+      } else {
+        // Sub-realm collapses too (cascade)
+        newStatus = 'cascading_collapse';
+        this.collapseRealm(subRealmId, world);
+        continue; // Skip orphan event since it's collapsing
+      }
+
+      // Emit orphan event for surviving sub-realms
+      world.eventBus.emit({
+        type: 'realm:orphaned',
+        source: subRealmId,
+        data: {
+          realmId: subRealmId,
+          realmName: subRealm.properties.name,
+          parentRealmId,
+          parentRealmName,
+          newStatus,
+        },
+      });
+    }
+  }
+
+  /**
+   * Notify realm ruler that their realm has collapsed
+   */
+  private notifyRuler(rulerId: string, realmId: string, realmName: string, world: World): void {
+    // Emit a divine intervention event that can be picked up by the deity system
+    world.eventBus.emit({
+      type: 'divine:intervention',
+      source: rulerId,
+      data: {
+        deityId: rulerId,
+        interventionType: 'realm_collapse_notification',
+        targetId: realmId,
+        description: `Your realm "${realmName}" has collapsed due to lack of maintenance!`,
+      },
+    });
+  }
+
+  /**
+   * Get ruler name for event logging
+   */
+  private getRulerName(rulerId: string, world: World): string | undefined {
+    // Try to find presence entity (gods/deities)
+    const rulerEntity = world.getEntity(rulerId);
+    if (rulerEntity) {
+      const identity = rulerEntity.getComponent<IdentityComponent>(CT.Identity);
+      if (identity) return identity.name;
+    }
+    return undefined;
   }
 
   /**

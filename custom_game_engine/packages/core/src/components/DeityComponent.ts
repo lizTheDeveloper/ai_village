@@ -155,11 +155,14 @@ export class DeityComponent extends ComponentBase {
     interpretation?: string;
   }>;
 
+  // Prayer Statistics
+  public totalAnsweredPrayers: number;
+
   // Mythology
   public myths: Array<{
     id: string;
     title: string;
-    category: 'origin' | 'miracle' | 'moral' | 'prophecy' | 'parable';
+    category: 'origin' | 'miracle' | 'moral' | 'prophecy' | 'parable' | 'heroic_deed' | 'cosmic_event' | 'political' | 'disaster';
     content: string;
     believerCount: number;
     variants: number;
@@ -215,6 +218,7 @@ export class DeityComponent extends ComponentBase {
     this.sentVisions = [];
     this.myths = [];
     this.controller = controller;
+    this.totalAnsweredPrayers = 0;
   }
 
   /**
@@ -337,6 +341,10 @@ export class DeityComponent extends ComponentBase {
 
     // Remove from queue
     this.removePrayer(prayerId);
+
+    // Increment total answered prayers
+    this.totalAnsweredPrayers++;
+
     return true;
   }
 

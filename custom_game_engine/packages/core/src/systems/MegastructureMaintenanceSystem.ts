@@ -28,9 +28,15 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { EntityImpl } from '../ecs/Entity.js';
+import type {
+  MegastructureComponent,
+  ConstructionPhase,
+} from '../components/MegastructureComponent.js';
+import type { WarehouseComponent } from '../components/WarehouseComponent.js';
 
 /**
  * Megastructure types with their maintenance requirements
+ * Note: This mirrors the structureType field from MegastructureComponent
  */
 export type MegastructureType =
   | 'space_station'
@@ -43,12 +49,10 @@ export type MegastructureType =
 
 /**
  * Megastructure operational phase
+ * Note: Using ConstructionPhase from MegastructureComponent directly
+ * (no 'critical' phase - use 'degraded' for near-failure state)
  */
-export type MegastructurePhase =
-  | 'operational' // Fully functional
-  | 'degraded' // Reduced efficiency, needs urgent maintenance
-  | 'critical' // Near failure
-  | 'ruins'; // Collapsed, archaeological value only
+export type MegastructurePhase = ConstructionPhase;
 
 /**
  * Decay stage definition
@@ -62,13 +66,10 @@ export interface DecayStage {
 }
 
 /**
- * Megastructure component (assumed structure based on specs)
- * This component would be defined elsewhere, but we define the interface here
- * for type safety.
+ * Extended maintenance-specific fields that may not be in MegastructureComponent yet.
+ * TODO: Migrate these fields to MegastructureComponent if not already present.
  */
-export interface MegastructureComponent {
-  type: 'megastructure';
-  structureType: MegastructureType;
+export interface MegastructureMaintenanceData {
   phase: MegastructurePhase;
   efficiency: number; // 0-1, production/function multiplier
   lastMaintenanceTick: number;
@@ -316,21 +317,24 @@ const MAINTENANCE_CONFIGS: Record<MegastructureType, MaintenanceConfig> = {
 
 /**
  * Numeric phase indices for fast comparison
+ * Note: ConstructionPhase doesn't have 'critical', only 'degraded'
  */
 const enum PhaseIndex {
-  Operational = 0,
-  Degraded = 1,
-  Critical = 2,
-  Ruins = 3,
+  Planning = 0,
+  Building = 1,
+  Operational = 2,
+  Degraded = 3,
+  Ruins = 4,
 }
 
 /**
  * Phase index to string mapping
  */
 const PHASE_STRINGS: readonly MegastructurePhase[] = [
+  'planning',
+  'building',
   'operational',
   'degraded',
-  'critical',
   'ruins',
 ];
 
@@ -372,7 +376,7 @@ class FastRNG {
 export class MegastructureMaintenanceSystem extends BaseSystem {
   public readonly id: SystemId = 'megastructure_maintenance';
   public readonly priority: number = 310;
-  public readonly requiredComponents: ReadonlyArray<CT_Type> = [CT.Position]; // Placeholder - actual 'megastructure' component
+  public readonly requiredComponents: ReadonlyArray<CT_Type> = [CT.Megastructure];
   // Lazy activation: Skip entire system when no megastructure exists
   public readonly activationComponents = ['megastructure'] as const;
   protected readonly throttleInterval = 500; // 25 seconds
@@ -402,7 +406,11 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   // Memoization cache for maintenance cost calculations
   private readonly maintenanceCostCache = new Map<string, number>();
 
-  protected onInitialize(_world: World, _eventBus: EventBus): void {
+  // World reference for queries
+  private world!: World;
+
+  protected onInitialize(world: World, _eventBus: EventBus): void {
+    this.world = world;
     // Build all lookup tables once at initialization
     for (const [type, config] of Object.entries(MAINTENANCE_CONFIGS)) {
       const structureType = type as MegastructureType;
@@ -440,11 +448,11 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
 
       // Get cached lookup values once
       const structureType = mega.structureType;
-      const ticksSinceMaintenance = currentTick - mega.lastMaintenanceTick;
+      const ticksSinceMaintenance = currentTick - mega.maintenance.lastMaintenanceAt;
 
       // Early exit: ruins only age (no maintenance/degradation)
-      if (mega.phase === 'ruins') {
-        this.ageRuinsOptimized(currentTick, mega);
+      if (mega.construction.phase === 'ruins') {
+        this.ageRuinsOptimized(currentTick, mega, impl);
         continue;
       }
 
@@ -457,28 +465,23 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
       const maintenancePerformed = this.performMaintenanceOptimized(mega, ticksSinceMaintenance);
 
       if (maintenancePerformed) {
-        // Restore efficiency and reset debt
+        // Restore efficiency
         mega.efficiency = Math.min(1.0, mega.efficiency + 0.1);
-        mega.lastMaintenanceTick = currentTick;
-        mega.maintenanceDebt = 0;
+        mega.maintenance.lastMaintenanceAt = currentTick;
+        // Note: maintenanceDebt not yet in component schema
         this.emitMaintenanceEvent(world, impl, mega);
       } else {
-        // Apply degradation and accumulate debt in single pass
+        // Apply degradation in single pass
         this.applyDegradationAndDebt(mega, ticksSinceMaintenance);
 
-        // Check for failure (using precomputed thresholds)
-        const failureDebt = this.failureDebtLookup.get(structureType)!;
-        const criticalDebt = this.criticalDebtLookup.get(structureType)!;
-
-        if (mega.maintenanceDebt > failureDebt || mega.efficiency <= 0) {
+        // Check for failure based on efficiency
+        if (mega.efficiency <= 0) {
           this.transitionToRuins(world, impl, mega);
           continue; // Skip phase update after ruins transition
         }
 
-        if (mega.maintenanceDebt > criticalDebt && mega.phase !== 'critical') {
-          mega.phase = 'critical';
-          this.emitFailureEvent(world, impl, mega, 'critical');
-        }
+        // Note: Critical phase transition based on debt requires debt field in component
+        // For now, just use efficiency thresholds
       }
 
       // Update phase based on efficiency (numeric comparison)
@@ -501,52 +504,162 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   }
 
   /**
-   * Get megastructure component (duck typing)
-   * In production, this would use entity.getComponent('megastructure')
+   * Get megastructure component from entity
    */
   private getMegastructureComponent(entity: EntityImpl): MegastructureComponent | null {
-    // PLACEHOLDER: Replace with actual component lookup once MegastructureComponent is defined
-    // const mega = entity.getComponent('megastructure') as MegastructureComponent;
-    // For now, return null to avoid runtime errors
-    return null;
+    return entity.getComponent<MegastructureComponent>(CT.Megastructure) ?? null;
+  }
+
+  /**
+   * Get maintenance data fields from nested component structure
+   * MegastructureComponent uses nested objects, but this system needs flat access
+   */
+  private getMaintenanceData(mega: MegastructureComponent): MegastructureMaintenanceData {
+    return {
+      phase: mega.construction.phase as MegastructurePhase,
+      efficiency: mega.efficiency,
+      lastMaintenanceTick: mega.maintenance.lastMaintenanceAt,
+      constructionCompleteTick: mega.construction.completedAt ?? mega.construction.startedAt,
+      controllingFactionId: mega.strategic.controlledBy,
+      isAIControlled: false, // TODO: Add AI control tracking to MegastructureComponent
+      maintenanceDebt: 0, // TODO: Add debt tracking to MegastructureComponent.maintenance
+      yearsInDecay: 0, // TODO: Add decay tracking for ruins
+      decayStageIndex: 0, // TODO: Add decay stage tracking
+      archaeologicalValue: 0, // TODO: Add archaeological value tracking
+    };
+  }
+
+  /**
+   * Update component from flat maintenance data
+   */
+  private updateComponentFromMaintenanceData(
+    mega: MegastructureComponent,
+    data: Partial<MegastructureMaintenanceData>
+  ): void {
+    if (data.phase !== undefined) {
+      mega.construction.phase = data.phase;
+    }
+    if (data.efficiency !== undefined) {
+      mega.efficiency = data.efficiency;
+    }
+    if (data.lastMaintenanceTick !== undefined) {
+      mega.maintenance.lastMaintenanceAt = data.lastMaintenanceTick;
+    }
+    // TODO: Update other fields when added to MegastructureComponent
   }
 
   /**
    * OPTIMIZED: Perform maintenance with zero allocations
    * Uses precomputed lookup tables and early exits
+   *
+   * Integrates with warehouse system to deduct resources from faction inventory
    */
   private performMaintenanceOptimized(
     mega: MegastructureComponent,
     ticksSinceMaintenance: number
   ): boolean {
-    // Early exit: AI-controlled structures always succeed (automation)
-    if (mega.isAIControlled) {
-      return true;
-    }
-
     // Early exit: no controlling faction
-    if (!mega.controllingFactionId) {
+    if (!mega.strategic.controlledBy) {
       return false;
     }
 
-    // Get precomputed cost per tick (zero division at runtime)
-    const costPerTick = this.maintenanceCostPerTickLookup.get(mega.structureType)!;
-    const effectiveCost = costPerTick * this.throttleInterval * 0.7; // 0.7 for faction discount
+    // Get maintenance configuration
+    const config = MAINTENANCE_CONFIGS[mega.structureType as MegastructureType];
+    if (!config) {
+      console.warn(`Unknown megastructure type for maintenance: ${mega.structureType}`);
+      return false;
+    }
 
-    // TODO: Check faction inventory for required resources
-    // This would integrate with economy/resource system
-    // PLACEHOLDER: Resource check would go here
-    // const faction = world.getFaction(mega.controllingFactionId);
-    // if (faction.hasResources(config.resourceType, effectiveCost)) {
-    //   faction.consumeResources(config.resourceType, effectiveCost);
-    //   return true;
-    // }
+    // Get precomputed cost per tick
+    const costPerTick = this.maintenanceCostPerTickLookup.get(mega.structureType as MegastructureType);
+    if (!costPerTick) {
+      console.warn(`Unknown megastructure type for maintenance: ${mega.structureType}`);
+      return false;
+    }
 
-    return false;
+    // Calculate resource requirement for this maintenance cycle
+    const ticksToMaintain = this.throttleInterval;
+    const resourceQuantityNeeded = costPerTick * ticksToMaintain;
+
+    // Try to find faction warehouse with required resources
+    // Query for warehouse entities controlled by the faction
+    const warehouseEntities = this.world.query()
+      .with(CT.Warehouse)
+      .executeEntities();
+
+    let resourcesAvailable = false;
+    let warehouseEntity: EntityImpl | null = null;
+
+    // Search for warehouse with required resource type and sufficient quantity
+    for (const entity of warehouseEntities) {
+      const warehouse = entity.getComponent<WarehouseComponent>(CT.Warehouse);
+      if (!warehouse) continue;
+
+      // Check if warehouse has the required resource type
+      if (warehouse.resourceType === config.resourceType) {
+        // Check stockpiles for required quantity
+        const totalAvailable = Object.values(warehouse.stockpiles).reduce((sum, qty) => sum + qty, 0);
+
+        if (totalAvailable >= resourceQuantityNeeded) {
+          resourcesAvailable = true;
+          warehouseEntity = entity as EntityImpl;
+          break;
+        }
+      }
+    }
+
+    // Early exit: insufficient resources in any warehouse
+    if (!resourcesAvailable || !warehouseEntity) {
+      // Increase maintenance debt
+      const newDebt = mega.maintenance.maintenanceDebt + resourceQuantityNeeded;
+      mega.maintenance.maintenanceDebt = newDebt;
+      return false;
+    }
+
+    // Deduct resources from warehouse
+    const warehouse = warehouseEntity.getComponent<WarehouseComponent>(CT.Warehouse);
+    if (!warehouse) {
+      return false;
+    }
+
+    // Deduct from stockpiles (first-in-first-out from available items)
+    let remainingToDeduct = resourceQuantityNeeded;
+    const updatedStockpiles = { ...warehouse.stockpiles };
+
+    for (const itemId in updatedStockpiles) {
+      if (remainingToDeduct <= 0) break;
+
+      const available = updatedStockpiles[itemId] || 0;
+      const toDeduct = Math.min(available, remainingToDeduct);
+
+      updatedStockpiles[itemId] = available - toDeduct;
+      if (updatedStockpiles[itemId] <= 0) {
+        delete updatedStockpiles[itemId];
+      }
+
+      remainingToDeduct -= toDeduct;
+    }
+
+    // Update warehouse component
+    warehouseEntity.updateComponent<WarehouseComponent>(CT.Warehouse, {
+      ...warehouse,
+      stockpiles: updatedStockpiles,
+      lastWithdrawTime: {
+        ...warehouse.lastWithdrawTime,
+        [config.resourceType]: Date.now(),
+      },
+    });
+
+    // Maintenance successful - reduce debt if any
+    if (mega.maintenance.maintenanceDebt > 0) {
+      mega.maintenance.maintenanceDebt = Math.max(0, mega.maintenance.maintenanceDebt - resourceQuantityNeeded);
+    }
+
+    return true;
   }
 
   /**
-   * OPTIMIZED: Combined degradation and debt accumulation in single pass
+   * OPTIMIZED: Combined degradation in single pass
    * Zero allocations, precomputed rates
    */
   private applyDegradationAndDebt(
@@ -554,16 +667,18 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     ticksSinceMaintenance: number
   ): void {
     // Get precomputed values (no map lookups in loop body)
-    const degradationRate = this.decayRateLookup.get(mega.structureType)!;
-    const costPerTick = this.maintenanceCostPerTickLookup.get(mega.structureType)!;
+    const degradationRate = this.decayRateLookup.get(mega.structureType as MegastructureType);
+    if (!degradationRate) {
+      console.warn(`Unknown megastructure type for degradation: ${mega.structureType}`);
+      return;
+    }
 
     // Apply efficiency loss
     const efficiencyLoss = degradationRate * ticksSinceMaintenance;
     mega.efficiency = Math.max(0, mega.efficiency - efficiencyLoss);
 
-    // Accumulate maintenance debt
-    const maintenanceNeeded = costPerTick * ticksSinceMaintenance;
-    mega.maintenanceDebt += maintenanceNeeded;
+    // Note: Maintenance debt tracking not yet in component schema
+    // TODO: Add maintenanceDebt field to MegastructureMaintenance interface
   }
 
   /**
@@ -575,17 +690,18 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     entity: EntityImpl,
     mega: MegastructureComponent
   ): void {
-    const oldPhase = mega.phase;
+    const oldPhase = mega.construction.phase;
     const eff = mega.efficiency;
 
     // Fast numeric comparison ladder
-    let newPhase: MegastructurePhase;
+    let newPhase: ConstructionPhase;
     if (eff >= 0.8) {
       newPhase = 'operational';
     } else if (eff >= 0.4) {
       newPhase = 'degraded';
     } else if (eff > 0) {
-      newPhase = 'critical';
+      // Note: 'critical' not in ConstructionPhase type, use 'degraded'
+      newPhase = 'degraded';
     } else {
       newPhase = 'ruins';
     }
@@ -595,11 +711,11 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
       return;
     }
 
-    mega.phase = newPhase;
+    mega.construction.phase = newPhase;
 
     // Emit event only for non-operational transitions
     if (oldPhase !== 'operational') {
-      this.emitPhaseTransitionEvent(world, entity, mega, oldPhase);
+      this.emitPhaseTransitionEvent(world, entity, mega, oldPhase as MegastructurePhase);
     }
   }
 
@@ -607,24 +723,17 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
    * Convert megastructure to ruins
    */
   private transitionToRuins(world: World, entity: EntityImpl, mega: MegastructureComponent): void {
-    const config = MAINTENANCE_CONFIGS[mega.structureType];
+    const config = MAINTENANCE_CONFIGS[mega.structureType as MegastructureType];
     if (!config) {
       throw new Error(`Missing maintenance config for megastructure type: ${mega.structureType}`);
     }
 
-    mega.phase = 'ruins';
+    mega.construction.phase = 'ruins';
     mega.efficiency = 0;
-    mega.yearsInDecay = 0;
-    mega.decayStageIndex = 0;
+    mega.operational = false;
 
-    // Set initial archaeological value
-    if (config.decayStages.length > 0) {
-      const firstStage = config.decayStages[0];
-      if (!firstStage) {
-        throw new Error(`Missing first decay stage for ${mega.structureType}`);
-      }
-      mega.archaeologicalValue = firstStage.archaeologicalValue;
-    }
+    // Note: Decay tracking (yearsInDecay, decayStageIndex, archaeologicalValue)
+    // not yet in component schema - will be added to MegastructureComponent
 
     this.emitCollapseEvent(world, entity, mega);
   }
@@ -632,41 +741,60 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   /**
    * OPTIMIZED: Age ruins with reusable working objects
    * Uses precomputed ticksPerYear and avoids allocations
+   *
+   * Progression through decay stages based on time in ruins phase
    */
-  private ageRuinsOptimized(currentTick: number, mega: MegastructureComponent): void {
-    const config = MAINTENANCE_CONFIGS[mega.structureType];
-    if (!config) {
-      throw new Error(`Missing maintenance config for megastructure type: ${mega.structureType}`);
-    }
-
-    // Calculate years in decay (using precomputed ticksPerYear)
-    mega.yearsInDecay = (currentTick - mega.lastMaintenanceTick) / this.ticksPerYear;
-
-    // Early exit: already at final decay stage
-    const currentStageIndex = mega.decayStageIndex;
-    const nextStageIndex = currentStageIndex + 1;
-    if (nextStageIndex >= config.decayStages.length) {
+  private ageRuinsOptimized(currentTick: number, mega: MegastructureComponent, entity: EntityImpl): void {
+    // Get decay configuration for this megastructure type
+    const config = MAINTENANCE_CONFIGS[mega.structureType as MegastructureType];
+    if (!config || !config.decayStages || config.decayStages.length === 0) {
       return;
     }
 
-    // Reuse working object instead of allocating
-    const nextStage = config.decayStages[nextStageIndex];
-    if (!nextStage) {
-      throw new Error(`Missing decay stage at index ${nextStageIndex} for ${mega.structureType}`);
+    // Calculate years in ruins phase
+    const completedAt = mega.construction.completedAt || mega.construction.startedAt;
+    const ticksInRuins = currentTick - completedAt;
+    const yearsInRuins = ticksInRuins / this.ticksPerYear;
+
+    // Update yearsInDecay field
+    mega.yearsInDecay = yearsInRuins;
+
+    // Find current decay stage based on yearsInRuins
+    const decayStages = config.decayStages;
+    let newStageIndex = 0;
+
+    for (let i = decayStages.length - 1; i >= 0; i--) {
+      const stage = decayStages[i];
+      if (!stage) continue;
+
+      if (yearsInRuins >= stage.yearsAfterCollapse) {
+        newStageIndex = i;
+        break;
+      }
     }
 
-    // Early exit: not ready for next stage yet
-    if (mega.yearsInDecay < nextStage.yearsAfterCollapse) {
-      return;
+    // Check if stage has changed
+    const oldStageIndex = mega.decayStageIndex;
+    if (newStageIndex !== oldStageIndex) {
+      const newStage = decayStages[newStageIndex];
+      if (!newStage) {
+        throw new Error(`Decay stage at index ${newStageIndex} is undefined`);
+      }
+
+      // Update decay stage and archaeological value
+      mega.decayStageIndex = newStageIndex;
+      mega.archaeologicalValue = newStage.archaeologicalValue;
+
+      // Add event to megastructure history
+      mega.events.push({
+        tick: currentTick,
+        eventType: 'decay_stage_advanced',
+        description: `Advanced to decay stage: ${newStage.status} - ${newStage.consequences}`,
+      });
+
+      // Emit decay stage event
+      this.emitDecayStageEvent(this.world, entity, mega, newStage);
     }
-
-    // Advance to next decay stage
-    mega.decayStageIndex = nextStageIndex;
-    mega.archaeologicalValue = nextStage.archaeologicalValue;
-
-    // Store stage in working object for event emission
-    this.workingDecayStage.stage = nextStage;
-    this.workingDecayStage.index = nextStageIndex;
   }
 
   /**
@@ -678,7 +806,10 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     let cost = this.maintenanceCostCache.get(cacheKey);
 
     if (cost === undefined) {
-      const config = MAINTENANCE_CONFIGS[mega.structureType];
+      const config = MAINTENANCE_CONFIGS[mega.structureType as MegastructureType];
+      if (!config) {
+        throw new Error(`Unknown megastructure type: ${mega.structureType}`);
+      }
       cost = config.maintenanceCostPerYear;
       this.maintenanceCostCache.set(cacheKey, cost);
     }
@@ -700,7 +831,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
         entityId: entity.id,
         structureType: mega.structureType,
         efficiency: mega.efficiency,
-        maintenanceDebt: mega.maintenanceDebt,
+        maintenanceDebt: mega.maintenance.maintenanceDebt,
       },
     });
   }
@@ -717,8 +848,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
         entityId: entity.id,
         structureType: mega.structureType,
         efficiency: mega.efficiency,
-        phase: mega.phase,
-        maintenanceDebt: mega.maintenanceDebt,
+        phase: mega.construction.phase as MegastructurePhase,
+        maintenanceDebt: mega.maintenance.maintenanceDebt,
       },
     });
   }
@@ -737,7 +868,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
         structureType: mega.structureType,
         severity,
         efficiency: mega.efficiency,
-        maintenanceDebt: mega.maintenanceDebt,
+        maintenanceDebt: mega.maintenance.maintenanceDebt,
       },
     });
   }
@@ -754,7 +885,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
         entityId: entity.id,
         structureType: mega.structureType,
         archaeologicalValue: mega.archaeologicalValue,
-        controllingFactionId: mega.controllingFactionId,
+        controllingFactionId: mega.strategic.controlledBy,
       },
     });
   }
@@ -772,7 +903,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
         entityId: entity.id,
         structureType: mega.structureType,
         oldPhase,
-        newPhase: mega.phase,
+        newPhase: mega.construction.phase as MegastructurePhase,
         efficiency: mega.efficiency,
       },
     });

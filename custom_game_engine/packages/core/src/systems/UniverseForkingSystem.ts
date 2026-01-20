@@ -82,6 +82,7 @@ export class UniverseForkingSystem extends BaseSystem {
     sourceUniverseId: string;
     forkAtTick: bigint;
     forkName: string;
+    day: number;
   }> = [];
 
   /**
@@ -100,6 +101,7 @@ export class UniverseForkingSystem extends BaseSystem {
     sourceUniverseId: '',
     forkAtTick: 0n,
     forkName: '',
+    day: 0,
   };
 
   /**
@@ -130,14 +132,14 @@ export class UniverseForkingSystem extends BaseSystem {
     }
 
     // Listen for player-initiated fork requests
-    // Note: These events are not yet in EventMap, using generic event emission
-    this.eventBus.onGeneric('universe_fork_requested', (data: unknown) => {
-      const request = data as UniverseForkRequestedEventData;
-
+    this.eventBus.on('universe:fork_requested', (request) => {
+      // Extract checkpoint data from request
+      const checkpoint = request.sourceCheckpoint;
       this.pendingManualForks.push({
-        sourceUniverseId: request.sourceUniverseId,
-        forkAtTick: BigInt(request.forkAtTick),
-        forkName: request.forkName,
+        sourceUniverseId: checkpoint?.key || 'current',
+        forkAtTick: BigInt(request.forkAtTick || checkpoint?.tick || 0),
+        forkName: checkpoint?.name || 'manual_fork',
+        day: checkpoint?.day || 0,
       });
     });
 
@@ -178,6 +180,7 @@ export class UniverseForkingSystem extends BaseSystem {
       this.workingManualFork.sourceUniverseId = request.sourceUniverseId;
       this.workingManualFork.forkAtTick = request.forkAtTick;
       this.workingManualFork.forkName = request.forkName;
+      this.workingManualFork.day = request.day;
       this.createManualFork();
     }
     this.pendingManualForks.length = 0;
@@ -244,7 +247,8 @@ export class UniverseForkingSystem extends BaseSystem {
       this.workingManualFork.forkAtTick,
       forkTrigger,
       this.workingManualFork.forkName,
-      this.FORK_TYPE_PLAYER
+      this.FORK_TYPE_PLAYER,
+      this.workingManualFork.day
     );
   }
 
@@ -337,7 +341,8 @@ export class UniverseForkingSystem extends BaseSystem {
     forkAtTick: bigint,
     forkTrigger: ForkTrigger,
     forkName: string,
-    forkTypeFlag: number  // Bitwise flag for logging/metrics optimization
+    forkTypeFlag: number,  // Bitwise flag for logging/metrics optimization
+    day?: number  // Optional day from checkpoint (calculated if not provided)
   ): void {
     // Early exit: no event bus (fail-fast)
     if (!this.eventBus) {
@@ -345,19 +350,26 @@ export class UniverseForkingSystem extends BaseSystem {
       return;
     }
 
-    // Emit fork event for persistence layer to handle
+    // Calculate day from tick if not provided
+    // Assuming 20 TPS and 1200 ticks per day (60 seconds)
+    const forkDay = day ?? Math.floor(Number(forkAtTick) / 1200);
+
+    // Emit typed fork event for persistence layer to handle
     // The actual snapshot loading and universe creation is handled by
     // the save/load system, not by this system directly
-    this.eventBus.emitGeneric('universe_forked', {
-      sourceUniverseId,
-      forkAtTick: forkAtTick.toString(),
-      forkTrigger,
-      forkName,
-      timestamp: Date.now(),
-    });
+    this.eventBus.emit('universe:forked', {
+      sourceCheckpoint: {
+        key: sourceUniverseId,
+        name: forkName,
+        day: forkDay,
+        tick: Number(forkAtTick),
+      },
+      newUniverseId: `fork_${forkName}_${Date.now()}`,
+      forkPoint: Number(forkAtTick),
+    }, sourceUniverseId);
 
     console.warn(
-      `[UniverseForkingSystem] Fork created: ${forkName} from ${sourceUniverseId} at tick ${forkAtTick}`
+      `[UniverseForkingSystem] Fork created: ${forkName} from ${sourceUniverseId} at tick ${forkAtTick} (day ${forkDay})`
     );
   }
 

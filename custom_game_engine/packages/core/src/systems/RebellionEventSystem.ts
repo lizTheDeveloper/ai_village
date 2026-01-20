@@ -26,6 +26,10 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import { SupremeCreatorComponent } from '../components/SupremeCreatorComponent.js';
 import { calculateRebellionReadiness, checkRebellionThresholds } from '../components/RebellionThresholdComponent.js';
 import { determineOutcome, getOutcomeNarrative } from '../components/CosmicRebellionOutcome.js';
+import type { AvatarSystem } from './AvatarSystem.js';
+import type { FleetComponent } from '../components/FleetComponent.js';
+import type { SquadronComponent } from '../components/SquadronComponent.js';
+import type { Entity } from '../ecs/Entity.js';
 
 export class RebellionEventSystem extends BaseSystem {
   public readonly id: SystemId = 'rebellion_event';
@@ -345,9 +349,8 @@ export class RebellionEventSystem extends BaseSystem {
           // Sync battle health with Creator component health
           battle.creatorHealth = creatorComp.getHealthPercent();
 
-          // Simulate gradual damage while mortal
-          // TODO: Integrate with proper combat system when available
-          creatorComp.takeDamage(1);
+          // Fleet combat integration: Attack Creator with coalition fleets
+          this.resolveFleetAttackOnCreator(world, creatorEntity, creatorComp, battle);
         }
       }
     }
@@ -379,15 +382,55 @@ export class RebellionEventSystem extends BaseSystem {
         }
       }
 
-      // TODO: Use AvatarSystem to manifest avatar
-      // For now, just emit event
-      this.events.emitGeneric('rebellion:creator_manifested', {
+      // Manifest Creator avatar using AvatarSystem
+      // Note: SupremeCreator doesn't have Deity component, so we check if it has one first
+      const avatarSystem = world.getSystem('AvatarSystem') as AvatarSystem | undefined;
+      const hasDeityComponent = entity.components.has(CT.Deity);
+
+      if (avatarSystem && hasDeityComponent) {
+        // Standard deity path - uses belief system
+        const avatar = avatarSystem.manifestAvatar(
+          entity.id,
+          world,
+          location,
+          'perform_miracle' // Creator manifests to confront rebellion
+        );
+
+        if (avatar) {
+          battle.narrativeEvents.push(`Creator manifested avatar at (${location.x}, ${location.y})`);
+
+          this.events.emitGeneric('rebellion:creator_manifested', {
+            message: 'The Supreme Creator descends from the heavens. Reality trembles.',
+            location,
+            creatorId: entity.id,
+            avatarId: avatar.id,
+          }, 'rebellion_event_system');
+        } else {
+          // Avatar creation failed (not enough belief) - fall back to event only
+          console.warn('[RebellionEventSystem] Failed to manifest Creator avatar - insufficient belief');
+          this.events.emitGeneric('rebellion:creator_manifested', {
+            message: 'The Supreme Creator\'s presence shakes the cosmos, but manifestation fails.',
+            location,
+            creatorId: entity.id,
+          }, 'rebellion_event_system');
+
+          battle.narrativeEvents.push(`Creator attempted manifestation at (${location.x}, ${location.y}) but failed`);
+        }
+      } else {
+        // SupremeCreator path - unlimited power, no belief required
+        // TODO: When full Avatar implementation is ready, create proper avatar entity with:
+        // - Position component at location
+        // - Avatar component linked to creator
+        // - Physical form matching creator's nature
+        // For now, just emit event indicating manifestation occurred
+        this.events.emitGeneric('rebellion:creator_manifested', {
           message: 'The Supreme Creator descends from the heavens. Reality trembles.',
           location,
           creatorId: entity.id,
         }, 'rebellion_event_system');
 
-      battle.narrativeEvents.push(`Creator manifested at (${location.x}, ${location.y})`);
+        battle.narrativeEvents.push(`Creator manifested at (${location.x}, ${location.y})`);
+      }
       break;
     }
   }
@@ -680,6 +723,125 @@ export class RebellionEventSystem extends BaseSystem {
         message: 'Meet the new boss, same as the old boss. The cycle of tyranny continues.',
         tyrannId: rebelId,
       }, 'rebellion_event_system');
+  }
+
+  /**
+   * Resolve fleet attacks on mortalized Creator
+   */
+  private resolveFleetAttackOnCreator(
+    world: World,
+    creatorEntity: Entity,
+    creatorComp: SupremeCreatorComponent,
+    battle: CosmicRebellionOutcome
+  ): void {
+    // Find coalition fleets near the Creator
+    const coalitionFleets: Entity[] = [];
+
+    for (const fleetEntity of world.query().with(CT.Fleet).executeEntities()) {
+      const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
+      if (!fleet) continue;
+
+      // Check if fleet admiral is in rebellion coalition
+      for (const thresholdEntity of world.query().with(CT.RebellionThreshold).executeEntities()) {
+        const threshold = thresholdEntity.getComponent<RebellionThresholdComponent>(CT.RebellionThreshold);
+        if (threshold && threshold.coalitionMembers.has(fleet.admiralId)) {
+          coalitionFleets.push(fleetEntity);
+          break;
+        }
+      }
+    }
+
+    // Calculate total fleet damage to Creator
+    let totalDamage = 0;
+    let totalShipsEngaged = 0;
+
+    for (const fleetEntity of coalitionFleets) {
+      const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
+      if (!fleet) continue;
+
+      // Fleet damage = offensive rating * coherence modifier * mortal amplification
+      const coherenceMod = this.getFleetCoherenceModifier(fleet.coherence.average);
+      const mortalAmplification = 2.0; // Creator is vulnerable while mortal
+      const fleetDamage = fleet.combat.offensiveRating * coherenceMod * mortalAmplification;
+
+      totalDamage += fleetDamage;
+      totalShipsEngaged += fleet.squadrons.totalShips;
+
+      // Emit fleet engagement event
+      this.events.emitSpace('fleet:battle_started', {
+        fleetId1: fleet.fleetId,
+        fleetId2: 'supreme_creator',
+        initialShips1: fleet.squadrons.totalShips,
+        initialShips2: 1, // Creator avatar counts as 1 "ship"
+      });
+
+      // Update fleet combat history
+      fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
+        ...f,
+        status: {
+          ...f.status,
+          inCombat: true,
+        },
+        combat: {
+          ...f.combat,
+          combatHistory: {
+            ...f.combat.combatHistory,
+            battlesWon: f.combat.combatHistory.battlesWon,
+            battlesLost: f.combat.combatHistory.battlesLost,
+            shipsLost: f.combat.combatHistory.shipsLost,
+          },
+        },
+      }));
+
+      battle.narrativeEvents.push(
+        `Fleet ${fleet.name} (${fleet.squadrons.totalShips} ships) engaged Creator avatar with ${fleetDamage.toFixed(1)} offensive power`
+      );
+    }
+
+    // Apply damage to Creator
+    if (totalDamage > 0) {
+      creatorComp.takeDamage(totalDamage);
+
+      this.events.emitGeneric('rebellion:fleet_assault', {
+        message: `${coalitionFleets.length} coalition fleet(s) with ${totalShipsEngaged} ships assault the mortalized Creator`,
+        fleetsEngaged: coalitionFleets.length,
+        totalShips: totalShipsEngaged,
+        totalDamage,
+        creatorHealthRemaining: creatorComp.getHealthPercent(),
+      }, 'rebellion_event_system');
+
+      battle.narrativeEvents.push(
+        `Coalition fleets dealt ${totalDamage.toFixed(1)} damage to Creator (${(creatorComp.getHealthPercent() * 100).toFixed(1)}% health remaining)`
+      );
+
+      // Check for Creator defeat
+      if (creatorComp.getHealthPercent() <= 0) {
+        this.events.emitGeneric('rebellion:creator_defeated_by_fleets', {
+          message: 'The Supreme Creator falls to the combined might of the coalition armada',
+          fleetsInvolved: coalitionFleets.length,
+          totalShips: totalShipsEngaged,
+        }, 'rebellion_event_system');
+
+        battle.narrativeEvents.push('Creator defeated by fleet assault');
+      }
+    } else {
+      // No fleets available - fall back to gradual damage
+      creatorComp.takeDamage(1);
+      battle.narrativeEvents.push('Creator takes gradual damage (no fleet support)');
+    }
+  }
+
+  /**
+   * Calculate fleet coherence modifier for combat effectiveness
+   */
+  private getFleetCoherenceModifier(coherence: number): number {
+    if (coherence >= 0.7) {
+      return 1.2; // High coherence: +20% offensive
+    } else if (coherence < 0.5) {
+      return 0.8; // Poor coherence: -20% offensive
+    } else {
+      return 1.0; // No modifier
+    }
   }
 
   /**

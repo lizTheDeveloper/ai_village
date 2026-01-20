@@ -19,10 +19,12 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
-    "@ai-village/reproduction": "*"
+    "@ai-village/reproduction": "*",
+    "@ai-village/language": "*"
   },
   "devDependencies": {
     "@ai-village/core": "*",
-    "@ai-village/reproduction": "*"
+    "@ai-village/reproduction": "*",
+    "@ai-village/language": "*"
   }
 }

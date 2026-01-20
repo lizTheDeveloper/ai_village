@@ -1,0 +1,1152 @@
+{
+  "buildings": [
+    {
+      "id": "elven_treehouse",
+      "name": "Moonlit Treehouse",
+      "description": "A serene treehouse blending with nature, using living wood and crystal",
+      "category": "residential",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 44
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 11
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 1
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W.D#",
+        "#.B.#",
+        "#S.#W",
+        "#####"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "living_wood",
+        "door": "crystal"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "elven_meditationbower",
+      "name": "Crystal Meditation Bower",
+      "description": "A serene meditation space with crystal floors and living wood walls, infused with moonlight.",
+      "category": "residential",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 35
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 19
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "capacity": 2
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W..#",
+        "#.T.#",
+        "#...#",
+        "#D###"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "crystal",
+        "door": "living_wood"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "elven_library",
+      "name": "Elven Living Wood Library",
+      "description": "A serene library woven from living wood and crystal, filled with ancient tomes and bathed in natural light.",
+      "category": "public",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 51
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 3
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 100,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {
+            "shelves": 4
+          }
+        },
+        {
+          "type": "reading",
+          "params": {
+            "tables": 1
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.S.#",
+        "#W.K#",
+        "#.D.#"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "living_wood",
+        "door": "living_wood",
+        "window": "crystal"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "enchanted_forge",
+      "name": "Enchanted Elven Forge",
+      "description": "A mystical workshop blending nature and magic, carved from living wood and crystal",
+      "category": "industrial",
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 43
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 33
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 144,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "specialty": "magic_smithing"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 12
+          }
+        },
+        {
+          "type": "table",
+          "params": {
+            "type": "crafting"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "######",
+        "#....#",
+        "#W.SK#",
+        "#B..T#",
+        "#....#",
+        "D#####"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "crystal",
+        "door": "living_wood"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "starlight_sanctuary",
+      "name": "Starlight Sanctuary",
+      "description": "An elven sanctuary infused with celestial energy, using living wood and crystal for harmony with nature.",
+      "category": "spiritual",
+      "width": 7,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 92
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 11
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 294,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "workstations": 1
+          }
+        },
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 1
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "shelves": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#######",
+        "#W...W#",
+        "#.B.K.#",
+        "#...T.#",
+        "#.....#",
+        "#S...D#",
+        "#######"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "moonlight",
+        "door": "crystal",
+        "window": "vines"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "centaur_stable",
+      "name": "Centaurs' Stable",
+      "description": "A spacious single-story stable with open design for centaurs",
+      "category": "residential",
+      "width": 7,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 38
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 35
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 70,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        },
+        {
+          "type": "workstation",
+          "params": {
+            "type": "crafting"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#.S...#",
+        "#.K...#",
+        "######D"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "centaur_meeting_hall",
+      "name": "Centaur Clan Hall",
+      "description": "Spacious meeting hall with open design and ramps",
+      "category": "public",
+      "width": 7,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 46
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 47
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 12
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 98,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "meeting",
+          "params": {
+            "capacity": 10
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#######",
+        "#W...W#",
+        "#.T...#",
+        "#.S...#",
+        "#.K...#",
+        "#W...W#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "capacity": 10
+    },
+    {
+      "id": "centaur_smithy",
+      "name": "Open Smithy",
+      "description": "A spacious workshop for centaur smiths with open work areas and storage",
+      "category": "commercial",
+      "width": 7,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 38
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 31
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 140,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "count": 1
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        },
+        {
+          "type": "table",
+          "params": {
+            "count": 1
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#######",
+        "D....W#",
+        "#K...W#",
+        "#T...S#",
+        "#######"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "clay",
+        "door": "wood"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "centaur_training_shelter",
+      "name": "Centaurs' Training Hall",
+      "description": "Spacious single-story training facility with ramps and open movement areas",
+      "category": "training",
+      "width": 6,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 25
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 3
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 108,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "training",
+          "params": {
+            "stations": 2
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W..D",
+        "#K...#",
+        "#T.S.#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "wood",
+        "roof": "thatch"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "centaur_war_council",
+      "name": "Centaur War Council Chamber",
+      "description": "A spacious chamber for strategic meetings.",
+      "category": "military",
+      "width": 6,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 26
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 27
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 3
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 156,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "meeting",
+          "params": {
+            "table": 1,
+            "workstations": 2
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#####",
+        "#D...",
+        "#...W",
+        "#.T.K.",
+        "#####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "clay",
+        "door": "wood"
+      },
+      "capacity": 10
+    },
+    {
+      "id": "celestial_prayer_spire",
+      "name": "Celestial Prayer Spire",
+      "description": "A vertical sanctuary for divine communion with radiant light.",
+      "category": "religious",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 36
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 13
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "type": "prayer"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#D#W#",
+        "#.#.#",
+        "#...#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "crystal",
+        "door": "gold"
+      },
+      "capacity": 1
+    },
+    {
+      "id": "choir_tower",
+      "name": "Choir Tower",
+      "description": "A vertical tower with sacred geometry and divine light",
+      "category": "religious",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 44
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "gathering",
+          "params": {
+            "capacity": 4
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#.T.#",
+        "#...#",
+        "###D#"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "marble",
+        "door": "gold",
+        "window": "crystal"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "celestial_archives",
+      "name": "Celestial Archives",
+      "description": "A sacred vault for storing divine knowledge, illuminated by starlight.",
+      "category": "commercial",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 44
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 100,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 10
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#...#",
+        "#..D#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "marble",
+        "door": "gold"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "meditation_sanctum_angelic",
+      "name": "Celestial Meditation Sanctum",
+      "description": "A towering meditative space with divine light and sacred geometry.",
+      "category": "spiritual",
+      "width": 7,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 38
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 33
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 210,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "meditation",
+          "params": {
+            "spots": 4
+          }
+        },
+        {
+          "type": "divine_light",
+          "params": {
+            "source": "starlight"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#.WWW.#",
+        "#.T..S#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "crystal",
+        "door": "gold"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "folded_manor",
+      "name": "Folded Manor",
+      "description": "A reality-bending structure with impossible geometry",
+      "category": "residential",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 37
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 16
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "type": "dimensional_folding"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#D..#",
+        "#.K.#",
+        "#S..#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "crystallized_dreams",
+        "floor": "starlight",
+        "door": "frozen_time"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "high_fae_impossible_tower",
+      "name": "Chronodream Spire",
+      "description": "A non-Euclidean tower folding reality into itself, constructed from frozen time and crystallized dreams",
+      "category": "residential",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 44
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "tier": 1,
+      "functionality": [
+        {
+          "type": "time_manipulation",
+          "params": {
+            "temporal_shift": true
+          }
+        },
+        {
+          "type": "dream_storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W.W#",
+        "#.B.#",
+        "#.S.#",
+        "D####"
+      ],
+      "materials": {
+        "wall": "frozen_time",
+        "floor": "crystallized_dreams",
+        "door": "starlight"
+      },
+      "capacity": 1
+    },
+    {
+      "id": "tesseract_court",
+      "name": "Tesseract Court of Dimensional Weave",
+      "description": "A non-Euclidean court with impossible geometry and dimensional folding.",
+      "category": "public",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 44
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 100,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "governing",
+          "params": {
+            "seats": 4
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W..#",
+        "#.K.#",
+        "#..W#",
+        "D...#"
+      ],
+      "materials": {
+        "wall": "frozen_time",
+        "floor": "crystallized_dreams",
+        "door": "starlight"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "high_fae_workshop",
+      "name": "Between-Space Workshop",
+      "description": "A workshop existing in folded dimensions, allowing crafting across realities",
+      "category": "workshop",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 46
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 3
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 100,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "workstation",
+          "params": {
+            "crafting": "dimensional_folding"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#W.K#",
+        "#.S.#",
+        "#D..#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "frozen_time",
+        "floor": "crystallized_dreams",
+        "door": "starlight"
+      },
+      "capacity": 4
+    }
+  ]
+}

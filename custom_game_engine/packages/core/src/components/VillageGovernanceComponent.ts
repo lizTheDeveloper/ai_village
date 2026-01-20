@@ -84,6 +84,9 @@ export interface VillageGovernanceComponent extends Component {
   villageName: string;
   foundedTick: number;
 
+  // City membership (optional - villages can be part of a city)
+  cityId?: string; // City entity ID if this village is part of a city
+
   // Leadership structure
   governanceType: 'elder_council' | 'chieftain' | 'direct_democracy';
   elderAgentIds: string[]; // Soul agent elders (3-7 typically)

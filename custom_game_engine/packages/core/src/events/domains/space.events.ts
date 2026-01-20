@@ -217,6 +217,56 @@ export interface SpaceEvents {
     lowCoherenceSquadrons: number;
   };
 
+  /** Fleet Heart synchronization started */
+  'fleet:sync_started': {
+    fleetId: string;
+    targetEmotion: string;
+    duration: number;
+    totalShips: number;
+    flagshipHeartId: string;
+  };
+
+  /** Fleet Heart synchronization progress update */
+  'fleet:sync_progress': {
+    fleetId: string;
+    progress: number;
+    alignedShips: number;
+    totalShips: number;
+    ticksRemaining: number;
+  };
+
+  /** Fleet Heart synchronization completed */
+  'fleet:sync_completed': {
+    fleetId: string;
+    success: boolean;
+    alignedShips: number;
+    totalShips: number;
+    alignmentRate: number;
+    fleetCoherence: number;
+  };
+
+  /** Fleet Heart synchronization cancelled */
+  'fleet:sync_cancelled': {
+    fleetId: string;
+    progress: number;
+  };
+
+  /** Ship aligned to fleet Heart network */
+  'fleet:ship_aligned': {
+    fleetId: string;
+    shipId: string;
+    alignedShips: number;
+    totalShips: number;
+  };
+
+  /** Fleet stragglers detected after synchronization */
+  'fleet:stragglers_detected': {
+    fleetId: string;
+    stragglers: string[];
+    stragglerCount: number;
+    alignmentRate: number;
+  };
+
   /** Fleet battle started */
   'fleet:battle_started': {
     fleetId1: string;
@@ -366,6 +416,57 @@ export interface SpaceEvents {
     shipsLost2: number;
   };
 
+  /** Squadron combat started (formation-based tactical combat) */
+  'squadron:combat_started': {
+    squadronId1: string;
+    squadronId2: string;
+    formation1: string;
+    formation2: string;
+  };
+
+  /** Squadron combat resolved (formation-based tactical combat) */
+  'squadron:combat_resolved': {
+    squadronId1: string;
+    squadronId2: string;
+    victor: string;
+    squadron1Remaining: number;
+    squadron2Remaining: number;
+    shipsLost1: number;
+    shipsLost2: number;
+  };
+
+  /** Ship destroyed in squadron combat */
+  'squadron:ship_destroyed': {
+    squadronId: string;
+    shipId: string;
+    destroyedBy: string;
+  };
+
+  /** Ship joined squadron */
+  'squadron:ship_joined': {
+    squadronId: string;
+    shipId: string;
+  };
+
+  /** Ship left squadron */
+  'squadron:ship_left': {
+    squadronId: string;
+    shipId: string;
+  };
+
+  /** Ship missing from squadron */
+  'squadron:ship_missing': {
+    squadronId: string;
+    missingShipId: string;
+  };
+
+  /** Squadron disbanding (too few ships) */
+  'squadron:disbanding': {
+    squadronId: string;
+    reason: string;
+    remainingShips: number;
+  };
+
   /** Armada system battle resolved */
   'armada:system_battle_resolved': {
     armadaId1: string;
@@ -374,6 +475,53 @@ export interface SpaceEvents {
     victor: string;
     losses1: number;
     losses2: number;
+  };
+
+  // === Ship Combat Events ===
+
+  /** Ship-to-ship combat started */
+  'ship:combat_started': {
+    attackerId: EntityId;
+    defenderId: EntityId;
+    attackerName: string;
+    defenderName: string;
+    phase: 'range' | 'close' | 'boarding' | 'resolved';
+  };
+
+  /** Ship combat phase changed */
+  'ship:combat_phase_changed': {
+    attackerId: EntityId;
+    defenderId: EntityId;
+    oldPhase: 'range' | 'close' | 'boarding' | 'resolved';
+    newPhase: 'range' | 'close' | 'boarding' | 'resolved';
+    attackerHull: number;
+    defenderHull: number;
+  };
+
+  /** Ship combat resolved */
+  'ship:combat_resolved': {
+    attackerId: EntityId;
+    defenderId: EntityId;
+    victor: EntityId;
+    attackerHull: number;
+    defenderHull: number;
+    captured: boolean;
+  };
+
+  /** Ship destroyed in combat */
+  'ship:destroyed': {
+    shipId: EntityId;
+    shipName: string;
+    destroyedBy: string;
+  };
+
+  /** Ship captured via boarding */
+  'ship:captured': {
+    captorId: EntityId;
+    capturedId: EntityId;
+    captorName: string;
+    capturedName: string;
+    boardingMarines: number;
   };
 
   // === Shipping Lane Events ===
@@ -483,7 +631,118 @@ export interface SpaceEvents {
     delayPercent: number;
   };
 
+  // === Crew Stress Events ===
+
+  /** Crew stress threshold crossed */
+  'crew:stress_threshold_crossed': {
+    crewId: string;
+    shipId: string;
+    role: string;
+    previousThreshold: number;
+    currentThreshold: number;
+    stress: number;
+  };
+
+  /** Crew stress reached critical level */
+  'crew:stress_critical': {
+    crewId: string;
+    shipId: string;
+    role: string;
+    stress: number;
+    morale: number;
+    quantumCoupling: number;
+  };
+
+  /** Crew stress recovered below threshold */
+  'crew:stress_recovered': {
+    crewId: string;
+    shipId: string;
+    role: string;
+    previousThreshold: number;
+    currentThreshold: number;
+    stress: number;
+  };
+
+  // === Straggler Events ===
+
+  /** Ship left behind during fleet β-jump */
+  'straggler:ship_stranded': {
+    shipId: string;
+    fleetId: string;
+    squadronId: string;
+    branchId: string;
+    tick: number;
+  };
+
+  /** Straggler ship attempted solo β-jump */
+  'straggler:solo_jump_attempted': {
+    shipId: string;
+    targetBranch: string;
+    attempt: number;
+    successChance: number;
+    coherence: number;
+  };
+
+  /** Straggler solo jump failed */
+  'straggler:solo_jump_failed': {
+    shipId: string;
+    targetBranch: string;
+    attempt: number;
+    coherenceLoss: number;
+    newCoherence: number;
+    newContaminationRisk: number;
+  };
+
+  /** Rescue squadron assigned to straggler */
+  'straggler:rescue_assigned': {
+    stragglerId: string;
+    rescueSquadronId: string;
+    squadronName: string;
+    stragglerBranch: string;
+  };
+
+  /** Straggler successfully recovered */
+  'straggler:recovered': {
+    shipId: string;
+    fleetId: string;
+    squadronId: string;
+    ticksStranded: number;
+    recoveryMethod: 'rescue' | 'solo_jump';
+    soloJumpAttempts: number;
+  };
+
+  /** Straggler lost to decoherence/contamination */
+  'straggler:lost': {
+    shipId: string;
+    fleetId: string;
+    squadronId: string;
+    ticksStranded: number;
+    contaminationRisk: number;
+    decoherenceRate: number;
+    reason: 'timeline_contamination' | 'exceeded_time_threshold';
+  };
+
   // === Megastructure Maintenance Events (Phase 5) ===
+
+  /** Megastructure activated and made operational */
+  'megastructure_activated': {
+    entityId: EntityId;
+    megastructureId: string;
+    structureType: string;
+    category: string;
+    tier: string;
+    name: string;
+    location: {
+      tier: string;
+      systemId?: string;
+      planetId?: string;
+      sectorId?: string;
+      coordinates?: { x: number; y: number; z: number };
+    };
+    capabilities: Record<string, unknown>;
+    projectId: string;
+    constructionTimeYears: number;
+  };
 
   /** Maintenance performed on megastructure */
   'maintenance_performed': {

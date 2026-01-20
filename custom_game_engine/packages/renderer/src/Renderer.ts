@@ -16,6 +16,7 @@ import type {
   EventBus,
 } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
+import { buildingBlueprintRegistry } from '@ai-village/core';
 import {
   ChunkManager,
   TerrainGenerator,
@@ -585,6 +586,71 @@ export class Renderer {
       const resource = entity.components.get('resource') as ResourceComponent | undefined;
       if (resource && resource.harvestable && resource.maxAmount > 0 && this.showResourceAmounts) {
         this.buildingRenderer.drawResourceAmount(screen.x, screen.y, resource.amount, resource.maxAmount, resource.resourceType, this.tileSize, this.camera.zoom);
+      }
+
+      // Render building layout and dimensional indicators
+      if (building) {
+        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType);
+
+        if (blueprint) {
+          let layoutToRender: string[] | undefined;
+          let isDimensional = false;
+
+          // 4D W-axis buildings
+          if (blueprint.dimensional?.w_axis) {
+            const currentSlice = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentWSlice || 0;
+            layoutToRender = blueprint.dimensional.w_axis.sliceLayouts?.[currentSlice];
+            isDimensional = true;
+          }
+          // 5D V-axis buildings (phase-shifting)
+          else if (blueprint.dimensional?.v_axis) {
+            const currentPhase = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentVPhase || 0;
+            layoutToRender = blueprint.dimensional.v_axis.phaseLayouts?.[currentPhase];
+            isDimensional = true;
+          }
+          // 6D U-axis buildings (quantum superposition)
+          else if (blueprint.dimensional?.u_axis) {
+            const stateData = this.buildingRenderer.getDimensionalStateForRendering(entity.id);
+            const selectedState = stateData?.collapsedUState;
+            if (selectedState !== undefined && selectedState !== -1) {
+              layoutToRender = blueprint.dimensional.u_axis.stateLayouts?.[selectedState];
+            }
+            isDimensional = true;
+          }
+          // 3D multi-floor or standard layout
+          else if (blueprint.floors && blueprint.floors.length > 0) {
+            // Use first floor for now (TODO: floor selection UI)
+            layoutToRender = blueprint.floors[0].layout;
+          }
+          else if (blueprint.layout) {
+            layoutToRender = blueprint.layout;
+          }
+
+          // Render the layout if we have one
+          if (layoutToRender && layoutToRender.length > 0) {
+            this.buildingRenderer.renderBuildingLayout(
+              screen.x,
+              screen.y,
+              layoutToRender,
+              this.tileSize,
+              this.camera.zoom,
+              isDimensional
+            );
+          }
+
+          // Draw dimensional indicator badge
+          if (blueprint.dimensional || blueprint.realmPocket) {
+            this.buildingRenderer.drawDimensionalIndicator(
+              screen.x,
+              screen.y,
+              entity.id,
+              blueprint.dimensional,
+              blueprint.realmPocket,
+              this.tileSize,
+              this.camera.zoom
+            );
+          }
+        }
       }
 
       // Draw agent behavior label

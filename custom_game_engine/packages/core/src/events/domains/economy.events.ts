@@ -227,6 +227,29 @@ export interface EconomyEvents {
     tick: bigint;
   };
 
+  'trade:escort_assigned': {
+    agreementId: string;
+    squadronId: string;
+    shipCount: number;
+  };
+
+  'trade:escort_completed': {
+    agreementId: string;
+    squadronId: string;
+  };
+
+  'trade:escort_failed': {
+    agreementId: string;
+    squadronId: string;
+    reason: string;
+  };
+
+  'trade:escort_needed': {
+    agreementId: string;
+    minimumFleetSize: number;
+    provider?: string;
+  };
+
   'gathering:tool_error': {
     agentId: string;
     toolId: string;

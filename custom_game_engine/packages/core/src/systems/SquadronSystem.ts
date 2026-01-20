@@ -19,6 +19,75 @@ import type { SquadronComponent } from '../components/SquadronComponent.js';
 import type { SpaceshipComponent, SpaceshipType } from '../navigation/SpaceshipComponent.js';
 
 // ============================================================================
+// Formation Modifiers
+// ============================================================================
+
+/**
+ * Formation modifiers for squadron stats
+ * Each formation provides different bonuses/penalties to:
+ * - coherenceBonus: How well the squadron maintains coordination
+ * - strengthBonus: Combat firepower effectiveness
+ * - speedBonus: Navigation/maneuver speed
+ * - defenseBonus: Damage mitigation
+ */
+export interface FormationModifiers {
+  coherenceBonus: number;
+  strengthBonus: number;
+  speedBonus: number;
+  defenseBonus: number;
+}
+
+/**
+ * FORMATION_MODIFIERS constant mapping formations to stat bonuses
+ *
+ * Formation characteristics:
+ * - wedge: Aggressive V-formation for focus fire, good speed, weak defense
+ * - sphere: Defensive ball formation, high coherence but slow and weak offense
+ * - line_ahead: Organized line for broadside, balanced stats
+ * - line_abreast: Wide front formation, poor coordination but good coverage
+ * - echelon: Diagonal steps for flanking, balanced offense/defense
+ * - scattered: No formation bonuses, independent ship operation
+ */
+export const FORMATION_MODIFIERS: Record<SquadronComponent['formation'], FormationModifiers> = {
+  wedge: {
+    coherenceBonus: 0.05,   // +5% (focus requires coordination)
+    strengthBonus: 0.10,    // +10% (concentrated firepower)
+    speedBonus: 0.08,       // +8% (arrow cuts through β-space)
+    defenseBonus: -0.05,    // -5% (exposed flanks)
+  },
+  sphere: {
+    coherenceBonus: 0.10,   // +10% (tight defensive formation)
+    strengthBonus: -0.05,   // -5% (defensive posture)
+    speedBonus: -0.10,      // -10% (slow, protective)
+    defenseBonus: 0.15,     // +15% (360-degree coverage)
+  },
+  line_ahead: {
+    coherenceBonus: 0.02,   // +2% (organized but spread)
+    strengthBonus: 0.0,     // No bonus (balanced)
+    speedBonus: 0.0,        // No bonus (standard speed)
+    defenseBonus: 0.03,     // +3% (coordinated defense)
+  },
+  line_abreast: {
+    coherenceBonus: -0.05,  // -5% (hard to coordinate wide front)
+    strengthBonus: 0.05,    // +5% (broad firing arc)
+    speedBonus: -0.05,      // -5% (wider formation = slower)
+    defenseBonus: 0.0,      // No bonus
+  },
+  echelon: {
+    coherenceBonus: 0.03,   // +3% (disciplined diagonal)
+    strengthBonus: 0.05,    // +5% (flanking advantage)
+    speedBonus: 0.03,       // +3% (diagonal approach)
+    defenseBonus: 0.05,     // +5% (stepped protection)
+  },
+  scattered: {
+    coherenceBonus: -0.10,  // -10% (no coordination)
+    strengthBonus: 0.0,     // No bonus (independent fire)
+    speedBonus: 0.05,       // +5% (ships move freely)
+    defenseBonus: -0.05,    // -5% (no mutual support)
+  },
+};
+
+// ============================================================================
 // System
 // ============================================================================
 
@@ -63,9 +132,10 @@ export class SquadronSystem extends BaseSystem {
   };
 
   /**
-   * Reusable ship type map - avoids creating new Record<> every update
+   * Reusable ship type map - object literal for O(1) access and GC efficiency
+   * GC: Cleared by deleting keys instead of creating new object
    */
-  private shipTypeMap: Map<string, number> = new Map();
+  private shipTypeMap: Record<string, number> = Object.create(null);
 
   // ========================================================================
   // Performance Optimizations - Dirty Tracking
@@ -150,7 +220,10 @@ export class SquadronSystem extends BaseSystem {
   ): void {
     // PERF: Reset reusable objects
     this.resetWorkingStats();
-    this.shipTypeMap.clear();
+    // GC: Clear object by deleting keys instead of creating new object
+    for (const key in this.shipTypeMap) {
+      delete this.shipTypeMap[key];
+    }
 
     // Gather stats from all ships using cached entities
     for (const shipId of squadron.ships.shipIds) {
@@ -178,9 +251,9 @@ export class SquadronSystem extends BaseSystem {
       // Combat strength (simplified: based on hull mass and integrity)
       this.workingStats.combatStrength += ship.hull.mass * ship.hull.integrity;
 
-      // Track ship types
+      // Track ship types (object literal for GC efficiency)
       const shipType = ship.ship_type;
-      this.shipTypeMap.set(shipType, (this.shipTypeMap.get(shipType) || 0) + 1);
+      this.shipTypeMap[shipType] = (this.shipTypeMap[shipType] || 0) + 1;
     }
 
     // Calculate average coherence weighted by crew size
@@ -197,11 +270,9 @@ export class SquadronSystem extends BaseSystem {
 
     this.lastSquadronHash[squadron.squadronId] = currentHash;
 
-    // Convert Map to Record only when actually updating
-    const shipTypeBreakdown: Record<string, number> = {};
-    for (const [type, count] of this.shipTypeMap) {
-      shipTypeBreakdown[type] = count;
-    }
+    // GC: Reuse shipTypeMap directly since it's already an object literal
+    // The spread in updateComponent will create a copy anyway
+    const shipTypeBreakdown = this.shipTypeMap;
 
     // Single batched component update
     squadronEntity.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({
@@ -224,40 +295,18 @@ export class SquadronSystem extends BaseSystem {
 
   /**
    * Apply formation bonuses to squadron
+   * This method currently does passive tracking - the actual modifiers
+   * are applied by combat/navigation systems via getFormationModifiers()
    */
   private applyFormationEffects(squadron: SquadronComponent): void {
-    // Formation bonuses affect squadron coherence and combat strength
-    // These are passive effects tracked in the component
+    // Formation bonuses are now handled via FORMATION_MODIFIERS constant
+    // Combat systems use getFormationModifiers() to read these values
+    // Navigation systems can use getFormationSpeedModifier() for β-space travel
+    // This method is kept for future passive effects (e.g., fuel consumption)
 
-    let coherenceBonus = 0;
-    let strengthBonus = 0;
-
-    switch (squadron.formation) {
-      case 'wedge':
-        // Wedge formation: +5% coherence, +10% strength (focus fire)
-        coherenceBonus = 0.05;
-        strengthBonus = 0.10;
-        break;
-
-      case 'sphere':
-        // Sphere formation: +10% coherence (tight formation), -5% strength
-        coherenceBonus = 0.10;
-        strengthBonus = -0.05;
-        break;
-
-      case 'line_ahead':
-        // Line ahead formation: +2% coherence (organized)
-        coherenceBonus = 0.02;
-        break;
-
-      case 'scattered':
-        // Scattered: No bonuses, each ship independent
-        break;
-    }
-
-    // Note: Bonuses would be applied during β-navigation or combat
-    // For now, we just track formation in the component
-    // Future systems can read squadron.formation and apply these modifiers
+    // Example future use: Fuel consumption based on formation
+    // const modifiers = getFormationModifiers(squadron.formation);
+    // fuelConsumptionRate *= (1 - modifiers.speedBonus); // Faster = more fuel
   }
 }
 
@@ -266,39 +315,73 @@ export class SquadronSystem extends BaseSystem {
 // ============================================================================
 
 /**
+ * Get all formation modifiers for a given formation
+ * Use this for comprehensive formation stat application
+ */
+export function getFormationModifiers(formation: SquadronComponent['formation']): FormationModifiers {
+  return FORMATION_MODIFIERS[formation];
+}
+
+/**
  * Calculate formation bonus for coherence
+ * Legacy helper - use getFormationModifiers() for new code
  */
 export function getFormationCoherenceBonus(formation: SquadronComponent['formation']): number {
-  switch (formation) {
-    case 'wedge':
-      return 0.05;
-    case 'sphere':
-      return 0.10;
-    case 'line_ahead':
-      return 0.02;
-    case 'scattered':
-      return 0;
-    default:
-      return 0;
-  }
+  return FORMATION_MODIFIERS[formation].coherenceBonus;
 }
 
 /**
  * Calculate formation bonus for combat strength
+ * Legacy helper - use getFormationModifiers() for new code
  */
 export function getFormationStrengthBonus(formation: SquadronComponent['formation']): number {
-  switch (formation) {
-    case 'wedge':
-      return 0.10; // Focus fire
-    case 'sphere':
-      return -0.05; // Defensive posture
-    case 'line_ahead':
-      return 0;
-    case 'scattered':
-      return 0;
-    default:
-      return 0;
-  }
+  return FORMATION_MODIFIERS[formation].strengthBonus;
+}
+
+/**
+ * Calculate formation bonus for speed/navigation
+ * Used by β-navigation systems for movement speed calculation
+ */
+export function getFormationSpeedModifier(formation: SquadronComponent['formation']): number {
+  return FORMATION_MODIFIERS[formation].speedBonus;
+}
+
+/**
+ * Calculate formation bonus for defense
+ * Used by combat systems for damage mitigation
+ */
+export function getFormationDefenseModifier(formation: SquadronComponent['formation']): number {
+  return FORMATION_MODIFIERS[formation].defenseBonus;
+}
+
+/**
+ * Apply formation modifiers to base stats
+ * Returns modified stats object
+ */
+export function applyFormationModifiers(
+  baseStats: {
+    coherence: number;
+    strength: number;
+    speed: number;
+    defense: number;
+  },
+  formation: SquadronComponent['formation']
+): {
+  coherence: number;
+  strength: number;
+  speed: number;
+  defense: number;
+  modifiers: FormationModifiers;
+} {
+  const modifiers = FORMATION_MODIFIERS[formation];
+
+  return {
+    coherence: baseStats.coherence * (1 + modifiers.coherenceBonus),
+    strength: baseStats.strength * (1 + modifiers.strengthBonus),
+    speed: baseStats.speed * (1 + modifiers.speedBonus),
+    defense: baseStats.defense * (1 + modifiers.defenseBonus),
+    modifiers,
+  };
 }
 
 /**

@@ -15,7 +15,9 @@ import type { WorldEvents } from './domains/world.events.js';
 import type { AgentEvents } from './domains/agent.events.js';
 import type { PlantEvents } from './domains/plant.events.js';
 import type { BuildingEvents } from './domains/building.events.js';
+import type { CognitiveEvents } from './domains/cognitive.events.js';
 import type { CombatEvents } from './domains/combat.events.js';
+import type { CompanionEvents } from './domains/companion.events.js';
 import type { SocialEvents } from './domains/social.events.js';
 import type { EconomyEvents } from './domains/economy.events.js';
 import type { MagicEvents } from './domains/magic.events.js';
@@ -27,8 +29,10 @@ import type { AnimalEvents } from './domains/animal.events.js';
 import type { SpaceEvents } from './domains/space.events.js';
 import type { MultiverseEvents } from './domains/multiverse.events.js';
 import type { UIEvents } from './domains/ui.events.js';
+import type { WorkEvents } from './domains/work.events.js';
 import type { ActionEvents } from './domains/action.events.js';
 import type { MiscEvents } from './domains/misc.events.js';
+import type { GovernanceEvents } from './domains/governance.events.js';
 
 /**
  * Unified map of all event types to their data payloads.
@@ -50,7 +54,9 @@ export interface GameEventMap extends
   AgentEvents,
   PlantEvents,
   BuildingEvents,
+  CognitiveEvents,
   CombatEvents,
+  CompanionEvents,
   SocialEvents,
   EconomyEvents,
   MagicEvents,
@@ -62,8 +68,10 @@ export interface GameEventMap extends
   SpaceEvents,
   MultiverseEvents,
   UIEvents,
+  WorkEvents,
   ActionEvents,
-  MiscEvents {}
+  MiscEvents,
+  GovernanceEvents {}
 
 /**
  * Union type of all valid event type strings.
@@ -81,7 +89,9 @@ export type {
   AgentEvents,
   PlantEvents,
   BuildingEvents,
+  CognitiveEvents,
   CombatEvents,
+  CompanionEvents,
   SocialEvents,
   EconomyEvents,
   MagicEvents,
@@ -93,6 +103,7 @@ export type {
   SpaceEvents,
   MultiverseEvents,
   UIEvents,
+  WorkEvents,
   ActionEvents,
   MiscEvents,
 };

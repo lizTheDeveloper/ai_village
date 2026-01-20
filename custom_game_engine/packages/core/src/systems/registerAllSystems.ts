@@ -109,7 +109,12 @@ import { ArmadaSystem } from './ArmadaSystem.js';
 import { FleetSystem } from './FleetSystem.js';
 import { SquadronSystem } from './SquadronSystem.js';
 import { FleetCoherenceSystem } from './FleetCoherenceSystem.js';
+import { CrewStressSystem } from './CrewStressSystem.js';
+import { HeartChamberNetworkSystem } from './HeartChamberNetworkSystem.js';
+import { StragglerRecoverySystem } from './StragglerRecoverySystem.js';
 import { FleetCombatSystem } from './FleetCombatSystem.js';
+import { SquadronCombatSystem } from './SquadronCombatSystem.js';
+import { ShipCombatSystem } from './ShipCombatSystem.js';
 import { NavyBudgetSystem } from './NavyBudgetSystem.js';
 
 // Megastructures (Phase 5: Grand Strategy)
@@ -140,6 +145,7 @@ import { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
 import { TradingSystem } from './TradingSystem.js';
 import { MarketEventSystem } from './MarketEventSystem.js';
 import { TradeAgreementSystem } from './TradeAgreementSystem.js';
+import { TradeEscortSystem } from './TradeEscortSystem.js';
 
 // Skills & Crafting
 import { SkillSystem } from './SkillSystem.js';
@@ -317,6 +323,8 @@ import { AutonomicSystem } from '../decision/AutonomicSystem.js';
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
 import { VillageGovernanceSystem } from './VillageGovernanceSystem.js';
 import { ProvinceGovernanceSystem } from './ProvinceGovernanceSystem.js';
+import { NationSystem } from './NationSystem.js';  // Nation-level governance
+import { EmpireSystem } from './EmpireSystem.js';  // Empire-level governance
 import { GovernorDecisionSystem } from './GovernorDecisionSystem.js';  // Phase 6: AI Governance
 import { MetricsCollectionSystem } from './MetricsCollectionSystem.js';
 import { CityDirectorSystem } from './CityDirectorSystem.js';
@@ -688,8 +696,18 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new SquadronSystem());
   // Fleet coherence (priority 400): Squadron→Fleet→Armada coherence aggregation
   gameLoop.systemRegistry.register(new FleetCoherenceSystem());
+  // Crew stress (priority 420): Stress accumulation/recovery during β-space navigation
+  gameLoop.systemRegistry.register(new CrewStressSystem());
+  // Straggler recovery (priority 430): Handle ships left behind during fleet β-jumps
+  gameLoop.systemRegistry.register(new StragglerRecoverySystem());
+  // Heart Chamber Network (priority 450): Fleet-wide emotional sync for β-jumps
+  gameLoop.systemRegistry.register(new HeartChamberNetworkSystem());
   // Fleet combat (priority 600): Lanchester's Laws fleet battle resolution
   gameLoop.systemRegistry.register(new FleetCombatSystem());
+  // Squadron combat (priority 610): Formation-based tactical combat between squadrons
+  gameLoop.systemRegistry.register(new SquadronCombatSystem());
+  // Ship combat (priority 620): Individual ship-to-ship combat with phases
+  gameLoop.systemRegistry.register(new ShipCombatSystem());
   // Navy budget (priority 850): Annual budget cycle, shipyard production
   gameLoop.systemRegistry.register(new NavyBudgetSystem());
 
@@ -698,10 +716,12 @@ export function registerAllSystems(
   // ============================================================================
   // Megastructure Construction (priority 300): Manages construction projects
   // Advances construction progress, consumes resources, handles phases
+  // Lazy activation: requires 'megastructure' component
   gameLoop.systemRegistry.register(new MegastructureConstructionSystem());
 
   // Megastructure Maintenance (priority 310): Handles maintenance, degradation, and decay
   // Runs after construction systems to process operational structures
+  // Lazy activation: requires 'megastructure' component
   gameLoop.systemRegistry.register(new MegastructureMaintenanceSystem());
 
   // ============================================================================
@@ -760,6 +780,7 @@ export function registerAllSystems(
   const marketEventSystem = new MarketEventSystem();
   gameLoop.systemRegistry.register(marketEventSystem);
   gameLoop.systemRegistry.register(new TradeAgreementSystem());
+  gameLoop.systemRegistry.register(new TradeEscortSystem());
 
   // ============================================================================
   // SKILLS & CRAFTING
@@ -859,7 +880,7 @@ export function registerAllSystems(
   // ============================================================================
   // DIVINITY - CORE
   // ============================================================================
-  gameLoop.systemRegistry.register(new DeityEmergenceSystem());
+  gameLoop.systemRegistry.register(new DeityEmergenceSystem({}, llmQueue || undefined));
   gameLoop.systemRegistry.register(new AIGodBehaviorSystem());
   const divinePowerSystem = new DivinePowerSystem();
   gameLoop.systemRegistry.register(divinePowerSystem);
@@ -1073,6 +1094,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new CityDirectorSystem());
   gameLoop.systemRegistry.register(new VillageGovernanceSystem());
   gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
+  gameLoop.systemRegistry.register(new NationSystem());  // Nation-level governance (priority 195)
+  gameLoop.systemRegistry.register(new EmpireSystem());  // Empire-level governance (priority 200)
   gameLoop.systemRegistry.register(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
 
   // ============================================================================
@@ -1104,7 +1127,7 @@ export function registerAllSystems(
   // AUTO-SAVE (Optional)
   // ============================================================================
   if (enableAutoSave) {
-    const autoSaveSystem = new AutoSaveSystem();
+    const autoSaveSystem = new AutoSaveSystem(llmQueue);
     gameLoop.systemRegistry.register(autoSaveSystem);
   }
 

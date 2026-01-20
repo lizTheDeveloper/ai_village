@@ -67,6 +67,18 @@ export interface MultiverseEvents {
     causalEvent: unknown;
   };
 
+  /** Universe fork requested (UI or system initiated) */
+  'universe:fork_requested': {
+    sourceCheckpoint?: {
+      key: string;
+      name: string;
+      day?: number;
+      tick?: number;
+    };
+    forkAtTick?: number;
+    reason?: string;
+  };
+
   /** Universe successfully forked from snapshot */
   'universe:forked': {
     sourceCheckpoint: {
@@ -249,6 +261,31 @@ export interface MultiverseEvents {
     convergenceStrength: number;
     targetEntities: string[];
     modifications: string[];
+  };
+
+  // ========================================================================
+  // Realm Events
+  // ========================================================================
+
+  /** Realm collapsed due to lack of maintenance or other reasons */
+  'realm:collapsed': {
+    realmId: string;
+    realmName: string;
+    reason: 'maintenance_depleted' | 'ruler_banished' | 'catastrophic_failure' | 'divine_intervention';
+    rulerId?: string;
+    rulerName?: string;
+    subRealmIds: string[];
+    inhabitantCount: number;
+    timeSinceCreation: number;
+  };
+
+  /** Sub-realm orphaned due to parent realm collapse */
+  'realm:orphaned': {
+    realmId: string;
+    realmName: string;
+    parentRealmId: string;
+    parentRealmName: string;
+    newStatus: 'independent' | 'unstable' | 'cascading_collapse';
   };
 }
 

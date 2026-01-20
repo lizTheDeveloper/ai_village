@@ -49,6 +49,7 @@ import {
   type MegastructureBlueprint,
 } from '../megastructures/MegastructureBlueprints.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
+import type { MegastructureComponent } from '../components/MegastructureComponent.js';
 
 // ============================================================================
 // FAST PRNG (xorshift32)
@@ -467,17 +468,29 @@ export class MegastructureConstructionSystem extends BaseSystem {
     projectEntity: EntityImpl,
     project: ConstructionProjectComponent
   ): void {
-    // TODO: Create MegastructureComponent on target entity
-    // This will be implemented when MegastructureComponent is created
-    // For now, just emit completion event
+    // Get blueprint for megastructure details
+    const blueprint = this.blueprintCache.get(project.megastructureType);
+    if (!blueprint) {
+      this.handleConstructionFailure(
+        ctx,
+        projectEntity,
+        project,
+        'blueprint_not_found_at_completion'
+      );
+      return;
+    }
 
+    // Create operational megastructure on target entity
+    this.createOperationalMegastructure(ctx, project, blueprint);
+
+    // Emit construction completion event
     ctx.emit(
       'construction_complete',
       {
         projectId: project.projectId,
         megastructureType: project.megastructureType,
         targetEntityId: project.targetEntityId,
-        constructionTimeYears: (ctx.tick - project.timeline.startTick) / (365 * 24 * 60 * 3), // Ticks to years
+        constructionTimeYears: (ctx.tick - project.timeline.startTick) / MegastructureConstructionSystem.TICKS_PER_YEAR,
         totalCost: this.calculateTotalCost(project),
       },
       projectEntity.id
@@ -495,6 +508,117 @@ export class MegastructureConstructionSystem extends BaseSystem {
           phaseProgress: 1.0,
         },
       })
+    );
+  }
+
+  /**
+   * Create operational megastructure component on target entity
+   * Called when construction project completes
+   */
+  private createOperationalMegastructure(
+    ctx: SystemContext,
+    project: ConstructionProjectComponent,
+    blueprint: MegastructureBlueprint
+  ): void {
+    const currentTick = ctx.tick;
+    const targetEntityId = project.targetEntityId;
+
+    // Get or create target entity
+    let targetEntity: EntityImpl | null = null;
+    if (targetEntityId) {
+      targetEntity = ctx.world.getEntity(targetEntityId) as EntityImpl | null;
+    }
+
+    // If no target entity specified or entity doesn't exist, create new entity
+    if (!targetEntity) {
+      targetEntity = ctx.world.createEntity() as EntityImpl;
+      if (!targetEntity) {
+        throw new Error('Failed to create megastructure entity');
+      }
+    }
+
+    // Generate unique megastructure ID
+    const megastructureId = `${blueprint.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+    // Build location object from project target
+    const location: any = {
+      systemId: undefined,
+      planetId: undefined,
+      sectorId: undefined,
+      coordinates: undefined,
+    };
+
+    // Determine tier and populate location based on blueprint
+    const tier = blueprint.tier;
+
+    // Create megastructure component with all blueprint data
+    const megastructureComponent = {
+      type: 'megastructure' as const,
+      version: 1,
+      megastructureId,
+      name: `${blueprint.name} (${project.projectId})`,
+      category: blueprint.category,
+      structureType: blueprint.id,
+      tier,
+      location,
+      construction: {
+        phase: 'operational' as const,
+        progress: 1.0,
+        startedAt: project.timeline.startTick,
+        completedAt: currentTick,
+        resourcesInvested: project.progress.resourcesDelivered,
+        laborInvested: project.progress.laborAllocated,
+        energyInvested: project.progress.energyAllocated,
+      },
+      operational: true,
+      efficiency: 1.0,
+      maintenance: {
+        lastMaintenanceAt: currentTick,
+        maintenanceCostPerYear: blueprint.maintenancePerYear,
+        energyCostPerYear: blueprint.energyMaintenancePerYear,
+        degradationRate: blueprint.degradationRate / 100, // Convert from % to fraction
+        failureTime: blueprint.failureTimeYears,
+        maintenanceDebt: 0,
+      },
+      yearsInDecay: 0,
+      decayStageIndex: 0,
+      archaeologicalValue: 0,
+      capabilities: blueprint.capabilities,
+      strategic: {
+        militaryValue: blueprint.militaryValue,
+        economicValue: blueprint.economicValue,
+        culturalValue: blueprint.culturalValue,
+        controlledBy: project.coordination.managerEntityId,
+        contested: false,
+      },
+      events: [
+        {
+          tick: currentTick,
+          eventType: 'construction_completed',
+          description: `${blueprint.name} construction completed - now operational`,
+        },
+      ],
+    };
+
+    // Add megastructure component to target entity
+    targetEntity.addComponent(megastructureComponent);
+
+    // Emit megastructure activation event with full details
+    ctx.emit(
+      'megastructure_activated',
+      {
+        entityId: targetEntity.id,
+        megastructureId,
+        structureType: blueprint.id,
+        category: blueprint.category,
+        tier,
+        name: megastructureComponent.name,
+        location,
+        capabilities: blueprint.capabilities,
+        projectId: project.projectId,
+        constructionTimeYears: (currentTick - project.timeline.startTick) / MegastructureConstructionSystem.TICKS_PER_YEAR,
+      },
+      targetEntity.id
     );
   }
 

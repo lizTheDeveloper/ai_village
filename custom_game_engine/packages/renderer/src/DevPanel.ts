@@ -22,6 +22,7 @@ import {
   type NeedsComponent,
   type ManaPoolsComponent,
   type SpiritualComponent,
+  type DivineAbilityComponent,
   CT,
   getTileBasedBlueprintRegistry,
   parseLayout,
@@ -283,6 +284,17 @@ function generateDivineResources(): DevDivineResource[] {
     category: 'belief',
   });
 
+  // Divine energy (from DivineAbilityComponent)
+  resources.push({
+    id: 'divine_energy',
+    name: 'Divine Energy',
+    value: 0,
+    min: 0,
+    max: 1000, // Will be updated from actual maxDivineEnergy
+    section: 'divinity',
+    category: 'energy',
+  });
+
   // Power tier thresholds as resources (shows current belief relative to tiers)
   const tierOrder = ['dormant', 'minor', 'moderate', 'major', 'supreme', 'world_shaping'] as const;
   for (const tier of tierOrder) {
@@ -461,6 +473,27 @@ export class DevPanel implements IWindowPanel {
         // Mana tracking would need to be added to MagicSystemStateManager
         // For now, keep local tracking
       }
+    }
+
+    // Sync divine energy from DivineAbilityComponent
+    try {
+      const deities = world.query().with(CT.Deity).with(CT.DivineAbility).executeEntities();
+      if (deities.length > 0) {
+        const deity = deities[0];
+        if (deity) {
+          const divineAbility = deity.getComponent<DivineAbilityComponent>(CT.DivineAbility);
+          if (divineAbility) {
+            this.divineResources.set('divine_energy', divineAbility.divineEnergyPool);
+            // Update max for the slider
+            const divineEnergyResource = DIVINE_RESOURCES.find(r => r.id === 'divine_energy');
+            if (divineEnergyResource) {
+              divineEnergyResource.max = divineAbility.maxDivineEnergy;
+            }
+          }
+        }
+      }
+    } catch (error) {
+      // Divine ability component may not exist yet, silently ignore
     }
   }
 
@@ -870,6 +903,28 @@ export class DevPanel implements IWindowPanel {
         ctx.font = '10px monospace';
         ctx.fillText(deityComp.controller, SIZES.padding + 110, y + 4);
         y += 24;
+      }
+    }
+
+    // Divine resources (sliders for belief, divine energy, etc.)
+    if (deities.length > 0) {
+      y = this.renderSectionHeader(ctx, width, y, 'DIVINE RESOURCES');
+
+      // Render sliders for editable divine resources
+      const editableResources = DIVINE_RESOURCES.filter(r =>
+        r.category === 'belief' || r.category === 'energy'
+      );
+
+      for (const resource of editableResources) {
+        const currentValue = this.divineResources.get(resource.id) ?? resource.value;
+        y = this.renderSlider(ctx, width, y, {
+          id: resource.id,
+          name: resource.name,
+          value: currentValue,
+          min: resource.min,
+          max: resource.max,
+          section: 'divinity',
+        });
       }
     }
 
@@ -2011,6 +2066,26 @@ export class DevPanel implements IWindowPanel {
           }
         }
         this.log(`Applied ${value} belief to ${deities.length} deities`);
+        return;
+      }
+
+      // Apply divine energy to all deities with DivineAbilityComponent
+      if (resourceId === 'divine_energy') {
+        const deities = this.world.query().with(CT.Deity).with(CT.DivineAbility).executeEntities();
+        if (deities.length === 0) {
+          this.log(`No deities with divine abilities found`);
+          return;
+        }
+
+        for (const deity of deities) {
+          const divineAbility = deity.getComponent<DivineAbilityComponent>(CT.DivineAbility);
+          if (divineAbility) {
+            // Set divine energy directly (capped at max)
+            divineAbility.divineEnergyPool = Math.min(value, divineAbility.maxDivineEnergy);
+            this.world.updateComponent(deity.id, CT.DivineAbility, () => divineAbility);
+          }
+        }
+        this.log(`Applied ${value} divine energy to ${deities.length} deities`);
         return;
       }
 

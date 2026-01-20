@@ -58,8 +58,8 @@ export class OffScreenProductionSystem extends BaseSystem {
   /**
    * Register a chunk for off-screen optimization
    */
-  registerChunk(chunkId: string, entities: Entity[]): void {
-    const state = this.calculateProductionState(entities);
+  registerChunk(chunkId: string, entities: Entity[], world?: { craftingSystem?: any }): void {
+    const state = this.calculateProductionState(entities, world);
     this.chunkStates.set(chunkId, state);
   }
 
@@ -78,7 +78,10 @@ export class OffScreenProductionSystem extends BaseSystem {
   /**
    * Calculate production rates for a chunk
    */
-  private calculateProductionState(entities: Entity[]): ChunkProductionStateComponent {
+  private calculateProductionState(
+    entities: Entity[],
+    world?: { craftingSystem?: any }
+  ): ChunkProductionStateComponent {
     const state = createChunkProductionState();
 
     // Find all assembly machines
@@ -93,29 +96,54 @@ export class OffScreenProductionSystem extends BaseSystem {
         continue;
       }
 
-      // Get recipe (simplified - assumes world has crafting system)
+      // Get recipe
       const recipeId = assembly.currentRecipe;
       if (!recipeId) {
         continue;
       }
 
       // Calculate production rate
-      // Assumes: recipe takes 1 second base time, machine speed = 1.0
-      // Real implementation would look up recipe from world.craftingSystem
-      const craftingTime = 1.0; // Placeholder
       const machineSpeed = assembly.speed;
       const powerEfficiency = power?.efficiency || 1.0;
 
+      // Default values (used if recipe lookup fails or world not provided)
+      let craftingTime = 1.0;
+      let outputItemId = 'unknown_output';
+      let inputRequirements: Array<{ itemId: string; ratePerHour: number }> = [];
+
+      // Look up recipe from crafting system if available
+      if (world?.craftingSystem) {
+        try {
+          const recipeRegistry = world.craftingSystem.getRecipeRegistry();
+          const recipe = recipeRegistry.getRecipe(recipeId);
+
+          if (recipe) {
+            // Extract real recipe data
+            craftingTime = recipe.craftingTime;
+            outputItemId = recipe.output.itemId;
+
+            // Map ingredients to input requirements
+            inputRequirements = recipe.ingredients.map((ingredient) => {
+              const ingredientCraftsPerHour = (3600 / craftingTime) * machineSpeed * powerEfficiency;
+              return {
+                itemId: ingredient.itemId,
+                ratePerHour: ingredient.quantity * ingredientCraftsPerHour,
+              };
+            });
+          }
+        } catch (error) {
+          // Recipe not found or crafting system error - use defaults
+          // This is an acceptable edge case (following CLAUDE.md: edge case handling is acceptable)
+          console.warn(`[OffScreenProduction] Failed to load recipe ${recipeId}:`, error);
+        }
+      }
+
       const craftsPerHour = (3600 / craftingTime) * machineSpeed * powerEfficiency;
 
-      // Placeholder recipe data (real system would look this up)
       const productionRate: ProductionRate = {
-        itemId: 'unknown_output', // Would come from recipe
+        itemId: outputItemId,
         ratePerHour: craftsPerHour,
-        inputRequirements: [
-          // Would come from recipe
-          { itemId: 'unknown_input', ratePerHour: craftsPerHour * 2 },
-        ],
+        inputRequirements,
         powerRequired: power?.consumption || 100,
       };
 

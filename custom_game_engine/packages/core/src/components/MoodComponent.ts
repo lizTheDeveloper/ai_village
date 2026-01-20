@@ -552,3 +552,30 @@ export function getPrimaryMoodFactor(component: MoodComponent): keyof MoodFactor
 
   return primary;
 }
+
+/**
+ * Get the duration (in ticks) that the agent has been in the current emotional state.
+ * Counts consecutive ticks from the end of mood history with the same emotional state.
+ */
+export function getEmotionalStateDuration(
+  component: MoodComponent,
+  state: EmotionalState
+): number {
+  if (component.emotionalState !== state) {
+    return 0; // Not currently in this state
+  }
+
+  let consecutiveTicks = 1; // Current tick counts
+
+  // Walk backwards through history counting consecutive matching states
+  for (let i = component.moodHistory.length - 1; i >= 0; i--) {
+    const entry = component.moodHistory[i];
+    if (entry && entry.emotionalState === state) {
+      consecutiveTicks++;
+    } else {
+      break; // State changed
+    }
+  }
+
+  return consecutiveTicks;
+}

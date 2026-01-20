@@ -29,6 +29,8 @@ export interface SocialEvents {
     speakerId?: EntityId;
     listenerId?: EntityId;
     message: string;
+    /** Alien translation of the message (if speaker has a native language) */
+    alienMessage?: string;
   };
   'conversation:ended': {
     conversationId: string;
@@ -224,6 +226,28 @@ export interface SocialEvents {
   /** Cell network technology upgraded */
   'cell_network_upgraded': {
     generation: string;
+  };
+
+  // === Interest Evolution Events (Deep Conversation System) ===
+
+  /** Interest mutated due to conversation or experience */
+  'interest:mutated': {
+    agentId: EntityId;
+    topic: string;
+    oldStrength: number;
+    newStrength: number;
+    mutationType: 'strengthened' | 'weakened' | 'created' | 'abandoned';
+    source: 'conversation' | 'experience' | 'reflection' | 'hearsay';
+    influencerId?: EntityId;
+  };
+
+  /** Interest shared during conversation */
+  'interest:shared': {
+    sharerId: EntityId;
+    receiverId: EntityId;
+    topic: string;
+    conversationId?: string;
+    depth: number;
   };
 }
 export type SocialEventType = keyof SocialEvents;

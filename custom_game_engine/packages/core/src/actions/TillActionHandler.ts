@@ -223,7 +223,8 @@ export class TillActionHandler implements ActionHandler {
 
     // Attempt to till the tile
     try {
-      this.soilSystem.tillTile(world, tile, targetPos.x, targetPos.y);
+      // Pass agentId to tillTile for tool checking
+      this.soilSystem.tillTile(world, tile, targetPos.x, targetPos.y, action.actorId);
 
       // Tilling succeeded - SoilSystem already emitted soil:tilled event
       return {
@@ -243,7 +244,7 @@ export class TillActionHandler implements ActionHandler {
         ],
       };
     } catch (error: unknown) {
-      // SoilSystem threw an error (invalid terrain, etc.)
+      // SoilSystem threw an error (invalid terrain, tool missing, etc.)
       // Return failed result with clear error message
       const err = error as Error;
       return {

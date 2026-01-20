@@ -1,0 +1,71 @@
+[
+  {
+    "id": "mushroom_house",
+    "name": "Mushroom House",
+    "description": "A cozy 5x5 mushroom house made of fungus with a bed and table",
+    "category": "residential",
+    "tier": 2,
+    "layout": [
+      "#####",
+      "#B..#",
+      "#T..#",
+      "#...D",
+      "#####"
+    ],
+    "materials": {
+      "wall": "fungus",
+      "floor": "fungus",
+      "door": "fungus"
+    },
+    "functionality": [
+      {
+        "type": "sleeping",
+        "params": {
+          "beds": 1
+        }
+      },
+      {
+        "type": "workstation",
+        "params": {
+          "tables": 1
+        }
+      }
+    ],
+    "capacity": 2
+  },
+  {
+    "id": "marble_temple",
+    "name": "Marble Temple",
+    "description": "A sacred place for rituals",
+    "category": "religious",
+    "tier": 3,
+    "layout": [
+      "######",
+      "#....#",
+      "#.T..#",
+      "#.S..#",
+      "#....#",
+      "##D###"
+    ],
+    "materials": {
+      "wall": "marble",
+      "floor": "marble",
+      "door": "marble"
+    },
+    "functionality": [
+      {
+        "type": "ritual",
+        "params": {
+          "tables": 1
+        }
+      },
+      {
+        "type": "storage",
+        "params": {
+          "storage_units": 1
+        }
+      }
+    ],
+    "capacity": 2
+  }
+]

@@ -24,6 +24,7 @@ import type {
   PerceivedPersonality
 } from '../divinity/DeityTypes.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
+import type { LLMDecisionQueue } from '../decision/LLMDecisionProcessor.js';
 
 /** Tracked belief contribution from proto_deity_belief events */
 interface ProtoDeityBelief {
@@ -31,6 +32,13 @@ interface ProtoDeityBelief {
   totalBelief: number;
   contributors: Set<string>;
   lastContribution: number;
+}
+
+/** Pending LLM domain inference request */
+interface PendingDomainInference {
+  prayerContent: string;
+  requestId: string;
+  timestamp: number;
 }
 
 // ============================================================================
@@ -115,18 +123,23 @@ export class DeityEmergenceSystem extends BaseSystem {
   public readonly requiredComponents = [] as const;
   // Only run when spiritual components exist (need believers to form new deities)
   public readonly activationComponents = ['spiritual'] as const;
+  protected readonly throttleInterval = DEFAULT_EMERGENCE_CONFIG.checkInterval; // ~1 minute at 20 TPS
 
   private config: EmergenceConfig;
-  protected readonly throttleInterval: number;
 
   // Track belief contributions from proto_deity_belief events
   // Key is inferred concept (or 'unknown' if no concept detected)
   private protoDeityBeliefs: Map<string, ProtoDeityBelief> = new Map();
 
-  constructor(config: Partial<EmergenceConfig> = {}) {
+  // LLM integration for prayer domain inference
+  private llmQueue: LLMDecisionQueue | null = null;
+  private pendingDomainInferences = new Map<string, PendingDomainInference>();
+  private domainInferenceCache = new Map<string, DivineDomain | null>();
+
+  constructor(config: Partial<EmergenceConfig> = {}, llmQueue?: LLMDecisionQueue) {
     super();
     this.config = { ...DEFAULT_EMERGENCE_CONFIG, ...config };
-    this.throttleInterval = this.config.checkInterval;
+    this.llmQueue = llmQueue || null;
   }
 
   protected onInitialize(): void {
@@ -175,6 +188,11 @@ export class DeityEmergenceSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Process any completed LLM domain inference requests
+    if (this.llmQueue) {
+      this.processLLMDomainInferences();
+    }
+
     // First, check if any proto_deity_beliefs have accumulated enough to trigger emergence
     this.checkProtoDeityEmergence(ctx.world, ctx.tick);
 
@@ -441,13 +459,161 @@ export class DeityEmergenceSystem extends BaseSystem {
   }
 
   /**
-   * Infer domain from prayer content
-   * TODO: In full implementation, use LLM to analyze prayer content
+   * Infer domain from prayer content using LLM or fallback to keyword matching
    */
   private inferDomainFromPrayer(content: string): DivineDomain | null {
+    // Check cache first
+    if (this.domainInferenceCache.has(content)) {
+      return this.domainInferenceCache.get(content)!;
+    }
+
+    // If LLM is available, queue inference request
+    if (this.llmQueue) {
+      this.requestLLMDomainInference(content);
+    }
+
+    // Always use keyword matching as immediate fallback
+    return this.keywordMatchDomain(content);
+  }
+
+  /**
+   * Request LLM-based domain inference (async)
+   */
+  private requestLLMDomainInference(prayerContent: string): void {
+    const requestId = `domain_inference_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+    // Skip if already pending
+    if (this.pendingDomainInferences.has(prayerContent)) {
+      return;
+    }
+
+    const prompt = this.buildDomainInferencePrompt(prayerContent);
+
+    this.llmQueue!.requestDecision(requestId, prompt).catch(err => {
+      console.error('[DeityEmergenceSystem] Failed to request domain inference:', err);
+    });
+
+    this.pendingDomainInferences.set(requestId, {
+      prayerContent,
+      requestId,
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Build LLM prompt for domain inference
+   */
+  private buildDomainInferencePrompt(prayerContent: string): string {
+    const validDomains: DivineDomain[] = [
+      'harvest', 'war', 'wisdom', 'craft', 'nature', 'death', 'love', 'chaos', 'order',
+      'fortune', 'protection', 'healing', 'mystery', 'time', 'sky', 'earth', 'water',
+      'fire', 'storm', 'hunt', 'home', 'travel', 'trade', 'justice', 'vengeance',
+      'dreams', 'fear', 'beauty', 'trickery'
+    ];
+
+    return `Analyze the following prayer and classify it into the most appropriate divine domain.
+
+Prayer: "${prayerContent}"
+
+Available domains:
+${validDomains.map(d => `- ${d}`).join('\n')}
+
+Respond with ONLY a valid JSON object in this format:
+{
+  "domain": "domain_name",
+  "confidence": 0.0-1.0,
+  "reasoning": "brief explanation"
+}
+
+If the prayer doesn't clearly fit any domain, use "mystery" as the domain.`;
+  }
+
+  /**
+   * Process completed LLM domain inference requests
+   */
+  private processLLMDomainInferences(): void {
+    if (!this.llmQueue) return;
+
+    const completedRequests: string[] = [];
+
+    for (const [requestId, pending] of this.pendingDomainInferences.entries()) {
+      const response = this.llmQueue.getDecision(requestId);
+      if (!response) continue; // Still waiting
+
+      try {
+        // Parse LLM response
+        const parsed = JSON.parse(response);
+        const domain = parsed.domain as DivineDomain;
+
+        // Validate domain
+        const validDomains: DivineDomain[] = [
+          'harvest', 'war', 'wisdom', 'craft', 'nature', 'death', 'love', 'chaos', 'order',
+          'fortune', 'protection', 'healing', 'mystery', 'time', 'sky', 'earth', 'water',
+          'fire', 'storm', 'hunt', 'home', 'travel', 'trade', 'justice', 'vengeance',
+          'dreams', 'fear', 'beauty', 'trickery'
+        ];
+
+        if (validDomains.includes(domain)) {
+          // Cache the result
+          this.domainInferenceCache.set(pending.prayerContent, domain);
+
+          // Update proto-deity beliefs if this prayer was already tracked
+          const oldDomain = this.keywordMatchDomain(pending.prayerContent);
+          if (oldDomain && oldDomain !== domain) {
+            // Migrate belief from keyword-matched domain to LLM-inferred domain
+            const oldKey = oldDomain;
+            const newKey = domain;
+            const oldTracked = this.protoDeityBeliefs.get(oldKey);
+            if (oldTracked) {
+              if (!this.protoDeityBeliefs.has(newKey)) {
+                this.protoDeityBeliefs.set(newKey, {
+                  concept: domain,
+                  totalBelief: 0,
+                  contributors: new Set(),
+                  lastContribution: Date.now(),
+                });
+              }
+              const newTracked = this.protoDeityBeliefs.get(newKey)!;
+              newTracked.totalBelief += oldTracked.totalBelief;
+              for (const contributor of oldTracked.contributors) {
+                newTracked.contributors.add(contributor);
+              }
+            }
+          }
+        } else {
+          console.warn('[DeityEmergenceSystem] LLM returned invalid domain:', domain);
+          this.domainInferenceCache.set(pending.prayerContent, null);
+        }
+      } catch (error) {
+        console.error('[DeityEmergenceSystem] Failed to parse LLM domain inference:', error);
+        this.domainInferenceCache.set(pending.prayerContent, null);
+      }
+
+      completedRequests.push(requestId);
+    }
+
+    // Clean up completed requests
+    for (const id of completedRequests) {
+      this.pendingDomainInferences.delete(id);
+    }
+
+    // Clean up old cache entries (keep only last 1000)
+    if (this.domainInferenceCache.size > 1000) {
+      const entries = Array.from(this.domainInferenceCache.entries());
+      const toDelete = entries.slice(0, entries.length - 1000);
+      for (const [key] of toDelete) {
+        this.domainInferenceCache.delete(key);
+      }
+    }
+  }
+
+  /**
+   * Keyword-based domain matching (fallback when LLM unavailable or for immediate results)
+   */
+  private keywordMatchDomain(content: string): DivineDomain | null {
     const lower = content.toLowerCase();
 
-    // Simple keyword matching for now
+    // Simple keyword matching
     if (lower.includes('harvest') || lower.includes('crop') || lower.includes('food')) {
       return 'harvest';
     }
@@ -471,6 +637,66 @@ export class DeityEmergenceSystem extends BaseSystem {
     }
     if (lower.includes('death') || lower.includes('died') || lower.includes('afterlife')) {
       return 'death';
+    }
+    if (lower.includes('craft') || lower.includes('build') || lower.includes('make')) {
+      return 'craft';
+    }
+    if (lower.includes('fortune') || lower.includes('luck') || lower.includes('prosper')) {
+      return 'fortune';
+    }
+    if (lower.includes('fire') || lower.includes('flame') || lower.includes('burn')) {
+      return 'fire';
+    }
+    if (lower.includes('water') || lower.includes('sea') || lower.includes('ocean')) {
+      return 'water';
+    }
+    if (lower.includes('earth') || lower.includes('stone') || lower.includes('mountain')) {
+      return 'earth';
+    }
+    if (lower.includes('dream') || lower.includes('sleep') || lower.includes('vision')) {
+      return 'dreams';
+    }
+    if (lower.includes('fear') || lower.includes('terror') || lower.includes('afraid')) {
+      return 'fear';
+    }
+    if (lower.includes('justice') || lower.includes('fair') || lower.includes('law')) {
+      return 'justice';
+    }
+    if (lower.includes('travel') || lower.includes('journey') || lower.includes('road')) {
+      return 'travel';
+    }
+    if (lower.includes('home') || lower.includes('hearth') || lower.includes('family')) {
+      return 'home';
+    }
+    if (lower.includes('hunt') || lower.includes('prey') || lower.includes('chase')) {
+      return 'hunt';
+    }
+    if (lower.includes('trade') || lower.includes('merchant') || lower.includes('commerce')) {
+      return 'trade';
+    }
+    if (lower.includes('beauty') || lower.includes('beautiful') || lower.includes('art')) {
+      return 'beauty';
+    }
+    if (lower.includes('trick') || lower.includes('deceive') || lower.includes('cunning')) {
+      return 'trickery';
+    }
+    if (lower.includes('vengeance') || lower.includes('revenge') || lower.includes('retribution')) {
+      return 'vengeance';
+    }
+    if (lower.includes('time') || lower.includes('season') || lower.includes('cycle')) {
+      return 'time';
+    }
+    if (lower.includes('chaos') || lower.includes('disorder') || lower.includes('random')) {
+      return 'chaos';
+    }
+    if (lower.includes('order') || lower.includes('stability') || lower.includes('structure')) {
+      return 'order';
+    }
+    if (lower.includes('nature') || lower.includes('wild') || lower.includes('forest')) {
+      return 'nature';
+    }
+    if (lower.includes('mystery') || lower.includes('secret') || lower.includes('unknown')) {
+      return 'mystery';
     }
 
     return null;

@@ -4,6 +4,8 @@ import type { BiomeType } from '../types/TerrainTypes.js';
 import type { TimeComponent } from './TimeSystem.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
+import { getWorkingTools } from '../components/InventoryComponent.js';
+import type { InventoryComponent } from '../components/InventoryComponent.js';
 
 export interface Tile {
   terrain: string;
@@ -55,6 +57,22 @@ export class SoilSystem extends BaseSystem {
   private lastDayProcessed: number = -1;
   private accumulatedTime: number = 0; // Track elapsed time in seconds
   private readonly SECONDS_PER_DAY = 24 * 60 * 60; // 24 hours in seconds
+  private initialized = false;
+
+  protected onInitialize(world: World): void {
+    if (this.initialized) return;
+    this.initialized = true;
+
+    // Subscribe to weather:changed events to emit specific rain/snow events
+    world.eventBus.on('weather:changed', (event) => {
+      this.handleWeatherChange(world, event);
+    });
+
+    // Subscribe to daily time events for moisture decay
+    world.eventBus.on('world:time:day', (event) => {
+      this.processDailyMoistureDecay(world);
+    });
+  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Get time acceleration from TimeComponent if available
@@ -83,10 +101,168 @@ export class SoilSystem extends BaseSystem {
   }
 
   /**
-   * Till a grass tile to make it plantable
-   * TODO: Add agentId parameter for tool checking when agent-initiated tilling is implemented
+   * Handle weather change events and emit specific rain/snow events
    */
-  public tillTile(world: World, tile: Tile, x: number, y: number, _agentId?: string): void {
+  private handleWeatherChange(world: World, event: any): void {
+    const { weatherType, intensity } = event.data;
+
+    if (weatherType === 'rain') {
+      // Emit rain event for soil moisture integration
+      world.eventBus.emit({
+        type: 'weather:rain',
+        source: 'soil-system',
+        data: {
+          intensity: intensity || 0.5,
+        },
+      });
+      // Apply rain to all outdoor tiles
+      this.handleRainEvent(world, intensity || 0.5);
+    } else if (weatherType === 'snow') {
+      // Emit snow event for soil moisture integration
+      world.eventBus.emit({
+        type: 'weather:snow',
+        source: 'soil-system',
+        data: {
+          intensity: intensity || 0.5,
+        },
+      });
+      // Apply snow to all outdoor tiles
+      this.handleSnowEvent(world, intensity || 0.5);
+    }
+  }
+
+  /**
+   * Handle rain events by increasing moisture on outdoor tiles
+   */
+  private handleRainEvent(world: World, intensity: number): void {
+    const chunkManager = world.getChunkManager();
+    if (!chunkManager) return;
+
+    // Check if getLoadedChunks is available
+    if ('getLoadedChunks' in chunkManager && typeof chunkManager.getLoadedChunks === 'function') {
+      const chunks = chunkManager.getLoadedChunks();
+      for (const chunk of chunks) {
+        for (let y = 0; y < chunk.tiles.length; y++) {
+          for (let x = 0; x < chunk.tiles[y]!.length; x++) {
+            const tile = chunk.tiles[y]![x]!;
+            const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
+            const worldY = chunk.y * 32 + y;
+
+            // Only apply rain to outdoor tiles
+            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
+              this.applyRain(world, tile as any, worldX, worldY, intensity);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle snow events by increasing moisture on outdoor tiles
+   */
+  private handleSnowEvent(world: World, intensity: number): void {
+    const chunkManager = world.getChunkManager();
+    if (!chunkManager) return;
+
+    // Check if getLoadedChunks is available
+    if ('getLoadedChunks' in chunkManager && typeof chunkManager.getLoadedChunks === 'function') {
+      const chunks = chunkManager.getLoadedChunks();
+      for (const chunk of chunks) {
+        for (let y = 0; y < chunk.tiles.length; y++) {
+          for (let x = 0; x < chunk.tiles[y]!.length; x++) {
+            const tile = chunk.tiles[y]![x]!;
+            const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
+            const worldY = chunk.y * 32 + y;
+
+            // Only apply snow to outdoor tiles
+            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
+              this.applySnow(world, tile as any, worldX, worldY, intensity);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Process daily moisture decay based on temperature
+   */
+  private processDailyMoistureDecay(world: World): void {
+    // Get current temperature for evaporation modifier
+    const temperature = this.getCurrentTemperature(world);
+
+    const chunkManager = world.getChunkManager();
+    if (!chunkManager) return;
+
+    // Check if getLoadedChunks is available
+    if ('getLoadedChunks' in chunkManager && typeof chunkManager.getLoadedChunks === 'function') {
+      const chunks = chunkManager.getLoadedChunks();
+      for (const chunk of chunks) {
+        for (let y = 0; y < chunk.tiles.length; y++) {
+          for (let x = 0; x < chunk.tiles[y]!.length; x++) {
+            const tile = chunk.tiles[y]![x]!;
+            const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
+            const worldY = chunk.y * 32 + y;
+
+            // Apply decay to outdoor tiles (indoor tiles decay slower)
+            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
+              this.decayMoisture(world, tile as any, worldX, worldY, temperature);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if a tile is indoors (covered by building)
+   * Buildings block rain and sun through walls, doors, windows, or roofs
+   */
+  private isTileIndoors(tile: any, _world: World, _x: number, _y: number): boolean {
+    // Per CLAUDE.md: No silent fallbacks - validate tile structure
+    if (!tile || typeof tile !== 'object') {
+      throw new Error(`isTileIndoors requires valid tile object, got ${typeof tile}`);
+    }
+
+    // Check if tile has any building structure:
+    // - wall: Blocks rain and sun completely
+    // - door: Blocks rain and sun (even when open)
+    // - window: Blocks rain, allows light but still provides shelter
+    // - roof: Provides overhead coverage (primary rain/sun blocker)
+    // Any of these means the tile is covered by a building
+    const hasWall = tile.wall !== undefined && tile.wall !== null;
+    const hasDoor = tile.door !== undefined && tile.door !== null;
+    const hasWindow = tile.window !== undefined && tile.window !== null;
+    const hasRoof = tile.roof !== undefined && tile.roof !== null;
+
+    return hasWall || hasDoor || hasWindow || hasRoof;
+  }
+
+  /**
+   * Get current temperature from TemperatureSystem or TimeSystem
+   */
+  private getCurrentTemperature(world: World): number {
+    // Try to get temperature from TemperatureSystem singleton
+    const tempEntities = world.query().with(CT.Temperature).executeEntities();
+    if (tempEntities.length > 0) {
+      const tempComp = tempEntities[0]!.components.get('temperature') as any;
+      if (tempComp && typeof tempComp.currentTemp === 'number') {
+        return tempComp.currentTemp;
+      }
+    }
+
+    // Fallback to moderate temperature if no temperature data available
+    // CLAUDE.md: Normally we'd throw, but temperature affects evaporation rate,
+    // not core correctness, so using a safe default is acceptable here
+    return 20; // Celsius - moderate temperature
+  }
+
+  /**
+   * Till a grass tile to make it plantable
+   * Requires agent to have a hoe tool for optimal tilling
+   */
+  public tillTile(world: World, tile: Tile, x: number, y: number, agentId?: string): void {
     // CLAUDE.md: Validate inputs, no silent fallbacks
     if (!tile) {
       const error = 'tillTile requires a valid tile object';
@@ -97,6 +273,34 @@ export class SoilSystem extends BaseSystem {
       const error = `tillTile requires valid position coordinates, got (${x},${y})`;
       console.error(`[SoilSystem] ❌ ERROR: ${error}`);
       throw new Error(error);
+    }
+
+    // CLAUDE.md: Tool checking - agents must have a hoe to till
+    // This prevents tilling without proper equipment
+    if (agentId) {
+      const agent = world.getEntity(agentId);
+      if (!agent) {
+        const error = `Agent ${agentId} not found`;
+        console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+        throw new Error(error);
+      }
+
+      const inventory = agent.getComponent<InventoryComponent>(CT.Inventory);
+      if (!inventory) {
+        const error = `Agent ${agentId} has no inventory - cannot check for tools`;
+        console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+        throw new Error(error);
+      }
+
+      // Check for hoe tool - required for tilling
+      const hoeTools = getWorkingTools(inventory, 'hoe');
+      if (hoeTools.length === 0) {
+        const error = `Agent ${agentId} has no working hoe. Tilling requires a hoe tool.`;
+        console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+        throw new Error(error);
+      }
+      // Tool found - tilling can proceed
+      // TODO (Phase 36+): Degrade tool condition after use
     }
 
     // CLAUDE.md: CRITICAL - Biome data is REQUIRED for fertility calculation
@@ -268,6 +472,16 @@ export class SoilSystem extends BaseSystem {
   }
 
   /**
+   * Seasonal modifiers for moisture evaporation rate
+   */
+  private readonly SEASONAL_MODIFIERS = {
+    spring: 1.0,   // Normal evaporation
+    summer: 1.25,  // +25% evaporation (hot, dry)
+    autumn: 1.0,   // Normal evaporation
+    winter: 0.5,   // -50% evaporation (cold, low evaporation)
+  } as const;
+
+  /**
    * Process moisture decay for a tile
    */
   public decayMoisture(
@@ -294,6 +508,11 @@ export class SoilSystem extends BaseSystem {
       // Cold: -50% decay
       decay *= 0.5;
     }
+
+    // Modify by season
+    const currentSeason = world.gameTime.season;
+    const seasonalModifier = this.SEASONAL_MODIFIERS[currentSeason];
+    decay *= seasonalModifier;
 
     tile.moisture = Math.max(0, tile.moisture - decay);
 

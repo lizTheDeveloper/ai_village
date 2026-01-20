@@ -106,14 +106,66 @@ describe('SoilSystem', () => {
       expect(tile.moisture).toBe(45);
     });
 
-    it.skip('should modify decay based on season (summer = +25%)', () => {
-      // TODO: Season-based decay modifiers not implemented in current SoilSystem
-      // The system uses temperature-based modifiers instead
+    it('should modify decay based on season (summer = +25%)', () => {
+      const world = new WorldImpl(eventBus);
+      // Set the world to summer season (index 1)
+      // Season cycle: spring (0), summer (1), autumn (2), winter (3)
+      // Days: 0-27 = spring, 28-55 = summer, 56-83 = autumn, 84-111 = winter
+      // 1200 ticks/hour * 24 hours/day = 28,800 ticks/day
+      // Day 28 = 28 * 28,800 = 806,400 ticks
+      world.setTick(28 * 24 * 1200); // Day 28 = first day of summer
+
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Normal temperature (20°C) with summer season
+      // Base decay: 10, Summer modifier: 1.25
+      // Expected decay: 10 * 1.25 = 12.5
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      expect(tile.moisture).toBe(37.5); // 50 - 12.5
     });
 
-    it.skip('should modify decay based on season (winter = -50%)', () => {
-      // TODO: Season-based decay modifiers not implemented in current SoilSystem
-      // The system uses temperature-based modifiers instead
+    it('should modify decay based on season (winter = -50%)', () => {
+      const world = new WorldImpl(eventBus);
+      // Set the world to winter season (index 3)
+      // Days: 84-111 = winter
+      // Day 84 = 84 * 28,800 = 2,419,200 ticks
+      world.setTick(84 * 24 * 1200); // Day 84 = first day of winter
+
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 70, phosphorus: 56, potassium: 63 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Normal temperature (20°C) with winter season
+      // Base decay: 10, Winter modifier: 0.5
+      // Expected decay: 10 * 0.5 = 5
+      soilSystem.decayMoisture(world, tile, 0, 0, 20);
+
+      expect(tile.moisture).toBe(45); // 50 - 5
     });
 
     it('should not decay moisture below 0', () => {

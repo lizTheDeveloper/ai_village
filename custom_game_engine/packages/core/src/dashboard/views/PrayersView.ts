@@ -151,7 +151,7 @@ export const PrayersView: DashboardView<PrayersViewData> = {
         deityName: deityComp.identity.primaryName,
         currentBelief: deityComp.belief.currentBelief,
         prayers,
-        totalAnswered: 0, // TODO: Track this in deity component
+        totalAnswered: deityComp.totalAnsweredPrayers,
       };
     } catch (error) {
       return {

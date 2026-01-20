@@ -21,6 +21,7 @@ import type { VillageGovernanceComponent } from '../components/VillageGovernance
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
 import type { TownHallComponent } from '../components/TownHallComponent.js';
 import type { CensusBureauComponent } from '../components/CensusBureauComponent.js';
+import type { WarehouseComponent } from '../components/WarehouseComponent.js';
 import type { NationGovernanceComponent } from '../components/NationGovernanceComponent.js';
 import type { EmpireGovernanceComponent } from '../components/EmpireGovernanceComponent.js';
 import type { GalacticCouncilComponent } from '../components/GalacticCouncilComponent.js';
@@ -169,6 +170,16 @@ export interface ProvinceGovernorContext {
     neighbors: Array<{ name: string; distance: number; relation: string }>;
   };
 
+  // Warehouse/storage data
+  warehouseData: {
+    totalCapacity: number;
+    usedCapacity: number;
+    utilizationPercent: number;
+    resourceStockpiles: Record<string, number>;
+    criticalShortages: string[];
+    surpluses: string[];
+  };
+
   nationalDirectives: Array<{
     type: string;
     priority: number;
@@ -209,13 +220,38 @@ export function buildProvinceGovernorContext(
   // Aggregate city data
   const cities = province.cities;
   const totalPopulation = province.totalPopulation;
-  const totalFood = cities.reduce((sum, city) => {
-    // In real implementation, would query city warehouses
-    // For now, use placeholder
-    return sum + 0;
-  }, 0);
 
-  // Calculate food days remaining (placeholder - needs warehouse integration)
+  // Query all warehouses and aggregate food resources
+  const warehouses = world.query().with(CT.Warehouse).executeEntities();
+  let totalFood = 0;
+  const resourceStockpiles = new Map<string, number>();
+
+  for (const entity of warehouses) {
+    const impl = entity as EntityImpl;
+    const warehouse = impl.getComponent<WarehouseComponent>(CT.Warehouse);
+
+    if (!warehouse) {
+      continue;
+    }
+
+    // Aggregate all stockpiles
+    for (const resourceName in warehouse.stockpiles) {
+      const amount = warehouse.stockpiles[resourceName];
+      if (amount !== undefined && amount > 0) {
+        const current = resourceStockpiles.get(resourceName) ?? 0;
+        resourceStockpiles.set(resourceName, current + amount);
+
+        // Count food-type resources for food supply calculation
+        if (warehouse.resourceType === 'food' || resourceName.includes('food') ||
+            resourceName.includes('meat') || resourceName.includes('berries') ||
+            resourceName.includes('grain') || resourceName.includes('bread')) {
+          totalFood += amount;
+        }
+      }
+    }
+  }
+
+  // Calculate food days remaining (assuming 3 food units per person per day)
   const foodDaysRemaining = totalPopulation > 0 ? totalFood / (totalPopulation * 3) : 999;
 
   // Extract key resources from province economy
@@ -269,6 +305,53 @@ export function buildProvinceGovernorContext(
     });
   }
 
+  // Calculate warehouse capacity and utilization
+  let totalCapacity = 0;
+  let usedCapacity = 0;
+  const criticalShortages: string[] = [];
+  const surpluses: string[] = [];
+
+  for (const entity of warehouses) {
+    const impl = entity as EntityImpl;
+    const warehouse = impl.getComponent<WarehouseComponent>(CT.Warehouse);
+
+    if (!warehouse) {
+      continue;
+    }
+
+    totalCapacity += warehouse.capacity;
+
+    // Calculate used capacity from stockpiles
+    for (const resourceName in warehouse.stockpiles) {
+      const amount = warehouse.stockpiles[resourceName];
+      if (amount !== undefined) {
+        usedCapacity += amount;
+      }
+    }
+
+    // Identify critical shortages and surpluses from warehouse status
+    for (const resourceName in warehouse.status) {
+      const status = warehouse.status[resourceName];
+      if (status === 'critical' || status === 'low') {
+        if (!criticalShortages.includes(resourceName)) {
+          criticalShortages.push(resourceName);
+        }
+      } else if (status === 'surplus') {
+        if (!surpluses.includes(resourceName)) {
+          surpluses.push(resourceName);
+        }
+      }
+    }
+  }
+
+  const utilizationPercent = totalCapacity > 0 ? (usedCapacity / totalCapacity) * 100 : 0;
+
+  // Convert Map to plain object for serialization
+  const resourceStockpilesObject: Record<string, number> = {};
+  resourceStockpiles.forEach((amount, resourceName) => {
+    resourceStockpilesObject[resourceName] = amount;
+  });
+
   return {
     // Base civilization data
     population: totalPopulation,
@@ -285,6 +368,17 @@ export function buildProvinceGovernorContext(
       buildings: buildingsArray,
       neighbors,
     },
+
+    // Warehouse/storage data
+    warehouseData: {
+      totalCapacity,
+      usedCapacity,
+      utilizationPercent,
+      resourceStockpiles: resourceStockpilesObject,
+      criticalShortages,
+      surpluses,
+    },
+
     nationalDirectives,
   };
 }
@@ -439,6 +533,29 @@ export function buildNationContext(headOfState: Entity, world: World): NationCon
   const provinceCount = nation.provinceIds.length;
   const allProvinces = provinceGovernanceQuery.get(world);
 
+  // Query all warehouses once for resource aggregation (performance optimization)
+  const allWarehouses = world.query().with(CT.Warehouse).executeEntities();
+  const nationalResourceStockpiles = new Map<string, number>();
+
+  // Aggregate national warehouse stockpiles
+  for (const entity of allWarehouses) {
+    const impl = entity as EntityImpl;
+    const warehouse = impl.getComponent<WarehouseComponent>(CT.Warehouse);
+
+    if (!warehouse) {
+      continue;
+    }
+
+    // Aggregate all stockpiles across the nation
+    for (const resourceName in warehouse.stockpiles) {
+      const amount = warehouse.stockpiles[resourceName];
+      if (amount !== undefined && amount > 0) {
+        const current = nationalResourceStockpiles.get(resourceName) ?? 0;
+        nationalResourceStockpiles.set(resourceName, current + amount);
+      }
+    }
+  }
+
   // Pre-allocate provinces array with exact size (avoids array resizing)
   const provinces = new Array(provinceCount);
 
@@ -478,11 +595,12 @@ export function buildNationContext(headOfState: Entity, world: World): NationCon
     record.population = province.totalPopulation;
     record.happiness = province.stability;
 
-    // Build resources map inline (avoid separate loop)
+    // Build resources map with actual warehouse quantities
     const resourceCount = province.economy.majorResources.length;
     for (let j = 0; j < resourceCount; j++) {
       const resource = province.economy.majorResources[j]!;
-      record.resources[resource] = 1; // Placeholder - would need actual quantities from warehouse system
+      // Use actual quantity from national stockpiles, default to 0 if not found
+      record.resources[resource] = nationalResourceStockpiles.get(resource) ?? 0;
     }
 
     provinces[i] = record;
@@ -1374,6 +1492,28 @@ export function buildVillageContext(elder: Entity, world: World): VillageContext
     relation: rel.relationship,
   }));
 
+  // Build resources from warehouses
+  const resources = new Map<string, number>();
+  const warehouses = world.query().with(CT.Warehouse).executeEntities();
+
+  for (const entity of warehouses) {
+    const impl = entity as EntityImpl;
+    const warehouse = impl.getComponent<WarehouseComponent>(CT.Warehouse);
+
+    if (!warehouse) {
+      continue;
+    }
+
+    // Aggregate stockpiles across all warehouses
+    for (const resourceName in warehouse.stockpiles) {
+      const amount = warehouse.stockpiles[resourceName];
+      if (amount !== undefined && amount > 0) {
+        const current = resources.get(resourceName) ?? 0;
+        resources.set(resourceName, current + amount);
+      }
+    }
+  }
+
   return {
     village: {
       name: village.villageName,
@@ -1381,7 +1521,7 @@ export function buildVillageContext(elder: Entity, world: World): VillageContext
       governanceType: village.governanceType,
     },
     demographics,
-    resources: new Map(), // TODO: Integrate with warehouse system
+    resources,
     proposals,
     laws,
     neighbors,

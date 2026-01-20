@@ -225,6 +225,13 @@ export interface AgentEvents {
     agentName?: string;
     parentIds?: string[];
   };
+  'agent:death': {
+    agentId: EntityId;
+    agentName?: string;
+    cause?: string;
+    position?: { x: number; y: number };
+    tick?: number;
+  };
   'agent:xp_gained': {
     agentId: string;
     skill: string;

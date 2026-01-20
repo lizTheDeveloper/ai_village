@@ -1,0 +1,912 @@
+{
+  "elven": [
+    {
+      "id": "treehouse_elven_2tier",
+      "name": "Elven Living Wood Treehouse",
+      "description": "A two-tiered treehouse grown from ancient living wood, with crystal windows and spiral staircases integrated into the tree's natural growth patterns. The structure curves organically with the tree's branches and features self-healing wooden walls.",
+      "category": "residential",
+      "width": 20,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 380
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 53
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 828,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "capacity": 4
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 10
+          }
+        },
+        {
+          "type": "natural_lighting",
+          "params": {
+            "sources": 8
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "###################",
+        "#D................#",
+        "#.#.WW.WW.WW.WW.#.#",
+        "#.#................",
+        "#.#.##..........##",
+        "#.#.#............#",
+        "#.#.##..........##",
+        "#.#................",
+        "#.#.WW.WW.WW.WW.#.#",
+        "#..................#",
+        "###################"
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "polished_bark",
+        "door": "crystal"
+      },
+      "capacity": 12
+    },
+    {
+      "id": "crystal_meditationbower_01",
+      "name": "Crystal Meditation Bower",
+      "description": "An elven sanctuary with crystal walls amplifying natural light and sacred geometric patterns. Features two tiers of meditation platforms connected by crystalline stairs.",
+      "category": "spiritual",
+      "width": 7,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "glass",
+          "amountRequired": 44
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 192,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "spiritual",
+          "params": {
+            "lightAmplification": true,
+            "platformCount": 2
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#.....#",
+        "#...>..",
+        "#.....#",
+        "#.....#",
+        "D######"
+      ],
+      "materials": {
+        "wall": "crystal",
+        "floor": "starlight",
+        "door": "living_wood"
+      },
+      "capacity": 8
+    }
+  ],
+  "centaur": [
+    {
+      "id": "centaur_meeting_hall",
+      "name": "Centaur Clan Assembly Hall",
+      "description": "A two-tiered meeting hall with wide ramps for centaur movement, high ceilings for rearing, and an expansive open floor plan. The ground floor features a 4-tile thatch-roofed entrance, while ramps connect to the upper tier.",
+      "category": "governance",
+      "width": 20,
+      "height": 20,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 144
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 668
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 1600,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "gathering",
+          "params": {
+            "capacity": 40,
+            "features": [
+              "raised podium",
+              "firepit",
+              "ramp access"
+            ]
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "####################",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "#..................#",
+        "DDDD################"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "wood",
+        "door": "thatch"
+      },
+      "capacity": 20
+    },
+    {
+      "id": "centaur_training_shelter_01",
+      "name": "Centaur Training Grounds Shelter",
+      "description": "A multi-tiered training facility for centaurs with an open interior, perimeter pillars, and wide entrances for easy access. Features two floors connected by stairs for varied training exercises and a high roof to accommodate aerial movement drills.",
+      "category": "production",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 30
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 21
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 96,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "training",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "D.>.#",
+        "#...#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "clay",
+        "door": "wood"
+      },
+      "capacity": 6
+    }
+  ],
+  "angelic": [
+    {
+      "id": "prayer_spire_angelic_3",
+      "name": "Celestial Light Spire",
+      "description": "A towering 3D spire crafted for angelic worship, using sacred geometry and light-conducting materials. Divine radiance channels through crystal conduits from the apex, illuminating radial patterns across floors.",
+      "category": "spiritual",
+      "width": 11,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 160
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 720,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "spiritual",
+          "params": {
+            "focus": "divine communion",
+            "light_sources": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###########",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#...+.....#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "###########"
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "crystal",
+        "door": "starlight"
+      },
+      "capacity": 10
+    }
+  ],
+  "high_fae_10d": [
+    {
+      "id": "pocket_manor_4tier",
+      "name": "Fae Pocket Manor",
+      "description": "A 5x5 exterior hut containing a 21x21 mansion with three floors. Time flows at 0.1x speed inside, perfect for extended study or meditation.",
+      "category": "residential",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 53
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 200,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "study",
+          "params": {
+            "time_multiplier": 0.1
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 8
+          }
+        },
+        {
+          "type": "sleeping",
+          "params": {
+            "rooms": 3
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.#D#",
+        "#...#",
+        "#####"
+      ],
+      "materials": {
+        "wall": "void",
+        "floor": "crystallized_dreams",
+        "door": "frozen_time"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "chronodream_spire_5d",
+      "name": "Chronodream Spire",
+      "description": "A 5D phase-shifting tower that morphs between past/present/future configurations. Walls and doors shift with observer interaction, creating fluid dreamlike geometries across time.",
+      "category": "spiritual",
+      "width": 17,
+      "height": 17,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 538
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 2690,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "spiritual",
+          "params": {
+            "focus": "temporal meditation"
+          }
+        },
+        {
+          "type": "research",
+          "params": {
+            "subject": "dream-time convergence"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#################",
+        "#..............##",
+        "#.##......##...##",
+        "#.##......##...##",
+        "#..............##",
+        "#..............##",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "######...######",
+        "#################"
+      ],
+      "materials": {
+        "wall": "time",
+        "floor": "crystallized_dreams",
+        "door": "void"
+      },
+      "capacity": 8
+    }
+  ],
+  "exotic": [
+    {
+      "id": "tesseract_research_lab_01",
+      "name": "Quantum Tesseract Research Lab",
+      "description": "A 4D research facility structured as nested cubes along the W-axis, with outer cube (slice 0) enclosing inner cube (slice 1) and transitional buffer zone (slice 2). Researchers navigate between dimensions via quantum portals and observe impossible geometries.",
+      "category": "research",
+      "width": 11,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "glass",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 162
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 1210,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {
+            "focus": "dimensional physics"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 150
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###########",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "###########"
+      ],
+      "materials": {
+        "wall": "crystal",
+        "floor": "metal",
+        "door": "force_field"
+      },
+      "capacity": 10
+    },
+    {
+      "id": "hypercube_vault_001",
+      "name": "Hypercube Vault",
+      "description": "A 4D security vault with hidden access points across W-axis slices, protecting a treasure in the inner dimensional fold. The vault's structure is a nested series of cubes, each requiring 4D navigation to access the next.",
+      "category": "production",
+      "width": 11,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 85
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 158
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 1200,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {}
+        },
+        {
+          "type": "security",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###########",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#...S....#",
+        "#.........#",
+        "#.........#",
+        "#.........#",
+        "#D........#",
+        "###########"
+      ],
+      "materials": {
+        "wall": "void",
+        "floor": "crystal",
+        "door": "force_field"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "5d_phase_temple_001",
+      "name": "Phase-Shifting Temple of Eternity",
+      "description": "A 5D rotating temple that cycles through 4 phase states, each revealing a different sanctum. Walls and doors morph between phases while maintaining structural coherence. The altar shifts position between configurations, ensuring worshippers from different phases never intersect.",
+      "category": "spiritual",
+      "width": 17,
+      "height": 17,
+      "resourceCost": [
+        {
+          "resourceId": "glass",
+          "amountRequired": 146
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 398
+        },
+        {
+          "resourceId": "stone",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 2730,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "spiritual",
+          "params": {
+            "ritual_type": "phase_convergence",
+            "duration": 300
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 50,
+            "contents": "time_artifacts"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#################",
+        "#...............",
+        "#....D.........#",
+        "#......A........",
+        "#...............",
+        "######.......###",
+        "#..............#",
+        "#..............#",
+        "#..............#",
+        "#..............#",
+        "#####.........##",
+        "#..............#",
+        "#..............#",
+        "#..............#",
+        "#..............#",
+        "#..............#",
+        "#################"
+      ],
+      "materials": {
+        "wall": "crystal",
+        "floor": "starlight",
+        "door": "marble"
+      },
+      "capacity": 15
+    },
+    {
+      "id": "morphing_fortress_5d",
+      "name": "Eonshift Morphing Fortress",
+      "description": "A 5D defensive structure with phase-shifting walls and adaptive fortifications. Accessible only during specific phase transitions, this fortress traps intruders between unstable quantum states while housing garrisons across phase-locked chambers.",
+      "category": "governance",
+      "width": 9,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 50
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 40
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 0
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 450,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "defensive",
+          "params": {
+            "forceFieldBars": 12
+          }
+        },
+        {
+          "type": "garrison",
+          "params": {
+            "troopCapacity": 20
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#########",
+        "#.......#",
+        "#...#...#",
+        "#.......#",
+        "#########"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "metal",
+        "door": "plasma"
+      },
+      "capacity": 20
+    },
+    {
+      "id": "quantum_observatory_6d",
+      "name": "Quantum Observatory Tier 5",
+      "description": "A 6D quantum superposition structure existing in three states: meditation hall (50%), war room (30%), and data analysis hub (20%). Observation collapses the state temporarily, allowing astronomers to work in parallel quantum states.",
+      "category": "research",
+      "width": 5,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 26
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 18
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 8
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 240,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {
+            "focus": "quantum_astronomy"
+          }
+        },
+        {
+          "type": "spiritual",
+          "params": {
+            "focus": "meditation"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "#####",
+        "#+...",
+        "#...D",
+        "#...W",
+        "#####"
+      ],
+      "materials": {
+        "wall": "void",
+        "floor": "starlight",
+        "door": "crystal"
+      },
+      "capacity": 15
+    },
+    {
+      "id": "infinite_library",
+      "name": "Infinite Library",
+      "description": "A 3D library that appears as a tiny phone booth but contains a 99×99 infinite library with frozen time. Books from all timelines are accessible via impossible Escher-like staircases.",
+      "category": "research",
+      "width": 3,
+      "height": 3,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 16
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 0
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 90,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {
+            "focus": "timeless_study"
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": "infinite_books"
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###",
+        "#D#",
+        "###"
+      ],
+      "materials": {
+        "wall": "pages",
+        "floor": "void",
+        "door": "starlight"
+      },
+      "capacity": 10
+    }
+  ]
+}

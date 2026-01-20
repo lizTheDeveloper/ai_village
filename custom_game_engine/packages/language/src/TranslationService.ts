@@ -71,8 +71,8 @@ export class TranslationService {
     const llmRequest: LLMRequest = {
       prompt,
       temperature: 0.7,  // Creative but consistent
-      maxTokens: 500,
-      stopSequences: ['\n\n\n'],  // Stop at triple newline
+      maxTokens: 1000,  // Increased for Qwen's reasoning tokens
+      stopSequences: ['\n\n\n', '```\n\n'],  // Stop at triple newline or end of code block
     };
 
     const llmResponse: LLMResponse = await this.llmProvider.generate(llmRequest);
@@ -216,6 +216,9 @@ Translate the word now. Respond with ONLY the JSON object:`;
   private parseTranslationResponse(text: string, originalWord: string): TranslationResponse {
     // Remove markdown code blocks if present
     let jsonText = text.trim();
+
+    // Remove <think>...</think> reasoning tags (from Qwen and other models)
+    jsonText = jsonText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
 
     // Remove ```json ... ``` or ``` ... ``` wrappers
     const jsonCodeBlockMatch = jsonText.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/);

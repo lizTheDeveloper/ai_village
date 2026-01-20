@@ -259,6 +259,13 @@ export * from './SpiritComponent.js';
 export { createPlaceSpiritComponent, createAncestorSpiritComponent, createObjectSpiritComponent } from './SpiritComponent.js';
 // Deity/divinity system (forward-compatibility - Phase 27)
 export * from './DeityComponent.js';
+// Divine ability system (divine powers, blessings, curses - Phase 27)
+export * from './DivineAbilityComponent.js';
+export { createDivineAbilityComponent } from './DivineAbilityComponent.js';
+export type { DivineAbilityComponent } from './DivineAbilityComponent.js';
+// Angel system (divine servants/messengers - Phase 7)
+export * from './AngelComponent.js';
+export { createAngelComponent, type AngelComponent } from './AngelComponent.js';
 // Player control/possession system (Phase 16: Polish & Player)
 export * from './PlayerControlComponent.js';
 export { createPlayerControlComponent, type PlayerControlComponent, calculatePossessionCost, shouldEndPossession } from './PlayerControlComponent.js';
@@ -850,6 +857,17 @@ export { createArmadaComponent, ArmadaComponentSchema } from './ArmadaComponent.
 export type { ArmadaComponent, ArmadaCampaignType } from './ArmadaComponent.js';
 
 export * from './NavyComponent.js';
+
+export * from './StragglerComponent.js';
+export {
+  createStragglerComponent,
+  updateDecoherenceRate,
+  updateContaminationRisk,
+  calculateSoloJumpSuccessChance,
+  shouldMarkAsLost,
+  StragglerComponentSchema,
+} from './StragglerComponent.js';
+export type { StragglerComponent, RecoveryStatus } from './StragglerComponent.js';
 export { createNavyComponent, NavyComponentSchema } from './NavyComponent.js';
 export type { NavyComponent, NavyStrategicPosture } from './NavyComponent.js';
 
@@ -943,6 +961,29 @@ export {
   isUngoverned,
 } from './PoliticalEntityComponent.js';
 
+// City Governance (Political Hierarchy - Tier 1.5)
+export * from './CityGovernanceComponent.js';
+export type {
+  CityGovernanceComponent,
+  CityDepartment,
+  CityDepartmentType,
+  InfrastructureProject,
+  CityLaw,
+  CityPolicy,
+} from './CityGovernanceComponent.js';
+export {
+  createCityGovernanceComponent,
+  addVillageToCity,
+  removeVillageFromCity,
+  allocateDepartmentBudget,
+  createInfrastructureProject,
+  updateProjectProgress,
+  enactCityLaw,
+  adoptCityPolicy,
+  updateCityReserves,
+  getDepartmentBudget,
+} from './CityGovernanceComponent.js';
+
 // Province Governance (Grand Strategy - Tier 2)
 export * from './ProvinceGovernanceComponent.js';
 export type {
@@ -996,6 +1037,23 @@ export type {
   FederalWar,
 } from './FederationGovernanceComponent.js';
 export { createFederationGovernanceComponent } from './FederationGovernanceComponent.js';
+
+// Governance History & Audit Trail
+export * from './GovernanceHistoryComponent.js';
+export type {
+  GovernanceHistoryComponent,
+  GovernanceAuditEntry,
+  GovernanceAuditQuery,
+  GovernanceStatistics,
+  GovernanceActionType,
+  GovernanceOutcome,
+} from './GovernanceHistoryComponent.js';
+export {
+  createGovernanceHistoryComponent,
+  addGovernanceAuditEntry,
+  queryGovernanceHistory,
+  getGovernanceStatistics,
+} from './GovernanceHistoryComponent.js';
 
 // Nation Component (06-POLITICAL-HIERARCHY.md - Tier 3)
 export * from './NationComponent.js';

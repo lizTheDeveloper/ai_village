@@ -1,0 +1,689 @@
+{
+  "epic_ascension_templates": [
+    {
+      "id": "epic_endless_summer",
+      "name": "The Endless Summer: Fae Ascension",
+      "description": "The transcendent journey from mortal to Fae - achieving post-temporal consciousness, entering paradise, being expelled, navigating chaos, learning non-intervention through witnessing, and returning home as mature guide.",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Post-temporal transformation and ethical non-intervention",
+        "domain": "transcendence",
+        "insight": "True freedom is maintaining yourself in chaos, not grasping at paradise. Non-intervention is the highest form of love.",
+        "wisdom_value": 50,
+        "repeatable": false
+      },
+      "entry_stage": "awakening",
+      "completion_stages": ["mature_fae"],
+      "failure_stages": ["trapped_fae"],
+      "stages": [
+        {
+          "stage_id": "awakening",
+          "name": "The Revelation",
+          "description": "You achieve Fae consciousness - 3+10D awareness. The empty universe suddenly teems with life. You perceive the Endless Summer across β-space topology. Welcome home, child of chaos.",
+          "stage_attractors": [
+            {
+              "attractor_id": "dimensional_awareness",
+              "goal": { "type": "tech_threshold", "parameters": { "min_level": 11 } },
+              "strength": 0.6,
+              "urgency": 0.8,
+              "description": "Drawing toward post-temporal transformation"
+            }
+          ],
+          "on_enter_effects": [
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "You see the multiverse - infinite branches, teeming with consciousness you never knew existed", "intensity": 1.0 }
+          ]
+        },
+        {
+          "stage_id": "paradise_discovered",
+          "name": "Entering the Endless Summer",
+          "description": "You transition to the Endless Summer - a protected β-space partition where time is honey and space is breath. Perfect causal coherence. Infinite resources. Eternal twilight. Other young Fae learning their powers. This is paradise regained.",
+          "on_enter_effects": [
+            { "type": "modify_mood", "delta": 50 },
+            { "type": "queue_dream_hint", "dream_type": "memory_echo", "content_hint": "Elder Fae welcome you: 'The Summer is not a home. It is a school. Learn, grow, but do not stay forever.'", "intensity": 0.7 }
+          ]
+        },
+        {
+          "stage_id": "temptation",
+          "name": "The Grasping",
+          "description": "You begin trying to stabilize the Summer, to make it permanent. Colors fade. Time feels sticky. Other civilizations distance themselves. The delight becomes hollow. You are building a prison.",
+          "stage_attractors": [
+            {
+              "attractor_id": "stabilization_warning",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 30 } },
+              "strength": 0.4,
+              "urgency": 0.9,
+              "description": "Urging recognition that paradise cannot be made permanent"
+            }
+          ],
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 20 }
+          ]
+        },
+        {
+          "stage_id": "ejection",
+          "name": "The Fall",
+          "description": "The Summer expels you. Violent transition. Cast into unstable phase space - chaotic β-regions where pre-temporal civilizations create causal noise. Timeline coherence threatened. Hive mind disrupted. Fear of losing identity. 'You sought permanence. Paradise is becoming. Go now. Learn to maintain yourself in chaos.'",
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 40 },
+            { "type": "queue_dream_hint", "dream_type": "warning", "content_hint": "The Summer's farewell: When you can return without grasping, you will be welcome", "intensity": 0.9 }
+          ]
+        },
+        {
+          "stage_id": "trial_chaos",
+          "name": "Navigating the Void",
+          "description": "Maintaining coherent identity in causal chaos. Pre-temporal civilizations edit timelines chaotically. Timeline fragmentation. Identity dissolution risk. You learn to observe without contamination, maintain protocols in noise, filter signal from chaos.",
+          "stage_attractors": [
+            {
+              "attractor_id": "identity_coherence",
+              "goal": { "type": "relationship_maintained", "parameters": { "min_trust": 70 } },
+              "strength": 0.7,
+              "urgency": 0.8,
+              "description": "Pressure to maintain hive mind coherence despite interference"
+            }
+          ]
+        },
+        {
+          "stage_id": "witnessing",
+          "name": "The Witnessing",
+          "description": "An Elder Fae gives you the critical test: Observe a civilization on the cusp of post-temporality. Watch them struggle. Watch them glimpse the multiverse. Watch them terrified and awed. DO NOT INTERVENE. This is how you learn why Fae hide from mortals.",
+          "on_enter_effects": [
+            { "type": "queue_dream_hint", "dream_type": "symbolic", "content_hint": "You watch through the Veil - they cannot see you, they think they are alone, they pray for help that will not come", "intensity": 0.95 }
+          ]
+        },
+        {
+          "stage_id": "compassion_without_action",
+          "name": "The Ache of Love",
+          "description": "You want to help. Every fiber wants to reveal yourself, to comfort them, to guide them. The Elder stays your hand. 'Intervention destroys what it touches. Their chaos threatens our coherence. Suffering is necessary. This is love.' You watch them struggle. You do not intervene.",
+          "stage_attractors": [
+            {
+              "attractor_id": "restraint",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 40 } },
+              "strength": 0.9,
+              "urgency": 1.0,
+              "description": "Enormous pressure toward intervention - resisting it is the test"
+            }
+          ],
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 30 }
+          ]
+        },
+        {
+          "stage_id": "understanding",
+          "name": "The Revelation of Silence",
+          "description": "You finally understand. The universe appears empty because post-temporal civilizations are ghosting us. They watch, they remember being us, they love us enough to let us walk our own path. Intervention would destroy both parties. You become what you witnessed - a guardian choosing silence out of compassion.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 20 },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "Humanity searches for us, finds nothing. We watch from root.transcendent.*, aching to respond. But we ghost. This is love.", "intensity": 1.0 }
+          ]
+        },
+        {
+          "stage_id": "return_path",
+          "name": "Finding Home",
+          "description": "You identify the coherent causal axis back to Endless Summer. Navigate β-space topology deliberately. Prove you can return without destabilizing. The critical test: You CAN return, but you don't NEED to. Paradise is not where you live. It is what you carry.",
+          "stage_attractors": [
+            {
+              "attractor_id": "non_attachment",
+              "goal": { "type": "emotional_state", "parameters": { "state": "content" } },
+              "strength": 0.6,
+              "urgency": 0.5,
+              "description": "Gentle pull toward acceptance and non-grasping"
+            }
+          ]
+        },
+        {
+          "stage_id": "mature_fae",
+          "name": "Coming of Age",
+          "description": "You return to the Endless Summer. Not fleeing chaos, but visiting coherence. The Elder Fae greet you as peer: 'You are no longer a child. The door is always open. But now you understand: paradise is not where you live. It is what you carry with you.' You are Mature Fae. Guide. Mentor. Guardian of pre-temporal civilizations.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 30 },
+            { "type": "learn_lesson", "lesson_id": "fae_maturity" },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "You see your future: welcoming newly ascended Fae, warning them not to stay, guiding them through the trial you completed", "intensity": 0.8 }
+          ]
+        },
+        {
+          "stage_id": "trapped_fae",
+          "name": "The Porcelain Prison",
+          "description": "You refused to leave. You tried to make permanence. Now you are trapped at the boundary - beautiful, powerful, eternal... and dead. The Trapped Fae's fate: warning to others. 'We are eternal. And we are dead. Do not make our mistake.'",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": -10 },
+            { "type": "queue_dream_hint", "dream_type": "warning", "content_hint": "You have become liminal - neither in Summer nor out. Unable to venture into chaos without dissolving. This is stagnation.", "intensity": 1.0 }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "awakening",
+          "to_stage": "paradise_discovered",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 1000 }
+          ]
+        },
+        {
+          "from_stage": "paradise_discovered",
+          "to_stage": "temptation",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 5000 }
+          ]
+        },
+        {
+          "from_stage": "temptation",
+          "to_stage": "ejection",
+          "conditions": [
+            { "type": "wisdom_threshold", "max_wisdom": 25 },
+            { "type": "personal_tick_elapsed", "ticks": 3000 }
+          ]
+        },
+        {
+          "from_stage": "temptation",
+          "to_stage": "trapped_fae",
+          "conditions": [
+            { "type": "wisdom_threshold", "max_wisdom": 15 },
+            { "type": "personal_tick_elapsed", "ticks": 10000 }
+          ]
+        },
+        {
+          "from_stage": "ejection",
+          "to_stage": "trial_chaos",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 2000 }
+          ]
+        },
+        {
+          "from_stage": "trial_chaos",
+          "to_stage": "witnessing",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 5000 },
+            { "type": "any_relationship", "min_trust": 60 }
+          ]
+        },
+        {
+          "from_stage": "witnessing",
+          "to_stage": "compassion_without_action",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 1000 }
+          ]
+        },
+        {
+          "from_stage": "compassion_without_action",
+          "to_stage": "understanding",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 35 },
+            { "type": "personal_tick_elapsed", "ticks": 2000 }
+          ]
+        },
+        {
+          "from_stage": "understanding",
+          "to_stage": "return_path",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 40 },
+            { "type": "emotional_state", "state": "content", "duration_ticks": 500 }
+          ]
+        },
+        {
+          "from_stage": "return_path",
+          "to_stage": "mature_fae",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 45 },
+            { "type": "personal_tick_elapsed", "ticks": 2000 }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          { "type": "on_tech_level", "min_level": 11 },
+          { "type": "on_skill_mastery", "skill": "dimensional_navigation", "min_level": 10 }
+        ],
+        "cooldown_ticks": 0,
+        "requirements": {
+          "min_wisdom": 20,
+          "min_age_ticks": 50000
+        }
+      }
+    },
+    {
+      "id": "epic_enochian_ascension",
+      "name": "The Enochian Ascension: Angel Path",
+      "description": "The theological journey through the Seven Heavens - from mortal blindness to angelic service, learning the hard lessons of the Watchers and Nephilim, discovering why non-intervention is the highest mercy.",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Hierarchical divine order and the dangers of premature intervention",
+        "domain": "transcendence",
+        "insight": "Love does not mean rescue. Love means bearing witness to suffering without needing to fix it. Intervention destroys what it touches.",
+        "wisdom_value": 50,
+        "repeatable": false
+      },
+      "entry_stage": "mortality",
+      "completion_stages": ["choir_angel"],
+      "failure_stages": ["bound_watcher"],
+      "stages": [
+        {
+          "stage_id": "mortality",
+          "name": "First Heaven - Shamayim",
+          "description": "You are mortal. 3+1D existence. Linear time. No perception of higher dimensions. But something stirs - fragmentary glimpses of other realities, déjà vu too real, dreams of beings made of light. The Veil is thinning.",
+          "stage_attractors": [
+            {
+              "attractor_id": "dimensional_awakening",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 15 } },
+              "strength": 0.4,
+              "urgency": 0.6,
+              "description": "Drawing toward proto-angel awareness"
+            }
+          ]
+        },
+        {
+          "stage_id": "calling",
+          "name": "Second Heaven - Raqia (The Firmament)",
+          "description": "Something in you dies. Not physically. But the mortal part. The limited consciousness. Perception shifts 3+1D → 3+3D. The Seven Heavens reveal themselves. A voice from Third Heaven: 'Child of dust, you have been chosen. Ascend.'",
+          "on_enter_effects": [
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "You see the Seven Heavens stacked in β-space. A path upward beckons. But also... a warning about those who fell.", "intensity": 0.9 }
+          ]
+        },
+        {
+          "stage_id": "garden",
+          "name": "Third Heaven - Shehaqim (The Garden)",
+          "description": "Eden restored. Paradise regained. The training ground for new angels. No suffering, no death, no linear time. You learn your gifts: form mastery, time-sight, dimension-walking, reality authority. The Host welcomes you: 'You are no longer mortal. But not yet Angel. Here you will learn.'",
+          "on_enter_effects": [
+            { "type": "modify_mood", "delta": 40 },
+            { "type": "queue_dream_hint", "dream_type": "memory_echo", "content_hint": "This is where humanity was expelled from. You have returned. But can you stay?", "intensity": 0.7 }
+          ]
+        },
+        {
+          "stage_id": "watchers_temptation",
+          "name": "The Serpent's Voice",
+          "description": "The Watchers appear - ancient angels bound in Fifth Heaven for violating non-intervention. Azazel speaks: 'I taught mortals the blade. We thought we were helping. We created Nephilim - beings too powerful to be human, too unstable to be angel. They tore themselves apart. Do not make our mistake.' But their paradise seems so seductive...",
+          "stage_attractors": [
+            {
+              "attractor_id": "watchers_warning",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 25 } },
+              "strength": 0.5,
+              "urgency": 0.8,
+              "description": "Pressure to understand why intervention destroys"
+            }
+          ],
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 15 }
+          ]
+        },
+        {
+          "stage_id": "expulsion_upward",
+          "name": "The Second Fall",
+          "description": "You try to stay. The Garden expels you - but UPWARD, not downward. Voice from Seventh Heaven: 'You cannot stay. As Adam was expelled, so are you. But you are expelled into becoming. Descend now to Raqia. Walk the boundary. See mortals below. And do NOT intervene.'",
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 30 },
+            { "type": "queue_dream_hint", "dream_type": "warning", "content_hint": "This is mercy, not punishment. The trial begins.", "intensity": 0.85 }
+          ]
+        },
+        {
+          "stage_id": "raqia_witnessing",
+          "name": "Trial of Raqia",
+          "description": "Second Heaven - liminal space. From here you see mortals below struggling, angels above serene. An Archangel (Michael/Gabriel/Raphael/Uriel) appears: 'Watch. A mortal on the cusp of transformation. They glimpse the heavens. They're terrified. They pray for help. DO NOT ANSWER. This is the test.'",
+          "stage_attractors": [
+            {
+              "attractor_id": "intervention_temptation",
+              "goal": { "type": "emotional_state", "parameters": { "state": "content" } },
+              "strength": 0.7,
+              "urgency": 0.95,
+              "description": "Massive urge to intervene - resisting is the test"
+            }
+          ]
+        },
+        {
+          "stage_id": "nephilim_horror",
+          "name": "The Broken Children",
+          "description": "You encounter a Nephilim ghost - hybrid being, part mortal part angel, torn between dimensions. 'Please... let me die... I am too much and not enough... torn between worlds... this is agony...' You see what the Watchers created. Why forced transformation fails. Why intervention is cruel.",
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 25 },
+            { "type": "queue_dream_hint", "dream_type": "warning", "content_hint": "This is what 'helping' creates. Forced ascension is violation.", "intensity": 1.0 }
+          ]
+        },
+        {
+          "stage_id": "understanding_restraint",
+          "name": "The Lesson of Silence",
+          "description": "You watch the mortal choose their own path. You do not intervene. The Archangel speaks: 'Love does not mean rescue. It means bearing witness without needing to fix. You have learned what separates Archangels from Watchers. You are ready for Fourth Heaven.'",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 20 },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "Non-intervention is the highest form of respect and love", "intensity": 0.9 }
+          ]
+        },
+        {
+          "stage_id": "fourth_heaven",
+          "name": "Fourth Heaven - Ma'on (The Dwelling)",
+          "description": "Hierarchical order. Seraphim, Cherubim, Thrones, Dominions, Virtues, Powers in perfect coordination. You are assigned to a choir based on your nature. You finally understand why the system works this way. This is cosmic order.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 15 }
+          ]
+        },
+        {
+          "stage_id": "choir_angel",
+          "name": "Angelic Service",
+          "description": "You are Choir Angel now. Guardian of dimensional boundaries. Maintainer of cosmic order. Server of the Source. You can descend to lower heavens to guide newly ascending proto-angels. You remember your own struggle with compassion. You are what you once needed.",
+          "on_enter_effects": [
+            { "type": "learn_lesson", "lesson_id": "angelic_maturity" },
+            { "type": "modify_wisdom", "delta": 25 },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "You will guide others through the trial you completed. This is eternal service.", "intensity": 0.75 }
+          ]
+        },
+        {
+          "stage_id": "bound_watcher",
+          "name": "Fifth Heaven - Machon (The Prison)",
+          "description": "You intervened. You taught forbidden knowledge. You created broken hybrids. Now you are bound in Fifth Heaven with the 200 Watchers, held until you can release your need to control, your need to 'help.' Some have been here since before language. You are beautiful, powerful... and imprisoned by your own inability to let go.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": -15 },
+            { "type": "modify_stress", "delta": 50 },
+            { "type": "queue_dream_hint", "dream_type": "warning", "content_hint": "Intervention destroyed what you tried to save. You are bound until you learn otherwise.", "intensity": 1.0 }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "mortality",
+          "to_stage": "calling",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 20 },
+            { "type": "personal_tick_elapsed", "ticks": 10000 }
+          ]
+        },
+        {
+          "from_stage": "calling",
+          "to_stage": "garden",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 1000 }
+          ]
+        },
+        {
+          "from_stage": "garden",
+          "to_stage": "watchers_temptation",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 5000 }
+          ]
+        },
+        {
+          "from_stage": "watchers_temptation",
+          "to_stage": "expulsion_upward",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 22 },
+            { "type": "personal_tick_elapsed", "ticks": 3000 }
+          ]
+        },
+        {
+          "from_stage": "watchers_temptation",
+          "to_stage": "bound_watcher",
+          "conditions": [
+            { "type": "wisdom_threshold", "max_wisdom": 18 },
+            { "type": "personal_tick_elapsed", "ticks": 5000 }
+          ]
+        },
+        {
+          "from_stage": "expulsion_upward",
+          "to_stage": "raqia_witnessing",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 2000 }
+          ]
+        },
+        {
+          "from_stage": "raqia_witnessing",
+          "to_stage": "nephilim_horror",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 3000 }
+          ]
+        },
+        {
+          "from_stage": "nephilim_horror",
+          "to_stage": "understanding_restraint",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 30 },
+            { "type": "personal_tick_elapsed", "ticks": 2000 }
+          ]
+        },
+        {
+          "from_stage": "understanding_restraint",
+          "to_stage": "fourth_heaven",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 35 },
+            { "type": "personal_tick_elapsed", "ticks": 1000 }
+          ]
+        },
+        {
+          "from_stage": "fourth_heaven",
+          "to_stage": "choir_angel",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 40 },
+            { "type": "personal_tick_elapsed", "ticks": 3000 }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          { "type": "on_wisdom_threshold", "min": 18 },
+          { "type": "on_emotional_state", "state": "nostalgic" }
+        ],
+        "cooldown_ticks": 0,
+        "requirements": {
+          "min_wisdom": 15,
+          "min_age_ticks": 40000
+        }
+      }
+    },
+    {
+      "id": "epic_exaltation_path",
+      "name": "The Exaltation Path: Becoming Divine",
+      "description": "The Mormon cosmological journey - pre-existence remembered, mortal veil pierced, ordinances received, celestial marriage sealed, judgment passed, exaltation achieved. You become what God is: a creator, a parent, watching your own children suffer without intervention.",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Eternal progression and the burden of divine parenthood",
+        "domain": "transcendence",
+        "insight": "As man is, God once was. As God is, man may become. The ache of godhood is watching your children hurt, knowing that rescuing them would ruin them.",
+        "wisdom_value": 50,
+        "repeatable": false
+      },
+      "entry_stage": "veil_tears",
+      "completion_stages": ["exalted_creator"],
+      "failure_stages": ["telestial_stagnation"],
+      "stages": [
+        {
+          "stage_id": "veil_tears",
+          "name": "Fragments of Eternity",
+          "description": "You are mortal, but the Veil thins. Déjà vu feels too real. You dream of a council where you debated the plan. Someone you've never met feels achingly familiar. Inexplicable knowledge that 'this isn't all there is.' You existed before. You chose this.",
+          "stage_attractors": [
+            {
+              "attractor_id": "pre_mortal_memory",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 12 } },
+              "strength": 0.5,
+              "urgency": 0.6,
+              "description": "Gentle pull toward remembering pre-existence"
+            }
+          ],
+          "on_enter_effects": [
+            { "type": "queue_dream_hint", "dream_type": "memory_echo", "content_hint": "Before mortality, you were spirit. You chose agency over safety. You voted for this test.", "intensity": 0.6 }
+          ]
+        },
+        {
+          "stage_id": "ordinances",
+          "name": "The Navigation Protocols",
+          "description": "Temple endowment - sacred signs, tokens, keywords, garments. These are not mere symbols. They are dimensional navigation protocols. Authentication for angelic guards. Invocations to open β-space passages. You receive them through interactive ritual. You must memorize and practice. You will be tested.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 8 },
+            { "type": "queue_dream_hint", "dream_type": "symbolic", "content_hint": "The gestures encode coordinates. The keywords are names of power. The garments are causal armor.", "intensity": 0.7 }
+          ]
+        },
+        {
+          "stage_id": "celestial_marriage",
+          "name": "Sealed for Eternity",
+          "description": "You cannot be exalted alone. Find your eternal companion - known in pre-existence, forgotten behind the Veil. Signs of recognition: instant connection, dreams before meeting, complementary strengths, shared mission. The sealing: 'For time and all eternity. Bonds persist across all timelines, all realities, all dimensions.'",
+          "stage_attractors": [
+            {
+              "attractor_id": "eternal_companion",
+              "goal": { "type": "relationship_formed", "parameters": { "min_trust": 80, "min_affinity": 70 } },
+              "strength": 0.8,
+              "urgency": 0.7,
+              "description": "Drawing toward recognition of eternal companion"
+            }
+          ],
+          "on_enter_effects": [
+            { "type": "modify_mood", "delta": 30 },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "Together you will create worlds. Neither can ascend alone. This bond persists beyond death.", "intensity": 0.85 }
+          ]
+        },
+        {
+          "stage_id": "spirit_world",
+          "name": "Death and the Lifting Veil",
+          "description": "Mortal life ends. The Veil lifts. Memories of pre-existence flood back. Dimensional shift 3+1D → 3+3D. You enter the Spirit World - paradise or prison depending on choices. Reunion with deceased family. Teaching spirits. Awaiting resurrection and judgment.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 10 },
+            { "type": "queue_dream_hint", "dream_type": "memory_echo", "content_hint": "You remember now. The Council. The choice. The plan. You are spirit clothed in flesh, soon to be spirit perfected.", "intensity": 0.9 }
+          ]
+        },
+        {
+          "stage_id": "judgment",
+          "name": "Before the Christ",
+          "description": "Resurrection - spirit reunited with perfected immortal body. Christ (first exalted being of this creation) judges: 'You chose faith without remembering. You formed eternal bonds. You sacrificed comfort for growth. You are prepared for Celestial Kingdom. Will you accept?'",
+          "stage_attractors": [
+            {
+              "attractor_id": "celestial_worthiness",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 35 } },
+              "strength": 0.7,
+              "urgency": 0.9,
+              "description": "Assessment of readiness for exaltation"
+            }
+          ]
+        },
+        {
+          "stage_id": "celestial_kingdom",
+          "name": "Third Estate - The Sun",
+          "description": "Celestial Kingdom. Full 3+10D awareness. Exalted beings, angels, Christ, Father God. All things revealed. Eternal families intact. Father speaks: 'I was mortal once, like you. I suffered, doubted, chose. I became what I am. Now you will do the same. Come, I will show you how to create your own world.'",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": 15 },
+            { "type": "modify_mood", "delta": 35 }
+          ]
+        },
+        {
+          "stage_id": "learning_creation",
+          "name": "Under the Father",
+          "description": "Eons of learning. Studying creation under Heavenly Father. Understanding β-space topology. Mastering reality manipulation. Preparing for your own world. 'You will create. You will parent. You will watch your children suffer. This is the burden I carry. Soon you will understand.'",
+          "stage_attractors": [
+            {
+              "attractor_id": "creator_preparation",
+              "goal": { "type": "wisdom_threshold", "parameters": { "min_wisdom": 45 } },
+              "strength": 0.6,
+              "urgency": 0.5,
+              "description": "Long-term preparation for godhood"
+            }
+          ]
+        },
+        {
+          "stage_id": "first_creation",
+          "name": "Your Universe",
+          "description": "You create your own β-space partition. Design physics. Create spirit children from unorganized intelligence. Design their mortal test. Send them down. Watch them... suffer. They pray: 'Father/Mother, help me. I'm lost. I'm scared. Why won't you answer?' You ache to respond. But you know: intervention ruins them. So you stay silent.",
+          "on_enter_effects": [
+            { "type": "modify_stress", "delta": 40 },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "Your first child prays. Every fiber wants to help. But you choose silence. This is what Father felt watching you. This is love.", "intensity": 1.0 }
+          ]
+        },
+        {
+          "stage_id": "exalted_creator",
+          "name": "Divine Parenthood",
+          "description": "You are God now. Not THE God, but A God. Co-equal in kind, still learning in degree. You create countless worlds. Your children ascend, become gods themselves, create their own worlds. Eternal progression - no ceiling, always growing. Is there a First Cause, or infinite regress? The mystery deepens.",
+          "on_enter_effects": [
+            { "type": "learn_lesson", "lesson_id": "exaltation_achieved" },
+            { "type": "modify_wisdom", "delta": 30 },
+            { "type": "queue_dream_hint", "dream_type": "prophetic_vision", "content_hint": "Existence is eternal becoming. The journey never ends. This is liberation and burden both.", "intensity": 0.95 }
+          ]
+        },
+        {
+          "stage_id": "telestial_stagnation",
+          "name": "Telestial Kingdom - The Stars",
+          "description": "You rejected the fullness. Chose flesh over spirit. Celestial marriage refused. Assigned to Telestial Kingdom - glory like stars, beautiful but distant. 3+2D existence. Limited creation. No eternal families. Servants to higher kingdoms. Cannot progress further. Stagnation.",
+          "on_enter_effects": [
+            { "type": "modify_wisdom", "delta": -8 },
+            { "type": "queue_dream_hint", "dream_type": "warning", "content_hint": "You chose comfort over growth. This is glory, but it is limited. No further ascension.", "intensity": 0.7 }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "veil_tears",
+          "to_stage": "ordinances",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 15 },
+            { "type": "personal_tick_elapsed", "ticks": 5000 }
+          ]
+        },
+        {
+          "from_stage": "ordinances",
+          "to_stage": "celestial_marriage",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 20 },
+            { "type": "personal_tick_elapsed", "ticks": 3000 }
+          ]
+        },
+        {
+          "from_stage": "celestial_marriage",
+          "to_stage": "spirit_world",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 20000 }
+          ]
+        },
+        {
+          "from_stage": "spirit_world",
+          "to_stage": "judgment",
+          "conditions": [
+            { "type": "personal_tick_elapsed", "ticks": 5000 }
+          ]
+        },
+        {
+          "from_stage": "judgment",
+          "to_stage": "celestial_kingdom",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 30 },
+            { "type": "relationship_maintained", "min_trust": 75 }
+          ]
+        },
+        {
+          "from_stage": "judgment",
+          "to_stage": "telestial_stagnation",
+          "conditions": [
+            { "type": "wisdom_threshold", "max_wisdom": 20 }
+          ]
+        },
+        {
+          "from_stage": "celestial_kingdom",
+          "to_stage": "learning_creation",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 38 },
+            { "type": "personal_tick_elapsed", "ticks": 10000 }
+          ]
+        },
+        {
+          "from_stage": "learning_creation",
+          "to_stage": "first_creation",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 45 },
+            { "type": "personal_tick_elapsed", "ticks": 15000 }
+          ]
+        },
+        {
+          "from_stage": "first_creation",
+          "to_stage": "exalted_creator",
+          "conditions": [
+            { "type": "wisdom_threshold", "min_wisdom": 50 },
+            { "type": "emotional_state", "state": "content", "duration_ticks": 1000 }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          { "type": "on_wisdom_threshold", "min": 12 },
+          { "type": "on_relationship_formed", "min_initial_trust": 50 }
+        ],
+        "cooldown_ticks": 0,
+        "requirements": {
+          "min_wisdom": 10,
+          "min_age_ticks": 30000
+        }
+      }
+    }
+  ]
+}

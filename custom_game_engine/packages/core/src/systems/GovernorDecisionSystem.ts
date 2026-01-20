@@ -68,6 +68,7 @@ import type {
   ProvinceGovernorContext,
 } from '../governance/GovernorContextBuilders.js';
 import type { LLMDecisionQueue } from '../decision/LLMDecisionProcessor.js';
+import { executeGovernorDecision, type ParsedGovernorDecision as ExecutorParsedDecision } from '../governance/GovernorDecisionExecutor.js';
 
 // ============================================================================
 // Types
@@ -745,8 +746,34 @@ export class GovernorDecisionSystem extends BaseSystem {
       return;
     }
 
-    // Route action to appropriate handler
-    this.executeActionByType(governor, govComp, decision, world);
+    // Execute decision using the executor
+    const executorDecision: ExecutorParsedDecision = {
+      reasoning: decision.reasoning,
+      action: decision.action,
+      speech: decision.speech,
+      proclamation: decision.proclamation,
+    };
+
+    const result = executeGovernorDecision(governor, executorDecision, world);
+
+    if (!result.success) {
+      console.error(
+        `[GovernorDecisionSystem] Failed to execute decision for governor ${governor.id}: ${result.error}`
+      );
+      recordDecision(
+        govComp,
+        'execution_error',
+        `Decision execution failed: ${result.error}`,
+        world.tick
+      );
+      return;
+    }
+
+    // Log successful execution
+    console.log(
+      `[GovernorDecisionSystem] Executed decision for governor ${governor.id} (${govComp.tier}): ` +
+      `${decision.action.type} - ${result.stateChanges.join(', ')}`
+    );
 
     // Emit decision executed event
     world.eventBus.emit({
@@ -762,119 +789,6 @@ export class GovernorDecisionSystem extends BaseSystem {
     });
   }
 
-  /**
-   * Route action to appropriate handler and emit typed events
-   */
-  private executeActionByType(
-    governor: EntityImpl,
-    govComp: GovernorComponent,
-    decision: ParsedGovernorDecision,
-    world: World
-  ): void {
-    const action = decision.action;
-
-    // All actions emit governor:action_executed event
-    // Future: Additional systems can listen to these events and implement actual logic
-    switch (action.type) {
-      case 'set_policy':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'set_policy',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      case 'allocate_resources':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'allocate_resources',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      case 'declare_war':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'declare_war',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      case 'propose_alliance':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'propose_alliance',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      case 'respond_to_crisis':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'respond_to_crisis',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      case 'complete_directive':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'complete_directive',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      case 'vote_on_proposal':
-        world.eventBus.emit({
-          type: 'governor:action_executed',
-          source: governor.id,
-          data: {
-            governorId: governor.id,
-            tier: govComp.tier,
-            actionType: 'vote_on_proposal',
-            tick: world.tick,
-          },
-        });
-        break;
-
-      default:
-        // Unknown action type - log warning
-        console.warn(
-          `[GovernorDecisionSystem] Unknown action type: ${action.type} for governor ${governor.id}`
-        );
-        break;
-    }
-  }
 
   /**
    * Rebuild governor cache by tier.

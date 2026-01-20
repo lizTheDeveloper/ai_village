@@ -12,7 +12,7 @@
  * Based on PROCEDURAL_LANGUAGE_SYSTEM.md section "Language Character Analysis".
  */
 
-import type { PhonemeMetadata } from './types.js';
+import type { PhonemeMetadata } from './PhonemeInventory.js';
 
 /**
  * Language character derived from phoneme analysis
@@ -76,7 +76,8 @@ export class PhonemeAnalyzer {
     // Count all quality occurrences across all phonemes
     for (const phoneme of selectedPhonemes) {
       // Iterate through each quality type (texture, hardness, position, manner)
-      for (const qualityType of Object.values(phoneme.qualities) as string[][]) {
+      const qualityValues = Object.values(phoneme.qualities) as string[][];
+      for (const qualityType of qualityValues) {
         // Count each individual quality
         for (const quality of qualityType) {
           qualityCounts[quality] = (qualityCounts[quality] || 0) + 1;

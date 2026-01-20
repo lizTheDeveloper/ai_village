@@ -21,6 +21,7 @@ import type { InventoryComponent } from '../components/InventoryComponent.js';
 import { hasItem } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { SkillsComponent, SkillId } from '../components/SkillsComponent.js';
+import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
 /**
  * Evaluate a single plot condition
@@ -86,8 +87,16 @@ export function evaluatePlotCondition(
     }
 
     case 'choice_made': {
-      // TODO: Hook into choice tracking
-      return false;
+      // Check episodic memory for a choice event matching the choice_id
+      const episodicMemory = getEpisodicMemoryComponent(context.entityId, world);
+      if (!episodicMemory) return false;
+
+      // Look for any memory where the eventType matches the choice_id
+      // Choices are stored as episodic memories with eventType = 'choice:{choice_id}'
+      const choiceEventType = `choice:${condition.choice_id}`;
+      return episodicMemory.episodicMemories.some(
+        (memory) => memory.eventType === choiceEventType
+      );
     }
 
     case 'custom': {
@@ -418,4 +427,11 @@ function getSkillsComponent(entityId: string, world: World): SkillsComponent | u
   if (!entity) return undefined;
 
   return entity.getComponent('skills') as SkillsComponent | undefined;
+}
+
+function getEpisodicMemoryComponent(entityId: string, world: World): EpisodicMemoryComponent | undefined {
+  const entity = world.getEntity(entityId);
+  if (!entity) return undefined;
+
+  return entity.getComponent('episodic_memory') as EpisodicMemoryComponent | undefined;
 }

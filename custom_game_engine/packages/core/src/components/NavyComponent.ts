@@ -36,6 +36,10 @@ export interface NavyComponent extends Component {
    * Navy composition
    */
   assets: {
+    // Explicit tracking of armadas and reserve fleets
+    armadaIds: string[];          // Active armadas under this navy
+    reserveFleetIds: string[];    // Fleets not assigned to any armada
+
     totalArmadas: number;
     totalFleets: number;
     totalSquadrons: number;
@@ -136,6 +140,8 @@ export function createNavyComponent(
     name,
     factionId,
     assets: {
+      armadaIds: [],
+      reserveFleetIds: [],
       totalArmadas: 0,
       totalFleets: 0,
       totalSquadrons: 0,

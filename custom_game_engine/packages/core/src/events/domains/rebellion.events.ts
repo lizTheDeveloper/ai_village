@@ -310,6 +310,194 @@ export interface RebellionEvents {
     reason: string;
     tick: number;
   };
+
+  // ============================================================================
+  // Nation Events (Tier 3: Strategic Governance)
+  // ============================================================================
+
+  /** Nation economic update (significant change) */
+  'nation:economic_update': {
+    nationId: string;
+    nationName: string;
+    totalRevenue: number;
+    totalExpenditure: number;
+    surplus: number;
+    treasuryBalance: number;
+    tick: number;
+  };
+
+  /** Nation election completed */
+  'nation:election_completed': {
+    nationId: string;
+    nationName: string;
+    newLeader?: string;
+    leadershipType: string;
+    tick: number;
+  };
+
+  /** Nation stability critical - warning */
+  'nation:stability_warning': {
+    nationId: string;
+    nationName: string;
+    stability: number;
+    legitimacy: number;
+    unrestFactors: string[];
+    tick: number;
+  };
+
+  /** Nation war progress update */
+  'nation:war_progress': {
+    nationId: string;
+    nationName: string;
+    warId: string;
+    warName: string;
+    duration: number;
+    casualties: number;
+    tick: number;
+  };
+
+  /** Nation research completed */
+  'nation:research_completed': {
+    nationId: string;
+    nationName: string;
+    projectId: string;
+    projectName: string;
+    field: 'military' | 'economic' | 'cultural' | 'scientific';
+    tick: number;
+  };
+
+  /** Nation policy completed */
+  'nation:policy_completed': {
+    nationId: string;
+    nationName: string;
+    policyId: string;
+    policyName: string;
+    category: 'military' | 'economic' | 'diplomatic' | 'cultural' | 'research';
+    tick: number;
+  };
+
+  /** Nation treaty expired */
+  'nation:treaty_expired': {
+    nationId: string;
+    nationName: string;
+    treatyId: string;
+    treatyName: string;
+    treatyType: 'trade' | 'military_alliance' | 'non_aggression' | 'peace' | 'customs_union';
+    tick: number;
+  };
+
+  /** Nation policy enacted */
+  'nation:policy_enacted': {
+    nationId: string;
+    nationName: string;
+    policyName: string;
+    category: 'military' | 'economic' | 'diplomatic' | 'cultural' | 'research';
+    tick: number;
+  };
+
+  // ============================================================================
+  // Crisis & Governance Events
+  // ============================================================================
+
+  /** Crisis escalated to higher governance tier */
+  'governance:crisis_escalated': {
+    crisisId: string;
+    crisisType: string;
+    fromTier: string;
+    toTier: string;
+    severity: number;
+    affectedEntityIds: string[];
+    tick: number;
+  };
+
+  /** Governance directive issued (delegation from higher to lower tier) */
+  'governance:directive_issued': {
+    directiveId: string;
+    originTier: string;
+    targetTier: string;
+    directive: string;
+    priority: 'routine' | 'urgent' | 'critical';
+    issuerAgentId?: string;
+    targetEntityIds: string[];
+    requiresAcknowledgment: boolean;
+    tick: number;
+  };
+
+  /** Governance directive received by entity */
+  'governance:directive_received': {
+    directiveId: string;
+    entityId: string;
+    directive: string;
+    tick: number;
+  };
+
+  /** Governance directive acknowledged by entity */
+  'governance:directive_acknowledged': {
+    directiveId: string;
+    entityId: string;
+    agentId?: string;
+    tick: number;
+  };
+
+  /** Governance proposal created */
+  'governance:proposal_created': {
+    proposalId: string;
+    tier: string;
+    topic: string;
+    proposedBy: string;
+    tick: number;
+  };
+
+  /** Governance vote concluded */
+  'governance:vote_concluded': {
+    proposalId: string;
+    tier: string;
+    decision: 'approved' | 'rejected';
+    approvalPercentage: number;
+    totalVotes: number;
+    tick: number;
+  };
+
+  /** Governance directive interpreted by LLM */
+  'governance:directive_interpreted': {
+    directiveId: string;
+    action: 'implement' | 'delegate' | 'negotiate' | 'refuse';
+    reasoning: string;
+    tick: number;
+  };
+
+  /** Governance directive LLM processing failed */
+  'governance:directive_llm_failed': {
+    directiveId: string;
+    error: string;
+    tick: number;
+  };
+
+  /** Crisis response received from governor */
+  'governance:crisis_response_received': {
+    crisisId: string;
+    governorId: EntityId;
+    tier: string;
+    action: 'handle_locally' | 'escalate' | 'request_assistance';
+    localMeasures?: string[];
+    escalationTarget?: string;
+    assistanceNeeded?: string[];
+    reasoning: string;
+    tick: number;
+  };
+
+  // EXOTIC PLOT EVENTS - for Fates Council
+  /** When agent is elevated to significant political power */
+  'governance:political_elevation': {
+    agentId: EntityId;
+    soulId: string;
+    previousRole: string | null;
+    newRole: 'village_leader' | 'province_governor' | 'emperor';
+    powerLevel: number;  // 1-100
+    subjectCount: number;  // How many agents they rule
+    electionType: 'democratic' | 'coup' | 'inheritance' | 'appointment';
+    tick: number;
+  };
 }
 
 export type RebellionEventType = keyof RebellionEvents;

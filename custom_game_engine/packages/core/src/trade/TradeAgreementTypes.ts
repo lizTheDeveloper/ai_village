@@ -231,6 +231,27 @@ export interface CrossRealmMetadata {
 
   /** Failed trades count */
   failedTrades: number;
+
+  /**
+   * Military escort requirement (for cross-universe/multiverse trades)
+   * Integrated with Squadron system via TradeEscortSystem
+   */
+  escort?: {
+    /** Whether escort is required */
+    required: boolean;
+
+    /** Minimum number of ships in escort squadron */
+    minimumFleetSize: number;
+
+    /** Assigned squadron ID (if escort active) */
+    escortSquadronId?: string;
+
+    /** Navy/organization providing escort */
+    escortProvider?: string;
+
+    /** Payment to navy for escort service (per tick or per delivery) */
+    escortCost: number;
+  };
 }
 
 // ============================================================================

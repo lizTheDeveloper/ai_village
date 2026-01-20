@@ -23,6 +23,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SquadronComponent, SquadronFormation } from '../components/SquadronComponent.js';
 import type { ArmadaComponent } from '../components/ArmadaComponent.js';
+import { getFormationModifiers } from './SquadronSystem.js';
 
 // ============================================================================
 // Types
@@ -45,6 +46,18 @@ export interface SquadronBattleResult {
   shipsLost2: number;
   formationBonus1: number;
   formationBonus2: number;
+  formation1Mods?: {
+    coherence: number;
+    strength: number;
+    speed: number;
+    defense: number;
+  };
+  formation2Mods?: {
+    coherence: number;
+    strength: number;
+    speed: number;
+    defense: number;
+  };
 }
 
 // ============================================================================
@@ -234,9 +247,17 @@ export class FleetCombatSystem extends BaseSystem {
     const alpha = squadron1.combat.totalFirepower / squadron1.ships.shipIds.length;
     const beta = squadron2.combat.totalFirepower / squadron2.ships.shipIds.length;
 
-    // Formation bonuses
-    const formationBonus1 = calculateFormationBonus(squadron1.formation, squadron2.formation);
-    const formationBonus2 = calculateFormationBonus(squadron2.formation, squadron1.formation);
+    // Formation modifiers (strength + defense)
+    const formation1Mods = getFormationModifiers(squadron1.formation);
+    const formation2Mods = getFormationModifiers(squadron2.formation);
+
+    // Tactical formation advantages (rock-paper-scissors)
+    const tacticalBonus1 = calculateFormationBonus(squadron1.formation, squadron2.formation);
+    const tacticalBonus2 = calculateFormationBonus(squadron2.formation, squadron1.formation);
+
+    // Total formation bonuses: base strength modifier + tactical advantage
+    const formationBonus1 = formation1Mods.strengthBonus + tacticalBonus1;
+    const formationBonus2 = formation2Mods.strengthBonus + tacticalBonus2;
 
     // Effective firepower with formation bonuses
     const alphaEffective = alpha * (1 + formationBonus1);
@@ -294,6 +315,18 @@ export class FleetCombatSystem extends BaseSystem {
       shipsLost2,
       formationBonus1,
       formationBonus2,
+      formation1Mods: {
+        coherence: formation1Mods.coherenceBonus,
+        strength: formation1Mods.strengthBonus,
+        speed: formation1Mods.speedBonus,
+        defense: formation1Mods.defenseBonus,
+      },
+      formation2Mods: {
+        coherence: formation2Mods.coherenceBonus,
+        strength: formation2Mods.strengthBonus,
+        speed: formation2Mods.speedBonus,
+        defense: formation2Mods.defenseBonus,
+      },
     };
   }
 

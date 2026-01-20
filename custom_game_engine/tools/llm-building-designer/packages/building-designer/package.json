@@ -1,0 +1,16 @@
+{
+  "name": "@ai-village/building-designer",
+  "version": "1.0.0",
+  "description": "LLM-powered building generation for species-specific and alien architecture",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "@ai-village/llm": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

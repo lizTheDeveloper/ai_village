@@ -85,3 +85,38 @@ export type {
 // Automation Buildings (Phase 38)
 export * from './AutomationBuildings.js';
 export type { BuildingDefinition } from './AutomationBuildings.js';
+
+// Species-Specific Buildings (Elven, Centaur, Angelic, High Fae)
+export * from './SpeciesBuildings.js';
+export {
+  // Elven
+  ELVEN_MOONLIT_TREEHOUSE,
+  ELVEN_MEDITATION_BOWER,
+  ELVEN_LIVING_WOOD_LIBRARY,
+  ELVEN_ENCHANTED_FORGE,
+  ELVEN_STARLIGHT_SANCTUARY,
+  ALL_ELVEN_BUILDINGS,
+  // Centaur
+  CENTAUR_STABLE,
+  CENTAUR_CLAN_HALL,
+  CENTAUR_OPEN_SMITHY,
+  CENTAUR_TRAINING_SHELTER,
+  CENTAUR_WAR_COUNCIL,
+  ALL_CENTAUR_BUILDINGS,
+  // Angelic
+  ANGELIC_PRAYER_SPIRE,
+  ANGELIC_CHOIR_TOWER,
+  ANGELIC_CELESTIAL_ARCHIVES,
+  ANGELIC_MEDITATION_SANCTUM,
+  ALL_ANGELIC_BUILDINGS,
+  // High Fae (10D)
+  HIGH_FAE_FOLDED_MANOR,
+  HIGH_FAE_CHRONODREAM_SPIRE,
+  HIGH_FAE_TESSERACT_COURT,
+  HIGH_FAE_BETWEEN_SPACE_WORKSHOP,
+  ALL_HIGH_FAE_BUILDINGS,
+  // Collections
+  BUILDINGS_BY_SPECIES,
+  ALL_SPECIES_BUILDINGS,
+  getBuildingsForSpecies,
+} from './SpeciesBuildings.js';

@@ -54,6 +54,14 @@ export {
   initializePlotTemplates,
 } from './PlotTemplates.js';
 
+// Scale-specific template collections
+export { MICRO_PLOT_TEMPLATES } from './templates/MicroPlotTemplates.js';
+export { SMALL_PLOT_TEMPLATES } from './templates/SmallPlotTemplates.js';
+export { MEDIUM_PLOT_TEMPLATES } from './templates/MediumPlotTemplates.js';
+export { LARGE_PLOT_TEMPLATES } from './templates/LargePlotTemplates.js';
+export { EXOTIC_PLOT_TEMPLATES } from './templates/ExoticPlotTemplates.js';
+export { EPIC_PLOT_TEMPLATES } from './templates/EpicPlotTemplates.js';
+
 // Plot Condition Evaluator (Phase 1)
 export {
   evaluatePlotCondition,
@@ -77,3 +85,13 @@ export {
   templateHasTriggers,
   getTriggeredTemplates,
 } from './EventDrivenPlotAssignment.js';
+
+// Fates Council - Exotic & Epic Plot Assignment
+export {
+  FatesCouncilSystem,
+  type EntityThread,
+  type ExoticEvent,
+  type StoryHook,
+  type FatesCouncilContext,
+  type FatesDecision,
+} from './FatesCouncilSystem.js';

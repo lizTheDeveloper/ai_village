@@ -26,6 +26,8 @@ import {
 } from '../components/PassageExtendedComponent.js';
 import type { PassageComponent } from '../components/PassageComponent.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
+import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
+import type { DivergenceTrackingComponent } from '../components/DivergenceTrackingComponent.js';
 
 /**
  * Result of a ship traversal attempt.
@@ -300,10 +302,8 @@ export class PassageTraversalSystem extends BaseSystem {
   /**
    * Get contamination level from timeline mixing (memoized).
    *
-   * This would ideally query the divergence between universes.
-   * For now, return a cached value.
-   *
-   * TODO: Integrate with UniverseForkMetadata when implemented
+   * Uses divergence score from DivergenceTrackingComponent to calculate
+   * timeline contamination. Higher divergence = more contamination.
    */
   private getContaminationLevel(
     sourceUniverseId: string,
@@ -322,12 +322,51 @@ export class PassageTraversalSystem extends BaseSystem {
     // Check cache
     let contamination = this.contaminationCache.get(cacheKey);
     if (contamination === undefined) {
-      // TODO: Calculate divergence score between universes
-      contamination = PassageTraversalSystem.CROSS_UNIVERSE_CONTAMINATION;
+      // Calculate divergence score between universes
+      contamination = this.calculateDivergenceContamination(sourceUniverseId, targetUniverseId);
       this.contaminationCache.set(cacheKey, contamination);
     }
 
     return contamination;
+  }
+
+  /**
+   * Calculate contamination based on universe divergence.
+   *
+   * Query DivergenceTrackingComponent from target universe and use
+   * divergenceScore (0-1) as contamination level.
+   *
+   * @returns Contamination level (0-1)
+   */
+  private calculateDivergenceContamination(
+    sourceUniverseId: string,
+    targetUniverseId: string
+  ): number {
+    // Try to find target universe
+    const targetUniverse = multiverseCoordinator.getUniverse(targetUniverseId);
+    if (!targetUniverse) {
+      // Universe not found - use default contamination
+      return PassageTraversalSystem.CROSS_UNIVERSE_CONTAMINATION;
+    }
+
+    // Query for DivergenceTrackingComponent in target universe
+    const divergenceEntities = targetUniverse.world.query()
+      .with(CT.DivergenceTracking)
+      .executeEntities();
+
+    // Find divergence tracking entity (should be at most one per universe)
+    for (const entity of divergenceEntities) {
+      const divergence = entity.getComponent<DivergenceTrackingComponent>(CT.DivergenceTracking);
+      if (divergence) {
+        // Use divergence score as contamination level
+        // divergenceScore is 0-1 where 0 = identical, 1 = completely different
+        return divergence.divergenceScore;
+      }
+    }
+
+    // No divergence tracking found - use default contamination
+    // (This happens for non-forked universes or universes without tracking)
+    return PassageTraversalSystem.CROSS_UNIVERSE_CONTAMINATION;
   }
 
   /**

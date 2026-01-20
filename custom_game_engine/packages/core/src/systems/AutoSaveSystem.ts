@@ -22,6 +22,7 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import { saveLoadService, type CanonEvent as ServerCanonEvent } from '../persistence/SaveLoadService.js';
 import { canonEventDetector, type CanonEvent as LocalCanonEvent } from './CanonEventDetector.js';
 import { checkpointRetentionPolicy } from './CheckpointRetentionPolicy.js';
+import type { LLMDecisionQueue } from '../decision/LLMDecisionProcessor.js';
 
 /** Time component shape for duck typing */
 interface TimeData {
@@ -51,6 +52,20 @@ export class AutoSaveSystem extends BaseSystem {
   private checkpoints: Checkpoint[] = [];
   private nameGenerationPending: boolean = false;
   private canonEventDetectorAttached: boolean = false;
+  private llmQueue: LLMDecisionQueue | null = null;
+
+  /** Pending name generation requests (checkpoint key -> request tick) */
+  private pendingNameRequests = new Map<string, number>();
+
+  /**
+   * Create an AutoSaveSystem.
+   *
+   * @param llmQueue Optional LLM decision queue for generating poetic checkpoint names
+   */
+  constructor(llmQueue?: LLMDecisionQueue) {
+    super();
+    this.llmQueue = llmQueue ?? null;
+  }
 
   protected onInitialize(world: World, _eventBus: EventBus): void {
     // Attach canon event detector on initialization
@@ -83,6 +98,11 @@ export class AutoSaveSystem extends BaseSystem {
     }
 
     this.lastSaveDay = currentDay;
+
+    // Process pending LLM name generation responses
+    if (this.llmQueue) {
+      this.processPendingNameRequests(world);
+    }
   }
 
   /**
@@ -242,16 +262,135 @@ export class AutoSaveSystem extends BaseSystem {
    * Generate a poetic name for the checkpoint using LLM.
    */
   private async generateCheckpointName(checkpoint: Checkpoint, world: World): Promise<void> {
-    // TODO: Integrate with LLM to generate poetic names
-    // The name should reflect the state of the world at this checkpoint
-    //
-    // Prompt ideas:
-    // - "Generate a short poetic name (3-5 words) for this moment in time..."
-    // - Include world stats: population, buildings, resources, major events
-    // - Examples: "The Dawn of Copper", "When Trees Spoke", "The First Harvest"
+    if (!this.llmQueue) {
+      // No LLM queue - emit event for potential external handling
+      this.events.emitGeneric('checkpoint:name_request', { checkpoint });
+      return;
+    }
 
-    // Emit event that can be handled by LLM system
-    this.events.emitGeneric('checkpoint:name_request', { checkpoint });
+    // Build LLM prompt with world context
+    const prompt = this.buildCheckpointNamePrompt(checkpoint, world);
+
+    // Queue LLM request using checkpoint key as ID
+    // Note: requestDecision returns Promise<string> but we don't need the immediate result
+    // We'll poll for it later using getDecision()
+    this.llmQueue.requestDecision(checkpoint.key, prompt).catch((error) => {
+      console.error('[AutoSave] Failed to queue LLM name generation:', error);
+    });
+
+    // Track pending request
+    this.pendingNameRequests.set(checkpoint.key, world.tick);
+  }
+
+  /**
+   * Build LLM prompt for generating a poetic checkpoint name.
+   */
+  private buildCheckpointNamePrompt(checkpoint: Checkpoint, world: World): string {
+    // Get world stats
+    const agents = world.query().with(CT.Agent).executeEntities();
+    const buildings = world.query().with(CT.Building).executeEntities();
+
+    // Get canon events for this day
+    const todaysCanonEvents = canonEventDetector.getEventsForDay(checkpoint.day);
+
+    let prompt = `You are naming a moment in history for a simulated world.\n\n`;
+    prompt += `Day ${checkpoint.day} - Universe: ${checkpoint.universeId}\n`;
+    prompt += `Population: ${agents.length} agents\n`;
+    prompt += `Buildings: ${buildings.length}\n\n`;
+
+    if (todaysCanonEvents.length > 0) {
+      prompt += `Canon events on this day:\n`;
+      for (const event of todaysCanonEvents) {
+        prompt += `- ${event.title}: ${event.description}\n`;
+      }
+      prompt += `\n`;
+    }
+
+    prompt += `Generate a short, poetic name (3-5 words) for this checkpoint in history.\n`;
+    prompt += `The name should evoke the mood and significance of this moment.\n\n`;
+    prompt += `Examples of good checkpoint names:\n`;
+    prompt += `- "The Dawn of Copper"\n`;
+    prompt += `- "When Trees Spoke"\n`;
+    prompt += `- "The First Harvest"\n`;
+    prompt += `- "Before the Storm"\n`;
+    prompt += `- "The Age of Discovery"\n\n`;
+    prompt += `Respond with ONLY the checkpoint name, nothing else. Keep it evocative and memorable.\n`;
+
+    return prompt;
+  }
+
+  /**
+   * Process pending LLM name generation requests.
+   */
+  private processPendingNameRequests(world: World): void {
+    if (!this.llmQueue) return;
+
+    const completedRequests: string[] = [];
+
+    for (const [checkpointKey, requestTick] of this.pendingNameRequests.entries()) {
+      // Check if LLM response is ready
+      const response = this.llmQueue.getDecision(checkpointKey);
+      if (!response) continue; // Still waiting
+
+      // Parse the name from the response
+      const name = this.parseCheckpointName(response);
+      if (!name) {
+        completedRequests.push(checkpointKey);
+        continue; // Invalid response - keep default name
+      }
+
+      // Update the checkpoint with the generated name
+      const checkpoint = this.checkpoints.find(c => c.key === checkpointKey);
+      if (checkpoint) {
+        const oldName = checkpoint.name;
+        checkpoint.name = name;
+
+        // Emit event for checkpoint rename
+        this.events.emitGeneric('checkpoint:renamed', {
+          checkpointKey,
+          oldName,
+          newName: name,
+        });
+      }
+
+      completedRequests.push(checkpointKey);
+    }
+
+    // Remove completed requests
+    for (const key of completedRequests) {
+      this.pendingNameRequests.delete(key);
+    }
+  }
+
+  /**
+   * Parse checkpoint name from LLM response.
+   */
+  private parseCheckpointName(response: string): string | null {
+    // Clean up the response
+    let name = response.trim();
+
+    // Remove common prefix patterns
+    name = name.replace(/^(The name is|I call it|Checkpoint name):?\s*/i, '');
+    name = name.replace(/^["']|["']$/g, ''); // Remove quotes
+
+    // Validate: should be 3-8 words, reasonable length
+    const words = name.split(/\s+/);
+    if (words.length < 1 || words.length > 8) return null;
+    if (name.length > 80) return null;
+
+    // Capitalize properly (Title Case for first word)
+    const capitalizedWords = words.map((word, index) => {
+      if (index === 0) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+      // Keep small words lowercase (of, the, and, etc.)
+      if (['of', 'the', 'and', 'or', 'in', 'on', 'at', 'to', 'a', 'an'].includes(word.toLowerCase())) {
+        return word.toLowerCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    });
+
+    return capitalizedWords.join(' ');
   }
 
   /**

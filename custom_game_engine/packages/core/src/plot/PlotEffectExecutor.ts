@@ -42,6 +42,8 @@ import {
   type InventoryComponent,
   addToInventory,
 } from '../components/InventoryComponent.js';
+import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem.js';
+import { createOutcomeAttractor } from '../narrative/NarrativePressureTypes.js';
 
 /**
  * Execute a single plot effect
@@ -133,9 +135,44 @@ export function executeEffect(
     }
 
     case 'spawn_attractor': {
-      // Attractor system integration - log for now until NarrativePressureSystem is hooked
-      // TODO: Hook into NarrativePressureSystem when available
-      // narrativePressure.addAttractor({ id: effect.attractor_id, ... });
+      // Get the narrative pressure system
+      const narrativePressure = getNarrativePressureSystem();
+
+      // Extract attractor parameters from effect.details
+      const {
+        goal,
+        strength = 0.5,
+        urgency = 0.5,
+        scope,
+        decay,
+        description,
+      } = effect.details;
+
+      if (!goal || !goal.type) {
+        console.warn('[PlotEffect] spawn_attractor missing required goal parameter');
+        break;
+      }
+
+      // Create the attractor with plot source
+      const attractor = createOutcomeAttractor({
+        id: effect.attractor_id,
+        source: {
+          type: 'plot',
+          plotInstanceId: context.plot.instance_id,
+          stageId: context.plot.current_stage,
+        },
+        goal: goal,
+        strength: strength,
+        urgency: urgency,
+        scope: scope ?? { type: 'entity', entityId: context.entityId },
+        decay: decay ?? { type: 'stage_exit' },
+        description: description,
+        createdAt: context.personalTick,
+      });
+
+      // Add to narrative pressure system
+      narrativePressure.addAttractor(attractor);
+
       break;
     }
 

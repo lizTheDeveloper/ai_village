@@ -29,6 +29,9 @@ import type {
 } from './NetworkProtocol.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
 import { computeChecksumSync } from '../persistence/utils.js';
+import type { UniverseConfig } from './MultiverseCoordinator.js';
+import type { UniversePhysicsConfig } from '../config/UniversePhysicsConfig.js';
+import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 
 // WebSocket type (works in both browser and Node.js)
 // Using structural typing to avoid direct dependency on ws package
@@ -45,6 +48,31 @@ interface WebSocketLike {
 interface WebSocketServerLike {
   close(): void;
   on(event: string, handler: (...args: unknown[]) => void): void;
+}
+
+/**
+ * Universe compatibility information
+ */
+interface UniverseCompatibility {
+  /** Overall compatibility score (0-1, where 1 = fully compatible) */
+  compatibilityScore: number;
+
+  /** Individual factor scores */
+  factors: {
+    timeRateCompatibility: number;
+    physicsCompatibility: number;
+    realityStability: number;
+    divergenceLevel: number;
+  };
+
+  /** Warnings about compatibility issues */
+  warnings: string[];
+
+  /** Whether passage creation is recommended */
+  recommended: boolean;
+
+  /** Estimated traversal cost multiplier (1.0 = normal) */
+  traversalCostMultiplier: number;
 }
 
 /**
@@ -330,9 +358,40 @@ export class MultiverseNetworkManager {
       throw new Error(`Local universe ${config.localUniverseId} not found`);
     }
 
-    // TODO: Calculate compatibility between universes
-    // const remoteConfig = await this.requestUniverseConfig(...);
-    // const compatibility = calculateCompatibility(localUniverse.config, remoteConfig);
+    // Calculate compatibility between universes
+    const remoteConfigResponse = await this.requestUniverseConfig(
+      config.remotePeerId,
+      config.remoteUniverseId
+    );
+
+    if (!remoteConfigResponse) {
+      throw new Error(`Failed to get remote universe config for ${config.remoteUniverseId}`);
+    }
+
+    const compatibility = this.calculateUniverseCompatibility(
+      localUniverse.config,
+      remoteConfigResponse
+    );
+
+    // Log compatibility warnings
+    if (compatibility.warnings.length > 0) {
+      console.warn(
+        `[NetworkManager] Compatibility warnings for ${config.localUniverseId} <-> ${config.remoteUniverseId}:`,
+        compatibility.warnings
+      );
+    }
+
+    if (!compatibility.recommended) {
+      console.error(
+        `[NetworkManager] Low compatibility (${(compatibility.compatibilityScore * 100).toFixed(1)}%) between universes - passage creation not recommended`
+      );
+    }
+
+    // Calculate costs based on compatibility
+    const baseCreationCost = 1000;
+    const baseTraversalCost = 100;
+    const creationCost = Math.ceil(baseCreationCost * compatibility.traversalCostMultiplier);
+    const traversalCost = Math.ceil(baseTraversalCost * compatibility.traversalCostMultiplier);
 
     // Create passage
     const passageId = this.generatePassageId();
@@ -378,9 +437,9 @@ export class MultiverseNetworkManager {
       owners: [config.creatorId],
       accessPolicy: config.accessPolicy ?? 'private',
 
-      creationCost: 1000, // TODO: Calculate based on compatibility
-      traversalCost: 100,
-      health: 1.0,
+      creationCost,
+      traversalCost,
+      health: compatibility.compatibilityScore, // Health based on compatibility
       createdAt: localUniverse.universeTick,
     };
 
@@ -1379,6 +1438,211 @@ export class MultiverseNetworkManager {
       this.pendingAcks.set(key, { resolve: resolve as any, reject: reject as any, timeout });
     });
   }
+
+  // ============================================================================
+  // Universe Compatibility Calculation
+  // ============================================================================
+
+  /**
+   * Calculate compatibility between two universes for remote passage creation
+   *
+   * Compatibility considers:
+   * - Time rate differences (time scale)
+   * - Physical laws similarity (if physics configs available)
+   * - Reality stability (based on pause state, forking depth)
+   * - Divergence level (for forked universes)
+   *
+   * Returns compatibility info with score 0-1 where 1 = perfectly compatible
+   */
+  private calculateUniverseCompatibility(
+    localConfig: UniverseConfig,
+    remoteConfig: UniverseConfig
+  ): UniverseCompatibility {
+    const warnings: string[] = [];
+    const factors = {
+      timeRateCompatibility: 0,
+      physicsCompatibility: 0,
+      realityStability: 0,
+      divergenceLevel: 0,
+    };
+
+    // 1. Time rate compatibility (25% weight)
+    // Time scales within 2x of each other = good, wider gaps = problematic
+    const timeRatio = localConfig.timeScale / remoteConfig.timeScale;
+    if (timeRatio >= 0.5 && timeRatio <= 2.0) {
+      factors.timeRateCompatibility = 1.0 - Math.abs(timeRatio - 1.0) / 1.0;
+    } else if (timeRatio >= 0.1 && timeRatio <= 10.0) {
+      factors.timeRateCompatibility = 0.5;
+      warnings.push(
+        `Significant time rate difference: ${localConfig.timeScale}x vs ${remoteConfig.timeScale}x`
+      );
+    } else {
+      factors.timeRateCompatibility = 0.2;
+      warnings.push(
+        `Extreme time rate difference: ${localConfig.timeScale}x vs ${remoteConfig.timeScale}x - traversal may be dangerous`
+      );
+    }
+
+    // 2. Physics compatibility (25% weight)
+    // Same multiverse = similar physics assumed
+    if (localConfig.multiverseId === remoteConfig.multiverseId) {
+      factors.physicsCompatibility = 1.0;
+    } else {
+      // Different multiverses may have different physics
+      factors.physicsCompatibility = 0.7;
+      warnings.push('Cross-multiverse passage - physics laws may differ');
+    }
+
+    // 3. Reality stability (25% weight)
+    // Paused universes or deeply forked timelines are less stable
+    let stabilityScore = 1.0;
+
+    if (localConfig.paused || remoteConfig.paused) {
+      stabilityScore -= 0.3;
+      warnings.push('One or both universes are paused - unstable connection');
+    }
+
+    // Count forking depth (how many ancestors)
+    const localDepth = this.calculateForkingDepth(localConfig);
+    const remoteDepth = this.calculateForkingDepth(remoteConfig);
+    const maxDepth = Math.max(localDepth, remoteDepth);
+
+    if (maxDepth > 5) {
+      stabilityScore -= 0.4;
+      warnings.push(`Deep timeline nesting (depth ${maxDepth}) - reality may be unstable`);
+    } else if (maxDepth > 2) {
+      stabilityScore -= 0.2;
+      warnings.push(`Moderate timeline nesting (depth ${maxDepth})`);
+    }
+
+    factors.realityStability = Math.max(0, stabilityScore);
+
+    // 4. Divergence level (25% weight)
+    // If connecting related timelines, check if they've diverged significantly
+    if (this.areRelatedTimelines(localConfig, remoteConfig)) {
+      // Related timelines (parent/child or siblings)
+      // Higher divergence makes passages more unstable
+      const divergenceEstimate = this.estimateDivergence(localConfig, remoteConfig);
+      factors.divergenceLevel = 1.0 - divergenceEstimate;
+
+      if (divergenceEstimate > 0.7) {
+        warnings.push('Timelines have diverged significantly - passage may be unstable');
+      } else if (divergenceEstimate > 0.4) {
+        warnings.push('Moderate timeline divergence detected');
+      }
+    } else {
+      // Unrelated timelines - no divergence concerns
+      factors.divergenceLevel = 1.0;
+    }
+
+    // Calculate overall compatibility score (weighted average)
+    const compatibilityScore =
+      factors.timeRateCompatibility * 0.25 +
+      factors.physicsCompatibility * 0.25 +
+      factors.realityStability * 0.25 +
+      factors.divergenceLevel * 0.25;
+
+    // Calculate traversal cost multiplier based on compatibility
+    // Lower compatibility = higher cost
+    const traversalCostMultiplier = compatibilityScore < 0.5
+      ? 1.0 / compatibilityScore  // Very incompatible = much more expensive
+      : 1.0 + (1.0 - compatibilityScore) * 0.5;  // Moderately incompatible = slightly more expensive
+
+    // Recommend passage creation if compatibility >= 0.4
+    const recommended = compatibilityScore >= 0.4;
+
+    if (!recommended) {
+      warnings.push(
+        `Low compatibility (${(compatibilityScore * 100).toFixed(1)}%) - passage creation not recommended`
+      );
+    }
+
+    return {
+      compatibilityScore,
+      factors,
+      warnings,
+      recommended,
+      traversalCostMultiplier,
+    };
+  }
+
+  /**
+   * Calculate forking depth (how many generations from root universe)
+   */
+  private calculateForkingDepth(config: UniverseConfig): number {
+    let depth = 0;
+    let current = config;
+
+    // Walk up the parent chain
+    while (current.parentId) {
+      depth++;
+      // Try to find parent config (might not be available for remote universes)
+      const parent = this.multiverseCoordinator.getUniverse(current.parentId);
+      if (!parent) break;
+      current = parent.config;
+
+      // Safety: prevent infinite loops
+      if (depth > 100) {
+        console.error(`[NetworkManager] Suspicious forking depth > 100 for ${config.id}`);
+        break;
+      }
+    }
+
+    return depth;
+  }
+
+  /**
+   * Check if two universes are related timelines (parent/child or siblings)
+   */
+  private areRelatedTimelines(config1: UniverseConfig, config2: UniverseConfig): boolean {
+    // Same universe
+    if (config1.id === config2.id) return true;
+
+    // Parent-child relationship
+    if (config1.parentId === config2.id || config2.parentId === config1.id) return true;
+
+    // Sibling relationship (same parent)
+    if (config1.parentId && config2.parentId && config1.parentId === config2.parentId) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Estimate divergence between related timelines
+   * Returns 0-1 where 0 = no divergence, 1 = completely different
+   */
+  private estimateDivergence(config1: UniverseConfig, config2: UniverseConfig): number {
+    // If not forked, no divergence
+    if (!config1.forkedAtTick && !config2.forkedAtTick) return 0;
+
+    // If one is parent of other, use time since fork as divergence estimate
+    let forkTime: bigint | undefined;
+    if (config1.parentId === config2.id) {
+      forkTime = config1.forkedAtTick;
+    } else if (config2.parentId === config1.id) {
+      forkTime = config2.forkedAtTick;
+    } else if (config1.forkedAtTick && config2.forkedAtTick) {
+      // Siblings - use difference in fork times
+      forkTime = config1.forkedAtTick > config2.forkedAtTick
+        ? config1.forkedAtTick - config2.forkedAtTick
+        : config2.forkedAtTick - config1.forkedAtTick;
+    }
+
+    if (!forkTime) return 0.5; // Unknown, assume moderate divergence
+
+    // Time-based divergence estimate
+    // Assume 100,000 ticks (50 minutes real-time) = significant divergence
+    const ticksSinceFork = Number(forkTime);
+    const divergence = Math.min(1.0, ticksSinceFork / 100000);
+
+    return divergence;
+  }
+
+  // ============================================================================
+  // Utility Methods
+  // ============================================================================
 
   /**
    * Generate unique peer ID

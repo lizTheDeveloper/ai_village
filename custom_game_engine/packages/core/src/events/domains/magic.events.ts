@@ -18,6 +18,14 @@ export interface MagicEvents {
     responseType: string;
     healingApplied?: boolean; // True if divine healing was applied
   };
+  'deity:miracle': {
+    deityId: EntityId;
+    deityName?: string;
+    targetId?: EntityId;
+    miracleType: string;
+    description?: string;
+    power?: number;
+  };
   'divine_power:request': {
     deityId: EntityId;
     powerType: string;
@@ -89,6 +97,45 @@ export interface MagicEvents {
     visionType: 'dream' | 'meditation' | 'sign' | 'direct';
     content: string;
     clarity: 'obscure' | 'symbolic' | 'clear' | 'vivid';
+  };
+  // EXOTIC PLOT EVENTS - for Fates Council
+  'divinity:deity_relationship_critical': {
+    agentId: EntityId;
+    soulId: string;
+    deityId: EntityId;
+    deityName: string;
+    relationshipValue: number;  // -100 to 100
+    relationshipType: 'favor' | 'disfavor' | 'obsession';
+    triggerReason: 'sacrilege' | 'heresy' | 'divine_champion' | 'prayer_answered' | 'miracle_witnessed';
+    tick: number;
+  };
+  'divinity:prophecy_given': {
+    recipientId: EntityId;
+    soulId: string;
+    deityId: EntityId;
+    prophecyText: string;
+    prophecyType: 'destiny' | 'warning' | 'doom' | 'blessing';
+    inevitability: number;  // 0-1 (how fixed is the future?)
+    timeframe: number;  // Ticks until prophecy should fulfill
+    tick: number;
+  };
+  'divinity:champion_chosen': {
+    championId: EntityId;
+    soulId: string;
+    deityId: EntityId;
+    deityName: string;
+    championType: 'avatar' | 'prophet' | 'warrior' | 'saint';
+    dutiesAssigned: string[];
+    powerGranted: number;  // Divine power level
+    tick: number;
+  };
+  'magic:paradigm_conflict_detected': {
+    agentId: EntityId;
+    paradigm1: string;  // e.g., 'divine'
+    paradigm2: string;  // e.g., 'pact'
+    conflictSeverity: 'warning' | 'dangerous' | 'catastrophic';
+    manifestation: 'spell_failure' | 'backlash' | 'unstable_magic' | 'paradigm_collapse';
+    tick: number;
   };
   'divinity:vision_interpreted': {
     visionId: string;

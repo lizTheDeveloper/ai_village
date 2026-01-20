@@ -455,6 +455,260 @@ describe('MultiverseNetworkManager', () => {
     });
   });
 
+  describe('Universe Compatibility', () => {
+    it('should calculate high compatibility for similar universes', () => {
+      const localConfig = {
+        id: 'universe-a',
+        name: 'Universe A',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const remoteConfig = {
+        id: 'universe-b',
+        name: 'Universe B',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+        localConfig,
+        remoteConfig
+      );
+
+      expect(compatibility.compatibilityScore).toBeGreaterThan(0.8);
+      expect(compatibility.recommended).toBe(true);
+      expect(compatibility.warnings).toHaveLength(0);
+    });
+
+    it('should calculate lower compatibility for different time scales', () => {
+      const localConfig = {
+        id: 'universe-a',
+        name: 'Universe A',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const remoteConfig = {
+        id: 'universe-b',
+        name: 'Universe B',
+        timeScale: 10.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+        localConfig,
+        remoteConfig
+      );
+
+      expect(compatibility.compatibilityScore).toBeLessThan(0.8);
+      expect(compatibility.warnings.length).toBeGreaterThan(0);
+      expect(compatibility.traversalCostMultiplier).toBeGreaterThan(1.0);
+    });
+
+    it('should detect cross-multiverse passages', () => {
+      const localConfig = {
+        id: 'universe-a',
+        name: 'Universe A',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const remoteConfig = {
+        id: 'universe-b',
+        name: 'Universe B',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-2',
+        paused: false,
+      };
+
+      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+        localConfig,
+        remoteConfig
+      );
+
+      expect(compatibility.warnings.some((w: string) => w.includes('Cross-multiverse'))).toBe(true);
+    });
+
+    it('should warn about paused universes', () => {
+      const localConfig = {
+        id: 'universe-a',
+        name: 'Universe A',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: true,
+      };
+
+      const remoteConfig = {
+        id: 'universe-b',
+        name: 'Universe B',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+        localConfig,
+        remoteConfig
+      );
+
+      expect(compatibility.warnings.some((w: string) => w.includes('paused'))).toBe(true);
+      expect(compatibility.factors.realityStability).toBeLessThan(1.0);
+    });
+
+    it('should calculate forking depth correctly', () => {
+      const rootConfig = {
+        id: 'universe-root',
+        name: 'Root Universe',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const child1Config = {
+        id: 'universe-child1',
+        name: 'Child 1',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-root',
+        forkedAtTick: 1000n,
+        paused: false,
+      };
+
+      const child2Config = {
+        id: 'universe-child2',
+        name: 'Child 2',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-child1',
+        forkedAtTick: 2000n,
+        paused: false,
+      };
+
+      // Register universes in coordinator
+      const mockWorld = {
+        entities: new Map(),
+        tick: 0,
+        update: () => {},
+      } as any;
+
+      coordinator.registerUniverse(mockWorld, rootConfig);
+      coordinator.registerUniverse(mockWorld, child1Config);
+
+      const depth0 = (networkManager as any).calculateForkingDepth(rootConfig);
+      const depth1 = (networkManager as any).calculateForkingDepth(child1Config);
+      const depth2 = (networkManager as any).calculateForkingDepth(child2Config);
+
+      expect(depth0).toBe(0);
+      expect(depth1).toBe(1);
+      expect(depth2).toBe(1); // Can't find parent beyond child1, so stops at 1
+    });
+
+    it('should detect related timelines (parent-child)', () => {
+      const parentConfig = {
+        id: 'universe-parent',
+        name: 'Parent',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const childConfig = {
+        id: 'universe-child',
+        name: 'Child',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-parent',
+        forkedAtTick: 1000n,
+        paused: false,
+      };
+
+      const areRelated = (networkManager as any).areRelatedTimelines(
+        parentConfig,
+        childConfig
+      );
+
+      expect(areRelated).toBe(true);
+    });
+
+    it('should detect related timelines (siblings)', () => {
+      const sibling1Config = {
+        id: 'universe-sibling1',
+        name: 'Sibling 1',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-parent',
+        forkedAtTick: 1000n,
+        paused: false,
+      };
+
+      const sibling2Config = {
+        id: 'universe-sibling2',
+        name: 'Sibling 2',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-parent',
+        forkedAtTick: 1500n,
+        paused: false,
+      };
+
+      const areRelated = (networkManager as any).areRelatedTimelines(
+        sibling1Config,
+        sibling2Config
+      );
+
+      expect(areRelated).toBe(true);
+    });
+
+    it('should estimate divergence based on fork time', () => {
+      const parentConfig = {
+        id: 'universe-parent',
+        name: 'Parent',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        paused: false,
+      };
+
+      const recentForkConfig = {
+        id: 'universe-recent',
+        name: 'Recent Fork',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-parent',
+        forkedAtTick: 100n,
+        paused: false,
+      };
+
+      const oldForkConfig = {
+        id: 'universe-old',
+        name: 'Old Fork',
+        timeScale: 1.0,
+        multiverseId: 'multiverse-1',
+        parentId: 'universe-parent',
+        forkedAtTick: 50000n,
+        paused: false,
+      };
+
+      const recentDivergence = (networkManager as any).estimateDivergence(
+        parentConfig,
+        recentForkConfig
+      );
+
+      const oldDivergence = (networkManager as any).estimateDivergence(
+        parentConfig,
+        oldForkConfig
+      );
+
+      expect(recentDivergence).toBeLessThan(oldDivergence);
+      expect(oldDivergence).toBeGreaterThan(0.4);
+    });
+  });
+
   describe('Live Universe Streaming', () => {
     it('should subscribe to universe updates', async () => {
       const universeA = {

@@ -29,8 +29,9 @@ export class PrayerSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer';
   public readonly priority: number = 116; // After belief generation
   public readonly requiredComponents = [] as const;
-  // Only run when deity components exist (O(1) activation check)
-  public readonly activationComponents = ['deity'] as const;
+  // Only run when spiritual components exist (need agents who can pray)
+  // This system handles both: prayers to existing deities AND proto_deity_belief events for deity emergence
+  public readonly activationComponents = ['spiritual'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS
 
   private prayerIdCounter: number = 0;

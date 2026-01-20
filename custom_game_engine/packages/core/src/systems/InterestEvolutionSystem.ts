@@ -103,6 +103,43 @@ const EXPERIENCE_TRIGGERS: ExperienceTrigger[] = [
       return event.source === agent.id;
     },
   },
+  {
+    eventType: 'trauma:experienced',
+    newInterest: 'mortality', // Trauma makes agents think about mortality and meaning
+    intensity: 0.5,
+    condition: (agent, event) => {
+      // Only for the agent who experienced trauma
+      if ('agentId' in event.data && typeof event.data.agentId === 'string') {
+        return event.data.agentId === agent.id;
+      }
+      return false;
+    },
+  },
+  {
+    eventType: 'discovery:created',
+    newInterest: 'work', // Making discoveries leads to interest in work/craft
+    intensity: 0.7,
+    condition: (agent, event) => {
+      // Only for the agent who made the discovery
+      if ('generatedBy' in event.data && typeof event.data.generatedBy === 'string') {
+        return event.data.generatedBy === agent.id;
+      }
+      return false;
+    },
+  },
+  {
+    eventType: 'profession:work_completed',
+    newInterest: 'craftsmanship', // High quality work leads to pride in craftsmanship
+    intensity: 0.3,
+    condition: (agent, event) => {
+      // Only for the working agent, and only if quality is high
+      if ('agentId' in event.data && typeof event.data.agentId === 'string' &&
+          'quality' in event.data && typeof event.data.quality === 'number') {
+        return event.data.agentId === agent.id && event.data.quality >= 0.7;
+      }
+      return false;
+    },
+  },
 ];
 
 /**
@@ -161,14 +198,15 @@ export class InterestEvolutionSystem extends BaseSystem {
   private static readonly WEEK_IN_TICKS = 7 * 24 * 1200; // 7 days * 24 hours * 1200 ticks/hour
 
   protected onInitialize(): void {
-    // Listen for experience triggers
-    // Note: Some events like 'agent:death', 'deity:miracle', 'prayer:answered' may not be in EventMap yet
-    // Using onGeneric for forward compatibility with events not yet in EventMap
-    this.events.onGeneric('agent:death', (data) => this.handleExperience(data as GameEvent, this.world));
-    this.events.onGeneric('deity:miracle', (data) => this.handleExperience(data as GameEvent, this.world));
+    // Listen for experience triggers (all using typed events)
+    this.events.on('agent:death', (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('deity:miracle', (_data, event) => this.handleExperience(event, this.world));
     this.events.on('building:completed', (_data, event) => this.handleExperience(event, this.world));
     this.events.on('agent:born', (_data, event) => this.handleExperience(event, this.world));
-    this.events.onGeneric('prayer:answered', (data) => this.handleExperience(data as GameEvent, this.world));
+    this.events.on('prayer:answered', (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('trauma:experienced', (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('discovery:created', (_data, event) => this.handleExperience(event, this.world));
+    this.events.on('profession:work_completed', (_data, event) => this.handleExperience(event, this.world));
 
     // Listen for skill increases
     this.events.on('skill:level_up', (_data, event) => this.handleSkillGrowth(event, this.world));
@@ -427,18 +465,56 @@ export class InterestEvolutionSystem extends BaseSystem {
     oldIntensity?: number,
     trigger?: string
   ): void {
-    const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+    // Determine mutation type based on event type and intensity changes
+    let mutationType: 'strengthened' | 'weakened' | 'created' | 'abandoned';
+    const eventTypeStr = eventType as string;
+    if (eventTypeStr === 'interest:created') {
+      mutationType = 'created';
+    } else if (eventTypeStr === 'interest:abandoned') {
+      mutationType = 'abandoned';
+    } else if ((oldIntensity || 0) < interest.intensity) {
+      mutationType = 'strengthened';
+    } else {
+      mutationType = 'weakened';
+    }
 
-    // Emit as generic event since interest mutation events not yet in EventMap
-    this.events.emitGeneric(eventType, {
+    // Map InterestSource to event source type
+    const mapSource = (src: string): 'conversation' | 'experience' | 'reflection' | 'hearsay' => {
+      switch (src) {
+        case 'conversation':
+        case 'hearsay':
+        case 'reflection':
+          return src;
+        case 'skill':
+        case 'innate':
+        case 'book':
+        default:
+          return 'experience';
+      }
+    };
+
+    // Extract influencer ID from trigger if it's an agent ID (not an event type)
+    let influencerId: string | undefined;
+    if (trigger) {
+      // If trigger looks like an entity ID (UUID format), use it as influencer
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidPattern.test(trigger)) {
+        influencerId = trigger;
+      }
+      // If trigger starts with "skill:", it's not an influencer
+      // If trigger is an event type like "agent:death", it's not an influencer
+    }
+
+    // Emit typed event
+    this.events.emit('interest:mutated', {
       agentId: agent.id,
-      agentName: identity?.name || 'Unknown',
       topic: interest.topic,
-      oldIntensity,
-      newIntensity: interest.intensity,
-      source: interest.source,
-      trigger,
-    });
+      oldStrength: oldIntensity || 0,
+      newStrength: interest.intensity,
+      mutationType,
+      source: mapSource(interest.source),
+      influencerId,
+    }, agent.id);
   }
 
   /**

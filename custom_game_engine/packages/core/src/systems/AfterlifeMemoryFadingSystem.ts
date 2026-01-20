@@ -43,6 +43,9 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
         continue;
       }
 
+      // Track memories remaining before fading
+      const memoriesBeforeFading = afterlifeMemory.afterlifeMemoryIds.size;
+
       // Calculate current age based on how long ago they were reincarnated
       // Store birth tick in component for tracking
       // For now, use a simplified age calculation based on component creation
@@ -55,6 +58,9 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
         afterlifeMemory.retainsIntoAdulthood,
         afterlifeMemory.fadingStartAge
       );
+
+      // Track if this is the moment of complete fading
+      const wasNotComplete = !afterlifeMemory.fadingComplete;
 
       // Update clarity multiplier
       entity.updateComponent<AfterlifeMemoryComponent>('afterlife_memory', (current) => {
@@ -70,10 +76,41 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
       });
 
       // Apply clarity reduction to afterlife memories
-      this.applyMemoryFading(afterlifeMemory, episodicMemory, newClarity);
+      const suppressedCount = this.applyMemoryFading(afterlifeMemory, episodicMemory, newClarity);
 
-      // TODO: Emit event if memories just completed fading
-      // (need to add event type to EventMap first)
+      // Emit progress event if memories were suppressed
+      if (suppressedCount > 0) {
+        const memoriesRemaining = afterlifeMemory.afterlifeMemoryIds.size;
+        const fadeProgress = memoriesRemaining === 0 ? 1.0 : 1.0 - (memoriesRemaining / memoriesBeforeFading);
+
+        ctx.events.emit(
+          'afterlife:memory_fading',
+          {
+            agentId: entity.id,
+            fadeProgress,
+            memoriesRemaining,
+            memoriesSuppressed: suppressedCount,
+            clarityMultiplier: newClarity,
+            age: currentAge,
+          },
+          entity.id
+        );
+      }
+
+      // Emit completion event if memories just completed fading
+      if (wasNotComplete && afterlifeMemory.fadingComplete) {
+        ctx.events.emit(
+          'afterlife:memories_faded',
+          {
+            agentId: entity.id,
+            totalMemoriesSuppressed: memoriesBeforeFading,
+            retainedIntoAdulthood: afterlifeMemory.retainsIntoAdulthood,
+            finalClarityMultiplier: newClarity,
+            fadingDuration: ctx.world.tick - (afterlifeMemory.fadingStartAge || 0),
+          },
+          entity.id
+        );
+      }
     }
   }
 
@@ -82,13 +119,15 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
    * When memories fade completely, they are SUPPRESSED (not deleted).
    * Suppressed memories accumulate across reincarnations, contributing to soul wisdom.
    * The God of Death can see all suppressed memories when judging souls.
+   *
+   * @returns Count of memories suppressed in this update
    */
   private applyMemoryFading(
     afterlifeMemory: AfterlifeMemoryComponent,
     episodicMemory: EpisodicMemoryComponent,
     newClarity: number
-  ): void {
-    if (!episodicMemory.episodicMemories) return;
+  ): number {
+    if (!episodicMemory.episodicMemories) return 0;
 
     const toSuppress: string[] = [];
 
@@ -116,6 +155,8 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
 
     // Remove suppressed memories from active tracking
     toSuppress.forEach(id => afterlifeMemory.afterlifeMemoryIds.delete(id));
+
+    return toSuppress.length;
   }
 
   /**
@@ -129,6 +170,9 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
     const afterlifeMemory = entity.components.get('afterlife_memory') as AfterlifeMemoryComponent | undefined;
 
     if (afterlifeMemory) {
+      const totalMemories = afterlifeMemory.afterlifeMemoryIds.size;
+      const fadingStartTick = afterlifeMemory.fadingStartAge || world.tick;
+
       // EntityImpl cast is necessary for updateComponent (internal mutable interface)
       // Entity interface is readonly, only EntityImpl exposes updateComponent
       const entityImpl = entity as EntityImpl;
@@ -158,7 +202,18 @@ export class AfterlifeMemoryFadingSystem extends BaseSystem {
         afterlifeMemory.afterlifeMemoryIds.clear();
       }
 
-      // TODO: Emit event when event type is added to EventMap
+      // Emit completion event
+      world.eventBus.emit({
+        type: 'afterlife:memories_faded',
+        source: entityId,
+        data: {
+          agentId: entityId,
+          totalMemoriesSuppressed: totalMemories,
+          retainedIntoAdulthood: afterlifeMemory.retainsIntoAdulthood,
+          finalClarityMultiplier: 0.0,
+          fadingDuration: world.tick - fadingStartTick,
+        },
+      });
     }
   }
 }

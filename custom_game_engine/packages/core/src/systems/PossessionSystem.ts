@@ -6,6 +6,7 @@ import type {
   DeityComponent,
   AgentComponent,
   NeedsComponent,
+  DivineAbilityComponent,
 } from '../components/index.js';
 import {
   calculatePossessionCost,
@@ -121,7 +122,10 @@ export class PossessionSystem extends BaseSystem {
     const isMoving = playerControl.movementCommand !== null;
     // Combat-like behaviors that increase possession cost
     const isInCombat = agentComp.behavior === 'flee' || agentComp.behavior === 'flee_danger';
-    const isUsingAbility = false; // TODO: Check for divine ability use
+    // Check if using divine ability (within last tick)
+    const divineAbility = playerEntity.getComponent<DivineAbilityComponent>('divine_ability');
+    const isUsingAbility = divineAbility ?
+      (currentTick - divineAbility.lastPowerUseTick <= 1) : false;
 
     const cost = calculatePossessionCost(
       this.baseCostPerTick,

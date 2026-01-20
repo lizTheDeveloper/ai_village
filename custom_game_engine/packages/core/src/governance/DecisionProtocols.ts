@@ -18,6 +18,26 @@
 
 import type { Entity } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
+import type {
+  GovernanceHistoryComponent,
+  GovernanceAuditEntry,
+  GovernanceAuditQuery,
+} from '../components/GovernanceHistoryComponent.js';
+import {
+  addGovernanceAuditEntry,
+  queryGovernanceHistory as queryGovernanceHistoryInternal,
+} from '../components/GovernanceHistoryComponent.js';
+import { v4 as uuidv4 } from 'uuid';
+import type { NationContext } from './GovernorContextBuilders.js';
+import {
+  requestGovernorVote,
+  requestGovernorDirectiveInterpretation,
+  requestGovernorCrisisResponse,
+  generateFallbackVote,
+  executeDirectiveInterpretation,
+  findGovernorAtTier,
+  addCrisisToGovernorQueue,
+} from './GovernorLLMIntegration.js';
 
 // ============================================================================
 // POLITICAL TIER HIERARCHY
@@ -138,18 +158,6 @@ export interface VoteResult {
 }
 
 /**
- * Context for nation-level decisions (placeholder - extend as needed)
- */
-export interface NationContext {
-  nationId: string;
-  nationName: string;
-  population: number;
-  gdp: number;
-  stability: number;
-  // Extend with additional context as governance systems develop
-}
-
-/**
  * Conduct a vote among parliament/council members
  *
  * This is a core function for democratic decision-making at all tiers:
@@ -172,22 +180,40 @@ export async function conductVote(
   parliament: Entity[],
   proposal: Proposal,
   context: NationContext,
-  world: World
+  world: World,
+  tier: PoliticalTier = 'nation'
 ): Promise<VoteResult> {
   const votes: Vote[] = [];
 
   // Collect votes from all parliament members
   for (const member of parliament) {
-    // TODO: For Phase 6, integrate with soul agent decision-making
-    // For now, use simple majority with equal weighting
+    let vote: Vote;
 
-    // Placeholder vote generation (replace with actual agent decision logic)
-    const vote: Vote = {
-      agentId: member.id,
-      stance: 'approve', // Placeholder - should be based on agent personality/beliefs
-      weight: 1.0,       // Equal weighting for now
-      reasoning: 'Placeholder vote - integrate with agent decision system',
-    };
+    // Check if member is a soul agent (has soul component)
+    const soulComponent = member.components?.get('soul');
+    const isSoulAgent = soulComponent !== undefined && soulComponent !== null;
+
+    if (isSoulAgent) {
+      // LLM-powered voting for soul agents
+      try {
+        const voteDecision = await requestGovernorVote(member, proposal, context, world);
+        vote = {
+          agentId: member.id,
+          stance: voteDecision.stance,
+          weight: voteDecision.weight ?? 1.0,
+          reasoning: voteDecision.reasoning,
+        };
+      } catch (error) {
+        // Fallback to rule-based voting if LLM unavailable
+        console.warn(
+          `[DecisionProtocols] LLM voting failed for ${member.id}, using fallback: ${error}`
+        );
+        vote = generateFallbackVote(member, proposal, context);
+      }
+    } else {
+      // Rule-based voting for non-soul agents
+      vote = generateFallbackVote(member, proposal, context);
+    }
 
     votes.push(vote);
   }
@@ -209,6 +235,28 @@ export async function conductVote(
   // Simple majority (>50% approval needed)
   const decision: 'approved' | 'rejected' = approvalPercentage > 0.5 ? 'approved' : 'rejected';
 
+  // Record vote conclusion in governance history
+  recordVoteConcluded(proposal, decision, votes, approvalPercentage, tier, world);
+
+  // Execute vote outcome (modify game state)
+  if (decision === 'approved') {
+    executeVoteOutcome(proposal, context, tier, world);
+  }
+
+  // Emit event for vote concluded
+  world.eventBus.emit({
+    type: 'governance:vote_concluded',
+    source: context.nation.name,
+    data: {
+      proposalId: proposal.id,
+      tier,
+      decision,
+      approvalPercentage,
+      totalVotes: votes.length,
+      tick: world.tick,
+    },
+  });
+
   return {
     decision,
     votes,
@@ -220,6 +268,246 @@ export async function conductVote(
   };
 }
 
+/**
+ * Execute vote outcome - modify game state based on approved proposal
+ *
+ * This function interprets the proposal topic and parameters to modify
+ * the appropriate component (Nation, Province, etc.)
+ */
+function executeVoteOutcome(
+  proposal: Proposal,
+  context: NationContext,
+  tier: PoliticalTier,
+  world: World
+): void {
+  // Parse proposal topic to determine what action to take
+  const topic = proposal.topic.toLowerCase();
+  const nationEntity = world
+    .query()
+    .with('nation')
+    .executeEntities()
+    .find((e) => {
+      const n = e.getComponent('nation');
+      return n && (n as any).nationName === context.nation.name;
+    });
+
+  if (!nationEntity) {
+    console.warn(`[DecisionProtocols] Nation entity not found for ${context.nation.name}`);
+    return;
+  }
+
+  // Route to appropriate handler based on topic
+  if (topic.includes('tax') || topic.includes('taxation')) {
+    executeVoteTaxPolicy(nationEntity, proposal, context, world);
+  } else if (topic.includes('research') || topic.includes('technology')) {
+    executeVoteResearchPolicy(nationEntity, proposal, context, world);
+  } else if (topic.includes('military') || topic.includes('defense')) {
+    executeVoteMilitaryPolicy(nationEntity, proposal, context, world);
+  } else if (topic.includes('law') || topic.includes('legislation')) {
+    executeVoteLaw(nationEntity, proposal, context, world);
+  } else if (topic.includes('budget') || topic.includes('spending')) {
+    executeVoteBudget(nationEntity, proposal, context, world);
+  } else {
+    // Generic policy enactment
+    executeVoteGenericPolicy(nationEntity, proposal, context, world);
+  }
+}
+
+/**
+ * Execute: Parliament votes to change tax policy
+ */
+function executeVoteTaxPolicy(
+  nationEntity: any,
+  proposal: Proposal,
+  context: NationContext,
+  world: World
+): void {
+  const taxLevel = proposal.context?.taxLevel as 'low' | 'moderate' | 'high';
+  if (!taxLevel) {
+    console.warn('[DecisionProtocols] Tax vote lacks taxLevel parameter');
+    return;
+  }
+
+  nationEntity.updateComponent('nation', (current: any) => ({
+    ...current,
+    economy: {
+      ...current.economy,
+      taxPolicy: taxLevel,
+    },
+  }));
+
+  const nation = nationEntity.getComponent('nation') as any;
+  const oldRate = nation.economy.taxPolicy === 'low' ? 0.1 : nation.economy.taxPolicy === 'moderate' ? 0.2 : 0.3;
+  const newRate = taxLevel === 'low' ? 0.1 : taxLevel === 'moderate' ? 0.2 : 0.3;
+
+  world.eventBus.emit({
+    type: 'nation:tax_rate_changed',
+    source: nationEntity.id,
+    data: {
+      nationId: nationEntity.id,
+      nationName: context.nation.name,
+      oldTaxRate: oldRate,
+      newTaxRate: newRate,
+      tick: world.tick,
+    },
+  });
+}
+
+/**
+ * Execute: Parliament votes to prioritize research
+ */
+function executeVoteResearchPolicy(
+  nationEntity: any,
+  proposal: Proposal,
+  context: NationContext,
+  world: World
+): void {
+  const field = proposal.context?.field as 'military' | 'economic' | 'cultural' | 'scientific';
+  if (!field) {
+    console.warn('[DecisionProtocols] Research vote lacks field parameter');
+    return;
+  }
+
+  nationEntity.updateComponent('nation', (current: any) => ({
+    ...current,
+    economy: {
+      ...current.economy,
+      researchBudget: current.economy.researchBudget * 1.2,
+    },
+  }));
+
+  world.eventBus.emit({
+    type: 'nation:research_prioritized',
+    source: nationEntity.id,
+    data: {
+      nationId: nationEntity.id,
+      nationName: context.nation.name,
+      field,
+      priority: 1,
+      tick: world.tick,
+    },
+  });
+}
+
+/**
+ * Execute: Parliament votes on military policy
+ */
+function executeVoteMilitaryPolicy(
+  nationEntity: any,
+  proposal: Proposal,
+  context: NationContext,
+  world: World
+): void {
+  const mobilization = proposal.context?.mobilization as 'peacetime' | 'partial' | 'full';
+  if (!mobilization) {
+    console.warn('[DecisionProtocols] Military vote lacks mobilization parameter');
+    return;
+  }
+
+  nationEntity.updateComponent('nation', (current: any) => ({
+    ...current,
+    military: {
+      ...current.military,
+      mobilization,
+    },
+  }));
+}
+
+/**
+ * Execute: Parliament enacts new law
+ */
+function executeVoteLaw(
+  nationEntity: any,
+  proposal: Proposal,
+  context: NationContext,
+  world: World
+): void {
+  const law = {
+    id: proposal.id,
+    name: proposal.topic,
+    description: proposal.description,
+    scope: proposal.context?.scope as 'military' | 'economic' | 'social' | 'foreign_policy' ?? 'economic',
+    enactedTick: world.tick,
+    enactedBy: proposal.proposedBy,
+    effects: proposal.context?.effects as any[] ?? [],
+  };
+
+  nationEntity.updateComponent('nation', (current: any) => ({
+    ...current,
+    laws: [...current.laws, law],
+  }));
+}
+
+/**
+ * Execute: Parliament allocates budget
+ */
+function executeVoteBudget(
+  nationEntity: any,
+  proposal: Proposal,
+  context: NationContext,
+  world: World
+): void {
+  const budgetCategory = proposal.context?.category as 'military' | 'infrastructure' | 'education' | 'healthcare' | 'research';
+  const amount = proposal.context?.amount as number;
+
+  if (!budgetCategory || !amount) {
+    console.warn('[DecisionProtocols] Budget vote lacks category or amount parameter');
+    return;
+  }
+
+  nationEntity.updateComponent('nation', (current: any) => {
+    const updated = { ...current };
+    const budgetField = `${budgetCategory}Budget` as keyof typeof current.economy;
+
+    if (budgetField in updated.economy) {
+      updated.economy = {
+        ...updated.economy,
+        [budgetField]: amount,
+      };
+    }
+
+    return updated;
+  });
+}
+
+/**
+ * Execute: Generic policy enactment
+ */
+function executeVoteGenericPolicy(
+  nationEntity: any,
+  proposal: Proposal,
+  context: NationContext,
+  world: World
+): void {
+  const policy = {
+    id: proposal.id,
+    name: proposal.topic,
+    category: proposal.context?.category as 'military' | 'economic' | 'diplomatic' | 'cultural' | 'research' ?? 'economic',
+    priority: proposal.context?.priority as 'low' | 'medium' | 'high' | 'critical' ?? 'medium',
+    description: proposal.description,
+    budgetAllocation: proposal.context?.budgetAllocation as number ?? 0.1,
+    progress: 0,
+    startTick: world.tick,
+  };
+
+  nationEntity.updateComponent('nation', (current: any) => ({
+    ...current,
+    policies: [...current.policies, policy],
+  }));
+
+  world.eventBus.emit({
+    type: 'nation:policy_enacted',
+    source: nationEntity.id,
+    data: {
+      nationId: nationEntity.id,
+      nationName: context.nation.name,
+      policyName: policy.name,
+      category: policy.category,
+      tick: world.tick,
+    },
+  });
+}
+
 // ============================================================================
 // 2. DELEGATION PROTOCOL (Empire → Nation → Province)
 // ============================================================================
@@ -228,6 +516,7 @@ export async function conductVote(
  * Delegation chain for downward authority transmission
  */
 export interface DelegationChain {
+  id?: string;                     // Unique directive ID (auto-generated if not provided)
   origin: PoliticalTier;           // Tier issuing the directive
   directive: string;               // What is being commanded/requested
   targetTier: PoliticalTier;       // Tier receiving the directive
@@ -271,13 +560,49 @@ export function delegateDirective(
     );
   }
 
-  // For each target entity, deliver the directive
-  for (const entity of toEntities) {
-    receiveDirective(entity, directive, world);
+  // Ensure directive has an ID
+  if (!directive.id) {
+    directive.id = `directive-${uuidv4()}`;
   }
 
-  // TODO: Record directive in governance history for audit trail
-  // TODO: Set up acknowledgment tracking if requiresAcknowledgment is true
+  // For each target entity, deliver the directive (async, non-blocking)
+  for (const entity of toEntities) {
+    receiveDirective(entity, directive, world).catch(error => {
+      console.error(
+        `[DecisionProtocols] Error processing directive ${directive.id} for entity ${entity.id}: ${error}`
+      );
+    });
+  }
+
+  // Record directive in governance history for audit trail
+  recordDirectiveIssued(fromGovernor, toEntities, directive, world);
+
+  // Set up acknowledgment tracking if requiresAcknowledgment is true
+  if (directive.requiresAcknowledgment) {
+    // TODO: Create acknowledgment tracking component/system in future phase
+    // For now, just log the requirement
+    console.warn(
+      `[DecisionProtocols] Directive ${directive.id} requires acknowledgment from ${toEntities.length} entities. ` +
+      `Acknowledgment tracking not yet implemented.`
+    );
+  }
+
+  // Emit event for directive issued
+  world.eventBus.emit({
+    type: 'governance:directive_issued',
+    source: fromGovernor.id,
+    data: {
+      directiveId: directive.id,
+      originTier: directive.origin,
+      targetTier: directive.targetTier,
+      directive: directive.directive,
+      priority: directive.priority,
+      issuerAgentId: directive.issuerAgentId,
+      targetEntityIds: toEntities.map(e => e.id),
+      requiresAcknowledgment: directive.requiresAcknowledgment,
+      tick: world.tick,
+    },
+  });
 }
 
 /**
@@ -292,26 +617,80 @@ export function delegateDirective(
  * @param directive Delegation chain
  * @param world World instance
  */
-export function receiveDirective(
+export async function receiveDirective(
   governor: Entity,
   directive: DelegationChain,
   world: World
-): void {
-  // TODO: For Phase 6, integrate with agent decision-making
-  // Governor should:
-  // 1. Parse directive intent
-  // 2. Check if it can be handled locally or needs further delegation
-  // 3. Update governance component with new priorities
-  // 4. Emit event for governance systems to react
+): Promise<void> {
+  // Record directive receipt in governance history
+  recordDirectiveReceived(governor, directive, world);
 
-  // Placeholder implementation
-  // In production, this would update the appropriate governance component
-  // (VillageGovernanceComponent, ProvinceGovernanceComponent, etc.)
+  // Emit event for directive received
+  world.eventBus.emit({
+    type: 'governance:directive_received',
+    source: governor.id,
+    data: {
+      directiveId: directive.id || 'unknown',
+      entityId: governor.id,
+      directive: directive.directive,
+      tick: world.tick,
+    },
+  });
 
-  console.warn(
-    `[DecisionProtocols] Directive received by ${governor.id}: "${directive.directive}" ` +
-    `from ${directive.origin} tier. Implementation pending.`
-  );
+  // Check if governor is a soul agent (has soul component)
+  const soulComponent = governor.components?.get('soul');
+  const isSoulAgent = soulComponent !== undefined && soulComponent !== null;
+
+  if (isSoulAgent) {
+    // LLM-powered directive interpretation for soul agents
+    try {
+      const interpretation = await requestGovernorDirectiveInterpretation(
+        governor,
+        directive,
+        directive.targetTier,
+        world
+      );
+
+      // Execute the interpretation
+      executeDirectiveInterpretation(governor, directive, interpretation, world);
+
+      // Emit event for directive interpretation
+      world.eventBus.emit({
+        type: 'governance:directive_interpreted',
+        source: governor.id,
+        data: {
+          directiveId: directive.id || 'unknown',
+          action: interpretation.action,
+          reasoning: interpretation.reasoning,
+          tick: world.tick,
+        },
+      });
+    } catch (error) {
+      // Fallback to simple acknowledgment if LLM unavailable
+      console.warn(
+        `[DecisionProtocols] LLM directive interpretation failed for ${governor.id}, ` +
+        `directive will be queued for later processing: ${error}`
+      );
+
+      // Emit event indicating LLM fallback
+      world.eventBus.emit({
+        type: 'governance:directive_llm_failed',
+        source: governor.id,
+        data: {
+          directiveId: directive.id || 'unknown',
+          error: String(error),
+          tick: world.tick,
+        },
+      });
+    }
+  } else {
+    // Non-soul agents use simple rule-based implementation
+    // This would be handled by the GovernorDecisionSystem for routine directives
+    console.log(
+      `[DecisionProtocols] Directive ${directive.id || 'unknown'} queued for rule-based ` +
+      `processing by ${governor.id}`
+    );
+  }
 }
 
 // ============================================================================
@@ -649,27 +1028,84 @@ export function escalateCrisis(
   crisis.escalatedTick = world.tick;
   crisis.status = 'escalated';
 
-  // TODO: For Phase 6, integrate with governance systems
-  // 1. Find entity with governance component at nextTier level
-  // 2. Update that entity's crisis queue
-  // 3. Notify governor (soul agent) of new crisis
-  // 4. Emit event for systems to react (e.g., mobilize resources)
+  // Record crisis escalation in audit trail
+  recordCrisisEscalation(crisis, currentTier, nextTier, world);
+
+  // Find governor entity at next tier level
+  const higherGovernor = findGovernorAtTier(nextTier, world);
+
+  if (higherGovernor) {
+    // Add crisis to governor's queue
+    addCrisisToGovernorQueue(higherGovernor, crisis, world);
+
+    // Check if governor is a soul agent
+    const soulComponent = higherGovernor.components?.get('soul');
+    const isSoulAgent = soulComponent !== undefined && soulComponent !== null;
+
+    if (isSoulAgent) {
+      // Request LLM crisis response asynchronously (non-blocking)
+      requestGovernorCrisisResponse(higherGovernor, crisis, nextTier, world)
+        .then(response => {
+          // Log the LLM's recommended response
+          console.log(
+            `[DecisionProtocols] Governor ${higherGovernor.id} LLM response to crisis ${crisis.id}: ` +
+            `${response.action} - ${response.reasoning}`
+          );
+
+          // Emit event with LLM response for systems to react
+          world.eventBus.emit({
+            type: 'governance:crisis_response_received',
+            source: higherGovernor.id,
+            data: {
+              crisisId: crisis.id,
+              governorId: higherGovernor.id,
+              tier: nextTier,
+              action: response.action,
+              localMeasures: response.local_measures,
+              escalationTarget: response.escalation_target,
+              assistanceNeeded: response.assistance_needed,
+              reasoning: response.reasoning,
+              tick: world.tick,
+            },
+          });
+        })
+        .catch(error => {
+          console.error(
+            `[DecisionProtocols] LLM crisis response failed for governor ${higherGovernor.id}: ${error}`
+          );
+          // Crisis remains in queue for manual/rule-based handling
+        });
+    } else {
+      console.log(
+        `[DecisionProtocols] Crisis ${crisis.id} added to non-soul governor ${higherGovernor.id} queue ` +
+        `for rule-based handling`
+      );
+    }
+  } else {
+    console.warn(
+      `[DecisionProtocols] No governor found at ${nextTier} tier to handle escalated crisis ${crisis.id}`
+    );
+  }
 
   console.warn(
     `[DecisionProtocols] Crisis ${crisis.id} (${crisis.type}) escalated from ` +
     `${currentTier} to ${nextTier} tier. Severity: ${crisis.severity.toFixed(2)}`
   );
 
-  // TODO: Emit escalation event for other systems to react
-  // Temporarily disabled until 'governance:crisis_escalated' is added to EventMap
-  // world.eventBus.emit('governance:crisis_escalated', {
-  //   crisisId: crisis.id,
-  //   crisisType: crisis.type,
-  //   fromTier: currentTier,
-  //   toTier: nextTier,
-  //   severity: crisis.severity,
-  //   affectedEntityIds: crisis.affectedEntityIds,
-  // });
+  // Emit escalation event for other systems to react
+  world.eventBus.emit({
+    type: 'governance:crisis_escalated',
+    source: crisis.id,
+    data: {
+      crisisId: crisis.id,
+      crisisType: crisis.type,
+      fromTier: currentTier,
+      toTier: nextTier,
+      severity: crisis.severity,
+      affectedEntityIds: crisis.affectedEntityIds,
+      tick: world.tick,
+    },
+  });
 }
 
 // ============================================================================
@@ -706,4 +1142,210 @@ export function getAllTiersOrdered(): PoliticalTier[] {
  */
 export function isTierHigherThan(tier1: PoliticalTier, tier2: PoliticalTier): boolean {
   return tierLevel(tier1) > tierLevel(tier2);
+}
+
+// ============================================================================
+// GOVERNANCE AUDIT TRAIL
+// ============================================================================
+
+/**
+ * Get or create governance history component for the world
+ *
+ * Searches for a singleton governance history entity, creates one if not found
+ */
+function getOrCreateGovernanceHistory(world: World): GovernanceHistoryComponent {
+  // Try to find existing governance history singleton
+  const historyEntities = world
+    .query()
+    .with('governance_history')
+    .executeEntities();
+
+  if (historyEntities.length > 0) {
+    const entity = historyEntities[0];
+    if (!entity) {
+      throw new Error('Governance history entity is undefined');
+    }
+    const component = entity.getComponent('governance_history');
+    if (!component) {
+      throw new Error('Governance history entity found but component is null');
+    }
+    return component as GovernanceHistoryComponent;
+  }
+
+  // Create new governance history singleton
+  const historyComponent: GovernanceHistoryComponent = {
+    type: 'governance_history',
+    version: 1,
+    entries: [],
+    maxEntries: 10000,
+    archivedCount: 0,
+    lastArchivalTick: 0,
+    actionTypeIndex: new Map(),
+    sourceAgentIndex: new Map(),
+    targetAgentIndex: new Map(),
+    tickIndex: new Map(),
+  };
+
+  const historyEntity = world.createEntity() as any;  // EntityImpl has addComponent
+  historyEntity.addComponent(historyComponent);
+
+  // Get the component back from the entity to ensure we have the correct reference
+  const finalComponent = historyEntity.getComponent('governance_history');
+  if (!finalComponent) {
+    throw new Error('Failed to create governance history component');
+  }
+
+  return finalComponent as GovernanceHistoryComponent;
+}
+
+/**
+ * Record a directive being issued in governance history
+ */
+function recordDirectiveIssued(
+  fromGovernor: Entity,
+  toEntities: Entity[],
+  directive: DelegationChain,
+  world: World
+): void {
+  const history = getOrCreateGovernanceHistory(world);
+
+  const entry: GovernanceAuditEntry = {
+    id: `audit-${uuidv4()}`,
+    actionType: 'directive_issued',
+    tier: directive.origin,
+    tick: world.tick,
+    sourceAgentId: directive.issuerAgentId || fromGovernor.id,
+    targetAgentIds: toEntities.map(e => e.id),
+    outcome: 'delegated',
+    description: `Directive issued from ${directive.origin} to ${directive.targetTier}: "${directive.directive}"`,
+    data: {
+      directiveId: directive.id,
+      directive: directive.directive,
+      originTier: directive.origin,
+      targetTier: directive.targetTier,
+      priority: directive.priority,
+      requiresAcknowledgment: directive.requiresAcknowledgment,
+      parameters: directive.parameters,
+    },
+    tags: [directive.priority, 'delegation'],
+  };
+
+  addGovernanceAuditEntry(history, entry);
+}
+
+/**
+ * Record a directive being received in governance history
+ */
+function recordDirectiveReceived(
+  governor: Entity,
+  directive: DelegationChain,
+  world: World
+): void {
+  const history = getOrCreateGovernanceHistory(world);
+
+  const entry: GovernanceAuditEntry = {
+    id: `audit-${uuidv4()}`,
+    actionType: 'directive_received',
+    tier: directive.targetTier,
+    tick: world.tick,
+    targetEntityId: governor.id,
+    outcome: 'pending',
+    description: `Directive received by ${getTierDisplayName(directive.targetTier)} entity: "${directive.directive}"`,
+    data: {
+      directiveId: directive.id,
+      directive: directive.directive,
+      originTier: directive.origin,
+      priority: directive.priority,
+    },
+    tags: ['delegation', 'received'],
+  };
+
+  addGovernanceAuditEntry(history, entry);
+}
+
+/**
+ * Record a vote conclusion in governance history
+ */
+function recordVoteConcluded(
+  proposal: Proposal,
+  decision: 'approved' | 'rejected',
+  votes: Vote[],
+  approvalPercentage: number,
+  tier: PoliticalTier,
+  world: World
+): void {
+  const history = getOrCreateGovernanceHistory(world);
+
+  const entry: GovernanceAuditEntry = {
+    id: `audit-${uuidv4()}`,
+    actionType: 'vote_concluded',
+    tier,
+    tick: world.tick,
+    sourceAgentId: proposal.proposedBy,
+    outcome: decision === 'approved' ? 'approved' : 'rejected',
+    description: `Vote on "${proposal.topic}" ${decision} with ${(approvalPercentage * 100).toFixed(1)}% approval`,
+    data: {
+      proposalId: proposal.id,
+      topic: proposal.topic,
+      description: proposal.description,
+      decision,
+      approvalPercentage,
+      totalVotes: votes.length,
+      votes: votes.map(v => ({
+        agentId: v.agentId,
+        stance: v.stance,
+        weight: v.weight,
+      })),
+    },
+    tags: ['voting', decision],
+  };
+
+  addGovernanceAuditEntry(history, entry);
+}
+
+/**
+ * Record a crisis escalation in governance history
+ */
+export function recordCrisisEscalation(
+  crisis: Crisis,
+  fromTier: PoliticalTier,
+  toTier: PoliticalTier,
+  world: World
+): void {
+  const history = getOrCreateGovernanceHistory(world);
+
+  const entry: GovernanceAuditEntry = {
+    id: `audit-${uuidv4()}`,
+    actionType: 'crisis_escalated',
+    tier: fromTier,
+    tick: world.tick,
+    targetEntityId: crisis.id,
+    outcome: 'escalated',
+    description: `Crisis "${crisis.type}" escalated from ${fromTier} to ${toTier} (severity: ${crisis.severity.toFixed(2)})`,
+    data: {
+      crisisId: crisis.id,
+      crisisType: crisis.type,
+      fromTier,
+      toTier,
+      severity: crisis.severity,
+      affectedEntityIds: crisis.affectedEntityIds,
+      populationAffected: crisis.populationAffected,
+    },
+    tags: ['crisis', 'escalation', crisis.type],
+  };
+
+  addGovernanceAuditEntry(history, entry);
+}
+
+/**
+ * Query governance history
+ *
+ * Convenience function for external systems to query audit history
+ */
+export function queryGovernanceAuditHistory(
+  world: World,
+  query: GovernanceAuditQuery
+): GovernanceAuditEntry[] {
+  const history = getOrCreateGovernanceHistory(world);
+  return queryGovernanceHistoryInternal(history, query);
 }

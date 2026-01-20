@@ -99,6 +99,18 @@ export interface WorldEvents {
     oldName: string;
     newName: string;
   };
+
+  // EXOTIC PLOT EVENTS - for Fates Council
+  /** When time manipulation creates a paradox */
+  'time:paradox_detected': {
+    agentId: EntityId;  // Who caused the paradox
+    soulId: string;
+    paradoxType: 'grandfather' | 'causal_loop' | 'bootstrap' | 'ontological';
+    timelineId: string;
+    alterationMagnitude: number;  // How big was the change (0-1)
+    affectedSouls: string[];  // Other souls impacted
+    tick: number;
+  };
 }
 
 /**

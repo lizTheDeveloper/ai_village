@@ -56,6 +56,8 @@ import {
   createSexualityComponent,
   ensureCourtshipComponent,
 } from '@ai-village/reproduction';
+// Language system components
+import { createLanguageKnowledgeComponent } from '@ai-village/language';
 
 /**
  * Determine the best vision profile based on agent skills.
@@ -307,6 +309,14 @@ export function createWanderingAgent(
   // Species - all agents default to human species
   entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
 
+  // Language knowledge - add native language from species
+  const speciesComponent = entity.getComponent('species') as SpeciesComponent;
+  if (speciesComponent?.nativeLanguageId) {
+    entity.addComponent(
+      createLanguageKnowledgeComponent([speciesComponent.nativeLanguageId])
+    );
+  }
+
   // Add to world with proper spatial indexing
   world.addEntity(entity);
 
@@ -532,6 +542,14 @@ export function createLLMAgent(
 
   // Species - all agents default to human species
   entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
+
+  // Language knowledge - add native language from species
+  const speciesComponentLLM = entity.getComponent('species') as SpeciesComponent;
+  if (speciesComponentLLM?.nativeLanguageId) {
+    entity.addComponent(
+      createLanguageKnowledgeComponent([speciesComponentLLM.nativeLanguageId])
+    );
+  }
 
   // Add initial "waking up" memory from Dungeon Master prompt
   if (dungeonMasterPrompt) {

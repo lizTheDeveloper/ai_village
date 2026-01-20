@@ -135,6 +135,9 @@ export class BiosphereGenerator {
         (alien as any).sizeClass = niche.sizeClass;
 
         species.push(alien);
+
+        // Report this species creation
+        this.reportProgress(`🦎 ${alien.name} evolved (${niche.category})`);
       } catch (error) {
         console.warn(`[BiosphereGenerator] Failed to generate species ${i} for niche ${niche.id}:`, error);
       }

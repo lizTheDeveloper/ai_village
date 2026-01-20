@@ -24,6 +24,7 @@ import type {
 } from './PlotTypes.js';
 import { plotLineRegistry } from './PlotLineRegistry.js';
 import type { MoodComponent, Trauma } from '../components/MoodComponent.js';
+import { getEmotionalStateDuration } from '../components/MoodComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 import type { SkillsComponent, SkillId } from '../components/SkillsComponent.js';
@@ -263,7 +264,15 @@ export class EventDrivenPlotAssignmentSystem extends BaseSystem {
       case 'on_emotional_state': {
         if (!mood?.emotionalState) return undefined;
         if (mood.emotionalState !== trigger.state) return undefined;
-        // TODO: Track duration for min_duration_ticks check
+
+        // Check minimum duration if specified
+        if (trigger.min_duration_ticks !== undefined) {
+          const duration = getEmotionalStateDuration(mood, trigger.state);
+          if (duration < trigger.min_duration_ticks) {
+            return undefined; // Not in state long enough
+          }
+        }
+
         return {
           trigger_type: 'on_emotional_state',
           entity_id: entity.id,

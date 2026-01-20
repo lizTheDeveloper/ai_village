@@ -1,0 +1,1136 @@
+{
+  "buildings": [
+    {
+      "id": "treehouse_dwelling",
+      "name": "Canopy Treehouse",
+      "description": "A dwelling built into the branches of a massive tree, accessible by rope ladder.",
+      "category": "residential",
+      "width": 9,
+      "height": 5,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 49
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 150,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 2,
+            "restBonus": 1.5
+          }
+        },
+        {
+          "type": "observation",
+          "params": {
+            "visionRange": 20
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "  #####  ",
+        "  #...#  ",
+        "  W...W  ",
+        "  #...#  ",
+        "  ##D##  "
+      ],
+      "materials": {
+        "wall": "living_wood",
+        "floor": "wood",
+        "door": "bamboo"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "underground_bunker",
+      "name": "Stone Bunker",
+      "description": "A fortified underground shelter with thick stone walls.",
+      "category": "residential",
+      "width": 11,
+      "height": 10,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 214
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 660,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 4,
+            "restBonus": 1.3
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 100,
+            "itemTypes": [
+              "all"
+            ]
+          }
+        },
+        {
+          "type": "defense",
+          "params": {
+            "armor": 50
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###########",
+        "#.........#",
+        "#.........#",
+        "W.........W",
+        "#.........#",
+        "#.........#",
+        "#....S....#",
+        "#.........#",
+        "#.........#",
+        "######D####"
+      ],
+      "materials": {
+        "wall": "granite",
+        "floor": "stone",
+        "door": "steel"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "wizards_tower",
+      "name": "Enchanter's Tower",
+      "description": "A mystical tower filled with arcane energy and strange materials.",
+      "category": "academic",
+      "width": 9,
+      "height": 12,
+      "resourceCost": [
+        {
+          "resourceId": "glass",
+          "amountRequired": 68
+        },
+        {
+          "resourceId": "magic",
+          "amountRequired": 72
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 700,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {
+            "magicBonus": 2
+          }
+        },
+        {
+          "type": "enchanting",
+          "params": {
+            "maxLevel": 10
+          }
+        },
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 1,
+            "restBonus": 1.8
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "   ###   ",
+        "  ##.##  ",
+        "  #...#  ",
+        "  #.K.#  ",
+        "  #...#  ",
+        "  #...#  ",
+        " ##...## ",
+        " W.....W ",
+        " #.....# ",
+        " #..T..# ",
+        " #.....# ",
+        " ####D## "
+      ],
+      "materials": {
+        "wall": "crystal",
+        "floor": "starlight",
+        "door": "enchanted_wood"
+      },
+      "capacity": 1
+    },
+    {
+      "id": "greenhouse_garden",
+      "name": "Crystal Greenhouse",
+      "description": "A glass-walled greenhouse for growing rare and exotic plants.",
+      "category": "production",
+      "width": 11,
+      "height": 9,
+      "resourceCost": [
+        {
+          "resourceId": "glass",
+          "amountRequired": 100
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 115
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 792,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "farming",
+          "params": {
+            "cropBonus": 2,
+            "specialCrops": true
+          }
+        },
+        {
+          "type": "alchemy",
+          "params": {
+            "potionBonus": 1.5
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###########",
+        "W.........W",
+        "W.........W",
+        "W...###...W",
+        "W...#K#...W",
+        "W...###...W",
+        "W.........W",
+        "W.........W",
+        "######D####"
+      ],
+      "materials": {
+        "wall": "glass",
+        "floor": "dirt",
+        "door": "wood"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "blacksmith_forge",
+      "name": "Master Forge",
+      "description": "A proper smithy with forge, anvil, and quenching station.",
+      "category": "production",
+      "width": 10,
+      "height": 10,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 190
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 12
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 600,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "smithing",
+          "params": {
+            "qualityBonus": 1.8,
+            "metalTypes": [
+              "iron",
+              "steel",
+              "mithril"
+            ]
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 50,
+            "itemTypes": [
+              "metal",
+              "tools"
+            ]
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "##########",
+        "#........#",
+        "W..K..K..W",
+        "#........#",
+        "#...KK...#",
+        "#........#",
+        "#........#",
+        "#...SS...#",
+        "W........W",
+        "#####D####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "brick",
+        "door": "iron"
+      },
+      "capacity": 3
+    },
+    {
+      "id": "alchemist_lab",
+      "name": "Alchemical Laboratory",
+      "description": "A workshop filled with bubbling potions and mysterious ingredients.",
+      "category": "production",
+      "width": 12,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 254
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 12
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 1056,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "alchemy",
+          "params": {
+            "potionQuality": 2,
+            "explosionRisk": 0.1
+          }
+        },
+        {
+          "type": "research",
+          "params": {
+            "chemistryBonus": 1.5
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 100,
+            "itemTypes": [
+              "herbs",
+              "reagents",
+              "potions"
+            ]
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "############",
+        "#..........#",
+        "W..KKKK....W",
+        "#..........#",
+        "#.###..###.#",
+        "#.#S#..#S#.#",
+        "#.###..###.#",
+        "#..........#",
+        "W....TT....W",
+        "#..........#",
+        "######D#####"
+      ],
+      "materials": {
+        "wall": "stone",
+        "floor": "tile",
+        "door": "wood"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "library_archive",
+      "name": "Grand Library",
+      "description": "A repository of knowledge with reading tables and endless shelves.",
+      "category": "academic",
+      "width": 15,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 321
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 18
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 1320,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {
+            "knowledgeBonus": 2.5
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 500,
+            "itemTypes": [
+              "books",
+              "scrolls",
+              "maps"
+            ]
+          }
+        },
+        {
+          "type": "teaching",
+          "params": {
+            "skillBonus": 1.5
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###############",
+        "#.............#",
+        "W.SSS...SSS...W",
+        "#.............#",
+        "#.............#",
+        "W...T.....T...W",
+        "#.............#",
+        "#.............#",
+        "W.SSS...SSS...W",
+        "#.............#",
+        "#######D#######"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "carpet",
+        "door": "enchanted_wood"
+      },
+      "capacity": 10
+    },
+    {
+      "id": "temple_sanctuary",
+      "name": "Sacred Temple",
+      "description": "A holy place of worship with an altar and meditation spaces.",
+      "category": "religious",
+      "width": 15,
+      "height": 14,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 346
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 12
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 1424,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "prayer",
+          "params": {
+            "faithBonus": 2
+          }
+        },
+        {
+          "type": "healing",
+          "params": {
+            "healingRate": 1.5
+          }
+        },
+        {
+          "type": "blessing",
+          "params": {
+            "duration": 86400
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "     #####     ",
+        "    ##...##    ",
+        "   ##.....##   ",
+        "  ##.......##  ",
+        " ##.........## ",
+        "##...........##",
+        "#.............#",
+        "W.....###.....W",
+        "#.....#K#.....#",
+        "W.....###.....W",
+        "#.............#",
+        "#.............#",
+        "##...........##",
+        " ######D###### "
+      ],
+      "materials": {
+        "wall": "marble",
+        "floor": "marble",
+        "door": "gold"
+      },
+      "capacity": 20
+    },
+    {
+      "id": "market_stall",
+      "name": "Trading Post",
+      "description": "A busy marketplace with counters and storage for goods.",
+      "category": "commercial",
+      "width": 10,
+      "height": 9,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 179
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 360,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "trading",
+          "params": {
+            "priceModifier": 0.9
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 200,
+            "itemTypes": [
+              "all"
+            ]
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "##########",
+        "#........#",
+        "W..CCCC..W",
+        "#........#",
+        "#..####..#",
+        "#..#SS#..#",
+        "#..####..#",
+        "#........#",
+        "#####D####"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "capacity": 5
+    },
+    {
+      "id": "tavern_inn",
+      "name": "The Wanderer's Rest",
+      "description": "A cozy tavern with beds, tables, and a bar for weary travelers.",
+      "category": "hospitality",
+      "width": 16,
+      "height": 12,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 375
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 18
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 1152,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 6,
+            "restBonus": 1.3
+          }
+        },
+        {
+          "type": "food_service",
+          "params": {
+            "mealQuality": 1.5
+          }
+        },
+        {
+          "type": "social",
+          "params": {
+            "moodBonus": 1.2
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "################",
+        "#..............#",
+        "W..TTTT..CCCC..W",
+        "#..............#",
+        "#..TTTT........#",
+        "W..............W",
+        "#..###..###..###",
+        "#..#B#..#B#..#B#",
+        "#..###..###..###",
+        "W..............W",
+        "#..............#",
+        "#########D######"
+      ],
+      "materials": {
+        "wall": "wood",
+        "floor": "wood",
+        "door": "wood"
+      },
+      "capacity": 15
+    },
+    {
+      "id": "ice_palace_room",
+      "name": "Frozen Chamber",
+      "description": "A room carved from solid ice, glittering in ethereal light.",
+      "category": "residential",
+      "width": 10,
+      "height": 11,
+      "resourceCost": [
+        {
+          "resourceId": "water",
+          "amountRequired": 66
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 144
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 17
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 880,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 2,
+            "restBonus": 1.4
+          }
+        },
+        {
+          "type": "cold_storage",
+          "params": {
+            "preservationBonus": 2
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "##########",
+        "#........#",
+        "W........W",
+        "#........#",
+        "#........#",
+        "#...BB...#",
+        "#........#",
+        "#........#",
+        "W........W",
+        "#........#",
+        "######D###"
+      ],
+      "materials": {
+        "wall": "ice",
+        "floor": "frost",
+        "door": "crystal"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "mushroom_hut",
+      "name": "Fungal Dwelling",
+      "description": "A house grown from giant mushrooms, soft and organic.",
+      "category": "residential",
+      "width": 9,
+      "height": 8,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 127
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 6
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 256,
+      "tier": 2,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 2,
+            "restBonus": 1.2
+          }
+        },
+        {
+          "type": "spore_production",
+          "params": {
+            "sporesPerDay": 10
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "  #####  ",
+        " ##...## ",
+        "##.....##",
+        "#.......#",
+        "W.......W",
+        "#.......#",
+        "##.....##",
+        " ####D## "
+      ],
+      "materials": {
+        "wall": "fungus",
+        "floor": "living_wood",
+        "door": "wax"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "obsidian_fortress",
+      "name": "Dark Fortress",
+      "description": "A imposing structure of black obsidian, radiating power.",
+      "category": "military",
+      "width": 15,
+      "height": 14,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 142
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 269
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 18
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 2100,
+      "tier": 5,
+      "functionality": [
+        {
+          "type": "defense",
+          "params": {
+            "armor": 100
+          }
+        },
+        {
+          "type": "weapon_crafting",
+          "params": {
+            "damageBonus": 1.5
+          }
+        },
+        {
+          "type": "storage",
+          "params": {
+            "capacity": 200,
+            "itemTypes": [
+              "weapons",
+              "armor"
+            ]
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "###############",
+        "#.............#",
+        "W.............W",
+        "#.....###.....#",
+        "#.....#K#.....#",
+        "#.....###.....#",
+        "W.............W",
+        "#.............#",
+        "#.###.....###.#",
+        "#.#S#.....#S#.#",
+        "#.###.....###.#",
+        "W.............W",
+        "#.............#",
+        "#######D#######"
+      ],
+      "materials": {
+        "wall": "obsidian",
+        "floor": "darksteel",
+        "door": "stygian_iron"
+      },
+      "capacity": 5
+    },
+    {
+      "id": "candy_cottage",
+      "name": "Gingerbread House",
+      "description": "A whimsical cottage made entirely of candy and sweets.",
+      "category": "residential",
+      "width": 9,
+      "height": 8,
+      "resourceCost": [
+        {
+          "resourceId": "wood",
+          "amountRequired": 135
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 12
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 420,
+      "tier": 3,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {
+            "beds": 2,
+            "restBonus": 1.1
+          }
+        },
+        {
+          "type": "food_production",
+          "params": {
+            "sweetness": 10
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        " ####### ",
+        "##.....##",
+        "#.......#",
+        "W.......W",
+        "#...T...#",
+        "W.......W",
+        "#.......#",
+        "####D####"
+      ],
+      "materials": {
+        "wall": "gingerbread",
+        "floor": "candy",
+        "door": "chocolate"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "bone_chapel",
+      "name": "Ossuary Chapel",
+      "description": "A sacred place built from the bones of the honored dead.",
+      "category": "religious",
+      "width": 11,
+      "height": 10,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 194
+        },
+        {
+          "resourceId": "wood",
+          "amountRequired": 5
+        },
+        {
+          "resourceId": "glass",
+          "amountRequired": 12
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": false,
+      "buildTime": 816,
+      "tier": 4,
+      "functionality": [
+        {
+          "type": "prayer",
+          "params": {
+            "deathAffinity": 2
+          }
+        },
+        {
+          "type": "necromancy",
+          "params": {
+            "undeadControl": 5
+          }
+        },
+        {
+          "type": "memorial",
+          "params": {
+            "spiritCommunion": true
+          }
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "  #######  ",
+        " ##.....## ",
+        "##.......##",
+        "#.........#",
+        "W...###...W",
+        "#...#K#...#",
+        "W...###...W",
+        "#.........#",
+        "##.......##",
+        " #####D### "
+      ],
+      "materials": {
+        "wall": "bone",
+        "floor": "bone",
+        "door": "ivory"
+      },
+      "capacity": 8
+    }
+  ],
+  "metadata": {
+    "source": "LLM Building Designer",
+    "generatedAt": "2026-01-20T00:57:03.056Z",
+    "count": 15
+  }
+}

@@ -315,12 +315,210 @@ export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
   }
 
   /**
-   * Determine body plan ID
+   * Determine body plan ID for uplifted species
+   *
+   * Maps source species anatomy to appropriate sapient body plan based on:
+   * - Base anatomy (quadruped, avian, aquatic, etc.)
+   * - Physical adaptations needed for sapience
+   * - Tool use capabilities
+   * - Communication apparatus
+   *
+   * BODY PLAN INTEGRATION NOTES:
+   * ==========================
+   *
+   * The body plan IDs returned here reference uplifted body plans that should be
+   * added to BodyPlanRegistry (packages/core/src/components/BodyPlanRegistry.ts).
+   *
+   * Currently defined base plans: humanoid_standard, avian_winged, aquatic_tentacled,
+   * aquatic_finned, celestial_winged, demonic_horned, reptilian_standard
+   *
+   * Uplifted body plans needed (to be implemented):
+   *
+   * CANINE BODY PLANS:
+   * - canine_bipedal: Wolf/dog transitioned to bipedal stance. Digitigrade legs,
+   *   enhanced forepaws for manipulation, elongated arms with opposable dewclaws.
+   * - canine_tool_adapted: Enhanced quadruped with prehensile paws, shoulder
+   *   mobility for tool use while quadrupedal.
+   *
+   * CORVID BODY PLANS:
+   * - corvid_sapient: Enhanced raven/crow with larger skull for brain, reinforced
+   *   beak for precision tool use, zygodactyl feet (two forward, two back toes)
+   *   for better grasping.
+   *
+   * CETACEAN BODY PLANS:
+   * - cetacean_tool_adapted: Dolphin/whale with evolved pectoral fins into
+   *   manipulative appendages (proto-hands), enhanced echolocation for
+   *   'seeing' tool interactions underwater.
+   *
+   * CEPHALOPOD BODY PLANS:
+   * - cephalopod_enhanced: Octopus with specialized manipulation tentacles,
+   *   enhanced neural ganglia in each arm, better out-of-water respiration.
+   *
+   * PROBOSCIDEAN BODY PLANS:
+   * - proboscidean_enhanced: Elephant with hyper-dexterous trunk (finger-like
+   *   projections at tip), enhanced shoulder mobility for tool use.
+   *
+   * PRIMATE BODY PLANS:
+   * - primate_enhanced: Already near-sapient anatomy, minimal changes. Enhanced
+   *   larynx for speech, slightly larger cranium.
+   *
+   * FELINE BODY PLANS:
+   * - feline_bipedal: Cat/big cat with bipedal stance, retractable claws in
+   *   hand-like forepaws, enhanced balance for upright locomotion.
+   * - feline_tool_adapted: Enhanced quadruped with remarkable forepaw dexterity,
+   *   partially opposable dewclaws.
+   *
+   * RODENT BODY PLANS:
+   * - rodent_bipedal: Rat/mouse with elongated hindlimbs, hand-like forepaws,
+   *   prehensile tail for balance.
+   *
+   * URSINE BODY PLANS:
+   * - ursine_bipedal: Bear with fully bipedal stance (bears already rear up),
+   *   plantigrade feet, hand-like forepaws with semi-opposable thumbs.
+   *
+   * GENERIC FALLBACK PLANS:
+   * - quadruped_to_bipedal: Generic quadruped → bipedal transition
+   * - quadruped_tool_adapted: Generic enhanced quadruped
+   * - avian_sapient: Generic sapient bird
+   * - aquatic_tool_adapted: Generic aquatic with manipulation
+   * - arthropod_enhanced: Generic insect/arthropod uplift
+   * - reptilian_bipedal: Generic reptile → bipedal
+   * - reptilian_enhanced: Enhanced reptile anatomy
+   *
+   * Implementation strategy:
+   * 1. Create uplifted body plan templates in BodyPlanRegistry
+   * 2. Each plan should define body parts (head, limbs, torso, etc.)
+   * 3. Specify manipulators for tool use (hands, tentacles, beaks, etc.)
+   * 4. Define locomotion capabilities (bipedal, quadruped, flight, swimming)
+   * 5. Set appropriate blood type, skeleton type, size category
+   *
+   * Example implementation (canine_bipedal):
+   * ```typescript
+   * canine_bipedal: {
+   *   id: 'canine_bipedal',
+   *   name: 'Bipedal Canine',
+   *   baseType: 'uplifted_quadruped',
+   *   symmetry: 'bilateral',
+   *   size: 'medium',
+   *   blood: 'red',
+   *   skeleton: 'internal',
+   *   parts: [
+   *     { type: 'head', count: 1, vital: true, health: 140,
+   *       functions: ['sensory', 'vital_organ', 'communication'] },
+   *     { type: 'torso', count: 1, vital: true, health: 180,
+   *       functions: ['vital_organ'] },
+   *     { type: 'arm', count: 2, vital: false, health: 100,
+   *       functions: ['manipulation'], children: [
+   *         { type: 'hand', count: 1, vital: false, health: 80,
+   *           functions: ['manipulation', 'tool_use'] }
+   *       ] },
+   *     { type: 'leg', count: 2, vital: false, health: 120,
+   *       functions: ['locomotion'], children: [
+   *         { type: 'foot', count: 1, vital: false, health: 70,
+   *           functions: ['locomotion'] }
+   *       ] },
+   *     { type: 'tail', count: 1, vital: false, health: 60,
+   *       functions: ['balance'] }
+   *   ]
+   * }
+   * ```
    */
   private determineBodyPlan(sourceSpecies: SpeciesComponent): string {
-    // For now, use source body plan with _sapient suffix
-    // TODO: Integration point - define actual uplifted body plans
-    return `${sourceSpecies.bodyPlanId || 'standard'}_sapient`;
+    const sourceBodyPlan = sourceSpecies.bodyPlanId || 'standard';
+
+    // Check for specific source species patterns
+    const speciesId = sourceSpecies.speciesId.toLowerCase();
+
+    // Canines (wolves, dogs, foxes) - can go bipedal or enhanced quadruped
+    if (speciesId.includes('wolf') || speciesId.includes('dog') || speciesId.includes('canine')) {
+      return this.shouldGoBipedal(sourceSpecies) ? 'canine_bipedal' : 'canine_tool_adapted';
+    }
+
+    // Corvids (ravens, crows) - already have manipulative beaks, add tool use
+    if (speciesId.includes('raven') || speciesId.includes('crow') || speciesId.includes('corvid')) {
+      return 'corvid_sapient';
+    }
+
+    // Cetaceans (dolphins, whales) - need manipulative appendages
+    if (speciesId.includes('dolphin') || speciesId.includes('whale') || speciesId.includes('cetacean')) {
+      return 'cetacean_tool_adapted';
+    }
+
+    // Octopods - already have manipulation, enhance neural complexity
+    if (speciesId.includes('octopus') || speciesId.includes('cephalopod')) {
+      return 'cephalopod_enhanced';
+    }
+
+    // Elephants - enhanced trunk dexterity
+    if (speciesId.includes('elephant') || speciesId.includes('proboscidean')) {
+      return 'proboscidean_enhanced';
+    }
+
+    // Primates - minimal changes needed
+    if (speciesId.includes('ape') || speciesId.includes('primate') || speciesId.includes('monkey')) {
+      return 'primate_enhanced';
+    }
+
+    // Felines - can go bipedal or tool-adapted quadruped
+    if (speciesId.includes('cat') || speciesId.includes('feline') || speciesId.includes('lion') ||
+        speciesId.includes('tiger')) {
+      return this.shouldGoBipedal(sourceSpecies) ? 'feline_bipedal' : 'feline_tool_adapted';
+    }
+
+    // Rodents - typically go bipedal for better tool use
+    if (speciesId.includes('rat') || speciesId.includes('mouse') || speciesId.includes('rodent')) {
+      return 'rodent_bipedal';
+    }
+
+    // Bears - enhanced bipedal (already semi-bipedal)
+    if (speciesId.includes('bear') || speciesId.includes('ursine')) {
+      return 'ursine_bipedal';
+    }
+
+    // Generic fallback by body plan type
+    if (sourceBodyPlan.includes('quadruped') || sourceBodyPlan.includes('four_leg')) {
+      return this.shouldGoBipedal(sourceSpecies) ? 'quadruped_to_bipedal' : 'quadruped_tool_adapted';
+    }
+
+    if (sourceBodyPlan.includes('avian') || sourceBodyPlan.includes('wing')) {
+      return 'avian_sapient';
+    }
+
+    if (sourceBodyPlan.includes('aquatic') || sourceBodyPlan.includes('fin')) {
+      return 'aquatic_tool_adapted';
+    }
+
+    if (sourceBodyPlan.includes('insectoid') || sourceBodyPlan.includes('arthropod')) {
+      return 'arthropod_enhanced';
+    }
+
+    if (sourceBodyPlan.includes('reptile') || sourceBodyPlan.includes('reptilian')) {
+      return this.shouldGoBipedal(sourceSpecies) ? 'reptilian_bipedal' : 'reptilian_enhanced';
+    }
+
+    // Ultimate fallback
+    return `${sourceBodyPlan}_sapient`;
+  }
+
+  /**
+   * Determine if species should transition to bipedal stance
+   * Based on size, current anatomy, and engineering feasibility
+   */
+  private shouldGoBipedal(sourceSpecies: SpeciesComponent): boolean {
+    const size = sourceSpecies.sizeCategory;
+
+    // Very small or very large species don't transition well to bipedal
+    if (size === 'tiny' || size === 'huge' || size === 'colossal') {
+      return false;
+    }
+
+    // Medium to large are good candidates for bipedal transition
+    if (size === 'medium' || size === 'large') {
+      return true;
+    }
+
+    // Small can go either way, 50/50
+    return Math.random() > 0.5;
   }
 
   /**

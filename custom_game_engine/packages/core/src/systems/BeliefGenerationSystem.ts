@@ -40,8 +40,9 @@ export class BeliefGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'belief_generation';
   public readonly priority: number = 115; // After belief formation
   public readonly requiredComponents = [];
-  // Only run when deity components exist (O(1) activation check)
-  public readonly activationComponents = ['deity'] as const;
+  // Only run when spiritual components exist (need believers to generate belief)
+  // Early-exits efficiently when no deities exist yet (see onUpdate implementation)
+  public readonly activationComponents = ['spiritual'] as const;
 
   protected readonly throttleInterval: number = 200; // VERY_SLOW - 10 seconds (belief generation is a slow process)
 

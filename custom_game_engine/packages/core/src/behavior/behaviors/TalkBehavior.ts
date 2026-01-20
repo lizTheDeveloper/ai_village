@@ -31,6 +31,12 @@ import { ComponentType } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
+// Language system imports (optional - gracefully degrades if not available)
+import type {
+  LanguageKnowledgeComponent,
+  LanguageComponent,
+} from '@ai-village/language';
+
 /** Probability of speaking each tick */
 const SPEAK_CHANCE = 0.3;
 
@@ -45,6 +51,97 @@ const CASUAL_MESSAGES = [
   'Have you seen any food around?',
   'I was just wandering.',
 ];
+
+/**
+ * Synchronously translate English to alien using cached vocabulary only.
+ * Falls back to English if any words are missing (no async LLM calls).
+ *
+ * @param englishText - Text to translate
+ * @param language - Speaker's language component
+ * @returns Translated text, or original if translation incomplete
+ */
+function translateEnglishToAlienSync(
+  englishText: string,
+  language: LanguageComponent
+): string {
+  if (language.knownWords.size === 0) {
+    return englishText; // No vocabulary
+  }
+
+  let alienText = englishText;
+
+  // Sort concepts by length (longest first) to handle compound words
+  const sortedConcepts = Array.from(language.knownWords.keys())
+    .sort((a, b) => b.length - a.length);
+
+  for (const concept of sortedConcepts) {
+    const wordData = language.knownWords.get(concept);
+    if (!wordData) continue;
+
+    // Simple word replacement (case-insensitive)
+    const pattern = new RegExp(`\\b${escapeRegex(concept)}\\b`, 'gi');
+    alienText = alienText.replace(pattern, wordData.word);
+  }
+
+  return alienText;
+}
+
+/**
+ * Prepare message for listener based on proficiency (synchronous version)
+ */
+function prepareMessageForListenerSync(
+  originalEnglish: string,
+  alienText: string,
+  sourceLanguageId: string,
+  listenerKnowledge: LanguageKnowledgeComponent
+): string {
+  const proficiency = listenerKnowledge.knownLanguages?.get(sourceLanguageId)?.proficiency ?? 0;
+
+  // Fluent (≥90%) → see English
+  if (proficiency >= 0.9) {
+    return originalEnglish;
+  }
+
+  // None (<10%) → see alien
+  if (proficiency < 0.1) {
+    return alienText;
+  }
+
+  // Partial (10-90%) → see mixed based on known words
+  const englishWords = originalEnglish.split(/\s+/);
+  const alienWords = alienText.split(/\s+/);
+  const maxLen = Math.max(englishWords.length, alienWords.length);
+  const mixedWords: string[] = new Array(maxLen);
+
+  const vocab = listenerKnowledge.knownLanguages?.get(sourceLanguageId)?.vocabularyLearning;
+
+  for (let i = 0; i < maxLen; i++) {
+    const englishWord = englishWords[i];
+    const alienWord = alienWords[i];
+
+    if (!alienWord || !englishWord) {
+      mixedWords[i] = alienWord || englishWord || '';
+      continue;
+    }
+
+    // If alien word differs from English, check if listener knows it
+    if (alienWord !== englishWord) {
+      const meaning = vocab?.get(alienWord.toLowerCase())?.inferredMeaning;
+      mixedWords[i] = meaning ? englishWord : alienWord;
+    } else {
+      mixedWords[i] = englishWord;
+    }
+  }
+
+  return mixedWords.join(' ');
+}
+
+/**
+ * Escape regex special characters
+ */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /**
  * TalkBehavior - Engage in conversation with another agent
@@ -293,16 +390,59 @@ export class TalkBehavior extends BaseBehavior {
   ): void {
     const message = CASUAL_MESSAGES[Math.floor(Math.random() * CASUAL_MESSAGES.length)] || 'Hello!';
 
+    // Default messages (English) - may be translated if language system available
+    let speakerMessage = message;
+    let listenerMessage = message;
+
+    // Attempt post-hoc translation (LLM thinks in English, we translate at message boundary)
+    try {
+      const speakerKnowledge = entity.getComponent<LanguageKnowledgeComponent>('language_knowledge');
+      const listenerKnowledge = partner.getComponent<LanguageKnowledgeComponent>('language_knowledge');
+
+      if (speakerKnowledge?.nativeLanguages?.[0] && listenerKnowledge) {
+        const nativeLanguageId = speakerKnowledge.nativeLanguages[0];
+
+        // Get speaker's language component from world
+        // Note: Language components are stored on a separate entity (the language itself)
+        const languageEntity = world.getEntity(nativeLanguageId);
+        if (languageEntity) {
+          const speakerLanguage = languageEntity.getComponent<LanguageComponent>('language');
+
+          if (speakerLanguage) {
+            // Translate English → Alien (speaker's native language)
+            // Uses cached vocabulary only (no async LLM calls)
+            const alienText = translateEnglishToAlienSync(message, speakerLanguage);
+
+            // Prepare message for listener based on their proficiency
+            listenerMessage = prepareMessageForListenerSync(
+              message,              // original English
+              alienText,           // alien version
+              nativeLanguageId,    // speaker's language ID
+              listenerKnowledge    // listener's knowledge
+            );
+
+            // Speaker sees their own native language
+            speakerMessage = alienText;
+          }
+        }
+      }
+    } catch (error) {
+      // Language system not available or error occurred - gracefully degrade to English
+      // Silent fallback (no console output per code quality rules)
+    }
+
+    // ADD SPEAKER'S VERSION TO SPEAKER'S CONVERSATION
     entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
-      addMessage(current, entity.id, message, world.tick)
+      addMessage(current, entity.id, speakerMessage, world.tick)
     );
 
-    // Partner also adds conversation to their component
+    // ADD LISTENER'S VERSION TO LISTENER'S CONVERSATION
     partner.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
-      addMessage(current, entity.id, message, world.tick)
+      addMessage(current, entity.id, listenerMessage, world.tick)
     );
 
     // Emit conversation:utterance event for episodic memory formation
+    // Original English is preserved for LLM context
     world.eventBus.emit({
       type: 'conversation:utterance',
       source: entity.id,
@@ -311,7 +451,8 @@ export class TalkBehavior extends BaseBehavior {
         speaker: entity.id,
         speakerId: entity.id,
         listenerId: conversation.partnerId ?? undefined,
-        message: message,
+        message: message, // Original English for memory/LLM
+        alienMessage: speakerMessage !== message ? speakerMessage : undefined,
       },
     });
   }
@@ -649,13 +790,51 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
   if (Math.random() < SPEAK_CHANCE) {
     const message = CASUAL_MESSAGES[Math.floor(Math.random() * CASUAL_MESSAGES.length)] || 'Hello!';
 
+    // Default messages (English) - may be translated if language system available
+    let speakerMessage = message;
+    let listenerMessage = message;
+
+    // Attempt post-hoc translation (LLM thinks in English, we translate at message boundary)
+    try {
+      const speakerKnowledge = ctx.getComponent<LanguageKnowledgeComponent>('language_knowledge');
+      const listenerKnowledge = activePartnerImpl.getComponent<LanguageKnowledgeComponent>('language_knowledge');
+
+      if (speakerKnowledge?.nativeLanguages?.[0] && listenerKnowledge) {
+        const nativeLanguageId = speakerKnowledge.nativeLanguages[0];
+
+        // Get speaker's language component from world
+        const languageEntity = ctx.getEntity(nativeLanguageId);
+        if (languageEntity) {
+          const speakerLanguage = languageEntity.getComponent<LanguageComponent>('language');
+
+          if (speakerLanguage) {
+            // Translate English → Alien (speaker's native language)
+            const alienText = translateEnglishToAlienSync(message, speakerLanguage);
+
+            // Prepare message for listener based on their proficiency
+            listenerMessage = prepareMessageForListenerSync(
+              message,
+              alienText,
+              nativeLanguageId,
+              listenerKnowledge
+            );
+
+            // Speaker sees their own native language
+            speakerMessage = alienText;
+          }
+        }
+      }
+    } catch (error) {
+      // Language system not available - gracefully degrade to English
+    }
+
     ctx.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
-      addMessage(current, ctx.entity.id, message, ctx.tick)
+      addMessage(current, ctx.entity.id, speakerMessage, ctx.tick)
     );
 
     // Partner also adds conversation to their component
     activePartnerImpl.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
-      addMessage(current, ctx.entity.id, message, ctx.tick)
+      addMessage(current, ctx.entity.id, listenerMessage, ctx.tick)
     );
 
     // Emit conversation:utterance event
@@ -666,7 +845,8 @@ export function talkBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorRe
         speaker: ctx.entity.id,
         speakerId: ctx.entity.id,
         listenerId: partnerId,
-        message: message,
+        message: message, // Original English for memory/LLM
+        alienMessage: speakerMessage !== message ? speakerMessage : undefined,
       },
     });
   }

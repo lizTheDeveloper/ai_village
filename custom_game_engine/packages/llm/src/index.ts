@@ -159,6 +159,7 @@ export * from './FallbackProvider';
 export * from './StructuredPromptBuilder';
 export * from './TalkerPromptBuilder';
 export * from './ExecutorPromptBuilder';
+export * from './GovernorPromptBuilder';
 
 // ============================================================================
 // Response Processing

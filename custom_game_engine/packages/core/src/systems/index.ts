@@ -55,6 +55,9 @@ export * from './SpatialMemoryQuerySystem.js';
 export * from './MetricsCollectionSystem.js';
 // Governance & Information Infrastructure
 export * from './GovernanceDataSystem.js';
+// Political Hierarchy Systems
+export * from './NationSystem.js';  // Nation-level governance
+export * from './EmpireSystem.js';  // Empire-level governance (multi-planet)
 // City Director System (City-level strategic management)
 export * from './CityDirectorSystem.js';
 export { CityDirectorSystem, DEFAULT_CITY_DIRECTOR_CONFIG } from './CityDirectorSystem.js';
@@ -71,6 +74,9 @@ export * from './MarketEventSystem.js';
 // Trade Agreements - Cross-universe/multiverse formal trade agreements
 export * from './TradeAgreementSystem.js';
 export { TradeAgreementSystem } from './TradeAgreementSystem.js';
+// Trade Escort - Links squadrons to trade agreements for escort missions
+export * from './TradeEscortSystem.js';
+export { TradeEscortSystem } from './TradeEscortSystem.js';
 // Phase 30: Magic System
 export * from './MagicSystem.js';
 // Phase 13: Research & Discovery
@@ -247,6 +253,16 @@ export { MegastructureMaintenanceSystem } from './MegastructureMaintenanceSystem
 // Planet Travel System
 export * from './PlanetTravelSystem.js';
 export { PlanetTravelSystem } from './PlanetTravelSystem.js';
+
+// Fleet Hierarchy Systems (Phase 5: Grand Strategy)
+export * from './SquadronSystem.js';
+export { SquadronSystem, getSquadronSystem } from './SquadronSystem.js';
+export * from './SquadronCombatSystem.js';
+export { SquadronCombatSystem, getSquadronCombatSystem } from './SquadronCombatSystem.js';
+export * from './FleetCombatSystem.js';
+export { FleetCombatSystem, getFleetCombatSystem } from './FleetCombatSystem.js';
+export * from './StragglerRecoverySystem.js';
+export { StragglerRecoverySystem, getStragglerRecoverySystem } from './StragglerRecoverySystem.js';
 
 // Centralized system registration
 export {

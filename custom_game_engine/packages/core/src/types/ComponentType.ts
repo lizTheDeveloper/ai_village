@@ -70,6 +70,7 @@ export enum ComponentType {
   TownHall = 'town_hall',
   CensusBureau = 'census_bureau',
   VillageGovernance = 'village_governance',
+  CityGovernance = 'city_governance',  // Political hierarchy: city governance (Tier 1.5)
   ProvinceGovernance = 'province_governance',  // Political hierarchy: regional governance (legacy)
   Province = 'province',  // Political hierarchy: province component (Tier 2)
   NationGovernance = 'nation_governance',  // Political hierarchy: national governance (legacy)
@@ -80,6 +81,7 @@ export enum ComponentType {
   GalacticCouncil = 'galactic_council',  // Political hierarchy: galactic governance
   Governor = 'governor',  // Phase 6: AI Governance - LLM-powered political decision making
   PoliticalEntity = 'political_entity',  // Phase 6: Political entity in hierarchy
+  GovernanceHistory = 'governance_history',  // Phase 6: Governance audit trail
   HealthClinic = 'health_clinic',
   WeatherStation = 'weather_station',
   Shop = 'shop',
@@ -181,8 +183,10 @@ export enum ComponentType {
   Spiritual = 'spiritual',
   Spirit = 'spirit',
   Deity = 'deity',
+  Angel = 'angel',
   Mythology = 'mythology',
   DivineChat = 'divine_chat',
+  DivineAbility = 'divine_ability',
   ChatRoom = 'chat_room',
   Companion = 'companion',
 
@@ -257,6 +261,7 @@ export enum ComponentType {
   MemoryHall = 'memory_hall',              // Memory preservation and replay
   MeditationChamber = 'meditation_chamber', // Emotional regulation
   HeartChamber = 'heart_chamber',          // The Heart - crew sync for jumps
+  Straggler = 'straggler',                 // Ship left behind during fleet β-jump
 
   // Virtual Reality
   VRSystem = 'vr_system',

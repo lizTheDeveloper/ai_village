@@ -13,7 +13,10 @@ import type { WeatherStationComponent } from '../components/WeatherStationCompon
 import type { HealthClinicComponent } from '../components/HealthClinicComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import type { ParentingComponent } from '../components/ParentingComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
+import { TICKS_PER_DAY } from '../constants/TimeConstants.js';
 
 /**
  * GovernanceDataSystem populates governance building components with data.
@@ -155,6 +158,48 @@ export class GovernanceDataSystem extends BaseSystem {
   }
 
   /**
+   * Calculate agent age in days from birth tick.
+   * Returns 0 if birthTick is not set.
+   */
+  private calculateAgeDays(birthTick: number | undefined, currentTick: number): number {
+    if (!birthTick) {
+      return 0;
+    }
+    const ageInTicks = currentTick - birthTick;
+    const ageDays = Math.floor(ageInTicks / TICKS_PER_DAY);
+    return Math.max(0, ageDays);
+  }
+
+  /**
+   * Calculate agent generation by walking up parent chain.
+   * First settlers (no parents) = generation 0
+   * Their children = generation 1, etc.
+   * Returns 0 if unable to determine generation.
+   */
+  private calculateGeneration(world: World, agentEntity: Entity): number {
+    // Check if agent is listed as a child in someone's ParentingComponent
+    // This requires querying all agents with parenting components
+    const parentsWithChildren = world.query().with(CT.Parenting).executeEntities();
+    for (const parentEntity of parentsWithChildren) {
+      const parentImpl = parentEntity as EntityImpl;
+      const parentingComp = parentImpl.getComponent<ParentingComponent>(CT.Parenting);
+      if (parentingComp && parentingComp.responsibilities) {
+        // Check if this agent is in the parent's responsibilities
+        const isChild = parentingComp.responsibilities.some(
+          (resp: { childId: string }) => resp.childId === agentEntity.id
+        );
+        if (isChild) {
+          // Found a parent - recurse to get parent's generation + 1
+          return this.calculateGeneration(world, parentEntity) + 1;
+        }
+      }
+    }
+
+    // No parents found - first generation (settlers)
+    return 0;
+  }
+
+  /**
    * Update TownHall components with population data.
    * Performance: Uses pre-queried agents to avoid repeated queries
    */
@@ -187,16 +232,24 @@ export class GovernanceDataSystem extends BaseSystem {
 
       // Use pre-queried agents instead of querying again
       const agentRecords: AgentRecord[] = [];
+      const currentTick = world.tick;
 
       for (const agentEntity of agents) {
         const agentEntityImpl = agentEntity as EntityImpl;
         const identity = agentEntityImpl.getComponent<IdentityComponent>(CT.Identity);
         if (identity) {
+          // Calculate age from birthTick in AgentComponent
+          const agentComp = agentEntityImpl.getComponent<AgentComponent>(CT.Agent);
+          const ageDays = this.calculateAgeDays(agentComp?.birthTick, currentTick);
+
+          // Calculate generation by walking up parent chain
+          const generation = this.calculateGeneration(world, agentEntity);
+
           agentRecords.push({
             id: agentEntity.id,
             name: identity.name,
-            age: 0, // Age tracking not yet implemented
-            generation: 0, // Generation tracking not yet implemented
+            age: ageDays,
+            generation,
             status: 'alive',
           });
         }

@@ -43,14 +43,6 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import { updateReporterBehaviors } from '../profession/ReporterBehaviorHandler.js';
 
 /**
- * Generic event emission helper for events not yet in EventMap.
- * These profession events should be added to EventMap in the future.
- */
-interface GenericEventEmitter {
-  emit: (event: { type: string; source: string; data: Record<string, unknown> }) => void;
-}
-
-/**
  * Configuration for ProfessionWorkSimulationSystem.
  */
 export interface ProfessionWorkConfig {
@@ -229,16 +221,16 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
 
     startProfessionWork(profession, workDescription, currentTick, workDuration);
 
-    // Emit event (using generic emitter for events not yet in EventMap)
+    // Emit typed event
     if (this.eventBus) {
-      (this.eventBus as unknown as GenericEventEmitter).emit({
+      this.eventBus.emit({
         type: 'profession:work_started',
         source: entity.id,
         data: {
           agentId: entity.id,
-          role: profession.role,
-          description: workDescription,
-          expectedCompletionTick: currentTick + workDuration,
+          profession: profession.role,
+          workstation: profession.workplaceBuildingId,
+          shift: this.getCurrentShift(currentTick),
         },
       });
     }
@@ -271,16 +263,18 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
     // Increase experience
     profession.experienceDays += 1 / profession.dailyOutputQuota; // Fractional for sub-daily work
 
-    // Emit completion event (using generic emitter for events not yet in EventMap)
+    // Emit typed completion event
     if (this.eventBus) {
-      (this.eventBus as unknown as GenericEventEmitter).emit({
+      const workHours = (currentTick - (profession.currentWork?.startedTick || currentTick)) / (20 * 60); // Convert ticks to hours
+      this.eventBus.emit({
         type: 'profession:work_completed',
         source: entity.id,
         data: {
           agentId: entity.id,
-          role: profession.role,
-          output,
+          profession: profession.role,
+          outputItems: [output.type],
           quality,
+          workHours,
         },
       });
     }
@@ -367,22 +361,41 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
       // Update production metrics
       this.updateProductionMetrics(director, currentTick);
 
-      // Emit aggregation event (using generic emitter for events not yet in EventMap)
+      // Emit aggregation event for profession outputs
       if (this.eventBus) {
-        (this.eventBus as unknown as GenericEventEmitter).emit({
-          type: 'city:professions_updated',
+        this.eventBus.emit({
+          type: 'profession:output_aggregated',
           source: impl.id,
           data: {
-            cityId: director.cityId,
-            newsArticleCount: director.professionOutputs.newsArticles.length,
-            tvEpisodeCount: director.professionOutputs.tvEpisodes.length,
-            radioBroadcastCount: director.professionOutputs.radioBroadcasts.length,
-            serviceCount: director.professionOutputs.services.length,
-            metrics: director.professionMetrics,
+            cityId: impl.id,
+            profession: 'all',
+            outputCount: director.professionOutputs.newsArticles.length +
+                         director.professionOutputs.tvEpisodes.length +
+                         director.professionOutputs.radioBroadcasts.length +
+                         director.professionOutputs.services.length,
+            averageQuality: this.calculateAverageQuality(director),
+            activeWorkers: professionAgents.length,
           },
         });
       }
     }
+  }
+
+  /**
+   * Calculate average quality across all profession outputs.
+   */
+  private calculateAverageQuality(director: CityDirectorComponent): number {
+    const outputs = [
+      ...director.professionOutputs.newsArticles,
+      ...director.professionOutputs.tvEpisodes,
+      ...director.professionOutputs.radioBroadcasts,
+      ...director.professionOutputs.services,
+    ];
+
+    if (outputs.length === 0) return 0;
+
+    const totalQuality = outputs.reduce((sum, output) => sum + output.quality, 0);
+    return totalQuality / outputs.length;
   }
 
   /**
@@ -446,6 +459,20 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
   // ============================================================================
   // TEMPLATE GENERATION HELPERS
   // ============================================================================
+
+  /**
+   * Determine current work shift based on tick.
+   */
+  private getCurrentShift(tick: number): 'morning' | 'afternoon' | 'evening' | 'night' {
+    // Assuming 1 day = 20 TPS * 60 sec * 24 hours = 28,800 ticks
+    const TICKS_PER_DAY = 28800;
+    const hourOfDay = ((tick % TICKS_PER_DAY) / TICKS_PER_DAY) * 24;
+
+    if (hourOfDay >= 6 && hourOfDay < 12) return 'morning';
+    if (hourOfDay >= 12 && hourOfDay < 18) return 'afternoon';
+    if (hourOfDay >= 18 && hourOfDay < 22) return 'evening';
+    return 'night';
+  }
 
   /**
    * Generate work description based on profession role.

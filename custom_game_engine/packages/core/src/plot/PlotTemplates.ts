@@ -6,10 +6,20 @@
  * These templates define reusable plot structures that teach wisdom through
  * multi-stage narrative arcs. The PlotAssignmentSystem instantiates these
  * templates for individual souls.
+ *
+ * Templates are now loaded from JSON files via scale-specific loaders.
  */
 
 import type { PlotLineTemplate } from './PlotTypes.js';
 import { plotLineRegistry } from './PlotLineRegistry.js';
+
+// Import all template loaders
+import { MICRO_PLOT_TEMPLATES } from './templates/MicroPlotTemplates.js';
+import { SMALL_PLOT_TEMPLATES } from './templates/SmallPlotTemplates.js';
+import { MEDIUM_PLOT_TEMPLATES } from './templates/MediumPlotTemplates.js';
+import { LARGE_PLOT_TEMPLATES } from './templates/LargePlotTemplates.js';
+import { EXOTIC_PLOT_TEMPLATES } from './templates/ExoticPlotTemplates.js';
+import { EPIC_PLOT_TEMPLATES } from './templates/EpicPlotTemplates.js';
 
 /**
  * MICRO: Moment of Courage
@@ -244,16 +254,23 @@ export const POC_PLOT_TEMPLATES: PlotLineTemplate[] = [
 ];
 
 /**
- * All defined plot templates (including future ones not yet active)
+ * All defined plot templates (loaded from JSON)
  */
 export const ALL_PLOT_TEMPLATES: PlotLineTemplate[] = [
-  ...POC_PLOT_TEMPLATES,
-  ascensionThroughSurrender, // Available but not registered for PoC
+  ...MICRO_PLOT_TEMPLATES,
+  ...SMALL_PLOT_TEMPLATES,
+  ...MEDIUM_PLOT_TEMPLATES,
+  ...LARGE_PLOT_TEMPLATES,
+  ...EXOTIC_PLOT_TEMPLATES,
+  ...EPIC_PLOT_TEMPLATES,
 ];
 
 /**
  * Initialize plot templates - call this during game startup
+ * Registers all plot templates from all scales (micro, small, medium, large, exotic, epic)
  */
 export function initializePlotTemplates(): void {
-  plotLineRegistry.registerMany(POC_PLOT_TEMPLATES);
+  console.log(`[PlotTemplates] Registering ${ALL_PLOT_TEMPLATES.length} plot templates...`);
+  plotLineRegistry.registerMany(ALL_PLOT_TEMPLATES);
+  console.log(`[PlotTemplates] Registration complete - ${plotLineRegistry.getAllTemplates().length} templates available`);
 }

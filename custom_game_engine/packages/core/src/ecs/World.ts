@@ -25,6 +25,8 @@ import { diagnosticsHarness } from '../diagnostics/DiagnosticsHarness.js';
 import { SpatialGrid } from './SpatialGrid.js';
 import { QueryCache } from './QueryCache.js';
 import { PositionSoA, VelocitySoA } from './SoAStorage.js';
+import { createTagsComponent } from '../components/TagsComponent.js';
+import { createPhysicsComponent } from '../components/PhysicsComponent.js';
 // ChunkManager is defined via IChunkManager interface to avoid circular dependency
 
 // Re-export for backwards compatibility
@@ -186,6 +188,105 @@ export interface IWindowTile {
   lightsThrough: boolean;
   constructionProgress?: number;
 }
+
+/**
+ * Archetype definition for entity pre-configuration
+ */
+interface ArchetypeDefinition {
+  /** Human-readable description */
+  description: string;
+  /** Component factory function */
+  apply: (entity: EntityImpl) => void;
+}
+
+/**
+ * Registry of entity archetypes for pre-configured entity creation.
+ *
+ * Usage:
+ * - 'agent': Minimal agent with just tags (use createWanderingAgent/createLLMAgent for full agents)
+ * - 'building': Basic building entity with position, renderable, tags
+ * - 'plant': Plant entity with position, renderable, tags, physics
+ * - 'animal': Animal entity with position, renderable, tags, physics
+ * - 'item': Item/resource entity with position, renderable, tags
+ * - 'deity': Divine entity with tags
+ *
+ * Note: For full agent creation with all cognitive systems, use createWanderingAgent() or
+ * createLLMAgent() from @ai-village/agents package. The 'agent' archetype here is minimal.
+ */
+const ENTITY_ARCHETYPES: Record<string, ArchetypeDefinition> = {
+  agent: {
+    description: 'Minimal agent entity (use createWanderingAgent/createLLMAgent for full agents)',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createTagsComponent('agent'));
+    },
+  },
+
+  building: {
+    description: 'Basic building entity with position, renderable, and tags',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRenderableComponent('building', 'entity'));
+      entity.addComponent(createTagsComponent('building'));
+      entity.addComponent(createPhysicsComponent(true, 2, 2)); // Solid, 2x2 footprint
+    },
+  },
+
+  plant: {
+    description: 'Plant entity with position, renderable, tags, and plant component',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRenderableComponent('plant', 'entity'));
+      entity.addComponent(createTagsComponent('plant'));
+      entity.addComponent(createPhysicsComponent(false, 1, 1)); // Non-solid
+      // PlantComponent should be added separately with specific plant genetics
+    },
+  },
+
+  animal: {
+    description: 'Animal entity with position, renderable, tags, and physics (AnimalComponent should be added separately with full data)',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRenderableComponent('animal', 'entity'));
+      entity.addComponent(createTagsComponent('animal'));
+      entity.addComponent(createPhysicsComponent(false, 1, 1)); // Non-solid
+      // Note: AnimalComponent requires extensive data - add it separately after entity creation
+    },
+  },
+
+  item: {
+    description: 'Item/resource entity with position, renderable, and tags',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRenderableComponent('item', 'entity'));
+      entity.addComponent(createTagsComponent('item', 'resource'));
+      entity.addComponent(createPhysicsComponent(false, 1, 1)); // Non-solid, can be picked up
+    },
+  },
+
+  deity: {
+    description: 'Divine entity with deity tags',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createTagsComponent('deity', 'divine', 'immortal'));
+    },
+  },
+
+  companion: {
+    description: 'Companion entity (use createOphanimimCompanion for full setup)',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createTagsComponent('companion', 'divine', 'immortal', 'conversational'));
+    },
+  },
+
+  spaceship: {
+    description: 'Spaceship entity with position, renderable, and tags',
+    apply: (entity: EntityImpl) => {
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRenderableComponent('spaceship', 'entity'));
+      entity.addComponent(createTagsComponent('spaceship', 'vehicle'));
+      entity.addComponent(createPhysicsComponent(true, 3, 3)); // Solid, 3x3 footprint
+    },
+  },
+};
 
 /**
  * Tile interface for world coordinates.
@@ -747,11 +848,21 @@ export class WorldImpl implements WorldMutator {
 
   // Mutator methods
 
-  createEntity(_archetype?: string): Entity {
-    // Note: archetype parameter is currently unused but kept for future compatibility
-    // TODO: Implement archetype-based entity creation
+  createEntity(archetype?: string): Entity {
     const id = createEntityId();
     const entity = new EntityImpl(id, this._tick);
+
+    // Apply archetype configuration if specified
+    if (archetype) {
+      const archetypeDef = ENTITY_ARCHETYPES[archetype];
+      if (!archetypeDef) {
+        throw new Error(
+          `Unknown archetype '${archetype}'. Valid archetypes: ${Object.keys(ENTITY_ARCHETYPES).join(', ')}`
+        );
+      }
+      archetypeDef.apply(entity);
+    }
+
     this._entities.set(id, entity);
     this._archetypeVersion++; // Invalidate query cache
     return entity;

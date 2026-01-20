@@ -36,6 +36,31 @@ export class PixelLabEntityRenderer {
   }
 
   /**
+   * Render a simple placeholder for entities while their sprite loads.
+   */
+  private renderPlaceholder(x: number, y: number, size: number, type: 'agent' | 'animal'): void {
+    const centerX = x + size / 2;
+    const centerY = y + size / 2;
+
+    if (type === 'agent') {
+      // Simple humanoid silhouette
+      this.ctx.fillStyle = '#6b8ba8'; // Grayish blue
+      // Head
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY - size * 0.25, size * 0.15, 0, Math.PI * 2);
+      this.ctx.fill();
+      // Body
+      this.ctx.fillRect(centerX - size * 0.15, centerY - size * 0.1, size * 0.3, size * 0.4);
+    } else {
+      // Simple animal shape
+      this.ctx.fillStyle = '#8b6f47'; // Brown
+      this.ctx.beginPath();
+      this.ctx.ellipse(centerX, centerY, size * 0.4, size * 0.25, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+  }
+
+  /**
    * Update animations for all sprite instances.
    * Call this once per frame before rendering.
    * @param currentTime Current time in milliseconds
@@ -112,7 +137,16 @@ export class PixelLabEntityRenderer {
             console.error(`[PixelLabEntityRenderer] Failed to load sprite ${spriteFolderId}, will retry in ${this.SPRITE_RETRY_DELAY_MS}ms:`, error.message);
           });
       }
-      return false; // Use fallback while loading
+
+      // Render blurred placeholder while loading
+      this.ctx.save();
+      this.ctx.filter = 'blur(4px)';
+      this.ctx.globalAlpha = 0.6;
+      this.renderPlaceholder(x, y, size, animal ? 'animal' : 'agent');
+      this.ctx.filter = 'none';
+      this.ctx.globalAlpha = 1.0;
+      this.ctx.restore();
+      return true; // We rendered a placeholder
     }
 
     // Get or create instance for this entity

@@ -94,6 +94,9 @@ export interface MegastructureMaintenance {
   // Degradation without maintenance
   degradationRate: number;                    // % efficiency lost per year (0-1)
   failureTime: number;                        // years until catastrophic failure
+
+  // Debt accumulation when maintenance cannot be performed
+  maintenanceDebt: number;                    // Accumulated maintenance requirements (resource units)
 }
 
 /**
@@ -174,6 +177,19 @@ export interface MegastructureComponent extends Component {
   maintenance: MegastructureMaintenance;
 
   // ============================================================================
+  // RUINS TRACKING
+  // ============================================================================
+
+  /** Years spent in decay (ruins phase only) */
+  yearsInDecay: number;
+
+  /** Current decay stage index (ruins phase only) */
+  decayStageIndex: number;
+
+  /** Archaeological value for ruins excavation (ruins phase only) */
+  archaeologicalValue: number;
+
+  // ============================================================================
   // CAPABILITIES
   // ============================================================================
 
@@ -245,7 +261,11 @@ export function createMegastructureComponent(config: {
       energyCostPerYear: 0,
       degradationRate: 0.01,  // 1% efficiency loss per year (default)
       failureTime: 100,       // 100 years until failure (default)
+      maintenanceDebt: 0,     // No debt initially
     },
+    yearsInDecay: 0,          // Not in decay initially
+    decayStageIndex: 0,       // No decay stage initially
+    archaeologicalValue: 0,   // No archaeological value initially
     capabilities: config.capabilities || {},
     strategic: {
       militaryValue: 1,

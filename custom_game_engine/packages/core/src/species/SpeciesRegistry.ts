@@ -42,6 +42,9 @@ export interface SpeciesTemplate {
   // Social
   sapient: boolean;
   socialStructure?: string;
+
+  // Language (Phase 4D integration)
+  nativeLanguageId?: string; // Reference to species' native language
 }
 
 // ============================================================================
@@ -160,6 +163,7 @@ export const HUMAN_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'varied',
+  nativeLanguageId: 'common_tongue', // Universal trade language
 };
 
 export const ELF_SPECIES: SpeciesTemplate = {
@@ -185,6 +189,7 @@ export const ELF_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'forest_communities',
+  nativeLanguageId: 'elvish', // Flowing forest language
 };
 
 export const DWARF_SPECIES: SpeciesTemplate = {
@@ -210,6 +215,7 @@ export const DWARF_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'clan_based',
+  nativeLanguageId: 'dwarven', // Deep mountain stone-tongue
 };
 
 export const ORC_SPECIES: SpeciesTemplate = {
@@ -235,6 +241,7 @@ export const ORC_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'tribal',
+  nativeLanguageId: 'orcish', // Harsh guttural tribal tongue
 };
 
 export const THRAKEEN_SPECIES: SpeciesTemplate = {
@@ -260,6 +267,7 @@ export const THRAKEEN_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'hive_based',
+  nativeLanguageId: 'thrakeen_trade', // Clicking merchant tongue
 };
 
 export const CELESTIAL_SPECIES: SpeciesTemplate = {
@@ -285,6 +293,7 @@ export const CELESTIAL_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'divine_hierarchy',
+  nativeLanguageId: 'celestial_hymnal', // Harmonic divine language
 };
 
 export const AQUATIC_SPECIES: SpeciesTemplate = {
@@ -325,6 +334,7 @@ export const AQUATIC_SPECIES: SpeciesTemplate = {
 
   sapient: true,
   socialStructure: 'underwater_cities',
+  nativeLanguageId: 'deepspeak', // Echoic underwater language
 };
 
 // ============================================================================
@@ -366,6 +376,7 @@ export function createSpeciesFromTemplate(template: SpeciesTemplate): SpeciesCom
       maturityAge: template.maturityAge,
       sapient: template.sapient,
       socialStructure: template.socialStructure,
+      nativeLanguageId: template.nativeLanguageId,
       isHybrid: false,
       hasMutation: false,
       mutations: [],
