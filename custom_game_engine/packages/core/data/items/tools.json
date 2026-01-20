@@ -33,7 +33,14 @@
     "craftedFrom": [
       {"itemId": "wood", "amount": 2},
       {"itemId": "stone", "amount": 2}
-    ]
+    ],
+    "traits": {
+      "tool": {
+        "toolType": "hoe",
+        "efficiency": 1.0,
+        "durabilityLoss": 0.2
+      }
+    }
   },
   {
     "id": "fishing_rod",
