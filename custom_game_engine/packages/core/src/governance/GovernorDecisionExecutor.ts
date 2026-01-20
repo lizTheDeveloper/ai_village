@@ -22,6 +22,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EmpireComponent } from '../components/EmpireComponent.js';
 import type { NationComponent } from '../components/NationComponent.js';
 import type { ProvinceGovernanceComponent } from '../components/ProvinceGovernanceComponent.js';
+import type { FederationGovernanceComponent } from '../components/FederationGovernanceComponent.js';
 import type { GovernorComponent } from '../components/GovernorComponent.js';
 import type { GalacticCouncilComponent } from '../components/GalacticCouncilComponent.js';
 import { declareImperialWar, addVassal, addCoreNation, grantIndependence } from '../components/EmpireComponent.js';
@@ -1338,6 +1339,19 @@ export function executeGovernorDecision(
       return executeProvinceDecision(governor, province, decision, world);
     }
 
+    case 'federation': {
+      const federation = jurisdictionEntity.getComponent<FederationGovernanceComponent>(CT.FederationGovernance);
+      if (!federation) {
+        return {
+          success: false,
+          error: 'Jurisdiction is not a federation',
+          eventsEmitted: [],
+          stateChanges: [],
+        };
+      }
+      return executeFederationDecision(governor, federation, decision, world);
+    }
+
     case 'galactic_council': {
       const council = jurisdictionEntity.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
       if (!council) {
@@ -1359,4 +1373,388 @@ export function executeGovernorDecision(
         stateChanges: [],
       };
   }
+}
+
+// ============================================================================
+// Federation Tier Executors
+// ============================================================================
+
+/**
+ * Execute federation-level decisions
+ */
+function executeFederationDecision(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  decision: ParsedGovernorDecision,
+  world: World
+): DecisionExecutionResult {
+  const action = decision.action;
+  const result: DecisionExecutionResult = {
+    success: false,
+    eventsEmitted: [],
+    stateChanges: [],
+  };
+
+  try {
+    switch (action.type) {
+      case 'propose_federal_law':
+        executeFederationProposeLaw(governor, federation, action, world, result);
+        break;
+
+      case 'call_for_vote':
+        executeFederationCallForVote(governor, federation, action, world, result);
+        break;
+
+      case 'deploy_peacekeepers':
+        executeFederationDeployPeacekeepers(governor, federation, action, world, result);
+        break;
+
+      case 'adjust_tariffs':
+        executeFederationAdjustTariffs(governor, federation, action, world, result);
+        break;
+
+      case 'mediate_dispute':
+        executeFederationMediateDispute(governor, federation, action, world, result);
+        break;
+
+      case 'grant_concessions':
+        executeFederationGrantConcessions(governor, federation, action, world, result);
+        break;
+
+      case 'coordinate_defense':
+        executeFederationCoordinateDefense(governor, federation, action, world, result);
+        break;
+
+      default:
+        result.error = `Unknown federation action type: ${action.type}`;
+        return result;
+    }
+
+    result.success = true;
+  } catch (error) {
+    result.error = error instanceof Error ? error.message : String(error);
+  }
+
+  return result;
+}
+
+/**
+ * Execute: Federation proposes new federal law
+ */
+function executeFederationProposeLaw(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const lawName = action.parameters?.lawName as string;
+  const scope = action.parameters?.scope as 'trade' | 'military' | 'justice' | 'rights' | 'environment';
+  const requiresSupermajority = action.parameters?.requiresSupermajority as boolean ?? false;
+
+  if (!lawName || !scope) {
+    throw new Error('propose_federal_law requires lawName and scope parameters');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  // Get FederationGovernanceSystem to call proposeFederalLaw
+  // Note: This requires accessing the system singleton
+  // For now, emit event that FederationGovernanceSystem will handle
+  world.eventBus.emit({
+    type: 'federation:law_proposed',
+    source: federationEntity.id,
+    data: {
+      federationName: federation.name,
+      proposalId: `proposal_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      proposalName: lawName,
+      proposerId: governor.id,
+      scope,
+      requiresSupermajority,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('federation:law_proposed');
+  result.stateChanges.push(`Proposed federal law: ${lawName} (${scope})`);
+}
+
+/**
+ * Execute: Federation calls for vote on pending proposal
+ */
+function executeFederationCallForVote(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const proposalId = action.target;
+  if (!proposalId) {
+    throw new Error('call_for_vote requires target (proposalId) parameter');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  // Emit event to trigger voting (FederationGovernanceSystem handles)
+  world.eventBus.emit({
+    type: 'federation:proposal_voting_started',
+    source: federationEntity.id,
+    data: {
+      federationName: federation.name,
+      proposalId,
+      proposalName: 'Unknown', // Would need to query system state
+      proposalType: 'law',
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('federation:proposal_voting_started');
+  result.stateChanges.push(`Called for vote on proposal: ${proposalId}`);
+}
+
+/**
+ * Execute: Federation deploys peacekeeping force
+ */
+function executeFederationDeployPeacekeepers(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const location = action.target;
+  const operationType = action.parameters?.operationType as 'defense' | 'peacekeeping' | 'exploration' | 'humanitarian' ?? 'peacekeeping';
+
+  if (!location) {
+    throw new Error('deploy_peacekeepers requires target (location) parameter');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  // Create joint operation
+  const operationId = `operation_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const operation: import('../components/FederationGovernanceComponent.js').JointOperation = {
+    id: operationId,
+    name: `Peacekeeping: ${location}`,
+    type: operationType,
+    participatingMembers: [...federation.memberEmpireIds, ...federation.memberNationIds].slice(0, 3), // First 3 members
+    fleetsCommitted: new Map(),
+    objective: `Maintain peace and security in ${location}`,
+    status: 'planning',
+    startedTick: world.tick,
+  };
+
+  (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
+    ...f,
+    military: {
+      ...f.military,
+      activeJointOperations: [...f.military.activeJointOperations, operation],
+    },
+  }));
+
+  world.eventBus.emit({
+    type: 'federation:joint_operation_started',
+    source: federationEntity.id,
+    data: {
+      federationName: federation.name,
+      operationId,
+      operationName: operation.name,
+      operationType,
+      participatingMembers: operation.participatingMembers,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('federation:joint_operation_started');
+  result.stateChanges.push(`Deployed peacekeepers to ${location}`);
+}
+
+/**
+ * Execute: Federation adjusts tariff rates
+ */
+function executeFederationAdjustTariffs(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const tariffType = action.parameters?.tariffType as 'internal' | 'external';
+  const newRate = action.parameters?.newRate as number;
+
+  if (!tariffType || newRate === undefined) {
+    throw new Error('adjust_tariffs requires tariffType and newRate parameters');
+  }
+
+  if (newRate < 0 || newRate > 1) {
+    throw new Error('Tariff rate must be between 0 and 1');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  const oldRate = tariffType === 'internal'
+    ? federation.tradeUnion.internalTariffs
+    : federation.tradeUnion.externalTariffs;
+
+  (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
+    ...f,
+    tradeUnion: {
+      ...f.tradeUnion,
+      ...(tariffType === 'internal' ? { internalTariffs: newRate } : { externalTariffs: newRate }),
+    },
+  }));
+
+  world.eventBus.emit({
+    type: 'federation:tariff_changed',
+    source: federationEntity.id,
+    data: {
+      federationName: federation.name,
+      tariffType,
+      oldRate,
+      newRate,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('federation:tariff_changed');
+  result.stateChanges.push(`Adjusted ${tariffType} tariffs from ${Math.round(oldRate * 100)}% to ${Math.round(newRate * 100)}%`);
+}
+
+/**
+ * Execute: Federation mediates dispute between members
+ */
+function executeFederationMediateDispute(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const memberId = action.target;
+  if (!memberId) {
+    throw new Error('mediate_dispute requires target (memberId) parameter');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  // Simplified: Increase satisfaction for target member
+  const currentSatisfaction = federation.stability.memberSatisfaction.get(memberId) || 0.5;
+  const newSatisfaction = Math.min(1.0, currentSatisfaction + 0.1); // +10% satisfaction
+
+  (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => {
+    f.stability.memberSatisfaction.set(memberId, newSatisfaction);
+    f.stability.withdrawalRisk.set(memberId, Math.max(0, (f.stability.withdrawalRisk.get(memberId) || 0) - 0.2));
+    return f;
+  });
+
+  result.eventsEmitted.push('federation:dispute_mediated');
+  result.stateChanges.push(`Mediated dispute with member ${memberId}, satisfaction increased to ${Math.round(newSatisfaction * 100)}%`);
+}
+
+/**
+ * Execute: Federation grants concessions to prevent secession
+ */
+function executeFederationGrantConcessions(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const memberId = action.target;
+  if (!memberId) {
+    throw new Error('grant_concessions requires target (memberId) parameter');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  // Grant concessions: increase satisfaction, reduce secession risk
+  const currentSatisfaction = federation.stability.memberSatisfaction.get(memberId) || 0.5;
+  const newSatisfaction = Math.min(1.0, currentSatisfaction + 0.2); // +20% satisfaction
+
+  (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => {
+    f.stability.memberSatisfaction.set(memberId, newSatisfaction);
+    f.stability.withdrawalRisk.set(memberId, 0); // Reset secession risk
+    return f;
+  });
+
+  result.eventsEmitted.push('federation:concessions_granted');
+  result.stateChanges.push(`Granted concessions to member ${memberId}, satisfaction increased to ${Math.round(newSatisfaction * 100)}%, secession risk reset`);
+}
+
+/**
+ * Execute: Federation coordinates defense operation
+ */
+function executeFederationCoordinateDefense(
+  governor: EntityImpl,
+  federation: FederationGovernanceComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const threat = action.target;
+  if (!threat) {
+    throw new Error('coordinate_defense requires target (threat) parameter');
+  }
+
+  const federationEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!federationEntity) {
+    throw new Error('Federation entity not found');
+  }
+
+  // Create joint defense operation
+  const operationId = `defense_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const operation: import('../components/FederationGovernanceComponent.js').JointOperation = {
+    id: operationId,
+    name: `Defense: ${threat}`,
+    type: 'defense',
+    participatingMembers: [...federation.memberEmpireIds, ...federation.memberNationIds], // All members
+    fleetsCommitted: new Map(),
+    objective: `Defend against ${threat}`,
+    status: 'active',
+    startedTick: world.tick,
+  };
+
+  (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
+    ...f,
+    military: {
+      ...f.military,
+      activeJointOperations: [...f.military.activeJointOperations, operation],
+    },
+  }));
+
+  world.eventBus.emit({
+    type: 'federation:joint_operation_started',
+    source: federationEntity.id,
+    data: {
+      federationName: federation.name,
+      operationId,
+      operationName: operation.name,
+      operationType: 'defense',
+      participatingMembers: operation.participatingMembers,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('federation:joint_operation_started');
+  result.stateChanges.push(`Coordinated joint defense against ${threat}`);
 }

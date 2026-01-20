@@ -14,8 +14,10 @@ import type {
   SteeringComponent,
   CityDirectorComponent,
   EventBus,
+  BuildingBlueprint,
 } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
+import { buildingBlueprintRegistry } from '@ai-village/core';
 import {
   ChunkManager,
   TerrainGenerator,
@@ -333,7 +335,7 @@ export class Renderer {
 
     // Update phase-shifting animations for 5D buildings
     const currentTick = world.tick;
-    const allEntities = world.getEntities();
+    const allEntities = world.getAllEntities();
     for (const entity of allEntities) {
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (building) {

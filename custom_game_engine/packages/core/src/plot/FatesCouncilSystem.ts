@@ -309,7 +309,7 @@ export class FatesCouncilSystem extends BaseSystem {
   private analyzeSoulThread(soul: Entity, world: World): EntityThread | null {
     const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
     const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
+    const thread = soul.getComponent(CT.SilverThread);
 
     if (!soulIdentity || !plotLines) return null;
 
@@ -318,9 +318,9 @@ export class FatesCouncilSystem extends BaseSystem {
 
     // Assess if needs challenge
     const hasRecentPlot = plotLines.active.some(p =>
-      (thread?.head.personal_tick ?? 0) - p.assigned_at_personal_tick < 10000
+      ((thread as any)?.head?.personal_tick ?? 0) - p.assigned_at_personal_tick < 10000
     );
-    const needsChallenge = !hasRecentPlot && soulIdentity.wisdom_level > 20;
+    const needsChallenge = !hasRecentPlot && ((soulIdentity as any).wisdom_level ?? 0) > 20;
 
     // Check if overwhelmed
     const overwhelmed = plotLines.active.length > 5;
@@ -334,10 +334,10 @@ export class FatesCouncilSystem extends BaseSystem {
     return {
       entityId: soul.id,
       entityType: 'soul',
-      name: soulIdentity.true_name || soul.id,
+      name: (soulIdentity as any).soulName || soul.id,
       activePlots: activePlotIds,
       completedPlots: plotLines.completed.length,
-      wisdom: soulIdentity.wisdom_level,
+      wisdom: (soulIdentity as any).wisdom_level ?? 0,
       recentActions: [],  // TODO: Extract from recent events
       storyPotential,
       needsChallenge,

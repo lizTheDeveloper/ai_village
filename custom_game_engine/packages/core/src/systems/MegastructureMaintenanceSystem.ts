@@ -466,7 +466,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
         // Restore efficiency
         mega.efficiency = Math.min(1.0, mega.efficiency + 0.1);
         mega.maintenance.lastMaintenanceAt = currentTick;
-        // Note: maintenanceDebt not yet in component schema
+        // Maintenance debt is reduced in performMaintenanceOptimized
         this.emitMaintenanceEvent(world, impl, mega);
       } else {
         // Apply degradation in single pass

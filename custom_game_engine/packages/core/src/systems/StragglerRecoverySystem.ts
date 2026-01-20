@@ -79,13 +79,14 @@ export class StragglerRecoverySystem extends BaseSystem {
   /**
    * PERF: Cache straggler entities by status
    * Allows fast filtering by recovery status
+   * GC: Uses object literals instead of Sets
    */
-  private stragglersByStatus: Record<string, Set<string>> = {
-    stranded: new Set(),
-    attempting_solo_jump: new Set(),
-    awaiting_rescue: new Set(),
-    recovered: new Set(),
-    lost: new Set(),
+  private stragglersByStatus: Record<string, Record<string, boolean>> = {
+    stranded: Object.create(null),
+    attempting_solo_jump: Object.create(null),
+    awaiting_rescue: Object.create(null),
+    recovered: Object.create(null),
+    lost: Object.create(null),
   };
 
   /**
@@ -97,8 +98,12 @@ export class StragglerRecoverySystem extends BaseSystem {
 
   /**
    * PERF: Dirty tracking - track stragglers that changed this tick
+   * GC: Uses object literal instead of Set
    */
-  private dirtyStragglersThisTick = new Set<string>();
+  private dirtyStragglersThisTick: Record<string, boolean> = Object.create(null);
+
+  // GC: Pre-allocated result array for getStragglersByStatus
+  private workingStatusArray: string[] = [];
 
   // ========================================================================
   // System Update
@@ -114,8 +119,10 @@ export class StragglerRecoverySystem extends BaseSystem {
       this.cacheValidTick = tick;
     }
 
-    // Clear dirty tracking from previous tick
-    this.dirtyStragglersThisTick.clear();
+    // GC: Clear dirty tracking by deleting keys
+    for (const key in this.dirtyStragglersThisTick) {
+      delete this.dirtyStragglersThisTick[key];
+    }
 
     // Process all stragglers
     for (const entity of ctx.activeEntities) {
@@ -129,8 +136,13 @@ export class StragglerRecoverySystem extends BaseSystem {
       this.processStraggler(ctx.world, entity as EntityImpl, straggler, ship, tick);
     }
 
-    // Rebuild status cache if any stragglers changed
-    if (this.dirtyStragglersThisTick.size > 0) {
+    // GC: Check if any stragglers changed (object has keys)
+    let hasDirty = false;
+    for (const _ in this.dirtyStragglersThisTick) {
+      hasDirty = true;
+      break;
+    }
+    if (hasDirty) {
       this.rebuildStatusCache(ctx.world);
     }
   }
@@ -140,7 +152,10 @@ export class StragglerRecoverySystem extends BaseSystem {
   // ========================================================================
 
   private rebuildCache(world: World): void {
-    this.squadronEntityCache = Object.create(null);
+    // GC: Clear by deleting keys instead of creating new object
+    for (const key in this.squadronEntityCache) {
+      delete this.squadronEntityCache[key];
+    }
 
     // Cache all squadrons
     const squadrons = world.query().with(CT.Squadron).executeEntities();
@@ -153,9 +168,12 @@ export class StragglerRecoverySystem extends BaseSystem {
   }
 
   private rebuildStatusCache(world: World): void {
-    // Clear status sets
+    // GC: Clear status objects by deleting keys
     for (const status in this.stragglersByStatus) {
-      this.stragglersByStatus[status]!.clear();
+      const statusObj = this.stragglersByStatus[status]!;
+      for (const key in statusObj) {
+        delete statusObj[key];
+      }
     }
 
     // Rebuild from all stragglers
@@ -164,9 +182,9 @@ export class StragglerRecoverySystem extends BaseSystem {
       const straggler = stragglerEntity.getComponent<StragglerComponent>(CT.Straggler);
       if (!straggler) continue;
 
-      const statusSet = this.stragglersByStatus[straggler.recoveryStatus];
-      if (statusSet) {
-        statusSet.add(stragglerEntity.id);
+      const statusObj = this.stragglersByStatus[straggler.recoveryStatus];
+      if (statusObj) {
+        statusObj[stragglerEntity.id] = true;
       }
     }
   }
@@ -273,8 +291,8 @@ export class StragglerRecoverySystem extends BaseSystem {
     // Add component
     shipEntity.addComponent(straggler);
 
-    // Mark as dirty
-    this.dirtyStragglersThisTick.add(shipId);
+    // Mark as dirty (GC: object literal instead of Set)
+    this.dirtyStragglersThisTick[shipId] = true;
 
     // Emit event
     world.eventBus.emit({
@@ -350,7 +368,7 @@ export class StragglerRecoverySystem extends BaseSystem {
       // Solo jump succeeded!
       // TODO: Actually move ship to target branch (requires β-space navigation integration)
       straggler.recoveryStatus = 'recovered';
-      this.dirtyStragglersThisTick.add(shipId);
+      this.dirtyStragglersThisTick[shipId] = true;
 
       return {
         success: true,
@@ -367,7 +385,7 @@ export class StragglerRecoverySystem extends BaseSystem {
 
       // Revert to stranded status
       straggler.recoveryStatus = 'stranded';
-      this.dirtyStragglersThisTick.add(shipId);
+      this.dirtyStragglersThisTick[shipId] = true;
 
       // Emit failure event
       world.eventBus.emit({
@@ -431,7 +449,7 @@ export class StragglerRecoverySystem extends BaseSystem {
     // Update straggler status
     straggler.recoveryStatus = 'awaiting_rescue';
     straggler.rescueSquadronId = rescueSquadronId;
-    this.dirtyStragglersThisTick.add(stragglerId);
+    this.dirtyStragglersThisTick[stragglerId] = true;
 
     // Emit event
     world.eventBus.emit({
@@ -471,7 +489,7 @@ export class StragglerRecoverySystem extends BaseSystem {
 
     // Update status to recovered
     straggler.recoveryStatus = 'recovered';
-    this.dirtyStragglersThisTick.add(stragglerId);
+    this.dirtyStragglersThisTick[stragglerId] = true;
 
     // Emit recovery event
     this.emitRecoveredEvent(world, stragglerId, straggler);
@@ -517,7 +535,7 @@ export class StragglerRecoverySystem extends BaseSystem {
     if (straggler.recoveryStatus === 'lost') return;
 
     straggler.recoveryStatus = 'lost';
-    this.dirtyStragglersThisTick.add(entity.id);
+    this.dirtyStragglersThisTick[entity.id] = true;
 
     // Emit lost event
     world.eventBus.emit({
@@ -577,34 +595,52 @@ export class StragglerRecoverySystem extends BaseSystem {
 
   /**
    * Get all stragglers by recovery status
+   * GC: Uses pre-allocated array to avoid allocations
    *
    * @param status - Recovery status to filter by
    * @returns Array of straggler entity IDs
    */
   public getStragglersByStatus(status: string): string[] {
-    const statusSet = this.stragglersByStatus[status];
-    if (!statusSet) return [];
-    return Array.from(statusSet);
+    const statusObj = this.stragglersByStatus[status];
+    if (!statusObj) return [];
+
+    // GC: Clear and reuse pre-allocated array
+    this.workingStatusArray.length = 0;
+    for (const id in statusObj) {
+      this.workingStatusArray.push(id);
+    }
+    return this.workingStatusArray;
   }
 
   /**
    * Get count of stragglers by status
+   * GC: Counts keys without allocation
    *
    * @param status - Recovery status to count
    * @returns Number of stragglers with that status
    */
   public getStragglerCount(status: string): number {
-    const statusSet = this.stragglersByStatus[status];
-    return statusSet ? statusSet.size : 0;
+    const statusObj = this.stragglersByStatus[status];
+    if (!statusObj) return 0;
+
+    let count = 0;
+    for (const _ in statusObj) {
+      count++;
+    }
+    return count;
   }
 
   /**
    * Get total straggler count across all statuses
+   * GC: Counts keys without allocation
    */
   public getTotalStragglerCount(): number {
     let total = 0;
     for (const status in this.stragglersByStatus) {
-      total += this.stragglersByStatus[status]!.size;
+      const statusObj = this.stragglersByStatus[status]!;
+      for (const _ in statusObj) {
+        total++;
+      }
     }
     return total;
   }

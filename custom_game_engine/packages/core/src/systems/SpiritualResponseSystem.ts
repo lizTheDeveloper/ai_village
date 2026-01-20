@@ -266,7 +266,7 @@ export class SpiritualResponseSystem extends BaseSystem {
     const spiritualAgents = world.query()
       .with(CT.Spiritual)
       .with(CT.Personality)
-      .executeEntities();
+      .executeEntities() as EntityImpl[];
 
     // Only ~10% of spiritual agents pray for weather
     for (const agent of spiritualAgents) {
@@ -281,14 +281,14 @@ export class SpiritualResponseSystem extends BaseSystem {
       );
 
       this.recordAgentPrayer(agent, prayer, tick);
-      this.emitPrayerEvent(agent, prayer, 'weather', world.eventBus);
+      this.emitPrayerEvent(agent, prayer, 'weather', this.events);
     }
   }
 
   /**
    * Check if agent should pray based on spirituality and cooldown
    */
-  private shouldPray(entity: Entity, currentTick: number, minInterval: number): boolean {
+  private shouldPray(entity: EntityImpl, currentTick: number, minInterval: number): boolean {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
     const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
 
@@ -321,7 +321,7 @@ export class SpiritualResponseSystem extends BaseSystem {
   /**
    * Record prayer in agent's spiritual component
    */
-  private recordAgentPrayer(entity: Entity, prayer: Prayer, tick: number): void {
+  private recordAgentPrayer(entity: EntityImpl, prayer: Prayer, tick: number): void {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
     if (!spiritual) return;
 
@@ -335,31 +335,23 @@ export class SpiritualResponseSystem extends BaseSystem {
   /**
    * Emit prayer event for PrayerAnsweringSystem and UI
    */
-  private emitPrayerEvent(entity: Entity, prayer: Prayer, trigger: string, eventBus: SystemContext['eventBus']): void {
+  private emitPrayerEvent(entity: EntityImpl, prayer: Prayer, trigger: string, events: SystemContext['events']): void {
     const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
 
-    eventBus.emit({
-      type: 'prayer:offered',
-      source: entity.id,
-      data: {
-        agentId: entity.id,
-        deityId: spiritual?.believedDeity ?? '',
-        prayerType: prayer.type,
-        urgency: prayer.urgency,
-        prayerId: prayer.id,
-      },
+    events.emit('prayer:offered', {
+      agentId: entity.id,
+      deityId: spiritual?.believedDeity ?? '',
+      prayerType: prayer.type,
+      urgency: prayer.urgency,
+      prayerId: prayer.id,
     });
 
     // Also emit agent speak event for prayer
-    eventBus.emit({
-      type: 'agent:speak',
-      source: entity.id,
-      data: {
-        agentId: entity.id,
-        text: prayer.content,
-        category: 'prayer',
-        tick: prayer.timestamp,
-      },
+    events.emit('agent:speak', {
+      agentId: entity.id,
+      text: prayer.content,
+      category: 'prayer',
+      tick: prayer.timestamp,
     });
   }
 }

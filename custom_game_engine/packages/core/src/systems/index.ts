@@ -58,6 +58,7 @@ export * from './GovernanceDataSystem.js';
 // Political Hierarchy Systems
 export * from './NationSystem.js';  // Nation-level governance
 export * from './EmpireSystem.js';  // Empire-level governance (multi-planet)
+export * from './GalacticCouncilSystem.js';  // Galactic Council governance (multi-species)
 // City Director System (City-level strategic management)
 export * from './CityDirectorSystem.js';
 export { CityDirectorSystem, DEFAULT_CITY_DIRECTOR_CONFIG } from './CityDirectorSystem.js';

@@ -30,6 +30,8 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { EmpireComponent, EmpireNationRecord, SeparatistMovement } from '../components/EmpireComponent.js';
 import type { NationComponent } from '../components/NationComponent.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
+import { selectHeir, handleSuccessionCrisis, executeSuccession } from './EmpireDynastyManager.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
 
 // ============================================================================
 // System
@@ -112,7 +114,10 @@ export class EmpireSystem extends BaseSystem {
     // Step 4: Process separatist movements
     this.processSeparatistMovements(world, empire, empireEntity, tick);
 
-    // Step 5: Update empire component
+    // Step 5: Process dynasty succession (if ruler died)
+    this.processDynastySuccession(world, empire, empireEntity, tick);
+
+    // Step 6: Update empire component
     empireEntity.updateComponent<EmpireComponent>(CT.Empire, (e) => ({
       ...e,
       territory: {
@@ -352,6 +357,127 @@ export class EmpireSystem extends BaseSystem {
       }
 
       // TODO: Add negotiation, suppression, and independence mechanics
+    }
+  }
+
+  // ========================================================================
+  // Dynasty Succession
+  // ========================================================================
+
+  /**
+   * Process dynasty succession when ruler dies or abdicates
+   *
+   * Integrated from EmpireDynastyManager
+   */
+  private processDynastySuccession(
+    world: World,
+    empire: EmpireComponent,
+    empireEntity: EntityImpl,
+    tick: number
+  ): void {
+    // Check if empire has a dynasty
+    if (!empire.rulingDynasty) {
+      return;
+    }
+
+    // Check if current ruler is alive
+    const currentRulerId = empire.rulingDynasty.currentRulerId;
+    if (!currentRulerId) {
+      return;
+    }
+
+    const rulerEntity = world.getEntity(currentRulerId);
+    if (!rulerEntity) {
+      // Ruler entity not found - succession crisis
+      this.triggerSuccession(world, empire, empireEntity, tick, 'ruler_missing');
+      return;
+    }
+
+    // Check if ruler is dead (no Agent component or health component shows death)
+    const agent = rulerEntity.getComponent<AgentComponent>(CT.Agent);
+    if (!agent || agent.isDead) {
+      // Ruler died - trigger succession
+      this.triggerSuccession(world, empire, empireEntity, tick, 'ruler_death');
+    }
+  }
+
+  /**
+   * Trigger succession process
+   */
+  private triggerSuccession(
+    world: World,
+    empire: EmpireComponent,
+    empireEntity: EntityImpl,
+    tick: number,
+    reason: string
+  ): void {
+    if (!empire.rulingDynasty) {
+      return;
+    }
+
+    // Select heir based on succession law
+    const successionResult = selectHeir(
+      world,
+      empire.rulingDynasty.dynastyId,
+      empire.rulingDynasty.currentRulerId,
+      empire.successionLaw,
+      tick
+    );
+
+    // Emit heir selected event
+    if (successionResult.heir) {
+      world.eventBus.emit({
+        type: 'empire:heir_selected',
+        source: empireEntity.id,
+        data: {
+          empireName: empire.empireName,
+          heirId: successionResult.heir.agentId,
+          heirName: successionResult.heir.agentName,
+          legitimacy: successionResult.heir.legitimacy,
+          reason,
+          tick,
+        },
+      });
+
+      // Execute succession
+      executeSuccession(world, empireEntity, empire.empireName, successionResult.heir.agentId, tick);
+
+      // Update empire component with new ruler
+      empireEntity.updateComponent<EmpireComponent>(CT.Empire, (current) => {
+        if (!current.rulingDynasty) {
+          return current;
+        }
+
+        return {
+          ...current,
+          rulingDynasty: {
+            ...current.rulingDynasty,
+            currentRulerId: successionResult.heir!.agentId,
+            rulers: [
+              ...current.rulingDynasty.rulers,
+              {
+                agentId: successionResult.heir!.agentId,
+                name: successionResult.heir!.agentName,
+                title: `Emperor ${successionResult.heir!.agentName}`,
+                reignStart: tick,
+                achievements: [],
+                failings: [],
+              },
+            ],
+          },
+        };
+      });
+    }
+
+    // Handle succession crisis
+    if (successionResult.crisis) {
+      handleSuccessionCrisis(
+        world,
+        empireEntity,
+        empire.empireName,
+        successionResult.crisisReason || 'unknown',
+        tick
+      );
     }
   }
 

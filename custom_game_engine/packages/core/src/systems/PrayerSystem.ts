@@ -9,6 +9,7 @@ import type { MoodComponent } from '../components/MoodComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritComponent } from '../components/SpiritComponent.js';
+import type { TagsComponent } from '../components/TagsComponent.js';
 import { resolvePrayer } from '../divinity/CosmologyInteraction.js';
 import type { Spirit } from '../divinity/AnimistTypes.js';
 import type { Deity } from '../divinity/DeityTypes.js';

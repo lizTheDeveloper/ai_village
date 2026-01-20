@@ -448,6 +448,107 @@ export interface GovernanceEvents {
     tick: number;
   };
 
+  'nation:ally_called_to_war': {
+    nationId: EntityId;
+    nationName: string;
+    allyId: EntityId;
+    allyName: string;
+    warId: string;
+    treatyType: string;
+    tick: number;
+  };
+
+  'nation:alliance_obligation_invoked': {
+    nationId: EntityId;
+    nationName: string;
+    allyId: EntityId;
+    allyName: string;
+    warId: string;
+    warName: string;
+    treatyId: string;
+    tick: number;
+  };
+
+  // === Dynasty Succession Events ===
+  'empire:heir_selected': {
+    empireName: string;
+    heirId: EntityId;
+    heirName: string;
+    legitimacy: number;
+    reason: string;
+    tick: number;
+  };
+
+  'empire:succession_crisis': {
+    empireName: string;
+    crisisReason: string;
+    tick: number;
+  };
+
+  'empire:ruler_changed': {
+    empireName: string;
+    newRulerId: EntityId;
+    tick: number;
+  };
+
+  // === Diplomatic Events ===
+  'empire:alliance_formed': {
+    empireId: EntityId;
+    empireName: string;
+    allyEmpireId: EntityId;
+    allyEmpireName: string;
+    treatyId: string;
+    tick: number;
+  };
+
+  'empire:war_consideration': {
+    empireId: EntityId;
+    empireName: string;
+    targetEmpireId: EntityId;
+    targetEmpireName: string;
+    opinion: number;
+    tick: number;
+  };
+
+  'empire:joined_ally_war': {
+    empireId: EntityId;
+    empireName: string;
+    allyId: string;
+    warId: string;
+    tick: number;
+  };
+
+  // === War Resolution Events ===
+  'empire:war_ended': {
+    empireId: EntityId;
+    empireName: string;
+    warId: string;
+    warName: string;
+    outcome: 'decisive_victory' | 'marginal_victory' | 'stalemate' | 'marginal_defeat' | 'decisive_defeat';
+    warScore: number;
+    duration: number;
+    tick: number;
+  };
+
+  'empire:peace_treaty_signed': {
+    empireId: EntityId;
+    empireName: string;
+    treatyId: string;
+    treatyName: string;
+    terms: string[];
+    tick: number;
+  };
+
+  'empire:battle_concluded': {
+    empireId: EntityId;
+    empireName: string;
+    warId: string;
+    battleId: string;
+    outcome: 'victory' | 'defeat' | 'stalemate';
+    casualties: number;
+    tick: number;
+  };
+
   // === Province Events ===
   'province:election_completed': {
     provinceId: EntityId;

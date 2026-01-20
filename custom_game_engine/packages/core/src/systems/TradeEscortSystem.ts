@@ -149,10 +149,13 @@ export class TradeEscortSystem extends BaseSystem {
   /**
    * Build cache of all squadron entities for O(1) lookups
    * PERF: Uses object literal for faster access than Map
+   * GC: Clears by deleting keys instead of creating new object
    */
   private rebuildSquadronCache(world: World): void {
-    // PERF: Clear by reassigning (faster than delete loop)
-    this.squadronEntityCache = Object.create(null);
+    // GC: Clear existing object instead of creating new one
+    for (const key in this.squadronEntityCache) {
+      delete this.squadronEntityCache[key];
+    }
 
     const squadronEntities = world.query().with('squadron').executeEntities();
 

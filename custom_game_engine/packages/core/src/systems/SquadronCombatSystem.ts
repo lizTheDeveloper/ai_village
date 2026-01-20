@@ -142,6 +142,11 @@ export class SquadronCombatSystem extends BaseSystem {
     victor: undefined,
   };
 
+  // GC: Pre-allocated arrays for ship selection
+  private workingShipHealths: Array<{ shipId: string; integrity: number }> = [];
+  private workingDestroyedShips: string[] = [];
+  private workingRemainingShips: string[] = [];
+
   protected onUpdate(ctx: SystemContext): void {
     // This system is primarily event-driven
     // Process any active engagements
@@ -365,6 +370,7 @@ export class SquadronCombatSystem extends BaseSystem {
   /**
    * Select which ships are destroyed based on damage taken
    * Prioritizes ships with lowest hull integrity first
+   * GC: Uses pre-allocated arrays to avoid allocations
    */
   private selectDestroyedShips(
     world: World,
@@ -373,8 +379,8 @@ export class SquadronCombatSystem extends BaseSystem {
   ): string[] {
     if (shipsToDestroy <= 0) return [];
 
-    // Get all ships with their hull integrity
-    const shipHealths: Array<{ shipId: string; integrity: number }> = [];
+    // GC: Clear and reuse pre-allocated array
+    this.workingShipHealths.length = 0;
 
     for (const shipId of squadron.ships.shipIds) {
       const shipEntity = world.getEntity(shipId);
@@ -383,23 +389,28 @@ export class SquadronCombatSystem extends BaseSystem {
       const ship = shipEntity.getComponent<SpaceshipComponent>(CT.Spaceship);
       if (!ship) continue;
 
-      shipHealths.push({
+      this.workingShipHealths.push({
         shipId,
         integrity: ship.hull.integrity,
       });
     }
 
-    // Sort by integrity (weakest first)
-    shipHealths.sort((a, b) => a.integrity - b.integrity);
+    // Sort by integrity (weakest first) - in-place sort, no allocation
+    this.workingShipHealths.sort((a, b) => a.integrity - b.integrity);
 
-    // Return the weakest ships
-    return shipHealths
-      .slice(0, Math.min(shipsToDestroy, shipHealths.length))
-      .map(sh => sh.shipId);
+    // GC: Clear and reuse destroyed ships array
+    this.workingDestroyedShips.length = 0;
+    const count = Math.min(shipsToDestroy, this.workingShipHealths.length);
+    for (let i = 0; i < count; i++) {
+      this.workingDestroyedShips.push(this.workingShipHealths[i].shipId);
+    }
+
+    return this.workingDestroyedShips;
   }
 
   /**
    * Apply battle damage to squadron by removing destroyed ships
+   * GC: Uses pre-allocated array for remaining ships
    */
   private applyBattleDamage(
     world: World,
@@ -409,10 +420,20 @@ export class SquadronCombatSystem extends BaseSystem {
   ): void {
     if (destroyedShips.length === 0) return;
 
-    // Remove destroyed ships from squadron
-    const remainingShips = squadron.ships.shipIds.filter(
-      shipId => !destroyedShips.includes(shipId)
-    );
+    // GC: Build destroyed set for O(1) lookup (uses object literal)
+    const destroyedSet: Record<string, boolean> = Object.create(null);
+    for (const shipId of destroyedShips) {
+      destroyedSet[shipId] = true;
+    }
+
+    // GC: Clear and reuse pre-allocated array
+    this.workingRemainingShips.length = 0;
+    for (const shipId of squadron.ships.shipIds) {
+      if (!(shipId in destroyedSet)) {
+        this.workingRemainingShips.push(shipId);
+      }
+    }
+    const remainingShips = this.workingRemainingShips;
 
     // Update squadron component
     squadronEntity.updateComponent<SquadronComponent>(CT.Squadron, (s) => ({

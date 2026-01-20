@@ -1084,6 +1084,21 @@ export {
   getCompletedResearchProjects,
 } from './NationComponent.js';
 
+// Dynasty Component (Empire dynasty membership)
+export * from './DynastyComponent.js';
+export type {
+  DynastyComponent,
+  SuccessionPosition,
+} from './DynastyComponent.js';
+export {
+  createDynastyComponent,
+  calculateLegitimacy,
+  updateLegitimacyFactors,
+  promoteToRuler,
+  designateAsHeir,
+  endReign,
+} from './DynastyComponent.js';
+
 // Empire Component (06-POLITICAL-HIERARCHY.md - Tier 4)
 export * from './EmpireComponent.js';
 export type {

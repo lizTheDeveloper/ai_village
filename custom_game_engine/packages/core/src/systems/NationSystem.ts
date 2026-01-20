@@ -563,7 +563,6 @@ export class NationSystem extends BaseSystem {
 
 /**
  * Get cities within a nation (aggregated from provinces)
- * TODO: Implement once Province component exists
  */
 export function getNationCities(world: World, nationId: string): string[] {
   const nationEntity = world.getEntity(nationId);
@@ -572,8 +571,32 @@ export function getNationCities(world: World, nationId: string): string[] {
   const nation = nationEntity.getComponent<NationComponent>(CT.Nation);
   if (!nation) return [];
 
-  // TODO: Query actual provinces and their cities
-  return [];
+  // Query all provinces that belong to this nation
+  const provinces = world
+    .query()
+    .with(CT.ProvinceGovernance)
+    .executeEntities();
+
+  const cityIds: string[] = [];
+
+  for (const provinceEntity of provinces) {
+    const provinceComponent = provinceEntity.getComponent(CT.ProvinceGovernance) as any;
+    if (!provinceComponent) continue;
+
+    // Check if this province belongs to our nation
+    if (provinceComponent.parentNationId !== nationId) continue;
+
+    // Aggregate all city IDs from this province
+    if (Array.isArray(provinceComponent.cities)) {
+      for (const cityRecord of provinceComponent.cities) {
+        if (cityRecord.cityId) {
+          cityIds.push(cityRecord.cityId);
+        }
+      }
+    }
+  }
+
+  return cityIds;
 }
 
 /**

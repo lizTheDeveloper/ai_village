@@ -82,6 +82,7 @@ export enum ComponentType {
   Governor = 'governor',  // Phase 6: AI Governance - LLM-powered political decision making
   PoliticalEntity = 'political_entity',  // Phase 6: Political entity in hierarchy
   GovernanceHistory = 'governance_history',  // Phase 6: Governance audit trail
+  Dynasty = 'dynasty',  // Empire dynasty membership for soul agents
   HealthClinic = 'health_clinic',
   WeatherStation = 'weather_station',
   Shop = 'shop',
