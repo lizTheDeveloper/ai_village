@@ -233,7 +233,40 @@ export class SpellCastingManager {
         // Update the component with new resource values
         caster.updateComponent<MagicComponent>(CT.Magic, () => magic);
       } catch (e) {
-        // Fall back to simple mana deduction
+        // EXOTIC PLOT EVENT: paradigm_conflict_detected
+        // Check if this is a paradigm conflict error
+        const errorMsg = (e as Error).message;
+        if (errorMsg && errorMsg.startsWith('PARADIGM_CONFLICT:')) {
+          const parts = errorMsg.split(':');
+          const paradigm1 = parts[1] || 'unknown';
+          const paradigm2 = parts[2] || 'unknown';
+          const reason = parts.slice(3).join(':') || 'Paradigms incompatible';
+
+          // Determine severity and manifestation based on error
+          const severity: 'warning' | 'dangerous' | 'catastrophic' = 'catastrophic';
+          const manifestation: 'spell_failure' | 'backlash' | 'unstable_magic' | 'paradigm_collapse' =
+            errorMsg.includes('Divine and Pact') ? 'paradigm_collapse' :
+            errorMsg.includes('blood magic') ? 'backlash' :
+            'unstable_magic';
+
+          this.eventBus?.emit({
+            type: 'magic:paradigm_conflict_detected',
+            source: caster.id,
+            data: {
+              agentId: caster.id,
+              paradigm1,
+              paradigm2,
+              conflictSeverity: severity,
+              manifestation,
+              tick: world.tick,
+            },
+          });
+
+          // Paradigm conflicts are catastrophic - prevent the cast
+          return false;
+        }
+
+        // Fall back to simple mana deduction for other errors
         const canCast = canCastSpell(magic, composedSpell);
         if (!canCast.canCast) {
           return false;

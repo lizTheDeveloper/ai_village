@@ -699,6 +699,8 @@ export function registerAllSystems(
   // Fleet management (priority 80): Strategic fleet groups (3-10 squadrons)
   // Squadron management (priority 85): Tactical ship squadrons (3-10 ships)
   gameLoop.systemRegistry.register(new NavySystem());
+  gameLoop.systemRegistry.register(new NavyPersonnelSystem());
+  gameLoop.systemRegistry.register(new ShipyardProductionSystem());
   gameLoop.systemRegistry.register(new ArmadaSystem());
   gameLoop.systemRegistry.register(new FleetSystem());
   gameLoop.systemRegistry.register(new SquadronSystem());

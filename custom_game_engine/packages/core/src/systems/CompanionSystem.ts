@@ -233,6 +233,37 @@ export class CompanionSystem extends BaseSystem {
       if (this.companionEntityId) {
         this.milestones.dimensionalTravelCount++;
 
+        // EXOTIC PLOT EVENT: dimensional_encounter
+        // When an agent traverses dimensions, they may encounter β-space entities
+        // The Ophanim companion itself is one such entity
+        const traverserId = event.data.entityId;
+        const traveler = this.worldRef?.getEntity(traverserId);
+        const soulComp = traveler?.getComponent(CT.Soul);
+
+        if (traveler && soulComp) {
+          // Small chance (10%) of encountering dimensional horror during transit
+          const encounterChance = Math.random();
+          if (encounterChance < 0.1) {
+            const creatureTypes: Array<'ophanim' | 'dimensional_horror' | 'reality_eater'> = [
+              'ophanim',
+              'dimensional_horror',
+              'reality_eater',
+            ];
+            const creatureType = creatureTypes[Math.floor(Math.random() * creatureTypes.length)]!;
+
+            // Emit exotic event
+            eventBus.emit('companion:dimensional_encounter', {
+              agentId: traverserId,
+              soulId: (soulComp as any).soulId || traverserId,
+              creatureId: `dimensional_${creatureType}_${Date.now()}`,
+              creatureType,
+              encounterType: 'portal_opened',
+              sanityDamage: creatureType === 'reality_eater' ? 30 : creatureType === 'dimensional_horror' ? 20 : 10,
+              tick: this.worldRef?.tick || 0,
+            });
+          }
+        }
+
         // First dimensional travel (Tier 2 → 3)
         if (
           !this.milestones.firstDimensionalTravel &&

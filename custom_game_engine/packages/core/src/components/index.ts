@@ -1144,3 +1144,22 @@ export type {
   EvacuationPlan,
 } from './GalacticCouncilComponent.js';
 export { createGalacticCouncilComponent } from './GalacticCouncilComponent.js';
+
+// Trade Network (Grand Strategy - Tier 3: 07-TRADE-LOGISTICS.md)
+export * from './TradeNetworkComponent.js';
+export type {
+  TradeNetworkComponent,
+  TradeEdge,
+  NetworkHub,
+  NetworkChokepoint,
+  NetworkDisruption,
+} from './TradeNetworkComponent.js';
+export { createTradeNetworkComponent } from './TradeNetworkComponent.js';
+
+// Blockade (Strategic Trade Warfare)
+export * from './BlockadeComponent.js';
+export type {
+  BlockadeComponent,
+  BlockadeCombatEvent,
+} from './BlockadeComponent.js';
+export { createBlockadeComponent } from './BlockadeComponent.js';
