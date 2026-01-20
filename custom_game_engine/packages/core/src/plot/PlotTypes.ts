@@ -92,7 +92,16 @@ export type PlotScale =
   | 'small'      // Days to weeks - 3-5 active
   | 'medium'     // Months to years - 1-2 active
   | 'large'      // Single lifetime - 0-1
+  | 'exotic'     // Single lifetime, system-driven - 0-1
   | 'epic';      // Multi-lifetime - 0-1 (rare)
+
+/**
+ * Multiverse scope - can a plot span multiple universes?
+ */
+export type MultiverseScope =
+  | 'local'              // Single universe, local to this reality
+  | 'multiverse_wide'    // Spans multiple universes (e.g., cosmic forces, pantheons)
+  | 'cross_multiverse';  // Transcends multiverse boundaries (extremely rare)
 
 /**
  * Plot status
@@ -329,6 +338,7 @@ export interface PlotLineTemplate {
 
   // Scale and scope
   scale: PlotScale;
+  multiverse_scope?: MultiverseScope;  // Optional, defaults to 'local'
   fork_behavior: PlotForkBehavior;
 
   // What this plot teaches
@@ -395,6 +405,10 @@ export interface PlotLineInstance {
   status: PlotStatus;
   current_stage: string;
   stage_entered_at: number;      // Personal tick
+
+  // Scale and scope (copied from template for performance)
+  scale: PlotScale;
+  multiverse_scope: MultiverseScope;
 
   // History
   stages_visited: Array<{
@@ -729,4 +743,142 @@ export function getPendingHintsForPlot(
   return plotLines.dream_hints.filter(
     h => h.plot_instance_id === plotInstanceId && !h.consumed
   );
+}
+
+// ============================================================================
+// Scale Hierarchy & Scope Management (Phase 6)
+// ============================================================================
+
+/**
+ * Scale hierarchy values for comparison
+ * Higher values supersede lower values
+ */
+const SCALE_HIERARCHY: Record<PlotScale, number> = {
+  micro: 1,
+  small: 2,
+  medium: 3,
+  large: 4,
+  exotic: 5,
+  epic: 6,
+};
+
+/**
+ * Check if newScale supersedes existingScale in the hierarchy
+ *
+ * @param newScale - The scale of the plot being assigned
+ * @param existingScale - The scale of an existing plot
+ * @returns true if newScale is higher in the hierarchy and should replace existingScale
+ *
+ * @example
+ * plotScaleSupersedes('exotic', 'large') // true - exotic replaces large
+ * plotScaleSupersedes('large', 'exotic') // false - large doesn't replace exotic
+ * plotScaleSupersedes('micro', 'micro') // false - same scale doesn't replace
+ */
+export function plotScaleSupersedes(newScale: PlotScale, existingScale: PlotScale): boolean {
+  return SCALE_HIERARCHY[newScale] > SCALE_HIERARCHY[existingScale];
+}
+
+/**
+ * Get plots that would be replaced by assigning newPlot
+ *
+ * Based on scale hierarchy:
+ * - Max 1 plot per scale tier
+ * - Higher scales replace lower scales (exotic replaces large/medium, epic replaces all)
+ * - Different multiverse scopes can coexist (1 local + 1 multiverse_wide + 1 cross_multiverse)
+ *
+ * @param activePlots - Currently active plots
+ * @param newPlot - The plot being assigned
+ * @returns Array of plots that should be abandoned to make room for newPlot
+ *
+ * @example
+ * // Soul has: micro(local), small(local), large(local)
+ * // Assigning: exotic(local)
+ * // Returns: [large] - exotic replaces large, same scope
+ *
+ * // Soul has: large(local), large(multiverse_wide)
+ * // Assigning: exotic(local)
+ * // Returns: [large(local)] - only replaces same scope
+ */
+export function getPlotsToReplace(
+  activePlots: PlotLineInstance[],
+  newPlot: PlotLineInstance
+): PlotLineInstance[] {
+  const toReplace: PlotLineInstance[] = [];
+
+  for (const existing of activePlots) {
+    // Only consider plots with the same multiverse scope
+    if (existing.multiverse_scope !== newPlot.multiverse_scope) {
+      continue;
+    }
+
+    // Case 1: Same scale - replace existing
+    if (existing.scale === newPlot.scale) {
+      toReplace.push(existing);
+      continue;
+    }
+
+    // Case 2: New plot's scale supersedes existing plot
+    if (plotScaleSupersedes(newPlot.scale, existing.scale)) {
+      toReplace.push(existing);
+    }
+  }
+
+  return toReplace;
+}
+
+/**
+ * Check if a soul can receive a new plot assignment
+ *
+ * Validates:
+ * 1. Scale limits - max 1 plot per scale tier per scope
+ * 2. Scope compatibility - different scopes can coexist
+ * 3. Supersedence rules - higher scales can replace lower
+ *
+ * @param plotLines - The soul's plot component
+ * @param newPlot - The plot being assigned
+ * @returns true if plot can be assigned (either fits or will replace existing)
+ *
+ * @example
+ * // Soul has: micro(local), small(local), micro(multiverse_wide)
+ * // Can assign: medium(local) - yes, new scale tier
+ * // Can assign: small(local) - yes, will replace existing small
+ * // Can assign: micro(cross_multiverse) - yes, new scope
+ */
+export function canAssignPlot(
+  plotLines: PlotLinesComponent,
+  newPlot: PlotLineInstance
+): boolean {
+  const activePlots = plotLines.active;
+
+  // Always check if there are plots to replace
+  // If getPlotsToReplace returns plots, it means we CAN assign (will replace them)
+  // If it returns empty array, check if this scale+scope combo exists
+  const toReplace = getPlotsToReplace(activePlots, newPlot);
+
+  if (toReplace.length > 0) {
+    // Will replace existing plots, so can assign
+    return true;
+  }
+
+  // Check if this scale+scope combination already exists
+  const hasMatchingPlot = activePlots.some(
+    plot =>
+      plot.scale === newPlot.scale &&
+      plot.multiverse_scope === newPlot.multiverse_scope &&
+      plot.status === 'active'
+  );
+
+  // Can assign if no matching plot exists
+  return !hasMatchingPlot;
+}
+
+/**
+ * Get scale hierarchy value for a plot scale
+ * Useful for sorting and priority decisions
+ *
+ * @param scale - The plot scale
+ * @returns Numeric value (1-6) representing hierarchy level
+ */
+export function getScaleHierarchyValue(scale: PlotScale): number {
+  return SCALE_HIERARCHY[scale];
 }

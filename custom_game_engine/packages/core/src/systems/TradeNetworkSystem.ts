@@ -94,14 +94,14 @@ export class TradeNetworkSystem extends BaseSystem {
     this.worldRef = world;
 
     // Listen for shipping lane events
-    world.eventBus.on('lane:created', (event) => {
-      if (this.worldRef) {
+    world.eventBus.on('economy:lane:created', (event) => {
+      if (this.worldRef && event.type === 'economy:lane:created') {
         this.handleLaneCreated(this.worldRef, event.data.laneId);
       }
     });
 
-    world.eventBus.on('lane:removed', (event) => {
-      if (this.worldRef) {
+    world.eventBus.on('economy:lane:removed', (event) => {
+      if (this.worldRef && event.type === 'economy:lane:removed') {
         this.handleLaneRemoved(this.worldRef, event.data.laneId);
       }
     });
@@ -312,10 +312,101 @@ export class TradeNetworkSystem extends BaseSystem {
     const avgPathLength = calculateAvgPathLength(allPairs);
     const diameter = calculateDiameter(allPairs);
 
-    // Clustering coefficient (simplified - would need triangle counting for accuracy)
-    const clustering = 0; // TODO: Implement triangle counting
+    // Clustering coefficient via triangle counting
+    const clustering = this.calculateClusteringCoefficient(graph);
 
     return { density, avgPathLength, diameter, clustering };
+  }
+
+  /**
+   * Calculate clustering coefficient using triangle counting
+   *
+   * Clustering coefficient measures the degree to which nodes cluster together.
+   * Formula: C = (actual triangles) / (possible triangles)
+   *
+   * For each node, we count triangles formed with its neighbors.
+   * A triangle exists when two neighbors of a node are also connected to each other.
+   *
+   * @param graph - Graph to analyze
+   * @returns Clustering coefficient (0-1, where 1 = fully clustered)
+   */
+  private calculateClusteringCoefficient(graph: Graph): number {
+    let triangles = 0;
+    let possibleTriangles = 0;
+
+    // For each node in the graph
+    for (const [nodeId, edgeIds] of graph.adjacencyList) {
+      // Get neighbors by resolving edge IDs to neighbor node IDs
+      const neighbors = new Set<EntityId>();
+      for (const edgeId of edgeIds) {
+        const edge = graph.edges.get(edgeId);
+        if (!edge) continue;
+
+        // Add the neighbor (the "other end" of the edge)
+        if (edge.fromNodeId === nodeId) {
+          neighbors.add(edge.toNodeId);
+        } else if (edge.toNodeId === nodeId) {
+          neighbors.add(edge.fromNodeId);
+        }
+      }
+
+      const degree = neighbors.size;
+
+      // Need at least 2 neighbors to form a triangle
+      if (degree < 2) continue;
+
+      // Count possible triangles for this node: C(degree, 2) = degree * (degree - 1) / 2
+      possibleTriangles += (degree * (degree - 1)) / 2;
+
+      // Count actual triangles: check all pairs of neighbors
+      const neighborArray = Array.from(neighbors);
+      for (let i = 0; i < neighborArray.length; i++) {
+        for (let j = i + 1; j < neighborArray.length; j++) {
+          const neighbor1 = neighborArray[i]!;
+          const neighbor2 = neighborArray[j]!;
+
+          // Check if neighbor1 and neighbor2 are connected
+          if (this.areNodesConnected(graph, neighbor1, neighbor2)) {
+            triangles++;
+          }
+        }
+      }
+    }
+
+    // Each triangle is counted 3 times (once per vertex)
+    // So we divide triangles by 3 to get unique triangle count
+    const uniqueTriangles = triangles / 3;
+
+    // Clustering coefficient = unique triangles / possible triangles
+    return possibleTriangles > 0 ? uniqueTriangles / possibleTriangles : 0;
+  }
+
+  /**
+   * Check if two nodes are connected by an edge
+   *
+   * @param graph - Graph to check
+   * @param node1 - First node ID
+   * @param node2 - Second node ID
+   * @returns True if nodes are connected
+   */
+  private areNodesConnected(graph: Graph, node1: EntityId, node2: EntityId): boolean {
+    const edges1 = graph.adjacencyList.get(node1);
+    if (!edges1) return false;
+
+    // Check if any edge from node1 connects to node2
+    for (const edgeId of edges1) {
+      const edge = graph.edges.get(edgeId);
+      if (!edge) continue;
+
+      if (
+        (edge.fromNodeId === node1 && edge.toNodeId === node2) ||
+        (edge.fromNodeId === node2 && edge.toNodeId === node1)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   // ===========================================================================
@@ -445,10 +536,13 @@ export class TradeNetworkSystem extends BaseSystem {
     let routeCount = 0;
 
     // For each pair of neighbors, check if alternative path exists
-    const neighbors = Array.from(graph.adjacencyList.get(nodeId) ?? new Set())
-      .map((edgeId) => {
+    const edgeIds = graph.adjacencyList.get(nodeId) ?? new Set<string>();
+    const neighbors = Array.from(edgeIds)
+      .map((edgeId: string) => {
         const edge = graph.edges.get(edgeId);
-        return edge ? edge.toNodeId : undefined;
+        if (!edge) return undefined;
+        // Get the neighbor (the "other end" of the edge)
+        return edge.fromNodeId === nodeId ? edge.toNodeId : edge.fromNodeId;
       })
       .filter((id): id is EntityId => id !== undefined && id !== nodeId);
 
@@ -764,7 +858,8 @@ export class TradeNetworkSystem extends BaseSystem {
     blockade.affectedEdges = affectedEdges;
 
     // BFS to find downstream nodes affected by reduced flow
-    const cascadeNodes = this.calculateCascadeEffect(world, blockade.targetNodeId, affectedNodes);
+    // OPTIMIZATION: Pass cached laneEntities to avoid O(n²) query-in-loop
+    const cascadeNodes = this.calculateCascadeEffect(laneEntities, blockade.targetNodeId, affectedNodes);
     affectedNodes.push(...cascadeNodes);
 
     return Array.from(new Set(affectedNodes)); // Deduplicate
@@ -772,9 +867,11 @@ export class TradeNetworkSystem extends BaseSystem {
 
   /**
    * Calculate cascade effect of blockade (BFS)
+   *
+   * OPTIMIZATION: Accepts pre-cached laneEntities to avoid O(n²) query-in-loop
    */
   private calculateCascadeEffect(
-    world: World,
+    laneEntities: ReadonlyArray<Entity>,
     blockadedNode: EntityId,
     directlyAffected: EntityId[]
   ): EntityId[] {
@@ -787,9 +884,9 @@ export class TradeNetworkSystem extends BaseSystem {
       const currentNode = queue.shift();
       if (!currentNode) break;
 
-      // Find lanes originating from this node
-      const laneEntities = world.query().with('shipping_lane').executeEntities();
-
+      // OPTIMIZATION: Use pre-cached laneEntities instead of querying
+      // This fixes O(n²) complexity (query executed once per BFS iteration)
+      // Previously: world.query().with('shipping_lane').executeEntities() in loop
       for (const laneEntity of laneEntities) {
         const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
         if (!lane || lane.originId !== currentNode) continue;
@@ -799,7 +896,7 @@ export class TradeNetworkSystem extends BaseSystem {
         // If destination depends on this route and has no alternatives
         if (!visited.has(nextNode)) {
           // Check if this is the only route to nextNode
-          const alternativeRoutes = this.countIncomingRoutes(world, nextNode);
+          const alternativeRoutes = this.countIncomingRoutes(laneEntities, nextNode);
 
           if (alternativeRoutes <= 1) {
             // Single route = dependency
@@ -816,11 +913,13 @@ export class TradeNetworkSystem extends BaseSystem {
 
   /**
    * Count incoming routes to a node
+   *
+   * OPTIMIZATION: Accepts pre-cached laneEntities to avoid redundant queries
    */
-  private countIncomingRoutes(world: World, nodeId: EntityId): number {
+  private countIncomingRoutes(laneEntities: ReadonlyArray<Entity>, nodeId: EntityId): number {
     let count = 0;
 
-    const laneEntities = world.query().with('shipping_lane').executeEntities();
+    // OPTIMIZATION: Use pre-cached laneEntities instead of querying
     for (const laneEntity of laneEntities) {
       const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
       if (lane && lane.destinationId === nodeId && lane.status === 'active') {

@@ -52,6 +52,9 @@ export * from './systems/index.js';
 export { WildAnimalSpawningSystem } from './systems/index.js';
 // Explicit system type re-exports
 export type { PossessionStatus } from './systems/PossessionSystem.js';
+// Resolve duplicate exports between systems and components
+export { addShipToSquadron } from './systems/SquadronSystem.js';
+export type { Season } from './types.js';
 // System helper base classes
 export { ThrottledSystem, FilteredSystem, ThrottledFilteredSystem } from './ecs/SystemHelpers.js';
 // System throttle configuration

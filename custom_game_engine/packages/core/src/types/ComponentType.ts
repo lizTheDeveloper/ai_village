@@ -172,12 +172,15 @@ export enum ComponentType {
   PassageExtended = 'passage_extended',  // Multiverse: extended passage metadata for inter-universe travel
 
   // Universe Metadata (Conservation of Game Matter)
+  Corrupted = 'corrupted',                          // Generic corruption marker (Conservation of Game Matter)
   ProtoReality = 'proto_reality',
   CorruptedUniverse = 'corrupted_universe',
   UniverseForkMetadata = 'universe_fork_metadata',  // Multiverse: timeline forking and divergence
   DivergenceTracking = 'divergence_tracking',       // Multiverse: track timeline differences
   CanonEvent = 'canon_event',                       // Multiverse: narrative anchors that resist change
+  CausalChain = 'causal_chain',                     // Multiverse: paradox detection via causal history
   MergeCompatibility = 'merge_compatibility',       // Multiverse: timeline merge compatibility tracking
+  TimelineMergerOperation = 'timeline_merger_operation', // Multiverse: active timeline merger ship operations
 
   // World-level Registries
   NamedLandmarks = 'named_landmarks',
@@ -204,6 +207,7 @@ export enum ComponentType {
   SupremeCreator = 'supreme_creator',
   PowerVacuum = 'power_vacuum',     // Tracks vacant positions of authority
   PositionHolder = 'position_holder', // Marks entities holding positions of power
+  DimensionalRift = 'dimensional_rift', // Tears in spacetime from rebellion, magic failures, or cosmic events
 
   // Combat
   Conflict = 'conflict',

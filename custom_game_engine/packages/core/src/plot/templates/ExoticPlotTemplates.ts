@@ -39,9 +39,9 @@ function loadExoticPlotTemplates(): PlotLineTemplate[] {
     if (!template.id || !template.name || !template.scale || !template.stages || !template.transitions) {
       throw new Error(`[ExoticPlotTemplates] Invalid template structure: ${template.id || 'unknown'}`);
     }
-    // Exotic templates use 'large' scale but have special system integration requirements
-    if (template.scale !== 'large') {
-      throw new Error(`[ExoticPlotTemplates] Template ${template.id} has wrong scale: ${template.scale} (expected 'large')`);
+    // Exotic templates use 'exotic' scale (tier 5 in hierarchy)
+    if (template.scale !== 'exotic') {
+      throw new Error(`[ExoticPlotTemplates] Template ${template.id} has wrong scale: ${template.scale} (expected 'exotic')`);
     }
   }
 

@@ -1,0 +1,142 @@
+--- a/packages/core/src/systems/GalacticCouncilSystem.ts
++++ b/packages/core/src/systems/GalacticCouncilSystem.ts
+@@ -142,6 +142,12 @@ export class GalacticCouncilSystem extends BaseSystem {
+   private processGalacticUpdate(world: World, councilEntity: EntityImpl, tick: number): void {
+     const council = councilEntity.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
+     if (!council) return;
++
++    // OPTIMIZATION: Cache all queries before processing
++    const speciesEntities = world.query().with(CT.Species).executeEntities();
++    const navyEntities = world.query().with(CT.Navy).executeEntities();
++    const councilEntities = world.query().with(CT.GalacticCouncil).executeEntities();
+
+     // Step 1: Update galaxy state
+     const galaxyStats = this.updateGalaxyState(world, council);
+
+     // Step 2: Track species civilizations
+-    this.trackSpeciesCivilizations(world, council);
++    this.trackSpeciesCivilizations(speciesEntities, council);
+
+     // Step 3: Process universal laws
+     this.enforceUniversalLaws(world, council, councilEntity, tick);
+
+     // Step 4: Manage peacekeeping missions
+-    this.managePeacekeepingMissions(world, council, councilEntity, tick);
++    this.managePeacekeepingMissions(navyEntities, council, councilEntity, tick);
+
+     // Step 5: Handle existential crises
+-    this.respondToCrises(world, council, councilEntity, tick);
++    this.respondToCrises(navyEntities, council, councilEntity, tick);
+
+     // Step 6: Mediate disputes
+     this.mediateDisputes(world, council, councilEntity, tick);
+@@ -223,10 +229,10 @@ export class GalacticCouncilSystem extends BaseSystem {
+   /**
+    * Track species civilizations and update their attributes
+    */
+   private trackSpeciesCivilizations(
++    speciesEntities: ReadonlyArray<Entity>,
+-    world: World,
+     council: GalacticCouncilComponent
+   ): void {
+-    // ❌ BEFORE: Query inside method called in update
+-    const speciesEntities = world.query().with(CT.Species).executeEntities();
++    // ✅ AFTER: Use passed cached entities
+
+     for (const entity of speciesEntities) {
+       const speciesComp = entity.getComponent<SpeciesComponent>(CT.Species);
+@@ -365,10 +371,10 @@ export class GalacticCouncilSystem extends BaseSystem {
+   /**
+    * Manage active peacekeeping missions
+    */
+   private managePeacekeepingMissions(
++    navyEntities: ReadonlyArray<Entity>,
+-    world: World,
+     council: GalacticCouncilComponent,
+     councilEntity: EntityImpl,
+     tick: number
+   ): void {
+     for (const mission of council.peacekeepingForces.activeMissions) {
+@@ -403,7 +409,7 @@ export class GalacticCouncilSystem extends BaseSystem {
+   /**
+    * Deploy peacekeeping mission
+    */
+   public deployPeacekeepingMission(
+-    world: World,
++    navyEntities: ReadonlyArray<Entity>,
+     council: GalacticCouncilComponent,
+     councilEntity: EntityImpl,
+     missionType: PeacekeepingMission['type'],
+@@ -413,9 +419,7 @@ export class GalacticCouncilSystem extends BaseSystem {
+   ): void {
+     // Query participating species' navies
+     const fleetsDeployed: string[] = [];
+-    // ❌ BEFORE: Query inside method
+-    const navyEntities = world.query().with(CT.Navy).executeEntities();
+
++    // ✅ AFTER: Use passed cached entities
+     for (const navyEntity of navyEntities) {
+       const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
+       if (!navy) continue;
+@@ -467,10 +471,10 @@ export class GalacticCouncilSystem extends BaseSystem {
+   /**
+    * Respond to existential crises
+    */
+   private respondToCrises(
++    navyEntities: ReadonlyArray<Entity>,
+-    world: World,
+     council: GalacticCouncilComponent,
+     councilEntity: EntityImpl,
+     tick: number
+   ): void {
+     for (const crisis of council.science.existentialThreats) {
+       // Check if crisis requires emergency response
+       if (crisis.severity === 'extinction_level' || crisis.severity === 'major') {
+         // Mobilize resources from all species
+-        const response = this.mobilizeCrisisResponse(world, council, crisis, tick);
++        const response = this.mobilizeCrisisResponse(navyEntities, council, crisis, tick);
+
+         // Track response
+         const existingResponses = this.activeCrisisResponses.get(council.name) || [];
+@@ -502,10 +506,10 @@ export class GalacticCouncilSystem extends BaseSystem {
+   /**
+    * Mobilize crisis response
+    */
+   private mobilizeCrisisResponse(
++    navyEntities: ReadonlyArray<Entity>,
+-    world: World,
+     council: GalacticCouncilComponent,
+     crisis: ExistentialThreat,
+     tick: number
+   ): CrisisResponse {
+     const respondingSpecies: string[] = [];
+     const fleetsMobilized: string[] = [];
+
+     // All species contribute to existential threats
+     for (const species of council.memberSpecies) {
+       respondingSpecies.push(species.name);
+     }
+
+-    // ❌ BEFORE: Query repeated
+-    const navyEntities = world.query().with(CT.Navy).executeEntities();
+-
++    // ✅ AFTER: Use passed cached entities
+     for (const navyEntity of navyEntities) {
+       const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
+       if (!navy) continue;
+@@ -885,10 +889,10 @@ export class GalacticCouncilSystem extends BaseSystem {
+   /**
+    * Get council entity by name
+    */
+   public getCouncilEntity(
++    councilEntities: ReadonlyArray<Entity>,
+-    world: World,
+     councilName: string
+   ): EntityImpl | null {
+-    // ❌ BEFORE: Query in helper method
+-    const councils = world.query().with(CT.GalacticCouncil).executeEntities();
+-
++    // ✅ AFTER: Use passed cached entities
+     for (const entity of councilEntities) {
+       const council = entity.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
+       if (council && council.name === councilName) {

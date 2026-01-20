@@ -352,7 +352,7 @@ export class EventReportingSystem extends BaseSystem {
     const method = data.discoveryMethod ?? 'unknown means';
 
     // Create headline based on content type
-    const typeLabelMap: Record<typeof contentType, string> = {
+    const typeLabelMap: Record<string, string> = {
       riddle: 'Ancient Riddle',
       spell: 'Legendary Spell',
       recipe: 'Divine Recipe',

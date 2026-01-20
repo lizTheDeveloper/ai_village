@@ -22,6 +22,7 @@ export interface WarehouseComponent extends Component {
   resourceType: string; // 'food', 'wood', 'stone', etc.
   capacity: number; // Maximum storage (1000)
   stockpiles: Record<string, number>; // { berries: 50, meat: 30 }
+  inventory: Record<string, number>; // Alias for stockpiles (for compatibility)
   productionRates: Record<string, number>; // units per hour
   consumptionRates: Record<string, number>; // units per hour
   daysRemaining: Record<string, number>; // days until depletion
@@ -42,6 +43,7 @@ export function createWarehouseComponent(resourceType: string): WarehouseCompone
     resourceType,
     capacity: 1000,
     stockpiles: {},
+    inventory: {}, // Alias for stockpiles
     productionRates: {},
     consumptionRates: {},
     daysRemaining: {},

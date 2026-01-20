@@ -17,7 +17,7 @@
  */
 
 import type { World } from '../ecs/World.js';
-import type { EntityImpl } from '../ecs/Entity.js';
+import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EmpireComponent } from '../components/EmpireComponent.js';
 import type { NationComponent } from '../components/NationComponent.js';
@@ -404,7 +404,7 @@ function executeEmpireDelegateDirective(
   // Get nation entities
   const nationEntities = targetNationIds
     .map((id) => world.getEntity(id))
-    .filter((e) => e !== null);
+    .filter((e): e is Entity => e !== null && e !== undefined);
 
   const delegationChain: DelegationChain = {
     origin: 'empire',
@@ -746,7 +746,7 @@ function executeNationDelegateDirective(
   // Get province entities
   const provinceEntities = targetProvinceIds
     .map((id) => world.getEntity(id))
-    .filter((e) => e !== null);
+    .filter((e): e is Entity => e !== null && e !== undefined);
 
   const delegationChain: DelegationChain = {
     origin: 'nation',
@@ -1663,7 +1663,19 @@ function executeFederationMediateDispute(
     return f;
   });
 
-  result.eventsEmitted.push('federation:dispute_mediated');
+  world.eventBus.emit({
+    type: 'federation:member_satisfaction_changed',
+    source: federationEntity.id,
+    data: {
+      federationName: federation.name,
+      memberId,
+      oldSatisfaction: currentSatisfaction,
+      newSatisfaction,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('federation:member_satisfaction_changed');
   result.stateChanges.push(`Mediated dispute with member ${memberId}, satisfaction increased to ${Math.round(newSatisfaction * 100)}%`);
 }
 

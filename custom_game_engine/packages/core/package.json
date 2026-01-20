@@ -15,7 +15,8 @@
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "validate:components": "tsx src/scripts/validate-components.ts"
   },
   "dependencies": {
     "uuid": "^9.0.1"

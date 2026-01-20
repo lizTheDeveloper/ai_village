@@ -199,7 +199,8 @@ export class QueryBuilder implements IQueryBuilder {
 
       case 'tags': {
         const tags = filter.data as string[];
-        const tagsComp = entity.components.get('tags') as
+        const tagsCompRaw = entity.components.get('tags');
+        const tagsComp = tagsCompRaw as unknown as
           | { tags: string[] }
           | undefined;
         if (!tagsComp) return false;
@@ -213,7 +214,8 @@ export class QueryBuilder implements IQueryBuilder {
           width: number;
           height: number;
         };
-        const pos = entity.components.get('position') as
+        const posRaw = entity.components.get('position');
+        const pos = posRaw as unknown as
           | { x: number; y: number }
           | undefined;
         if (!pos) return false;
@@ -230,7 +232,8 @@ export class QueryBuilder implements IQueryBuilder {
           chunkX: number;
           chunkY: number;
         };
-        const pos = entity.components.get('position') as
+        const posRaw = entity.components.get('position');
+        const pos = posRaw as unknown as
           | { chunkX: number; chunkY: number }
           | undefined;
         if (!pos) return false;
@@ -247,12 +250,14 @@ export class QueryBuilder implements IQueryBuilder {
         const targetEntity = this.world.getEntity(entityId);
         if (!targetEntity) return false;
 
-        const targetPos = targetEntity.components.get('position') as
+        const targetPosRaw = targetEntity.components.get('position');
+        const targetPos = targetPosRaw as unknown as
           | { x: number; y: number }
           | undefined;
         if (!targetPos) return false;
 
-        const pos = entity.components.get('position') as
+        const posRaw = entity.components.get('position');
+        const pos = posRaw as unknown as
           | { x: number; y: number }
           | undefined;
         if (!pos) return false;

@@ -1213,7 +1213,7 @@ export function buildFederationContext(president: Entity, world: World): Federat
       type: 'empire',
       population: empire.totalPopulation,
       satisfaction: federation.stability.memberSatisfaction.get(empireId) || 0.7,
-      militaryContribution: empire.military.fleets.length,
+      militaryContribution: empire.military.totalShips,
       votingPower,
     });
   }

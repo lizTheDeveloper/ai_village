@@ -670,6 +670,77 @@ console.log({
 });
 ```
 
+## Performance Profiling (Phase 6)
+
+**Enable performance profiling to identify system bottlenecks and optimization opportunities.**
+
+### Enable Profiling
+```javascript
+// Enable profiling
+game.gameLoop.enableProfiling();
+
+// Let it run for 100+ ticks to gather data
+// (at 20 TPS, 100 ticks = 5 seconds)
+
+// Get performance report
+const report = game.gameLoop.getProfilingReport();
+console.log(report.summary);
+console.log(`TPS: ${report.actualTPS.toFixed(1)}`);
+console.log(`Budget usage: ${report.budgetUsagePercent.toFixed(1)}%`);
+
+// View per-system metrics
+report.systems.forEach(s => {
+  console.log(`${s.systemName}: ${s.avgExecutionTimeMs.toFixed(2)}ms avg, ${s.maxExecutionTimeMs.toFixed(2)}ms max`);
+});
+
+// View hotspots with suggestions
+report.hotspots.forEach(h => {
+  console.log(`[${h.severity}] ${h.systemName}: ${h.issue}`);
+  console.log(`  Measurement: ${h.measurement}`);
+  console.log(`  Suggestion: ${h.suggestion}`);
+});
+```
+
+### Export Reports
+```javascript
+// Export as markdown
+const markdown = game.gameLoop.exportProfilingMarkdown();
+console.log(markdown);
+
+// Copy to clipboard
+navigator.clipboard.writeText(markdown);
+
+// Export as JSON
+const json = game.gameLoop.exportProfilingJSON();
+const data = JSON.parse(json);
+
+// Download as file
+const blob = new Blob([markdown], { type: 'text/markdown' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'performance-report.md';
+a.click();
+```
+
+### Disable Profiling
+```javascript
+// Disable profiling (reduces overhead)
+game.gameLoop.disableProfiling();
+```
+
+### Profiler Metrics
+- **Avg(ms)**: Average execution time per tick
+- **Max(ms)**: Maximum execution time (p99)
+- **CPU%**: Percentage of tick budget used
+- **Entities**: Average entity count processed
+- **Status**: ✅ OK, ⚠️ SLOW (>5ms), ❌ CRITICAL (>10ms)
+
+### Hotspot Severity
+- **🔴 Critical**: System exceeds budget by >2x (needs immediate optimization)
+- **⚠️ Warning**: System exceeds 5ms budget
+- **ℹ️ Info**: Optimization opportunities (throttling, caching, etc.)
+
 ## Important Notes
 
 ### API Architecture

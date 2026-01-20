@@ -61,6 +61,7 @@ export { MEDIUM_PLOT_TEMPLATES } from './templates/MediumPlotTemplates.js';
 export { LARGE_PLOT_TEMPLATES } from './templates/LargePlotTemplates.js';
 export { EXOTIC_PLOT_TEMPLATES } from './templates/ExoticPlotTemplates.js';
 export { EPIC_PLOT_TEMPLATES } from './templates/EpicPlotTemplates.js';
+export { ISEKAI_PLOT_TEMPLATES } from './templates/IsekaiPlotTemplates.js';
 
 // Plot Condition Evaluator (Phase 1)
 export {

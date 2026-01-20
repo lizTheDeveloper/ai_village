@@ -16,7 +16,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
-import type { PoliticalTier } from '../governance/DecisionProtocols.js';
+import type { PoliticalTier } from '../governance/types.js';
 
 /**
  * Types of governance actions that can be recorded

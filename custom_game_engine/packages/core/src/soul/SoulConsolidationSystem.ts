@@ -40,7 +40,7 @@ export class SoulConsolidationSystem extends BaseSystem {
    */
   async onSleepStart(agent: Entity, world: World): Promise<void> {
     // Check if agent has a soul
-    const soulLink = agent.getComponent(ComponentType.SoulLink) as SoulLinkComponent | undefined;
+    const soulLink = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
     if (!soulLink) return; // No soul = no consolidation
 
     // Get the soul entity
@@ -50,7 +50,7 @@ export class SoulConsolidationSystem extends BaseSystem {
       return;
     }
 
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
     if (!thread) {
       console.warn(`[SoulConsolidation] Soul ${soul.id} missing SilverThread component`);
       return;

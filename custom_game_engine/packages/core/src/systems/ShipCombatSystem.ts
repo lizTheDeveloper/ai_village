@@ -58,7 +58,7 @@ export class ShipCombatSystem extends BaseSystem {
   public readonly metadata = {
     category: 'combat',
     description: 'Resolves individual ship-to-ship combat with phases',
-    dependsOn: ['fleet_combat' as SystemId],
+    dependsOn: [],
     writesComponents: [CT.Spaceship, CT.ShipCrew] as const,
   } as const;
 

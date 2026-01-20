@@ -18,7 +18,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { EmpireComponent, EmpireRelation } from '../components/EmpireComponent.js';
+import type { EmpireComponent, EmpireRelation, ImperialWar, ImperialTreaty } from '../components/EmpireComponent.js';
 
 // ============================================================================
 // Types
@@ -66,7 +66,7 @@ export class EmpireDiplomacySystem extends BaseSystem {
   // Update interval: 3000 ticks = 2.5 minutes at 20 TPS (quarterly diplomatic review)
   protected readonly throttleInterval = 3000;
 
-  private lastUpdateTick: Map<string, number> = new Map();
+  private empireLastUpdateTick: Map<string, number> = new Map();
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
@@ -77,11 +77,11 @@ export class EmpireDiplomacySystem extends BaseSystem {
       if (!empire) continue;
 
       // Check if update is due
-      const lastUpdate = this.lastUpdateTick.get(empire.empireName) || 0;
+      const lastUpdate = this.empireLastUpdateTick.get(empire.empireName) || 0;
       if (tick - lastUpdate < this.throttleInterval) continue;
 
       this.processDiplomaticUpdate(ctx.world, empireEntity as EntityImpl, empire, tick);
-      this.lastUpdateTick.set(empire.empireName, tick);
+      this.empireLastUpdateTick.set(empire.empireName, tick);
     }
   }
 
@@ -116,8 +116,8 @@ export class EmpireDiplomacySystem extends BaseSystem {
    * Update opinion scores for all diplomatic relations
    */
   private updateOpinionScores(world: World, empire: EmpireComponent, tick: number): void {
-    for (const [empireId, relation] of empire.foreignPolicy.diplomaticRelations) {
-      const modifiers = this.calculateOpinionModifiers(world, empire, empireId, relation);
+    for (const [empireId, relation] of empire.foreignPolicy?.diplomaticRelations ?? new Map()) {
+      const modifiers = this.calculateOpinionModifiers(world, empire, empireId, relation, tick);
       const newOpinion = this.calculateOpinion(modifiers);
 
       // Update relation
@@ -145,17 +145,20 @@ export class EmpireDiplomacySystem extends BaseSystem {
     world: World,
     empire: EmpireComponent,
     otherEmpireId: string,
-    relation: EmpireRelation
+    relation: EmpireRelation,
+    tick: number
   ): OpinionModifiers {
     // Shared border (check if any nations are neighbors)
     const sharedBorder = this.hasSharedBorder(world, empire, otherEmpireId) ? -10 : 0;
 
     // Trade volume (0-30 points based on trade)
-    const tradeVolume = Math.min(30, relation.interImperialTrade / 1000);
+    // Note: EmpireRelation in EmpireComponent doesn't have interImperialTrade
+    // Using placeholder calculation based on treaties
+    const tradeVolume = relation.treaties.length * 5;
 
     // Recent wars (-50 per war in last 30000 ticks = ~5 years)
-    const recentWars = empire.foreignPolicy.activeWars
-      .filter(w => w.aggressorNationIds.includes(otherEmpireId) || w.defenderNationIds.includes(otherEmpireId))
+    const recentWars = (empire.foreignPolicy?.activeWars ?? [])
+      .filter(w => w.aggressorEmpireIds.includes(otherEmpireId) || w.defenderEmpireIds.includes(otherEmpireId))
       .filter(w => tick - w.startedTick < 30000)
       .length * -50;
 
@@ -212,7 +215,7 @@ export class EmpireDiplomacySystem extends BaseSystem {
     empire: EmpireComponent,
     tick: number
   ): void {
-    for (const [empireId, relation] of empire.foreignPolicy.diplomaticRelations) {
+    for (const [empireId, relation] of empire.foreignPolicy?.diplomaticRelations ?? new Map()) {
       // Skip if already allied or at war
       if (relation.relationship === 'allied' || relation.relationship === 'at_war') {
         continue;
@@ -245,7 +248,8 @@ export class EmpireDiplomacySystem extends BaseSystem {
     const hasSharedThreat = this.hasSharedThreat(world, empire, otherEmpireId);
 
     // Condition 3: Complementary resources (trade benefits)
-    const hasTradeValue = relation.interImperialTrade > 5000;
+    // Note: EmpireRelation doesn't have interImperialTrade, using treaty count as proxy
+    const hasTradeValue = relation.treaties.length > 0;
 
     // Condition 4: Cultural similarity
     const culturallySimilar = true; // Placeholder
@@ -265,11 +269,11 @@ export class EmpireDiplomacySystem extends BaseSystem {
     tick: number
   ): void {
     // Create defense pact treaty
-    const treaty = {
+    const treaty: ImperialTreaty = {
       id: `treaty_${tick}_alliance_${empire.empireName}_${targetEmpireId}`,
       name: `${empire.empireName}-${targetEmpireId} Defense Pact`,
       type: 'military_alliance' as const,
-      signatoryNationIds: [empire.empireName, targetEmpireId],
+      signatoryEmpireIds: [empire.empireName, targetEmpireId],
       terms: ['Mutual defense', 'Military cooperation', 'Intelligence sharing'],
       signedTick: tick,
       status: 'active' as const,
@@ -317,11 +321,11 @@ export class EmpireDiplomacySystem extends BaseSystem {
     tick: number
   ): void {
     // Don't declare war if already at war
-    if (empire.foreignPolicy.activeWars.length > 0) {
+    if ((empire.foreignPolicy?.activeWars ?? []).length > 0) {
       return;
     }
 
-    for (const [empireId, relation] of empire.foreignPolicy.diplomaticRelations) {
+    for (const [empireId, relation] of empire.foreignPolicy?.diplomaticRelations ?? new Map()) {
       // Skip allies and friendly relations
       if (relation.relationship === 'allied' || relation.relationship === 'friendly') {
         continue;
@@ -392,7 +396,7 @@ export class EmpireDiplomacySystem extends BaseSystem {
     empire: EmpireComponent,
     tick: number
   ): void {
-    for (const treaty of empire.foreignPolicy.imperialTreaties) {
+    for (const treaty of empire.foreignPolicy?.imperialTreaties ?? []) {
       if (treaty.status !== 'active') continue;
 
       switch (treaty.type) {
@@ -424,17 +428,17 @@ export class EmpireDiplomacySystem extends BaseSystem {
   private executeTradeAgreement(
     world: World,
     empire: EmpireComponent,
-    treaty: any,
+    treaty: ImperialTreaty,
     tick: number
   ): void {
-    // Increase trade volume between signatories
-    for (const signatoryId of treaty.signatoryNationIds) {
+    // Trade agreements improve relations
+    for (const signatoryId of treaty.signatoryEmpireIds) {
       if (signatoryId === empire.empireName) continue;
 
-      const relation = empire.foreignPolicy.diplomaticRelations.get(signatoryId);
+      const relation = empire.foreignPolicy?.diplomaticRelations.get(signatoryId);
       if (relation) {
-        // Increase trade by 10% per quarter
-        relation.interImperialTrade *= 1.1;
+        // Improve opinion gradually through trade
+        relation.opinion = Math.min(100, relation.opinion + 0.5);
       }
     }
   }
@@ -446,11 +450,11 @@ export class EmpireDiplomacySystem extends BaseSystem {
     world: World,
     empireEntity: EntityImpl,
     empire: EmpireComponent,
-    treaty: any,
+    treaty: ImperialTreaty,
     tick: number
   ): void {
     // Check if any ally is at war
-    for (const signatoryId of treaty.signatoryNationIds) {
+    for (const signatoryId of treaty.signatoryEmpireIds) {
       if (signatoryId === empire.empireName) continue;
 
       // Get ally empire
@@ -461,8 +465,8 @@ export class EmpireDiplomacySystem extends BaseSystem {
       if (!ally) continue;
 
       // Check if ally was attacked (is defender in war)
-      for (const war of ally.foreignPolicy.activeWars) {
-        if (war.defenderNationIds.includes(signatoryId)) {
+      for (const war of ally.foreignPolicy?.activeWars ?? []) {
+        if (war.defenderEmpireIds.includes(signatoryId)) {
           // Ally was attacked - we must join
           this.joinAllyWar(world, empireEntity, empire, war, signatoryId, tick);
         }
@@ -477,23 +481,26 @@ export class EmpireDiplomacySystem extends BaseSystem {
     world: World,
     empireEntity: EntityImpl,
     empire: EmpireComponent,
-    war: any,
+    war: ImperialWar,
     allyId: string,
     tick: number
   ): void {
     // Add empire to war as defender
     empireEntity.updateComponent<EmpireComponent>(CT.Empire, (current) => {
       // Clone war and add us as defender
-      const updatedWar = {
+      const updatedWar: ImperialWar = {
         ...war,
-        defenderNationIds: [...war.defenderNationIds, empire.empireName],
+        defenderEmpireIds: [...war.defenderEmpireIds, empire.empireName],
+        defenderNationIds: [...war.defenderNationIds],
       };
 
       return {
         ...current,
         foreignPolicy: {
           ...current.foreignPolicy,
-          activeWars: [...current.foreignPolicy.activeWars, updatedWar],
+          activeWars: [...(current.foreignPolicy?.activeWars ?? []), updatedWar],
+          imperialTreaties: current.foreignPolicy?.imperialTreaties ?? [],
+          diplomaticRelations: current.foreignPolicy?.diplomaticRelations ?? new Map(),
         },
       };
     });
@@ -524,7 +531,7 @@ export class EmpireDiplomacySystem extends BaseSystem {
 
   private hasSharedThreat(world: World, empire: EmpireComponent, otherEmpireId: string): boolean {
     // Check if both empires have a common enemy
-    for (const [enemyId, relation] of empire.foreignPolicy.diplomaticRelations) {
+    for (const [enemyId, relation] of empire.foreignPolicy?.diplomaticRelations ?? new Map()) {
       if (relation.relationship === 'hostile' || relation.relationship === 'at_war') {
         // Check if other empire also hates this enemy
         const otherEmpire = this.getEmpireByName(world, otherEmpireId);
@@ -567,7 +574,7 @@ export class EmpireDiplomacySystem extends BaseSystem {
     if (!empire) return false;
 
     // Check for military alliances
-    return empire.foreignPolicy.imperialTreaties.some(
+    return (empire.foreignPolicy?.imperialTreaties ?? []).some(
       (t) => t.type === 'military_alliance' && t.status === 'active'
     );
   }

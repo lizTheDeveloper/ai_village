@@ -359,7 +359,7 @@ export class InteractionAPI {
     }
 
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent(ComponentType.Plant) as {
+    const plant = plantImpl.getComponent(ComponentType.Plant) as unknown as {
       speciesId: string;
       fruitCount: number;
       stage: string;
@@ -559,7 +559,7 @@ export class InteractionAPI {
 
     const itemImpl = itemEntity as EntityImpl;
     interface ItemData { itemId: string; quantity?: number }
-    const item = itemImpl.getComponent(ComponentType.Item) as ItemData | undefined;
+    const item = itemImpl.getComponent(ComponentType.Item) as unknown as ItemData | undefined;
     if (!item) {
       return { success: false, message: 'Target is not an item' };
     }

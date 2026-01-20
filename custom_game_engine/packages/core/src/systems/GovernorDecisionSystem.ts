@@ -38,9 +38,9 @@ import type { EventBus } from '../events/EventBus.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type {
   GovernorComponent,
-  PoliticalTier,
   GovernorDecision,
 } from '../components/GovernorComponent.js';
+import type { PoliticalTier } from '../governance/types.js';
 import {
   canMakeDecision,
   recordDecision,
@@ -124,6 +124,12 @@ const TIER_LLM_BUDGETS: Record<PoliticalTier, TierLLMBudget> = {
     priorityLevel: 'critical',
     modelRecommended: 'claude-3-5-sonnet-20241022',
   },
+  federation: {
+    tier: 'federation',
+    callsPerHour: 2,
+    priorityLevel: 'high',
+    modelRecommended: 'claude-3-5-sonnet-20241022',
+  },
   empire: {
     tier: 'empire',
     callsPerHour: 5,
@@ -142,6 +148,12 @@ const TIER_LLM_BUDGETS: Record<PoliticalTier, TierLLMBudget> = {
     priorityLevel: 'normal',
     modelRecommended: 'claude-3-5-haiku-20241022',
   },
+  city: {
+    tier: 'city',
+    callsPerHour: 30,
+    priorityLevel: 'normal',
+    modelRecommended: 'claude-3-5-haiku-20241022',
+  },
   village: {
     tier: 'village',
     callsPerHour: 0,
@@ -155,9 +167,11 @@ const TIER_LLM_BUDGETS: Record<PoliticalTier, TierLLMBudget> = {
  */
 const UPDATE_INTERVALS: Record<PoliticalTier, number> = {
   galactic_council: 72000, // 1 hour
-  empire: 36000, // 30 minutes
+  federation: 36000, // 30 minutes
+  empire: 18000, // 15 minutes
   nation: 12000, // 10 minutes
   province: 6000, // 5 minutes
+  city: 3000, // 2.5 minutes
   village: 0, // No LLM
 };
 
@@ -167,25 +181,31 @@ const UPDATE_INTERVALS: Record<PoliticalTier, number> = {
 
 // Bitflags for active tiers (avoid Map lookups in hot path)
 const TIER_FLAG_GALACTIC = 1 << 0;
-const TIER_FLAG_EMPIRE = 1 << 1;
-const TIER_FLAG_NATION = 1 << 2;
-const TIER_FLAG_PROVINCE = 1 << 3;
-// Village tier (1 << 4) is never set - it's rule-based, no LLM
+const TIER_FLAG_FEDERATION = 1 << 1;
+const TIER_FLAG_EMPIRE = 1 << 2;
+const TIER_FLAG_NATION = 1 << 3;
+const TIER_FLAG_PROVINCE = 1 << 4;
+const TIER_FLAG_CITY = 1 << 5;
+// Village tier (1 << 6) is never set - it's rule-based, no LLM
 
 const TIER_TO_FLAG: Record<PoliticalTier, number> = {
   galactic_council: TIER_FLAG_GALACTIC,
+  federation: TIER_FLAG_FEDERATION,
   empire: TIER_FLAG_EMPIRE,
   nation: TIER_FLAG_NATION,
   province: TIER_FLAG_PROVINCE,
+  city: TIER_FLAG_CITY,
   village: 0, // Never set - rule-based
 };
 
 // Pre-allocated tier array (only LLM-enabled tiers, no village)
 const LLM_ENABLED_TIERS: readonly PoliticalTier[] = [
   'galactic_council',
+  'federation',
   'empire',
   'nation',
   'province',
+  'city',
 ] as const;
 
 export class GovernorDecisionSystem extends BaseSystem {
@@ -212,9 +232,11 @@ export class GovernorDecisionSystem extends BaseSystem {
   // Per-tier last update tracking (using object instead of Map for speed)
   private lastTierUpdate: Record<PoliticalTier, number> = {
     galactic_council: 0,
+    federation: 0,
     empire: 0,
     nation: 0,
     province: 0,
+    city: 0,
     village: 0,
   };
 

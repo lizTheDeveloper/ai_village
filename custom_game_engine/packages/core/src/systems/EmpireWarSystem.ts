@@ -17,7 +17,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { EmpireComponent, ImperialWar, MilitaryContribution } from '../components/EmpireComponent.js';
+import type { EmpireComponent, ImperialWar, ImperialTreaty, MilitaryContribution } from '../components/EmpireComponent.js';
 
 // ============================================================================
 // Types
@@ -67,7 +67,7 @@ export class EmpireWarSystem extends BaseSystem {
   // Update interval: 100 ticks = 5 seconds at 20 TPS (battle resolution frequency)
   protected readonly throttleInterval = 100;
 
-  private lastUpdateTick: Map<string, number> = new Map();
+  private empireUpdateTicks: Map<string, number> = new Map();
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
@@ -78,11 +78,11 @@ export class EmpireWarSystem extends BaseSystem {
       if (!empire) continue;
 
       // Check if update is due
-      const lastUpdate = this.lastUpdateTick.get(empire.empireName) || 0;
+      const lastUpdate = this.empireUpdateTicks.get(empire.empireName) || 0;
       if (tick - lastUpdate < this.throttleInterval) continue;
 
       this.processWarUpdate(ctx.world, empireEntity as EntityImpl, empire, tick);
-      this.lastUpdateTick.set(empire.empireName, tick);
+      this.empireUpdateTicks.set(empire.empireName, tick);
     }
   }
 
@@ -97,7 +97,7 @@ export class EmpireWarSystem extends BaseSystem {
     tick: number
   ): void {
     // Process each active war
-    for (const war of empire.foreignPolicy.activeWars) {
+    for (const war of empire.foreignPolicy?.activeWars ?? []) {
       if (war.status !== 'active') continue;
 
       // Step 1: Update war duration
@@ -159,8 +159,8 @@ export class EmpireWarSystem extends BaseSystem {
     const territoryScore = totalEnemyNations > 0 ? (occupiedNations / totalEnemyNations) * 40 : 0;
 
     // Battles won (0-30 points)
-    const totalBattles = war.battles.length;
-    const battlesWon = war.battles.filter((b) => b.outcome === 'attacker_victory').length;
+    const totalBattles = war.battles?.length ?? 0;
+    const battlesWon = war.battles?.filter((b) => b.victor === empire.empireName).length ?? 0;
     const battleScore = totalBattles > 0 ? (battlesWon / totalBattles) * 30 : 0;
 
     // Economic damage (0-20 points)
@@ -286,11 +286,11 @@ export class EmpireWarSystem extends BaseSystem {
     const peaceDemands = this.generatePeaceDemands(outcome, warScore, war);
 
     // Create peace treaty
-    const peaceTreaty = {
+    const peaceTreaty: ImperialTreaty = {
       id: `treaty_${tick}_peace_${war.id}`,
       name: `Peace of ${war.name}`,
       type: 'peace' as const,
-      signatoryNationIds: [...war.aggressorNationIds, ...war.defenderNationIds],
+      signatoryEmpireIds: [...war.aggressorEmpireIds, ...war.defenderEmpireIds],
       terms: this.formatPeaceDemands(peaceDemands),
       signedTick: tick,
       expirationTick: tick + 6000, // 1 year peace
@@ -300,10 +300,10 @@ export class EmpireWarSystem extends BaseSystem {
     // Update empire component
     empireEntity.updateComponent<EmpireComponent>(CT.Empire, (current) => {
       // Remove war from active wars
-      const updatedWars = current.foreignPolicy.activeWars.filter((w) => w.id !== war.id);
+      const updatedWars = (current.foreignPolicy?.activeWars ?? []).filter((w) => w.id !== war.id);
 
       // Add peace treaty
-      const updatedTreaties = [...current.foreignPolicy.imperialTreaties, peaceTreaty];
+      const updatedTreaties = [...(current.foreignPolicy?.imperialTreaties ?? []), peaceTreaty];
 
       // Apply peace demands
       let updatedNations = current.territory.nations;
@@ -331,6 +331,7 @@ export class EmpireWarSystem extends BaseSystem {
           ...current.foreignPolicy,
           activeWars: updatedWars,
           imperialTreaties: updatedTreaties,
+          diplomaticRelations: current.foreignPolicy?.diplomaticRelations ?? new Map(),
         },
       };
     });

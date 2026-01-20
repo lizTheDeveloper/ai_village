@@ -542,7 +542,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
 
   /**
    * OPTIMIZED: Perform maintenance with zero allocations
-   * Uses precomputed lookup tables and early exits
+   * Uses actual component data instead of hardcoded configs
    *
    * Integrates with warehouse system to deduct resources from faction inventory
    */
@@ -555,99 +555,107 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
       return false;
     }
 
-    // Get maintenance configuration
-    const config = MAINTENANCE_CONFIGS[mega.structureType as MegastructureType];
-    if (!config) {
-      console.warn(`Unknown megastructure type for maintenance: ${mega.structureType}`);
-      return false;
+    // Early exit: no maintenance requirements defined
+    const maintenanceResources = mega.maintenance.maintenanceCostPerYear;
+    if (!maintenanceResources || Object.keys(maintenanceResources).length === 0) {
+      // No maintenance required - always succeeds
+      return true;
     }
 
-    // Get precomputed cost per tick
-    const costPerTick = this.maintenanceCostPerTickLookup.get(mega.structureType as MegastructureType);
-    if (!costPerTick) {
-      console.warn(`Unknown megastructure type for maintenance: ${mega.structureType}`);
-      return false;
-    }
-
-    // Calculate resource requirement for this maintenance cycle
+    // Calculate resource requirements for this maintenance cycle
     const ticksToMaintain = this.throttleInterval;
-    const resourceQuantityNeeded = costPerTick * ticksToMaintain;
+    const costPerTick: Record<string, number> = {};
 
-    // Try to find faction warehouse with required resources
-    // Query for warehouse entities controlled by the faction
+    // Calculate per-tick cost for each resource
+    for (const itemId in maintenanceResources) {
+      const annualCost = maintenanceResources[itemId];
+      if (annualCost === undefined) {
+        throw new Error(`Maintenance cost undefined for resource: ${itemId}`);
+      }
+      costPerTick[itemId] = annualCost / this.ticksPerYear;
+    }
+
+    // Query for warehouse entities (TODO: filter by controlling faction)
     const warehouseEntities = this.world.query()
       .with(CT.Warehouse)
       .executeEntities();
 
-    let resourcesAvailable = false;
-    let warehouseEntity: EntityImpl | null = null;
+    // Track which resources we can fulfill and from which warehouses
+    const warehouseAllocations = new Map<string, { warehouse: EntityImpl; itemId: string; quantity: number }[]>();
 
-    // Search for warehouse with required resource type and sufficient quantity
-    for (const entity of warehouseEntities) {
-      const warehouse = entity.getComponent<WarehouseComponent>(CT.Warehouse);
-      if (!warehouse) continue;
+    // For each required resource, find warehouses that can provide it
+    for (const itemId in costPerTick) {
+      const quantityNeeded = costPerTick[itemId]! * ticksToMaintain;
+      let remainingNeeded = quantityNeeded;
 
-      // Check if warehouse has the required resource type
-      if (warehouse.resourceType === config.resourceType) {
-        // Check stockpiles for required quantity
-        const totalAvailable = Object.values(warehouse.stockpiles).reduce((sum, qty) => sum + qty, 0);
+      const allocations: { warehouse: EntityImpl; itemId: string; quantity: number }[] = [];
 
-        if (totalAvailable >= resourceQuantityNeeded) {
-          resourcesAvailable = true;
-          warehouseEntity = entity as EntityImpl;
-          break;
+      // Search warehouses for this resource
+      for (const entity of warehouseEntities) {
+        if (remainingNeeded <= 0) break;
+
+        const warehouse = entity.getComponent<WarehouseComponent>(CT.Warehouse);
+        if (!warehouse) continue;
+
+        // Check if warehouse has this specific item in stockpiles
+        const availableInWarehouse = warehouse.stockpiles[itemId] || 0;
+        if (availableInWarehouse > 0) {
+          const toAllocate = Math.min(availableInWarehouse, remainingNeeded);
+          allocations.push({
+            warehouse: entity as EntityImpl,
+            itemId,
+            quantity: toAllocate,
+          });
+          remainingNeeded -= toAllocate;
         }
       }
-    }
 
-    // Early exit: insufficient resources in any warehouse
-    if (!resourcesAvailable || !warehouseEntity) {
-      // Increase maintenance debt
-      const newDebt = mega.maintenance.maintenanceDebt + resourceQuantityNeeded;
-      mega.maintenance.maintenanceDebt = newDebt;
-      return false;
-    }
-
-    // Deduct resources from warehouse
-    const warehouse = warehouseEntity.getComponent<WarehouseComponent>(CT.Warehouse);
-    if (!warehouse) {
-      return false;
-    }
-
-    // Deduct from stockpiles (first-in-first-out from available items)
-    let remainingToDeduct = resourceQuantityNeeded;
-    const updatedStockpiles = { ...warehouse.stockpiles };
-
-    for (const itemId in updatedStockpiles) {
-      if (remainingToDeduct <= 0) break;
-
-      const available = updatedStockpiles[itemId] || 0;
-      const toDeduct = Math.min(available, remainingToDeduct);
-
-      updatedStockpiles[itemId] = available - toDeduct;
-      if (updatedStockpiles[itemId] <= 0) {
-        delete updatedStockpiles[itemId];
+      // If we couldn't fulfill this resource requirement, maintenance fails
+      if (remainingNeeded > 0) {
+        // Increase maintenance debt for this resource
+        mega.maintenance.maintenanceDebt += quantityNeeded;
+        return false;
       }
 
-      remainingToDeduct -= toDeduct;
+      warehouseAllocations.set(itemId, allocations);
     }
 
-    // Update warehouse component using SystemContext
-    const warehouseFromEntity = warehouseEntity.getComponent<WarehouseComponent>(CT.Warehouse);
-    if (warehouseFromEntity) {
-      warehouseEntity.updateComponent<WarehouseComponent>(CT.Warehouse, (current) => ({
-        ...current,
-        stockpiles: updatedStockpiles,
-        lastWithdrawTime: {
-          ...current.lastWithdrawTime,
-          [config.resourceType]: Date.now(),
-        },
-      }));
+    // All resources available - deduct from warehouses
+    for (const [itemId, allocations] of warehouseAllocations) {
+      for (const allocation of allocations) {
+        const warehouse = allocation.warehouse.getComponent<WarehouseComponent>(CT.Warehouse);
+        if (!warehouse) continue;
+
+        const currentQuantity = warehouse.stockpiles[itemId] || 0;
+        const newQuantity = currentQuantity - allocation.quantity;
+
+        const updatedStockpiles = { ...warehouse.stockpiles };
+        if (newQuantity <= 0) {
+          delete updatedStockpiles[itemId];
+        } else {
+          updatedStockpiles[itemId] = newQuantity;
+        }
+
+        // Update warehouse component
+        allocation.warehouse.updateComponent<WarehouseComponent>(CT.Warehouse, (current) => ({
+          ...current,
+          stockpiles: updatedStockpiles,
+          lastWithdrawTime: {
+            ...current.lastWithdrawTime,
+            [itemId]: Date.now(),
+          },
+        }));
+      }
     }
 
     // Maintenance successful - reduce debt if any
     if (mega.maintenance.maintenanceDebt > 0) {
-      mega.maintenance.maintenanceDebt = Math.max(0, mega.maintenance.maintenanceDebt - resourceQuantityNeeded);
+      // Calculate total value of maintenance performed
+      let totalMaintValue = 0;
+      for (const itemId in costPerTick) {
+        totalMaintValue += costPerTick[itemId]! * ticksToMaintain;
+      }
+      mega.maintenance.maintenanceDebt = Math.max(0, mega.maintenance.maintenanceDebt - totalMaintValue);
     }
 
     return true;

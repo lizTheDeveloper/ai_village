@@ -23,8 +23,7 @@ import type { World } from '../ecs/World.js';
 import type { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { MultiverseCoordinator } from './MultiverseCoordinator.js';
 import { PlanetFactionAI } from './PlanetFactionAI.js';
-import { AbstractPlanet } from '@ai-village/hierarchy-simulator';
-import { renormalizationEngine } from '@ai-village/hierarchy-simulator';
+import { AbstractPlanet, RenormalizationEngine } from '@ai-village/hierarchy-simulator';
 import type {
   BackgroundUniverseParams,
   BackgroundUniverse,
@@ -346,11 +345,11 @@ export class BackgroundUniverseManager {
       economicStrength,
       stability: planet.stability.overall,
       resources: {
-        food: planet.economy.resourceStockpiles.get('food') ?? 0,
-        metal: planet.economy.resourceStockpiles.get('metal') ?? 0,
-        energy: planet.economy.resourceStockpiles.get('energy') ?? 0,
+        food: planet.economy.stockpiles.get('food') ?? 0,
+        metal: planet.economy.stockpiles.get('metal') ?? 0,
+        energy: planet.economy.stockpiles.get('energy') ?? 0,
       },
-      activeWars: planet.majorCivilizations.reduce((sum, civ) => sum + civ.activeWars.length, 0),
+      activeWars: planet.majorCivilizations.reduce((sum: number, civ: { activeWars: string[] }) => sum + civ.activeWars.length, 0),
       hasDiscoveredPlayer: false, // Will be updated by faction AI
       hasInterstellarTech: planet.tech.level >= 7,
       currentTick,
@@ -370,7 +369,7 @@ export class BackgroundUniverseManager {
       invasionType: decision.invasionType,
       fleetSize: decision.fleetSize,
       techLevel: bg.planet.tech.level,
-      estimatedArrival: decision.estimatedTicks,
+      estimatedArrival: BigInt(decision.estimatedTicks ?? 0),
       culturalTraits: bg.factionAI.getPersonality(),
     };
 
@@ -480,7 +479,7 @@ export class BackgroundUniverseManager {
       buildingDistribution: new Map(), // TODO: Extract from planet economy
       namedNPCs: [], // TODO: Extract from planet.majorCivilizations
       majorStructures: [], // TODO: Extract from planet.megastructures
-      factions: planet.majorCivilizations.map((civ) => ({
+      factions: planet.majorCivilizations.map((civ: { id: string; name: string; population: number; activeWars: string[] }) => ({
         id: civ.id,
         name: civ.name,
         population: civ.population,
@@ -496,7 +495,7 @@ export class BackgroundUniverseManager {
     const planet = new AbstractPlanet(
       `${universeId}_planet`,
       params.description,
-      { universe: universeId }
+      {} // Partial<UniversalAddress> - can be empty for background universes
     );
 
     // Apply tech bias

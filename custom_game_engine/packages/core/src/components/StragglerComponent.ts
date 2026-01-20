@@ -1,4 +1,4 @@
-import type { Component, ComponentSchema } from '../ecs/Component.js';
+import type { Component } from '../ecs/Component.js';
 
 // ============================================================================
 // Types
@@ -197,43 +197,3 @@ export function shouldMarkAsLost(
 
   return false;
 }
-
-// ============================================================================
-// Schema
-// ============================================================================
-
-export const StragglerComponentSchema: ComponentSchema = {
-  type: 'object',
-  properties: {
-    type: { type: 'string', enum: ['straggler'] },
-    version: { type: 'number', enum: [1] },
-    originalFleetId: { type: 'string' },
-    originalSquadronId: { type: 'string' },
-    strandedAtBranch: { type: 'string' },
-    strandedTick: { type: 'number' },
-    recoveryStatus: {
-      type: 'string',
-      enum: ['stranded', 'attempting_solo_jump', 'awaiting_rescue', 'recovered', 'lost'],
-    },
-    soloJumpAttempts: { type: 'number' },
-    rescueSquadronId: { type: 'string' },
-    decoherenceRate: { type: 'number' },
-    contaminationRisk: { type: 'number' },
-    maxStrandedTicks: { type: 'number' },
-    coherenceLossPerTick: { type: 'number' },
-  },
-  required: [
-    'type',
-    'version',
-    'originalFleetId',
-    'originalSquadronId',
-    'strandedAtBranch',
-    'strandedTick',
-    'recoveryStatus',
-    'soloJumpAttempts',
-    'decoherenceRate',
-    'contaminationRisk',
-    'maxStrandedTicks',
-    'coherenceLossPerTick',
-  ],
-};

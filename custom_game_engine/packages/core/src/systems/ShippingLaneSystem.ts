@@ -138,7 +138,7 @@ export class ShippingLaneSystem extends BaseSystem {
       needsUpdate = true;
 
       world.eventBus.emit({
-        type: 'lane:abandoned' as const,
+        type: 'economy:lane:abandoned' as const,
         source: entity.id,
         data: { laneId: lane.laneId, ticksSinceLastUse },
       });
@@ -214,7 +214,7 @@ export class ShippingLaneSystem extends BaseSystem {
       needsUpdate = true;
 
       world.eventBus.emit({
-        type: 'lane:caravan_lost' as const,
+        type: 'economy:lane:caravan_lost' as const,
         source: entity.id,
         data: { caravanId: caravan.caravanId, reason: 'lane_not_found' },
       });
@@ -229,7 +229,7 @@ export class ShippingLaneSystem extends BaseSystem {
       needsUpdate = true;
 
       world.eventBus.emit({
-        type: 'lane:caravan_lost' as const,
+        type: 'economy:lane:caravan_lost' as const,
         source: entity.id,
         data: { caravanId: caravan.caravanId, reason: 'lane_component_missing' },
       });
@@ -245,7 +245,7 @@ export class ShippingLaneSystem extends BaseSystem {
         needsUpdate = true;
 
         world.eventBus.emit({
-          type: 'lane:blocked' as const,
+          type: 'economy:lane:blocked' as const,
           source: entity.id,
           data: { laneId: lane.laneId, caravanId: caravan.caravanId },
         });
@@ -270,7 +270,7 @@ export class ShippingLaneSystem extends BaseSystem {
       needsUpdate = true;
 
       world.eventBus.emit({
-        type: 'lane:hazard_encountered' as const,
+        type: 'economy:lane:hazard_encountered' as const,
         source: entity.id,
         data: {
           caravanId: caravan.caravanId,
@@ -297,7 +297,7 @@ export class ShippingLaneSystem extends BaseSystem {
         updatedCaravan.status = 'arrived';
 
         world.eventBus.emit({
-          type: 'lane:caravan_arrived' as const,
+          type: 'economy:lane:caravan_arrived' as const,
           source: entity.id,
           data: {
             caravanId: caravan.caravanId,
@@ -455,7 +455,7 @@ export class ShippingLaneSystem extends BaseSystem {
 
     // Emit departure event
     world.eventBus.emit({
-      type: 'lane:caravan_departed' as const,
+      type: 'economy:lane:caravan_departed' as const,
       source: caravanEntity.id,
       data: {
         caravanId,

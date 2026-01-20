@@ -116,10 +116,13 @@ export class CityGovernanceSystem extends BaseSystem {
 
       // Get village warehouse for resource data
       const warehouse = villageImpl.getComponent<WarehouseComponent>(CT.Warehouse);
-      if (warehouse && warehouse.inventory) {
-        for (const [resourceType, quantity] of warehouse.inventory.entries()) {
-          const current = totalReserves.get(resourceType) || 0;
-          totalReserves.set(resourceType, current + quantity);
+      if (warehouse && warehouse.stockpiles) {
+        for (const resourceType in warehouse.stockpiles) {
+          const quantity = warehouse.stockpiles[resourceType];
+          if (quantity !== undefined && quantity > 0) {
+            const current = totalReserves.get(resourceType) || 0;
+            totalReserves.set(resourceType, current + quantity);
+          }
         }
       }
     }

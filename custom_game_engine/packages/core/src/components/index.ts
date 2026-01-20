@@ -91,6 +91,8 @@ export * from './SocialGradientComponent.js';
 export { SocialGradientComponent } from './SocialGradientComponent.js';
 export * from './ExplorationStateComponent.js';
 export { ExplorationStateComponent } from './ExplorationStateComponent.js';
+export * from './ExplorationMissionComponent.js';
+export { createExplorationMissionComponent, type ExplorationMissionComponent } from './ExplorationMissionComponent.js';
 export * from './SteeringComponent.js';
 export { createSteeringComponent } from './SteeringComponent.js';
 export * from './VelocityComponent.js';
@@ -867,9 +869,20 @@ export {
   updateContaminationRisk,
   calculateSoloJumpSuccessChance,
   shouldMarkAsLost,
-  StragglerComponentSchema,
 } from './StragglerComponent.js';
 export type { StragglerComponent, RecoveryStatus } from './StragglerComponent.js';
+
+// Corruption (Conservation of Game Matter)
+export * from './CorruptedComponent.js';
+export {
+  createCorruptedComponent,
+  createCorruptedShipComponent,
+  isRecoverable,
+  getDangerLevel,
+  hasRecoveryRequirements,
+} from './CorruptedComponent.js';
+export type { CorruptedComponent, CorruptionReason } from './CorruptedComponent.js';
+
 export { createNavyComponent, NavyComponentSchema } from './NavyComponent.js';
 export type { NavyComponent, NavyStrategicPosture } from './NavyComponent.js';
 
@@ -882,11 +895,13 @@ export type { TradeCaravanComponent, CargoItem } from './TradeCaravanComponent.j
 // Multiverse & Timeline Forking
 export * from './UniverseForkMetadataComponent.js';
 export * from './MergeCompatibilityComponent.js';
+export * from './TimelineMergerOperationComponent.js';
 export {
   createUniverseForkMetadata,
   recordDivergenceEvent,
   DIVERGENCE_EVENT_IMPACTS,
 } from './UniverseForkMetadataComponent.js';
+export { createTimelineMergerOperation } from './TimelineMergerOperationComponent.js';
 export type {
   UniverseForkMetadataComponent,
   ForkTrigger,
@@ -895,11 +910,33 @@ export type {
   CanonEvent,
   MergeConflict,
 } from './UniverseForkMetadataComponent.js';
+export type {
+  TimelineMergerOperationComponent,
+  MergerState,
+  MergeStrategy,
+  EntityConflict,
+} from './TimelineMergerOperationComponent.js';
 
 // Multiverse - Divergence Tracking
 export * from './DivergenceTrackingComponent.js';
 export type { DivergenceTrackingComponent } from './DivergenceTrackingComponent.js';
 export { DIVERGENCE_EVENT_IMPACTS as DIVERGENCE_IMPACTS } from './DivergenceTrackingComponent.js';
+
+// Multiverse - Causal Chain (Paradox Detection)
+export * from './CausalChainComponent.js';
+export type {
+  CausalChainComponent,
+  CausalEvent,
+  CausalEventType,
+} from './CausalChainComponent.js';
+export {
+  createCausalChainComponent,
+  recordUniverseTraversal,
+  recordCausalEvent,
+  markCausalLoop,
+  recordParadox,
+  resolveParadox,
+} from './CausalChainComponent.js';
 
 // Multiverse - Canon Events
 export * from './CanonEventComponent.js';
@@ -912,7 +949,6 @@ export type {
 // Grand Strategy - AI Governance (Phase 6)
 export type {
   GovernorComponent,
-  PoliticalTier,
   GovernmentType,
   GovernorDecision,
   PoliticalIdeology,
@@ -1163,3 +1199,7 @@ export type {
   BlockadeCombatEvent,
 } from './BlockadeComponent.js';
 export { createBlockadeComponent } from './BlockadeComponent.js';
+
+// Mining Operation (Stellar Resource Extraction)
+export * from './MiningOperationComponent.js';
+export { createMiningOperationComponent, type MiningOperationComponent } from './MiningOperationComponent.js';

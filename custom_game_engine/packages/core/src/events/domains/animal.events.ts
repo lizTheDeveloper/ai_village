@@ -59,9 +59,9 @@ export interface AnimalEvents {
   };
   'animal:life_stage_change': {
     animalId: EntityId;
-    oldStage: 'infant' | 'juvenile' | 'adult' | 'senior';
-    newStage: 'infant' | 'juvenile' | 'adult' | 'senior';
-    ageYears: number;
+    oldStage: 'infant' | 'juvenile' | 'adult' | 'elder';
+    newStage: 'infant' | 'juvenile' | 'adult' | 'elder';
+    ageDays: number;
   };
   animal_state_changed: {
     animalId: EntityId;

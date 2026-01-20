@@ -3,7 +3,7 @@
  */
 
 // Export specific items from BuildingBlueprintRegistry to avoid SkillRequirement conflict
-export { BuildingBlueprintRegistry } from './BuildingBlueprintRegistry.js';
+export { BuildingBlueprintRegistry, buildingBlueprintRegistry } from './BuildingBlueprintRegistry.js';
 
 export * from './PlacementValidator.js';
 export { PlacementValidator } from './PlacementValidator.js';

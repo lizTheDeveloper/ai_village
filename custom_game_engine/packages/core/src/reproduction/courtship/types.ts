@@ -22,6 +22,7 @@ export type CourtshipType =
   | 'song'
   | 'pursuit'
   | 'gradual_proximity'
+  | 'romantic'
   | 'mind_merge'
   | 'dream_meeting'
   | 'timeline_search'

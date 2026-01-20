@@ -169,10 +169,10 @@ export class EventDrivenPlotAssignmentSystem extends BaseSystem {
     const triggers = template.assignment_rules?.triggers;
     if (!triggers) return;
 
-    const mood = entity.getComponent(CT.Mood) as MoodComponent | undefined;
-    const relationship = entity.getComponent(CT.Relationship) as RelationshipComponent | undefined;
-    const skills = entity.getComponent(CT.Skills) as SkillsComponent | undefined;
-    const position = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
+    const mood = entity.getComponent(CT.Mood) as unknown as MoodComponent | undefined;
+    const relationship = entity.getComponent(CT.Relationship) as unknown as RelationshipComponent | undefined;
+    const skills = entity.getComponent(CT.Skills) as unknown as SkillsComponent | undefined;
+    const position = entity.getComponent(CT.Position) as unknown as { x: number; y: number } | undefined;
 
     for (const trigger of triggers) {
       const triggerEvent = this._evaluateTrigger(
@@ -582,6 +582,8 @@ export class EventDrivenPlotAssignmentSystem extends BaseSystem {
       status: 'active',
       current_stage: template.entry_stage,
       stage_entered_at: currentTick,
+      scale: template.scale,
+      multiverse_scope: template.multiverse_scope ?? 'local',
       stages_visited: [],
       parameters: { ...template.parameters },
       bound_agents: boundAgents,

@@ -370,7 +370,8 @@ export class SystemContextImpl implements SystemContext {
       );
 
       for (const entity of entities) {
-        const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+        const posRaw = entity.getComponent('position');
+        const pos = posRaw as unknown as { x: number; y: number } | undefined;
         if (!pos) continue;
 
         const dx = pos.x - center.x;
@@ -400,7 +401,8 @@ export class SystemContextImpl implements SystemContext {
           if (!hasAll) continue;
         }
 
-        const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+        const posRaw = entity.getComponent('position');
+        const pos = posRaw as unknown as { x: number; y: number } | undefined;
         if (!pos) continue;
 
         const dx = pos.x - center.x;

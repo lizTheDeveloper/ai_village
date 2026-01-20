@@ -240,7 +240,8 @@ export class SeekFoodBehavior extends BaseBehavior {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // Check if it's an edible plant with fruit
-        const plant = entityImpl.getComponent(ComponentType.Plant) as { speciesId: string; fruitCount: number } | undefined;
+        const plantComp = entityImpl.getComponent(ComponentType.Plant);
+        const plant = plantComp as unknown as { speciesId: string; fruitCount: number } | undefined;
         if (plant && isEdibleSpecies(plant.speciesId) && plant.fruitCount > 0) {
           const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
           const fruitItemId = isBerry ? 'berry' : 'fruit';
@@ -493,7 +494,8 @@ export class SeekFoodBehavior extends BaseBehavior {
 
       for (const { entity: plantEntity } of plantsInRadius) {
         const plantImpl = plantEntity as EntityImpl;
-        const plant = plantImpl.getComponent(ComponentType.Plant) as {
+        const plantComp = plantImpl.getComponent(ComponentType.Plant);
+        const plant = plantComp as unknown as {
           speciesId: string;
           fruitCount: number;
         } | undefined;
@@ -523,7 +525,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     for (const plantEntity of plantEntities) {
       const plantImpl = plantEntity as EntityImpl;
       const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
-      const plant = plantImpl.getComponent(ComponentType.Plant) as {
+      const plantComp = plantImpl.getComponent(ComponentType.Plant);
+      const plant = plantComp as unknown as {
         speciesId: string;
         fruitCount: number;
       } | undefined;
@@ -733,7 +736,8 @@ function tryEatFromNearbyPlant(ctx: BehaviorContext): InteractionResult | null {
 
   for (const { entity: plantEntity } of plantsInRadius) {
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent(CT.Plant) as {
+    const plantComp = plantImpl.getComponent(CT.Plant);
+    const plant = plantComp as unknown as {
       speciesId: string;
       fruitCount: number;
     } | undefined;
@@ -795,7 +799,8 @@ function findNearestFoodSourceWithContext(
   const plantsInRadius = ctx.getEntitiesInRadius(MAX_SEARCH_RADIUS, [CT.Plant]);
   for (const { entity: plantEntity, distance, position } of plantsInRadius) {
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent(CT.Plant) as { speciesId: string; fruitCount: number } | undefined;
+    const plantComp = plantImpl.getComponent(CT.Plant);
+    const plant = plantComp as unknown as { speciesId: string; fruitCount: number } | undefined;
 
     if (!plant || !isEdibleSpecies(plant.speciesId) || plant.fruitCount <= 0) continue;
 

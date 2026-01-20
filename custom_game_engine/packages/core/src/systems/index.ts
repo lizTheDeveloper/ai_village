@@ -156,6 +156,9 @@ export * from './DivineBodyModification.js';
 export * from './MassEventSystem.js';
 // Multiverse & Passages
 export * from './PassageSystem.js';
+export * from './PassageTraversalSystem.js';
+export * from './UniverseForkingSystem.js';
+export * from './ParadoxDetectionSystem.js';
 export * from './TimelineMergerSystem.js';
 // Realm System - Mythological pocket dimensions
 export * from './RealmManager.js';
@@ -282,6 +285,10 @@ export { StellarMiningSystem } from './StellarMiningSystem.js';
 // Building Summoning System (Magic)
 export * from './BuildingSummoningSystem.js';
 export { BuildingSummoningSystem } from './BuildingSummoningSystem.js';
+
+// Invasion Plot Handler (Phase 4: Multiverse)
+export * from './InvasionPlotHandler.js';
+export { InvasionPlotHandler } from './InvasionPlotHandler.js';
 
 // Centralized system registration
 export {

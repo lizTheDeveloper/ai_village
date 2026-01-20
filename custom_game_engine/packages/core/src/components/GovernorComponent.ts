@@ -20,8 +20,8 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import type { PoliticalTier } from '../governance/types.js';
 
-export type PoliticalTier = 'galactic_council' | 'empire' | 'nation' | 'province' | 'village';
 export type GovernmentType = 'monarchy' | 'democracy' | 'oligarchy' | 'council';
 
 /**
@@ -85,9 +85,11 @@ export interface GovernorComponent extends Component {
  */
 export const TIER_COOLDOWNS: Record<PoliticalTier, number> = {
   galactic_council: 72000, // 1 hour (3600 seconds * 20 TPS)
-  empire: 36000, // 30 minutes
+  federation: 36000, // 30 minutes
+  empire: 18000, // 15 minutes
   nation: 12000, // 10 minutes
   province: 6000, // 5 minutes
+  city: 3000, // 2.5 minutes
   village: 0, // No LLM
 };
 
@@ -96,9 +98,11 @@ export const TIER_COOLDOWNS: Record<PoliticalTier, number> = {
  */
 export const TIER_MODELS: Record<PoliticalTier, string> = {
   galactic_council: 'claude-3-5-sonnet-20241022', // Highest quality
+  federation: 'claude-3-5-sonnet-20241022',
   empire: 'claude-3-5-sonnet-20241022',
   nation: 'claude-3-5-haiku-20241022', // Faster, cheaper
   province: 'claude-3-5-haiku-20241022',
+  city: 'claude-3-5-haiku-20241022',
   village: 'none', // No LLM
 };
 
@@ -120,9 +124,11 @@ export function createGovernorComponent(
   // Term lengths vary by tier (in ticks at 20 TPS)
   const termLengths: Record<PoliticalTier, number | undefined> = {
     galactic_council: 1_440_000, // 20 game hours
+    federation: 1_080_000, // 15 game hours
     empire: 720_000, // 10 game hours
     nation: 288_000, // 4 game hours (if democracy)
     province: 144_000, // 2 game hours (if democracy)
+    city: 72_000, // 1 game hour (if democracy)
     village: undefined, // No formal terms
   };
 

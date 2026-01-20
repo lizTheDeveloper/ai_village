@@ -875,7 +875,8 @@ export class WorldImpl implements WorldMutator {
     }
 
     // Remove from spatial grid
-    const pos = entity.components.get('position') as
+    const posRaw = entity.components.get('position');
+    const pos = posRaw as unknown as
       | { x: number; y: number; chunkX: number; chunkY: number }
       | undefined;
     if (pos) {
@@ -971,7 +972,8 @@ export class WorldImpl implements WorldMutator {
 
     // Update spatial index if removing position
     if (componentType === 'position') {
-      const pos = entity.components.get('position') as
+      const posRaw = entity.components.get('position');
+      const pos = posRaw as unknown as
         | { chunkX: number; chunkY: number }
         | undefined;
       if (pos) {
@@ -1069,7 +1071,8 @@ export class WorldImpl implements WorldMutator {
     this._archetypeVersion++; // Invalidate query cache
 
     // Update spatial chunk index if entity has position component
-    const pos = entity.components.get('position') as
+    const posRaw = entity.components.get('position');
+    const pos = posRaw as unknown as
       | { x: number; y: number; chunkX?: number; chunkY?: number }
       | undefined;
     if (pos) {

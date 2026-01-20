@@ -72,7 +72,7 @@ export class FleetCombatSystem extends BaseSystem {
   public readonly metadata = {
     category: 'combat',
     description: 'Resolves fleet-scale combat using Lanchester\'s Laws',
-    dependsOn: ['fleet_coherence' as SystemId],
+    dependsOn: [],
     writesComponents: [CT.Fleet, CT.Squadron, CT.Armada] as const,
   } as const;
 

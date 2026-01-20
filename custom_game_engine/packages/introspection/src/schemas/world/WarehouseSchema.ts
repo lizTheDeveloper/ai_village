@@ -186,6 +186,7 @@ export const WarehouseSchema = autoRegister(
       resourceType: 'food',
       capacity: 1000,
       stockpiles: {},
+      inventory: {},
       productionRates: {},
       consumptionRates: {},
       daysRemaining: {},

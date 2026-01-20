@@ -1,0 +1,811 @@
+[
+  {
+    "id": "isekai_summoned_hero",
+    "name": "The Summoned Hero",
+    "description": "You are called to another universe to fulfill a desperate prophecy. A world not your own needs salvation, and fate has chosen you as its champion.",
+    "scale": "exotic",
+    "fork_behavior": "suspend",
+    "multiverse_scope": "cross_multiverse",
+    "lesson": {
+      "theme": "Heroic duty across worlds",
+      "domain": "transcendence",
+      "insight": "True heroism means answering the call, even when the world calling isn't your own.",
+      "wisdom_value": 25,
+      "repeatable": false
+    },
+    "entry_stage": "summons_received",
+    "completion_stages": ["prophecy_fulfilled", "returned_changed"],
+    "failure_stages": ["summons_rejected", "lost_between_worlds"],
+    "stages": [
+      {
+        "stage_id": "summons_received",
+        "name": "The Call from Beyond",
+        "description": "A voice from another universe reaches across the void. It speaks of prophecy, of desperate need, of you being chosen. The summons is both invitation and plea.",
+        "stage_attractors": [
+          {
+            "attractor_id": "understand_summons",
+            "goal": {
+              "type": "wisdom_threshold",
+              "parameters": { "min_wisdom": 15 }
+            },
+            "strength": 0.6,
+            "urgency": 0.7,
+            "description": "Pressure to understand the cross-universe summons"
+          }
+        ],
+        "on_enter_effects": [
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "prophetic_vision",
+            "content_hint": "You see another world: unfamiliar stars, strange faces, desperate hope in their eyes",
+            "intensity": 0.9,
+            "emotional_tone": "mysterious"
+          }
+        ]
+      },
+      {
+        "stage_id": "threshold_approached",
+        "name": "At the Dimensional Rift",
+        "description": "The portal opens. Reality tears. You stand at the threshold between universes. Behind you: everything you know. Ahead: a world that needs you. The choice is yours.",
+        "stage_attractors": [
+          {
+            "attractor_id": "crossing_decision",
+            "goal": {
+              "type": "choice_made",
+              "parameters": { "choice_id": "accept_summons" }
+            },
+            "strength": 0.9,
+            "urgency": 0.95,
+            "description": "Intense pressure to decide whether to cross"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 35 }
+        ]
+      },
+      {
+        "stage_id": "between_worlds",
+        "name": "The Crossing",
+        "description": "You step through. Reality dissolves. You exist in the space between universes - a moment of infinite possibility and infinite terror. Then: arrival.",
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 20 },
+          { "type": "set_emotional_state", "state": "overwhelmed", "duration_ticks": 100 }
+        ]
+      },
+      {
+        "stage_id": "foreign_arrival",
+        "name": "New World, New Rules",
+        "description": "You emerge in an alien universe. Different laws of physics, different cultures, different magic. You are the outsider, the stranger, the prophesied hero. Learning begins.",
+        "stage_attractors": [
+          {
+            "attractor_id": "adapt_to_world",
+            "goal": {
+              "type": "skill_threshold",
+              "parameters": { "skill": "adaptability", "min_level": 5 }
+            },
+            "strength": 0.8,
+            "urgency": 0.8,
+            "description": "Pressure to adapt to foreign universe"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_mood", "delta": -15 }
+        ]
+      },
+      {
+        "stage_id": "hero_tested",
+        "name": "The Prophecy's Trial",
+        "description": "The universe that summoned you now tests you. Are you truly the one foretold? Can you wield powers unknown in your home universe? Will you break, or become what they need?",
+        "stage_attractors": [
+          {
+            "attractor_id": "prove_worth",
+            "goal": {
+              "type": "skill_threshold",
+              "parameters": { "skill": "combat", "min_level": 7 }
+            },
+            "strength": 0.85,
+            "urgency": 0.9,
+            "description": "Pressure to prove heroic worth"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 25 }
+        ]
+      },
+      {
+        "stage_id": "prophecy_fulfilled",
+        "name": "Salvation Delivered",
+        "description": "You have done what was asked. The prophecy is fulfilled. This universe is saved. You are celebrated as a hero... but you are still a stranger. Do you stay or return home?",
+        "on_enter_effects": [
+          { "type": "modify_mood", "delta": 30 },
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "symbolic",
+            "content_hint": "Two homes, two lives. Which world truly needs you now?",
+            "intensity": 0.7,
+            "emotional_tone": "melancholic"
+          }
+        ]
+      },
+      {
+        "stage_id": "returned_changed",
+        "name": "Home, But Transformed",
+        "description": "You return to your original universe, but you are no longer the person who left. You have seen other realities, saved another world. How small your old life seems now.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 25 },
+          { "type": "modify_mood", "delta": -10 }
+        ]
+      },
+      {
+        "stage_id": "summons_rejected",
+        "name": "The Call Unanswered",
+        "description": "You refuse. The portal closes. That other universe will find another hero... or fall into darkness. You will never know. But the weight of the unanswered call remains.",
+        "on_enter_effects": [
+          {
+            "type": "add_trauma",
+            "trauma_type": "regret",
+            "severity": 5,
+            "description": "Haunted by the summons refused"
+          }
+        ]
+      },
+      {
+        "stage_id": "lost_between_worlds",
+        "name": "Stranded in the Void",
+        "description": "Something went wrong during the crossing. You are trapped in the space between universes - neither here nor there. A fate worse than death: eternal displacement.",
+        "on_enter_effects": [
+          { "type": "trigger_breakdown", "breakdown_type": "existential" }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from_stage": "summons_received",
+        "to_stage": "threshold_approached",
+        "conditions": [
+          { "type": "wisdom_threshold", "min_wisdom": 15 },
+          { "type": "personal_tick_elapsed", "ticks": 500 }
+        ]
+      },
+      {
+        "from_stage": "threshold_approached",
+        "to_stage": "between_worlds",
+        "conditions": [
+          { "type": "choice_made", "choice_id": "accept_summons" }
+        ]
+      },
+      {
+        "from_stage": "threshold_approached",
+        "to_stage": "summons_rejected",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 1000 }
+        ]
+      },
+      {
+        "from_stage": "between_worlds",
+        "to_stage": "foreign_arrival",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 50 }
+        ],
+        "probability": 0.95
+      },
+      {
+        "from_stage": "between_worlds",
+        "to_stage": "lost_between_worlds",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 50 }
+        ],
+        "probability": 0.05
+      },
+      {
+        "from_stage": "foreign_arrival",
+        "to_stage": "hero_tested",
+        "conditions": [
+          { "type": "skill_threshold", "skill": "adaptability", "min_level": 5 },
+          { "type": "personal_tick_elapsed", "ticks": 2000 }
+        ]
+      },
+      {
+        "from_stage": "hero_tested",
+        "to_stage": "prophecy_fulfilled",
+        "conditions": [
+          { "type": "skill_threshold", "skill": "combat", "min_level": 7 },
+          { "type": "personal_tick_elapsed", "ticks": 3000 }
+        ]
+      },
+      {
+        "from_stage": "prophecy_fulfilled",
+        "to_stage": "returned_changed",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 1000 }
+        ]
+      }
+    ],
+    "assignment_rules": {
+      "min_wisdom": 10,
+      "required_interests": ["adventure", "heroism"],
+      "cooldown_ticks": 0
+    }
+  },
+  {
+    "id": "isekai_dimensional_refugee",
+    "name": "Refugee from a Dying Universe",
+    "description": "Your home universe is collapsing. To survive, you must flee to another reality - but refugees are rarely welcome, and the trauma of losing your world will never fully heal.",
+    "scale": "exotic",
+    "fork_behavior": "suspend",
+    "multiverse_scope": "cross_multiverse",
+    "lesson": {
+      "theme": "Survival and adaptation",
+      "domain": "self",
+      "insight": "Home is not a place but the memories you carry. Loss shapes you, but need not define you.",
+      "wisdom_value": 22,
+      "repeatable": false
+    },
+    "entry_stage": "universe_dying",
+    "completion_stages": ["found_new_home", "embraced_wandering"],
+    "failure_stages": ["refused_to_flee", "rejected_by_all"],
+    "stages": [
+      {
+        "stage_id": "universe_dying",
+        "name": "The End of All Things",
+        "description": "Your universe is dying. Reality itself is unraveling. The laws of physics fail. Stars go dark. Time becomes unstable. Everyone you know faces annihilation. There is only one hope: flee to another universe.",
+        "stage_attractors": [
+          {
+            "attractor_id": "escape_urgency",
+            "goal": {
+              "type": "survival_priority",
+              "parameters": { "min_urgency": 0.9 }
+            },
+            "strength": 1,
+            "urgency": 1,
+            "description": "Overwhelming pressure to escape dying universe"
+          }
+        ],
+        "on_enter_effects": [
+          {
+            "type": "add_trauma",
+            "trauma_type": "loss",
+            "severity": 8,
+            "description": "Witnessing universe collapse"
+          },
+          { "type": "modify_stress", "delta": 50 }
+        ]
+      },
+      {
+        "stage_id": "desperate_crossing",
+        "name": "Flight into the Unknown",
+        "description": "You abandon your dying universe. No prophecy guides you, no destination is certain. This is raw survival: leap blindly into another reality and pray it can sustain you.",
+        "on_enter_effects": [
+          { "type": "set_emotional_state", "state": "terrified", "duration_ticks": 200 },
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "memory_echo",
+            "content_hint": "Your last glimpse of home: collapsing, dying, gone forever",
+            "intensity": 1,
+            "emotional_tone": "melancholic"
+          }
+        ]
+      },
+      {
+        "stage_id": "unwelcome_arrival",
+        "name": "The Refugee's Burden",
+        "description": "You arrive in a stable universe, but you are not wanted. You are the outsider, the strange one, the refugee. They fear you might bring your universe's corruption. Proving your worth begins.",
+        "stage_attractors": [
+          {
+            "attractor_id": "prove_harmless",
+            "goal": {
+              "type": "relationship_threshold",
+              "parameters": { "min_relationships": 3, "min_trust": 30 }
+            },
+            "strength": 0.8,
+            "urgency": 0.85,
+            "description": "Pressure to build trust in foreign universe"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_mood", "delta": -25 }
+        ]
+      },
+      {
+        "stage_id": "integration_struggle",
+        "name": "Between Two Worlds",
+        "description": "You try to adapt. Learn their customs. Hide your grief. Pretend you belong. But the nightmares persist: your dying universe, the faces of those who didn't escape. You are haunted.",
+        "stage_attractors": [
+          {
+            "attractor_id": "cultural_adaptation",
+            "goal": {
+              "type": "skill_threshold",
+              "parameters": { "skill": "social", "min_level": 6 }
+            },
+            "strength": 0.7,
+            "urgency": 0.75,
+            "description": "Pressure to integrate into new society"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 15 }
+        ]
+      },
+      {
+        "stage_id": "found_new_home",
+        "name": "Roots in Foreign Soil",
+        "description": "Time passes. Wounds heal, though scars remain. You have built a new life here. You are no longer just a refugee - you are a member of this universe. Home is where you make it.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 22 },
+          { "type": "modify_mood", "delta": 20 },
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "symbolic",
+            "content_hint": "You plant a seed from your lost universe in new soil. It blooms.",
+            "intensity": 0.6,
+            "emotional_tone": "hopeful"
+          }
+        ]
+      },
+      {
+        "stage_id": "embraced_wandering",
+        "name": "The Eternal Traveler",
+        "description": "You accept that you will never truly belong anywhere. Instead of seeking a new home, you become a wanderer between universes - carrying memories of the lost, witnessing countless realities.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 18 },
+          { "type": "modify_mood", "delta": 5 }
+        ]
+      },
+      {
+        "stage_id": "refused_to_flee",
+        "name": "Gone with the Old World",
+        "description": "You refuse to abandon your universe. You choose to die with your world rather than live as a refugee. Whether this is noble or foolish, it is final.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 10 }
+        ]
+      },
+      {
+        "stage_id": "rejected_by_all",
+        "name": "Nowhere to Call Home",
+        "description": "No universe accepts you. You are cast out again and again. You drift between realities, unwanted everywhere. The eternal exile.",
+        "on_enter_effects": [
+          { "type": "trigger_breakdown", "breakdown_type": "despair" }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from_stage": "universe_dying",
+        "to_stage": "desperate_crossing",
+        "conditions": [
+          { "type": "stress_threshold", "min": 40 }
+        ]
+      },
+      {
+        "from_stage": "universe_dying",
+        "to_stage": "refused_to_flee",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 500 }
+        ]
+      },
+      {
+        "from_stage": "desperate_crossing",
+        "to_stage": "unwelcome_arrival",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 100 }
+        ]
+      },
+      {
+        "from_stage": "unwelcome_arrival",
+        "to_stage": "integration_struggle",
+        "conditions": [
+          { "type": "any_relationship", "min_trust": 20 },
+          { "type": "personal_tick_elapsed", "ticks": 1000 }
+        ]
+      },
+      {
+        "from_stage": "unwelcome_arrival",
+        "to_stage": "rejected_by_all",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 3000 },
+          {
+            "type": "not",
+            "condition": { "type": "any_relationship", "min_trust": 15 }
+          }
+        ]
+      },
+      {
+        "from_stage": "integration_struggle",
+        "to_stage": "found_new_home",
+        "conditions": [
+          { "type": "skill_threshold", "skill": "social", "min_level": 6 },
+          { "type": "any_relationship", "min_trust": 40 },
+          { "type": "personal_tick_elapsed", "ticks": 3000 }
+        ]
+      },
+      {
+        "from_stage": "integration_struggle",
+        "to_stage": "embraced_wandering",
+        "conditions": [
+          { "type": "wisdom_threshold", "min_wisdom": 25 },
+          { "type": "personal_tick_elapsed", "ticks": 2500 }
+        ]
+      }
+    ],
+    "assignment_rules": {
+      "min_wisdom": 5,
+      "cooldown_ticks": 0
+    }
+  },
+  {
+    "id": "isekai_multiversal_diplomat",
+    "name": "Bridge Between Worlds",
+    "description": "Two universes are on the brink of conflict. You are chosen as a mediator - the only soul trusted by both sides. Prevent war, or watch realities clash and burn.",
+    "scale": "exotic",
+    "fork_behavior": "suspend",
+    "multiverse_scope": "cross_multiverse",
+    "lesson": {
+      "theme": "Diplomacy and mediation",
+      "domain": "relationships",
+      "insight": "Understanding requires walking between worlds. Peace is built on bridges, not walls.",
+      "wisdom_value": 20,
+      "repeatable": false
+    },
+    "entry_stage": "conflict_brewing",
+    "completion_stages": ["peace_achieved", "permanent_bridge"],
+    "failure_stages": ["war_erupted", "mediator_rejected"],
+    "stages": [
+      {
+        "stage_id": "conflict_brewing",
+        "name": "Tensions Rise",
+        "description": "Two universes, once separate, have made contact. Cultural differences breed fear. Fear breeds hostility. Both sides prepare for war. You are selected as a neutral mediator.",
+        "stage_attractors": [
+          {
+            "attractor_id": "understand_both_sides",
+            "goal": {
+              "type": "skill_threshold",
+              "parameters": { "skill": "diplomacy", "min_level": 5 }
+            },
+            "strength": 0.7,
+            "urgency": 0.8,
+            "description": "Pressure to understand both universes' perspectives"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 30 }
+        ]
+      },
+      {
+        "stage_id": "traveling_ambassador",
+        "name": "Walking Between Realities",
+        "description": "You travel between the two universes, learning their cultures, hearing their grievances. You are neither fully trusted nor fully rejected - the eternal outsider mediating between worlds.",
+        "stage_attractors": [
+          {
+            "attractor_id": "build_trust_both_sides",
+            "goal": {
+              "type": "relationship_threshold",
+              "parameters": { "min_relationships": 4, "min_trust": 35 }
+            },
+            "strength": 0.8,
+            "urgency": 0.85,
+            "description": "Pressure to build trust with leaders from both universes"
+          }
+        ],
+        "on_enter_effects": [
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "symbolic",
+            "content_hint": "You stand on a bridge between two worlds, holding hands on both sides",
+            "intensity": 0.6,
+            "emotional_tone": "hopeful"
+          }
+        ]
+      },
+      {
+        "stage_id": "crisis_point",
+        "name": "The Breaking Point",
+        "description": "An incident occurs. A misunderstanding escalates. War seems inevitable. Both sides look to you for answers. This is the moment that decides everything.",
+        "stage_attractors": [
+          {
+            "attractor_id": "prevent_war",
+            "goal": {
+              "type": "choice_made",
+              "parameters": { "choice_id": "diplomatic_solution" }
+            },
+            "strength": 0.95,
+            "urgency": 1,
+            "description": "Critical pressure to find peaceful solution"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 40 },
+          { "type": "set_emotional_state", "state": "anxious", "duration_ticks": 200 }
+        ]
+      },
+      {
+        "stage_id": "peace_achieved",
+        "name": "The Accord Signed",
+        "description": "Through patience, understanding, and tireless effort, you broker peace. The universes agree to coexist. War is averted. You are celebrated by both worlds as the one who prevented catastrophe.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 20 },
+          { "type": "modify_mood", "delta": 35 },
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "prophetic_vision",
+            "content_hint": "Two universes flourish side by side, connected by bridges of understanding",
+            "intensity": 0.8,
+            "emotional_tone": "triumphant"
+          }
+        ]
+      },
+      {
+        "stage_id": "permanent_bridge",
+        "name": "Guardian of the Crossing",
+        "description": "You choose to remain as permanent liaison between the universes. Your life becomes an endless crossing between realities, ensuring the peace endures.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 15 }
+        ]
+      },
+      {
+        "stage_id": "war_erupted",
+        "name": "Failure of Diplomacy",
+        "description": "Despite your efforts, war breaks out. The universes clash. Reality tears. You witness the horror of inter-universal conflict and carry the weight of failure.",
+        "on_enter_effects": [
+          {
+            "type": "add_trauma",
+            "trauma_type": "guilt",
+            "severity": 7,
+            "description": "Failed to prevent multiversal war"
+          },
+          { "type": "modify_mood", "delta": -40 }
+        ]
+      },
+      {
+        "stage_id": "mediator_rejected",
+        "name": "Trust Broken",
+        "description": "Both sides reject you as mediator. You are accused of bias, treachery, or incompetence. The diplomatic mission fails before it truly begins.",
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 25 },
+          { "type": "modify_mood", "delta": -20 }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from_stage": "conflict_brewing",
+        "to_stage": "traveling_ambassador",
+        "conditions": [
+          { "type": "skill_threshold", "skill": "diplomacy", "min_level": 5 }
+        ]
+      },
+      {
+        "from_stage": "conflict_brewing",
+        "to_stage": "mediator_rejected",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 1500 },
+          {
+            "type": "not",
+            "condition": { "type": "skill_threshold", "skill": "diplomacy", "min_level": 5 }
+          }
+        ]
+      },
+      {
+        "from_stage": "traveling_ambassador",
+        "to_stage": "crisis_point",
+        "conditions": [
+          { "type": "any_relationship", "min_trust": 30 },
+          { "type": "personal_tick_elapsed", "ticks": 2000 }
+        ]
+      },
+      {
+        "from_stage": "crisis_point",
+        "to_stage": "peace_achieved",
+        "conditions": [
+          { "type": "choice_made", "choice_id": "diplomatic_solution" },
+          { "type": "skill_threshold", "skill": "diplomacy", "min_level": 7 }
+        ]
+      },
+      {
+        "from_stage": "crisis_point",
+        "to_stage": "war_erupted",
+        "conditions": [
+          { "type": "personal_tick_elapsed", "ticks": 500 }
+        ]
+      },
+      {
+        "from_stage": "peace_achieved",
+        "to_stage": "permanent_bridge",
+        "conditions": [
+          { "type": "wisdom_threshold", "min_wisdom": 25 },
+          { "type": "personal_tick_elapsed", "ticks": 1000 }
+        ]
+      }
+    ],
+    "assignment_rules": {
+      "min_wisdom": 12,
+      "required_interests": ["diplomacy", "peace"],
+      "cooldown_ticks": 0
+    }
+  },
+  {
+    "id": "isekai_convergence",
+    "name": "When Selves Collide",
+    "description": "Across the multiverse, infinite versions of you exist. Now, dimensional barriers weaken and you meet your other selves. Unity or conflict? The choice defines all of you.",
+    "scale": "exotic",
+    "fork_behavior": "fork",
+    "multiverse_scope": "cross_multiverse",
+    "lesson": {
+      "theme": "Self-understanding through multiplicity",
+      "domain": "self",
+      "insight": "You are not one self but infinite possibilities. Understanding who you could have been reveals who you are.",
+      "wisdom_value": 28,
+      "repeatable": false
+    },
+    "entry_stage": "first_glimpse",
+    "completion_stages": ["selves_unified", "divergence_embraced"],
+    "failure_stages": ["self_destroyed", "lost_in_mirrors"],
+    "stages": [
+      {
+        "stage_id": "first_glimpse",
+        "name": "The Mirror Cracks",
+        "description": "You catch a glimpse of yourself in another universe. But the reflection is wrong - it's you, but different. Different choices, different life, different person. Yet unmistakably you.",
+        "stage_attractors": [
+          {
+            "attractor_id": "understand_alternate_self",
+            "goal": {
+              "type": "wisdom_threshold",
+              "parameters": { "min_wisdom": 18 }
+            },
+            "strength": 0.6,
+            "urgency": 0.7,
+            "description": "Pressure to understand alternate selves"
+          }
+        ],
+        "on_enter_effects": [
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "prophetic_vision",
+            "content_hint": "You see yourself from outside: many yous, making different choices, living different lives",
+            "intensity": 0.85,
+            "emotional_tone": "mysterious"
+          }
+        ]
+      },
+      {
+        "stage_id": "convergence_begins",
+        "name": "The Meeting",
+        "description": "Dimensional barriers collapse. You meet your other selves face-to-face. The hero you could have been. The villain. The lover. The hermit. All you, all different. The confrontation begins.",
+        "stage_attractors": [
+          {
+            "attractor_id": "understand_divergence",
+            "goal": {
+              "type": "skill_threshold",
+              "parameters": { "skill": "introspection", "min_level": 6 }
+            },
+            "strength": 0.75,
+            "urgency": 0.8,
+            "description": "Pressure to understand how selves diverged"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 35 },
+          { "type": "set_emotional_state", "state": "confused", "duration_ticks": 150 }
+        ]
+      },
+      {
+        "stage_id": "conflict_of_selves",
+        "name": "Identity Crisis",
+        "description": "Your selves disagree. Some want to merge, become one unified being. Others demand independence. Some hate what they see in their alternates. The struggle intensifies.",
+        "stage_attractors": [
+          {
+            "attractor_id": "resolve_identity",
+            "goal": {
+              "type": "choice_made",
+              "parameters": { "choice_id": "convergence_path" }
+            },
+            "strength": 0.9,
+            "urgency": 0.95,
+            "description": "Critical pressure to resolve identity conflict"
+          }
+        ],
+        "on_enter_effects": [
+          { "type": "modify_stress", "delta": 30 }
+        ]
+      },
+      {
+        "stage_id": "selves_unified",
+        "name": "The Synthesis",
+        "description": "Your alternate selves merge into one being. All experiences, all choices, all lives unite. You are no longer singular - you are the sum of all you could have been. Overwhelming power and terrible burden.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 28 },
+          { "type": "modify_stress", "delta": 20 },
+          {
+            "type": "queue_dream_hint",
+            "dream_type": "symbolic",
+            "content_hint": "Many rivers converge into one vast ocean",
+            "intensity": 0.9,
+            "emotional_tone": "triumphant"
+          }
+        ]
+      },
+      {
+        "stage_id": "divergence_embraced",
+        "name": "Celebrating Difference",
+        "description": "Your selves choose to remain separate. You respect each other's divergence and return to your respective universes - connected by understanding but celebrating your differences.",
+        "on_enter_effects": [
+          { "type": "modify_wisdom", "delta": 22 },
+          { "type": "modify_mood", "delta": 15 }
+        ]
+      },
+      {
+        "stage_id": "self_destroyed",
+        "name": "The Annihilation",
+        "description": "Conflict between selves escalates to violence. You fight your own alternate versions. Some selves are destroyed. You survive, but diminished - knowing you killed parts of yourself.",
+        "on_enter_effects": [
+          {
+            "type": "add_trauma",
+            "trauma_type": "violence",
+            "severity": 9,
+            "description": "Destroyed alternate selves"
+          },
+          { "type": "trigger_breakdown", "breakdown_type": "guilt" }
+        ]
+      },
+      {
+        "stage_id": "lost_in_mirrors",
+        "name": "Identity Dissolution",
+        "description": "You can no longer distinguish which version is the 'real' you. Identity fractures. You exist simultaneously as all your selves and none of them. Madness of infinite reflection.",
+        "on_enter_effects": [
+          { "type": "trigger_breakdown", "breakdown_type": "existential" }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "from_stage": "first_glimpse",
+        "to_stage": "convergence_begins",
+        "conditions": [
+          { "type": "wisdom_threshold", "min_wisdom": 18 }
+        ]
+      },
+      {
+        "from_stage": "convergence_begins",
+        "to_stage": "conflict_of_selves",
+        "conditions": [
+          { "type": "skill_threshold", "skill": "introspection", "min_level": 6 },
+          { "type": "personal_tick_elapsed", "ticks": 1000 }
+        ]
+      },
+      {
+        "from_stage": "convergence_begins",
+        "to_stage": "lost_in_mirrors",
+        "conditions": [
+          { "type": "in_breakdown", "breakdown_type": "existential" }
+        ]
+      },
+      {
+        "from_stage": "conflict_of_selves",
+        "to_stage": "selves_unified",
+        "conditions": [
+          { "type": "choice_made", "choice_id": "merge_selves" },
+          { "type": "wisdom_threshold", "min_wisdom": 22 }
+        ]
+      },
+      {
+        "from_stage": "conflict_of_selves",
+        "to_stage": "divergence_embraced",
+        "conditions": [
+          { "type": "choice_made", "choice_id": "embrace_divergence" }
+        ]
+      },
+      {
+        "from_stage": "conflict_of_selves",
+        "to_stage": "self_destroyed",
+        "conditions": [
+          { "type": "stress_threshold", "min": 70 },
+          { "type": "personal_tick_elapsed", "ticks": 1500 }
+        ]
+      }
+    ],
+    "assignment_rules": {
+      "min_wisdom": 15,
+      "required_interests": ["philosophy", "self-knowledge"],
+      "cooldown_ticks": 0
+    }
+  }
+]

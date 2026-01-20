@@ -538,6 +538,12 @@ export interface MagicEvents {
     targetId?: string;
     description?: string;
   };
+  'divine:maintenance_failed': {
+    realmId: string;
+    maintenanceRequired: number;
+    maintenanceAvailable: number;
+    rulerId?: string;
+  };
   'magic:liberated': {
     message: string;
     level: 'full';

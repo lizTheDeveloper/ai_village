@@ -1,0 +1,1148 @@
+{
+  "invasion_plot_templates": [
+    {
+      "id": "invasion_scout_ships_detected",
+      "name": "Unknown Ships Detected",
+      "description": "Scout ships from an advanced civilization have entered our space",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "First contact and strategic response",
+        "domain": "political",
+        "insight": "How we respond to the unknown shapes who we become.",
+        "wisdom_value": 3,
+        "repeatable": false
+      },
+      "entry_stage": "detection",
+      "completion_stages": ["diplomatic_contact", "invasion_repelled"],
+      "failure_stages": ["occupation", "cultural_assimilation"],
+      "stages": [
+        {
+          "stage_id": "detection",
+          "name": "Unknown Contacts",
+          "description": "Sensors have detected unidentified vessels at the edge of our territory. They are not responding to hails.",
+          "stage_attractors": [
+            {
+              "attractor_id": "investigate",
+              "goal": {
+                "type": "investigate_anomaly",
+                "parameters": {
+                  "investigation_type": "scout_ships"
+                }
+              },
+              "strength": 0.6,
+              "urgency": 0.8,
+              "description": "Send scouts to investigate"
+            }
+          ]
+        },
+        {
+          "stage_id": "hail_ships",
+          "name": "Attempting Communication",
+          "description": "You've decided to reach out peacefully. Broadcasting on all frequencies...",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -10
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "premonition",
+              "content_hint": "Voices from the stars, speaking in patterns you've never heard",
+              "intensity": 0.7
+            }
+          ]
+        },
+        {
+          "stage_id": "diplomatic_contact",
+          "name": "First Contact Established",
+          "description": "Communication established. They come from beyond our known space, seeking trade and knowledge.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "fire_on_intruders",
+          "name": "Show of Force",
+          "description": "You've ordered an attack on the unknown ships. This may escalate quickly.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "military_incursion",
+          "name": "Invasion Begins",
+          "description": "Your attack provoked a massive response. Enemy fleets are entering our space.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "invasion_repelled",
+          "name": "Victory at Great Cost",
+          "description": "The invaders have been driven back, but at terrible cost. Our world will never be the same.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "occupation",
+          "name": "Under Occupation",
+          "description": "Enemy forces control key systems. We live under their rule now.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -30
+            }
+          ]
+        },
+        {
+          "stage_id": "cultural_assimilation",
+          "name": "Absorbed",
+          "description": "Our culture is being erased. We are becoming them.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -20
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "detection",
+          "to_stage": "hail_ships",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "attempt_communication"
+            }
+          ]
+        },
+        {
+          "from_stage": "detection",
+          "to_stage": "fire_on_intruders",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "attack_unknown"
+            }
+          ]
+        },
+        {
+          "from_stage": "hail_ships",
+          "to_stage": "diplomatic_contact",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 500
+            }
+          ]
+        },
+        {
+          "from_stage": "fire_on_intruders",
+          "to_stage": "military_incursion",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 200
+            }
+          ]
+        },
+        {
+          "from_stage": "military_incursion",
+          "to_stage": "invasion_repelled",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "invasion_defense_success"
+            }
+          ]
+        },
+        {
+          "from_stage": "military_incursion",
+          "to_stage": "occupation",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "invasion_defense_failure"
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_event",
+            "event_type": "multiverse:invasion_triggered",
+            "invasion_phase": "scout"
+          }
+        ],
+        "max_concurrent": 1,
+        "cooldown_ticks": 10000,
+        "min_wisdom": 1
+      }
+    },
+    {
+      "id": "invasion_full_military",
+      "name": "The Invasion Fleet",
+      "description": "A massive military invasion force has arrived at our doorstep",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Survival against overwhelming odds",
+        "domain": "military",
+        "insight": "In war, the first casualty is innocence.",
+        "wisdom_value": 4,
+        "repeatable": false
+      },
+      "entry_stage": "fleet_arrival",
+      "completion_stages": ["victory", "negotiated_peace"],
+      "failure_stages": ["total_defeat", "vassalization"],
+      "stages": [
+        {
+          "stage_id": "fleet_arrival",
+          "name": "The Sky Darkens",
+          "description": "Hundreds of ships drop out of FTL at the edge of our system. Their intent is clear.",
+          "stage_attractors": [
+            {
+              "attractor_id": "mobilize_defenses",
+              "goal": {
+                "type": "military_mobilization",
+                "parameters": {
+                  "urgency": "critical"
+                }
+              },
+              "strength": 0.9,
+              "urgency": 1.0,
+              "description": "All hands to battle stations"
+            }
+          ]
+        },
+        {
+          "stage_id": "desperate_defense",
+          "name": "Fighting for Survival",
+          "description": "Our fleets engage the invaders. Every ship, every life matters now.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 40
+            }
+          ]
+        },
+        {
+          "stage_id": "surrender_offered",
+          "name": "Terms of Surrender",
+          "description": "The enemy offers terms: submit to their rule or be annihilated.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -25
+            }
+          ]
+        },
+        {
+          "stage_id": "victory",
+          "name": "Against All Odds",
+          "description": "We held the line. The invaders retreat. Our world survives.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 35
+            }
+          ]
+        },
+        {
+          "stage_id": "negotiated_peace",
+          "name": "Compromise and Survival",
+          "description": "A treaty is signed. We keep our sovereignty, but at a price.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 5
+            }
+          ]
+        },
+        {
+          "stage_id": "total_defeat",
+          "name": "The End",
+          "description": "Our defenses are broken. The invasion is complete.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -50
+            }
+          ]
+        },
+        {
+          "stage_id": "vassalization",
+          "name": "Subjugated",
+          "description": "We accepted their terms. We are now a vassal state.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -15
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "fleet_arrival",
+          "to_stage": "desperate_defense",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "fight"
+            }
+          ]
+        },
+        {
+          "from_stage": "fleet_arrival",
+          "to_stage": "surrender_offered",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1000
+            }
+          ]
+        },
+        {
+          "from_stage": "desperate_defense",
+          "to_stage": "victory",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "military_victory"
+            }
+          ]
+        },
+        {
+          "from_stage": "desperate_defense",
+          "to_stage": "total_defeat",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "military_defeat"
+            }
+          ]
+        },
+        {
+          "from_stage": "surrender_offered",
+          "to_stage": "negotiated_peace",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "negotiate"
+            }
+          ]
+        },
+        {
+          "from_stage": "surrender_offered",
+          "to_stage": "vassalization",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "surrender"
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_event",
+            "event_type": "multiverse:invasion_started",
+            "invasion_type": "military"
+          }
+        ],
+        "max_concurrent": 1,
+        "cooldown_ticks": 20000,
+        "min_wisdom": 2
+      }
+    },
+    {
+      "id": "invasion_cultural_conquest",
+      "name": "The Soft Invasion",
+      "description": "They come bearing gifts - technology, culture, ideas. But at what cost?",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Cultural preservation vs technological advancement",
+        "domain": "cultural",
+        "insight": "Not all conquests are won with weapons.",
+        "wisdom_value": 3,
+        "repeatable": false
+      },
+      "entry_stage": "arrival",
+      "completion_stages": ["cultural_preservation", "mutual_exchange"],
+      "failure_stages": ["cultural_erasure", "dependency"],
+      "stages": [
+        {
+          "stage_id": "arrival",
+          "name": "Benevolent Contact",
+          "description": "They arrive with advanced technology and open hands. They want to 'uplift' us.",
+          "stage_attractors": [
+            {
+              "attractor_id": "evaluate_offer",
+              "goal": {
+                "type": "political_decision",
+                "parameters": {
+                  "decision_type": "cultural_exchange"
+                }
+              },
+              "strength": 0.5,
+              "urgency": 0.6,
+              "description": "Assess their intentions"
+            }
+          ]
+        },
+        {
+          "stage_id": "tech_adoption",
+          "name": "Accepting the Gift",
+          "description": "Their technology transforms our world. But our traditional ways begin to fade.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "cultural_resistance",
+          "name": "Holding the Line",
+          "description": "You've chosen to preserve our culture, even if it means slower progress.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 5
+            }
+          ]
+        },
+        {
+          "stage_id": "cultural_preservation",
+          "name": "Identity Intact",
+          "description": "We've found our own path forward, keeping what makes us unique.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "mutual_exchange",
+          "name": "Cultural Synthesis",
+          "description": "We've blended their gifts with our traditions, creating something new.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "cultural_erasure",
+          "name": "Lost Heritage",
+          "description": "Our culture is gone. We are them now, in all but name.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -30
+            }
+          ]
+        },
+        {
+          "stage_id": "dependency",
+          "name": "Cannot Stand Alone",
+          "description": "We depend on their technology for survival. We cannot resist their will.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -20
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "arrival",
+          "to_stage": "tech_adoption",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "accept_technology"
+            }
+          ]
+        },
+        {
+          "from_stage": "arrival",
+          "to_stage": "cultural_resistance",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "resist_change"
+            }
+          ]
+        },
+        {
+          "from_stage": "tech_adoption",
+          "to_stage": "mutual_exchange",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "balanced_adoption"
+            }
+          ]
+        },
+        {
+          "from_stage": "tech_adoption",
+          "to_stage": "cultural_erasure",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "total_adoption"
+            }
+          ]
+        },
+        {
+          "from_stage": "cultural_resistance",
+          "to_stage": "cultural_preservation",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 2000
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_event",
+            "event_type": "multiverse:invasion_started",
+            "invasion_type": "cultural"
+          }
+        ],
+        "max_concurrent": 1,
+        "cooldown_ticks": 15000,
+        "min_wisdom": 2
+      }
+    },
+    {
+      "id": "invasion_economic_takeover",
+      "name": "The Trade War",
+      "description": "They control our markets, our resources, our economy. Can we break free?",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Economic independence and sovereignty",
+        "domain": "economic",
+        "insight": "Economic chains are as real as iron ones.",
+        "wisdom_value": 3,
+        "repeatable": false
+      },
+      "entry_stage": "trade_agreement",
+      "completion_stages": ["economic_independence", "fair_partnership"],
+      "failure_stages": ["economic_collapse", "corporate_vassalage"],
+      "stages": [
+        {
+          "stage_id": "trade_agreement",
+          "name": "Profitable Partnership",
+          "description": "The trade agreement seems beneficial. Resources flow, economy grows. Too good to be true?",
+          "stage_attractors": [
+            {
+              "attractor_id": "monitor_economy",
+              "goal": {
+                "type": "economic_oversight",
+                "parameters": {
+                  "focus": "trade_balance"
+                }
+              },
+              "strength": 0.4,
+              "urgency": 0.5,
+              "description": "Watch the numbers carefully"
+            }
+          ]
+        },
+        {
+          "stage_id": "dependency_realized",
+          "name": "The Trap Closes",
+          "description": "Our industries can't compete. We rely on their goods. We're trapped.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "economic_resistance",
+          "name": "Breaking Free",
+          "description": "You've initiated policies to rebuild domestic industry. The transition will be painful.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "renegotiation",
+          "name": "Leveling the Field",
+          "description": "You're pushing for better terms. They don't like losing their advantage.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -5
+            }
+          ]
+        },
+        {
+          "stage_id": "economic_independence",
+          "name": "Self-Sufficient",
+          "description": "We've rebuilt our economy. We trade as equals now.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "fair_partnership",
+          "name": "Mutual Benefit",
+          "description": "New agreements reached. Both sides prosper without exploitation.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "economic_collapse",
+          "name": "Industrial Ruins",
+          "description": "The resistance failed. Our economy lies in ruins.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -40
+            }
+          ]
+        },
+        {
+          "stage_id": "corporate_vassalage",
+          "name": "Company World",
+          "description": "We exist to serve their economic interests. Nothing more.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -25
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "trade_agreement",
+          "to_stage": "dependency_realized",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 1500
+            }
+          ]
+        },
+        {
+          "from_stage": "dependency_realized",
+          "to_stage": "economic_resistance",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "rebuild_industry"
+            }
+          ]
+        },
+        {
+          "from_stage": "dependency_realized",
+          "to_stage": "renegotiation",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "renegotiate_terms"
+            }
+          ]
+        },
+        {
+          "from_stage": "economic_resistance",
+          "to_stage": "economic_independence",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "industrial_recovery_success"
+            }
+          ]
+        },
+        {
+          "from_stage": "economic_resistance",
+          "to_stage": "economic_collapse",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "industrial_recovery_failure"
+            }
+          ]
+        },
+        {
+          "from_stage": "renegotiation",
+          "to_stage": "fair_partnership",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "negotiation_success"
+            }
+          ]
+        },
+        {
+          "from_stage": "renegotiation",
+          "to_stage": "corporate_vassalage",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "negotiation_failure"
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_event",
+            "event_type": "multiverse:invasion_started",
+            "invasion_type": "economic"
+          }
+        ],
+        "max_concurrent": 1,
+        "cooldown_ticks": 15000,
+        "min_wisdom": 2
+      }
+    },
+    {
+      "id": "invasion_dimensional_breach",
+      "name": "The Breach",
+      "description": "A portal has opened, and things from beyond are coming through",
+      "scale": "epic",
+      "fork_behavior": "continue",
+      "lesson": {
+        "theme": "Facing the unknowable and incomprehensible",
+        "domain": "existential",
+        "insight": "Some doors should never be opened.",
+        "wisdom_value": 5,
+        "repeatable": false
+      },
+      "entry_stage": "portal_opens",
+      "completion_stages": ["portal_sealed", "peaceful_coexistence"],
+      "failure_stages": ["reality_corruption", "dimensional_merger"],
+      "stages": [
+        {
+          "stage_id": "portal_opens",
+          "name": "Tear in Reality",
+          "description": "Space itself splits open. Things that should not exist emerge into our world.",
+          "stage_attractors": [
+            {
+              "attractor_id": "contain_breach",
+              "goal": {
+                "type": "emergency_response",
+                "parameters": {
+                  "threat_type": "dimensional"
+                }
+              },
+              "strength": 0.8,
+              "urgency": 0.95,
+              "description": "Contain the anomaly before it spreads"
+            }
+          ]
+        },
+        {
+          "stage_id": "entities_emerge",
+          "name": "The Visitors",
+          "description": "Beings from another dimension step through. Their very presence distorts reality.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 35
+            },
+            {
+              "type": "queue_dream_hint",
+              "dream_type": "nightmare",
+              "content_hint": "Geometries that hurt to perceive, thoughts not your own",
+              "intensity": 0.9
+            }
+          ]
+        },
+        {
+          "stage_id": "attempt_communication",
+          "name": "Speaking the Unspeakable",
+          "description": "You try to understand them. Your mind struggles with concepts it wasn't built for.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "military_response",
+          "name": "Fighting the Impossible",
+          "description": "Weapons that work on matter fail against things that barely exist in our dimension.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "portal_sealed",
+          "name": "The Breach Closes",
+          "description": "Through sacrifice and ingenuity, the portal is sealed. But the scars remain.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "peaceful_coexistence",
+          "name": "Beyond Understanding",
+          "description": "Contact was made. An accord reached. Reality will never be quite the same.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 10
+            }
+          ]
+        },
+        {
+          "stage_id": "reality_corruption",
+          "name": "Warped World",
+          "description": "The dimensional bleed cannot be stopped. Our reality is changing, becoming like theirs.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -35
+            }
+          ]
+        },
+        {
+          "stage_id": "dimensional_merger",
+          "name": "Two Worlds, One Space",
+          "description": "The dimensions merge. We exist in both realms now, changed forever.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -20
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "portal_opens",
+          "to_stage": "entities_emerge",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 300
+            }
+          ]
+        },
+        {
+          "from_stage": "entities_emerge",
+          "to_stage": "attempt_communication",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "communicate"
+            }
+          ]
+        },
+        {
+          "from_stage": "entities_emerge",
+          "to_stage": "military_response",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "attack"
+            }
+          ]
+        },
+        {
+          "from_stage": "attempt_communication",
+          "to_stage": "peaceful_coexistence",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "communication_success"
+            }
+          ]
+        },
+        {
+          "from_stage": "attempt_communication",
+          "to_stage": "reality_corruption",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "communication_failure"
+            }
+          ]
+        },
+        {
+          "from_stage": "military_response",
+          "to_stage": "portal_sealed",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "military_success"
+            }
+          ]
+        },
+        {
+          "from_stage": "military_response",
+          "to_stage": "dimensional_merger",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "military_failure"
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_event",
+            "event_type": "multiverse:invasion_started",
+            "invasion_type": "dimensional"
+          }
+        ],
+        "max_concurrent": 1,
+        "cooldown_ticks": 25000,
+        "min_wisdom": 3
+      }
+    },
+    {
+      "id": "invasion_temporal_attack",
+      "name": "War Across Time",
+      "description": "They're not just attacking us now - they're attacking our past and future",
+      "scale": "epic",
+      "fork_behavior": "fork_required",
+      "lesson": {
+        "theme": "Causality and timeline defense",
+        "domain": "temporal",
+        "insight": "Every moment is a battlefield when time itself is weaponized.",
+        "wisdom_value": 4,
+        "repeatable": false
+      },
+      "entry_stage": "temporal_anomaly",
+      "completion_stages": ["timeline_secured", "paradox_resolved"],
+      "failure_stages": ["timeline_erasure", "causal_loop"],
+      "stages": [
+        {
+          "stage_id": "temporal_anomaly",
+          "name": "Time Fractures",
+          "description": "Causality is breaking. Events that happened are un-happening. Our history is under attack.",
+          "stage_attractors": [
+            {
+              "attractor_id": "investigate_paradox",
+              "goal": {
+                "type": "temporal_investigation",
+                "parameters": {
+                  "urgency": "critical"
+                }
+              },
+              "strength": 0.7,
+              "urgency": 0.9,
+              "description": "Track the source of temporal interference"
+            }
+          ]
+        },
+        {
+          "stage_id": "enemy_identified",
+          "name": "Temporal Aggressor",
+          "description": "They're from a rival timeline. They're trying to erase our existence by changing our past.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 30
+            }
+          ]
+        },
+        {
+          "stage_id": "defend_timeline",
+          "name": "Temporal Defense",
+          "description": "You've sent agents into the past to protect key events from alteration.",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "counter_attack",
+          "name": "Strike Their Past",
+          "description": "If they can change our history, we can change theirs. But at what cost?",
+          "on_enter_effects": [
+            {
+              "type": "modify_stress",
+              "delta": 20
+            }
+          ]
+        },
+        {
+          "stage_id": "timeline_secured",
+          "name": "Causality Restored",
+          "description": "The attack is repelled. Our timeline is intact, protected by temporal defenses.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 25
+            }
+          ]
+        },
+        {
+          "stage_id": "paradox_resolved",
+          "name": "Timeline Merger",
+          "description": "A treaty across time. Both timelines coexist peacefully now.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": 15
+            }
+          ]
+        },
+        {
+          "stage_id": "timeline_erasure",
+          "name": "Never Were",
+          "description": "They succeeded. Our timeline is being deleted. We fade from existence.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -50
+            }
+          ]
+        },
+        {
+          "stage_id": "causal_loop",
+          "name": "Trapped in Loop",
+          "description": "The war created a paradox. We're stuck in a causal loop, reliving the conflict eternally.",
+          "on_enter_effects": [
+            {
+              "type": "modify_mood",
+              "delta": -30
+            }
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from_stage": "temporal_anomaly",
+          "to_stage": "enemy_identified",
+          "conditions": [
+            {
+              "type": "personal_tick_elapsed",
+              "ticks": 400
+            }
+          ]
+        },
+        {
+          "from_stage": "enemy_identified",
+          "to_stage": "defend_timeline",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "defend"
+            }
+          ]
+        },
+        {
+          "from_stage": "enemy_identified",
+          "to_stage": "counter_attack",
+          "conditions": [
+            {
+              "type": "player_choice",
+              "choice_id": "counter_strike"
+            }
+          ]
+        },
+        {
+          "from_stage": "defend_timeline",
+          "to_stage": "timeline_secured",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "defense_success"
+            }
+          ]
+        },
+        {
+          "from_stage": "defend_timeline",
+          "to_stage": "timeline_erasure",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "defense_failure"
+            }
+          ]
+        },
+        {
+          "from_stage": "counter_attack",
+          "to_stage": "paradox_resolved",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "mutual_deterrence"
+            }
+          ]
+        },
+        {
+          "from_stage": "counter_attack",
+          "to_stage": "causal_loop",
+          "conditions": [
+            {
+              "type": "custom",
+              "custom_condition_id": "paradox_created"
+            }
+          ]
+        }
+      ],
+      "assignment_rules": {
+        "triggers": [
+          {
+            "type": "on_event",
+            "event_type": "multiverse:invasion_started",
+            "invasion_type": "temporal"
+          }
+        ],
+        "max_concurrent": 1,
+        "cooldown_ticks": 30000,
+        "min_wisdom": 3
+      }
+    }
+  ]
+}

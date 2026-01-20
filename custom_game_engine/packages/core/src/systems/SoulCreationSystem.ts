@@ -38,13 +38,14 @@ import {
   getDefaultSpeciesForCulture,
   type SoulCulture,
 } from '../components/SoulIdentityComponent.js';
-import { createIncarnationComponent } from '../components/IncarnationComponent.js';
+import { createIncarnationComponent, type IncarnationComponent } from '../components/IncarnationComponent.js';
 import { createSoulWisdomComponent, type SoulWisdomComponent } from '../components/SoulWisdomComponent.js';
 import { createSoulCreationEventComponent } from '../components/SoulCreationEventComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createRealmLocationComponent } from '../components/RealmLocationComponent.js';
 import { createAfterlifeComponent, type AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 import { soulNameGenerator } from '../divinity/SoulNameGenerator.js';
 
 /** Request to create a soul */
@@ -359,7 +360,7 @@ export class SoulCreationSystem extends BaseSystem {
    * 2. Spawn near parents if they exist
    * 3. Spawn at world spawn point (0, 0)
    */
-  private determineSpawnLocation(context: SoulCreationContext): { chunkX: number; chunkY: number; worldX: number; worldY: number } {
+  private determineSpawnLocation(world: World, context: SoulCreationContext): { chunkX: number; chunkY: number; worldX: number; worldY: number } {
     const CHUNK_SIZE = 32; // Must match world package CHUNK_SIZE
 
     // Priority 1: Use explicit incarnation location
@@ -374,8 +375,37 @@ export class SoulCreationSystem extends BaseSystem {
       };
     }
 
-    // Priority 2: Spawn near parents (not implemented yet - would require parent entity lookup)
-    // TODO: If context.parentSouls provided, look up parent entities and spawn nearby
+    // Priority 2: Spawn near parents
+    if (context.parentSouls && context.parentSouls.length > 0) {
+      // Find first parent with a position (incarnated in an agent)
+      for (const parentSoulId of context.parentSouls) {
+        const parentSoul = world.getEntity(parentSoulId);
+        if (!parentSoul) continue;
+
+        // Check if parent soul is incarnated (has agent with position)
+        const incarnation = parentSoul.getComponent<IncarnationComponent>('incarnation');
+        if (incarnation?.primaryBindingId) {
+          const agent = world.getEntity(incarnation.primaryBindingId);
+          const pos = agent?.getComponent<PositionComponent>('position');
+          if (pos) {
+            // Spawn within 5-10 tiles of parent
+            const offset = 5 + Math.random() * 5;
+            const angle = Math.random() * Math.PI * 2;
+            const worldX = pos.x + Math.cos(angle) * offset;
+            const worldY = pos.y + Math.sin(angle) * offset;
+            console.log(`[SoulCreationSystem] Spawning soul near parent at (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) -> (${worldX.toFixed(1)}, ${worldY.toFixed(1)}), offset: ${offset.toFixed(1)} tiles`);
+            return {
+              chunkX: Math.floor(worldX / CHUNK_SIZE),
+              chunkY: Math.floor(worldY / CHUNK_SIZE),
+              worldX,
+              worldY,
+            };
+          }
+        }
+      }
+      // If no parent found with position, fall through to Priority 3
+      console.log(`[SoulCreationSystem] Parent souls provided but none have valid positions, using spawn point`);
+    }
 
     // Priority 3: World spawn point
     const worldX = 0;
@@ -459,7 +489,7 @@ export class SoulCreationSystem extends BaseSystem {
 
     // Pre-generate chunks around spawn location during ceremony
     // This ensures terrain is ready when the soul incarnates
-    const spawnLocation = this.determineSpawnLocation(request.context);
+    const spawnLocation = this.determineSpawnLocation(world, request.context);
     const generator = world.getBackgroundChunkGenerator();
     if (generator) {
       generator.queueChunkGrid(

@@ -26,7 +26,6 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { TimeCompressionComponent } from '../components/TimeCompressionComponent.js';
-import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
 import type { Component } from '../ecs/Component.js';
 import { SimulationMode } from '../ecs/SimulationScheduler.js';
@@ -40,7 +39,9 @@ import { SimulationMode } from '../ecs/SimulationScheduler.js';
  */
 interface PreservedEntityState {
   entityId: string;
-  components: Map<ComponentType, Component>;
+  /** Component snapshots keyed by type (object literal for GC) */
+  components: Record<ComponentType, Component>;
+  componentCount: number;
   previousSchedulerMode: SimulationMode;
   wasActive: boolean;
 }
@@ -105,14 +106,16 @@ export class StatisticalModeManager extends BaseSystem {
   /** Current statistical mode state */
   private isStatisticalMode: boolean = false;
 
-  /** Preserved entity states for resurrection */
-  private preservedEntityStates: Map<string, PreservedEntityState> = new Map();
+  /** Preserved entity states for resurrection (object literal for GC) */
+  private preservedEntityStates: Record<string, PreservedEntityState> = Object.create(null);
+  private preservedEntityCount: number = 0;
 
-  /** Headless soul agent states */
-  private headlessSoulStates: Map<string, HeadlessState> = new Map();
+  /** Headless soul agent states (object literal for GC) */
+  private headlessSoulStates: Record<string, HeadlessState> = Object.create(null);
+  private headlessSoulCount: number = 0;
 
-  /** Entities that were marked as PASSIVE during statistical mode */
-  private passiveEntities: Set<string> = new Set();
+  /** Entities that were marked as PASSIVE during statistical mode (object literal for GC) */
+  private passiveEntities: Record<string, boolean> = Object.create(null);
 
   protected onUpdate(ctx: SystemContext): void {
     const { world, tick } = ctx;
@@ -163,6 +166,10 @@ export class StatisticalModeManager extends BaseSystem {
   private enterStatisticalMode(ctx: SystemContext, world: World): void {
     const { tick } = ctx;
 
+    // Reset counters
+    this.preservedEntityCount = 0;
+    this.headlessSoulCount = 0;
+
     // 1. Snapshot all entities with Position (active simulation targets)
     const activeEntities = world.query().with(CT.Position).executeEntities();
 
@@ -175,39 +182,38 @@ export class StatisticalModeManager extends BaseSystem {
 
       // Preserve entity state
       const state = this.preserveEntityState(impl, isSoulAgent);
-      this.preservedEntityStates.set(entity.id, state);
+      this.preservedEntityStates[entity.id] = state;
+      this.preservedEntityCount++;
 
       // Mark entity as passive (disable per-tick processing)
-      this.passiveEntities.add(entity.id);
+      this.passiveEntities[entity.id] = true;
 
       // For soul agents, create headless state
       if (isSoulAgent && soulLink) {
-        const soulIdentity = impl.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
         const identity = impl.getComponent(CT.Identity) as { age?: number } | undefined;
 
-        const headlessState: HeadlessState = {
+        this.headlessSoulStates[entity.id] = {
           agentId: entity.id,
-          soulId: soulLink.soulEntityId, // Correct field name
+          soulId: soulLink.soulEntityId,
           lastTick: Number(tick),
           age: identity?.age ?? 0,
           isAlive: true,
         };
-
-        this.headlessSoulStates.set(entity.id, headlessState);
+        this.headlessSoulCount++;
       }
     }
 
     // 2. Emit event
     ctx.emit('time:entered_statistical_mode', {
-      entitiesPreserved: this.preservedEntityStates.size,
-      soulAgents: this.headlessSoulStates.size,
+      entitiesPreserved: this.preservedEntityCount,
+      soulAgents: this.headlessSoulCount,
       tick: Number(tick),
     }, this.timeCompressionEntityId ?? 'world');
 
     console.log(
       `[StatisticalModeManager] Entered statistical mode: ` +
-      `${this.preservedEntityStates.size} entities preserved, ` +
-      `${this.headlessSoulStates.size} soul agents headless`
+      `${this.preservedEntityCount} entities preserved, ` +
+      `${this.headlessSoulCount} soul agents headless`
     );
   }
 
@@ -221,8 +227,13 @@ export class StatisticalModeManager extends BaseSystem {
   private exitStatisticalMode(ctx: SystemContext, world: World): void {
     const { tick } = ctx;
 
+    // Track counts before clearing
+    const entitiesRestored = this.preservedEntityCount;
+    const soulAgentsResumed = this.headlessSoulCount;
+
     // 1. Restore entity states
-    for (const [entityId, state] of this.preservedEntityStates.entries()) {
+    for (const entityId in this.preservedEntityStates) {
+      const state = this.preservedEntityStates[entityId]!;
       const entity = world.getEntity(entityId);
       if (!entity) {
         console.warn(`[StatisticalModeManager] Entity ${entityId} no longer exists, cannot restore`);
@@ -232,17 +243,18 @@ export class StatisticalModeManager extends BaseSystem {
       this.restoreEntityState(entity as EntityImpl, state);
 
       // Remove from passive set (re-enable per-tick processing)
-      this.passiveEntities.delete(entityId);
+      delete this.passiveEntities[entityId];
 
       // Emit restoration event
       ctx.emit('time:entity_restored', {
         entityId,
-        componentsRestored: state.components.size,
+        componentsRestored: state.componentCount,
       }, entityId);
     }
 
     // 2. Update soul agents from headless state
-    for (const [entityId, headlessState] of this.headlessSoulStates.entries()) {
+    for (const entityId in this.headlessSoulStates) {
+      const headlessState = this.headlessSoulStates[entityId]!;
       const entity = world.getEntity(entityId);
       if (!entity) continue;
 
@@ -263,38 +275,58 @@ export class StatisticalModeManager extends BaseSystem {
       }
     }
 
-    // 3. Clear caches
-    this.preservedEntityStates.clear();
-    this.headlessSoulStates.clear();
-    this.passiveEntities.clear();
+    // 3. Clear caches by deleting keys (avoid GC pressure from new objects)
+    for (const key in this.preservedEntityStates) {
+      delete this.preservedEntityStates[key];
+    }
+    for (const key in this.headlessSoulStates) {
+      delete this.headlessSoulStates[key];
+    }
+    for (const key in this.passiveEntities) {
+      delete this.passiveEntities[key];
+    }
+    this.preservedEntityCount = 0;
+    this.headlessSoulCount = 0;
 
     // 4. Emit event
     ctx.emit('time:exited_statistical_mode', {
-      entitiesRestored: this.preservedEntityStates.size,
-      soulAgentsResumed: this.headlessSoulStates.size,
+      entitiesRestored,
+      soulAgentsResumed,
       tick: Number(tick),
     }, this.timeCompressionEntityId ?? 'world');
 
     console.log(
       `[StatisticalModeManager] Exited statistical mode: ` +
-      `${this.preservedEntityStates.size} entities restored`
+      `${entitiesRestored} entities restored`
     );
   }
 
   /**
    * Preserve entity state for later restoration
+   * Uses shallow clone for critical components only (not full deep clone)
    */
   private preserveEntityState(entity: EntityImpl, isSoulAgent: boolean): PreservedEntityState {
-    // Snapshot all components
-    const components = new Map<ComponentType, Component>();
-    for (const [type, component] of entity.components.entries()) {
-      // Deep clone component to prevent mutations during statistical mode
-      components.set(type as ComponentType, JSON.parse(JSON.stringify(component)));
+    // Snapshot critical components only (object literal for GC)
+    const components: Record<ComponentType, Component> = Object.create(null);
+    let componentCount = 0;
+
+    // Only preserve components needed for restoration (Position, Needs, Inventory)
+    // Full deep clone via JSON is extremely expensive for GC
+    const criticalTypes = [CT.Position, CT.Needs, CT.Inventory] as ComponentType[];
+
+    for (const type of criticalTypes) {
+      const component = entity.getComponent(type);
+      if (component) {
+        // Shallow clone with spread - sufficient for simple value objects
+        components[type] = { ...component };
+        componentCount++;
+      }
     }
 
     return {
       entityId: entity.id,
       components,
+      componentCount,
       previousSchedulerMode: SimulationMode.ALWAYS, // TODO: Get from SimulationScheduler
       wasActive: true,
     };
@@ -309,19 +341,19 @@ export class StatisticalModeManager extends BaseSystem {
     // Instead, we only restore critical state like position, needs, etc.
 
     // Restore position (critical for spatial queries)
-    const preservedPosition = state.components.get(CT.Position);
+    const preservedPosition = state.components[CT.Position];
     if (preservedPosition) {
       entity.updateComponent(CT.Position, () => preservedPosition);
     }
 
     // Restore needs (prevent starvation after long statistical periods)
-    const preservedNeeds = state.components.get(CT.Needs);
+    const preservedNeeds = state.components[CT.Needs];
     if (preservedNeeds) {
       entity.updateComponent(CT.Needs, () => preservedNeeds);
     }
 
     // Restore inventory
-    const preservedInventory = state.components.get(CT.Inventory);
+    const preservedInventory = state.components[CT.Inventory];
     if (preservedInventory) {
       entity.updateComponent(CT.Inventory, () => preservedInventory);
     }
@@ -360,21 +392,21 @@ export class StatisticalModeManager extends BaseSystem {
    * Check if entity is currently in statistical mode (passive)
    */
   public isEntityPassive(entityId: string): boolean {
-    return this.passiveEntities.has(entityId);
+    return this.passiveEntities[entityId] === true;
   }
 
   /**
    * Get headless state for soul agent
    */
   public getHeadlessState(agentId: string): HeadlessState | undefined {
-    return this.headlessSoulStates.get(agentId);
+    return this.headlessSoulStates[agentId];
   }
 
   /**
    * Update soul agent headless state with trajectory
    */
   public updateSoulAgentHeadless(agentId: string, trajectory: LifeTrajectory): void {
-    const state = this.headlessSoulStates.get(agentId);
+    const state = this.headlessSoulStates[agentId];
     if (!state) {
       console.warn(`[StatisticalModeManager] No headless state for agent ${agentId}`);
       return;
@@ -389,13 +421,13 @@ export class StatisticalModeManager extends BaseSystem {
    * Get count of preserved entities
    */
   public getPreservedCount(): number {
-    return this.preservedEntityStates.size;
+    return this.preservedEntityCount;
   }
 
   /**
    * Get count of headless soul agents
    */
   public getHeadlessSoulCount(): number {
-    return this.headlessSoulStates.size;
+    return this.headlessSoulCount;
   }
 }

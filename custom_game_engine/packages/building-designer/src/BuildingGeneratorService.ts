@@ -5,7 +5,8 @@
  * Integrates with alien world generation pipeline
  */
 
-import { LLMServiceFacade } from '@ai-village/llm';
+// Note: LLM integration temporarily disabled - needs proper provider setup
+// import type { LLMProvider } from '@ai-village/llm';
 
 export interface GeneratedBuilding {
   id: string;
@@ -101,10 +102,10 @@ const ARCHITECTURAL_STYLES: Record<string, SpeciesArchitecturalStyle> = {
 };
 
 export class BuildingGeneratorService {
-  private llm: LLMServiceFacade;
+  // private llm: LLMProvider; // TODO: Re-enable when LLM integration is set up
 
   constructor() {
-    this.llm = LLMServiceFacade.getInstance();
+    // this.llm = ...; // TODO: Initialize LLM provider
   }
 
   /**
@@ -129,23 +130,27 @@ export class BuildingGeneratorService {
 
     const prompt = this.buildPrompt(style, buildingType, tier, sizeSpec, options.specialFeatures);
 
-    try {
-      const response = await this.llm.chat({
-        provider: 'groq',
-        model: 'qwen/qwen3-32b',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt() },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 4000
-      });
+    // TODO: Re-enable LLM integration
+    console.error('BuildingGeneratorService: LLM integration not yet implemented');
+    return null;
 
-      return this.parseResponse(response.content, species);
-    } catch (error) {
-      console.error('Failed to generate building:', error);
-      return null;
-    }
+    // try {
+    //   const response = await this.llm.chat({
+    //     provider: 'groq',
+    //     model: 'qwen/qwen3-32b',
+    //     messages: [
+    //       { role: 'system', content: this.getSystemPrompt() },
+    //       { role: 'user', content: prompt }
+    //     ],
+    //     temperature: 0.7,
+    //     max_tokens: 4000
+    //   });
+    //
+    //   return this.parseResponse(response.content, species);
+    // } catch (error) {
+    //   console.error('Failed to generate building:', error);
+    //   return null;
+    // }
   }
 
   /**

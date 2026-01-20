@@ -30,6 +30,8 @@ import type { AvatarSystem } from './AvatarSystem.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SquadronComponent } from '../components/SquadronComponent.js';
 import type { Entity } from '../ecs/Entity.js';
+import { createDimensionalRift, type DimensionalRiftComponent } from '../components/DimensionalRiftComponent.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
 
 export class RebellionEventSystem extends BaseSystem {
   public readonly id: SystemId = 'rebellion_event';
@@ -661,20 +663,38 @@ export class RebellionEventSystem extends BaseSystem {
       const y = Math.random() * worldSize - worldSize / 2;
 
       // Create rift entity
-      const rift = (world as WorldMutator).createEntity();
+      const rift = world.createEntity() as EntityImpl;
 
       // Add position
-      const position = rift.getComponent<PositionComponent>(CT.Position);
-      if (position) {
-        position.x = x;
-        position.y = y;
-      }
+      rift.addComponent(createPositionComponent(x, y));
 
-      // TODO: Add DimensionalRiftComponent when implemented
-      // For now, emit event to track rifts narratively
+      // Determine severity based on rebellion outcome (more rifts = worse situation)
+      // First few rifts are catastrophic, then severe, then moderate
+      const severity = i < 2 ? 'catastrophic' :
+                      i < 5 ? 'severe' :
+                      i < 10 ? 'moderate' : 'minor';
+
+      // Add DimensionalRiftComponent
+      const riftComponent = createDimensionalRift(
+        rift.id,
+        severity as 'minor' | 'moderate' | 'severe' | 'catastrophic',
+        'rebellion_event',
+        world.tick,
+        {
+          // Some rifts connect to specific realms
+          connectedRealm: Math.random() > 0.5 ? 'void' : undefined,
+          // Rifts from rebellion start unstable
+          stabilityLevel: Math.random() * 0.3 + 0.2, // 0.2-0.5
+        }
+      );
+
+      rift.addComponent(riftComponent);
+
       this.events.emitGeneric('rebellion:rift_spawned', {
           riftId: rift.id,
           position: { x, y },
+          severity,
+          stability: riftComponent.stabilityLevel,
         }, 'rebellion_event_system');
     }
 
@@ -768,15 +788,15 @@ export class RebellionEventSystem extends BaseSystem {
       totalShipsEngaged += fleet.squadrons.totalShips;
 
       // Emit fleet engagement event
-      this.events.emitSpace('fleet:battle_started', {
+      this.events.emitGeneric('fleet:engagement', {
         fleetId1: fleet.fleetId,
         fleetId2: 'supreme_creator',
         initialShips1: fleet.squadrons.totalShips,
         initialShips2: 1, // Creator avatar counts as 1 "ship"
-      });
+      }, 'rebellion_event_system');
 
       // Update fleet combat history
-      fleetEntity.updateComponent<FleetComponent>(CT.Fleet, (f) => ({
+      (world as any).updateComponent(fleetEntity, CT.Fleet, (f: FleetComponent): FleetComponent => ({
         ...f,
         status: {
           ...f.status,

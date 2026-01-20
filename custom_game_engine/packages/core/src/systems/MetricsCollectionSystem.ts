@@ -927,7 +927,7 @@ export class MetricsCollectionSystem extends BaseSystem {
           day: currentDay,
           tick: world.tick,
           phase: timeComp.phase,
-          season: ('season' in timeComp) ? (timeComp as Record<string, unknown>).season : undefined,
+          season: ('season' in timeComp) ? (timeComp as unknown as Record<string, unknown>).season : undefined,
         },
       }).catch((error) => {
         console.error('[MetricsCollection] Failed to record time milestone canon event:', error);

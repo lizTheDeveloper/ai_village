@@ -93,7 +93,7 @@ export function scorePartners(
   const seekerInterests = seekerImpl.getComponent<InterestsComponent>(CT.Interests);
   const seekerRelationships = seekerImpl.getComponent<RelationshipComponent>(CT.Relationship);
   const seekerAgent = seekerImpl.getComponent<AgentComponent>(CT.Agent);
-  const seekerPos = seekerImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+  const seekerPos = seekerImpl.getComponent(CT.Position) as unknown as { x: number; y: number } | undefined;
 
   const scores: PartnerScore[] = [];
 
@@ -110,7 +110,7 @@ export function scorePartners(
     let score = 0;
     const reasons: string[] = [];
 
-    const candidatePos = candidateImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+    const candidatePos = candidateImpl.getComponent(CT.Position) as unknown as { x: number; y: number } | undefined;
     const candidateInterests = candidateImpl.getComponent<InterestsComponent>(CT.Interests);
     const candidateAgent = candidateImpl.getComponent<AgentComponent>(CT.Agent);
 
@@ -364,7 +364,7 @@ export function findBestPartnerInRange(
   range: number
 ): Entity | null {
   const seekerImpl = seeker as EntityImpl;
-  const seekerPos = seekerImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+  const seekerPos = seekerImpl.getComponent(CT.Position) as unknown as { x: number; y: number } | undefined;
 
   if (!seekerPos) return null;
 
@@ -380,7 +380,7 @@ export function findBestPartnerInRange(
     if (other.id === seeker.id) return false;
 
     const otherImpl = other as EntityImpl;
-    const otherPos = otherImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+    const otherPos = otherImpl.getComponent(CT.Position) as unknown as { x: number; y: number } | undefined;
     if (!otherPos) return false;
 
     const dx = seekerPos.x - otherPos.x;

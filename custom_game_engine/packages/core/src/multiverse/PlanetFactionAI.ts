@@ -242,7 +242,8 @@ export class PlanetFactionAI {
     const invasionType = this.selectInvasionType();
 
     // Calculate travel time (if applicable)
-    const estimatedTicks = this.calculateTravelTime();
+    const estimatedTicksBigInt = this.calculateTravelTime();
+    const estimatedTicks = Number(estimatedTicksBigInt);
 
     const decision: FactionDecision = {
       type: 'invade',
@@ -336,7 +337,11 @@ export class PlanetFactionAI {
     // Use dominant civilization if available
     if (this.planet.majorCivilizations.length > 0) {
       // Find largest civilization
-      let largest = this.planet.majorCivilizations[0];
+      const firstCiv = this.planet.majorCivilizations[0];
+      if (!firstCiv) {
+        return this.planet.id;
+      }
+      let largest = firstCiv;
       for (const civ of this.planet.majorCivilizations) {
         if (civ.population > largest.population) {
           largest = civ;
@@ -448,12 +453,12 @@ export class PlanetFactionAI {
       economicStrength,
       stability: planet.stability.overall,
       resources: {
-        food: planet.economy.resourceStockpiles.get('food') ?? 0,
-        metal: planet.economy.resourceStockpiles.get('metal') ?? 0,
-        energy: planet.economy.resourceStockpiles.get('energy') ?? 0,
+        food: planet.economy.stockpiles.get('food') ?? 0,
+        metal: planet.economy.stockpiles.get('metal') ?? 0,
+        energy: planet.economy.stockpiles.get('energy') ?? 0,
       },
       activeWars: planet.majorCivilizations.reduce(
-        (sum, civ) => sum + civ.activeWars.length,
+        (sum: number, civ: { activeWars: string[] }) => sum + civ.activeWars.length,
         0
       ),
       hasDiscoveredPlayer: false,

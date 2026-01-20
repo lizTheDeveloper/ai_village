@@ -2,6 +2,10 @@
  * Multiverse, universe, and reality events.
  */
 import type { EntityId } from '../../types.js';
+import type {
+  InvasionTriggeredEvent,
+  BackgroundUniverseDiscoveredEvent,
+} from '../../multiverse/BackgroundUniverseTypes.js';
 
 export interface MultiverseEvents {
   /** Reality anchor charging interrupted */
@@ -137,6 +141,49 @@ export interface MultiverseEvents {
     }>;
   };
 
+  // ========================================================================
+  // Timeline Merger Ship Events (Phase 4 Multiverse)
+  // ========================================================================
+
+  /** Timeline merger operation initiated by ship */
+  'multiverse:merger_initiated': {
+    sourceUniverse: string;
+    targetUniverse: string;
+    mergerShipId: string;
+    tick: number;
+  };
+
+  /** Merger compatibility calculation completed */
+  'multiverse:merger_compatibility_calculated': {
+    sourceUniverse: string;
+    targetUniverse: string;
+    mergerShipId: string;
+    compatibilityScore: number;
+    compatible: boolean;
+    tick: number;
+  };
+
+  /** Timelines successfully merged */
+  'multiverse:timelines_merged': {
+    sourceUniverse: string;
+    targetUniverse: string;
+    mergerShipId: string;
+    conflictsResolved: number;
+    entitiesPreserved: number;
+    entitiesMerged: number;
+    entitiesDiscarded: number;
+    tick: number;
+  };
+
+  /** Timeline merger operation failed */
+  'multiverse:merger_failed': {
+    sourceUniverse: string;
+    targetUniverse: string;
+    mergerShipId: string;
+    reason: string;
+    tick: number;
+  };
+
   /** Passage experiencing high traffic congestion */
   'passage:congested': {
     passageId: string;
@@ -232,6 +279,12 @@ export interface MultiverseEvents {
     success?: boolean;
   };
 
+  /** New universe discovered (from background simulation) */
+  'multiverse:universe_discovered': BackgroundUniverseDiscoveredEvent;
+
+  /** Invasion triggered by background universe (faction AI decision) */
+  'multiverse:invasion_triggered': InvasionTriggeredEvent;
+
   // ========================================================================
   // Canon Event System
   // ========================================================================
@@ -286,6 +339,49 @@ export interface MultiverseEvents {
     parentRealmId: string;
     parentRealmName: string;
     newStatus: 'independent' | 'unstable' | 'cascading_collapse';
+  };
+
+  // ========================================================================
+  // Paradox Detection Events (Phase 4 Multiverse)
+  // ========================================================================
+
+  /** Temporal paradox detected in timeline */
+  'multiverse:paradox_detected': {
+    entityId: string;
+    paradoxType: 'grandfather' | 'bootstrap' | 'predestination' | 'ontological';
+    severity: 'minor' | 'moderate' | 'severe' | 'catastrophic';
+    description: string;
+    causalChain: string[]; // Entity IDs involved in paradox
+    tick: number;
+  };
+
+  /** Universe forked to resolve paradox */
+  'multiverse:paradox_forked': {
+    paradoxType: 'grandfather' | 'bootstrap' | 'predestination' | 'ontological';
+    severity: 'minor' | 'moderate' | 'severe' | 'catastrophic';
+    entityId: string;
+    description: string;
+    tick: number;
+  };
+
+  /** Timeline collapsed due to paradox */
+  'multiverse:timeline_collapsed': {
+    paradoxType: 'grandfather' | 'bootstrap' | 'predestination' | 'ontological';
+    severity: 'minor' | 'moderate' | 'severe' | 'catastrophic';
+    entityId: string;
+    description: string;
+    affectedUniverses: string[];
+    tick: number;
+  };
+
+  /** Minor paradox auto-corrected via quantum effects */
+  'multiverse:retrocausal_adjustment': {
+    paradoxType: 'grandfather' | 'bootstrap' | 'predestination' | 'ontological';
+    severity: 'minor' | 'moderate' | 'severe' | 'catastrophic';
+    entityId: string;
+    description: string;
+    adjustmentType: 'quantum_decoherence' | 'timeline_nudge' | 'probability_collapse';
+    tick: number;
   };
 }
 

@@ -290,8 +290,8 @@ export class SpellCastingService {
   }
 
   private calculateDistance(entity1: Entity, entity2: Entity): number {
-    const pos1 = entity1.components.get('position') as { x: number; y: number } | undefined;
-    const pos2 = entity2.components.get('position') as { x: number; y: number } | undefined;
+    const pos1 = entity1.components.get('position') as unknown as { x: number; y: number } | undefined;
+    const pos2 = entity2.components.get('position') as unknown as { x: number; y: number } | undefined;
 
     if (!pos1 || !pos2) return Infinity;
 

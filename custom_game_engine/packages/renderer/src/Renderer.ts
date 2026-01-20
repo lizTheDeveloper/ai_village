@@ -650,7 +650,7 @@ export class Renderer {
           // 3D multi-floor or standard layout
           else if (blueprint.floors && blueprint.floors.length > 0) {
             // Use first floor for now (TODO: floor selection UI)
-            layoutToRender = blueprint.floors[0].layout;
+            layoutToRender = blueprint.floors[0]?.layout;
           }
           else if (blueprint.layout) {
             layoutToRender = blueprint.layout;
@@ -734,7 +734,7 @@ export class Renderer {
     }
 
     // Clear dimensional controls if no building selected
-    if (!selectedEntity || !world.getEntityById(selectedEntity.id)?.components.get('building')) {
+    if (!selectedEntity || !world.getEntity(selectedEntity.id)?.components.get('building')) {
       if (this.selectedDimensionalBuildingId !== null) {
         this.handleDimensionalBuildingSelection(world, null);
       }

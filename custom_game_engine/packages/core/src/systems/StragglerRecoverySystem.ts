@@ -29,6 +29,7 @@ import {
   shouldMarkAsLost,
   createStragglerComponent,
 } from '../components/StragglerComponent.js';
+import { createCorruptedShipComponent } from '../components/CorruptedComponent.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 import type { SquadronComponent } from '../components/SquadronComponent.js';
 
@@ -667,8 +668,19 @@ export class StragglerRecoverySystem extends BaseSystem {
     // Following Conservation of Game Matter principles:
     // Do NOT delete entity - mark as corrupted for potential recovery
 
-    // TODO: Add CorruptedComponent instead of removing entity
-    // For now, remove straggler component (ship remains in world as corrupted)
+    // Create corruption component with ship-specific data
+    const corruptedComponent = createCorruptedShipComponent(
+      world.tick,
+      straggler.originalFleetId,
+      straggler.originalSquadronId,
+      straggler.contaminationRisk,
+      straggler.decoherenceRate
+    );
+
+    // Add corruption marker
+    entity.addComponent(corruptedComponent);
+
+    // Remove straggler component (ship is now corrupted, not recovering)
     entity.removeComponent(CT.Straggler);
   }
 

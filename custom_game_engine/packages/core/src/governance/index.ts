@@ -9,4 +9,5 @@
  * - Political tier types and utilities
  */
 
+export * from './types.js';
 export * from './DecisionProtocols.js';

@@ -653,7 +653,7 @@ export class VisionProcessor {
 
     // Filter features to only those in the forward direction (120° cone)
     // Get agent's facing direction from velocity or last movement
-    const velocity = entity.components.get('velocity') as { vx: number; vy: number } | undefined;
+    const velocity = entity.components.get('velocity') as unknown as { vx: number; vy: number } | undefined;
 
     let facingAngle = 0; // Default to east if no velocity
     if (velocity && (velocity.vx !== 0 || velocity.vy !== 0)) {

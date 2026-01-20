@@ -82,7 +82,7 @@ export class HeartChamberNetworkSystem extends BaseSystem {
   public readonly metadata = {
     category: 'combat',
     description: 'Fleet-wide coherence synchronization for β-space jumps',
-    dependsOn: ['fleet_coherence' as SystemId],
+    dependsOn: [],
     writesComponents: [CT.Fleet, CT.Spaceship] as const,
   } as const;
 
@@ -481,7 +481,7 @@ export class HeartChamberNetworkSystem extends BaseSystem {
       // GC: Push individually instead of spread to avoid intermediate array
       const shipIds = squadron.ships.shipIds;
       for (let i = 0, len = shipIds.length; i < len; i++) {
-        allShipIds.push(shipIds[i]);
+        allShipIds.push(shipIds[i]!);
       }
     }
 

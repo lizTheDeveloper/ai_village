@@ -5,7 +5,7 @@
  * across all political tiers (empire, nation, province, city, village).
  */
 import type { EntityId } from '../../types.js';
-import type { PoliticalTier } from '../../components/GovernorComponent.js';
+import type { PoliticalTier } from '../../governance/types.js';
 import type { VoteStance } from '../../governance/DecisionProtocols.js';
 import type { CityDepartmentType } from '../../components/CityGovernanceComponent.js';
 
@@ -865,6 +865,21 @@ export interface GovernanceEvents {
     disputeId: string;
     disputeType: string;
     parties: string[];
+    tick: number;
+  };
+
+  'galactic_council:emergency_session': {
+    councilName: string;
+    reason: string;
+    calledBy: EntityId;
+    tick: number;
+  };
+
+  'federation:member_satisfaction_changed': {
+    federationName: string;
+    memberId: EntityId;
+    oldSatisfaction: number;
+    newSatisfaction: number;
     tick: number;
   };
 }

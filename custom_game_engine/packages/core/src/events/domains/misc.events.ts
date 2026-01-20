@@ -764,6 +764,19 @@ export interface MiscEvents {
     tick: number;
   };
 
+  // === Divine Power Events ===
+  'divine:blessing_expired': {
+    deityId: EntityId;
+    targetId: EntityId;
+    blessingType: string;
+  };
+
+  'divine:curse_expired': {
+    deityId: EntityId;
+    targetId: EntityId;
+    curseType: string;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

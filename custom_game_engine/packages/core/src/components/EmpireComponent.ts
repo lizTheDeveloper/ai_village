@@ -15,10 +15,12 @@ import type { Component } from '../ecs/Component.js';
  * Dynasty tracking for hereditary empires
  */
 export interface Dynasty {
+  dynastyId: string; // Unique dynasty identifier
   name: string;
   founderAgentId: string; // Soul agent founder
   foundedTick: number;
-  currentRulerAgentId: string; // Current emperor
+  currentRulerId: string; // Current emperor ID
+  currentRulerAgentId: string; // Current emperor (for backward compatibility)
   rulers: DynastyRuler[];
   legitimacy: number; // 0-1
 }
@@ -88,6 +90,25 @@ export interface EmpireDiplomaticEvent {
 }
 
 /**
+ * Battle event in imperial war
+ */
+export interface ImperialBattle {
+  name: string;
+  location: string; // System or planet ID
+  tick: number;
+  attackerEmpireId: string;
+  defenderEmpireId: string;
+  attackerForces: number;
+  defenderForces: number;
+  victor: string; // Empire ID
+  outcome: 'attacker_victory' | 'defender_victory' | 'stalemate';
+  casualties: {
+    attacker: number;
+    defender: number;
+  };
+}
+
+/**
  * Imperial war state
  */
 export interface ImperialWar {
@@ -95,11 +116,16 @@ export interface ImperialWar {
   name: string;
   aggressorEmpireIds: string[];
   defenderEmpireIds: string[];
+  aggressorNationIds: string[]; // Nation-level participants (aggregated from empires)
+  defenderNationIds: string[]; // Nation-level participants (aggregated from empires)
   warGoals: string[];
   startedTick: number;
   duration: number;
   totalCasualties: number;
+  militaryLosses: Map<string, number>; // Empire ID → losses
+  battles: ImperialBattle[]; // Battle history
   systemsConquered: Map<string, string>; // System ID → conquering empire
+  occupation?: Map<string, string>; // Province ID → occupying empire ID
   status: 'active' | 'truce' | 'white_peace' | 'victory' | 'defeat';
 }
 
@@ -154,6 +180,7 @@ export interface EmpireComponent extends Component {
     vassalNationIds: string[]; // Peripheral vassals
     planets: string[]; // Planet IDs (from spatial hierarchy)
     systems: string[]; // System IDs
+    totalSystems: number; // Total system count
     totalPopulation: number; // 100M-50B
     totalArea: number; // km² across all planets
   };
@@ -238,6 +265,27 @@ export interface EmpireComponent extends Component {
   // Nations
   nationRecords: EmpireNationRecord[];
 
+  // Foreign Policy (top-level for systems that access it directly)
+  foreignPolicy: {
+    activeWars: ImperialWar[];
+    imperialTreaties: ImperialTreaty[];
+    diplomaticRelations: Map<string, EmpireRelation>;
+  };
+
+  // Stability (top-level for context builders)
+  stability: {
+    imperialLegitimacy: number; // 0-100
+    vassalLoyalty: Map<string, number>; // Vassal ID → loyalty (0-1)
+    rebellionRisk: Map<string, number>; // Vassal ID → risk (0-1)
+    separatistMovements: SeparatistMovement[];
+  };
+
+  // Ruling Dynasty (top-level for succession systems)
+  rulingDynasty?: Dynasty;
+
+  // Succession Law (top-level for succession systems)
+  successionLaw: 'primogeniture' | 'election' | 'meritocracy' | 'divine_right';
+
   // Update tracking
   lastImperialUpdateTick: number;
 }
@@ -283,6 +331,7 @@ export function createEmpireComponent(
       vassalNationIds: [],
       planets: [],
       systems: [],
+      totalSystems: 0,
       totalPopulation: 0,
       totalArea: 0,
     },
@@ -319,6 +368,18 @@ export function createEmpireComponent(
       allies: [],
       tributaries: [],
     },
+    foreignPolicy: {
+      activeWars: [],
+      imperialTreaties: [],
+      diplomaticRelations: new Map(),
+    },
+    stability: {
+      imperialLegitimacy: 70, // Start with moderate legitimacy
+      vassalLoyalty: new Map(),
+      rebellionRisk: new Map(),
+      separatistMovements: [],
+    },
+    successionLaw,
     techLevel: 1,
     kardashevLevel: 1.0,
     centralAuthority: 0.7,
@@ -384,11 +445,16 @@ export function declareImperialWar(
     name: `${aggressor.empireName} vs ${defenderName}`,
     aggressorEmpireIds: [aggressor.empireName],
     defenderEmpireIds: [defenderId],
+    aggressorNationIds: [...aggressor.territory.nations], // All nations in aggressor empire
+    defenderNationIds: [], // Will be populated when defender empire is loaded
     warGoals,
     startedTick: currentTick,
     duration: 0,
     totalCasualties: 0,
+    militaryLosses: new Map(),
+    battles: [],
     systemsConquered: new Map(),
+    occupation: new Map(),
     status: 'active',
   };
 
@@ -566,7 +632,8 @@ export function updateDynasty(
   }
 
   // Start new ruler's reign
-  dynasty.currentRulerAgentId = newRulerAgentId;
+  dynasty.currentRulerId = newRulerAgentId;
+  dynasty.currentRulerAgentId = newRulerAgentId; // Keep both for backward compatibility
   empire.leadership.emperorId = newRulerAgentId;
 
   dynasty.rulers.push({

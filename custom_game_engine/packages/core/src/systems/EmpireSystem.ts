@@ -26,6 +26,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EmpireComponent, EmpireNationRecord, SeparatistMovement } from '../components/EmpireComponent.js';
 import type { NationComponent } from '../components/NationComponent.js';
@@ -57,6 +58,33 @@ export class EmpireSystem extends BaseSystem {
   // ========================================================================
 
   private empireLastUpdateTick: Map<string, number> = new Map();
+
+  /**
+   * Initialize event listeners
+   */
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
+    // === Governor Decision Events ===
+    // React to governor decisions being executed
+    this.events.on('empire:war_declared', (data) => {
+      this._onWarDeclared(data);
+    });
+
+    this.events.on('empire:nation_absorbed', (data) => {
+      this._onNationAbsorbed(data);
+    });
+
+    this.events.on('empire:nation_released', (data) => {
+      this._onNationReleased(data);
+    });
+
+    this.events.on('empire:resources_allocated', (data) => {
+      this._onResourcesAllocated(data);
+    });
+
+    this.events.on('governance:directive_issued', (data) => {
+      this._onDirectiveIssued(data);
+    });
+  }
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
@@ -376,12 +404,12 @@ export class EmpireSystem extends BaseSystem {
     tick: number
   ): void {
     // Check if empire has a dynasty
-    if (!empire.rulingDynasty) {
+    if (!empire.leadership.dynasty) {
       return;
     }
 
     // Check if current ruler is alive
-    const currentRulerId = empire.rulingDynasty.currentRulerId;
+    const currentRulerId = empire.leadership.dynasty.currentRulerId;
     if (!currentRulerId) {
       return;
     }
@@ -393,9 +421,10 @@ export class EmpireSystem extends BaseSystem {
       return;
     }
 
-    // Check if ruler is dead (no Agent component or health component shows death)
+    // Check if ruler is dead (no Agent component or has death_judgment component)
     const agent = rulerEntity.getComponent<AgentComponent>(CT.Agent);
-    if (!agent || agent.isDead) {
+    const hasDied = rulerEntity.hasComponent(CT.DeathJudgment);
+    if (!agent || hasDied) {
       // Ruler died - trigger succession
       this.triggerSuccession(world, empire, empireEntity, tick, 'ruler_death');
     }
@@ -411,16 +440,16 @@ export class EmpireSystem extends BaseSystem {
     tick: number,
     reason: string
   ): void {
-    if (!empire.rulingDynasty) {
+    if (!empire.leadership.dynasty) {
       return;
     }
 
     // Select heir based on succession law
     const successionResult = selectHeir(
       world,
-      empire.rulingDynasty.dynastyId,
-      empire.rulingDynasty.currentRulerId,
-      empire.successionLaw,
+      empire.leadership.dynasty.dynastyId,
+      empire.leadership.dynasty.currentRulerId,
+      empire.leadership.successionLaw,
       tick
     );
 
@@ -444,26 +473,30 @@ export class EmpireSystem extends BaseSystem {
 
       // Update empire component with new ruler
       empireEntity.updateComponent<EmpireComponent>(CT.Empire, (current) => {
-        if (!current.rulingDynasty) {
+        if (!current.leadership.dynasty) {
           return current;
         }
 
         return {
           ...current,
-          rulingDynasty: {
-            ...current.rulingDynasty,
-            currentRulerId: successionResult.heir!.agentId,
-            rulers: [
-              ...current.rulingDynasty.rulers,
-              {
-                agentId: successionResult.heir!.agentId,
-                name: successionResult.heir!.agentName,
-                title: `Emperor ${successionResult.heir!.agentName}`,
-                reignStart: tick,
-                achievements: [],
-                failings: [],
-              },
-            ],
+          leadership: {
+            ...current.leadership,
+            emperorId: successionResult.heir!.agentId,
+            dynasty: {
+              ...current.leadership.dynasty,
+              currentRulerId: successionResult.heir!.agentId,
+              currentRulerAgentId: successionResult.heir!.agentId,
+              rulers: [
+                ...current.leadership.dynasty.rulers,
+                {
+                  agentId: successionResult.heir!.agentId,
+                  name: successionResult.heir!.agentName,
+                  reignStart: tick,
+                  achievements: [],
+                  failings: [],
+                },
+              ],
+            },
           },
         };
       });
@@ -618,6 +651,55 @@ export class EmpireSystem extends BaseSystem {
         tick: world.tick,
       },
     });
+  }
+
+  // ========================================================================
+  // Event Handlers - Governor Decisions
+  // ========================================================================
+
+  /**
+   * Handle war declaration (from governor decisions)
+   */
+  private _onWarDeclared(data: { empireId: string; empireName: string; targetEmpireId: string; targetEmpireName: string; warGoals: string[]; tick: number }): void {
+    // War already declared by GovernorDecisionExecutor
+    // This is notification-only - war is already in empire component
+    // Future: Coordinate nation military mobilization, fleet deployment
+  }
+
+  /**
+   * Handle nation absorption (from governor decisions)
+   */
+  private _onNationAbsorbed(data: { empireId: string; empireName: string; nationId: string; nationName: string; tick: number }): void {
+    // Nation already absorbed by GovernorDecisionExecutor
+    // This is notification-only - nation is already in core territory
+    // Future: Trigger integration events, update nation loyalty, assign governors
+  }
+
+  /**
+   * Handle nation release (from governor decisions)
+   */
+  private _onNationReleased(data: { empireId: string; empireName: string; nationId: string; nationName: string; tick: number }): void {
+    // Nation already released by GovernorDecisionExecutor
+    // This is notification-only - nation removed from empire
+    // Future: Update diplomatic relations, create independence treaty
+  }
+
+  /**
+   * Handle resource allocation (from governor decisions)
+   */
+  private _onResourcesAllocated(data: { empireId: string; empireName: string; targetNationId: string; resourceType: string; amount: number; tick: number }): void {
+    // Resources already transferred by GovernorDecisionExecutor
+    // This is notification-only - treasuries already updated
+    // Future: Track resource flow for economic modeling
+  }
+
+  /**
+   * Handle directive issuance (from governor decisions)
+   */
+  private _onDirectiveIssued(data: { directiveId: string; originTier: string; targetTier: string; directive: string; priority: string; targetEntityIds: string[]; tick: number }): void {
+    // Directive already issued by DecisionProtocols.delegateDirective()
+    // This is notification-only - directives delivered to target entities
+    // Future: Track directive compliance, acknowledgment tracking
   }
 }
 

@@ -2651,7 +2651,7 @@
       "id": "large_conflict_with_god",
       "name": "Divine Reckoning",
       "description": "You have angered a deity. Whether through hubris, sacrilege, or simply existing in defiance of divine will, a god has marked you. Appeasement, defiance, or transcendence - choose your path carefully.",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Relationship with the divine",
@@ -2993,13 +2993,14 @@
       "assignment_rules": {
         "min_wisdom": 20,
         "cooldown_ticks": 50000
-      }
+      },
+      "multiverse_scope": "multiverse_wide"
     },
     {
       "id": "medium_prophecy_trap",
       "name": "The Prophecy You Cannot Escape",
       "description": "An oracle speaks: your future is fixed. Doom approaches. You will try to prevent it. You will fail. Or will you? The harder you struggle against fate, the more you ensure it. This is the prophecy trap.",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Fate vs free will",
@@ -3269,13 +3270,14 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 30000
-      }
+      },
+      "multiverse_scope": "multiverse_wide"
     },
     {
       "id": "large_multiverse_invasion",
       "name": "From Beyond the Veil",
       "description": "A background universe you didn't know existed has discovered your world. Their tech level surpasses yours. Their culture is alien. Their faction AI has decided: invasion. You are RimWorld now - under siege from the stars/timelines/dimensions.",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Contact with advanced post-temporal civilizations",
@@ -3297,7 +3299,7 @@
         {
           "stage_id": "first_contact",
           "name": "The Signal",
-          "description": "Strange readings. Anomalies in β-space. Then: contact. A message from beings you didn't know existed. They are post-temporal. They can see you. They have been watching. And now they're coming.",
+          "description": "Strange readings. Anomalies in \u03b2-space. Then: contact. A message from beings you didn't know existed. They are post-temporal. They can see you. They have been watching. And now they're coming.",
           "stage_attractors": [
             {
               "attractor_id": "preparation",
@@ -3418,7 +3420,7 @@
             {
               "type": "queue_dream_hint",
               "dream_type": "prophetic_vision",
-              "content_hint": "The invaders withdraw. But you saw their reinforcements in β-space. This was a probe. The real fleet is coming.",
+              "content_hint": "The invaders withdraw. But you saw their reinforcements in \u03b2-space. This was a probe. The real fleet is coming.",
               "intensity": 0.85
             }
           ]
@@ -3439,7 +3441,7 @@
             {
               "type": "queue_dream_hint",
               "dream_type": "prophetic_vision",
-              "content_hint": "You see the future: joint colonies in β-space, cultural fusion, children of both worlds. What could have been war became cooperation.",
+              "content_hint": "You see the future: joint colonies in \u03b2-space, cultural fusion, children of both worlds. What could have been war became cooperation.",
               "intensity": 0.8
             }
           ]
@@ -3596,13 +3598,14 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 100000
-      }
+      },
+      "multiverse_scope": "local"
     },
     {
       "id": "medium_paradigm_war",
       "name": "When Magics Collide",
       "description": "Two incompatible magic paradigms meet. Enochian vs Chaos. Druidic vs Technomantic. Shinto vs Necromantic. When realities that shouldn't coexist try to occupy the same space, something has to give. Reality itself is the battlefield.",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Incompatible realities and paradigm conflicts",
@@ -3867,13 +3870,14 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 20000
-      }
+      },
+      "multiverse_scope": "local"
     },
     {
       "id": "large_tyrants_fall",
       "name": "The Tyrant You Became",
       "description": "You rose to power to save your people. Village leader. City governor. Provincial lord. Emperor. Each step justified. Each sacrifice necessary. And now you look in the mirror and see... tyrant. How did this happen? Can it be undone?",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Corruption of power across political scales",
@@ -4199,13 +4203,14 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 80000
-      }
+      },
+      "multiverse_scope": "local"
     },
     {
       "id": "medium_dimensional_horror",
       "name": "What Dwells Between",
-      "description": "You glimpsed something in β-space that should not be glimpsed. An entity. Not post-temporal civilization. Not god. Something... else. Incomprehensible. Indifferent. And now it knows you exist.",
-      "scale": "large",
+      "description": "You glimpsed something in \u03b2-space that should not be glimpsed. An entity. Not post-temporal civilization. Not god. Something... else. Incomprehensible. Indifferent. And now it knows you exist.",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Cosmic horror and limitations of comprehension",
@@ -4227,7 +4232,7 @@
         {
           "stage_id": "the_glimpse",
           "name": "What Cannot Be Unseen",
-          "description": "During β-space navigation, you saw it. Not a civilization. Not a structure. Something that exists in dimensions you cannot perceive. Your mind tries to process. Fails. You scream. It does not notice. Yet.",
+          "description": "During \u03b2-space navigation, you saw it. Not a civilization. Not a structure. Something that exists in dimensions you cannot perceive. Your mind tries to process. Fails. You scream. It does not notice. Yet.",
           "stage_attractors": [
             {
               "attractor_id": "comprehension_attempt",
@@ -4503,13 +4508,14 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 100000
-      }
+      },
+      "multiverse_scope": "local"
     },
     {
       "id": "medium_time_paradox",
       "name": "The Price of Changing Yesterday",
       "description": "You have timeline editing capability. You changed the past. It worked. But causality has limits. The paradox builds. Timelines fork. Memories conflict. You exist in multiple incompatible histories simultaneously. Reality is rejecting the change. Something has to give.",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "branch",
       "lesson": {
         "theme": "Causality and consequences of time manipulation",
@@ -4767,13 +4773,14 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 30000
-      }
+      },
+      "multiverse_scope": "local"
     },
     {
       "id": "large_divine_champion",
       "name": "The Burden of Being Chosen",
       "description": "A god has chosen you as champion. Not asked - chosen. Divine power flows through you. Miracles at your command. The god's agenda becomes your purpose. But what if the god's plan conflicts with your morals? What if being divine instrument means becoming divine tool?",
-      "scale": "large",
+      "scale": "exotic",
       "fork_behavior": "continue",
       "lesson": {
         "theme": "Divine service and the cost of being chosen",
@@ -5110,7 +5117,8 @@
       ],
       "assignment_rules": {
         "cooldown_ticks": 60000
-      }
+      },
+      "multiverse_scope": "local"
     }
   ],
   "epic_ascension_templates": [
@@ -5138,7 +5146,7 @@
         {
           "stage_id": "awakening",
           "name": "The Revelation",
-          "description": "You achieve Fae consciousness - 3+10D awareness. The empty universe suddenly teems with life. You perceive the Endless Summer across β-space topology. Welcome home, child of chaos.",
+          "description": "You achieve Fae consciousness - 3+10D awareness. The empty universe suddenly teems with life. You perceive the Endless Summer across \u03b2-space topology. Welcome home, child of chaos.",
           "stage_attractors": [
             {
               "attractor_id": "dimensional_awareness",
@@ -5165,7 +5173,7 @@
         {
           "stage_id": "paradise_discovered",
           "name": "Entering the Endless Summer",
-          "description": "You transition to the Endless Summer - a protected β-space partition where time is honey and space is breath. Perfect causal coherence. Infinite resources. Eternal twilight. Other young Fae learning their powers. This is paradise regained.",
+          "description": "You transition to the Endless Summer - a protected \u03b2-space partition where time is honey and space is breath. Perfect causal coherence. Infinite resources. Eternal twilight. Other young Fae learning their powers. This is paradise regained.",
           "on_enter_effects": [
             {
               "type": "modify_mood",
@@ -5207,7 +5215,7 @@
         {
           "stage_id": "ejection",
           "name": "The Fall",
-          "description": "The Summer expels you. Violent transition. Cast into unstable phase space - chaotic β-regions where pre-temporal civilizations create causal noise. Timeline coherence threatened. Hive mind disrupted. Fear of losing identity. 'You sought permanence. Paradise is becoming. Go now. Learn to maintain yourself in chaos.'",
+          "description": "The Summer expels you. Violent transition. Cast into unstable phase space - chaotic \u03b2-regions where pre-temporal civilizations create causal noise. Timeline coherence threatened. Hive mind disrupted. Fear of losing identity. 'You sought permanence. Paradise is becoming. Go now. Learn to maintain yourself in chaos.'",
           "on_enter_effects": [
             {
               "type": "modify_stress",
@@ -5298,7 +5306,7 @@
         {
           "stage_id": "return_path",
           "name": "Finding Home",
-          "description": "You identify the coherent causal axis back to Endless Summer. Navigate β-space topology deliberately. Prove you can return without destabilizing. The critical test: You CAN return, but you don't NEED to. Paradise is not where you live. It is what you carry.",
+          "description": "You identify the coherent causal axis back to Endless Summer. Navigate \u03b2-space topology deliberately. Prove you can return without destabilizing. The critical test: You CAN return, but you don't NEED to. Paradise is not where you live. It is what you carry.",
           "stage_attractors": [
             {
               "attractor_id": "non_attachment",
@@ -5509,7 +5517,7 @@
         {
           "stage_id": "mortality",
           "name": "First Heaven - Shamayim",
-          "description": "You are mortal. 3+1D existence. Linear time. No perception of higher dimensions. But something stirs - fragmentary glimpses of other realities, déjà vu too real, dreams of beings made of light. The Veil is thinning.",
+          "description": "You are mortal. 3+1D existence. Linear time. No perception of higher dimensions. But something stirs - fragmentary glimpses of other realities, d\u00e9j\u00e0 vu too real, dreams of beings made of light. The Veil is thinning.",
           "stage_attractors": [
             {
               "attractor_id": "dimensional_awakening",
@@ -5528,12 +5536,12 @@
         {
           "stage_id": "calling",
           "name": "Second Heaven - Raqia (The Firmament)",
-          "description": "Something in you dies. Not physically. But the mortal part. The limited consciousness. Perception shifts 3+1D → 3+3D. The Seven Heavens reveal themselves. A voice from Third Heaven: 'Child of dust, you have been chosen. Ascend.'",
+          "description": "Something in you dies. Not physically. But the mortal part. The limited consciousness. Perception shifts 3+1D \u2192 3+3D. The Seven Heavens reveal themselves. A voice from Third Heaven: 'Child of dust, you have been chosen. Ascend.'",
           "on_enter_effects": [
             {
               "type": "queue_dream_hint",
               "dream_type": "prophetic_vision",
-              "content_hint": "You see the Seven Heavens stacked in β-space. A path upward beckons. But also... a warning about those who fell.",
+              "content_hint": "You see the Seven Heavens stacked in \u03b2-space. A path upward beckons. But also... a warning about those who fell.",
               "intensity": 0.9
             }
           ]
@@ -5859,7 +5867,7 @@
         {
           "stage_id": "veil_tears",
           "name": "Fragments of Eternity",
-          "description": "You are mortal, but the Veil thins. Déjà vu feels too real. You dream of a council where you debated the plan. Someone you've never met feels achingly familiar. Inexplicable knowledge that 'this isn't all there is.' You existed before. You chose this.",
+          "description": "You are mortal, but the Veil thins. D\u00e9j\u00e0 vu feels too real. You dream of a council where you debated the plan. Someone you've never met feels achingly familiar. Inexplicable knowledge that 'this isn't all there is.' You existed before. You chose this.",
           "stage_attractors": [
             {
               "attractor_id": "pre_mortal_memory",
@@ -5886,7 +5894,7 @@
         {
           "stage_id": "ordinances",
           "name": "The Navigation Protocols",
-          "description": "Temple endowment - sacred signs, tokens, keywords, garments. These are not mere symbols. They are dimensional navigation protocols. Authentication for angelic guards. Invocations to open β-space passages. You receive them through interactive ritual. You must memorize and practice. You will be tested.",
+          "description": "Temple endowment - sacred signs, tokens, keywords, garments. These are not mere symbols. They are dimensional navigation protocols. Authentication for angelic guards. Invocations to open \u03b2-space passages. You receive them through interactive ritual. You must memorize and practice. You will be tested.",
           "on_enter_effects": [
             {
               "type": "modify_wisdom",
@@ -5935,7 +5943,7 @@
         {
           "stage_id": "spirit_world",
           "name": "Death and the Lifting Veil",
-          "description": "Mortal life ends. The Veil lifts. Memories of pre-existence flood back. Dimensional shift 3+1D → 3+3D. You enter the Spirit World - paradise or prison depending on choices. Reunion with deceased family. Teaching spirits. Awaiting resurrection and judgment.",
+          "description": "Mortal life ends. The Veil lifts. Memories of pre-existence flood back. Dimensional shift 3+1D \u2192 3+3D. You enter the Spirit World - paradise or prison depending on choices. Reunion with deceased family. Teaching spirits. Awaiting resurrection and judgment.",
           "on_enter_effects": [
             {
               "type": "modify_wisdom",
@@ -5986,7 +5994,7 @@
         {
           "stage_id": "learning_creation",
           "name": "Under the Father",
-          "description": "Eons of learning. Studying creation under Heavenly Father. Understanding β-space topology. Mastering reality manipulation. Preparing for your own world. 'You will create. You will parent. You will watch your children suffer. This is the burden I carry. Soon you will understand.'",
+          "description": "Eons of learning. Studying creation under Heavenly Father. Understanding \u03b2-space topology. Mastering reality manipulation. Preparing for your own world. 'You will create. You will parent. You will watch your children suffer. This is the burden I carry. Soon you will understand.'",
           "stage_attractors": [
             {
               "attractor_id": "creator_preparation",
@@ -6005,7 +6013,7 @@
         {
           "stage_id": "first_creation",
           "name": "Your Universe",
-          "description": "You create your own β-space partition. Design physics. Create spirit children from unorganized intelligence. Design their mortal test. Send them down. Watch them... suffer. They pray: 'Father/Mother, help me. I'm lost. I'm scared. Why won't you answer?' You ache to respond. But you know: intervention ruins them. So you stay silent.",
+          "description": "You create your own \u03b2-space partition. Design physics. Create spirit children from unorganized intelligence. Design their mortal test. Send them down. Watch them... suffer. They pray: 'Father/Mother, help me. I'm lost. I'm scared. Why won't you answer?' You ache to respond. But you know: intervention ruins them. So you stay silent.",
           "on_enter_effects": [
             {
               "type": "modify_stress",
@@ -6180,5 +6188,6 @@
         "cooldown_ticks": 0
       }
     }
-  ]
+  ],
+  "isekai_plot_templates": []
 }

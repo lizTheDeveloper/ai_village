@@ -12,7 +12,8 @@ export type ToolType =
   | 'needle'
   | 'chisel'
   | 'tongs'
-  | 'bellows';
+  | 'bellows'
+  | 'watering_can';
 
 /**
  * Trait for items that can be used as tools.

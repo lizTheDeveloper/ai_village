@@ -610,7 +610,7 @@ export class LiveEntityAPI {
       };
     }
 
-    const inventory = entity.components.get('inventory') as {
+    const inventory = entity.components.get('inventory') as unknown as {
       slots: Array<{ itemId: string; quantity: number } | null>;
       maxSlots: number;
     } | undefined;

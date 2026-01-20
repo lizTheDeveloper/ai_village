@@ -1,0 +1,3373 @@
+{
+  "timestamp": "2026-01-20T10:40:33.761Z",
+  "systemsAudited": 197,
+  "priorityIssues": [],
+  "eventCoverageIssues": [
+    {
+      "eventType": "time:phase_changed",
+      "emittedBy": [
+        "TimeSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "resource:regenerated",
+      "emittedBy": [
+        "ResourceGatheringSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "time:era_changed",
+      "emittedBy": [
+        "TimeCompressionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "time:simulation_mode_changed",
+      "emittedBy": [
+        "TimeCompressionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "time:jump_started",
+      "emittedBy": [
+        "TimeCompressionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "time:jump_completed",
+      "emittedBy": [
+        "TimeCompressionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "time:era_snapshot_created",
+      "emittedBy": [
+        "TimeCompressionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:queue:interrupted",
+      "emittedBy": [
+        "AgentBrainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "behavior:change",
+      "emittedBy": [
+        "AgentBrainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:queue:resumed",
+      "emittedBy": [
+        "AgentBrainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:queue:completed",
+      "emittedBy": [
+        "AgentBrainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "time:paradox_detected",
+      "emittedBy": [
+        "UniverseForkingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:unconscious",
+      "emittedBy": [
+        "BodySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:regained_consciousness",
+      "emittedBy": [
+        "BodySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "combat:death",
+      "emittedBy": [
+        "BodySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "body:modifications_expired",
+      "emittedBy": [
+        "BodySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "temperature:danger",
+      "emittedBy": [
+        "TemperatureSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "temperature:comfortable",
+      "emittedBy": [
+        "TemperatureSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "life_stage_changed",
+      "emittedBy": [
+        "AnimalSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "animal_state_changed",
+      "emittedBy": [
+        "AnimalSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "animal_died",
+      "emittedBy": [
+        "AnimalSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "conversation:joined",
+      "emittedBy": [
+        "CommunicationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "need:starvation_day",
+      "emittedBy": [
+        "NeedsSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "passage:activated",
+      "emittedBy": [
+        "PassageSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "passage:traversal_failed",
+      "emittedBy": [
+        "PassageSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "weather:rain",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "weather:snow",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soil:tilled",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soil:watered",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soil:moistureChanged",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soil:fertilized",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soil:depleted",
+      "emittedBy": [
+        "SoilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:became_shade",
+      "emittedBy": [
+        "AfterlifeNeedsSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:passed_on",
+      "emittedBy": [
+        "AfterlifeNeedsSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:became_restless",
+      "emittedBy": [
+        "AfterlifeNeedsSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "building:placement:failed",
+      "emittedBy": [
+        "BuildingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "building:placement:complete",
+      "emittedBy": [
+        "BuildingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "station:fuel_low",
+      "emittedBy": [
+        "BuildingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "station:fuel_empty",
+      "emittedBy": [
+        "BuildingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "item:dropped",
+      "emittedBy": [
+        "BuildingSystem",
+        "TreeFellingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "technology:building_unlocked",
+      "emittedBy": [
+        "TechnologyUnlockSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "building:harmony_analyzed",
+      "emittedBy": [
+        "BuildingSpatialAnalysisSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:xp_gained",
+      "emittedBy": [
+        "BuildingSpatialAnalysisSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "building:spawned",
+      "emittedBy": [
+        "CityBuildingGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "interest:mutated",
+      "emittedBy": [
+        "InterestEvolutionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "door:opened",
+      "emittedBy": [
+        "DoorSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "door:closed",
+      "emittedBy": [
+        "DoorSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:remote_acceptance",
+      "emittedBy": [
+        "TradeAgreementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:remote_cancellation",
+      "emittedBy": [
+        "TradeAgreementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:remote_violation",
+      "emittedBy": [
+        "TradeAgreementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "interest:hungry",
+      "emittedBy": [
+        "InterestsSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "housing:dirty",
+      "emittedBy": [
+        "AnimalHousingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "housing:full",
+      "emittedBy": [
+        "AnimalHousingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "governance:political_elevation",
+      "emittedBy": [
+        "VillageGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "village:proposal_passed",
+      "emittedBy": [
+        "VillageGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "village:proposal_rejected",
+      "emittedBy": [
+        "VillageGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "village:council_meeting",
+      "emittedBy": [
+        "VillageGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "city:population_aggregated",
+      "emittedBy": [
+        "CityGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "city:department_efficiency_changed",
+      "emittedBy": [
+        "CityGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "city:infrastructure_completed",
+      "emittedBy": [
+        "CityGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "province:policy_completed",
+      "emittedBy": [
+        "ProvinceGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "research:progress",
+      "emittedBy": [
+        "ResearchSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "research:unlocked",
+      "emittedBy": [
+        "ResearchSystem",
+        "PublishingUnlockSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "tool_used",
+      "emittedBy": [
+        "DurabilitySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "tool_low_durability",
+      "emittedBy": [
+        "DurabilitySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "tool_broken",
+      "emittedBy": [
+        "DurabilitySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "product_ready",
+      "emittedBy": [
+        "AnimalProductionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fire:extinguished",
+      "emittedBy": [
+        "FireSpreadSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fire:tile_ignited",
+      "emittedBy": [
+        "FireSpreadSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fire:tile_extinguished",
+      "emittedBy": [
+        "FireSpreadSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fire:ignited",
+      "emittedBy": [
+        "FireSpreadSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:armada_missing",
+      "emittedBy": [
+        "NavySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:budget_exceeded",
+      "emittedBy": [
+        "NavySystem",
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:armada_joined",
+      "emittedBy": [
+        "NavySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:armada_left",
+      "emittedBy": [
+        "NavySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:fleet_added_to_reserves",
+      "emittedBy": [
+        "NavySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "bond_level_changed",
+      "emittedBy": [
+        "TamingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "armada:fleet_missing",
+      "emittedBy": [
+        "ArmadaSystem",
+        "FleetCoherenceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "armada:fleet_joined",
+      "emittedBy": [
+        "ArmadaSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "armada:disbanding",
+      "emittedBy": [
+        "ArmadaSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "armada:fleet_left",
+      "emittedBy": [
+        "ArmadaSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:squadron_missing",
+      "emittedBy": [
+        "FleetSystem",
+        "FleetCoherenceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:low_supply",
+      "emittedBy": [
+        "FleetSystem",
+        "FleetCoherenceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:squadron_joined",
+      "emittedBy": [
+        "FleetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:disbanding",
+      "emittedBy": [
+        "FleetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:squadron_left",
+      "emittedBy": [
+        "FleetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:ship_missing",
+      "emittedBy": [
+        "SquadronSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:ship_joined",
+      "emittedBy": [
+        "SquadronSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:disbanding",
+      "emittedBy": [
+        "SquadronSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:ship_left",
+      "emittedBy": [
+        "SquadronSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "animal_spawned",
+      "emittedBy": [
+        "WildAnimalSpawningSystem",
+        "AquaticAnimalSpawningSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "timeline:merge_completed",
+      "emittedBy": [
+        "TimelineMergerSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:invasion_cultural_conquest",
+      "emittedBy": [
+        "InvasionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:invasion_economic_conquest",
+      "emittedBy": [
+        "InvasionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:invasion_defense_activated",
+      "emittedBy": [
+        "InvasionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:invasion_failed",
+      "emittedBy": [
+        "InvasionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "memory:forgotten",
+      "emittedBy": [
+        "MemoryConsolidationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "memory:consolidated",
+      "emittedBy": [
+        "MemoryConsolidationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "belief:formed",
+      "emittedBy": [
+        "BeliefFormationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "belief:generated",
+      "emittedBy": [
+        "BeliefGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:goal_formed",
+      "emittedBy": [
+        "GoalGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:goal_completed",
+      "emittedBy": [
+        "GoalGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:goal_milestone",
+      "emittedBy": [
+        "GoalGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "mythology:myth_created",
+      "emittedBy": [
+        "MythGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "mythology:legend_formed",
+      "emittedBy": [
+        "MythGenerationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "sacred_site:named",
+      "emittedBy": [
+        "SacredSiteSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "sacred_site:created",
+      "emittedBy": [
+        "SacredSiteSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "sacred_site:discovered",
+      "emittedBy": [
+        "SacredSiteSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divine:maintenance_failed",
+      "emittedBy": [
+        "DivinePowerSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divine:blessing_expired",
+      "emittedBy": [
+        "DivinePowerSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divine:curse_expired",
+      "emittedBy": [
+        "DivinePowerSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:prophecy_given",
+      "emittedBy": [
+        "DivinePowerSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "profession:work_started",
+      "emittedBy": [
+        "ProfessionWorkSimulationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "profession:output_aggregated",
+      "emittedBy": [
+        "ProfessionWorkSimulationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship_jump_window_open",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "emotion_theater_session_complete",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "emotion_theater_session_ended",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "memory_replay_complete",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "memory_recording_stopped",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "meditation_session_complete",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "emotion_theater_session_started",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship_beta_jump_executed",
+      "emittedBy": [
+        "SpaceshipManagementSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship:construction:progress",
+      "emittedBy": [
+        "SpaceshipConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship:construction:failed",
+      "emittedBy": [
+        "SpaceshipConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship:construction:started",
+      "emittedBy": [
+        "SpaceshipConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship:construction:complete",
+      "emittedBy": [
+        "SpaceshipConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "spaceship:construction:cancelled",
+      "emittedBy": [
+        "SpaceshipConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lane:abandoned",
+      "emittedBy": [
+        "ShippingLaneSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lane:caravan_lost",
+      "emittedBy": [
+        "ShippingLaneSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lane:blocked",
+      "emittedBy": [
+        "ShippingLaneSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lane:hazard_encountered",
+      "emittedBy": [
+        "ShippingLaneSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lane:caravan_arrived",
+      "emittedBy": [
+        "ShippingLaneSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lane:caravan_departed",
+      "emittedBy": [
+        "ShippingLaneSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:shortage_detected",
+      "emittedBy": [
+        "TradeNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:hub_identified",
+      "emittedBy": [
+        "TradeNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:chokepoint_detected",
+      "emittedBy": [
+        "TradeNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:network_resilience_low",
+      "emittedBy": [
+        "TradeNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:blockade_started",
+      "emittedBy": [
+        "TradeNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "shipyard:construction_delayed",
+      "emittedBy": [
+        "ShipyardProductionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "shipyard:construction_completed",
+      "emittedBy": [
+        "ShipyardProductionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "shipyard:construction_started",
+      "emittedBy": [
+        "ShipyardProductionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "shipyard:construction_cancelled",
+      "emittedBy": [
+        "ShipyardProductionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:personnel_costs_calculated",
+      "emittedBy": [
+        "NavyPersonnelSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:personnel_budget_shortfall",
+      "emittedBy": [
+        "NavyPersonnelSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:academy_upgraded",
+      "emittedBy": [
+        "NavyPersonnelSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:nco_training_upgraded",
+      "emittedBy": [
+        "NavyPersonnelSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:mission_started",
+      "emittedBy": [
+        "ExplorationDiscoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:resource_discovered",
+      "emittedBy": [
+        "ExplorationDiscoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:stellar_phenomenon_discovered",
+      "emittedBy": [
+        "ExplorationDiscoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:rare_find",
+      "emittedBy": [
+        "ExplorationDiscoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:mission_completed",
+      "emittedBy": [
+        "ExplorationDiscoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:mining_operation_ended",
+      "emittedBy": [
+        "StellarMiningSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "exploration:stockpile_full",
+      "emittedBy": [
+        "StellarMiningSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "nation:economic_update",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:budget_allocated",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "nation:stability_warning",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "nation:war_progress",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "nation:research_completed",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "nation:policy_completed",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "nation:alliance_obligation_invoked",
+      "emittedBy": [
+        "NationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "empire:separatist_movement_active",
+      "emittedBy": [
+        "EmpireSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "empire:heir_selected",
+      "emittedBy": [
+        "EmpireSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "empire:nation_added",
+      "emittedBy": [
+        "EmpireSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "empire:war_consideration",
+      "emittedBy": [
+        "EmpireDiplomacySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "empire:joined_ally_war",
+      "emittedBy": [
+        "EmpireDiplomacySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:strategic_update",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:law_enforced",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:joint_operation_progress",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:member_seceded",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:presidency_rotated",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:proposal_voting_started",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:proposal_failed",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:proposal_vetoed",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:proposal_passed",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:law_proposed",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "federation:vote_cast",
+      "emittedBy": [
+        "FederationGovernanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:cosmic_update",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:violation_detected",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:peacekeeping_completed",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:peacekeeping_deployed",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:crisis_declared",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:dispute_resolved",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:dispute_escalated",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:species_joined",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:law_proposed",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:law_passed",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "galactic_council:law_rejected",
+      "emittedBy": [
+        "GalacticCouncilSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:paradox_detected",
+      "emittedBy": [
+        "ParadoxDetectionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:paradox_forked",
+      "emittedBy": [
+        "ParadoxDetectionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:timeline_collapsed",
+      "emittedBy": [
+        "ParadoxDetectionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:retrocausal_adjustment",
+      "emittedBy": [
+        "ParadoxDetectionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:canon_event_occurred",
+      "emittedBy": [
+        "CanonEventSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "multiverse:timeline_converging",
+      "emittedBy": [
+        "CanonEventSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "production:tier_changed",
+      "emittedBy": [
+        "ProductionScalingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "construction_phase_complete",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "construction_complete",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "megastructure_activated",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "construction_failed",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "construction_delayed",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "construction_progress",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "construction_started",
+      "emittedBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "maintenance_performed",
+      "emittedBy": [
+        "MegastructureMaintenanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "megastructure_degraded",
+      "emittedBy": [
+        "MegastructureMaintenanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "megastructure_failed",
+      "emittedBy": [
+        "MegastructureMaintenanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "megastructure_collapsed",
+      "emittedBy": [
+        "MegastructureMaintenanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "megastructure_phase_transition",
+      "emittedBy": [
+        "MegastructureMaintenanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "megastructure_decay_stage",
+      "emittedBy": [
+        "MegastructureMaintenanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "planet_travel_started",
+      "emittedBy": [
+        "PlanetTravelSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:straggler_detected",
+      "emittedBy": [
+        "FleetCoherenceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:coherence_updated",
+      "emittedBy": [
+        "FleetCoherenceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "crew:stress_threshold_crossed",
+      "emittedBy": [
+        "CrewStressSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "crew:stress_critical",
+      "emittedBy": [
+        "CrewStressSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "crew:stress_recovered",
+      "emittedBy": [
+        "CrewStressSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:ship_stranded",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:solo_jump_attempted",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:solo_jump_succeeded",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:solo_jump_failed",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:rescue_assigned",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:rescued",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:lost",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "straggler:recovered",
+      "emittedBy": [
+        "StragglerRecoverySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:sync_started",
+      "emittedBy": [
+        "HeartChamberNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:ship_aligned",
+      "emittedBy": [
+        "HeartChamberNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:sync_progress",
+      "emittedBy": [
+        "HeartChamberNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:sync_completed",
+      "emittedBy": [
+        "HeartChamberNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:stragglers_detected",
+      "emittedBy": [
+        "HeartChamberNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:sync_cancelled",
+      "emittedBy": [
+        "HeartChamberNetworkSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:escort_needed",
+      "emittedBy": [
+        "TradeEscortSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:escort_failed",
+      "emittedBy": [
+        "TradeEscortSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:escort_assigned",
+      "emittedBy": [
+        "TradeEscortSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "trade:escort_completed",
+      "emittedBy": [
+        "TradeEscortSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:miracle",
+      "emittedBy": [
+        "AIGodBehaviorSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "afterlife:memories_faded",
+      "emittedBy": [
+        "AfterlifeMemoryFadingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "combat:started",
+      "emittedBy": [
+        "AgentCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:became_ancestor_kami",
+      "emittedBy": [
+        "AncestorTransformationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:champion_chosen",
+      "emittedBy": [
+        "AvatarSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "bookstore:out_of_stock",
+      "emittedBy": [
+        "BookstoreSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "bookstore:purchase",
+      "emittedBy": [
+        "BookstoreSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "bookstore:restocked",
+      "emittedBy": [
+        "BookstoreSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "bookstore:revenue_milestone",
+      "emittedBy": [
+        "BookstoreSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "companion:advice",
+      "emittedBy": [
+        "CompanionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "conversion_campaign_started",
+      "emittedBy": [
+        "ConversionWarfareSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "believer_converted",
+      "emittedBy": [
+        "ConversionWarfareSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "courtship:interested",
+      "emittedBy": [
+        "CourtshipSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "courtship:initiated",
+      "emittedBy": [
+        "CourtshipSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "courtship:rejected",
+      "emittedBy": [
+        "CourtshipSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "courtship:consent",
+      "emittedBy": [
+        "CourtshipSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "magic:spell_blocked",
+      "emittedBy": [
+        "CreatorInterventionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:banned_spell_attempt",
+      "emittedBy": [
+        "CreatorInterventionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "magic:spell_suppressed",
+      "emittedBy": [
+        "CreatorInterventionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:trap_triggered",
+      "emittedBy": [
+        "CreatorInterventionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:annihilation",
+      "emittedBy": [
+        "CreatorInterventionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:ban_trap_escalated",
+      "emittedBy": [
+        "CreatorInterventionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "divinity:surveillance_alert",
+      "emittedBy": [
+        "CreatorSurveillanceSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:bargain_offered",
+      "emittedBy": [
+        "DeathBargainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:challenge_started",
+      "emittedBy": [
+        "DeathBargainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:challenge_succeeded",
+      "emittedBy": [
+        "DeathBargainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:challenge_failed",
+      "emittedBy": [
+        "DeathBargainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:resurrected",
+      "emittedBy": [
+        "DeathBargainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:final",
+      "emittedBy": [
+        "DeathBargainSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:judgment_started",
+      "emittedBy": [
+        "DeathJudgmentSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:judgment_delivered",
+      "emittedBy": [
+        "DeathJudgmentSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:crossing_over",
+      "emittedBy": [
+        "DeathJudgmentSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:exchange",
+      "emittedBy": [
+        "DeathJudgmentSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:died",
+      "emittedBy": [
+        "DeathTransitionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:annihilated",
+      "emittedBy": [
+        "DeathTransitionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:reincarnation_queued",
+      "emittedBy": [
+        "DeathTransitionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "death:notification",
+      "emittedBy": [
+        "DeathTransitionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "rebellion:power_vacuum",
+      "emittedBy": [
+        "DeathTransitionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "dominance:challenge",
+      "emittedBy": [
+        "DominanceChallengeSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "dominance:cascade",
+      "emittedBy": [
+        "DominanceChallengeSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "dominance:resolved",
+      "emittedBy": [
+        "DominanceChallengeSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "friendship:formed",
+      "emittedBy": [
+        "FriendshipSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "guard:alertness_low",
+      "emittedBy": [
+        "GuardDutySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "guard:threat_detected",
+      "emittedBy": [
+        "GuardDutySystem",
+        "PredatorAttackSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "guard:response",
+      "emittedBy": [
+        "GuardDutySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "hunt:started",
+      "emittedBy": [
+        "HuntingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "hunt:failed",
+      "emittedBy": [
+        "HuntingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "hunt:injured",
+      "emittedBy": [
+        "HuntingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "hunt:success",
+      "emittedBy": [
+        "HuntingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "journal:written",
+      "emittedBy": [
+        "JournalingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "library:book_borrowed",
+      "emittedBy": [
+        "LibrarySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "library:book_returned",
+      "emittedBy": [
+        "LibrarySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "library:reading",
+      "emittedBy": [
+        "LibrarySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "library:access_denied",
+      "emittedBy": [
+        "LibrarySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "lore:spawned",
+      "emittedBy": [
+        "LoreSpawnSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "market:event_ended",
+      "emittedBy": [
+        "MarketEventSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "market:event_started",
+      "emittedBy": [
+        "MarketEventSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "mood:changed",
+      "emittedBy": [
+        "MoodSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "parenting:neglect",
+      "emittedBy": [
+        "ParentingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "parenting:concern",
+      "emittedBy": [
+        "ParentingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "parenting:success",
+      "emittedBy": [
+        "ParentingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "parenting:action",
+      "emittedBy": [
+        "ParentingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "parenting:assigned",
+      "emittedBy": [
+        "ParentingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "parenting:ended",
+      "emittedBy": [
+        "ParentingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "possession:tick",
+      "emittedBy": [
+        "PossessionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "possession:jack_in",
+      "emittedBy": [
+        "PossessionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "possession:jack_out",
+      "emittedBy": [
+        "PossessionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "predator:attack",
+      "emittedBy": [
+        "PredatorAttackSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "predator:repelled",
+      "emittedBy": [
+        "PredatorAttackSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "injury:inflicted",
+      "emittedBy": [
+        "PredatorAttackSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "chunk_prediction_queued",
+      "emittedBy": [
+        "PredictiveChunkLoadingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "publishing:paper_recorded",
+      "emittedBy": [
+        "PublishingUnlockSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "publishing:technology_unlocked",
+      "emittedBy": [
+        "PublishingUnlockSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:reincarnated",
+      "emittedBy": [
+        "ReincarnationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:woke",
+      "emittedBy": [
+        "SleepSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "agent:dreamed",
+      "emittedBy": [
+        "SleepSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:ceremony_started",
+      "emittedBy": [
+        "SoulCreationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:fate_thinking",
+      "emittedBy": [
+        "SoulCreationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "soul:fate_speaks",
+      "emittedBy": [
+        "SoulCreationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "species_created",
+      "emittedBy": [
+        "SpeciesCreationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "species_modified",
+      "emittedBy": [
+        "SpeciesCreationSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "voxel_resource:falling_started",
+      "emittedBy": [
+        "TreeFellingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "voxel_resource:fell",
+      "emittedBy": [
+        "TreeFellingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "animation:created",
+      "emittedBy": [
+        "TreeFellingSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "university:research_completed",
+      "emittedBy": [
+        "UniversitySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "university:stats",
+      "emittedBy": [
+        "UniversitySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "university:research_started",
+      "emittedBy": [
+        "UniversitySystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "wisdom:scrutiny_started",
+      "emittedBy": [
+        "WisdomGoddessSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "wisdom:judgment",
+      "emittedBy": [
+        "WisdomGoddessSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "wisdom:queue_processed",
+      "emittedBy": [
+        "WisdomGoddessSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:battle_started",
+      "emittedBy": [
+        "FleetCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:battle_started",
+      "emittedBy": [
+        "FleetCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:battle_resolved",
+      "emittedBy": [
+        "FleetCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "armada:system_battle_resolved",
+      "emittedBy": [
+        "FleetCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "empire:war_ended",
+      "emittedBy": [
+        "EmpireWarSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:combat_started",
+      "emittedBy": [
+        "SquadronCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:ship_destroyed",
+      "emittedBy": [
+        "SquadronCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "squadron:combat_resolved",
+      "emittedBy": [
+        "SquadronCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "ship:destroyed",
+      "emittedBy": [
+        "SquadronCombatSystem",
+        "ShipCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "ship:combat_started",
+      "emittedBy": [
+        "ShipCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "ship:combat_phase_changed",
+      "emittedBy": [
+        "ShipCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "ship:captured",
+      "emittedBy": [
+        "ShipCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "ship:combat_resolved",
+      "emittedBy": [
+        "ShipCombatSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "governor:decision_made",
+      "emittedBy": [
+        "GovernorDecisionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "governor:decision_requested",
+      "emittedBy": [
+        "GovernorDecisionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "governor:decision_executed",
+      "emittedBy": [
+        "GovernorDecisionSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:budget_processed",
+      "emittedBy": [
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:ship_constructed",
+      "emittedBy": [
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:maintenance_crisis",
+      "emittedBy": [
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:personnel_crisis",
+      "emittedBy": [
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "navy:research_progress",
+      "emittedBy": [
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    },
+    {
+      "eventType": "fleet:morale_decreased",
+      "emittedBy": [
+        "NavyBudgetSystem"
+      ],
+      "handledBy": [],
+      "severity": "warning"
+    }
+  ],
+  "componentDependencyIssues": [
+    {
+      "system": "TimeSystem",
+      "component": "time",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "ResourceGatheringSystem",
+      "component": "resource",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "TimeCompressionSystem",
+      "component": "timecompression",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "WeatherSystem",
+      "component": "weather",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentBrainSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentBrainSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentBrainSystem",
+      "component": "movement",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BodySystem",
+      "component": "body",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "TemperatureSystem",
+      "component": "temperature",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "TemperatureSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AnimalSystem",
+      "component": "animal",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AnimalSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "CommunicationSystem",
+      "component": "conversation",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "NeedsSystem",
+      "component": "needs",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "SpatialGridMaintenanceSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "SteeringSystem",
+      "component": "steering",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "SteeringSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "SteeringSystem",
+      "component": "velocity",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BuildingSystem",
+      "component": "building",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BuildingSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "SocialFatigueSystem",
+      "component": "conversation",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BuildingSpatialAnalysisSystem",
+      "component": "building",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentSwimmingSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentSwimmingSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentSwimmingSystem",
+      "component": "movement",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AgentSwimmingSystem",
+      "component": "needs",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "InterestEvolutionSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "InterestEvolutionSystem",
+      "component": "interests",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "DoorSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "DoorSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "MovementSystem",
+      "component": "movement",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "MovementSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "SocialGradientSystem",
+      "component": "socialgradient",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "ExplorationSystem",
+      "component": "explorationstate",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "MemorySystem",
+      "component": "spatialmemory",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "TradingSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "InterestsSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "InterestsSystem",
+      "component": "interests",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "PowerGridSystem",
+      "component": "power",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "PowerGridSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AnimalHousingSystem",
+      "component": "building",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AnimalHousingSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "VillageGovernanceSystem",
+      "component": "villagegovernance",
+      "isRegistered": false,
+      "createdBy": [
+        "CityGovernanceSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "BeltSystem",
+      "component": "belt",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BeltSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "CityGovernanceSystem",
+      "component": "citygovernance",
+      "isRegistered": false,
+      "createdBy": [
+        "CityGovernanceSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "ProvinceGovernanceSystem",
+      "component": "provincegovernance",
+      "isRegistered": false,
+      "createdBy": [
+        "ProvinceGovernanceSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "ResearchSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "ResearchSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AnimalProductionSystem",
+      "component": "animal",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AnimalProductionSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "ExperimentationSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "ExperimentationSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "FireSpreadSystem",
+      "component": "burning",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "TamingSystem",
+      "component": "animal",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "PassageTraversalSystem",
+      "component": "passageextended",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "BeliefFormationSystem",
+      "component": "belief",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BeliefFormationSystem",
+      "component": "episodicmemory",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "BeliefFormationSystem",
+      "component": "agent",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BuildingMaintenanceSystem",
+      "component": "building",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "BuildingMaintenanceSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "TechnologyEraSystem",
+      "component": "technologyera",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "FederationGovernanceSystem",
+      "component": "federationgovernance",
+      "isRegistered": false,
+      "createdBy": [
+        "FederationGovernanceSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "GalacticCouncilSystem",
+      "component": "galacticcouncil",
+      "isRegistered": false,
+      "createdBy": [
+        "GalacticCouncilSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "DivergenceTrackingSystem",
+      "component": "divergencetracking",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "CanonEventSystem",
+      "component": "canonevent",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "MegastructureConstructionSystem",
+      "component": "constructionproject",
+      "isRegistered": false,
+      "createdBy": [
+        "MegastructureConstructionSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "CrewStressSystem",
+      "component": "shipcrew",
+      "isRegistered": false,
+      "createdBy": [
+        "CrewStressSystem",
+        "ShipCombatSystem"
+      ],
+      "severity": "error"
+    },
+    {
+      "system": "BookstoreSystem",
+      "component": "bookstore",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "HuntingSystem",
+      "component": "conflict",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "IdleBehaviorSystem",
+      "component": "needs",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "IdleBehaviorSystem",
+      "component": "personality",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "IdleBehaviorSystem",
+      "component": "actionqueue",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "LibrarySystem",
+      "component": "library",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "TreeFellingSystem",
+      "component": "voxelresource",
+      "isRegistered": false,
+      "createdBy": [],
+      "severity": "error"
+    },
+    {
+      "system": "TreeFellingSystem",
+      "component": "position",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "UniversityResearchManagementSystem",
+      "component": "university",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "UniversitySystem",
+      "component": "university",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    },
+    {
+      "system": "AutoSaveSystem",
+      "component": "time",
+      "isRegistered": true,
+      "createdBy": [],
+      "severity": "warning"
+    }
+  ],
+  "circularDependencies": [
+    {
+      "cycle": [
+        "ProvinceGovernanceSystem",
+        "village_governance"
+      ],
+      "severity": "error"
+    },
+    {
+      "cycle": [
+        "FederationGovernanceSystem",
+        "empire"
+      ],
+      "severity": "error"
+    },
+    {
+      "cycle": [
+        "trade_agreement",
+        "squadron_management"
+      ],
+      "severity": "error"
+    },
+    {
+      "cycle": [
+        "trade_agreement",
+        "trade_agreement"
+      ],
+      "severity": "error"
+    },
+    {
+      "cycle": [
+        "SquadronCombatSystem",
+        "squadron_management"
+      ],
+      "severity": "error"
+    }
+  ],
+  "singletonConflicts": [],
+  "summary": {
+    "errors": 23,
+    "warnings": 404,
+    "healthy": false
+  }
+}

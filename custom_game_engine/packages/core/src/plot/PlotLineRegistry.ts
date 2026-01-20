@@ -145,6 +145,8 @@ class PlotLineRegistry {
       status: 'active',
       current_stage: template.entry_stage,
       stage_entered_at: params.assigned_at_personal_tick,
+      scale: template.scale,
+      multiverse_scope: template.multiverse_scope ?? 'local',  // Default to 'local'
       stages_visited: [],
       parameters,
       bound_agents: params.agent_bindings ?? {},
@@ -174,6 +176,7 @@ class PlotLineRegistry {
         small: 0,
         medium: 0,
         large: 0,
+        exotic: 0,
         epic: 0,
       } as Record<PlotScale, number>,
     };

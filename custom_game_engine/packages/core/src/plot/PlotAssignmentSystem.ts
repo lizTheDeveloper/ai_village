@@ -21,13 +21,14 @@ import { plotLineRegistry, instantiatePlot } from './PlotLineRegistry.js';
 
 /**
  * Scale-based plot limits per soul
- * Based on spec: micro 10-20, small 3-5, medium 1-2, large 0-1, epic 0-1
+ * Based on spec: micro 10-20, small 3-5, medium 1-2, large 0-1, exotic 0-1, epic 0-1
  */
 interface ScaleLimits {
   micro: { min: number; max: number };
   small: { min: number; max: number };
   medium: { min: number; max: number };
   large: { min: number; max: number };
+  exotic: { min: number; max: number };
   epic: { min: number; max: number };
 }
 
@@ -36,6 +37,7 @@ const DEFAULT_SCALE_LIMITS: ScaleLimits = {
   small: { min: 1, max: 5 },    // Active regularly
   medium: { min: 0, max: 2 },   // Long-term arcs
   large: { min: 0, max: 1 },    // Single lifetime
+  exotic: { min: 0, max: 1 },   // Single lifetime, system-driven
   epic: { min: 0, max: 1 },     // Multi-lifetime (rare)
 };
 
@@ -68,9 +70,9 @@ export class PlotAssignmentSystem extends BaseSystem {
    * Assign initial plot to newly created soul
    */
   assignInitialPlot(soul: Entity, _world: World): PlotLineInstance | null {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!identity || !plotLines || !thread) {
       console.warn(`[PlotAssignment] Soul ${soul.id} missing required components`);
@@ -117,9 +119,9 @@ export class PlotAssignmentSystem extends BaseSystem {
    * Assign follow-up plot after completion (Phase 4: scale-aware)
    */
   assignFollowUpPlot(soul: Entity, completedPlotId: string, _world: World): PlotLineInstance | null {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!identity || !plotLines || !thread) {
       return null;
@@ -208,8 +210,8 @@ export class PlotAssignmentSystem extends BaseSystem {
       .executeEntities();
 
     for (const soul of souls) {
-      const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-      const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+      const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+      const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
 
       if (!identity || !plotLines) continue;
 
@@ -218,7 +220,7 @@ export class PlotAssignmentSystem extends BaseSystem {
       if (scalesNeeding.length === 0) continue;
 
       // Get silver thread for personal tick
-      const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+      const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
       if (!thread) continue;
 
       // Get eligible templates
@@ -275,9 +277,9 @@ export class PlotAssignmentSystem extends BaseSystem {
     _world: World,
     preferredScale?: PlotScale
   ): PlotLineInstance | null {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!identity || !plotLines || !thread) return null;
 
@@ -337,8 +339,8 @@ export class PlotAssignmentSystem extends BaseSystem {
   ): Array<{ templateId: string; reason: string }> {
     const opportunities: Array<{ templateId: string; reason: string }> = [];
 
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
 
     if (!identity || !plotLines) return opportunities;
 
@@ -380,8 +382,8 @@ export class PlotAssignmentSystem extends BaseSystem {
     templateId: string,
     _world: World
   ): PlotLineInstance | null {
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!plotLines || !thread) return null;
 
@@ -420,7 +422,7 @@ export class PlotAssignmentSystem extends BaseSystem {
     let soulsAtMax = 0;
 
     for (const soul of souls) {
-      const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+      const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
       if (!plotLines) continue;
 
       if (plotLines.active.length > 0) {
@@ -459,6 +461,7 @@ export class PlotAssignmentSystem extends BaseSystem {
       small: 0,
       medium: 0,
       large: 0,
+      exotic: 0,
       epic: 0,
     };
 
@@ -495,7 +498,7 @@ export class PlotAssignmentSystem extends BaseSystem {
     const counts = this.countPlotsByScale(plotLines);
     const needing: PlotScale[] = [];
 
-    for (const scale of ['micro', 'small', 'medium', 'large', 'epic'] as PlotScale[]) {
+    for (const scale of ['micro', 'small', 'medium', 'large', 'exotic', 'epic'] as PlotScale[]) {
       if (counts[scale] < this.scaleLimits[scale].min) {
         needing.push(scale);
       }

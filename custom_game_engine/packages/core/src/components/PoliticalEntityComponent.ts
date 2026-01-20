@@ -17,7 +17,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
-import type { PoliticalTier } from './GovernorComponent.js';
+import type { PoliticalTier } from '../governance/types.js';
 
 /**
  * Directive from a higher-tier entity to a lower-tier entity.

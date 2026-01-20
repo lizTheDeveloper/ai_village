@@ -548,6 +548,10 @@ export class ShipyardProductionSystem extends BaseSystem {
     }
 
     const project = queue[projectIndex];
+    if (!project) {
+      return { success: false, reason: 'Project not found in queue' };
+    }
+
     queue.splice(projectIndex, 1);
     this.constructionQueue.set(navyId, queue);
 

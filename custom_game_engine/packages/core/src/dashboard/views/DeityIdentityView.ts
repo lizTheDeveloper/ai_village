@@ -12,7 +12,7 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
-import type { DeityComponent } from '../../components/DeityComponent.js';
+import type { DeityComponent, DeityIdentity } from '../../components/DeityComponent.js';
 
 /**
  * Data returned by the DeityIdentity view
@@ -123,7 +123,7 @@ export const DeityIdentityView: DashboardView<DeityIdentityViewData> = {
       }
 
       const deityComp = playerDeity.component;
-      const identity = deityComp.identity ?? {};
+      const identity = deityComp.identity as DeityIdentity;
 
       // Convert trait confidence map to array
       const traitConfidence: Array<{ trait: string; confidence: number }> = [];

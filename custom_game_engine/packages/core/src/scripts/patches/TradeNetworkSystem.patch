@@ -1,0 +1,208 @@
+--- a/packages/core/src/systems/TradeNetworkSystem.ts
++++ b/packages/core/src/systems/TradeNetworkSystem.ts
+@@ -113,6 +113,9 @@ export class TradeNetworkSystem extends BaseSystem {
+   protected onUpdate(ctx: SystemContext): void {
+     const currentTick = ctx.tick;
+
++    // OPTIMIZATION: Cache shipping lanes once for entire update
++    const laneEntities = ctx.world.query().with('shipping_lane').executeEntities();
++
+     // Cache queries before loops (CLAUDE.md performance guideline)
+     const networkEntities = ctx.world.query().with('trade_network').executeEntities();
+     const blockadeEntities = ctx.world.query().with('blockade').executeEntities();
+
+     // Update each trade network
+     for (const networkEntity of networkEntities) {
+       const network = networkEntity.getComponent<TradeNetworkComponent>('trade_network');
+       if (!network) continue;
+
+-      this.updateNetwork(ctx.world, networkEntity, network, currentTick);
++      this.updateNetwork(ctx.world, networkEntity, network, laneEntities, currentTick);
+     }
+
+     // Update each blockade
+     for (const blockadeEntity of blockadeEntities) {
+       const blockade = blockadeEntity.getComponent<BlockadeComponent>('blockade');
+       if (!blockade) continue;
+
+-      this.updateBlockade(ctx.world, blockadeEntity, blockade, currentTick);
++      this.updateBlockade(ctx.world, blockadeEntity, blockade, laneEntities, currentTick);
+     }
+   }
+
+@@ -142,10 +145,10 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Build network graph from shipping lanes
+    */
+   private buildNetworkGraph(
++    laneEntities: ReadonlyArray<Entity>,
+-    world: World,
+     network: TradeNetworkComponent
+   ): Graph {
+     const graph: Graph = {
+       nodes: new Set(),
+       edges: new Map(),
+       adjacencyList: new Map(),
+     };
+
+-    // ❌ BEFORE: Query inside method
+-    const laneEntities = world.query().with('shipping_lane').executeEntities();
+-
++    // ✅ AFTER: Use passed cached entities
+     for (const laneEntity of laneEntities) {
+       const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
+@@ -206,11 +209,11 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Rebuild network topology and metrics
+    */
+   private rebuildNetwork(
++    laneEntities: ReadonlyArray<Entity>,
+-    world: World,
+     entity: Entity,
+     network: TradeNetworkComponent
+   ): void {
+-    const graph = this.buildNetworkGraph(world, network);
++    const graph = this.buildNetworkGraph(laneEntities, network);
+
+     // Skip analysis if network too large
+     if (graph.nodes.size > MAX_NETWORK_SIZE) {
+@@ -757,10 +760,11 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Update blockade status and effects
+    */
+   private updateBlockade(
+     world: World,
+     entity: Entity,
+     blockade: BlockadeComponent,
++    laneEntities: ReadonlyArray<Entity>,
+     currentTick: number
+   ): void {
+     if (blockade.status !== 'active' && blockade.status !== 'contested') {
+@@ -771,7 +775,7 @@ export class TradeNetworkSystem extends BaseSystem {
+     const effectiveness = this.calculateBlockadeEffectiveness(world, blockade);
+
+     // Apply flow reductions to affected lanes
+-    const affectedNodes = this.applyBlockadeEffects(world, blockade, effectiveness);
++    const affectedNodes = this.applyBlockadeEffects(world, blockade, effectiveness, laneEntities);
+
+     // Calculate economic damage
+     const economicDamage = this.calculateEconomicDamage(world, blockade, affectedNodes);
+@@ -814,12 +818,12 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Apply blockade effects to shipping lanes
+    */
+   private applyBlockadeEffects(
+     world: World,
+     blockade: BlockadeComponent,
+     effectiveness: number
++    laneEntities: ReadonlyArray<Entity>,
+   ): EntityId[] {
+     const affectedNodes: EntityId[] = [blockade.targetNodeId];
+     const affectedEdges: string[] = [];
+
+-    // ❌ BEFORE: Query repeated
+-    const laneEntities = world.query().with('shipping_lane').executeEntities();
+-
++    // ✅ AFTER: Use passed cached entities
+     for (const laneEntity of laneEntities) {
+       const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
+@@ -855,7 +859,7 @@ export class TradeNetworkSystem extends BaseSystem {
+     blockade.affectedEdges = affectedEdges;
+
+     // BFS to find downstream nodes affected by reduced flow
+-    const cascadeNodes = this.calculateCascadeEffect(world, blockade.targetNodeId, affectedNodes);
++    const cascadeNodes = this.calculateCascadeEffect(laneEntities, blockade.targetNodeId, affectedNodes);
+     affectedNodes.push(...cascadeNodes);
+
+     return Array.from(new Set(affectedNodes)); // Deduplicate
+@@ -865,12 +869,12 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Calculate cascade effect of blockade (BFS)
+    */
+   private calculateCascadeEffect(
++    laneEntities: ReadonlyArray<Entity>,
+-    world: World,
+     blockadedNode: EntityId,
+     directlyAffected: EntityId[]
+   ): EntityId[] {
+     const cascade: EntityId[] = [];
+     const visited = new Set<EntityId>(directlyAffected);
+     const queue: EntityId[] = [...directlyAffected];
+
+     // BFS from directly affected nodes
+     while (queue.length > 0) {
+       const currentNode = queue.shift();
+       if (!currentNode) break;
+
+-      // ❌ CRITICAL: Query inside WHILE loop - O(n²) complexity!
+-      const laneEntities = world.query().with('shipping_lane').executeEntities();
+-
++      // ✅ AFTER: Use passed cached entities (fixes O(n²) → O(n))
+       for (const laneEntity of laneEntities) {
+         const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
+         if (!lane || lane.originId !== currentNode) continue;
+
+         const nextNode = lane.destinationId;
+
+         // If destination depends on this route and has no alternatives
+         if (!visited.has(nextNode)) {
+           // Check if this is the only route to nextNode
+-          const alternativeRoutes = this.countIncomingRoutes(world, nextNode);
++          const alternativeRoutes = this.countIncomingRoutes(laneEntities, nextNode);
+
+           if (alternativeRoutes <= 1) {
+             // Single route = dependency
+@@ -909,11 +913,11 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Count incoming routes to a node
+    */
+   private countIncomingRoutes(
++    laneEntities: ReadonlyArray<Entity>,
+-    world: World,
+     nodeId: EntityId
+   ): number {
+     let count = 0;
+
+-    // ❌ BEFORE: Query repeated
+-    const laneEntities = world.query().with('shipping_lane').executeEntities();
++    // ✅ AFTER: Use passed cached entities
+     for (const laneEntity of laneEntities) {
+       const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
+@@ -928,12 +932,12 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Calculate economic damage from blockade
+    */
+   private calculateEconomicDamage(
+     world: World,
+     blockade: BlockadeComponent,
+-    affectedNodes: EntityId[]
++    affectedNodes: EntityId[],
++    laneEntities: ReadonlyArray<Entity>
+   ): number {
+     let totalDamage = 0;
+
+-    // ❌ BEFORE: Query repeated
+-    const laneEntities = world.query().with('shipping_lane').executeEntities();
+-
++    // ✅ AFTER: Use passed cached entities
+     for (const laneEntity of laneEntities) {
+       const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
+@@ -980,11 +984,11 @@ export class TradeNetworkSystem extends BaseSystem {
+   /**
+    * Update network analysis
+    */
+   private updateNetwork(
+     world: World,
+     entity: Entity,
+     network: TradeNetworkComponent,
++    laneEntities: ReadonlyArray<Entity>,
+     currentTick: number
+   ): void {
+     // Rebuild network periodically
+     const ticksSinceLastAnalysis = currentTick - network.lastAnalysisTick;
+
+     if (ticksSinceLastAnalysis >= UPDATE_INTERVAL) {
+-      this.rebuildNetwork(world, entity, network);
++      this.rebuildNetwork(laneEntities, world, entity, network);
+     }
+   }

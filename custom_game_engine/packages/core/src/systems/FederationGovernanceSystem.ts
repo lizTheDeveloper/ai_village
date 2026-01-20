@@ -194,7 +194,7 @@ export class FederationGovernanceSystem extends BaseSystem {
     this.processSecessionAttempts(world, federation, federationEntity, satisfactionMap, tick);
 
     // Step 7: Rotate presidency if needed
-    this.rotatePrresidency(world, federation, federationEntity, tick);
+    this.rotatePresidency(world, federation, federationEntity, tick);
 
     // Step 8: Update federation component with aggregated data
     federationEntity.updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
@@ -257,7 +257,7 @@ export class FederationGovernanceSystem extends BaseSystem {
       totalGDP += empire.economy.gdp;
       totalMilitaryStrength += empire.military.totalShips;
       totalFleetCount += empire.military.totalFleets;
-      totalSystemCount += empire.territory.totalSystems;
+      totalSystemCount += empire.territory.systems.length;
     }
 
     // Aggregate independent nation stats (non-empire members)
@@ -268,9 +268,9 @@ export class FederationGovernanceSystem extends BaseSystem {
       const nation = nationEntity.getComponent<NationComponent>(CT.Nation);
       if (!nation) continue;
 
-      totalPopulation += nation.totalPopulation;
-      totalGDP += nation.economy.GDP;
-      totalMilitaryStrength += nation.military.standingArmy + nation.military.reserves;
+      totalPopulation += nation.population;
+      totalGDP += nation.economy.gdp;
+      totalMilitaryStrength += nation.military.armyStrength;
       // Nations are single-planet/system entities
       totalSystemCount += 1;
     }
@@ -684,7 +684,7 @@ export class FederationGovernanceSystem extends BaseSystem {
   /**
    * Rotate federation presidency if term has ended
    */
-  private rotatePrresidency(
+  private rotatePresidency(
     world: World,
     federation: FederationGovernanceComponent,
     federationEntity: EntityImpl,
@@ -923,7 +923,7 @@ export class FederationGovernanceSystem extends BaseSystem {
       const nation = nationEntity.getComponent<NationComponent>(CT.Nation);
       if (!nation) continue;
 
-      const population = nation.totalPopulation;
+      const population = nation.population;
       memberPopulations.set(nationId, population);
       totalSqrtPopulation += Math.sqrt(population);
     }

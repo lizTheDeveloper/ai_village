@@ -123,7 +123,7 @@ export class OffScreenProductionSystem extends BaseSystem {
             outputItemId = recipe.output.itemId;
 
             // Map ingredients to input requirements
-            inputRequirements = recipe.ingredients.map((ingredient) => {
+            inputRequirements = recipe.ingredients.map((ingredient: { itemId: string; quantity: number }) => {
               const ingredientCraftsPerHour = (3600 / craftingTime) * machineSpeed * powerEfficiency;
               return {
                 itemId: ingredient.itemId,

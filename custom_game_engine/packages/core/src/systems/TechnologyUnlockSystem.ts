@@ -299,6 +299,9 @@ export class TechnologyUnlockSystem extends BaseSystem {
       this.systemRegistry.enable('PlotAssignmentSystem');
       this.systemRegistry.enable('PlotProgressionSystem');
       this.systemRegistry.enable('NarrativePressureSystem');
+      // Fates Council - Exotic/Epic plot weaving
+      this.systemRegistry.enable('fates_council');
+      console.log('[TechnologyUnlock] The Three Fates now observe the narrative tapestry');
     }
   }
 }

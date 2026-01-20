@@ -56,7 +56,7 @@ interface SystemThrottle {
  * System throttle configurations.
  * Based on spec: openspec/specs/grand-strategy/03-TIME-SCALING.md lines 235-285
  */
-const SYSTEM_THROTTLE_CONFIG: SystemThrottle[] = [
+const SYSTEM_THROTTLE_CONFIG: readonly SystemThrottle[] = [
   // Memory & Cognitive Systems (can be delayed during fast-forward)
   { systemId: 'memory_consolidation', baseInterval: 10, speedMultiplier: 1.0, maxInterval: 1000, disableAtSpeed: 10000 },
   { systemId: 'memory_formation', baseInterval: 5, speedMultiplier: 0.5, maxInterval: 500, disableAtSpeed: 10000 },
@@ -133,6 +133,12 @@ const SYSTEM_THROTTLE_CONFIG: SystemThrottle[] = [
   { systemId: 'metrics_collection', baseInterval: 20, speedMultiplier: 0.5, maxInterval: 200 },
 ];
 
+/** Pre-built lookup for O(1) config access by systemId */
+const THROTTLE_CONFIG_BY_ID: Record<SystemId, SystemThrottle> = Object.create(null);
+for (const config of SYSTEM_THROTTLE_CONFIG) {
+  THROTTLE_CONFIG_BY_ID[config.systemId] = config;
+}
+
 // ============================================================================
 // SYSTEM
 // ============================================================================
@@ -165,11 +171,15 @@ export class TimeThrottleCoordinator extends BaseSystem {
   /** Last time scale for change detection */
   private lastTimeScale: number = 1;
 
-  /** Current active throttle presets by system ID */
-  private currentThrottles: Map<SystemId, number> = new Map();
+  /** Current active throttle presets by system ID (object literal for GC) */
+  private currentThrottles: Record<SystemId, number> = Object.create(null);
 
-  /** Systems currently disabled due to speed threshold */
-  private disabledSystems: Set<SystemId> = new Set();
+  /** Systems currently disabled due to speed threshold (object literal for GC) */
+  private disabledSystems: Record<SystemId, boolean> = Object.create(null);
+
+  /** Pre-allocated arrays for event emission (avoid Array.from allocations) */
+  private throttledSystemsCache: SystemId[] = [];
+  private disabledSystemsCache: SystemId[] = [];
 
   protected onUpdate(ctx: SystemContext): void {
     const { world, tick } = ctx;
@@ -205,12 +215,22 @@ export class TimeThrottleCoordinator extends BaseSystem {
     // Apply new throttles
     this.applyThrottles(world, currentScale);
 
+    // Build cached arrays for event emission (reuse arrays, avoid allocations)
+    this.throttledSystemsCache.length = 0;
+    for (const systemId in this.currentThrottles) {
+      this.throttledSystemsCache.push(systemId as SystemId);
+    }
+    this.disabledSystemsCache.length = 0;
+    for (const systemId in this.disabledSystems) {
+      this.disabledSystemsCache.push(systemId as SystemId);
+    }
+
     // Emit event
     ctx.emit('time:throttles_updated', {
       timeScale: currentScale,
       previousScale: this.lastTimeScale,
-      throttledSystems: Array.from(this.currentThrottles.keys()),
-      disabledSystems: Array.from(this.disabledSystems),
+      throttledSystems: this.throttledSystemsCache,
+      disabledSystems: this.disabledSystemsCache,
     }, entity.id);
 
     this.lastTimeScale = currentScale;
@@ -221,34 +241,37 @@ export class TimeThrottleCoordinator extends BaseSystem {
    * Implements the throttling strategy from spec lines 235-285.
    */
   private applyThrottles(world: World, timeScale: number): void {
-    const newThrottles = new Map<SystemId, number>();
-    const newDisabledSystems = new Set<SystemId>();
+    // Track which systems should be disabled (avoid allocations by reusing temp object)
+    const newDisabledSystems: Record<SystemId, boolean> = Object.create(null);
 
     for (const config of SYSTEM_THROTTLE_CONFIG) {
       // Check if system should be disabled at this speed
       if (config.disableAtSpeed !== undefined && timeScale >= config.disableAtSpeed) {
-        newDisabledSystems.add(config.systemId);
+        newDisabledSystems[config.systemId] = true;
         this.disableSystem(world, config.systemId);
         continue;
       }
 
       // Calculate throttle interval
       const interval = this.calculateThrottle(config, timeScale);
-      newThrottles.set(config.systemId, interval);
+      this.currentThrottles[config.systemId] = interval;
 
       // Apply throttle to system
       this.setSystemThrottle(world, config.systemId, interval);
     }
 
     // Re-enable systems that were previously disabled but are now active
-    for (const systemId of this.disabledSystems) {
-      if (!newDisabledSystems.has(systemId)) {
-        this.enableSystem(world, systemId);
+    for (const systemId in this.disabledSystems) {
+      if (!newDisabledSystems[systemId as SystemId]) {
+        this.enableSystem(world, systemId as SystemId);
+        delete this.disabledSystems[systemId as SystemId];
       }
     }
 
-    this.currentThrottles = newThrottles;
-    this.disabledSystems = newDisabledSystems;
+    // Update disabled systems (add new ones)
+    for (const systemId in newDisabledSystems) {
+      this.disabledSystems[systemId as SystemId] = true;
+    }
   }
 
   /**
@@ -315,8 +338,8 @@ export class TimeThrottleCoordinator extends BaseSystem {
    * Re-enable a previously disabled system.
    */
   private enableSystem(world: World, systemId: SystemId): void {
-    // Recalculate appropriate throttle for current speed
-    const config = SYSTEM_THROTTLE_CONFIG.find(c => c.systemId === systemId);
+    // Recalculate appropriate throttle for current speed (O(1) lookup)
+    const config = THROTTLE_CONFIG_BY_ID[systemId];
     if (config) {
       const interval = this.calculateThrottle(config, this.lastTimeScale);
       this.setSystemThrottle(world, systemId, interval);
@@ -327,20 +350,20 @@ export class TimeThrottleCoordinator extends BaseSystem {
    * Get current throttle for a system (public API for debugging/admin).
    */
   public getThrottleForSystem(systemId: SystemId): number | null {
-    return this.currentThrottles.get(systemId) ?? null;
+    return this.currentThrottles[systemId] ?? null;
   }
 
   /**
    * Check if a system is currently disabled due to speed threshold.
    */
   public isSystemDisabled(systemId: SystemId): boolean {
-    return this.disabledSystems.has(systemId);
+    return this.disabledSystems[systemId] === true;
   }
 
   /**
    * Get all current throttle settings (for admin panel).
    */
-  public getAllThrottles(): ReadonlyMap<SystemId, number> {
+  public getAllThrottles(): Readonly<Record<SystemId, number>> {
     return this.currentThrottles;
   }
 
@@ -348,6 +371,11 @@ export class TimeThrottleCoordinator extends BaseSystem {
    * Get list of currently disabled systems.
    */
   public getDisabledSystems(): ReadonlyArray<SystemId> {
-    return Array.from(this.disabledSystems);
+    // Reuse cache array to avoid allocations
+    this.disabledSystemsCache.length = 0;
+    for (const systemId in this.disabledSystems) {
+      this.disabledSystemsCache.push(systemId as SystemId);
+    }
+    return this.disabledSystemsCache;
   }
 }

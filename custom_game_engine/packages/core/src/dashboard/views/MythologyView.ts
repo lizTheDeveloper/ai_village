@@ -12,7 +12,7 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
-import { DeityComponent } from '../../components/DeityComponent.js';
+import { DeityComponent, type DeityIdentity } from '../../components/DeityComponent.js';
 
 /**
  * Myth/story information
@@ -20,7 +20,7 @@ import { DeityComponent } from '../../components/DeityComponent.js';
 export interface MythInfo {
   id: string;
   title: string;
-  category: 'origin' | 'miracle' | 'moral' | 'prophecy' | 'parable';
+  category: 'origin' | 'miracle' | 'moral' | 'prophecy' | 'parable' | 'heroic_deed' | 'cosmic_event' | 'political' | 'disaster';
   content: string;
   believerCount: number;
   variants: number;
@@ -101,7 +101,7 @@ export const MythologyView: DashboardView<MythologyViewData> = {
       }
 
       const deityComp = playerDeity.component;
-      const identity = deityComp.identity ?? { primaryName: 'Unknown Deity' };
+      const identity = deityComp.identity as DeityIdentity;
 
       const believerCount = deityComp.believers?.size ?? 0;
       const originStory = `${identity.primaryName} emerged from the collective belief of ${believerCount} mortals, drawn together by their shared need for divine guidance.`;
@@ -115,8 +115,8 @@ export const MythologyView: DashboardView<MythologyViewData> = {
         deityName: identity.primaryName,
         originStory,
         myths,
-        epithets: identity.epithets,
-        symbols: identity.symbols,
+        epithets: identity.epithets ?? [],
+        symbols: identity.symbols ?? [],
       };
     } catch (error) {
       return {

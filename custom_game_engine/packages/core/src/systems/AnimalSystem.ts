@@ -223,12 +223,13 @@ export class AnimalSystem extends BaseSystem {
 
         // Emit life stage changed event
         ctx.world.eventBus.emit({
-          type: 'life_stage_changed',
+          type: 'animal:life_stage_change',
           source: entity.id,
           data: {
             animalId: animal.id,
-            from: oldStage,
-            to: newLifeStage,
+            oldStage: oldStage,
+            newStage: newLifeStage,
+            ageDays: animal.age,
           },
         });
 

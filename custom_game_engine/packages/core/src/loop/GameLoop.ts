@@ -10,6 +10,7 @@ import { ActionQueue } from '../actions/ActionQueue.js';
 import { ComponentRegistry } from '../ecs/ComponentRegistry.js';
 import { TICKS_PER_SECOND, MS_PER_TICK } from '../types.js';
 import { timelineManager } from '../multiverse/TimelineManager.js';
+import { SystemProfiler } from '../profiling/SystemProfiler.js';
 
 export type GameLoopState = 'stopped' | 'running' | 'paused';
 
@@ -45,6 +46,10 @@ export class GameLoop {
 
   // Universe tracking for timeline management
   private _universeId: string = 'default';
+
+  // Performance profiler (optional, disabled by default)
+  private profiler: SystemProfiler | null = null;
+  private profilingEnabled = false;
 
   constructor() {
     this.eventBus = new EventBusImpl();
@@ -175,6 +180,11 @@ export class GameLoop {
   private executeTick(): void {
     const tickStart = performance.now();
 
+    // Update profiler if enabled
+    if (this.profilingEnabled && this.profiler) {
+      this.profiler.setCurrentTick(this._world.tick);
+    }
+
     // Update event bus tick
     this.eventBus.setCurrentTick(this._world.tick);
 
@@ -234,8 +244,18 @@ export class GameLoop {
           }
         }
 
-        // Update system
-        system.update(this._world, entities, this.msPerTick / 1000);
+        // Update system (with profiling if enabled)
+        if (this.profilingEnabled && this.profiler) {
+          this.profiler.profileSystem(
+            system.id,
+            () => {
+              system.update(this._world, entities, this.msPerTick / 1000);
+            },
+            entities.length
+          );
+        } else {
+          system.update(this._world, entities, this.msPerTick / 1000);
+        }
       } catch (error) {
         console.error(`Error in system ${system.id}:`, error);
       }
@@ -358,6 +378,11 @@ export class GameLoop {
     this.avgTickTime = (this.avgTickTime * (this.tickCount - 1) + tickTime) / this.tickCount;
     this.maxTickTime = Math.max(this.maxTickTime, tickTime);
 
+    // Record tick time in profiler if enabled
+    if (this.profilingEnabled && this.profiler) {
+      this.profiler.recordTickTime(this._world.tick, tickTime);
+    }
+
     // Warn if tick took too long - include full breakdown
     if (tickTime > this.msPerTick) {
       // Sort systems to find top 5 slowest
@@ -377,6 +402,55 @@ export class GameLoop {
       maxTickTimeMs: this.maxTickTime,
       systemStats: this._systemRegistry.getStats(),
     };
+  }
+
+  /**
+   * Enable performance profiling
+   * Profiles system execution times and generates performance reports
+   */
+  enableProfiling(): void {
+    if (!this.profiler) {
+      this.profiler = new SystemProfiler();
+      this.profiler.startSession(this._world.tick);
+    }
+    this.profilingEnabled = true;
+  }
+
+  /**
+   * Disable performance profiling
+   */
+  disableProfiling(): void {
+    this.profilingEnabled = false;
+  }
+
+  /**
+   * Get performance profiling report
+   */
+  getProfilingReport() {
+    if (!this.profiler) {
+      throw new Error('Profiling not enabled. Call enableProfiling() first.');
+    }
+    return this.profiler.getReport();
+  }
+
+  /**
+   * Export profiling report as JSON
+   */
+  exportProfilingJSON(): string {
+    if (!this.profiler) {
+      throw new Error('Profiling not enabled. Call enableProfiling() first.');
+    }
+    return this.profiler.exportJSON();
+  }
+
+  /**
+   * Export profiling report as Markdown
+   */
+  exportProfilingMarkdown(): string {
+    if (!this.profiler) {
+      throw new Error('Profiling not enabled. Call enableProfiling() first.');
+    }
+    return this.profiler.exportMarkdown();
   }
 
   // Expose mutator for internal use only

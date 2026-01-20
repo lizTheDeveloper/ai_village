@@ -106,7 +106,7 @@ export class SquadronCombatSystem extends BaseSystem {
   public readonly metadata = {
     category: 'combat',
     description: 'Handles tactical combat between squadrons with formation-based mechanics',
-    dependsOn: ['fleet_combat' as SystemId, 'squadron_management' as SystemId],
+    dependsOn: ['squadron_management' as SystemId],
     writesComponents: [CT.Squadron, CT.Spaceship] as const,
   } as const;
 
@@ -402,7 +402,7 @@ export class SquadronCombatSystem extends BaseSystem {
     this.workingDestroyedShips.length = 0;
     const count = Math.min(shipsToDestroy, this.workingShipHealths.length);
     for (let i = 0; i < count; i++) {
-      this.workingDestroyedShips.push(this.workingShipHealths[i].shipId);
+      this.workingDestroyedShips.push(this.workingShipHealths[i]!.shipId);
     }
 
     return this.workingDestroyedShips;

@@ -70,7 +70,7 @@ export class BackgroundUniverseSystem extends BaseSystem {
     return this.manager;
   }
 
-  protected onCleanup(ctx: SystemContext): void {
+  protected onCleanup(): void {
     // Cleanup handled by MultiverseCoordinator
     console.log('[BackgroundUniverseSystem] Cleaned up');
   }

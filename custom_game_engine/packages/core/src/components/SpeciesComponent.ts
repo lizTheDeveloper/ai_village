@@ -71,9 +71,15 @@ export class SpeciesComponent extends ComponentBase {
   public speciesId: string;          // e.g., 'human', 'elf', 'thrakeen_insectoid'
   public speciesName: string;        // e.g., 'Human', 'Elf', 'Thrakeen'
   public commonName?: string;        // e.g., 'Human' (for display)
+  public name: string;               // Alias for speciesName (for galactic council compatibility)
 
   // Body plan reference
   public bodyPlanId: string;         // Links to BodyPlanRegistry
+
+  // Galactic-scale properties
+  public techLevel: number;          // Technology level (1-15+, space age at 7+)
+  public population: number;         // Total population of this species
+  public homeworld?: string;         // Name of homeworld planet
 
   // Hybrid info
   public isHybrid: boolean;
@@ -118,7 +124,13 @@ export class SpeciesComponent extends ComponentBase {
 
     this.speciesId = speciesId;
     this.speciesName = speciesName;
+    this.name = options.name ?? speciesName; // Default to speciesName
     this.bodyPlanId = bodyPlanId;
+
+    // Galactic-scale defaults
+    this.techLevel = options.techLevel ?? 1;
+    this.population = options.population ?? 0;
+    this.homeworld = options.homeworld;
 
     // Defaults
     this.isHybrid = options.isHybrid ?? false;
@@ -308,6 +320,10 @@ export class SpeciesComponent extends ComponentBase {
       this.speciesName,
       this.bodyPlanId,
       {
+        name: this.name,
+        techLevel: this.techLevel,
+        population: this.population,
+        homeworld: this.homeworld,
         isHybrid: this.isHybrid,
         parentSpecies: this.parentSpecies ? [...this.parentSpecies] : undefined,
         hybridGeneration: this.hybridGeneration,

@@ -62,7 +62,74 @@ export class NationSystem extends BaseSystem {
    * Initialize event listeners
    */
   protected onInitialize(_world: World, _eventBus: EventBus): void {
-    // TODO: Listen for province events, war declarations, treaty signings
+    // === Province Events ===
+    // Track when provinces join or leave this nation
+    this.events.on('province:city_added', (data) => {
+      this._onProvinceCityAdded(data);
+    });
+
+    this.events.on('province:city_rebelled', (data) => {
+      this._onProvinceCityRebelled(data);
+    });
+
+    this.events.on('province:rebellion_warning', (data) => {
+      this._onProvinceRebellionWarning(data);
+    });
+
+    this.events.on('province:economic_update', (data) => {
+      this._onProvinceEconomicUpdate(data);
+    });
+
+    this.events.on('province:election_completed', (data) => {
+      this._onProvinceElectionCompleted(data);
+    });
+
+    // === War and Conflict Events ===
+    // React to war declarations from other systems
+    this.events.on('nation:war_declared', (data) => {
+      this._onWarDeclared(data);
+    });
+
+    this.events.on('empire:war_declared', (data) => {
+      this._onEmpireWarDeclared(data);
+    });
+
+    this.events.on('nation:ally_called_to_war', (data) => {
+      this._onAllyCalledToWar(data);
+    });
+
+    // === Treaty Events ===
+    // React to treaty signings and expirations
+    this.events.on('nation:treaty_signed', (data) => {
+      this._onTreatySigned(data);
+    });
+
+    this.events.on('nation:treaty_expired', (data) => {
+      this._onTreatyExpired(data);
+    });
+
+    this.events.on('empire:peace_treaty_signed', (data) => {
+      this._onEmpirePeaceTreatySigned(data);
+    });
+
+    // === Diplomatic Events ===
+    this.events.on('empire:alliance_formed', (data) => {
+      this._onEmpireAllianceFormed(data);
+    });
+
+    // === Governor Decision Events ===
+    // React to governor decisions being executed
+    this.events.on('nation:policy_enacted', (data) => {
+      this._onPolicyEnacted(data);
+    });
+
+    this.events.on('nation:research_prioritized', (data) => {
+      this._onResearchPrioritized(data);
+    });
+
+    this.events.on('nation:tax_rate_changed', (data) => {
+      this._onTaxRateChanged(data);
+    });
   }
 
   /**
@@ -350,7 +417,7 @@ export class NationSystem extends BaseSystem {
       data: {
         nationId: entity.id,
         nationName: nation.nationName,
-        newLeader,
+        newLeader: newLeader || '',
         leadershipType: nation.leadership.type,
         tick: world.tick,
       },
@@ -624,6 +691,150 @@ export class NationSystem extends BaseSystem {
         },
       }));
     }
+  }
+
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+
+  /**
+   * Handle province adding a city
+   */
+  private _onProvinceCityAdded(data: { provinceId: string; cityId: string; cityName: string }): void {
+    // Find the nation that owns this province and update its records
+    // This is handled by aggregateProvinceData in the main update loop
+    // No immediate action needed - just logged for debugging
+  }
+
+  /**
+   * Handle province city rebellion
+   */
+  private _onProvinceCityRebelled(data: { provinceId: string; provinceName: string; cityId: string; tick: number }): void {
+    // A city in one of our provinces has rebelled
+    // This impacts province loyalty and nation stability
+    // The main update loop will handle stability calculations
+  }
+
+  /**
+   * Handle province rebellion warning
+   */
+  private _onProvinceRebellionWarning(data: { provinceId: string; provinceName: string; stability: number; factors: string[]; tick: number }): void {
+    // A province is showing signs of rebellion
+    // We could implement crisis response here in the future (send military, negotiate, grant autonomy)
+    // For now, the stability system will handle this in the main update loop
+  }
+
+  /**
+   * Handle province economic update
+   */
+  private _onProvinceEconomicUpdate(data: { provinceId: string; provinceName: string; taxRevenue: number; maintenanceCost: number; netRevenue: number; tick: number }): void {
+    // Province economic data has changed
+    // The main update loop aggregates this data in aggregateProvinceData
+    // No immediate action needed
+  }
+
+  /**
+   * Handle province election completed
+   */
+  private _onProvinceElectionCompleted(data: { provinceId: string; provinceName: string; newGovernor: string; tick: number }): void {
+    // Province elected a new governor
+    // This could affect national politics and stability
+    // Future: Track governor loyalty, political alignment
+  }
+
+  /**
+   * Handle war declaration by another nation
+   */
+  private _onWarDeclared(data: { nationId: string; nationName: string; targetNationId: string; targetNationName: string; warGoals: string[]; tick: number }): void {
+    // Another nation has declared war (either on us or on someone else)
+    // If we're the target, we should update our war status
+    // If an ally is involved, we may need to respond per treaty obligations
+
+    // Note: The declaring nation will add the war to their activeWars
+    // The target nation should also add it to their activeWars via their own system logic
+  }
+
+  /**
+   * Handle empire-level war declaration
+   */
+  private _onEmpireWarDeclared(data: { empireId: string; empireName: string; targetEmpireId: string; targetEmpireName: string; warGoals: string[]; tick: number }): void {
+    // An empire-level war has been declared
+    // If our nation belongs to one of these empires, we may be called to war
+    // This is handled by the EmpireSystem coordinating with nations
+  }
+
+  /**
+   * Handle being called to war by an ally
+   */
+  private _onAllyCalledToWar(data: { nationId: string; nationName: string; allyId: string; allyName: string; warId: string; treatyType: string; tick: number }): void {
+    // An ally has called us to war based on a treaty obligation
+    // This event is informational - the actual war joining logic is handled
+    // in processAllianceObligations() which adds the war to our activeWars
+  }
+
+  /**
+   * Handle treaty being signed
+   */
+  private _onTreatySigned(data: { nationId: string; nationName: string; treatyId: string; treatyName: string; treatyType: string; signatories: string[]; tick: number }): void {
+    // A treaty has been signed
+    // If we're one of the signatories, the treaty is already in our component
+    // This event is for other nations to track diplomatic changes
+    // Future: Update opinion values based on treaty type
+  }
+
+  /**
+   * Handle treaty expiration
+   */
+  private _onTreatyExpired(data: { nationId: string; nationName: string; treatyId: string; treatyName: string; treatyType: string; tick: number }): void {
+    // A treaty has expired
+    // This event is emitted by this system in updateDiplomacy()
+    // Other systems can react to treaty expirations
+    // Future: Trigger renegotiation, update diplomatic stance
+  }
+
+  /**
+   * Handle empire peace treaty signing
+   */
+  private _onEmpirePeaceTreatySigned(data: { empireId: string; empireName: string; treatyId: string; treatyName: string; terms: string[]; tick: number }): void {
+    // An empire-level peace treaty has been signed
+    // If our nation belongs to this empire, we may need to end wars with enemy nations
+    // This is coordinated by the EmpireSystem
+  }
+
+  /**
+   * Handle empire alliance formation
+   */
+  private _onEmpireAllianceFormed(data: { empireId: string; empireName: string; allyEmpireId: string; allyEmpireName: string; treatyId: string; tick: number }): void {
+    // Two empires have formed an alliance
+    // If our nation belongs to one of these empires, we may have new diplomatic relations
+    // This is coordinated by the EmpireSystem
+  }
+
+  /**
+   * Handle policy enactment (from governor decisions)
+   */
+  private _onPolicyEnacted(data: { nationId: string; nationName: string; policyName: string; category: string; tick: number }): void {
+    // Policy already enacted by GovernorDecisionExecutor
+    // This is notification-only - policy is already in nation component
+    // Future: Trigger economic/military/cultural effects based on policy category
+  }
+
+  /**
+   * Handle research prioritization (from governor decisions)
+   */
+  private _onResearchPrioritized(data: { nationId: string; nationName: string; field: string; priority: number; tick: number }): void {
+    // Research budget already increased by GovernorDecisionExecutor
+    // This is notification-only - budget is already updated
+    // Future: Create research project entity, assign researchers
+  }
+
+  /**
+   * Handle tax rate change (from governor decisions)
+   */
+  private _onTaxRateChanged(data: { nationId: string; nationName: string; oldTaxRate: number; newTaxRate: number; tick: number }): void {
+    // Tax rate already changed by GovernorDecisionExecutor
+    // This is notification-only - tax policy is already updated
+    // Future: Calculate provincial reactions, update unrest based on tax changes
   }
 
   /**

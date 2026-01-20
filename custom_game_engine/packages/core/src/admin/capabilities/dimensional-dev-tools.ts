@@ -12,7 +12,7 @@ const dimensionalDevTools = defineCapability({
   id: 'dimensional_dev_tools',
   name: 'Dimensional Dev Tools',
   description: 'Spawn dimensional buildings, portals, and test magic',
-  category: 'development',
+  category: 'systems' as const,
 
   queries: [
     defineQuery({
@@ -79,12 +79,12 @@ const dimensionalDevTools = defineCapability({
       name: 'Spawn Dimensional Rift',
       description: 'Create a portal/rift between dimensional states',
       params: [
-        { name: 'x', type: 'number', required: true },
-        { name: 'y', type: 'number', required: true },
-        { name: 'sourceDimensions', type: 'number', required: false, default: 3, description: '2, 3, 4, 5, or 6' },
-        { name: 'targetDimensions', type: 'number', required: false, default: 4 },
-        { name: 'stability', type: 'number', required: false, default: 1.0, description: '0-1, 1 = permanent' },
-        { name: 'radius', type: 'number', required: false, default: 2, description: 'Rift size' }
+        { name: 'x', type: 'number' as const, required: true, description: 'X coordinate' },
+        { name: 'y', type: 'number' as const, required: true, description: 'Y coordinate' },
+        { name: 'sourceDimensions', type: 'number' as const, required: false, description: '2, 3, 4, 5, or 6', default: 3 },
+        { name: 'targetDimensions', type: 'number' as const, required: false, description: 'Target dimensions', default: 4 },
+        { name: 'stability', type: 'number' as const, required: false, description: '0-1, 1 = permanent', default: 1.0 },
+        { name: 'radius', type: 'number' as const, required: false, description: 'Rift size', default: 2 }
       ],
       handler: async (params, gameClient, context) => {
         return {

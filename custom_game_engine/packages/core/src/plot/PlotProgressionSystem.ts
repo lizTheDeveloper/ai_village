@@ -64,11 +64,11 @@ export class PlotProgressionSystem extends BaseSystem {
    * Progress all active plots for a soul
    */
   private progressSoulPlots(soul: Entity, world: World): void {
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
     if (!plotLines) return;
 
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!identity || !thread) return;
 
@@ -90,7 +90,7 @@ export class PlotProgressionSystem extends BaseSystem {
     agent: Entity | null,
     world: World
   ): void {
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
     if (!plotLines) return;
 
     // Get the template to access completion/failure stages and transitions
@@ -131,7 +131,7 @@ export class PlotProgressionSystem extends BaseSystem {
     _agent: Entity | null,
     world: World
   ): boolean {
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
     if (!thread) return false;
 
     // If no conditions, auto-transition (narrative beats)
@@ -174,7 +174,7 @@ export class PlotProgressionSystem extends BaseSystem {
     const toStageName = toStage.name;
 
 
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
     if (!thread) return;
 
     const narrativePressure = getNarrativePressureSystem();
@@ -239,9 +239,9 @@ export class PlotProgressionSystem extends BaseSystem {
    * Handle plot completion
    */
   private handlePlotCompletion(plot: PlotLineInstance, soul: Entity, _world: World): void {
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!plotLines || !identity || !thread) return;
 
@@ -255,7 +255,7 @@ export class PlotProgressionSystem extends BaseSystem {
     narrativePressure.removePlotStageAttractors(plot.instance_id, plot.current_stage);
 
     // Get soul link for incarnation number
-    const soulLink = soul.getComponent(ComponentType.SoulLink) as SoulLinkComponent | undefined;
+    const soulLink = soul.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
 
     // Add lesson from plot
     addLessonToSoul(identity, {
@@ -326,8 +326,8 @@ export class PlotProgressionSystem extends BaseSystem {
    * Handle plot failure
    */
   private handlePlotFailure(plot: PlotLineInstance, soul: Entity, _world: World): void {
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
     if (!plotLines || !thread) return;
 
@@ -362,7 +362,7 @@ export class PlotProgressionSystem extends BaseSystem {
       .executeEntities();
 
     for (const agent of agents) {
-      const link = agent.getComponent(ComponentType.SoulLink) as SoulLinkComponent | undefined;
+      const link = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
       if (link?.soul_id === soulId && link.is_primary_incarnation) {
         return agent;
       }

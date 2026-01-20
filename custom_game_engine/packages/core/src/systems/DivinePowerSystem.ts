@@ -193,7 +193,7 @@ export class DivinePowerSystem extends BaseSystem {
     }
 
     // Cannot afford maintenance - start dropping effects
-    this.events.emit('divine:maintenance_failed', {
+    this.emitGeneric('divine:maintenance_failed', {
       deityId,
       deityName: deity.identity.primaryName,
       maintenanceCost: totalCost,
@@ -248,7 +248,7 @@ export class DivinePowerSystem extends BaseSystem {
         divineAbility.removeBlessing(effect.id);
         divineAbility.removeActivePower(effect.id);
 
-        this.events.emit('divine:blessing_expired', {
+        this.emitGeneric('divine:blessing_expired', {
           deityId,
           deityName: deity.identity.primaryName,
           blessingId: effect.id,
@@ -261,7 +261,7 @@ export class DivinePowerSystem extends BaseSystem {
         divineAbility.removeCurse(effect.id);
         divineAbility.removeActivePower(effect.id);
 
-        this.events.emit('divine:curse_expired', {
+        this.emitGeneric('divine:curse_expired', {
           deityId,
           deityName: deity.identity.primaryName,
           curseId: effect.id,
@@ -301,7 +301,7 @@ export class DivinePowerSystem extends BaseSystem {
       divineAbility.removeBlessing(id);
       divineAbility.removeActivePower(id);
 
-      this.events.emit('divine:blessing_expired', {
+      this.emitGeneric('divine:blessing_expired', {
         deityId,
         deityName: deity.identity.primaryName,
         blessingId: id,
@@ -327,7 +327,7 @@ export class DivinePowerSystem extends BaseSystem {
       divineAbility.removeCurse(id);
       divineAbility.removeActivePower(id);
 
-      this.events.emit('divine:curse_expired', {
+      this.emitGeneric('divine:curse_expired', {
         deityId,
         deityName: deity.identity.primaryName,
         curseId: id,

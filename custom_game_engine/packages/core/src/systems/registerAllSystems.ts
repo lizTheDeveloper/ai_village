@@ -302,6 +302,7 @@ import { InvasionSystem } from './InvasionSystem.js';
 import { PortalSystem } from './PortalSystem.js';
 import { RealmTimeSystem } from './RealmTimeSystem.js';
 import { UniverseForkingSystem } from './UniverseForkingSystem.js';
+import { ParadoxDetectionSystem } from './ParadoxDetectionSystem.js';
 import { DivergenceTrackingSystem } from './DivergenceTrackingSystem.js';
 import { CanonEventSystem } from './CanonEventSystem.js';
 import { DeathJudgmentSystem } from './DeathJudgmentSystem.js';
@@ -331,6 +332,7 @@ import { AutonomicSystem } from '../decision/AutonomicSystem.js';
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
 import { VillageGovernanceSystem } from './VillageGovernanceSystem.js';
+import { CityGovernanceSystem } from './CityGovernanceSystem.js';
 import { ProvinceGovernanceSystem } from './ProvinceGovernanceSystem.js';
 import { NationSystem } from './NationSystem.js';  // Nation-level governance
 import { EmpireSystem } from './EmpireSystem.js';  // Empire-level governance
@@ -338,6 +340,7 @@ import { EmpireDiplomacySystem } from './EmpireDiplomacySystem.js';  // Inter-em
 import { EmpireWarSystem } from './EmpireWarSystem.js';  // Imperial war resolution
 import { FederationGovernanceSystem } from './FederationGovernanceSystem.js';  // Federation governance
 import { GalacticCouncilSystem } from './GalacticCouncilSystem.js';  // Galactic Council governance
+import { InvasionPlotHandler } from './InvasionPlotHandler.js';  // Phase 4: Multiverse invasion plots
 import { GovernorDecisionSystem } from './GovernorDecisionSystem.js';  // Phase 6: AI Governance
 import { MetricsCollectionSystem } from './MetricsCollectionSystem.js';
 import { CityDirectorSystem } from './CityDirectorSystem.js';
@@ -459,6 +462,8 @@ export interface SystemRegistrationResult {
   realmManager: RealmManager;
   /** ChunkLoadingSystem instance (if chunkManager and terrainGenerator were provided) */
   chunkLoadingSystem?: ChunkLoadingSystem;
+  /** FatesCouncilSystem instance (if llmQueue was provided) */
+  fatesCouncilSystem?: FatesCouncilSystem;
 }
 
 /**
@@ -995,6 +1000,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PassageTraversalSystem());  // Inter-universe passage traversal (priority 90)
   gameLoop.systemRegistry.register(new TimelineMergerSystem());  // Timeline merge compatibility and operations (priority 95)
   gameLoop.systemRegistry.register(new InvasionSystem());  // Multiverse invasion mechanics (priority 100)
+  gameLoop.systemRegistry.register(new ParadoxDetectionSystem());  // Paradox detection and resolution (priority 220)
   gameLoop.systemRegistry.register(new PortalSystem());
   gameLoop.systemRegistry.register(new RealmTimeSystem());
   // RealmManager registered below with variable (line 666)
@@ -1081,8 +1087,10 @@ export function registerAllSystems(
 
   // Fates Council - Exotic/Epic plot weaving (priority 999, end of day)
   // Requires LLM provider for Fates conversations
+  let fatesCouncilSystem: FatesCouncilSystem | undefined;
   if (llmQueue) {
-    registerDisabled(new FatesCouncilSystem(llmQueue));
+    fatesCouncilSystem = new FatesCouncilSystem(llmQueue);
+    registerDisabled(fatesCouncilSystem);
   }
 
   // ============================================================================
@@ -1120,12 +1128,14 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(governanceDataSystem);
   gameLoop.systemRegistry.register(new CityDirectorSystem());
   gameLoop.systemRegistry.register(new VillageGovernanceSystem());
+  gameLoop.systemRegistry.register(new CityGovernanceSystem());
   gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
   gameLoop.systemRegistry.register(new NationSystem());  // Nation-level governance (priority 195)
   gameLoop.systemRegistry.register(new EmpireSystem());  // Empire-level governance (priority 200)
   gameLoop.systemRegistry.register(new EmpireDiplomacySystem());  // Inter-empire diplomacy (priority 202)
   gameLoop.systemRegistry.register(new FederationGovernanceSystem());  // Federation governance (priority 205)
   gameLoop.systemRegistry.register(new GalacticCouncilSystem());  // Galactic Council governance (priority 210)
+  gameLoop.systemRegistry.register(new InvasionPlotHandler());  // Multiverse invasion plot assignment (priority 215)
   gameLoop.systemRegistry.register(new EmpireWarSystem());  // Empire war resolution (priority 605, combat phase)
   gameLoop.systemRegistry.register(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
 
@@ -1181,5 +1191,6 @@ export function registerAllSystems(
     marketEventSystem,
     realmManager,
     chunkLoadingSystem,
+    fatesCouncilSystem,
   };
 }

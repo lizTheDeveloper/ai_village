@@ -201,7 +201,7 @@ export class ProvinceGovernanceSystem extends BaseSystem {
       data: {
         provinceId: entity.id,
         provinceName: governance.provinceName,
-        newGovernor,
+        newGovernor: newGovernor || '',
         tick: world.tick,
       },
     });

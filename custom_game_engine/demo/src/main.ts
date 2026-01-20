@@ -2791,7 +2791,8 @@ function setupDebugAPI(
   resourcesPanel: ResourcesPanel,
   devPanelInstance: DevPanel,
   agentDebugManager: AgentDebugManager,
-  skillTreePanel: SkillTreePanel
+  skillTreePanel: SkillTreePanel,
+  fatesCouncilSystem?: any
 ) {
   (window as any).game = {
     world: gameLoop.world,
@@ -3233,6 +3234,58 @@ function setupDebugAPI(
 
     // Game Introspection API - runtime entity introspection with schema validation
     introspection: (gameLoop.world as any).__introspectionAPI || null,
+
+    // Fates Council Debug Tools
+    triggerFatesCouncil: () => {
+      if (!fatesCouncilSystem) {
+        console.error('[FatesCouncil] System not available (requires LLM provider)');
+        return false;
+      }
+      const enabled = gameLoop.systemRegistry.isEnabled('fates_council');
+      if (!enabled) {
+        console.error('[FatesCouncil] System is disabled. Build a library or university to unlock.');
+        return false;
+      }
+      console.log('[FatesCouncil] Manually triggering Fates Council...');
+      // Trigger council by calling conductFatesCouncil directly
+      const currentDay = Math.floor(gameLoop.world.tick / (20 * 60 * 60 * 24));
+      (fatesCouncilSystem as any).conductFatesCouncil(gameLoop.world, gameLoop.world.tick, currentDay);
+      return true;
+    },
+
+    getFatesCouncilStatus: () => {
+      if (!fatesCouncilSystem) {
+        return { available: false, reason: 'System not available (requires LLM provider)' };
+      }
+      const enabled = gameLoop.systemRegistry.isEnabled('fates_council');
+      const activeCouncil = (fatesCouncilSystem as any).activeCouncil;
+      return {
+        available: true,
+        enabled,
+        hasLLMProvider: !!(fatesCouncilSystem as any).llmProvider,
+        councilInProgress: !!activeCouncil,
+        lastCouncilDay: (fatesCouncilSystem as any).lastCouncilDay,
+        currentDay: Math.floor(gameLoop.world.tick / (20 * 60 * 60 * 24)),
+      };
+    },
+
+    getLastFatesTranscript: () => {
+      if (!fatesCouncilSystem) {
+        console.error('[FatesCouncil] System not available');
+        return null;
+      }
+      const activeCouncil = (fatesCouncilSystem as any).activeCouncil;
+      if (activeCouncil) {
+        return {
+          inProgress: true,
+          transcript: activeCouncil.transcript,
+          currentSpeaker: activeCouncil.currentSpeaker,
+          turnCount: activeCouncil.turnCount,
+        };
+      }
+      console.log('[FatesCouncil] No active council. Last council transcript not yet implemented.');
+      return null;
+    },
   };
 
   (window as any).promptLogger = promptLogger;
@@ -3724,6 +3777,13 @@ async function main() {
       height: canvas.height,
     }));
     console.log('[Main] ChunkLoadingSystem viewport provider configured');
+  }
+
+  // Set up LLM provider for FatesCouncilSystem
+  // The Fates use LLM-powered conversations to weave exotic/epic narratives
+  if (systemsResult.fatesCouncilSystem && llmProvider) {
+    systemsResult.fatesCouncilSystem.setLLMProvider(llmProvider);
+    console.log('[Main] FatesCouncilSystem LLM provider configured');
   }
 
   // Apply render settings from saved settings
@@ -4588,7 +4648,8 @@ async function main() {
   setupDebugAPI(
     gameLoop, renderer, placementUI, blueprintRegistry,
     panels.agentInfoPanel, panels.animalInfoPanel, panels.resourcesPanel,
-    devPanel, agentDebugManager, skillTreePanel
+    devPanel, agentDebugManager, skillTreePanel,
+    systemsResult.fatesCouncilSystem
   );
 
   // Game loop already started before soul creation

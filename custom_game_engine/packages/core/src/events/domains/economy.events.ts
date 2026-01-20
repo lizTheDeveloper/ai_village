@@ -356,28 +356,28 @@ export interface EconomyEvents {
   };
 
   // Shipping lane lifecycle events
-  'lane:created': {
+  'economy:lane:created': {
     laneId: string;
     originId: EntityId;
     destinationId: EntityId;
   };
 
-  'lane:removed': {
+  'economy:lane:removed': {
     laneId: string;
     reason?: string;
   };
 
-  'lane:abandoned': {
+  'economy:lane:abandoned': {
     laneId: string;
     ticksSinceLastUse: number;
   };
 
-  'lane:blocked': {
+  'economy:lane:blocked': {
     laneId: string;
     caravanId: string;
   };
 
-  'lane:caravan_departed': {
+  'economy:lane:caravan_departed': {
     caravanId: string;
     laneId: string;
     agreementId: string;
@@ -386,7 +386,7 @@ export interface EconomyEvents {
     destinationId: EntityId;
   };
 
-  'lane:caravan_arrived': {
+  'economy:lane:caravan_arrived': {
     caravanId: string;
     laneId: string;
     agreementId: string;
@@ -395,12 +395,12 @@ export interface EconomyEvents {
     travelTime: number;
   };
 
-  'lane:caravan_lost': {
+  'economy:lane:caravan_lost': {
     caravanId: string;
     reason: string;
   };
 
-  'lane:hazard_encountered': {
+  'economy:lane:hazard_encountered': {
     caravanId: string;
     laneId: string;
     hazardType: 'pirates' | 'weather' | 'monsters' | 'passage_instability';

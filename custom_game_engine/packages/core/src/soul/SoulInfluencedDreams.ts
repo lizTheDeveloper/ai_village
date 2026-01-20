@@ -47,15 +47,15 @@ export function generateSoulDream(
   world: World
 ): SoulDream | null {
   // Check if agent has a soul
-  const soulLink = agent.getComponent(ComponentType.SoulLink) as SoulLinkComponent | undefined;
+  const soulLink = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
   if (!soulLink) return null;
 
   // Get soul entity
   const soul = world.getEntity(soulLink.soul_id);
   if (!soul) return null;
 
-  const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-  const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+  const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
+  const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
 
   if (!identity || !thread) return null;
 
@@ -439,7 +439,7 @@ export function shouldReceiveSoulDream(
   agent: Entity,
   world: World
 ): boolean {
-  const soulLink = agent.getComponent(ComponentType.SoulLink) as SoulLinkComponent | undefined;
+  const soulLink = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
   if (!soulLink) return false;
 
   const soul = world.getEntity(soulLink.soul_id);

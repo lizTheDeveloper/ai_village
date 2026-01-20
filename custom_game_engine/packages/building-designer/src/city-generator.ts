@@ -332,7 +332,7 @@ const DISTRICT_BUILDINGS: Record<DistrictType, VoxelBuildingDefinition[]> = buil
 
 // District adjacency preferences (loaded from city-config.json)
 export const DISTRICT_AFFINITIES: Record<DistrictType, { prefer: DistrictType[]; avoid: DistrictType[] }> =
-  cityConfig.districtAffinities as Record<DistrictType, { prefer: DistrictType[]; avoid: DistrictType[] }>;
+  cityConfig.districtAffinities as unknown as Record<DistrictType, { prefer: DistrictType[]; avoid: DistrictType[] }>;
 
 // =============================================================================
 // UTILITY FUNCTIONS

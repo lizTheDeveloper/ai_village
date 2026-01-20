@@ -250,7 +250,7 @@ interface DevDivineResource {
   min: number;
   max: number;
   section: DevSection;
-  category?: 'belief' | 'power_tier' | 'attribute' | 'entity';
+  category?: 'belief' | 'energy' | 'power_tier' | 'attribute' | 'entity';
 }
 
 /**

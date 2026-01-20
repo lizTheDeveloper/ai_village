@@ -83,8 +83,13 @@ const SpeechBubbleElement: React.FC<{
         {/* Speech text - with alien text if available */}
         {hasAlienText ? (
           <HoverableAlienText
-            tokens={bubble.alienTokens!}
-            stylePreset="speech-bubble"
+            renderedText={{
+              fullText: bubble.alienTokens!.map(t => t.alien).join(' '),
+              tokens: bubble.alienTokens!,
+              translation: bubble.text,
+              languageId: 'unknown',
+            }}
+            style="speech-bubble"
             tooltipDelay={200}
           />
         ) : (

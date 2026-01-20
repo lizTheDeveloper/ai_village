@@ -152,6 +152,10 @@ export class FatesCouncilSystem extends BaseSystem {
   private recentExoticEvents: ExoticEvent[] = [];
   private readonly EVENT_RETENTION_DAYS = 1;  // Keep events for 1 day
 
+  // Epic plot scanning
+  private lastEpicScanTick = 0;
+  private readonly EPIC_SCAN_INTERVAL = 50000;  // ~40 minutes real time at 20 TPS
+
   // Active council tracking
   private activeCouncil?: {
     context: FatesCouncilContext;
@@ -218,6 +222,9 @@ export class FatesCouncilSystem extends BaseSystem {
     // Council time!
     this.lastCouncilDay = currentDay;
     this.conductFatesCouncil(ctx.world, ctx.tick, currentDay);
+
+    // After council, scan for epic ascensions (periodic)
+    this.scanForEpicAscensions(ctx.world, ctx.tick);
   }
 
   /**
@@ -320,7 +327,7 @@ export class FatesCouncilSystem extends BaseSystem {
     const hasRecentPlot = plotLines.active.some(p =>
       ((thread as any)?.head?.personal_tick ?? 0) - p.assigned_at_personal_tick < 10000
     );
-    const needsChallenge = !hasRecentPlot && ((soulIdentity as any).wisdom_level ?? 0) > 20;
+    const needsChallenge = !hasRecentPlot && (soulIdentity.wisdom_level ?? 0) > 20;
 
     // Check if overwhelmed
     const overwhelmed = plotLines.active.length > 5;
@@ -334,10 +341,10 @@ export class FatesCouncilSystem extends BaseSystem {
     return {
       entityId: soul.id,
       entityType: 'soul',
-      name: (soulIdentity as any).soulName || soul.id,
+      name: soulIdentity.true_name || soul.id,
       activePlots: activePlotIds,
       completedPlots: plotLines.completed.length,
-      wisdom: (soulIdentity as any).wisdom_level ?? 0,
+      wisdom: soulIdentity.wisdom_level ?? 0,
       recentActions: [],  // TODO: Extract from recent events
       storyPotential,
       needsChallenge,
@@ -864,7 +871,7 @@ export class FatesCouncilSystem extends BaseSystem {
       return;
     }
 
-    // Get or create PlotLines component
+    // Get PlotLines component
     const plotLines = entity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
     if (!plotLines) {
       console.warn(`[FatesCouncilSystem] Entity ${entityId} has no PlotLines component - skipping plot assignment`);
@@ -874,7 +881,7 @@ export class FatesCouncilSystem extends BaseSystem {
     // Get soul ID (for souls) or use entity ID
     const soulIdentity = entity.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
     const thread = entity.getComponent(CT.SilverThread);
-    const soulId = (soulIdentity as any)?.soulName || entityId;
+    const soulId = soulIdentity?.true_name || entityId;
     const personalTick = (thread as any)?.head?.personal_tick || tick;
 
     // Instantiate plot
@@ -890,8 +897,14 @@ export class FatesCouncilSystem extends BaseSystem {
       return;
     }
 
-    // Add to active plots (modifies plotLines in-place)
-    addActivePlot(plotLines, plotInstance);
+    // Create updated PlotLines component with new plot (immutable pattern)
+    const updatedPlotLines: PlotLinesComponent = {
+      ...plotLines,
+      active: [...plotLines.active, plotInstance],
+    };
+
+    // Update the component in the world
+    (world as any).addComponent(entityId, updatedPlotLines);
 
     console.log(`[FatesCouncilSystem] ✨ The Fates weave: ${plotTemplateId} → ${soulId}`);
     console.log(`[FatesCouncilSystem]    Reasoning: ${reasoning}`);
@@ -1107,6 +1120,270 @@ export class FatesCouncilSystem extends BaseSystem {
     if (dayProgress < 0.5) return 'morning';
     if (dayProgress < 0.75) return 'afternoon';
     return 'evening';
+  }
+
+  /**
+   * Scan for souls ready for epic ascension plots
+   *
+   * Epic plots are assigned based on:
+   * - Wisdom >= 100
+   * - Completed 5+ large-scale plots
+   * - Lesson/affinity-based template selection
+   * - Periodic scan every 50,000 ticks (~40 minutes real time)
+   */
+  private scanForEpicAscensions(world: World, tick: number): void {
+    // Throttle to scan interval
+    if (tick - this.lastEpicScanTick < this.EPIC_SCAN_INTERVAL) {
+      return;
+    }
+
+    this.lastEpicScanTick = tick;
+
+    console.log('[FatesCouncilSystem] The Fates scan for souls ready for ascension...');
+
+    // Query souls with required components
+    const souls = world.query()
+      .with(CT.SoulIdentity)
+      .with(CT.PlotLines)
+      .executeEntities();
+
+    let eligibleCount = 0;
+    let assignedCount = 0;
+
+    for (const soul of souls) {
+      const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent;
+      const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent;
+
+      if (!soulIdentity || !plotLines) continue;
+
+      // Check eligibility
+      if (!this.isEligibleForEpicPlot(soulIdentity, plotLines)) {
+        continue;
+      }
+
+      eligibleCount++;
+
+      // Select appropriate epic template
+      const templateId = this.selectEpicTemplate(soul, soulIdentity, plotLines, world);
+
+      if (!templateId) {
+        console.log(`[FatesCouncilSystem] Soul ${soulIdentity.true_name} eligible but no matching epic template`);
+        continue;
+      }
+
+      // Assign the epic plot
+      const thread = soul.getComponent(CT.SilverThread);
+      const personalTick = (thread as any)?.head?.personal_tick || tick;
+
+      console.log(`[FatesCouncilSystem] ✨ EPIC ASCENSION: ${soulIdentity.true_name} → ${templateId} (wisdom: ${soulIdentity.wisdom_level})`);
+
+      this.assignPlotToEntity(
+        soul.id,
+        templateId,
+        world,
+        tick,
+        `Epic ascension granted by the Fates for reaching wisdom ${soulIdentity.wisdom_level}`,
+        {}
+      );
+
+      assignedCount++;
+    }
+
+    if (eligibleCount > 0) {
+      console.log(`[FatesCouncilSystem] Epic scan complete: ${eligibleCount} eligible, ${assignedCount} assigned`);
+    }
+  }
+
+  /**
+   * Check if soul is eligible for epic plot assignment
+   */
+  private isEligibleForEpicPlot(
+    soulIdentity: SoulIdentityComponent,
+    plotLines: PlotLinesComponent
+  ): boolean {
+    // Must have wisdom >= 100
+    if ((soulIdentity.wisdom_level ?? 0) < 100) {
+      return false;
+    }
+
+    // Must have completed 5+ large-scale plots
+    const largePlotCount = plotLines.completed.filter(p => {
+      // Count large and epic plots
+      const template = plotLineRegistry.getTemplate(p.template_id);
+      return template && (template.scale === 'large' || template.scale === 'epic');
+    }).length;
+
+    if (largePlotCount < 5) {
+      return false;
+    }
+
+    // Must not have an active epic plot
+    const hasActiveEpic = plotLines.active.some(p => {
+      const template = plotLineRegistry.getTemplate(p.template_id);
+      return template && template.scale === 'epic';
+    });
+
+    if (hasActiveEpic) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Select epic template based on soul's lessons and affinities
+   *
+   * Template selection logic:
+   * - Fae Ascension: nature_harmony OR communion_with_wild, has nature skills
+   * - Enochian Ascension: purity OR divine_devotion, has strong deity relationship
+   * - Exaltation Path: family_creation OR legacy_building, has many descendants
+   * - Default: Random if wisdom >= 100 but no clear affinity
+   */
+  private selectEpicTemplate(
+    entity: Entity,
+    soulIdentity: SoulIdentityComponent,
+    plotLines: PlotLinesComponent,
+    world: World
+  ): string | null {
+    // Extract lesson IDs
+    const lessonIds = soulIdentity.lessons_learned.map(l => l.lesson_id);
+    const lessonInsights = soulIdentity.lessons_learned.map(l => l.insight.toLowerCase());
+
+    // Check for Fae Ascension affinity
+    const hasNatureAffinity =
+      lessonIds.some(id => id.includes('nature') || id.includes('wild') || id.includes('harmony')) ||
+      lessonInsights.some(insight =>
+        insight.includes('nature') ||
+        insight.includes('wild') ||
+        insight.includes('communion') ||
+        insight.includes('druid')
+      );
+
+    const hasNatureSkills = this.hasSkillAffinity(entity, ['gathering', 'farming', 'animal_handling']);
+
+    if (hasNatureAffinity && hasNatureSkills) {
+      return 'epic_endless_summer';
+    }
+
+    // Check for Enochian Ascension affinity
+    const hasPurityAffinity =
+      lessonIds.some(id => id.includes('purity') || id.includes('divine') || id.includes('devotion')) ||
+      lessonInsights.some(insight =>
+        insight.includes('purity') ||
+        insight.includes('divine') ||
+        insight.includes('devotion') ||
+        insight.includes('angel') ||
+        insight.includes('celestial')
+      );
+
+    const hasStrongDeityRelationship = this.hasDeityRelationship(entity, world, 90);
+
+    if (hasPurityAffinity && hasStrongDeityRelationship) {
+      return 'epic_enochian_ascension';
+    }
+
+    // Check for Exaltation Path affinity
+    const hasFamilyAffinity =
+      lessonIds.some(id => id.includes('family') || id.includes('legacy') || id.includes('descendant')) ||
+      lessonInsights.some(insight =>
+        insight.includes('family') ||
+        insight.includes('legacy') ||
+        insight.includes('descendant') ||
+        insight.includes('children') ||
+        insight.includes('creation')
+      );
+
+    const hasDescendants = this.countDescendants(entity, world) >= 10;
+
+    if (hasFamilyAffinity && hasDescendants) {
+      return 'epic_exaltation_path';
+    }
+
+    // Default: If no clear affinity but eligible, pick based on strongest tendency
+    console.log(`[FatesCouncilSystem] No clear epic affinity for ${soulIdentity.true_name}, selecting default based on lessons`);
+
+    // Count affinity scores
+    const scores = {
+      nature: (hasNatureAffinity ? 2 : 0) + (hasNatureSkills ? 1 : 0),
+      purity: (hasPurityAffinity ? 2 : 0) + (hasStrongDeityRelationship ? 1 : 0),
+      family: (hasFamilyAffinity ? 2 : 0) + (hasDescendants ? 1 : 0),
+    };
+
+    // Pick highest score
+    const maxScore = Math.max(scores.nature, scores.purity, scores.family);
+    if (maxScore === 0) {
+      // No affinity at all - pick random
+      const templates = ['epic_endless_summer', 'epic_enochian_ascension', 'epic_exaltation_path'];
+      return templates[Math.floor(Math.random() * templates.length)] || null;
+    }
+
+    if (scores.nature === maxScore) return 'epic_endless_summer';
+    if (scores.purity === maxScore) return 'epic_enochian_ascension';
+    if (scores.family === maxScore) return 'epic_exaltation_path';
+
+    return null;
+  }
+
+  /**
+   * Check if entity has skill affinity (any skill at level 2+)
+   */
+  private hasSkillAffinity(entity: Entity, skills: string[]): boolean {
+    const skillsComp = entity.getComponent(CT.Skills);
+    if (!skillsComp) return false;
+
+    const levels = (skillsComp as any).levels || {};
+    return skills.some(skill => (levels[skill] ?? 0) >= 2);
+  }
+
+  /**
+   * Check if entity has strong deity relationship
+   */
+  private hasDeityRelationship(entity: Entity, world: World, minTrust: number): boolean {
+    const relationships = entity.getComponent(CT.Relationship);
+    if (!relationships) return false;
+
+    const relMap = (relationships as any).relationships || new Map();
+
+    // Check all relationships for deity with high trust
+    for (const [targetId, rel] of relMap.entries()) {
+      const targetEntity = world.getEntity(targetId);
+      if (!targetEntity) continue;
+
+      const isDeity = targetEntity.hasComponent(CT.Deity);
+      if (!isDeity) continue;
+
+      const trust = rel.trust ?? 0;
+      if (trust >= minTrust) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Count descendants of entity
+   */
+  private countDescendants(entity: Entity, world: World): number {
+    // Check for parenting component
+    const parenting = entity.getComponent(CT.Parenting);
+    if (!parenting) return 0;
+
+    const responsibilities = (parenting as any).children || [];
+    let count = responsibilities.length;
+
+    // Recursively count descendants
+    for (const resp of responsibilities) {
+      const childId = typeof resp === 'string' ? resp : (resp as any).childId;
+      if (!childId) continue;
+
+      const childEntity = world.getEntity(childId);
+      if (childEntity) {
+        count += this.countDescendants(childEntity, world);
+      }
+    }
+
+    return count;
   }
 
   protected onCleanup(): void {

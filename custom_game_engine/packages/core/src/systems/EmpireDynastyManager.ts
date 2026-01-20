@@ -110,22 +110,28 @@ function getCandidates(
       continue;
     }
 
-    // Get agent component for name and age
+    // Get agent component
     const agent = entity.getComponent<AgentComponent>(CT.Agent);
     if (!agent) {
       continue;
     }
 
-    // Calculate age (assume 1 tick = 1 day, 365 ticks/year)
-    const age = agent.age ?? 25; // Default to 25 if not set
+    // Get identity for name and age
+    const identity = entity.getComponent(CT.Identity);
+    if (!identity) {
+      continue;
+    }
+
+    // Calculate age from identity
+    const age = (identity as any).age ?? 25; // Default to 25 if not set
 
     // Get skills
     const skillsComp = entity.getComponent<SkillsComponent>(CT.Skills);
-    const skills = skillsComp?.skills ?? new Map();
+    const skills = skillsComp ? new Map(Object.entries(skillsComp.levels)) : new Map();
 
-    // Get traits
+    // Get personality traits (using personality component properties as proxy for traits)
     const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
-    const traits = personality?.traits ?? [];
+    const traits: string[] = [];
 
     // Update legitimacy factors
     const updatedDynasty = updateLegitimacyFactors(
@@ -147,7 +153,7 @@ function getCandidates(
 
     candidates.push({
       agentId: entity.id,
-      agentName: agent.name,
+      agentName: (identity as any).name ?? 'Unknown',
       dynastyComponent: updatedDynasty,
       legitimacy,
       age,

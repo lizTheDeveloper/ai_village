@@ -23,6 +23,7 @@
   },
   "include": [],
   "references": [
+    { "path": "./packages/hierarchy-simulator" },
     { "path": "./packages/introspection" },
     { "path": "./packages/building-designer" },
     { "path": "./packages/core" },

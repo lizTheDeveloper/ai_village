@@ -20,6 +20,7 @@ import { MEDIUM_PLOT_TEMPLATES } from './templates/MediumPlotTemplates.js';
 import { LARGE_PLOT_TEMPLATES } from './templates/LargePlotTemplates.js';
 import { EXOTIC_PLOT_TEMPLATES } from './templates/ExoticPlotTemplates.js';
 import { EPIC_PLOT_TEMPLATES } from './templates/EpicPlotTemplates.js';
+import { ISEKAI_PLOT_TEMPLATES } from './templates/IsekaiPlotTemplates.js';
 
 /**
  * MICRO: Moment of Courage
@@ -263,11 +264,12 @@ export const ALL_PLOT_TEMPLATES: PlotLineTemplate[] = [
   ...LARGE_PLOT_TEMPLATES,
   ...EXOTIC_PLOT_TEMPLATES,
   ...EPIC_PLOT_TEMPLATES,
+  ...ISEKAI_PLOT_TEMPLATES,
 ];
 
 /**
  * Initialize plot templates - call this during game startup
- * Registers all plot templates from all scales (micro, small, medium, large, exotic, epic)
+ * Registers all plot templates from all scales (micro, small, medium, large, exotic, epic, isekai)
  */
 export function initializePlotTemplates(): void {
   console.log(`[PlotTemplates] Registering ${ALL_PLOT_TEMPLATES.length} plot templates...`);

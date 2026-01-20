@@ -676,14 +676,14 @@ export interface SpaceEvents {
     outcome: 'survived' | 'damaged' | 'destroyed';
   };
 
-  /** Shipping lane blocked */
-  'lane:blocked': {
+  /** Shipping lane blocked (space context) */
+  'space:lane:blocked': {
     laneId: string;
     caravanId?: string;
   };
 
-  /** Shipping lane abandoned due to lack of use */
-  'lane:abandoned': {
+  /** Shipping lane abandoned due to lack of use (space context) */
+  'space:lane:abandoned': {
     laneId: string;
     ticksSinceLastUse: number;
   };
