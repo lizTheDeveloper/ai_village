@@ -48,6 +48,12 @@ export interface WorldEvents {
     yearsCovered: number;
     soulCount: number;
   };
+  'time:throttles_updated': {
+    timeScale: number;
+    previousScale: number;
+    throttledSystems: string[];
+    disabledSystems: string[];
+  };
 
   // === Statistical Mode Events ===
   'time:entered_statistical_mode': {

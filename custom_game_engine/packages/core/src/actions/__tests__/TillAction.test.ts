@@ -962,9 +962,8 @@ describe('Tilling Action', () => {
       };
 
       // Create agent without a hoe
-      const agentId = world.createEntity();
-      const agent = world.getEntity(agentId);
-      agent?.addComponent({
+      const agent = world.createEntity();
+      world.addComponent(agent.id, {
         type: 'inventory' as const,
         slots: [],
         capacity: 10,
@@ -972,7 +971,7 @@ describe('Tilling Action', () => {
       });
 
       // Should throw when agent has no hoe
-      expect(() => soilSystem.tillTile(world, tile, 5, 5, agentId)).toThrow(
+      expect(() => soilSystem.tillTile(world, tile, 5, 5, agent.id)).toThrow(
         /no working hoe/i
       );
     });

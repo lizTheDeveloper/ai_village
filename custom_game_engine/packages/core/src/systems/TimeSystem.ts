@@ -212,10 +212,9 @@ export class TimeSystem extends BaseSystem {
 
       // Emit season change event if season changed
       if (this.lastSeason !== null && this.lastSeason !== newSeason) {
-        ctx.emit('time:season_changed', {
-          season: newSeason,
-          oldSeason: this.lastSeason,
+        ctx.emit('time:season_change', {
           newSeason,
+          oldSeason: this.lastSeason,
         }, entity.id);
       }
 

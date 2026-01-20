@@ -1924,3 +1924,10 @@ export class BuildingBlueprintRegistry {
     }
   }
 }
+
+/**
+ * Global singleton instance of BuildingBlueprintRegistry.
+ * Pre-loaded with all default blueprints.
+ */
+export const buildingBlueprintRegistry = new BuildingBlueprintRegistry();
+buildingBlueprintRegistry.registerDefaults();
