@@ -862,8 +862,7 @@ export class Renderer {
       return;
     }
 
-    // TODO: Re-enable blueprint lookups when buildingBlueprintRegistry is available
-    const blueprint = null; // buildingBlueprintRegistry.tryGet(building.buildingType);
+    const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType) as BuildingBlueprint | null;
     if (!blueprint) {
       this.selectedDimensionalBuildingId = null;
       this.dimensionalControls.hideAll();

@@ -45,6 +45,7 @@ export class ThreatResponseSystem extends BaseSystem {
   protected readonly throttleInterval = 5; // Every 5 ticks (~0.25 seconds)
 
   protected onUpdate(ctx: SystemContext): void {
+    this.ctx = ctx; // Store context for helper methods
     for (const entity of ctx.activeEntities) {
       this.processEntity(entity, ctx.world);
     }
@@ -176,10 +177,109 @@ export class ThreatResponseSystem extends BaseSystem {
       return true; // Dangerous wild animals are hostile
     }
 
-    // TODO: Check faction/team relationships when those systems exist
+    // Check nation relationships (diplomatic relations between nations)
+    // Note: This uses NationComponent.foreignPolicy.diplomaticRelations to determine hostility
+    // Agents don't have direct nation membership yet - this will be expanded when citizen
+    // components are added to track agent->village->city->province->nation hierarchy
+    const agentNation = this.findAgentNation(agent);
+    const otherNation = this.findAgentNation(other);
+
+    if (agentNation && otherNation && agentNation !== otherNation) {
+      const relationship = this.getNationRelationship(agentNation, otherNation);
+      // Hostile or at war = treat as hostile
+      if (relationship === 'hostile' || relationship === 'at_war') {
+        return true;
+      }
+    }
 
     return false;
   }
+
+  /**
+   * Find the nation an agent belongs to by checking proximity to villages/cities
+   * that are part of nations.
+   *
+   * TODO: Replace this with proper CitizenComponent when implemented
+   * Future: agent -> village -> city -> province -> nation hierarchy
+   */
+  private findAgentNation(agent: Entity): string | null {
+    // For now, check if agent has a position and find nearest governance structure
+    const position = agent.getComponent<PositionComponent>(CT.Position);
+    if (!position) return null;
+
+    // Check if agent is within a village with nation membership
+    const villages = this.ctx?.world.query()?.with?.(CT.VillageGovernance)?.executeEntities?.() ?? [];
+    for (const village of villages) {
+      const governance = village.getComponent<any>(CT.VillageGovernance);
+      const villagePos = village.getComponent<PositionComponent>(CT.Position);
+
+      if (!governance || !villagePos) continue;
+
+      // Check if agent is within village bounds (rough proximity check)
+      const dx = position.x - villagePos.x;
+      const dy = position.y - villagePos.y;
+      const distSq = dx * dx + dy * dy;
+
+      // If within 50 tiles of village center, consider them part of that village
+      if (distSq < 50 * 50) {
+        // Check if village is part of a city
+        if (governance.cityId) {
+          const city = this.ctx?.world.getEntity(governance.cityId);
+          const cityGovernance = city?.getComponent<any>(CT.CityGovernance);
+          if (cityGovernance?.provinceId) {
+            // Check if province is part of a nation
+            const province = this.ctx?.world.getEntity(cityGovernance.provinceId);
+            const provinceComp = province?.getComponent<any>(CT.Province);
+            if (provinceComp?.nationId) {
+              return provinceComp.nationId;
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the diplomatic relationship between two nations.
+   *
+   * @param nationId1 - First nation entity ID
+   * @param nationId2 - Second nation entity ID
+   * @returns Relationship type ('allied' | 'friendly' | 'neutral' | 'rival' | 'hostile' | 'at_war')
+   */
+  private getNationRelationship(
+    nationId1: string,
+    nationId2: string
+  ): 'allied' | 'friendly' | 'neutral' | 'rival' | 'hostile' | 'at_war' | null {
+    const nation1 = this.ctx?.world.getEntity(nationId1);
+    if (!nation1) return null;
+
+    const nationComp = nation1.getComponent<any>(CT.Nation);
+    if (!nationComp) return null;
+
+    // Check foreignPolicy.diplomaticRelations Map
+    const relation = nationComp.foreignPolicy.diplomaticRelations.get(nationId2);
+    if (relation) {
+      return relation.relationship;
+    }
+
+    // Check if nations are at war (in enemies array)
+    if (nationComp.foreignPolicy.enemies.includes(nationId2)) {
+      return 'at_war';
+    }
+
+    // Check if nations are allied (in allies array)
+    if (nationComp.foreignPolicy.allies.includes(nationId2)) {
+      return 'allied';
+    }
+
+    // Default to neutral if no explicit relationship
+    return 'neutral';
+  }
+
+  // Store context for use in helper methods
+  private ctx: SystemContext | null = null;
 
   private createThreatFromAgent(
     hostile: Entity,

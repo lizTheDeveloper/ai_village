@@ -693,6 +693,15 @@ export interface SpaceEvents {
     newContaminationRisk: number;
   };
 
+  /** Straggler solo jump succeeded */
+  'straggler:solo_jump_succeeded': {
+    shipId: string;
+    targetBranch: string;
+    attempt: number;
+    coherenceLoss: number;
+    newCoherence: number;
+  };
+
   /** Rescue squadron assigned to straggler */
   'straggler:rescue_assigned': {
     stragglerId: string;

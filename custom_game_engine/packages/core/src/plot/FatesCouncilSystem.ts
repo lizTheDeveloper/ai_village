@@ -899,11 +899,11 @@ export class FatesCouncilSystem extends BaseSystem {
     // Add to active plots
     addActivePlot(plotLines, plotInstance);
 
-    // Update component using entity's method
+    // Update component using World API
     if (entity.hasComponent(CT.PlotLines)) {
-      entity.removeComponent(CT.PlotLines);
+      world.removeComponent(entityId, CT.PlotLines);
     }
-    entity.addComponent(plotLines);
+    world.addComponent(entityId, plotLines);
 
     console.log(`[FatesCouncilSystem] ✨ The Fates weave: ${plotTemplateId} → ${soulId}`);
     console.log(`[FatesCouncilSystem]    Reasoning: ${reasoning}`);

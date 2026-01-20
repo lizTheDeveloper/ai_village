@@ -366,14 +366,36 @@ export class StragglerRecoverySystem extends BaseSystem {
 
     if (success) {
       // Solo jump succeeded!
-      // TODO: Actually move ship to target branch (requires β-space navigation integration)
+      // Update ship navigation state to reflect successful β-space jump
+      if (!ship.navigation.visited_branches.includes(targetBranch)) {
+        ship.navigation.visited_branches.push(targetBranch);
+      }
+
+      // Apply minor coherence loss from solo jump stress
+      const coherenceLoss = 0.05;
+      ship.crew.coherence = Math.max(0, ship.crew.coherence - coherenceLoss);
+
+      // Mark straggler as recovered
       straggler.recoveryStatus = 'recovered';
       this.dirtyStragglersThisTick[shipId] = true;
+
+      // Emit success event
+      world.eventBus.emit({
+        type: 'straggler:solo_jump_succeeded',
+        source: shipId,
+        data: {
+          shipId,
+          targetBranch,
+          attempt: straggler.soloJumpAttempts,
+          coherenceLoss,
+          newCoherence: ship.crew.coherence,
+        },
+      });
 
       return {
         success: true,
         targetBranch,
-        coherenceLoss: 0.05, // Minor coherence loss from solo jump
+        coherenceLoss,
       };
     } else {
       // Solo jump failed - apply penalties
