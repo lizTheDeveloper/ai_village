@@ -17,6 +17,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
 import type { SpeciesComponent, SpeciesTrait } from '../components/SpeciesComponent.js';
 import type { SpeciesTemplate } from '../species/SpeciesRegistry.js';
+import { getSpeciesTemplate, createSpeciesFromTemplate } from '../species/SpeciesRegistry.js';
 
 /**
  * Registry of uplifted species templates
@@ -128,10 +129,20 @@ export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
 
   /**
    * Get source species template
-   * TODO: Integration point - query actual SpeciesRegistry
+   *
+   * Uses SpeciesRegistry for O(1) lookup of predefined species (human, elf, dwarf, etc).
+   * Falls back to entity search for custom/uplifted species not in the registry.
    */
   private getSourceSpeciesTemplate(world: World, speciesId: string): SpeciesComponent | null {
-    // Get any entity with this species
+    // First, try to get from SpeciesRegistry (O(1) lookup for predefined species)
+    const template = getSpeciesTemplate(speciesId);
+    if (template) {
+      // Convert SpeciesTemplate to SpeciesComponent
+      return createSpeciesFromTemplate(template);
+    }
+
+    // Fallback: Search entities for custom/uplifted species not in registry
+    // This handles uplifted species or dynamically created species
     const speciesEntities = world.query()
       .with(CT.Species)
       .executeEntities();

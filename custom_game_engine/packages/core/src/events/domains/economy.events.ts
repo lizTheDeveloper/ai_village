@@ -309,6 +309,103 @@ export interface EconomyEvents {
     newTier: number;
     techLevel: number;
   };
+
+  // Trade Network events (Tier 3)
+  'trade:network_formed': {
+    networkId: string;
+    scope: 'planet' | 'system' | 'sector';
+    nodeCount: number;
+    edgeCount: number;
+  };
+
+  'trade:hub_identified': {
+    networkId: string;
+    nodeId: EntityId;
+    betweenness: number;
+    tier: 'major' | 'minor';
+  };
+
+  'trade:chokepoint_detected': {
+    networkId: string;
+    nodeId: EntityId;
+    criticalityScore: number;
+    strategicValue: number;
+    affectedNodes: EntityId[];
+  };
+
+  'trade:network_resilience_low': {
+    networkId: string;
+    resilienceScore: number;
+    criticalNodeCount: number;
+  };
+
+  // Blockade events
+  'trade:blockade_started': {
+    blockadeId: string;
+    networkId: string;
+    targetNodeId: EntityId;
+    blockadingFaction: EntityId;
+    fleetStrength: number;
+  };
+
+  'trade:shortage_detected': {
+    nodeId: EntityId;
+    blockadeId: string;
+    blockadedChokepoint: EntityId;
+    severity: number;
+  };
+
+  // Shipping lane lifecycle events
+  'lane:created': {
+    laneId: string;
+    originId: EntityId;
+    destinationId: EntityId;
+  };
+
+  'lane:removed': {
+    laneId: string;
+    reason?: string;
+  };
+
+  'lane:abandoned': {
+    laneId: string;
+    ticksSinceLastUse: number;
+  };
+
+  'lane:blocked': {
+    laneId: string;
+    caravanId: string;
+  };
+
+  'lane:caravan_departed': {
+    caravanId: string;
+    laneId: string;
+    agreementId: string;
+    cargo: Array<{ itemId: string; quantity: number }>;
+    originId: EntityId;
+    destinationId: EntityId;
+  };
+
+  'lane:caravan_arrived': {
+    caravanId: string;
+    laneId: string;
+    agreementId: string;
+    cargo: Array<{ itemId: string; quantity: number }>;
+    destinationId: EntityId;
+    travelTime: number;
+  };
+
+  'lane:caravan_lost': {
+    caravanId: string;
+    reason: string;
+  };
+
+  'lane:hazard_encountered': {
+    caravanId: string;
+    laneId: string;
+    hazardType: 'pirates' | 'weather' | 'monsters' | 'passage_instability';
+    outcome: 'survived' | 'damaged' | 'destroyed';
+  };
 }
 
 export type EconomyEventType = keyof EconomyEvents;

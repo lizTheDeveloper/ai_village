@@ -105,6 +105,8 @@ import { VRSystem } from '../vr/VRSystem.js';
 
 // Fleet & Squadron Management
 import { NavySystem } from './NavySystem.js';
+import { NavyPersonnelSystem } from './NavyPersonnelSystem.js';
+import { ShipyardProductionSystem } from './ShipyardProductionSystem.js';
 import { ArmadaSystem } from './ArmadaSystem.js';
 import { FleetSystem } from './FleetSystem.js';
 import { SquadronSystem } from './SquadronSystem.js';

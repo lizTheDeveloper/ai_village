@@ -796,6 +796,35 @@ export class DivinePowerSystem extends BaseSystem {
       visionContent,
       cost,
     });
+
+    // EXOTIC PLOT EVENT: prophecy_given if vision contains prophetic content
+    // Check if content suggests future knowledge/destiny/warning
+    const lowerContent = visionContent.toLowerCase();
+    const isProphecy = lowerContent.includes('will') ||
+                       lowerContent.includes('shall') ||
+                       lowerContent.includes('destiny') ||
+                       lowerContent.includes('future') ||
+                       lowerContent.includes('warning') ||
+                       lowerContent.includes('come to pass');
+
+    if (isProphecy) {
+      const soulComp = target.getComponent(CT.Soul);
+      const prophecyType = lowerContent.includes('warning') || lowerContent.includes('doom') ? 'warning' :
+                           lowerContent.includes('blessing') ? 'blessing' :
+                           lowerContent.includes('death') || lowerContent.includes('fall') ? 'doom' :
+                           'destiny';
+
+      this.events.emit('divinity:prophecy_given', {
+        recipientId: request.targetId!,
+        soulId: (soulComp as any)?.soulId || request.targetId!,
+        deityId: request.deityId,
+        prophecyText: visionContent,
+        prophecyType,
+        inevitability: vision.clarity || 0.9, // High clarity = more inevitable
+        timeframe: 14400, // 2 game hours as default timeframe (7200 ticks = 1 hour at 20 TPS)
+        tick: currentTick,
+      });
+    }
   }
 
   /**

@@ -114,6 +114,8 @@ export enum ComponentType {
   MarketState = 'market_state',
   ShippingLane = 'shipping_lane',
   TradeCaravan = 'trade_caravan',
+  TradeNetwork = 'trade_network',  // Tier 3: Network topology
+  Blockade = 'blockade',  // Strategic chokepoint blockades
 
   // Research & Technology
   ResearchState = 'research_state',

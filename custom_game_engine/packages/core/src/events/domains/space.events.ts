@@ -395,6 +395,128 @@ export interface SpaceEvents {
     activeProjects: number;
   };
 
+  /** Navy personnel costs calculated */
+  'navy:personnel_costs_calculated': {
+    navyId: string;
+    totalCrew: number;
+    costBreakdown: {
+      baseSalaries: number;
+      officerTraining: number;
+      ncoTraining: number;
+      veteranBonuses: number;
+      totalCost: number;
+    };
+    tick: number;
+  };
+
+  /** Navy personnel budget shortfall */
+  'navy:personnel_budget_shortfall': {
+    navyId: string;
+    personnelBudget: number;
+    requiredBudget: number;
+    shortfall: number;
+    unpaidPercentage: number;
+  };
+
+  /** Navy officer academy upgraded */
+  'navy:academy_upgraded': {
+    navyId: string;
+    oldQuality: number;
+    newQuality: number;
+    costIncrease: number;
+  };
+
+  /** Navy NCO training upgraded */
+  'navy:nco_training_upgraded': {
+    navyId: string;
+    oldQuality: number;
+    newQuality: number;
+    costIncrease: number;
+  };
+
+  // === Shipyard Production Events ===
+
+  /** Shipyard construction started */
+  'shipyard:construction_started': {
+    navyId: string;
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    requiredCapacity: number;
+    budgetRequired: number;
+    estimatedCompletionTick: number;
+  };
+
+  /** Shipyard construction delayed */
+  'shipyard:construction_delayed': {
+    navyId: string;
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    reason: string;
+    missingResources: string[];
+  };
+
+  /** Shipyard construction completed */
+  'shipyard:construction_completed': {
+    navyId: string;
+    projectId: string;
+    shipId: EntityId;
+    shipType: string;
+    shipName: string;
+    constructionTime: number;
+    budgetSpent: number;
+  };
+
+  /** Shipyard construction cancelled */
+  'shipyard:construction_cancelled': {
+    navyId: string;
+    projectId: string;
+    shipType: string;
+    shipName: string;
+    progress: number;
+    budgetRefund: number;
+  };
+
+  /** Navy budget allocated (annual cycle) */
+  'navy:budget_allocated': {
+    navyId: string;
+    totalBudget: number;
+    allocation: {
+      newConstruction: number;
+      maintenance: number;
+      personnel: number;
+      researchAndDevelopment: number;
+      reserves: number;
+    };
+    tick: number;
+  };
+
+  /** Navy maintenance deferred (insufficient budget) */
+  'navy:maintenance_deferred': {
+    navyId: string;
+    totalShips: number;
+    shipsCanMaintain: number;
+    deferredShips: number;
+    readinessPenalty: number;
+  };
+
+  /** Navy readiness decreased (budget/maintenance issues) */
+  'navy:readiness_decreased': {
+    navyId: string;
+    oldReadiness: number;
+    newReadiness: number;
+    reason: 'maintenance_deficit' | 'personnel_crisis' | 'budget_shortfall';
+  };
+
+  /** Navy research completed (tech upgrade unlocked) */
+  'navy:research_completed': {
+    navyId: string;
+    researchType: 'coherence_threshold' | 'decoherence_mitigation' | 'observation_precision' | 'ship_type';
+    improvement: number;
+    newCapability?: string;
+  };
+
   // === Squadron Events ===
 
   /** Squadron battle started */

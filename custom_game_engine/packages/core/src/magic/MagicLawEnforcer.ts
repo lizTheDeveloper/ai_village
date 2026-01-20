@@ -287,7 +287,12 @@ export class MagicLawEnforcer {
     for (const combo of forbiddenCombos) {
       const hasBoth = combo.paradigms.every(p => knownParadigms.includes(p));
       if (hasBoth) {
-        throw new Error(`Forbidden paradigm combination: ${combo.reason}`);
+        // EXOTIC PLOT EVENT: paradigm_conflict_detected
+        // This is a catastrophic magical event - incompatible paradigms colliding
+        // Note: We need access to eventBus, which may require injecting it into MagicLawEnforcer
+        // For now, we'll throw the error which will be caught by the MagicSystem
+        // The MagicSystem should emit the event when catching this specific error
+        throw new Error(`PARADIGM_CONFLICT:${combo.paradigms[0]}:${combo.paradigms[1]}:${combo.reason}`);
       }
     }
 
@@ -295,8 +300,9 @@ export class MagicLawEnforcer {
     if (this.paradigm.conflictingParadigms) {
       for (const conflictingId of this.paradigm.conflictingParadigms) {
         if (knownParadigms.includes(conflictingId)) {
+          // EXOTIC PLOT EVENT: paradigm_conflict_detected
           throw new Error(
-            `Paradigm ${this.paradigm.name} conflicts with known paradigm: ${conflictingId}`
+            `PARADIGM_CONFLICT:${this.paradigm.id}:${conflictingId}:Paradigm ${this.paradigm.name} conflicts with known paradigm: ${conflictingId}`
           );
         }
       }

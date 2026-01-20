@@ -218,7 +218,7 @@ export class NationSystem extends BaseSystem {
 
   /**
    * Update national military
-   * TODO: Implement detailed military management (mobilization, readiness, commanders)
+   * Handles military maintenance costs and navy budget allocation
    */
   private updateMilitary(
     world: World,
@@ -246,8 +246,73 @@ export class NationSystem extends BaseSystem {
       },
     }));
 
-    // TODO: Deduct maintenance from economy budget
-    // TODO: Process navy operations if navyId exists
+    // Allocate budget to navy if one exists
+    if (nation.military.navyId) {
+      this.allocateNavyBudget(world, entity, nation);
+    }
+  }
+
+  /**
+   * Allocate military budget to navy
+   *
+   * Budget allocation varies by war status:
+   * - Peace: 10% of military budget to navy
+   * - Tension: 25% of military budget to navy
+   * - War: 40% of military budget to navy (space dominance critical)
+   */
+  private allocateNavyBudget(
+    world: World,
+    entity: EntityImpl,
+    nation: NationComponent
+  ): void {
+    if (!nation.military.navyId) return;
+
+    const navyEntity = world.getEntity(nation.military.navyId);
+    if (!navyEntity) return;
+
+    const navy = navyEntity.getComponent<NavyComponent>(CT.Navy);
+    if (!navy) return;
+
+    const militaryBudget = nation.economy.militaryBudget;
+
+    // Determine navy budget share based on war status
+    let navyShare = 0.3; // Default 30% of military budget
+    if (nation.military.warStatus === 'peace') {
+      navyShare = 0.1; // 10% during peace
+    } else if (nation.military.warStatus === 'mobilizing') {
+      navyShare = 0.25; // 25% during tension
+    } else if (nation.military.warStatus === 'at_war') {
+      navyShare = 0.4; // 40% during war (space dominance critical)
+    }
+
+    const navyBudget = militaryBudget * navyShare;
+
+    // Update navy annual budget
+    (navyEntity as EntityImpl).updateComponent<NavyComponent>(CT.Navy, (n) => ({
+      ...n,
+      economy: {
+        ...n.economy,
+        annualBudget: navyBudget,
+      },
+    }));
+
+    // Emit budget allocation event
+    world.eventBus.emit({
+      type: 'navy:budget_allocated',
+      source: navyEntity.id,
+      data: {
+        navyId: navy.navyId,
+        totalBudget: navyBudget,
+        allocation: {
+          newConstruction: navyBudget * navy.economy.budgetAllocation.newConstruction,
+          maintenance: navyBudget * navy.economy.budgetAllocation.maintenance,
+          personnel: navyBudget * navy.economy.budgetAllocation.personnel,
+          researchAndDevelopment: navyBudget * navy.economy.budgetAllocation.researchAndDevelopment,
+          reserves: navyBudget * navy.economy.budgetAllocation.reserves,
+        },
+        tick: world.tick,
+      },
+    });
   }
 
   /**
