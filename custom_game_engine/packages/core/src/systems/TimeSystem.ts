@@ -34,6 +34,7 @@ export function createTimeComponent(
   dayLength: number = GAME_DAY_SECONDS,       // 48 seconds per game day at 1x speed (20 year generation in 96 hours)
   speedMultiplier: number = 1   // Default 1x speed
 ): TimeComponent {
+  const initialDay = 1;
   return {
     type: 'time',
     version: 1,
@@ -42,7 +43,8 @@ export function createTimeComponent(
     speedMultiplier,
     phase: calculatePhase(timeOfDay),
     lightLevel: calculateLightLevel(timeOfDay, calculatePhase(timeOfDay)),
-    day: 1, // Start at day 1
+    day: initialDay,
+    season: calculateSeason(initialDay), // Start in spring (day 1)
   };
 }
 
@@ -126,6 +128,7 @@ export class TimeSystem extends BaseSystem {
 
   private lastPhase: DayPhase | null = null;
   private lastDay: number = 1; // Track previous day to detect week changes
+  private lastSeason: Season | null = null; // Track previous season to detect season changes
   private universeId: string = 'universe:main'; // Default universe ID
 
   /**
@@ -183,8 +186,9 @@ export class TimeSystem extends BaseSystem {
         this.lastDay = newDay;
       }
 
-      // Calculate new phase and light level
+      // Calculate new phase, light level, and season
       const newPhase = calculatePhase(newTimeOfDay);
+      const newSeason = calculateSeason(newDay);
       // Light level calculated but not stored in component currently
       void calculateLightLevel(newTimeOfDay, newPhase);
 
@@ -194,6 +198,7 @@ export class TimeSystem extends BaseSystem {
         timeOfDay: newTimeOfDay,
         phase: newPhase,
         day: newDay,
+        season: newSeason,
         }));
 
       // Emit phase change event if phase changed
@@ -205,7 +210,17 @@ export class TimeSystem extends BaseSystem {
         }, entity.id);
       }
 
+      // Emit season change event if season changed
+      if (this.lastSeason !== null && this.lastSeason !== newSeason) {
+        ctx.emit('time:season_changed', {
+          season: newSeason,
+          oldSeason: this.lastSeason,
+          newSeason,
+        }, entity.id);
+      }
+
       this.lastPhase = newPhase;
+      this.lastSeason = newSeason;
     }
   }
 

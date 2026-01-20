@@ -43,6 +43,7 @@ import {
 } from '../components/TimeCompressionSnapshotComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
 
 // ============================================================================
 // CONSTANTS
@@ -437,6 +438,24 @@ export class TimeCompressionSystem extends BaseSystem {
 
   /**
    * Generate trajectory for a single soul using LLM
+   *
+   * INTEGRATION PATTERN (ready to use):
+   * 1. Import TrajectoryPromptBuilder from '@ai-village/llm'
+   * 2. Get LLMDecisionQueue instance from service registry
+   * 3. Build prompt using buildLifeTrajectoryPrompt() or buildSoulTrajectoryPrompt()
+   * 4. Queue LLM request with appropriate priority
+   * 5. Parse response using parseLifeTrajectoryResponse() or parseTrajectoryResult()
+   *
+   * The TrajectoryPromptBuilder provides:
+   * - buildLifeTrajectoryPrompt(): Full trajectory with milestones, death handling
+   * - buildSoulTrajectoryPrompt(): Simpler trajectory for basic use
+   * - buildMajorEventsPrompt(): Civilization-wide events during time jump
+   * - calculateLifeExpectancy(): Tech-level-aware life expectancy
+   * - parseLifeTrajectoryResponse(): Parse LifeTrajectory with milestones
+   * - parseTrajectoryResult(): Parse basic TrajectoryResult
+   * - parseMajorEventsResponse(): Parse major historical events
+   *
+   * @see packages/llm/src/TrajectoryPromptBuilder.ts
    */
   private async generateSoulTrajectory(
     world: World,
@@ -453,38 +472,104 @@ export class TimeCompressionSystem extends BaseSystem {
       return null;
     }
 
-    // Check if LLM integration is available
-    // NOTE: In a full implementation, this would use the LLMDecisionQueue
-    // For now, generate a placeholder trajectory based on soul's purpose and interests
+    // TODO: Full LLM integration - Replace placeholder with actual LLM call
+    // Example integration code:
+    /*
+    import { TrajectoryPromptBuilder, LLMDecisionQueue } from '@ai-village/llm';
+
+    const trajectoryBuilder = new TrajectoryPromptBuilder();
+    const llmQueue = getLLMDecisionQueue(); // Get from service registry
+
+    // Get current age of soul agent
+    const agentComp = soulEntity.getComponent(CT.Agent) as AgentComponent | undefined;
+    const currentAge = agentComp?.age || 25; // Default if age not tracked
+
+    // Estimate tech level from world state
+    const techLevel = this.estimateTechnologyLevel(world);
+
+    // Build comprehensive prompt with life expectancy and death handling
+    const prompt = trajectoryBuilder.buildLifeTrajectoryPrompt(
+      {
+        soulEntity: soulEntity as Entity,
+        startTick,
+        endTick,
+        yearsCovered,
+        world,
+      },
+      currentAge,
+      techLevel
+    );
+
+    // Queue LLM request (returns immediately, processes async)
+    const response = await llmQueue.requestDecision(
+      `trajectory_${soulEntity.id}`,
+      prompt
+    );
+
+    // Parse life trajectory with milestones and death state
+    const lifeTrajectory = trajectoryBuilder.parseLifeTrajectoryResponse(
+      soulEntity.id,
+      response,
+      startTick,
+      endTick
+    );
+
+    if (!lifeTrajectory) {
+      console.warn(`[TimeCompressionSystem] Failed to parse trajectory for soul ${soulEntity.id}`);
+      return this.generatePlaceholderTrajectory(soulEntity.id, soulIdentity, yearsCovered);
+    }
+
+    // Convert LifeTrajectory to SoulTrajectory format
+    return createSoulTrajectory({
+      soulId: soulEntity.id,
+      soulName: soulIdentity.soulName,
+      narrative: lifeTrajectory.milestones.map(m => `Year ${m.year}: ${m.event}`).join('\n'),
+      majorEvents: lifeTrajectory.milestones.map(m => m.event),
+      characterDevelopment: lifeTrajectory.endState.alive
+        ? 'Continued growth and development'
+        : `Life ended: ${lifeTrajectory.endState.causeOfDeath || 'unknown cause'}`,
+      skillsGained: [],
+      relationshipChanges: [],
+      achievements: lifeTrajectory.endState.achievements,
+    });
+    */
+
+    // Placeholder implementation until LLM integration is complete
     const trajectory = this.generatePlaceholderTrajectory(
       soulEntity.id,
       soulIdentity,
       yearsCovered
     );
 
-    // TODO: Replace with actual LLM call once TrajectoryPromptBuilder is integrated
-    // Example LLM integration (commented out):
-    /*
-    const trajectoryBuilder = new TrajectoryPromptBuilder();
-    const prompt = trajectoryBuilder.buildSoulTrajectoryPrompt({
-      soulEntity: soulEntity as Entity,
-      startTick,
-      endTick,
-      yearsCovered,
-      world,
-    });
-
-    const llmQueue = getLLMDecisionQueue(); // Get from service registry
-    const response = await llmQueue.requestDecision(
-      `trajectory_${soulEntity.id}`,
-      prompt
-    );
-
-    const parsed = trajectoryBuilder.parseTrajectoryResult(soulEntity.id, response);
-    return parsed;
-    */
-
     return trajectory;
+  }
+
+  /**
+   * Estimate technology level from world state
+   * Used for calculating life expectancy during time jumps
+   */
+  private estimateTechnologyLevel(world: World): number {
+    // TODO: Implement based on actual technology tracking
+    // For now, estimate based on building types, skills, etc.
+
+    // Count advanced buildings as proxy for tech level
+    const buildings = world.query().with(CT.Building).executeEntities();
+    const buildingCount = buildings.length;
+
+    // Simple heuristic: more buildings = higher tech
+    // Tech level 0-10 scale
+    if (buildingCount < 5) return 0; // Stone age
+    if (buildingCount < 20) return 2; // Bronze age
+    if (buildingCount < 50) return 4; // Iron age
+    if (buildingCount < 100) return 6; // Medieval
+    if (buildingCount < 200) return 8; // Renaissance
+    return 10; // Industrial/Modern
+
+    // Better implementation would check:
+    // - TechnologyUnlockComponent
+    // - Building types (forge = higher tech than hut)
+    // - Agent skill levels (advanced crafting = higher tech)
+    // - Population density (cities = higher tech)
   }
 
   /**

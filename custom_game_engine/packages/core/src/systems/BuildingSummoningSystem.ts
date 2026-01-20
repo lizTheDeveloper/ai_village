@@ -3,19 +3,33 @@
  * Processes spell casts that create buildings.
  */
 
-import { System } from '../ecs/System.js';
+import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { CT } from '../components/ComponentTypes.js';
-import { buildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 
-export class BuildingSummoningSystem extends System {
-  systemType = 'building_summoning' as const;
-  priority = 150; // After magic casting, before rendering
+export class BuildingSummoningSystem extends BaseSystem {
+  public readonly id: SystemId = 'building_summoning' as SystemId;
+  public readonly priority: number = 150; // After magic casting, before rendering
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  protected readonly throttleInterval = 0; // Every tick
 
-  update(world: World): void {
+  private blueprintRegistry: BuildingBlueprintRegistry;
+
+  constructor() {
+    super();
+    this.blueprintRegistry = new BuildingBlueprintRegistry();
+  }
+
+  public override onUpdate(ctx: SystemContext): void {
+    const { world } = ctx;
+
     // Find all spell cast events that summon buildings
-    const summoningEvents = world.getEvents('spell_cast')
+    const eventBus = world.getEventBus();
+    const summoningEvents = eventBus.getEventsSince(world.tick - 1, 'spell_cast')
       .filter(e => e.effects?.some((eff: any) => eff.type === 'summon_building'));
 
     for (const event of summoningEvents) {
@@ -23,7 +37,7 @@ export class BuildingSummoningSystem extends System {
     }
 
     // Also handle rift creation events
-    const riftEvents = world.getEvents('spell_cast')
+    const riftEvents = eventBus.getEventsSince(world.tick - 1, 'spell_cast')
       .filter(e => e.effects?.some((eff: any) => eff.type === 'create_dimensional_rift'));
 
     for (const event of riftEvents) {
@@ -32,14 +46,14 @@ export class BuildingSummoningSystem extends System {
   }
 
   private handleBuildingSummoning(world: World, event: any): void {
-    const caster = world.getEntityById(event.casterId);
+    const caster = world.getEntity(event.casterId);
     if (!caster) return;
 
     const summonEffect = event.effects.find((e: any) => e.type === 'summon_building');
     const buildingType = summonEffect.buildingType;
     const location = summonEffect.location;
 
-    const blueprint = buildingBlueprintRegistry.tryGet(buildingType);
+    const blueprint = this.blueprintRegistry.tryGet(buildingType);
     if (!blueprint) {
       console.error(`Building blueprint "${buildingType}" not found`);
       return;
@@ -55,20 +69,22 @@ export class BuildingSummoningSystem extends System {
       spawnY = location.y;
     } else {
       // Default to caster position
-      const pos = caster.getComponent(CT.Position);
+      const pos = caster.components.get(CT.Position);
+      if (!pos) return;
       spawnX = pos.x + 5; // Offset slightly
       spawnY = pos.y;
     }
 
     // Create building entity
-    const building = world.createEntity();
-    building.addComponent({
+    const building = new EntityImpl(world);
+
+    building.components.set(CT.Position, {
       type: CT.Position,
       x: spawnX,
       y: spawnY
     });
 
-    building.addComponent({
+    building.components.set(CT.Building, {
       type: CT.Building,
       buildingType: buildingType,
       constructionProgress: 100, // Instantly built (it's magic!)
@@ -77,7 +93,7 @@ export class BuildingSummoningSystem extends System {
       summonedAt: world.tick
     });
 
-    building.addComponent({
+    building.components.set(CT.Sprite, {
       type: CT.Sprite,
       spriteId: `building_${buildingType}`,
       width: blueprint.width,
@@ -86,8 +102,8 @@ export class BuildingSummoningSystem extends System {
 
     // Add dimensional marker if dimensional building
     if (blueprint.dimensional || blueprint.realmPocket) {
-      building.addComponent({
-        type: 'magical_construct',
+      building.components.set('magical_construct' as ComponentType, {
+        type: 'magical_construct' as ComponentType,
         constructType: 'summoned_building',
         dimension: blueprint.dimensional?.dimension || 3,
         summoner: caster.id,
@@ -97,7 +113,7 @@ export class BuildingSummoningSystem extends System {
     }
 
     // Emit summoning visual effect
-    world.emitEvent({
+    world.getEventBus().emit({
       type: 'building_summoned',
       buildingId: building.id,
       buildingType: buildingType,
@@ -111,7 +127,7 @@ export class BuildingSummoningSystem extends System {
   }
 
   private handleRiftCreation(world: World, event: any): void {
-    const caster = world.getEntityById(event.casterId);
+    const caster = world.getEntity(event.casterId);
     if (!caster) return;
 
     const riftEffect = event.effects.find((e: any) => e.type === 'create_dimensional_rift');
@@ -126,22 +142,23 @@ export class BuildingSummoningSystem extends System {
       spawnX = location.x;
       spawnY = location.y;
     } else {
-      const pos = caster.getComponent(CT.Position);
+      const pos = caster.components.get(CT.Position);
+      if (!pos) return;
       spawnX = pos.x + 3;
       spawnY = pos.y;
     }
 
     // Create rift entity
-    const rift = world.createEntity();
+    const rift = new EntityImpl(world);
 
-    rift.addComponent({
+    rift.components.set(CT.Position, {
       type: CT.Position,
       x: spawnX,
       y: spawnY
     });
 
-    rift.addComponent({
-      type: 'dimensional_rift',
+    rift.components.set('dimensional_rift' as ComponentType, {
+      type: 'dimensional_rift' as ComponentType,
       sourceDimensions: riftEffect.sourceDimensions || 3,
       targetDimensions: riftEffect.targetDimensions || 4,
       stability: riftEffect.stability || 1.0,
@@ -155,7 +172,7 @@ export class BuildingSummoningSystem extends System {
     });
 
     // Visual effect
-    rift.addComponent({
+    rift.components.set(CT.Sprite, {
       type: CT.Sprite,
       spriteId: 'dimensional_rift',
       width: (riftEffect.radius || 2) * 2,
@@ -164,8 +181,8 @@ export class BuildingSummoningSystem extends System {
 
     // Add particle effect
     const targetDim = riftEffect.targetDimensions || 4;
-    rift.addComponent({
-      type: 'particle_emitter',
+    rift.components.set('particle_emitter' as ComponentType, {
+      type: 'particle_emitter' as ComponentType,
       particleType: 'dimensional_shimmer',
       rate: 5,
       color: targetDim === 4 ? '#00FFFF' :
@@ -173,7 +190,7 @@ export class BuildingSummoningSystem extends System {
     });
 
     // Emit rift creation event
-    world.emitEvent({
+    world.getEventBus().emit({
       type: 'dimensional_rift_created',
       riftId: rift.id,
       casterId: caster.id,
