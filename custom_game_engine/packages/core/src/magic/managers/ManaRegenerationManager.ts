@@ -87,6 +87,17 @@ export class ManaRegenerationManager {
   // Faith/Favor Synchronization (Divine Magic)
   // =========================================================================
 
+  // Track last favor check to avoid spam
+  private lastFavorCheckTick = new Map<string, number>();
+  private eventBus: any = null;
+
+  /**
+   * Initialize with event bus for exotic event emissions.
+   */
+  initialize(eventBus: any): void {
+    this.eventBus = eventBus;
+  }
+
   /**
    * Synchronize faith (SpiritualComponent) with divine favor (ManaPoolsComponent).
    * This ensures bidirectional consistency:
@@ -111,16 +122,57 @@ export class ManaRegenerationManager {
     const favorPool = manaPools.resourcePools.favor;
     if (!favorPool) return;
 
-    // Calculate normalized favor (0-1)
-    const normalizedFavor = favorPool.maximum > 0 ? favorPool.current / favorPool.maximum : 0;
+    // Calculate normalized favor (-100 to 100 range, typical deity favor)
+    // We'll treat current/maximum as 0-1 and convert to -100 to 100
+    const normalizedFavor = favorPool.maximum > 0 ? (favorPool.current / favorPool.maximum) * 200 - 100 : 0;
+
+    // EXOTIC PLOT EVENT: deity_relationship_critical
+    // Check if favor has reached critical levels (|favor| > 80)
+    // Only emit once per 10 minutes (12000 ticks) per agent to avoid spam
+    const lastCheck = this.lastFavorCheckTick.get(entity.id) || 0;
+    const currentTick = (entity as any).world?.tick || 0;
+    if (this.eventBus && Math.abs(normalizedFavor) > 80 && currentTick - lastCheck > 12000) {
+      const soulComp = entity.getComponent(CT.Soul);
+      const deityId = spiritual.believedDeity;
+
+      if (deityId && soulComp) {
+        // Determine relationship type and trigger reason
+        const relationshipType: 'favor' | 'disfavor' | 'obsession' =
+          normalizedFavor > 80 ? 'favor' :
+          normalizedFavor < -80 ? 'disfavor' :
+          'obsession';
+
+        const triggerReason: 'sacrilege' | 'heresy' | 'divine_champion' | 'prayer_answered' | 'miracle_witnessed' =
+          normalizedFavor > 90 ? 'divine_champion' :
+          normalizedFavor > 80 ? 'prayer_answered' :
+          normalizedFavor < -90 ? 'sacrilege' :
+          'heresy';
+
+        this.eventBus.emit('divinity:deity_relationship_critical', {
+          agentId: entity.id,
+          soulId: (soulComp as any).soulId || entity.id,
+          deityId,
+          deityName: 'Unknown Deity', // Would need to look up deity entity
+          relationshipValue: Math.round(normalizedFavor),
+          relationshipType,
+          triggerReason,
+          tick: currentTick,
+        });
+
+        this.lastFavorCheckTick.set(entity.id, currentTick);
+      }
+    }
+
+    // Convert normalized favor back to 0-1 for faith calculation
+    const normalizedFavorZeroToOne = (normalizedFavor + 100) / 200;
 
     // Calculate expected faith based on favor (with some tolerance)
     // High favor = high faith, but not 1:1 (favor can be higher with more experience)
-    const expectedFaith = Math.min(1.0, normalizedFavor * 0.8 + 0.1);
+    const expectedFaith = Math.min(1.0, normalizedFavorZeroToOne * 0.8 + 0.1);
 
     // If faith and favor are significantly different, sync them
     const faithDiff = Math.abs(spiritual.faith - expectedFaith);
-    const favorDiff = Math.abs(normalizedFavor - spiritual.faith);
+    const favorDiff = Math.abs(normalizedFavorZeroToOne - spiritual.faith);
 
     if (faithDiff > 0.1 || favorDiff > 0.1) {
       // Average the two to create smooth sync (neither dominates)

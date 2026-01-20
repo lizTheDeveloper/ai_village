@@ -82,21 +82,28 @@ export class TradeNetworkSystem extends BaseSystem {
   private isInitialized = false;
 
   /**
-   * Initialize the system
+   * Initialize the system - store world reference for event handlers
    */
-  protected onInitialize(_world: World): void {
+  private worldRef?: World;
+
+  protected onInitialize(world: World): void {
     if (this.isInitialized) {
       return;
     }
     this.isInitialized = true;
+    this.worldRef = world;
 
     // Listen for shipping lane events
-    _world.eventBus.on('lane:created', (event) => {
-      this.handleLaneCreated(_world, event.data.laneId);
+    world.eventBus.on('lane:created', (event) => {
+      if (this.worldRef) {
+        this.handleLaneCreated(this.worldRef, event.data.laneId);
+      }
     });
 
-    _world.eventBus.on('lane:removed', (event) => {
-      this.handleLaneRemoved(_world, event.data.laneId);
+    world.eventBus.on('lane:removed', (event) => {
+      if (this.worldRef) {
+        this.handleLaneRemoved(this.worldRef, event.data.laneId);
+      }
     });
   }
 

@@ -204,20 +204,31 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
           return this.spawnRecipe(content as RecipeContent, world, position);
 
         case 'legendary_item':
+          return this.spawnLegendaryItem(content as LegendaryItemContent, world, position);
+
         case 'soul':
+          return this.spawnSoul(content as SoulContent, world, position);
+
         case 'quest':
+          return this.spawnQuest(content, world, position);
+
         case 'alien_species':
+          return this.spawnAlienSpecies(content, world, position);
+
         case 'magic_paradigm':
+          return this.spawnMagicParadigm(content, world, position);
+
         case 'building':
+          return this.spawnBuilding(content, world, position);
+
         case 'technology':
+          return this.spawnTechnology(content, world, position);
+
         case 'deity':
+          return this.spawnDeity(content, world, position);
+
         case 'religion':
-          // TODO: Implement spawning for these content types
-          console.warn(`[GodCraftedDiscovery] Spawning not yet implemented for: ${content.type}`);
-          return {
-            success: false,
-            error: `Spawning not implemented for ${content.type}`,
-          };
+          return this.spawnReligion(content, world, position);
 
         default:
           console.error(`[GodCraftedDiscovery] Unknown content type:`, content.type);

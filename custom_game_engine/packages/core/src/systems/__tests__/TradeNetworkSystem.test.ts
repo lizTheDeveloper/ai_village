@@ -12,7 +12,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
+import { WorldImpl } from '../../ecs/World.js';
+import type { World } from '../../ecs/World.js';
 import { TradeNetworkSystem } from '../TradeNetworkSystem.js';
 import { EntityImpl } from '../../ecs/Entity.js';
 import type { ShippingLaneComponent } from '../../components/ShippingLaneComponent.js';
@@ -25,7 +26,7 @@ describe('TradeNetworkSystem', () => {
   let system: TradeNetworkSystem;
 
   beforeEach(() => {
-    world = new World();
+    world = new WorldImpl();
     system = new TradeNetworkSystem();
     system.initialize(world, world.eventBus);
   });

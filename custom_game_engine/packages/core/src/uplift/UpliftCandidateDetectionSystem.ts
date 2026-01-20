@@ -21,6 +21,7 @@ import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import type { GeneticComponent } from '../components/GeneticComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
+import type { ClarketechSystem } from '../clarketech/ClarketechSystem.js';
 
 /**
  * Evaluation thresholds for uplift suitability
@@ -58,6 +59,9 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
   private cacheExpiry = 0;
   private readonly CACHE_DURATION = 2000; // 100 seconds
 
+  // Required technology for uplift candidate detection
+  private readonly TECH_REQUIRED = 'genetic_engineering';
+
   protected onUpdate(ctx: SystemContext): void {
     // Only run if consciousness studies tech is unlocked
     if (!this.isTechnologyUnlocked(ctx.world)) return;
@@ -86,12 +90,23 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
 
   /**
    * Check if required technology is unlocked
-   * NOTE: Not integrated yet - always returns true for testing
+   *
+   * Requires genetic_engineering technology from ClarketechSystem.
+   * This ensures uplift candidate detection only becomes available after
+   * advanced genetic engineering technology is discovered.
    */
-  private isTechnologyUnlocked(_world: World): boolean {
-    // TODO: Integration point - check ClarketechSystem
-    // return clarketechManager.isTechUnlocked(this.TECH_REQUIRED);
-    return true; // Placeholder for standalone testing
+  private isTechnologyUnlocked(world: World): boolean {
+    // Query for ClarketechSystem from system registry
+    const clarketechSystem = world.gameLoop.systemRegistry.tryGetSystem<ClarketechSystem>('ClarketechSystem');
+
+    if (!clarketechSystem) {
+      // ClarketechSystem not registered - allow detection (standalone mode)
+      return true;
+    }
+
+    // Check if genetic_engineering technology is unlocked
+    const manager = clarketechSystem.getManager();
+    return manager.isTechUnlocked(this.TECH_REQUIRED);
   }
 
   /**

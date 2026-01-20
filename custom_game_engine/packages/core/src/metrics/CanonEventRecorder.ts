@@ -245,22 +245,188 @@ export class CanonEventRecorder {
   /**
    * Extract runtime definitions from world
    */
-  private extractRuntimeDefinitions(_world: World): RuntimeDefinitions {
-    // TODO: Implement extraction from:
-    // - RecipeRegistry for discovered recipes
-    // - ItemRegistry for custom items
-    // - LandmarkNamingSystem for named landmarks
-    // - Sacred site entities
-    // - Cultural belief components
+  private extractRuntimeDefinitions(world: World): RuntimeDefinitions {
+    const recipes = this.extractRecipes(world);
+    const items = this.extractCustomItems(world);
+    const landmarks = this.extractLandmarks(world);
+    const sacredSites = this.extractSacredSites(world);
+    const culturalBeliefs = this.extractCulturalBeliefs(world);
+    const customBuildings = this.extractCustomBuildings(world);
 
     return {
-      recipes: [],
-      items: [],
-      sacredSites: [],
-      landmarks: [],
-      culturalBeliefs: [],
-      customBuildings: [],
+      recipes,
+      items,
+      sacredSites,
+      landmarks,
+      culturalBeliefs,
+      customBuildings,
     };
+  }
+
+  /**
+   * Extract recipes from RecipeRegistry
+   * Note: RecipeRegistry is accessed via CraftingSystem, not directly from World
+   */
+  private extractRecipes(_world: World): RuntimeDefinitions['recipes'] {
+    // RecipeRegistry is not directly accessible from World
+    // It's injected into CraftingSystem via setRecipeRegistry
+    // For now, return empty array - would need system registry access
+    // TODO: Access via world.getSystem('crafting')?.recipeRegistry if exposed
+    return [];
+  }
+
+  /**
+   * Extract custom items from ItemRegistry
+   * Note: ItemRegistry is a global singleton, imported from items package
+   */
+  private extractCustomItems(_world: World): RuntimeDefinitions['items'] {
+    // ItemRegistry is a global singleton (itemRegistry)
+    // Would need to import and access it directly
+    // For now, return empty array
+    // TODO: Import itemRegistry from '../items/ItemRegistry.js' and extract custom items
+    return [];
+  }
+
+  /**
+   * Extract named landmarks from NamedLandmarksComponent
+   */
+  private extractLandmarks(world: World): RuntimeDefinitions['landmarks'] {
+    const landmarks: RuntimeDefinitions['landmarks'] = [];
+
+    // Query for entities with NamedLandmarks component
+    const landmarkEntities = world.query().with(CT.NamedLandmarks).executeEntities();
+
+    for (const entity of landmarkEntities) {
+      const landmarksComp = entity.getComponent(CT.NamedLandmarks) as {
+        getAllLandmarks?: () => Array<{
+          id: string;
+          x: number;
+          y: number;
+          name: string;
+          namedBy: string;
+          namedAt: number;
+        }>;
+      } | undefined;
+
+      if (!landmarksComp?.getAllLandmarks) continue;
+
+      const namedLandmarks = landmarksComp.getAllLandmarks();
+      for (const landmark of namedLandmarks) {
+        landmarks.push({
+          id: landmark.id,
+          name: landmark.name,
+          namedBy: landmark.namedBy,
+          namedAt: landmark.namedAt,
+          position: { x: landmark.x, y: landmark.y },
+        });
+      }
+    }
+
+    return landmarks;
+  }
+
+  /**
+   * Extract sacred sites from SacredSiteSystem
+   */
+  private extractSacredSites(world: World): RuntimeDefinitions['sacredSites'] {
+    const sacredSites: RuntimeDefinitions['sacredSites'] = [];
+
+    // Access SacredSiteSystem via world.getSystem
+    const sacredSiteSystem = world.getSystem('sacred_site') as {
+      getSites?: () => ReadonlyArray<{
+        id: string;
+        position: { x: number; y: number };
+        type: 'natural' | 'built' | 'emergent';
+        name?: string;
+        namedBy?: string;
+        discoveredAt: number;
+        prayerPower: number;
+        answerRate: number;
+      }>;
+    } | undefined;
+
+    if (!sacredSiteSystem?.getSites) {
+      return sacredSites;
+    }
+
+    const sites = sacredSiteSystem.getSites();
+    for (const site of sites) {
+      // Only include named sites
+      if (!site.name) continue;
+
+      sacredSites.push({
+        id: site.id,
+        name: site.name,
+        namedBy: site.namedBy,
+        namedAt: site.discoveredAt,
+        position: site.position,
+        significance: `${site.type} site with ${(site.answerRate * 100).toFixed(0)}% prayer answer rate`,
+      });
+    }
+
+    return sacredSites;
+  }
+
+  /**
+   * Extract cultural beliefs from agent BeliefComponents
+   */
+  private extractCulturalBeliefs(world: World): RuntimeDefinitions['culturalBeliefs'] {
+    const beliefsMap = new Map<string, { content: string; emergedAt: number; believers: Set<string> }>();
+
+    // Query all entities with belief components
+    const beliefEntities = world.query().with(CT.Belief).executeEntities();
+
+    for (const entity of beliefEntities) {
+      const beliefComp = entity.getComponent(CT.Belief) as {
+        allBeliefs?: ReadonlyArray<{
+          description: string;
+          formedAt: number;
+          confidence: number;
+        }>;
+      } | undefined;
+
+      if (!beliefComp?.allBeliefs) continue;
+
+      for (const belief of beliefComp.allBeliefs) {
+        // Only include strong beliefs (confidence > 0.6)
+        if (belief.confidence <= 0.6) continue;
+
+        const key = belief.description;
+        if (!beliefsMap.has(key)) {
+          beliefsMap.set(key, {
+            content: belief.description,
+            emergedAt: belief.formedAt,
+            believers: new Set(),
+          });
+        }
+        beliefsMap.get(key)!.believers.add(entity.id);
+      }
+    }
+
+    // Only include beliefs held by multiple agents (cultural, not personal)
+    const culturalBeliefs: RuntimeDefinitions['culturalBeliefs'] = [];
+    for (const belief of beliefsMap.values()) {
+      if (belief.believers.size >= 2) {
+        culturalBeliefs.push({
+          content: belief.content,
+          emergedAt: belief.emergedAt,
+          believedBy: Array.from(belief.believers),
+        });
+      }
+    }
+
+    return culturalBeliefs;
+  }
+
+  /**
+   * Extract custom buildings from BuildingBlueprintRegistry
+   */
+  private extractCustomBuildings(_world: World): RuntimeDefinitions['customBuildings'] {
+    // BuildingBlueprintRegistry is accessible via world.buildingRegistry
+    // But it's private - would need to expose it or access via getter
+    // For now, return empty array
+    // TODO: Access world.buildingRegistry if exposed, filter for custom/player-created buildings
+    return [];
   }
 
   /**
