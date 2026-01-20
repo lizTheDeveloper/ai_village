@@ -385,6 +385,13 @@ export const TOOL_ITEMS: ItemDefinition[] = [
     ],
     baseValue: 25,
     rarity: 'common',
+    traits: {
+      tool: {
+        toolType: 'hoe',
+        efficiency: 1.0,
+        durabilityLoss: 0.2,
+      },
+    },
   }),
 
   defineItem('fishing_rod', 'Fishing Rod', 'tool', {
@@ -446,6 +453,13 @@ export const TOOL_ITEMS: ItemDefinition[] = [
     ],
     baseValue: 65,
     rarity: 'uncommon',
+    traits: {
+      tool: {
+        toolType: 'hoe',
+        efficiency: 1.5,
+        durabilityLoss: 0.15,
+      },
+    },
   }),
 
   // Steel tools - highest tier
@@ -671,6 +685,13 @@ export const FARMING_TOOL_ITEMS: ItemDefinition[] = [
     ],
     baseValue: 40,
     rarity: 'common',
+    traits: {
+      tool: {
+        toolType: 'watering_can',
+        efficiency: 1.0,
+        durabilityLoss: 0.1,
+      },
+    },
   }),
 
   defineItem('stone_hoe', 'Stone Hoe', 'tool', {
@@ -683,6 +704,13 @@ export const FARMING_TOOL_ITEMS: ItemDefinition[] = [
     ],
     baseValue: 20,
     rarity: 'common',
+    traits: {
+      tool: {
+        toolType: 'hoe',
+        efficiency: 1.0,
+        durabilityLoss: 0.2,
+      },
+    },
   }),
 ];
 

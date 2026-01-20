@@ -29,6 +29,7 @@ interface SimplifiedEventBus {
 // Time & Environment
 import { TimeSystem } from './TimeSystem.js';
 import { TimeCompressionSystem } from './TimeCompressionSystem.js';
+import { TimeThrottleCoordinator } from './TimeThrottleCoordinator.js';
 import { StatisticalModeManager } from './StatisticalModeManager.js';
 import { WeatherSystem } from './WeatherSystem.js';
 import { TemperatureSystem } from './TemperatureSystem.js';
@@ -497,6 +498,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new TimeSystem());
   gameLoop.systemRegistry.register(new TimeCompressionSystem());
+  gameLoop.systemRegistry.register(new TimeThrottleCoordinator());
   gameLoop.systemRegistry.register(new StatisticalModeManager());
   gameLoop.systemRegistry.register(new WeatherSystem());
 

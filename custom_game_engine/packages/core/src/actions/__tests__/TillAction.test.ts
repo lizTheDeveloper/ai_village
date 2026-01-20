@@ -942,6 +942,65 @@ describe('Tilling Action', () => {
   });
 
   // ============================================================================
+  // Tool Requirement Tests
+  // ============================================================================
+  describe('Tool Requirement', () => {
+    it('should require hoe tool when agentId is provided', () => {
+      const tile: Tile = {
+        terrain: 'grass',
+        moisture: 50,
+        fertility: 0,
+        biome: 'plains' as BiomeType,
+        tilled: false,
+        plantability: 0,
+        nutrients: { nitrogen: 0, phosphorus: 0, potassium: 0 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false
+      };
+
+      // Create agent without a hoe
+      const agentId = world.createEntity();
+      const agent = world.getEntity(agentId);
+      agent?.addComponent({
+        type: 'inventory' as const,
+        slots: [],
+        capacity: 10,
+        weight: 0,
+      });
+
+      // Should throw when agent has no hoe
+      expect(() => soilSystem.tillTile(world, tile, 5, 5, agentId)).toThrow(
+        /no working hoe/i
+      );
+    });
+
+    it('should allow tilling when no agentId is provided (manual tilling)', () => {
+      const tile: Tile = {
+        terrain: 'grass',
+        moisture: 50,
+        fertility: 0,
+        biome: 'plains' as BiomeType,
+        tilled: false,
+        plantability: 0,
+        nutrients: { nitrogen: 0, phosphorus: 0, potassium: 0 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false
+      };
+
+      // Should not throw when no agentId is provided
+      expect(() => soilSystem.tillTile(world, tile, 5, 5)).not.toThrow();
+      expect(tile.tilled).toBe(true);
+      expect(tile.terrain).toBe('dirt');
+    });
+  });
+
+  // ============================================================================
   // Integration Tests - These will fail until ActionHandler is implemented
   // ============================================================================
   describe('ActionHandler Integration (Not Yet Implemented)', () => {

@@ -9,7 +9,14 @@
     "craftedFrom": [
       {"itemId": "wood", "amount": 2},
       {"itemId": "stone", "amount": 3}
-    ]
+    ],
+    "traits": {
+      "tool": {
+        "toolType": "axe",
+        "efficiency": 1.0,
+        "durabilityLoss": 0.3
+      }
+    }
   },
   {
     "id": "pickaxe",
@@ -21,7 +28,14 @@
     "craftedFrom": [
       {"itemId": "wood", "amount": 2},
       {"itemId": "stone", "amount": 3}
-    ]
+    ],
+    "traits": {
+      "tool": {
+        "toolType": "pickaxe",
+        "efficiency": 1.0,
+        "durabilityLoss": 0.4
+      }
+    }
   },
   {
     "id": "hoe",
@@ -64,6 +78,13 @@
     "craftedFrom": [
       {"itemId": "wood", "amount": 1},
       {"itemId": "stone", "amount": 2}
-    ]
+    ],
+    "traits": {
+      "tool": {
+        "toolType": "hammer",
+        "efficiency": 1.0,
+        "durabilityLoss": 0.25
+      }
+    }
   }
 ]
