@@ -77,6 +77,126 @@ export interface TrajectoryResult {
 }
 
 /**
+ * Milestone in a soul's trajectory
+ */
+export interface Milestone {
+  /** Year during time jump when event occurred */
+  year: number;
+
+  /** Event description */
+  event: string;
+
+  /** Emotional impact on the soul (-1 = devastating, 0 = neutral, 1 = joyful) */
+  emotionalImpact: number;
+
+  /** Other agents involved in this event */
+  involvedAgents: string[];
+
+  /** Significance of this event (0 = minor, 1 = life-defining) */
+  significance: number;
+}
+
+/**
+ * Complete life trajectory during a time jump
+ * Includes detailed milestones and end state (alive/dead)
+ */
+export interface LifeTrajectory {
+  /** Soul agent ID */
+  soulAgentId: string;
+
+  /** Starting tick of trajectory */
+  startTick: number;
+
+  /** Ending tick of trajectory */
+  endTick: number;
+
+  /** Chronological milestones during this period */
+  milestones: Milestone[];
+
+  /** Final state at end of time jump */
+  endState: {
+    /** Is the soul agent still alive? */
+    alive: boolean;
+
+    /** Age at end of period */
+    age: number;
+
+    /** Cause of death (if not alive) */
+    causeOfDeath?: string;
+
+    /** Descendant agent IDs */
+    descendants: string[];
+
+    /** Major achievements accumulated */
+    achievements: string[];
+  };
+}
+
+/**
+ * Major historical event during time compression
+ */
+export interface MajorEvent {
+  /** Tick when event occurred */
+  tick: number;
+
+  /** Event type classification */
+  type: 'discovery' | 'war' | 'plague' | 'golden_age' | 'extinction' | 'contact' | 'ascension' | 'cultural';
+
+  /** Event title */
+  title: string;
+
+  /** Event description */
+  description: string;
+
+  /** Soul agents involved in this event */
+  involvedSoulAgents: string[];
+
+  /** Impact on world state */
+  impact: {
+    /** Population change (delta) */
+    population: number;
+
+    /** Technology level change (delta) */
+    techLevel: number;
+
+    /** Stability change (-1 to 1) */
+    stability: number;
+  };
+
+  /** Historical significance (0 = minor, 1 = era-defining) */
+  significance: number;
+}
+
+/**
+ * Parameters for generating major events during time jump
+ */
+export interface EventGenerationParams {
+  /** Years covered by time jump */
+  years: number;
+
+  /** Number of events to generate */
+  totalEvents: number;
+
+  /** Starting population */
+  startingPopulation: number;
+
+  /** Current technology level */
+  techLevel: number;
+
+  /** Number of civilizations */
+  civilizationCount: number;
+
+  /** Soul agent trajectories for context */
+  soulTrajectories: LifeTrajectory[];
+
+  /** Starting tick */
+  startTick: number;
+
+  /** Ending tick */
+  endTick: number;
+}
+
+/**
  * TrajectoryPromptBuilder - Build LLM prompts for time compression
  */
 export class TrajectoryPromptBuilder {

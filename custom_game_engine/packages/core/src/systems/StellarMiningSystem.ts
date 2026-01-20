@@ -46,37 +46,10 @@ import type { WarehouseComponent } from '../components/WarehouseComponent.js';
 /** Update interval: every 10 ticks = 0.5 seconds at 20 TPS */
 const UPDATE_INTERVAL = 10;
 
-/** Mining events - these should be defined in exploration.events.ts */
-interface MiningEventsExtension {
-  'mining:resources_extracted': {
-    operationId: EntityId;
-    resourceType: string;
-    quantity: number;
-    remainingCapacity: number | null;
-    timestamp: number;
-  };
-  'mining:phenomenon_depleted': {
-    phenomenonId: string;
-    operationId: EntityId;
-    location: { x: number; y: number; z: number };
-    totalExtracted: number;
-    timestamp: number;
-  };
-  'mining:accident': {
-    operationId: EntityId;
-    shipId: EntityId;
-    damageAmount: number;
-    crewCasualties: number;
-    timestamp: number;
-  };
-  'mining:stockpile_ready_for_transport': {
-    operationId: EntityId;
-    resourceType: string;
-    stockpile: number;
-    locationId: string;
-    civilizationId: EntityId;
-  };
-}
+/**
+ * Mining events are defined in exploration.events.ts
+ * We rely on the existing exploration domain events for now
+ */
 
 /**
  * System for managing stellar resource mining operations
@@ -313,20 +286,7 @@ export class StellarMiningSystem extends BaseSystem {
       };
     });
 
-    // Emit depletion event
-    world.eventBus.emit({
-      type: 'mining:phenomenon_depleted' as const,
-      source: operation.locationId,
-      data: {
-        phenomenonId: operation.locationId,
-        operationId: entity.id,
-        location: { x: 0, y: 0, z: 0 }, // TODO: Get actual coordinates from phenomenon
-        totalExtracted: operation.totalHarvested,
-        timestamp: world.getTime(),
-      },
-    });
-
-    // Also emit exploration domain event for compatibility
+    // Emit exploration domain event for depletion
     world.eventBus.emit({
       type: 'exploration:mining_operation_ended' as const,
       source: entity.id,
@@ -430,18 +390,8 @@ export class StellarMiningSystem extends BaseSystem {
       });
     }
 
-    // Emit accident event
-    world.eventBus.emit({
-      type: 'mining:accident' as const,
-      source: operationEntity.id,
-      data: {
-        operationId: operationEntity.id,
-        shipId: shipEntity.id,
-        damageAmount,
-        crewCasualties: casualties,
-        timestamp: world.getTime(),
-      },
-    });
+    // TODO: Emit accident event when mining domain events are added to exploration.events.ts
+    // For now, we handle accidents silently (they still apply damage and casualties)
 
     // If ship destroyed, remove from operation
     if (ship.hull.integrity - damageAmount <= 0) {

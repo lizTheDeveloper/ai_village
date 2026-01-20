@@ -247,16 +247,23 @@ export class CompanionSystem extends BaseSystem {
           ];
           const creatureType = creatureTypes[Math.floor(Math.random() * creatureTypes.length)]!;
 
-          // Emit exotic event without specific agent ID (applies to passage traversal)
-          eventBus.emit('companion:dimensional_encounter', {
-            agentId: '', // Unknown which agent traversed
-            soulId: '', // Unknown
-            creatureId: `dimensional_${creatureType}_${Date.now()}`,
-            creatureType,
-            encounterType: 'portal_opened',
-            sanityDamage: creatureType === 'reality_eater' ? 30 : creatureType === 'dimensional_horror' ? 20 : 10,
-            tick: this.worldRef.tick || 0,
-          });
+          // EXOTIC PLOT EVENT: dimensional_encounter
+          // Emit via eventBusRef using the correct signature (single object with type + data)
+          if (this.eventBusRef) {
+            this.eventBusRef.emit({
+              type: 'companion:dimensional_encounter',
+              source: '', // Unknown which agent traversed
+              data: {
+                agentId: '', // Unknown which agent traversed
+                soulId: '', // Unknown
+                creatureId: `dimensional_${creatureType}_${Date.now()}`,
+                creatureType,
+                encounterType: 'portal_opened',
+                sanityDamage: creatureType === 'reality_eater' ? 30 : creatureType === 'dimensional_horror' ? 20 : 10,
+                tick: this.worldRef.tick || 0,
+              },
+            });
+          }
         }
 
         // First dimensional travel (Tier 2 → 3)

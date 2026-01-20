@@ -39,12 +39,16 @@ import {
 } from '../components/ExplorationMissionComponent.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 import type { WarehouseComponent } from '../components/WarehouseComponent.js';
-import type { StellarPhenomenon, ResourceSpawn } from '@ai-village/world';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type {
+  StellarPhenomenon,
+  ResourceSpawn,
+} from '../../../world/src/stellar/StellarPhenomena.js';
 import {
   StellarPhenomenonType,
   getRequiredTechLevel,
   calculateMiningEfficiency,
-} from '@ai-village/world';
+} from '../../../world/src/stellar/StellarPhenomena.js';
 
 /** Update interval: every 5 ticks = 0.25 seconds at 20 TPS */
 const UPDATE_INTERVAL = 5;
@@ -209,9 +213,7 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     shipEntity: Entity
   ): void {
     // Get ship position (assuming ship has position component)
-    const position = shipEntity.getComponent<{ x: number; y: number; z: number }>(
-      'position'
-    );
+    const position = shipEntity.getComponent<PositionComponent>('position');
     if (!position) {
       // Ship doesn't have position yet, can't check arrival
       return;

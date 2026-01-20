@@ -19,6 +19,7 @@ export * from './FireSpreadSystem.js';
 export * from './SoilSystem.js';
 export * from './TimeSystem.js';
 export * from './TimeCompressionSystem.js';
+export * from './TimeThrottleCoordinator.js';
 export * from './StatisticalModeManager.js';
 export * from './StateMutatorSystem.js'; // Batched vector updates for performance
 export * from './SleepSystem.js';

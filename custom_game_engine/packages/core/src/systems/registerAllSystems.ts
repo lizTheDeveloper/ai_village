@@ -693,6 +693,7 @@ export function registerAllSystems(
   }
   gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
   gameLoop.systemRegistry.register(new ExplorationDiscoverySystem());
+  gameLoop.systemRegistry.register(new StellarMiningSystem()); // Priority 185: Resource extraction from stellar phenomena
 
   // ============================================================================
   // FLEET & SQUADRON MANAGEMENT

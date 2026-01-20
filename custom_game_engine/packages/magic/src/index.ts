@@ -944,6 +944,9 @@ export * from './MaterialCreationSpells.js';
 export * from './TileConstructionSpells.js';
 export * from './SummonableEntities.js';
 
+// Building Summoning Spells (Dimensional Magic)
+export { BUILDING_SUMMONING_SPELLS, BUILDING_SPELLS_BY_TIER } from './spells/BuildingSummoningSpells.js';
+
 // ============================================================================
 // Magic Detection
 // ============================================================================
