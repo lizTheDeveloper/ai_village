@@ -518,4 +518,252 @@ export interface GovernanceEvents {
     responseType: 'negotiate' | 'suppress' | 'grant_autonomy';
     tick: number;
   };
+
+  // === Federation Events ===
+  'federation:formed': {
+    federationId: EntityId;
+    federationName: string;
+    foundingMembers: EntityId[];
+    governanceType: 'confederal' | 'federal' | 'supranational';
+    tick: number;
+  };
+
+  'federation:strategic_update': {
+    federationName: string;
+    totalPopulation: number;
+    totalSystems: number;
+    memberCount: number;
+    cohesion: number;
+    tick: number;
+  };
+
+  'federation:law_proposed': {
+    federationName: string;
+    proposalId: string;
+    proposalName: string;
+    proposerId: EntityId;
+    scope: 'trade' | 'military' | 'justice' | 'rights' | 'environment';
+    requiresSupermajority: boolean;
+    tick: number;
+  };
+
+  'federation:proposal_voting_started': {
+    federationName: string;
+    proposalId: string;
+    proposalName: string;
+    proposalType: string;
+    tick: number;
+  };
+
+  'federation:vote_cast': {
+    federationName: string;
+    proposalId: string;
+    memberId: EntityId;
+    vote: 'for' | 'against' | 'abstain';
+    tick: number;
+  };
+
+  'federation:proposal_passed': {
+    federationName: string;
+    proposalId: string;
+    proposalName: string;
+    proposalType: string;
+    passageRate: number;
+    tick: number;
+  };
+
+  'federation:proposal_failed': {
+    federationName: string;
+    proposalId: string;
+    proposalName: string;
+    reason: 'quorum_not_met' | 'insufficient_votes';
+    participation?: number;
+    passageRate?: number;
+    tick: number;
+  };
+
+  'federation:proposal_vetoed': {
+    federationName: string;
+    proposalId: string;
+    proposalName: string;
+    vetoedBy: EntityId;
+    tick: number;
+  };
+
+  'federation:law_enforced': {
+    federationName: string;
+    lawName: string;
+    newlyEnforcedMembers: EntityId[];
+    complianceRate: number;
+    tick: number;
+  };
+
+  'federation:member_joined': {
+    federationName: string;
+    memberId: EntityId;
+    memberType: 'empire' | 'nation';
+    tick: number;
+  };
+
+  'federation:member_seceded': {
+    federationName: string;
+    memberId: EntityId;
+    satisfactionAtSecession: number;
+    consecutiveTicksLow: number;
+    tick: number;
+  };
+
+  'federation:presidency_rotated': {
+    federationName: string;
+    previousPresidentId?: EntityId;
+    newPresidentId: EntityId;
+    tick: number;
+  };
+
+  'federation:joint_operation_started': {
+    federationName: string;
+    operationId: string;
+    operationName: string;
+    operationType: 'defense' | 'peacekeeping' | 'exploration' | 'humanitarian';
+    participatingMembers: EntityId[];
+    tick: number;
+  };
+
+  'federation:joint_operation_progress': {
+    federationName: string;
+    operationId: string;
+    operationName: string;
+    operationType: string;
+    participatingMembers: EntityId[];
+    totalFleetStrength: number;
+    duration: number;
+    tick: number;
+  };
+
+  'federation:tariff_changed': {
+    federationName: string;
+    tariffType: 'internal' | 'external';
+    oldRate: number;
+    newRate: number;
+    tick: number;
+  };
+
+  // === Galactic Council Events ===
+  'galactic_council:formed': {
+    councilId: EntityId;
+    councilName: string;
+    foundingSpecies: string[];
+    governanceType: 'democratic' | 'oligarchic' | 'hegemonic';
+    tick: number;
+  };
+
+  'galactic_council:cosmic_update': {
+    councilName: string;
+    speciesCount: number;
+    totalPopulation: number;
+    universalLaws: number;
+    peacekeepingMissions: number;
+    existentialThreats: number;
+    tick: number;
+  };
+
+  'galactic_council:species_joined': {
+    councilName: string;
+    speciesName: string;
+    homeworld: string;
+    techLevel: number;
+    votingPower: number;
+    tick: number;
+  };
+
+  'galactic_council:law_proposed': {
+    councilName: string;
+    proposalId: string;
+    lawName: string;
+    scope: 'war_crimes' | 'trade' | 'rights' | 'environment' | 'technology';
+    proposedBy: string;
+    tick: number;
+  };
+
+  'galactic_council:law_passed': {
+    councilName: string;
+    lawName: string;
+    scope: string;
+    approvalPercentage: number;
+    tick: number;
+  };
+
+  'galactic_council:law_rejected': {
+    councilName: string;
+    proposalId: string;
+    lawName: string;
+    approvalPercentage: number;
+    tick: number;
+  };
+
+  'galactic_council:violation_detected': {
+    councilName: string;
+    lawName: string;
+    violatorId: string;
+    violationType: string;
+    sanctions: string[];
+    tick: number;
+  };
+
+  'galactic_council:sanctions_applied': {
+    councilName: string;
+    targetSpecies: string;
+    sanctions: string[];
+    reason: string;
+    tick: number;
+  };
+
+  'galactic_council:peacekeeping_deployed': {
+    councilName: string;
+    missionName: string;
+    missionType: 'conflict_mediation' | 'humanitarian_aid' | 'border_patrol' | 'disaster_relief';
+    location: string;
+    fleetsDeployed: number;
+    tick: number;
+  };
+
+  'galactic_council:peacekeeping_completed': {
+    councilName: string;
+    missionName: string;
+    missionType: string;
+    duration: number;
+    tick: number;
+  };
+
+  'galactic_council:crisis_declared': {
+    councilName: string;
+    crisisType: string;
+    severity: string;
+    affectedSectors: number;
+    tick: number;
+  };
+
+  'galactic_council:crisis_resolved': {
+    councilName: string;
+    crisisId: string;
+    crisisType: string;
+    resolution: string;
+    tick: number;
+  };
+
+  'galactic_council:dispute_resolved': {
+    councilName: string;
+    disputeId: string;
+    disputeType: string;
+    parties: string[];
+    tick: number;
+  };
+
+  'galactic_council:dispute_escalated': {
+    councilName: string;
+    disputeId: string;
+    disputeType: string;
+    parties: string[];
+    tick: number;
+  };
 }

@@ -16,7 +16,6 @@ import type {
   EventBus,
 } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
-import { buildingBlueprintRegistry } from '@ai-village/core';
 import {
   ChunkManager,
   TerrainGenerator,
@@ -338,7 +337,8 @@ export class Renderer {
     for (const entity of allEntities) {
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (building) {
-        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType);
+        // TODO: Re-enable blueprint lookups when buildingBlueprintRegistry is available
+        const blueprint = null; // buildingBlueprintRegistry.tryGet(building.buildingType);
         if (blueprint?.dimensional?.v_axis) {
           this.buildingRenderer.updateVPhase(entity.id, currentTick, blueprint.dimensional);
 
@@ -619,7 +619,8 @@ export class Renderer {
 
       // Render building layout and dimensional indicators
       if (building) {
-        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType);
+        // TODO: Re-enable blueprint lookups when buildingBlueprintRegistry is available
+        const blueprint = null; // buildingBlueprintRegistry.tryGet(building.buildingType);
 
         if (blueprint) {
           let layoutToRender: string[] | undefined;
@@ -861,7 +862,8 @@ export class Renderer {
       return;
     }
 
-    const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType);
+    // TODO: Re-enable blueprint lookups when buildingBlueprintRegistry is available
+    const blueprint = null; // buildingBlueprintRegistry.tryGet(building.buildingType);
     if (!blueprint) {
       this.selectedDimensionalBuildingId = null;
       this.dimensionalControls.hideAll();

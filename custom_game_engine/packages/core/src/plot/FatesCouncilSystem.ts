@@ -724,13 +724,8 @@ export class FatesCouncilSystem extends BaseSystem {
 
     council.transcript.push(exchange);
 
-    // Emit event for observation
-    world.eventBus.emitGeneric('soul:fate_speaks', {
-      speaker: council.currentSpeaker,
-      text: response,
-      topic: exchange.topic,
-      dayNumber: council.dayNumber,
-    });
+    // Log the Fate's speech
+    console.log(`[FatesCouncilSystem] ${this.getFateName(council.currentSpeaker)}: ${response}`);
 
     // Advance to next speaker
     council.turnCount++;
@@ -772,13 +767,8 @@ export class FatesCouncilSystem extends BaseSystem {
     // Execute the decisions
     this.executeFatesDecisions(decision, world, council.tick);
 
-    // Emit completion event
-    world.eventBus.emitGeneric('plot:fates_council_complete', {
-      dayNumber: council.dayNumber,
-      plotAssignments: decision.plotAssignments.length,
-      summary: decision.summary,
-      transcript: council.transcript,
-    });
+    // Log completion
+    console.log(`[FatesCouncilSystem] Council complete: ${decision.summary}`);
 
     // Clear active council
     this.activeCouncil = undefined;
@@ -879,17 +869,19 @@ export class FatesCouncilSystem extends BaseSystem {
     if (!plotLines) {
       plotLines = {
         type: CT.PlotLines,
+        version: 1,
         active: [],
         completed: [],
         abandoned: [],
+        dream_hints: [],
       };
     }
 
     // Get soul ID (for souls) or use entity ID
     const soulIdentity = entity.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
-    const thread = entity.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
-    const soulId = soulIdentity?.soulName || entityId;
-    const personalTick = thread?.head?.personal_tick || tick;
+    const thread = entity.getComponent(CT.SilverThread);
+    const soulId = (soulIdentity as any)?.soulName || entityId;
+    const personalTick = (thread as any)?.head?.personal_tick || tick;
 
     // Instantiate plot
     const plotInstance = instantiatePlot(
@@ -906,7 +898,7 @@ export class FatesCouncilSystem extends BaseSystem {
 
     // Add to active plots
     addActivePlot(plotLines, plotInstance);
-    entity.addComponent(plotLines);
+    world.updateComponent(entityId, plotLines);
 
     console.log(`[FatesCouncilSystem] ✨ The Fates weave: ${plotTemplateId} → ${soulId}`);
     console.log(`[FatesCouncilSystem]    Reasoning: ${reasoning}`);

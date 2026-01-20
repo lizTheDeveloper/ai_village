@@ -23,6 +23,7 @@ import type { EmpireComponent } from '../components/EmpireComponent.js';
 import type { NationComponent } from '../components/NationComponent.js';
 import type { ProvinceGovernanceComponent } from '../components/ProvinceGovernanceComponent.js';
 import type { GovernorComponent } from '../components/GovernorComponent.js';
+import type { GalacticCouncilComponent } from '../components/GalacticCouncilComponent.js';
 import { declareImperialWar, addVassal, addCoreNation, grantIndependence } from '../components/EmpireComponent.js';
 import { declareWar as declareNationWar, signTreaty } from '../components/NationComponent.js';
 import { delegateDirective, type DelegationChain } from './DecisionProtocols.js';
@@ -1000,6 +1001,273 @@ function executeProvinceEnactLaw(
   result.stateChanges.push(`Enacted law: ${lawName} (${scope})`);
 }
 
+// ============================================================================
+// Galactic Council Tier Executors
+// ============================================================================
+
+/**
+ * Execute galactic council decisions
+ */
+export function executeGalacticCouncilDecision(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  decision: ParsedGovernorDecision,
+  world: World
+): DecisionExecutionResult {
+  const action = decision.action;
+  const result: DecisionExecutionResult = {
+    success: false,
+    eventsEmitted: [],
+    stateChanges: [],
+  };
+
+  try {
+    switch (action.type) {
+      case 'propose_universal_law':
+        executeCouncilProposeLaw(governor, council, action, world, result);
+        break;
+
+      case 'call_emergency_session':
+        executeCouncilEmergencySession(governor, council, action, world, result);
+        break;
+
+      case 'deploy_peacekeepers':
+        executeCouncilDeployPeacekeepers(governor, council, action, world, result);
+        break;
+
+      case 'mediate_dispute':
+        executeCouncilMediateDispute(governor, council, action, world, result);
+        break;
+
+      case 'declare_sanctions':
+        executeCouncilDeclareSanctions(governor, council, action, world, result);
+        break;
+
+      case 'grant_membership':
+        executeCouncilGrantMembership(governor, council, action, world, result);
+        break;
+
+      default:
+        result.error = `Unknown galactic council action type: ${action.type}`;
+        return result;
+    }
+
+    result.success = true;
+  } catch (error) {
+    result.error = error instanceof Error ? error.message : String(error);
+  }
+
+  return result;
+}
+
+/**
+ * Execute: Propose universal law
+ */
+function executeCouncilProposeLaw(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const lawName = action.parameters?.lawName as string;
+  const lawDescription = action.parameters?.description as string;
+  const scope = action.parameters?.scope as 'war_crimes' | 'trade' | 'rights' | 'environment' | 'technology';
+
+  if (!lawName || !scope) {
+    throw new Error('propose_universal_law requires lawName and scope parameters');
+  }
+
+  const councilEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!councilEntity) {
+    throw new Error('Council entity not found');
+  }
+
+  // Emit law proposal event (actual voting happens in GalacticCouncilSystem)
+  world.eventBus.emit({
+    type: 'galactic_council:law_proposed',
+    source: councilEntity.id,
+    data: {
+      councilName: council.name,
+      proposalId: `law_${world.tick}_${lawName}`,
+      lawName,
+      scope,
+      proposedBy: governor.id,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('galactic_council:law_proposed');
+  result.stateChanges.push(`Proposed universal law: ${lawName} (${scope})`);
+}
+
+/**
+ * Execute: Call emergency session
+ */
+function executeCouncilEmergencySession(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const reason = action.parameters?.reason as string ?? 'Emergency session called';
+
+  const councilEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!councilEntity) {
+    throw new Error('Council entity not found');
+  }
+
+  world.eventBus.emit({
+    type: 'galactic_council:emergency_session',
+    source: councilEntity.id,
+    data: {
+      councilName: council.name,
+      reason,
+      calledBy: governor.id,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('galactic_council:emergency_session');
+  result.stateChanges.push(`Called emergency session: ${reason}`);
+}
+
+/**
+ * Execute: Deploy peacekeepers
+ */
+function executeCouncilDeployPeacekeepers(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const missionType = action.parameters?.missionType as 'conflict_mediation' | 'humanitarian_aid' | 'border_patrol' | 'disaster_relief';
+  const location = action.parameters?.location as string;
+  const objective = action.parameters?.objective as string ?? 'Peacekeeping mission';
+
+  if (!missionType || !location) {
+    throw new Error('deploy_peacekeepers requires missionType and location parameters');
+  }
+
+  const councilEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!councilEntity) {
+    throw new Error('Council entity not found');
+  }
+
+  // Deploy mission (actual logic in GalacticCouncilSystem)
+  world.eventBus.emit({
+    type: 'galactic_council:peacekeeping_deployed',
+    source: councilEntity.id,
+    data: {
+      councilName: council.name,
+      missionName: `Peacekeeping: ${objective}`,
+      missionType,
+      location,
+      fleetsDeployed: 0, // Calculated by system
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('galactic_council:peacekeeping_deployed');
+  result.stateChanges.push(`Deployed peacekeepers to ${location} (${missionType})`);
+}
+
+/**
+ * Execute: Mediate dispute
+ */
+function executeCouncilMediateDispute(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const disputeId = action.target;
+  const resolution = action.parameters?.resolution as string;
+
+  if (!disputeId) {
+    throw new Error('mediate_dispute requires target (disputeId) parameter');
+  }
+
+  const councilEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!councilEntity) {
+    throw new Error('Council entity not found');
+  }
+
+  // Find dispute
+  const dispute = council.disputes.activeDisputes.find((d) => d.id === disputeId);
+  if (!dispute) {
+    throw new Error(`Dispute ${disputeId} not found`);
+  }
+
+  // Assign mediator
+  dispute.mediatorAgentId = governor.id;
+  dispute.status = 'mediation';
+
+  result.stateChanges.push(`Mediating dispute: ${dispute.type} between ${dispute.parties.join(', ')}`);
+}
+
+/**
+ * Execute: Declare sanctions
+ */
+function executeCouncilDeclareSanctions(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const targetSpecies = action.target;
+  const sanctions = action.parameters?.sanctions as string[] ?? ['diplomatic_censure'];
+  const reason = action.parameters?.reason as string ?? 'Law violation';
+
+  if (!targetSpecies) {
+    throw new Error('declare_sanctions requires target (speciesName) parameter');
+  }
+
+  const councilEntity = world.getEntity(governor.getComponent<GovernorComponent>(CT.Governor)?.jurisdiction ?? '');
+  if (!councilEntity) {
+    throw new Error('Council entity not found');
+  }
+
+  world.eventBus.emit({
+    type: 'galactic_council:sanctions_applied',
+    source: councilEntity.id,
+    data: {
+      councilName: council.name,
+      targetSpecies,
+      sanctions,
+      reason,
+      tick: world.tick,
+    },
+  });
+
+  result.eventsEmitted.push('galactic_council:sanctions_applied');
+  result.stateChanges.push(`Applied sanctions to ${targetSpecies}: ${sanctions.join(', ')}`);
+}
+
+/**
+ * Execute: Grant membership to new species
+ */
+function executeCouncilGrantMembership(
+  governor: EntityImpl,
+  council: GalacticCouncilComponent,
+  action: GovernorDecisionAction,
+  world: World,
+  result: DecisionExecutionResult
+): void {
+  const speciesName = action.target;
+
+  if (!speciesName) {
+    throw new Error('grant_membership requires target (speciesName) parameter');
+  }
+
+  // Species will be added by GalacticCouncilSystem when detected
+  result.stateChanges.push(`Granted membership to ${speciesName}`);
+}
+
 /**
  * Main entry point: Execute any governor decision based on tier
  */
@@ -1068,6 +1336,19 @@ export function executeGovernorDecision(
         };
       }
       return executeProvinceDecision(governor, province, decision, world);
+    }
+
+    case 'galactic_council': {
+      const council = jurisdictionEntity.getComponent<GalacticCouncilComponent>(CT.GalacticCouncil);
+      if (!council) {
+        return {
+          success: false,
+          error: 'Jurisdiction is not a galactic council',
+          eventsEmitted: [],
+          stateChanges: [],
+        };
+      }
+      return executeGalacticCouncilDecision(governor, council, decision, world);
     }
 
     default:

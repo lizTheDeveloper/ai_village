@@ -66,8 +66,10 @@ export interface DecayStage {
 }
 
 /**
- * Extended maintenance-specific fields that may not be in MegastructureComponent yet.
- * TODO: Migrate these fields to MegastructureComponent if not already present.
+ * Extended maintenance-specific fields that are not in MegastructureComponent.
+ * Note: Most fields are now in MegastructureComponent directly:
+ * - yearsInDecay, decayStageIndex, archaeologicalValue (ruins tracking)
+ * - maintenanceDebt (in MegastructureMaintenance interface)
  */
 export interface MegastructureMaintenanceData {
   phase: MegastructurePhase;
@@ -75,11 +77,7 @@ export interface MegastructureMaintenanceData {
   lastMaintenanceTick: number;
   constructionCompleteTick: number;
   controllingFactionId?: string;
-  isAIControlled: boolean;
-  maintenanceDebt: number; // Accumulated maintenance requirements
-  yearsInDecay: number; // For ruins
-  decayStageIndex: number; // Current decay stage
-  archaeologicalValue: number; // Value for future excavation
+  isAIControlled: boolean; // AI control tracking (not yet in MegastructureStrategic)
 }
 
 /**
@@ -521,11 +519,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
       lastMaintenanceTick: mega.maintenance.lastMaintenanceAt,
       constructionCompleteTick: mega.construction.completedAt ?? mega.construction.startedAt,
       controllingFactionId: mega.strategic.controlledBy,
-      isAIControlled: false, // TODO: Add AI control tracking to MegastructureComponent
-      maintenanceDebt: 0, // TODO: Add debt tracking to MegastructureComponent.maintenance
-      yearsInDecay: 0, // TODO: Add decay tracking for ruins
-      decayStageIndex: 0, // TODO: Add decay stage tracking
-      archaeologicalValue: 0, // TODO: Add archaeological value tracking
+      isAIControlled: false, // Not yet tracked in MegastructureStrategic
     };
   }
 
@@ -545,7 +539,8 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     if (data.lastMaintenanceTick !== undefined) {
       mega.maintenance.lastMaintenanceAt = data.lastMaintenanceTick;
     }
-    // TODO: Update other fields when added to MegastructureComponent
+    // Note: yearsInDecay, decayStageIndex, archaeologicalValue, maintenanceDebt
+    // are now direct fields on MegastructureComponent - updated in-place
   }
 
   /**
@@ -680,8 +675,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
     const efficiencyLoss = degradationRate * ticksSinceMaintenance;
     mega.efficiency = Math.max(0, mega.efficiency - efficiencyLoss);
 
-    // Note: Maintenance debt tracking not yet in component schema
-    // TODO: Add maintenanceDebt field to MegastructureMaintenance interface
+    // Note: Maintenance debt is tracked directly in mega.maintenance.maintenanceDebt
   }
 
   /**

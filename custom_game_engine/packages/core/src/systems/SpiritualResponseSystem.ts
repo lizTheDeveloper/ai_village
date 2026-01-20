@@ -16,11 +16,12 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { SpiritualComponent, Prayer, PrayerType, PrayerUrgency } from '../components/SpiritualComponent.js';
 import { recordPrayer } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 export class SpiritualResponseSystem extends BaseSystem {
   public readonly id: SystemId = 'spiritual_response';
@@ -97,7 +98,7 @@ export class SpiritualResponseSystem extends BaseSystem {
    * Trigger desperate prayer for food when starving
    */
   private triggerStarvationPrayer(agentId: string, world: SystemContext['world'], tick: number): void {
-    const entity = world.getEntity(agentId);
+    const entity = world.getEntity(agentId) as EntityImpl | undefined;
     if (!entity || !this.shouldPray(entity, tick, 100)) return; // At most once per 5 seconds
 
     const prayer = this.createPrayer(
@@ -108,14 +109,14 @@ export class SpiritualResponseSystem extends BaseSystem {
     );
 
     this.recordAgentPrayer(entity, prayer, tick);
-    this.emitPrayerEvent(entity, prayer, 'starvation', world.eventBus);
+    this.emitPrayerEvent(entity, prayer, 'starvation', this.events);
   }
 
   /**
    * Trigger prayer for healing when critically injured
    */
   private triggerInjuryPrayer(agentId: string, world: SystemContext['world'], tick: number): void {
-    const entity = world.getEntity(agentId);
+    const entity = world.getEntity(agentId) as EntityImpl | undefined;
     if (!entity || !this.shouldPray(entity, tick, 200)) return; // At most once per 10 seconds
 
     const prayer = this.createPrayer(
@@ -126,14 +127,14 @@ export class SpiritualResponseSystem extends BaseSystem {
     );
 
     this.recordAgentPrayer(entity, prayer, tick);
-    this.emitPrayerEvent(entity, prayer, 'injury', world.eventBus);
+    this.emitPrayerEvent(entity, prayer, 'injury', this.events);
   }
 
   /**
    * Trigger mourning prayers from nearby agents when someone dies
    */
   private triggerDeathMourningPrayers(deceasedId: string, world: SystemContext['world'], tick: number): void {
-    const deceased = world.getEntity(deceasedId);
+    const deceased = world.getEntity(deceasedId) as EntityImpl | undefined;
     if (!deceased) return;
 
     const deceasedPos = deceased.getComponent<PositionComponent>(CT.Position);
@@ -144,7 +145,7 @@ export class SpiritualResponseSystem extends BaseSystem {
       .with(CT.Spiritual)
       .with(CT.Position)
       .with(CT.Personality)
-      .executeEntities();
+      .executeEntities() as EntityImpl[];
 
     for (const agent of nearbyAgents) {
       if (agent.id === deceasedId) continue;
@@ -167,11 +168,12 @@ export class SpiritualResponseSystem extends BaseSystem {
    * Trigger mourning prayer for specific deceased
    */
   private triggerMourningPrayer(agentId: string, deceasedId: string, world: SystemContext['world'], tick: number): void {
-    const entity = world.getEntity(agentId);
+    const entity = world.getEntity(agentId) as EntityImpl | undefined;
     if (!entity || !this.shouldPray(entity, tick, 300)) return;
 
-    const deceased = world.getEntity(deceasedId);
-    const deceasedName = deceased?.name ?? 'the departed';
+    const deceased = world.getEntity(deceasedId) as EntityImpl | undefined;
+    const deceasedIdentity = deceased?.getComponent<IdentityComponent>(CT.Identity);
+    const deceasedName = deceasedIdentity?.name ?? 'the departed';
 
     const prayer = this.createPrayer(
       'mourning',
@@ -181,14 +183,14 @@ export class SpiritualResponseSystem extends BaseSystem {
     );
 
     this.recordAgentPrayer(entity, prayer, tick);
-    this.emitPrayerEvent(entity, prayer, 'death', world.eventBus);
+    this.emitPrayerEvent(entity, prayer, 'death', this.events);
   }
 
   /**
    * Trigger gratitude prayer after successful harvest
    */
   private triggerGratitudePrayer(agentId: string, reason: string, world: SystemContext['world'], tick: number): void {
-    const entity = world.getEntity(agentId);
+    const entity = world.getEntity(agentId) as EntityImpl | undefined;
     if (!entity || !this.shouldPray(entity, tick, 400)) return; // At most once per 20 seconds
 
     const prayer = this.createPrayer(
@@ -199,14 +201,14 @@ export class SpiritualResponseSystem extends BaseSystem {
     );
 
     this.recordAgentPrayer(entity, prayer, tick);
-    this.emitPrayerEvent(entity, prayer, 'harvest', world.eventBus);
+    this.emitPrayerEvent(entity, prayer, 'harvest', this.events);
   }
 
   /**
    * Trigger blessing prayer for newborn
    */
   private triggerBirthPrayer(parentId: string, childId: string, childName: string, world: SystemContext['world'], tick: number): void {
-    const entity = world.getEntity(parentId);
+    const entity = world.getEntity(parentId) as EntityImpl | undefined;
     if (!entity || !this.shouldPray(entity, tick, 500)) return;
 
     const prayer = this.createPrayer(
@@ -217,7 +219,7 @@ export class SpiritualResponseSystem extends BaseSystem {
     );
 
     this.recordAgentPrayer(entity, prayer, tick);
-    this.emitPrayerEvent(entity, prayer, 'birth', world.eventBus);
+    this.emitPrayerEvent(entity, prayer, 'birth', this.events);
   }
 
   /**
@@ -229,7 +231,7 @@ export class SpiritualResponseSystem extends BaseSystem {
       .with(CT.Spiritual)
       .with(CT.Position)
       .with(CT.Personality)
-      .executeEntities();
+      .executeEntities() as EntityImpl[];
 
     for (const agent of nearbyAgents) {
       const pos = agent.getComponent<PositionComponent>(CT.Position);
@@ -252,7 +254,7 @@ export class SpiritualResponseSystem extends BaseSystem {
       );
 
       this.recordAgentPrayer(agent, prayer, tick);
-      this.emitPrayerEvent(agent, prayer, 'disaster', world.eventBus);
+      this.emitPrayerEvent(agent, prayer, 'disaster', this.events);
     }
   }
 

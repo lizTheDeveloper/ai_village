@@ -1032,6 +1032,282 @@ export function buildEmpireContext(emperor: Entity, world: World): EmpireContext
 }
 
 // ============================================================================
+// TIER 5: FEDERATION CONTEXT
+// ============================================================================
+
+/**
+ * Member state record in federation context (aggregated empire/nation)
+ */
+export interface FederationMemberRecord {
+  id: string;
+  name: string;
+  type: 'empire' | 'nation';
+  population: number;
+  satisfaction: number; // 0-1
+  militaryContribution: number;
+  votingPower: number; // 0-1 (weighted by population)
+}
+
+/**
+ * Federal law summary
+ */
+export interface FederalLawSummary {
+  name: string;
+  scope: 'trade' | 'military' | 'justice' | 'rights' | 'environment';
+  complianceRate: number; // 0-1
+  enactedTick: number;
+}
+
+/**
+ * Joint operation summary
+ */
+export interface JointOperationSummary {
+  id: string;
+  name: string;
+  type: 'defense' | 'peacekeeping' | 'exploration' | 'humanitarian';
+  participatingMembers: number;
+  fleetsCommitted: number;
+  status: 'planning' | 'active' | 'completed';
+}
+
+/**
+ * FederationContext - Context for federation president/assembly
+ *
+ * Federations govern multiple empires/nations, coordinate pan-galactic policy.
+ * Time scale: 1 decade/tick (strategic simulation)
+ */
+export interface FederationContext {
+  /** Federation metadata */
+  federation: {
+    name: string;
+    governanceType: 'confederal' | 'federal' | 'supranational';
+    population: number;
+    territory: number; // Star systems
+    memberCount: number;
+  };
+
+  /** Current president */
+  presidency: {
+    currentPresidentId?: string;
+    termRemaining: number; // Ticks until rotation
+  };
+
+  /** Member states */
+  members: FederationMemberRecord[];
+
+  /** Federal laws in effect */
+  federalLaws: FederalLawSummary[];
+
+  /** Active joint military operations */
+  jointOperations: JointOperationSummary[];
+
+  /** Trade union status */
+  tradeUnion: {
+    internalTariffRate: number;
+    externalTariffRate: number;
+    internalTradeVolume: number;
+    commonCurrency?: string;
+  };
+
+  /** Federation stability */
+  stability: {
+    cohesion: number; // 0-1
+    averageSatisfaction: number; // 0-1
+    secessionRisks: Array<{ memberId: string; risk: number }>;
+  };
+
+  /** Pending proposals */
+  pendingProposals: Array<{
+    id: string;
+    name: string;
+    type: string;
+    proposerId: string;
+    status: 'debating' | 'voting';
+  }>;
+}
+
+/**
+ * Build context for federation president
+ *
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Uses cached queries to avoid repeated world.query() calls
+ * - Pre-allocates arrays with known size
+ * - Minimizes Map iterations
+ *
+ * @param president - President entity (emperor/head of state from current presidency)
+ * @param world - World instance
+ * @returns Federation context for LLM prompts
+ */
+export function buildFederationContext(president: Entity, world: World): FederationContext {
+  // Find federation where president is current president
+  const federations = world.query().with(CT.FederationGovernance).executeEntities();
+  const federationEntity = federations.find((f) => {
+    const impl = f as EntityImpl;
+    const fg = impl.getComponent<import('../components/FederationGovernanceComponent.js').FederationGovernanceComponent>(CT.FederationGovernance);
+    return fg && fg.currentPresidentEmpireId === president.id;
+  });
+
+  if (!federationEntity) {
+    throw new Error(`President ${president.id} has no associated federation`);
+  }
+
+  const federationImpl = federationEntity as EntityImpl;
+  const federation = federationImpl.getComponent<import('../components/FederationGovernanceComponent.js').FederationGovernanceComponent>(CT.FederationGovernance);
+
+  if (!federation) {
+    throw new Error('Federation entity missing FederationGovernance component');
+  }
+
+  // Cache queries
+  const allEmpires = empireGovernanceQuery.get(world);
+  const allNations = nationGovernanceQuery.get(world);
+
+  // Build members array
+  const memberCount = federation.memberEmpireIds.length + federation.memberNationIds.length;
+  const members: FederationMemberRecord[] = [];
+
+  // Calculate total sqrt population for voting power normalization
+  let totalSqrtPopulation = 0;
+  const memberPopulations = new Map<string, number>();
+
+  // Process empire members
+  for (const empireId of federation.memberEmpireIds) {
+    const empireEntity = allEmpires.find((e) => e.id === empireId);
+    if (!empireEntity) continue;
+
+    const empire = empireEntity.getComponent<EmpireGovernanceComponent>(CT.EmpireGovernance);
+    if (!empire) continue;
+
+    const population = empire.totalPopulation;
+    memberPopulations.set(empireId, population);
+    totalSqrtPopulation += Math.sqrt(population);
+  }
+
+  // Process nation members
+  for (const nationId of federation.memberNationIds) {
+    const nationEntity = allNations.find((n) => n.id === nationId);
+    if (!nationEntity) continue;
+
+    const nation = nationEntity.getComponent<NationGovernanceComponent>(CT.NationGovernance);
+    if (!nation) continue;
+
+    const population = nation.totalPopulation;
+    memberPopulations.set(nationId, population);
+    totalSqrtPopulation += Math.sqrt(population);
+  }
+
+  // Build member records with voting power
+  for (const empireId of federation.memberEmpireIds) {
+    const empireEntity = allEmpires.find((e) => e.id === empireId);
+    if (!empireEntity) continue;
+
+    const empire = empireEntity.getComponent<EmpireGovernanceComponent>(CT.EmpireGovernance);
+    if (!empire) continue;
+
+    const population = memberPopulations.get(empireId) || 0;
+    const votingPower = Math.sqrt(population) / totalSqrtPopulation;
+
+    members.push({
+      id: empireId,
+      name: empire.name,
+      type: 'empire',
+      population: empire.totalPopulation,
+      satisfaction: federation.stability.memberSatisfaction.get(empireId) || 0.7,
+      militaryContribution: empire.military.fleets.length,
+      votingPower,
+    });
+  }
+
+  for (const nationId of federation.memberNationIds) {
+    const nationEntity = allNations.find((n) => n.id === nationId);
+    if (!nationEntity) continue;
+
+    const nation = nationEntity.getComponent<NationGovernanceComponent>(CT.NationGovernance);
+    if (!nation) continue;
+
+    const population = memberPopulations.get(nationId) || 0;
+    const votingPower = Math.sqrt(population) / totalSqrtPopulation;
+
+    members.push({
+      id: nationId,
+      name: nation.name,
+      type: 'nation',
+      population: nation.totalPopulation,
+      satisfaction: federation.stability.memberSatisfaction.get(nationId) || 0.7,
+      militaryContribution: nation.military.standingArmy,
+      votingPower,
+    });
+  }
+
+  // Build federal laws array
+  const federalLaws: FederalLawSummary[] = federation.federalLaws.map((law) => ({
+    name: law.name,
+    scope: law.scope,
+    complianceRate: law.complianceRate,
+    enactedTick: law.enactedTick,
+  }));
+
+  // Build joint operations array
+  const jointOperations: JointOperationSummary[] = federation.military.activeJointOperations.map((op) => ({
+    id: op.id,
+    name: op.name,
+    type: op.type,
+    participatingMembers: op.participatingMembers.length,
+    fleetsCommitted: op.fleetsCommitted.size,
+    status: op.status,
+  }));
+
+  // Calculate secession risks
+  const secessionRisks: Array<{ memberId: string; risk: number }> = [];
+  for (const [memberId, risk] of federation.stability.withdrawalRisk.entries()) {
+    if (risk > 0.1) {
+      secessionRisks.push({ memberId, risk });
+    }
+  }
+
+  // Calculate average satisfaction
+  let totalSatisfaction = 0;
+  let satisfactionCount = 0;
+  for (const satisfaction of federation.stability.memberSatisfaction.values()) {
+    totalSatisfaction += satisfaction;
+    satisfactionCount++;
+  }
+  const averageSatisfaction = satisfactionCount > 0 ? totalSatisfaction / satisfactionCount : 0.7;
+
+  // Calculate term remaining
+  const termRemaining = federation.nextRotationTick ? federation.nextRotationTick - world.tick : 0;
+
+  return {
+    federation: {
+      name: federation.name,
+      governanceType: federation.governanceType,
+      population: federation.totalPopulation,
+      territory: federation.totalSystems,
+      memberCount,
+    },
+    presidency: {
+      currentPresidentId: federation.currentPresidentEmpireId,
+      termRemaining,
+    },
+    members,
+    federalLaws,
+    jointOperations,
+    tradeUnion: {
+      internalTariffRate: federation.tradeUnion.internalTariffs,
+      externalTariffRate: federation.tradeUnion.externalTariffs,
+      internalTradeVolume: federation.tradeUnion.internalTradeVolume,
+      commonCurrency: federation.tradeUnion.commonCurrency,
+    },
+    stability: {
+      cohesion: federation.stability.cohesion,
+      averageSatisfaction,
+      secessionRisks,
+    },
+    pendingProposals: [], // TODO: Link to FederationGovernanceSystem.activeProposals
+  };
+}
+
+// ============================================================================
 // TIER 6: GALACTIC COUNCIL CONTEXT
 // ============================================================================
 

@@ -25,6 +25,7 @@ import type {
   EmpireContext,
   NationContext,
   ProvinceGovernorContext,
+  FederationContext,
 } from './GovernorContextBuilders.js';
 import type { Crisis } from './DecisionProtocols.js';
 
@@ -369,6 +370,133 @@ Respond with JSON:
     "amendment": "proposed changes (if applicable)"
   },
   "speech": "Your floor speech (optional, keep brief)"
+}`;
+}
+
+// ============================================================================
+// 3.5. FEDERATION PRESIDENT PROMPT TEMPLATE
+// ============================================================================
+
+/**
+ * Build prompt for federation president (federation tier)
+ *
+ * Per 11-LLM-GOVERNORS.md:
+ * - Pan-galactic coordination of multiple empires/nations
+ * - Decisions: Federal laws, joint operations, tariff policy, mediation
+ * - LLM Budget: 2 calls/hour (strategic tier)
+ *
+ * @param context Federation context from context builders
+ * @returns Formatted prompt string for LLM
+ */
+export function buildFederationPresidentPrompt(context: FederationContext): string {
+  // Format members list with satisfaction indicators
+  const membersList = context.members
+    .map((m) => {
+      const satisfactionIndicator =
+        m.satisfaction > 0.7 ? '✓'
+        : m.satisfaction > 0.4 ? '~'
+        : '!';
+      return `- [${satisfactionIndicator}] ${m.name} (${m.type}): ${m.population.toLocaleString()} pop, ${Math.round(m.votingPower * 100)}% voting power, ${Math.round(m.satisfaction * 100)}% satisfaction`;
+    })
+    .join('\n');
+
+  // Format federal laws
+  const lawsList = context.federalLaws.length > 0
+    ? context.federalLaws
+        .map((l) => `- ${l.name} (${l.scope}): ${Math.round(l.complianceRate * 100)}% compliance`)
+        .join('\n')
+    : '- No federal laws enacted yet';
+
+  // Format joint operations
+  const operationsList = context.jointOperations.length > 0
+    ? context.jointOperations
+        .map((o) => `- ${o.name} (${o.type}): ${o.participatingMembers} members, ${o.fleetsCommitted} fleets, ${o.status}`)
+        .join('\n')
+    : '- No active joint operations';
+
+  // Format secession risks
+  const secessionRisksList = context.stability.secessionRisks.length > 0
+    ? context.stability.secessionRisks
+        .map((r) => `- ${r.memberId}: ${Math.round(r.risk * 100)}% risk`)
+        .join('\n')
+    : '- No significant secession risks';
+
+  // Calculate term info
+  const termTicks = context.presidency.termRemaining;
+  const termMonths = Math.floor(termTicks / (20 * 60 * 60 * 24 * 30)); // Rough estimate
+
+  return `You are the FEDERATION PRESIDENT of the ${context.federation.name}, a ${context.federation.governanceType} alliance governing ${context.federation.population.toLocaleString()} citizens across ${context.federation.territory} star systems.
+
+FEDERATION STATUS:
+- Governance Type: ${context.federation.governanceType.toUpperCase()}
+- Member States: ${context.federation.memberCount}
+- Total Population: ${context.federation.population.toLocaleString()}
+- Territory: ${context.federation.territory} star systems
+- Cohesion: ${Math.round(context.stability.cohesion * 100)}%
+- Average Satisfaction: ${Math.round(context.stability.averageSatisfaction * 100)}%
+
+YOUR PRESIDENCY:
+- Term Remaining: ${termTicks} ticks (~${termMonths} months)
+- Presidency rotates among member states
+
+MEMBER STATES:
+${membersList}
+
+FEDERAL LAWS:
+${lawsList}
+
+JOINT MILITARY OPERATIONS:
+${operationsList}
+
+TRADE UNION:
+- Internal Tariffs: ${Math.round(context.tradeUnion.internalTariffRate * 100)}%
+- External Tariffs: ${Math.round(context.tradeUnion.externalTariffRate * 100)}%
+- Internal Trade Volume: ${context.tradeUnion.internalTradeVolume.toLocaleString()}
+${context.tradeUnion.commonCurrency ? `- Common Currency: ${context.tradeUnion.commonCurrency}` : ''}
+
+SECESSION RISKS:
+${secessionRisksList}
+
+YOUR ROLE AS PRESIDENT:
+- Propose federal laws (require 66% supermajority for constitutional changes)
+- Coordinate joint military operations
+- Set federal tariff policy
+- Mediate disputes between member states
+- Maintain federation cohesion
+
+VOTING SYSTEM:
+- Weighted by population: votingPower = sqrt(population) / totalSqrtPop
+- Founding members (first 3-5) have veto power
+- Quorum requirement: 60% of voting power must participate
+- Passage threshold: 66% for constitutional, 51% for normal laws
+
+AVAILABLE ACTIONS:
+- propose_federal_law: Introduce new law binding on all members
+- call_for_vote: Initiate voting on pending proposal
+- deploy_peacekeepers: Send joint fleet for peacekeeping operation
+- adjust_tariffs: Change internal or external tariff rates
+- mediate_dispute: Resolve conflict between members
+- grant_concessions: Offer benefits to dissatisfied member (prevent secession)
+- coordinate_defense: Organize joint defense against external threat
+
+What is your presidential decision?
+
+Respond with JSON:
+{
+  "reasoning": "Your strategic analysis",
+  "action": {
+    "type": "propose_federal_law" | "call_for_vote" | "deploy_peacekeepers" | "adjust_tariffs" | "mediate_dispute" | "grant_concessions" | "coordinate_defense",
+    "target": "member_id or proposal_id",
+    "parameters": {
+      "lawName": "name of law (if proposing)",
+      "scope": "trade | military | justice | rights | environment",
+      "requiresSupermajority": true | false,
+      "tariffType": "internal | external",
+      "newRate": 0.05,
+      "operationType": "defense | peacekeeping | exploration | humanitarian"
+    }
+  },
+  "statement": "Your presidential address (optional)"
 }`;
 }
 
