@@ -167,6 +167,21 @@ export class AvatarSystem extends BaseSystem {
 
     this.avatars.set(avatar.id, avatar);
 
+    // EXOTIC PLOT EVENT: champion_chosen when deity creates an avatar
+    // Avatars are divine champions/manifestations
+    const deityIdentity = deity.identity;
+    const soulComp = avatarEntity.getComponent(CT.Soul);
+    this.events.emit('divinity:champion_chosen', {
+      championId: avatarEntity.id,
+      soulId: (soulComp as any)?.soulId || avatarEntity.id,
+      deityId,
+      deityName: deityIdentity.primaryName,
+      championType: 'avatar',
+      dutiesAssigned: [purpose, 'represent_deity', 'manifest_divine_will'],
+      powerGranted: Math.floor(deity.belief.currentBelief * 0.1), // 10% of deity's belief as power
+      tick: world.tick,
+    });
+
     return avatar;
   }
 

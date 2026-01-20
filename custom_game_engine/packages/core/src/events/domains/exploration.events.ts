@@ -15,202 +15,97 @@
  * See: packages/core/src/systems/ExplorationDiscoverySystem.ts
  */
 
-import type { BaseEvent } from '../EventMap.js';
+import type { EntityId } from '../../types.js';
 
-// ============================================================================
-// Exploration Mission Events
-// ============================================================================
+export interface ExplorationEvents {
+  // === Exploration Mission Events ===
 
-/**
- * Ship begins exploration mission
- */
-export interface ExplorationMissionStartedEvent extends BaseEvent {
-  type: 'exploration:mission_started';
-  domain: 'exploration';
-  payload: {
-    /** Ship entity ID */
-    shipId: string;
-    /** Target stellar phenomenon or planet ID */
+  /** Ship begins exploration mission */
+  'exploration:mission_started': {
+    shipId: EntityId;
     targetId: string;
-    /** Target type */
     targetType: 'stellar_phenomenon' | 'planet';
-    /** Mission type */
     missionType: 'survey' | 'resource_scan' | 'deep_analysis';
-    /** Target coordinates */
     targetCoordinates: { x: number; y: number; z: number };
-    /** Civilization conducting mission */
-    civilizationId: string;
+    civilizationId: EntityId;
   };
-}
 
-/**
- * Resource discovered during exploration
- */
-export interface ExplorationResourceDiscoveredEvent extends BaseEvent {
-  type: 'exploration:resource_discovered';
-  domain: 'exploration';
-  payload: {
-    /** Ship entity ID */
-    shipId: string;
-    /** Resource type discovered */
+  /** Resource discovered during exploration */
+  'exploration:resource_discovered': {
+    shipId: EntityId;
     resourceType: string;
-    /** Location ID (stellar phenomenon or planet) */
     locationId: string;
-    /** Location type */
     locationType: 'stellar_phenomenon' | 'planet';
-    /** Estimated abundance (0-1) */
     abundance: number;
-    /** Extraction difficulty (0-1) */
     difficulty: number;
-    /** Civilization that discovered it */
-    civilizationId: string;
-    /** Is this resource era-gated? */
+    civilizationId: EntityId;
     isEraGated: boolean;
-    /** Era requirement (if era-gated) */
     eraRequirement?: number;
   };
-}
 
-/**
- * Exploration mission completed
- */
-export interface ExplorationMissionCompletedEvent extends BaseEvent {
-  type: 'exploration:mission_completed';
-  domain: 'exploration';
-  payload: {
-    /** Ship entity ID */
-    shipId: string;
-    /** Target that was surveyed */
+  /** Exploration mission completed */
+  'exploration:mission_completed': {
+    shipId: EntityId;
     targetId: string;
-    /** Target type */
     targetType: 'stellar_phenomenon' | 'planet';
-    /** Resources discovered during mission */
-    discoveredResources: string[]; // Resource type IDs
-    /** Mission duration in ticks */
+    discoveredResources: string[];
     duration: number;
-    /** Final progress (0-100%) */
     progress: number;
-    /** Civilization conducting mission */
-    civilizationId: string;
+    civilizationId: EntityId;
   };
-}
 
-/**
- * Rare or exotic resource found (high difficulty/low abundance)
- */
-export interface ExplorationRareFindEvent extends BaseEvent {
-  type: 'exploration:rare_find';
-  domain: 'exploration';
-  payload: {
-    /** Ship entity ID */
-    shipId: string;
-    /** Rare resource discovered */
+  /** Rare or exotic resource found (high difficulty/low abundance) */
+  'exploration:rare_find': {
+    shipId: EntityId;
     resourceType: string;
-    /** Location ID */
     locationId: string;
-    /** Rarity score (difficulty + (1 - abundance)) / 2 */
     rarityScore: number;
-    /** Civilization that found it */
-    civilizationId: string;
-    /** Is this the first discovery of this resource? */
+    civilizationId: EntityId;
     isFirstDiscovery: boolean;
   };
-}
 
-// ============================================================================
-// Mining Operation Events
-// ============================================================================
+  // === Mining Operation Events ===
 
-/**
- * Mining operation started at a location
- */
-export interface ExplorationMiningOperationStartedEvent extends BaseEvent {
-  type: 'exploration:mining_operation_started';
-  domain: 'exploration';
-  payload: {
-    /** Mining operation entity ID */
-    operationId: string;
-    /** Location being mined */
+  /** Mining operation started at a location */
+  'exploration:mining_operation_started': {
+    operationId: EntityId;
     locationId: string;
-    /** Location type */
     locationType: 'stellar_phenomenon' | 'planet';
-    /** Resource being extracted */
     resourceType: string;
-    /** Ships assigned to mining */
-    assignedShips: string[];
-    /** Expected harvest rate (units per tick) */
+    assignedShips: EntityId[];
     harvestRate: number;
-    /** Extraction efficiency (0-1) */
     efficiency: number;
-    /** Civilization conducting operation */
-    civilizationId: string;
+    civilizationId: EntityId;
   };
-}
 
-/**
- * Mining stockpile reached threshold, ready for transport
- */
-export interface ExplorationStockpileFullEvent extends BaseEvent {
-  type: 'exploration:stockpile_full';
-  domain: 'exploration';
-  payload: {
-    /** Mining operation entity ID */
-    operationId: string;
-    /** Resource type in stockpile */
+  /** Mining stockpile reached threshold, ready for transport */
+  'exploration:stockpile_full': {
+    operationId: EntityId;
     resourceType: string;
-    /** Current stockpile amount */
     stockpile: number;
-    /** Location ID */
     locationId: string;
-    /** Civilization owning the operation */
-    civilizationId: string;
-    /** Suggested transport: create shipping mission */
+    civilizationId: EntityId;
     suggestTransport: boolean;
   };
-}
 
-/**
- * Mining operation ended (depleted, abandoned, or completed)
- */
-export interface ExplorationMiningOperationEndedEvent extends BaseEvent {
-  type: 'exploration:mining_operation_ended';
-  domain: 'exploration';
-  payload: {
-    /** Mining operation entity ID */
-    operationId: string;
-    /** Resource type */
+  /** Mining operation ended (depleted, abandoned, or completed) */
+  'exploration:mining_operation_ended': {
+    operationId: EntityId;
     resourceType: string;
-    /** Total extracted during operation */
     totalExtracted: number;
-    /** Reason for ending */
     reason: 'depleted' | 'abandoned' | 'completed' | 'destroyed';
-    /** Location ID */
     locationId: string;
-    /** Civilization conducting operation */
-    civilizationId: string;
+    civilizationId: EntityId;
   };
-}
 
-// ============================================================================
-// Era Progression Events
-// ============================================================================
+  // === Era Progression Events ===
 
-/**
- * Era advancement blocked due to missing gated resources
- */
-export interface EraAdvancementBlockedEvent extends BaseEvent {
-  type: 'era:advancement_blocked';
-  domain: 'exploration';
-  payload: {
-    /** Civilization entity ID */
-    civilizationId: string;
-    /** Current era */
+  /** Era advancement blocked due to missing gated resources */
+  'era:advancement_blocked': {
+    civilizationId: EntityId;
     currentEra: number;
-    /** Target era (blocked) */
     targetEra: number;
-    /** Missing gated resources */
     missingResources: string[];
-    /** Suggested locations to find missing resources */
     suggestedLocations?: Array<{
       locationId: string;
       locationType: 'stellar_phenomenon' | 'planet';
@@ -218,72 +113,28 @@ export interface EraAdvancementBlockedEvent extends BaseEvent {
       estimatedAbundance: number;
     }>;
   };
-}
 
-// ============================================================================
-// Discovery Analytics Events
-// ============================================================================
+  // === Discovery Analytics Events ===
 
-/**
- * New stellar phenomenon discovered
- */
-export interface StellarPhenomenonDiscoveredEvent extends BaseEvent {
-  type: 'exploration:stellar_phenomenon_discovered';
-  domain: 'exploration';
-  payload: {
-    /** Phenomenon entity ID */
+  /** New stellar phenomenon discovered */
+  'exploration:stellar_phenomenon_discovered': {
     phenomenonId: string;
-    /** Phenomenon type */
     phenomenonType: string;
-    /** Ship that discovered it */
-    shipId: string;
-    /** System ID */
+    shipId: EntityId;
     systemId: string;
-    /** Coordinates */
     coordinates: { x: number; y: number; z: number };
-    /** Number of resources at this location */
     resourceCount: number;
-    /** Civilization that discovered it */
-    civilizationId: string;
+    civilizationId: EntityId;
   };
-}
 
-/**
- * Planet discovered and catalogued
- */
-export interface PlanetDiscoveredEvent extends BaseEvent {
-  type: 'exploration:planet_discovered';
-  domain: 'exploration';
-  payload: {
-    /** Planet ID */
+  /** Planet discovered and catalogued */
+  'exploration:planet_discovered': {
     planetId: string;
-    /** Planet type */
     planetType: string;
-    /** Ship that discovered it */
-    shipId: string;
-    /** System ID */
+    shipId: EntityId;
     systemId: string;
-    /** Estimated resource richness (0-1) */
     resourceRichness: number;
-    /** Civilization that discovered it */
-    civilizationId: string;
-    /** Is this planet habitable? */
+    civilizationId: EntityId;
     isHabitable: boolean;
   };
 }
-
-// ============================================================================
-// Event Type Union
-// ============================================================================
-
-export type ExplorationEvent =
-  | ExplorationMissionStartedEvent
-  | ExplorationResourceDiscoveredEvent
-  | ExplorationMissionCompletedEvent
-  | ExplorationRareFindEvent
-  | ExplorationMiningOperationStartedEvent
-  | ExplorationStockpileFullEvent
-  | ExplorationMiningOperationEndedEvent
-  | EraAdvancementBlockedEvent
-  | StellarPhenomenonDiscoveredEvent
-  | PlanetDiscoveredEvent;

@@ -128,6 +128,32 @@ export class VillageGovernanceSystem extends BaseSystem {
       newElders,
       tick: world.tick,
     });
+
+    // EXOTIC PLOT EVENT: political_elevation for village leader
+    if (newElders.length > 0 && newElders[0]) {
+      const chiefId = newElders[0];
+      const chiefAgent = world.getEntity(chiefId);
+      const soulComp = chiefAgent?.getComponent(CT.Soul);
+
+      if (chiefAgent && soulComp) {
+        // Calculate power level based on population
+        const powerLevel = Math.min(100, 40 + Math.floor(voters.length / 2));
+
+        // Emit political_elevation if power level >= 50 and ruling >= 10 people
+        if (powerLevel >= 50 && voters.length >= 10) {
+          this.events.emit('governance:political_elevation', {
+            agentId: chiefId,
+            soulId: (soulComp as any).soulId || chiefId,
+            previousRole: null,
+            newRole: 'village_leader',
+            powerLevel,
+            subjectCount: voters.length,
+            electionType: governance.governanceType === 'direct_democracy' ? 'democratic' : 'democratic',
+            tick: world.tick,
+          });
+        }
+      }
+    }
   }
 
   /**
