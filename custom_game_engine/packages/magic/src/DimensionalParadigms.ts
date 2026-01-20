@@ -497,6 +497,10 @@ export const DIMENSION_PARADIGM: MagicParadigm = {
 sees as a mere slice. Dimensional mages learn to perceive beyond their native
 dimensions, fold space for travel, and - if desperate - reduce dimensions entirely.
 
+**Building Summoning**: Advanced mages can conjure shelters (Tier 1), towers (Tier 2),
+tesseracts (Tier 3), penteracts (Tier 4), and hexeracts (Tier 5). Realm pockets create
+spaces bigger on the inside. These structures are folded from geometry itself.
+
 The Nightmare Realm exists in the spaces between. Entities like the Triangle
 (DO NOT SUMMON) wait for moments when the barrier thins. Every portal is a door
 that swings both ways.

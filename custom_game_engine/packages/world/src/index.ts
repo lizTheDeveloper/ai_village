@@ -14,5 +14,6 @@ export * from './research-papers/index.js';
 export * from './systems/index.js';
 export * from './planet/index.js';
 export * from './biosphere/index.js';
+export * from './stellar/index.js';
 export * from './workers/chunk-generation-types.js';
 export { ChunkGenerationWorkerPool } from './workers/ChunkGenerationWorkerPool.js';

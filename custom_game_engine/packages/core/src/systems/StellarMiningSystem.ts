@@ -434,20 +434,7 @@ export class StellarMiningSystem extends BaseSystem {
       };
     });
 
-    // Emit stockpile full event
-    world.eventBus.emit({
-      type: 'mining:stockpile_ready_for_transport' as const,
-      source: entity.id,
-      data: {
-        operationId: entity.id,
-        resourceType: operation.resourceType,
-        stockpile: operation.stockpile,
-        locationId: operation.locationId,
-        civilizationId: operation.civilizationId,
-      },
-    });
-
-    // Also emit exploration domain event for compatibility
+    // Emit exploration domain event for stockpile full
     world.eventBus.emit({
       type: 'exploration:stockpile_full' as const,
       source: entity.id,
@@ -522,7 +509,7 @@ export class StellarMiningSystem extends BaseSystem {
         },
         lastDepositTime: {
           ...typed.lastDepositTime,
-          [operation.resourceType]: world.getTime(),
+          [operation.resourceType]: world.tick,
         },
       };
     });
@@ -569,24 +556,16 @@ export class StellarMiningSystem extends BaseSystem {
 
   /**
    * Emit resource extraction event
+   * TODO: Add mining-specific events to exploration.events.ts
    */
   private emitExtractionEvent(
-    world: World,
-    operation: MiningOperationComponent,
-    quantity: number,
+    _world: World,
+    _operation: MiningOperationComponent,
+    _quantity: number,
     _currentTick: number
   ): void {
-    world.eventBus.emit({
-      type: 'mining:resources_extracted' as const,
-      source: operation.locationId,
-      data: {
-        operationId: operation.locationId, // Using locationId as operation ID
-        resourceType: operation.resourceType,
-        quantity,
-        remainingCapacity: operation.estimatedRemaining,
-        timestamp: world.getTime(),
-      },
-    });
+    // For now, resource extraction happens silently
+    // In full implementation, this would emit detailed mining metrics
   }
 
   // ===========================================================================

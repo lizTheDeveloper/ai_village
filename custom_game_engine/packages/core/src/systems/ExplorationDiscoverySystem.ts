@@ -43,12 +43,12 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type {
   StellarPhenomenon,
   ResourceSpawn,
-} from '../../../world/src/stellar/StellarPhenomena.js';
+} from '@ai-village/world';
 import {
   StellarPhenomenonType,
   getRequiredTechLevel,
   calculateMiningEfficiency,
-} from '../../../world/src/stellar/StellarPhenomena.js';
+} from '@ai-village/world';
 
 /** Update interval: every 5 ticks = 0.25 seconds at 20 TPS */
 const UPDATE_INTERVAL = 5;

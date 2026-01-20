@@ -29,6 +29,7 @@ interface SimplifiedEventBus {
 // Time & Environment
 import { TimeSystem } from './TimeSystem.js';
 import { TimeCompressionSystem } from './TimeCompressionSystem.js';
+import { StatisticalModeManager } from './StatisticalModeManager.js';
 import { WeatherSystem } from './WeatherSystem.js';
 import { TemperatureSystem } from './TemperatureSystem.js';
 import { FireSpreadSystem } from './FireSpreadSystem.js';
@@ -72,6 +73,7 @@ import { NeedsSystem } from './NeedsSystem.js';
 import { MoodSystem } from './MoodSystem.js';
 import { SleepSystem } from './SleepSystem.js';
 import { SteeringSystem } from './SteeringSystem.js';
+import { AgeTrackingSystem } from './AgeTrackingSystem.js';
 
 // Memory & Cognition
 import { MemorySystem } from './MemorySystem.js';

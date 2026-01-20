@@ -479,4 +479,344 @@ Generate the era snapshot now:`;
       return null;
     }
   }
+
+  /**
+   * Calculate life expectancy based on technology level and current age
+   *
+   * @param techLevel - Current civilization technology level (0-10 scale)
+   * @param currentAge - Current age of the soul agent
+   * @returns Expected remaining years of life
+   */
+  calculateLifeExpectancy(techLevel: number, currentAge: number): number {
+    // Base life expectancy ranges by tech level
+    // Tech 0-2 (stone age): 30-40 years
+    // Tech 3-5 (bronze/iron): 40-60 years
+    // Tech 6-8 (medieval/renaissance): 50-70 years
+    // Tech 9-10 (industrial/modern): 70-90 years
+
+    const baseLifeExpectancy = 30 + (techLevel * 6); // Linear scaling from 30 to 90
+
+    // Add some randomness (±20%)
+    const variance = baseLifeExpectancy * 0.2;
+    const randomFactor = (Math.random() * 2 - 1) * variance;
+    const totalLifeExpectancy = Math.max(25, baseLifeExpectancy + randomFactor);
+
+    // Calculate remaining years
+    const remainingYears = Math.max(0, totalLifeExpectancy - currentAge);
+
+    return remainingYears;
+  }
+
+  /**
+   * Build prompt for generating major historical events during time jump
+   */
+  buildMajorEventsPrompt(params: EventGenerationParams): string {
+    const {
+      years,
+      totalEvents,
+      startingPopulation,
+      techLevel,
+      civilizationCount,
+      soulTrajectories,
+      startTick,
+      endTick,
+    } = params;
+
+    // Extract notable soul achievements for context
+    const notableAchievements = soulTrajectories
+      .filter(t => t.endState.alive || t.endState.achievements.length > 0)
+      .map(t => ({
+        id: t.soulAgentId,
+        achievements: t.endState.achievements.slice(0, 3), // Top 3 achievements
+      }))
+      .slice(0, 10); // Limit to top 10 souls for prompt size
+
+    const prompt = `# Major Historical Event Generation
+
+You are creating a historical timeline for a civilization that experienced ${years} years of compressed time (tick ${startTick} to ${endTick}).
+
+## Civilization Context
+- **Population**: ${startingPopulation.toLocaleString()} individuals
+- **Technology Level**: ${techLevel}/10
+- **Number of Civilizations**: ${civilizationCount}
+- **Notable Souls**: ${soulTrajectories.length} individuals with tracked trajectories
+
+## Notable Soul Achievements
+${notableAchievements.map(soul =>
+  `- Soul ${soul.id}: ${soul.achievements.join(', ')}`
+).join('\n') || 'No notable achievements recorded'}
+
+## Your Task
+
+Generate ${totalEvents} major historical events that occurred during this ${years}-year period. These should be:
+
+1. **Era-Appropriate**: Match the technology level (${techLevel}/10)
+2. **Population-Scaled**: Reflect a population of ${startingPopulation.toLocaleString()}
+3. **Diverse**: Mix of discoveries, conflicts, golden ages, plagues, cultural developments
+4. **Connected**: Some events should reference soul achievements or prior events
+5. **Impactful**: Each event should have measurable effects on population/tech/stability
+
+## Event Frequency Guidelines
+- More population = more events
+- Higher tech = more innovation events
+- Multiple civilizations = more diplomatic/conflict events
+- Events should be spread across the ${years} years
+
+## Output Format
+
+Return a JSON object with this structure:
+
+\`\`\`json
+{
+  "events": [
+    {
+      "yearOffset": 15,
+      "type": "discovery",
+      "title": "The Iron Revolution",
+      "description": "A breakthrough in metallurgy enabled mass production of iron tools",
+      "involvedSouls": ["soul_id_1", "soul_id_2"],
+      "impact": {
+        "population": 500,
+        "techLevel": 0.5,
+        "stability": 0.2
+      },
+      "significance": 0.8
+    }
+  ]
+}
+\`\`\`
+
+**Event Types**: discovery, war, plague, golden_age, extinction, contact, ascension, cultural
+
+**Impact Values**:
+- population: Positive/negative delta (deaths = negative)
+- techLevel: 0-1 delta (0.1 = minor advance, 1.0 = major breakthrough)
+- stability: -1 to 1 delta (negative = chaos, positive = harmony)
+
+**Significance**: 0-1 (how important for history; 1.0 = era-defining)
+
+Generate the ${totalEvents} events now:`;
+
+    return prompt;
+  }
+
+  /**
+   * Parse major events from LLM response
+   */
+  parseMajorEventsResponse(
+    llmResponse: string,
+    startTick: number,
+    endTick: number
+  ): MajorEvent[] {
+    try {
+      // Extract JSON from response
+      const jsonMatch = llmResponse.match(/```json\s*([\s\S]*?)\s*```/) ||
+                       llmResponse.match(/\{[\s\S]*\}/);
+
+      if (!jsonMatch) {
+        console.error('[TrajectoryPromptBuilder] No JSON found in events response');
+        return [];
+      }
+
+      const jsonStr = jsonMatch[1] || jsonMatch[0];
+      const parsed = JSON.parse(jsonStr);
+
+      if (!Array.isArray(parsed.events)) {
+        console.error('[TrajectoryPromptBuilder] Events response missing "events" array');
+        return [];
+      }
+
+      const totalYears = Number(endTick - startTick) / 525600; // Ticks to years
+
+      return parsed.events.map((event: any) => {
+        // Convert year offset to absolute tick
+        const yearOffset = event.yearOffset || 0;
+        const tickOffset = Math.floor((yearOffset / totalYears) * Number(endTick - startTick));
+        const eventTick = startTick + tickOffset;
+
+        return {
+          tick: eventTick,
+          type: event.type || 'cultural',
+          title: event.title || 'Untitled Event',
+          description: event.description || '',
+          involvedSoulAgents: Array.isArray(event.involvedSouls) ? event.involvedSouls : [],
+          impact: {
+            population: event.impact?.population || 0,
+            techLevel: event.impact?.techLevel || 0,
+            stability: event.impact?.stability || 0,
+          },
+          significance: Math.max(0, Math.min(1, event.significance || 0.5)),
+        };
+      });
+    } catch (error) {
+      console.error('[TrajectoryPromptBuilder] Failed to parse events response:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Build prompt for generating a complete life trajectory with milestones
+   * This is an enhanced version that generates the LifeTrajectory format
+   */
+  buildLifeTrajectoryPrompt(
+    request: TrajectoryRequest,
+    currentAge: number,
+    techLevel: number
+  ): string {
+    const { soulEntity, startTick, endTick, yearsCovered } = request;
+
+    const soulIdentity = soulEntity.getComponent('soul_identity' as ComponentType) as
+      | SoulIdentityComponent
+      | undefined;
+
+    if (!soulIdentity) {
+      throw new Error(`Soul entity ${soulEntity.id} missing SoulIdentityComponent`);
+    }
+
+    const { soulName, purpose, destiny, coreInterests, archetype } = soulIdentity;
+
+    // Calculate life expectancy
+    const expectedRemainingYears = this.calculateLifeExpectancy(techLevel, currentAge);
+    const willDie = yearsCovered > expectedRemainingYears;
+    const deathYear = willDie ? Math.floor(expectedRemainingYears + (Math.random() * 5)) : null;
+
+    const prompt = `# Life Trajectory Generation
+
+You are generating a detailed life trajectory for a soul during a ${yearsCovered}-year time skip.
+
+## Soul Identity
+- **Name**: ${soulName}
+- **Current Age**: ${currentAge} years
+- **Archetype**: ${archetype || 'wanderer'}
+- **Purpose**: ${purpose}
+${destiny ? `- **Destiny**: ${destiny}` : ''}
+- **Core Interests**: ${coreInterests.join(', ')}
+
+## Life Expectancy Context
+- **Expected Remaining Years**: ~${Math.floor(expectedRemainingYears)} years
+- **Time Skip Duration**: ${yearsCovered} years
+${willDie ? `- **WILL LIKELY DIE** around year ${deathYear} of time skip` : '- **LIKELY TO SURVIVE** time skip'}
+
+## Your Task
+
+Generate a detailed life trajectory with milestones. This should include:
+
+1. **Major Life Milestones**: 3-7 significant events spread across the ${yearsCovered} years
+2. **Death Handling**: ${willDie ? 'Include death event and cause' : 'Character survives to end of period'}
+3. **Descendants**: If appropriate for age/culture, mention children/family
+4. **Achievements**: Align with purpose and interests
+5. **Emotional Journey**: Include emotional impacts (joy, sorrow, growth)
+
+## Output Format
+
+Return a JSON object with this structure:
+
+\`\`\`json
+{
+  "milestones": [
+    {
+      "year": 5,
+      "event": "Married childhood friend",
+      "emotionalImpact": 0.8,
+      "involvedAgents": [],
+      "significance": 0.6
+    },
+    {
+      "year": 15,
+      "event": "Mastered advanced farming techniques",
+      "emotionalImpact": 0.7,
+      "involvedAgents": [],
+      "significance": 0.7
+    }
+    ${willDie ? `,
+    {
+      "year": ${deathYear},
+      "event": "Died peacefully, surrounded by family",
+      "emotionalImpact": -0.5,
+      "involvedAgents": [],
+      "significance": 1.0
+    }` : ''}
+  ],
+  "endState": {
+    "alive": ${!willDie},
+    "age": ${willDie ? currentAge + deathYear! : currentAge + yearsCovered},
+    ${willDie ? `"causeOfDeath": "natural causes / disease / accident",` : ''}
+    "descendants": [],
+    "achievements": [
+      "Achievement 1",
+      "Achievement 2"
+    ]
+  }
+}
+\`\`\`
+
+**Guidelines**:
+- emotionalImpact: -1 (devastating) to 1 (joyful)
+- significance: 0 (minor) to 1 (life-defining)
+- Spread milestones across the years (don't cluster)
+- Make achievements align with purpose: "${purpose}"
+
+Generate the life trajectory now:`;
+
+    return prompt;
+  }
+
+  /**
+   * Parse life trajectory from LLM response
+   */
+  parseLifeTrajectoryResponse(
+    soulAgentId: string,
+    llmResponse: string,
+    startTick: number,
+    endTick: number
+  ): LifeTrajectory | null {
+    try {
+      // Extract JSON from response
+      const jsonMatch = llmResponse.match(/```json\s*([\s\S]*?)\s*```/) ||
+                       llmResponse.match(/\{[\s\S]*\}/);
+
+      if (!jsonMatch) {
+        console.error('[TrajectoryPromptBuilder] No JSON found in life trajectory response');
+        return null;
+      }
+
+      const jsonStr = jsonMatch[1] || jsonMatch[0];
+      const parsed = JSON.parse(jsonStr);
+
+      // Validate milestones
+      const milestones: Milestone[] = Array.isArray(parsed.milestones)
+        ? parsed.milestones.map((m: any) => ({
+            year: m.year || 0,
+            event: m.event || 'Unknown event',
+            emotionalImpact: Math.max(-1, Math.min(1, m.emotionalImpact || 0)),
+            involvedAgents: Array.isArray(m.involvedAgents) ? m.involvedAgents : [],
+            significance: Math.max(0, Math.min(1, m.significance || 0.5)),
+          }))
+        : [];
+
+      // Sort milestones chronologically
+      milestones.sort((a, b) => a.year - b.year);
+
+      return {
+        soulAgentId,
+        startTick,
+        endTick,
+        milestones,
+        endState: {
+          alive: parsed.endState?.alive ?? true,
+          age: parsed.endState?.age || 0,
+          causeOfDeath: parsed.endState?.causeOfDeath,
+          descendants: Array.isArray(parsed.endState?.descendants)
+            ? parsed.endState.descendants
+            : [],
+          achievements: Array.isArray(parsed.endState?.achievements)
+            ? parsed.endState.achievements
+            : [],
+        },
+      };
+    } catch (error) {
+      console.error('[TrajectoryPromptBuilder] Failed to parse life trajectory:', error);
+      return null;
+    }
+  }
 }

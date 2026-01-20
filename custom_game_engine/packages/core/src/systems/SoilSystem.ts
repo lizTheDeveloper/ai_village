@@ -477,7 +477,7 @@ export class SoilSystem extends BaseSystem {
   private readonly SEASONAL_MODIFIERS = {
     spring: 1.0,   // Normal evaporation
     summer: 1.25,  // +25% evaporation (hot, dry)
-    autumn: 1.0,   // Normal evaporation
+    fall: 1.0,     // Normal evaporation
     winter: 0.5,   // -50% evaporation (cold, low evaporation)
   } as const;
 
@@ -510,9 +510,14 @@ export class SoilSystem extends BaseSystem {
     }
 
     // Modify by season
-    const currentSeason = world.gameTime.season;
-    const seasonalModifier = this.SEASONAL_MODIFIERS[currentSeason];
-    decay *= seasonalModifier;
+    const currentSeason = this.getCurrentSeason(world);
+    if (currentSeason) {
+      const seasonalModifier = this.SEASONAL_MODIFIERS[currentSeason];
+      if (seasonalModifier === undefined) {
+        throw new Error(`Missing seasonal modifier for season: ${currentSeason}`);
+      }
+      decay *= seasonalModifier;
+    }
 
     tile.moisture = Math.max(0, tile.moisture - decay);
 
