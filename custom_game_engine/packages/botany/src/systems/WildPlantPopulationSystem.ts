@@ -298,6 +298,10 @@ export class WildPlantPopulationSystem extends BaseSystem {
    * Try to germinate seeds from the seed bank
    */
   private germinateSeedBank(world: World): void {
+    // PERFORMANCE: Cache plant query before loop - avoids O(chunks × seeds × plants) → O(plants + chunks × seeds)
+    const allPlants = world.query().with(CT.Plant).executeEntities();
+    const crowdingRadiusSquared = this.config.crowdingRadius * this.config.crowdingRadius;
+
     for (const [chunkKey, bank] of this.seedBanks) {
       const currentCount = this.chunkPlantCounts.get(chunkKey) || 0;
 
@@ -316,8 +320,8 @@ export class WildPlantPopulationSystem extends BaseSystem {
 
         // Check germination conditions
         if (Math.random() < seed.viability * 0.3) { // 30% max chance
-          // Check for crowding at specific position
-          if (!this.isPositionCrowded(seed.position, world)) {
+          // Check for crowding at specific position (using cached plants)
+          if (!this.isPositionCrowdedCached(seed.position, allPlants, crowdingRadiusSquared)) {
             this.emitGerminationEvent(seed);
             seed.viability = 0; // Mark as used
             germinated++;
@@ -332,14 +336,14 @@ export class WildPlantPopulationSystem extends BaseSystem {
   }
 
   /**
-   * Check if a position is too crowded for a new plant
+   * Check if a position is too crowded for a new plant (using cached plants)
+   * PERFORMANCE: Uses pre-cached plant list and squared distance comparison
    */
-  private isPositionCrowded(
+  private isPositionCrowdedCached(
     position: { x: number; y: number },
-    world: World
+    plants: ReadonlyArray<Entity>,
+    crowdingRadiusSquared: number
   ): boolean {
-    const plants = world.query().with(CT.Plant).executeEntities();
-
     for (const entity of plants) {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
@@ -347,9 +351,10 @@ export class WildPlantPopulationSystem extends BaseSystem {
 
       const dx = plant.position.x - position.x;
       const dy = plant.position.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance < this.config.crowdingRadius) {
+      // PERFORMANCE: Squared distance comparison avoids Math.sqrt
+      if (distanceSquared < crowdingRadiusSquared) {
         return true;
       }
     }

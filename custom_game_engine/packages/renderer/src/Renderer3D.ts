@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import type { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
 import type { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 
@@ -768,10 +769,10 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    for (const entity of this.world.entities.values()) {
-      const agent = entity.components.get('agent');
-      if (!agent) continue;
+    // PERFORMANCE: Use ECS query instead of scanning all entities
+    const agentEntities = this.world.query().with(CT.Agent).with(CT.Position).executeEntities();
 
+    for (const entity of agentEntities) {
       const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
       if (!position) continue;
 
@@ -952,7 +953,10 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    for (const entity of this.world.entities.values()) {
+    // PERFORMANCE: Use ECS query instead of scanning all entities
+    const buildingEntities = this.world.query().with(CT.Building).with(CT.Position).executeEntities();
+
+    for (const entity of buildingEntities) {
       const building = entity.components.get('building') as {
         buildingType?: string;
         tier?: number;
@@ -1040,7 +1044,10 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    for (const entity of this.world.entities.values()) {
+    // PERFORMANCE: Use ECS query instead of scanning all entities
+    const animalEntities = this.world.query().with(CT.Animal).with(CT.Position).executeEntities();
+
+    for (const entity of animalEntities) {
       const animal = entity.components.get('animal') as {
         speciesId?: string;
         name?: string;
@@ -1431,7 +1438,10 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    for (const entity of this.world.entities.values()) {
+    // PERFORMANCE: Use ECS query instead of scanning all entities
+    const plantEntities = this.world.query().with(CT.Plant).executeEntities();
+
+    for (const entity of plantEntities) {
       const plant = entity.components.get('plant') as {
         speciesId?: string;
         stage?: string;
@@ -1649,6 +1659,9 @@ export class Renderer3D {
   // TIME-OF-DAY LIGHTING
   // ============================================================================
 
+  // PERFORMANCE: Cache time entity ID to avoid repeated queries
+  private cachedTimeEntityId: string | null = null;
+
   /**
    * Update lighting based on world time
    */
@@ -1657,14 +1670,34 @@ export class Renderer3D {
 
     // Find time entity - time component uses timeOfDay (0-24 continuous)
     let timeOfDay = 12; // Default to noon
-    for (const entity of this.world.entities.values()) {
-      const time = entity.components.get('time') as {
-        timeOfDay?: number;
-        phase?: string;
-      } | undefined;
-      if (time && time.timeOfDay !== undefined) {
-        timeOfDay = time.timeOfDay;
-        break;
+
+    // PERFORMANCE: Use cached time entity or query once
+    if (this.cachedTimeEntityId) {
+      const timeEntity = this.world.getEntity(this.cachedTimeEntityId);
+      if (timeEntity) {
+        const time = timeEntity.components.get('time') as {
+          timeOfDay?: number;
+          phase?: string;
+        } | undefined;
+        if (time && time.timeOfDay !== undefined) {
+          timeOfDay = time.timeOfDay;
+        }
+      } else {
+        this.cachedTimeEntityId = null; // Entity was removed, clear cache
+      }
+    }
+
+    if (!this.cachedTimeEntityId) {
+      const timeEntities = this.world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0 && timeEntities[0]) {
+        this.cachedTimeEntityId = timeEntities[0].id;
+        const time = timeEntities[0].components.get('time') as {
+          timeOfDay?: number;
+          phase?: string;
+        } | undefined;
+        if (time && time.timeOfDay !== undefined) {
+          timeOfDay = time.timeOfDay;
+        }
       }
     }
 

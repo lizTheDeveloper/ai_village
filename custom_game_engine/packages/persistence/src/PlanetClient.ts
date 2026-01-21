@@ -467,9 +467,6 @@ export class PlanetClient {
   /**
    * Subscribe to real-time chunk updates for a planet.
    * Returns an unsubscribe function.
-   *
-   * NOTE: WebSocket support requires server-side implementation (Phase 4).
-   * For now, this uses polling as a fallback.
    */
   subscribeToChunkUpdates(
     planetId: string,
@@ -484,15 +481,16 @@ export class PlanetClient {
 
     callbacks.add(onChunkUpdate);
 
-    // Try to establish WebSocket connection if not already connected
-    this.connectWebSocket(planetId);
+    // Establish WebSocket connection and subscribe to planet
+    this.connectWebSocket();
+    this.subscribeToPlanetViaWs(planetId);
 
     // Return unsubscribe function
     return () => {
       callbacks?.delete(onChunkUpdate);
       if (callbacks?.size === 0) {
         this.chunkUpdateCallbacks.delete(planetId);
-        // Could close WebSocket here if no more subscribers
+        this.unsubscribeFromPlanetViaWs(planetId);
       }
     };
   }
@@ -500,13 +498,101 @@ export class PlanetClient {
   /**
    * Connect to WebSocket for real-time updates
    */
-  private connectWebSocket(planetId: string): void {
-    // WebSocket implementation will be added in Phase 4
-    // For now, this is a stub that doesn't actually connect
-    // Real implementation would be:
-    // const wsUrl = this.baseUrl.replace('http', 'ws') + `/ws/planet/${planetId}/sync`;
-    // this.wsConnection = new WebSocket(wsUrl);
-    // this.wsConnection.onmessage = (event) => { ... };
+  private connectWebSocket(): void {
+    // Already connected
+    if (this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN) {
+      return;
+    }
+
+    // Connecting in progress
+    if (this.wsConnection && this.wsConnection.readyState === WebSocket.CONNECTING) {
+      return;
+    }
+
+    // Convert http to ws protocol
+    const wsUrl = this.baseUrl.replace(/^http/, 'ws');
+
+    try {
+      this.wsConnection = new WebSocket(wsUrl);
+
+      this.wsConnection.onopen = () => {
+        console.log('[PlanetClient] WebSocket connected');
+        // Re-subscribe to all planets we have callbacks for
+        for (const planetId of this.chunkUpdateCallbacks.keys()) {
+          this.subscribeToPlanetViaWs(planetId);
+        }
+      };
+
+      this.wsConnection.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+
+          if (message.type === 'planet_chunk_updated') {
+            // Received chunk update from another client
+            this.notifyChunkUpdate(message.planetId, message.chunk);
+          } else if (message.type === 'planet_subscribed') {
+            console.log(`[PlanetClient] Subscribed to planet ${message.planetId}`);
+          } else if (message.type === 'planet_unsubscribed') {
+            console.log(`[PlanetClient] Unsubscribed from planet ${message.planetId}`);
+          }
+        } catch (error) {
+          console.error('[PlanetClient] Error parsing WebSocket message:', error);
+        }
+      };
+
+      this.wsConnection.onclose = () => {
+        console.log('[PlanetClient] WebSocket disconnected');
+        this.wsConnection = null;
+
+        // Attempt to reconnect after 5 seconds if we still have subscribers
+        if (this.chunkUpdateCallbacks.size > 0) {
+          setTimeout(() => this.connectWebSocket(), 5000);
+        }
+      };
+
+      this.wsConnection.onerror = (error) => {
+        console.warn('[PlanetClient] WebSocket error:', error);
+      };
+    } catch (error) {
+      console.warn('[PlanetClient] Failed to connect WebSocket:', error);
+    }
+  }
+
+  /**
+   * Subscribe to a planet's updates via WebSocket
+   */
+  private subscribeToPlanetViaWs(planetId: string): void {
+    if (this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN) {
+      this.wsConnection.send(JSON.stringify({
+        type: 'planet_subscribe',
+        planetId,
+      }));
+    }
+  }
+
+  /**
+   * Unsubscribe from a planet's updates via WebSocket
+   */
+  private unsubscribeFromPlanetViaWs(planetId: string): void {
+    if (this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN) {
+      this.wsConnection.send(JSON.stringify({
+        type: 'planet_unsubscribe',
+        planetId,
+      }));
+    }
+  }
+
+  /**
+   * Send a chunk update to other subscribers via WebSocket
+   */
+  sendChunkUpdateViaWs(planetId: string, chunk: SerializedChunk): void {
+    if (this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN) {
+      this.wsConnection.send(JSON.stringify({
+        type: 'planet_chunk_update',
+        planetId,
+        chunk,
+      }));
+    }
   }
 
   /**

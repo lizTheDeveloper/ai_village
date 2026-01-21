@@ -21,6 +21,9 @@ export interface PlanetInitializationOptions {
   /** Whether to generate biosphere (default: true) */
   generateBiosphere?: boolean;
 
+  /** Pre-existing biosphere data from server cache (skip LLM generation) */
+  existingBiosphere?: any;
+
   /** Whether to queue sprite generation (default: true) */
   queueSprites?: boolean;
 
@@ -42,6 +45,7 @@ export async function initializePlanet(
     llmProvider,
     godCraftedSpawner,
     generateBiosphere = true,
+    existingBiosphere,
     queueSprites = true,
     spriteQueuePath,
     onProgress,
@@ -57,8 +61,53 @@ export async function initializePlanet(
   // Step 1: Create planet with terrain generator
   const planet = new Planet(config, godCraftedSpawner);
 
-  // Step 2: Generate biosphere if requested
-  if (generateBiosphere) {
+  // Step 2: Use existing biosphere from cache, or generate new one
+  if (existingBiosphere) {
+    // Use cached biosphere from server (skip 57s LLM generation!)
+    reportProgress(`🌿 Using cached biosphere...`);
+
+    try {
+      // Convert server format to full BiosphereData format
+      const speciesList = existingBiosphere.species || [];
+      const sapientList = speciesList.filter((s: any) => s.type === 'sapient');
+
+      const biosphere = {
+        $schema: 'https://aivillage.dev/schemas/biosphere/v1' as const,
+        planet: config,
+        niches: existingBiosphere.niches || [],
+        species: speciesList,
+        foodWeb: existingBiosphere.foodWeb || { relationships: [], trophicLevels: [] },
+        nicheFilling: existingBiosphere.nicheFilling || {},
+        sapientSpecies: sapientList,
+        artStyle: existingBiosphere.artStyle || 'pixel',
+        metadata: existingBiosphere.metadata || {
+          generatedAt: existingBiosphere.generatedAt || Date.now(),
+          generationTimeMs: existingBiosphere.generationDurationMs || 0,
+          totalSpecies: speciesList.length,
+          sapientCount: sapientList.length,
+          trophicLevels: 3,
+          averageSpeciesPerNiche: speciesList.length / Math.max(1, existingBiosphere.niches?.length || 1),
+        },
+      };
+
+      planet.setBiosphere(biosphere);
+
+      console.log(
+        `[PlanetInitializer] Cached biosphere: ${biosphere.species.length} species, ` +
+        `${biosphere.sapientSpecies.length} sapient`
+      );
+
+      // Still queue sprites for cached biosphere if needed
+      if (queueSprites) {
+        reportProgress(`🖼️ Preparing sprites...`);
+        await queueBiosphereSprites(biosphere, spriteQueuePath);
+        console.log(`[PlanetInitializer] Sprites queued`);
+      }
+    } catch (error) {
+      console.error(`[PlanetInitializer] Failed to use cached biosphere:`, error);
+    }
+  } else if (generateBiosphere) {
+    // Generate new biosphere via LLM (slow, ~57s)
     reportProgress(`🌿 Beginning biosphere generation...`);
 
     try {

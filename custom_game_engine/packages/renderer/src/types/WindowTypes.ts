@@ -157,6 +157,13 @@ export interface WindowConfig {
 
   /** Optional factory function to create panel lazily on first show */
   factory?: () => IWindowPanel;
+
+  /**
+   * List of system class names that must be enabled for this panel to appear in menus.
+   * If any system is disabled, the panel won't show in menus.
+   * Example: ['FleetSystem', 'NavySystem'] - panel only shows when fleet systems are enabled.
+   */
+  requiredSystems?: string[];
 }
 
 /**

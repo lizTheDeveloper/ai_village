@@ -351,8 +351,9 @@ import { GovernorDecisionSystem } from './GovernorDecisionSystem.js';  // Phase 
 import { MetricsCollectionSystem } from './MetricsCollectionSystem.js';
 import { CityDirectorSystem } from './CityDirectorSystem.js';
 
-// Auto-save
+// Auto-save & Chunk Sync
 import { AutoSaveSystem } from './AutoSaveSystem.js';
+import { ChunkSyncSystem } from './ChunkSyncSystem.js';
 
 // Query Cache Monitoring
 import { QueryCacheMonitorSystem } from './QueryCacheMonitorSystem.js';
@@ -1254,6 +1255,13 @@ export function registerAllSystems(
     const autoSaveSystem = new AutoSaveSystem(llmQueue);
     gameLoop.systemRegistry.register(autoSaveSystem);
   }
+
+  // ============================================================================
+  // CHUNK SYNC (Server-backed terrain persistence)
+  // ============================================================================
+  // Always register - system self-disables if not using ServerBackedChunkManager
+  const chunkSyncSystem = new ChunkSyncSystem();
+  gameLoop.systemRegistry.register(chunkSyncSystem);
 
   // ============================================================================
   // VALIDATION

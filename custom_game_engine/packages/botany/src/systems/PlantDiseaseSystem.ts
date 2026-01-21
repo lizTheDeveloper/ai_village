@@ -454,6 +454,22 @@ export class PlantDiseaseSystem extends BaseSystem {
     });
   }
 
+  // PERFORMANCE: Cache for plant queries to avoid repeated queries in same update cycle
+  private cachedPlants: ReadonlyArray<Entity> | null = null;
+  private cachedPlantsTickStamp: number = -1;
+
+  /**
+   * Get cached plants for this update cycle
+   */
+  private getCachedPlants(world: World): ReadonlyArray<Entity> {
+    const currentTick = world.tick;
+    if (this.cachedPlants === null || this.cachedPlantsTickStamp !== currentTick) {
+      this.cachedPlants = world.query().with(CT.Plant).executeEntities();
+      this.cachedPlantsTickStamp = currentTick;
+    }
+    return this.cachedPlants;
+  }
+
   /**
    * Check for new pest infestation
    */
@@ -478,6 +494,9 @@ export class PlantDiseaseSystem extends BaseSystem {
       return;
     }
 
+    // PERFORMANCE: Use cached plants query
+    const cachedPlants = this.getCachedPlants(world);
+
     // Select a pest
     const eligiblePests: PlantPest[] = [];
     for (const pest of this.pests.values()) {
@@ -485,8 +504,8 @@ export class PlantDiseaseSystem extends BaseSystem {
       if (!pest.seasonalActivity.includes(this.currentEnvironment.season)) continue;
       if (plant.pests.some(p => p.pestId === pest.id)) continue;
 
-      // Check repellents
-      if (this.isRepelledByNearbyPlants(plant, pest, world)) continue;
+      // Check repellents (using cached plants)
+      if (this.isRepelledByNearbyPlantsCached(plant, pest, cachedPlants)) continue;
 
       // Check conditions
       const conditions = pest.favoredConditions;
@@ -537,18 +556,17 @@ export class PlantDiseaseSystem extends BaseSystem {
   }
 
   /**
-   * Check if pest is repelled by nearby companion plants
+   * Check if pest is repelled by nearby companion plants (using cached plants)
+   * PERFORMANCE: Uses pre-cached plant list to avoid repeated queries
    */
-  private isRepelledByNearbyPlants(
+  private isRepelledByNearbyPlantsCached(
     plant: PlantComponent,
     pest: PlantPest,
-    world: World
+    cachedPlants: ReadonlyArray<Entity>
   ): boolean {
     if (!pest.repelledBy || pest.repelledBy.length === 0) return false;
 
-    const plants = world.query().with(CT.Plant).executeEntities();
-
-    for (const entity of plants) {
+    for (const entity of cachedPlants) {
       const impl = entity as EntityImpl;
       const otherPlant = impl.getComponent<PlantComponent>(CT.Plant);
 
@@ -685,8 +703,9 @@ export class PlantDiseaseSystem extends BaseSystem {
         const targetCategory = targetSpecies?.category ?? 'crop';
         if (!pest.targetCategories.includes(targetCategory)) continue;
 
-        // Check repellents
-        if (this.isRepelledByNearbyPlants(targetPlant, pest, world)) continue;
+        // Check repellents (using cached plants)
+        const cachedPlantsForMigration = this.getCachedPlants(world);
+        if (this.isRepelledByNearbyPlantsCached(targetPlant, pest, cachedPlantsForMigration)) continue;
 
         // Migrate some pests
         const existingPest = targetPlant.pests.find(p => p.pestId === pest.id);

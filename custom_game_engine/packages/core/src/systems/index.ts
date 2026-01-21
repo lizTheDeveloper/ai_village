@@ -178,6 +178,7 @@ export * from './PixelLabSpriteGenerationSystem.js';
 export * from './SoulRepositorySystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
+export * from './ChunkSyncSystem.js';
 export * from './CheckpointNamingService.js';
 export * from './CanonEventDetector.js';
 export * from './CheckpointRetentionPolicy.js';

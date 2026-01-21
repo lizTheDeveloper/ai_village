@@ -259,6 +259,8 @@ export class ColonizationSystem extends BaseSystem {
 
     // Count nearby colonized entities within pressure radius
     let nearbyColonizedCount = 0;
+    // PERFORMANCE: Use squared distance to avoid Math.sqrt
+    const hivePressureRadiusSquared = this.config.hivePressureRadius * this.config.hivePressureRadius;
 
     for (const otherEntity of world.entities.values()) {
       if (otherEntity.id === entity.id) continue;
@@ -273,12 +275,12 @@ export class ColonizationSystem extends BaseSystem {
       const otherPosition = otherImpl.getComponent<PositionComponent>(CT.Position);
       if (!otherPosition) continue;
 
-      // Calculate distance
+      // PERFORMANCE: Squared distance comparison avoids Math.sqrt
       const dx = position.x - otherPosition.x;
       const dy = position.y - otherPosition.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= this.config.hivePressureRadius) {
+      if (distanceSquared <= hivePressureRadiusSquared) {
         nearbyColonizedCount++;
       }
     }

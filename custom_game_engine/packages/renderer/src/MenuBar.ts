@@ -3,6 +3,12 @@ import type { Renderer } from './Renderer.js';
 import type { WindowMenuCategory, ManagedWindow } from './types/WindowTypes.js';
 
 /**
+ * Function type for checking if a system is enabled.
+ * Called with system ID, returns true if system is enabled.
+ */
+export type SystemStateChecker = (systemId: string) => boolean;
+
+/**
  * Menu item definition
  */
 interface MenuItem {
@@ -58,6 +64,7 @@ export class MenuBar {
   private openMenuId: string | null = null;
   private hoveredMenuItem: string | null = null;
   private devMode: boolean = true; // Can be toggled
+  private systemStateChecker: SystemStateChecker | null = null;
 
   // Menu definitions
   private menus: MenuDefinition[] = [
@@ -124,6 +131,36 @@ export class MenuBar {
    */
   setRenderer(renderer: Renderer): void {
     this.renderer = renderer;
+  }
+
+  /**
+   * Set the system state checker function.
+   * This is used to filter panels that depend on disabled systems.
+   * @param checker Function that returns true if a system ID is enabled
+   */
+  setSystemStateChecker(checker: SystemStateChecker): void {
+    this.systemStateChecker = checker;
+  }
+
+  /**
+   * Check if a window should be shown in menus based on its required systems.
+   * If any required system is disabled, the window won't appear in menus.
+   */
+  private isWindowAvailable(window: ManagedWindow): boolean {
+    const requiredSystems = window.config.requiredSystems;
+
+    // If no required systems specified, always available
+    if (!requiredSystems || requiredSystems.length === 0) {
+      return true;
+    }
+
+    // If no system state checker set, assume all systems available
+    if (!this.systemStateChecker) {
+      return true;
+    }
+
+    // Check if all required systems are enabled
+    return requiredSystems.every(systemId => this.systemStateChecker!(systemId));
   }
 
   /**
@@ -326,7 +363,8 @@ export class MenuBar {
     const settingsWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'settings' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -361,7 +399,8 @@ export class MenuBar {
     const agentWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       (w.config.menuCategory === 'info' || w.config.menuCategory === 'social') &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -428,7 +467,8 @@ export class MenuBar {
     const economyWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'economy' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -465,7 +505,8 @@ export class MenuBar {
     const farmingWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'farming' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -502,7 +543,8 @@ export class MenuBar {
     const animalWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'animals' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -539,7 +581,8 @@ export class MenuBar {
     const researchWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'research' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -576,7 +619,8 @@ export class MenuBar {
     const magicWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'magic' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -613,7 +657,8 @@ export class MenuBar {
     const divinityWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'divinity' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];
@@ -652,7 +697,8 @@ export class MenuBar {
     const devWindows = windows.filter(w =>
       w.config.showInWindowList !== false &&
       w.config.menuCategory === 'dev' &&
-      w.panel !== null
+      w.panel !== null &&
+      this.isWindowAvailable(w)
     );
 
     const items: MenuItem[] = [];

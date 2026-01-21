@@ -67,7 +67,7 @@ import {
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
-import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus } from '@ai-village/persistence';
+import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, type PlanetMetadata } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
 import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
@@ -208,7 +208,7 @@ import {
   promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
-import { TerrainGenerator, ChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager, ServerBackedChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig } from '@ai-village/world';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 import { getLanguageRegistry } from '@ai-village/language';
 
@@ -944,11 +944,18 @@ function setupWindowManager(
   renderer: Renderer,
   panels: UIPanelsResult,
   keyboardRegistry: KeyboardRegistry,
-  showNotification: (message: string, color?: string) => void
+  showNotification: (message: string, color?: string) => void,
+  systemRegistry: ISystemRegistry
 ): { windowManager: WindowManager; menuBar: MenuBar; controlsPanel: ControlsPanel; skillTreePanel: SkillTreePanel; divineChatPanel: DivineChatPanel } {
   const windowManager = new WindowManager(canvas);
   const menuBar = new MenuBar(windowManager, canvas);
   menuBar.setRenderer(renderer);
+
+  // Set up system state checker to filter panels based on enabled systems
+  // Panels with requiredSystems will only appear when those systems are enabled
+  menuBar.setSystemStateChecker((systemId: string) => {
+    return systemRegistry.isEnabled(systemId);
+  });
 
   // Create adapters
   const agentInfoAdapter = createAgentInfoPanelAdapter(panels.agentInfoPanel);
@@ -1296,6 +1303,7 @@ function setupWindowManager(
     keyboardShortcut: 'Y',
     menuCategory: 'research',
     factory: createResearchLibraryPanelFactory(),
+    requiredSystems: ['research'],
   });
 
   // Tech Tree Panel - LAZY
@@ -1310,6 +1318,7 @@ function setupWindowManager(
     keyboardShortcut: 'K',
     menuCategory: 'research',
     factory: createTechTreePanelFactory(),
+    requiredSystems: ['research'],
   });
 
   // Agent Selection Panel (Jack-In)
@@ -1343,6 +1352,7 @@ function setupWindowManager(
     showInWindowList: true,
     menuCategory: 'magic',
     factory: createMagicSystemsPanelFactory(),
+    requiredSystems: ['magic'],
   });
 
   // Spellbook Panel - LAZY
@@ -1358,6 +1368,7 @@ function setupWindowManager(
     factory: createSpellbookPanelFactory(),
     showInWindowList: true,
     menuCategory: 'magic',
+    requiredSystems: ['magic'],
   });
 
   // Skill Tree Panel
@@ -1390,6 +1401,7 @@ function setupWindowManager(
     showInWindowList: true,
     menuCategory: 'divinity',
     factory: createDivinePowersPanelFactory(),
+    requiredSystems: ['divine_power'],
   });
 
   // Divine Chat Panel
@@ -1467,6 +1479,7 @@ function setupWindowManager(
     showInWindowList: true,
     menuCategory: 'divinity',
     factory: createDivineAnalyticsPanelFactory(),
+    requiredSystems: ['divine_power'],
   });
 
   // Sacred Geography Panel - LAZY
@@ -1482,6 +1495,7 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'divinity',
+    requiredSystems: ['sacred_site'],
   });
 
   // Angel Management Panel - LAZY
@@ -1497,6 +1511,7 @@ function setupWindowManager(
     showInWindowList: true,
     menuCategory: 'divinity',
     factory: createAngelManagementPanelFactory(),
+    requiredSystems: ['AngelSystem'],
   });
 
   // Prayer Panel - LAZY
@@ -1512,6 +1527,7 @@ function setupWindowManager(
     showInWindowList: true,
     menuCategory: 'divinity',
     factory: createPrayerPanelFactory(),
+    requiredSystems: ['prayer'],
   });
 
   // Text Adventure Panel (1D Renderer - accessibility/narrative output)
@@ -3522,6 +3538,28 @@ async function main() {
     console.log('[Demo] Created new player ID:', playerId);
   }
 
+  // Initialize PlanetClient with player ID for shared planet support
+  planetClient.setPlayerId(playerId);
+
+  // Check if planet server is available (non-blocking)
+  let planetServerAvailable = false;
+  let existingPlanets: PlanetMetadata[] = [];
+  try {
+    planetServerAvailable = await planetClient.isAvailable();
+    if (planetServerAvailable) {
+      existingPlanets = await planetClient.listPlanets();
+      console.log(`[Demo] Planet server available, ${existingPlanets.length} existing planets`);
+    } else {
+      console.log('[Demo] Planet server not available - using local-only mode');
+    }
+  } catch (error) {
+    console.warn('[Demo] Failed to check planet server:', error);
+  }
+
+  // Track selected planet (if using shared planet mode)
+  let selectedPlanet: PlanetMetadata | null = null;
+  let useSharedPlanet = false;
+
   // Try to enable server sync (non-blocking - game works without server)
   saveLoadService.enableServerSync(playerId).then(enabled => {
     if (enabled) {
@@ -3575,7 +3613,11 @@ async function main() {
   // Create ChunkManager and TerrainGenerator BEFORE loading saves
   // so terrain can be restored from checkpoints
   const terrainGenerator = new TerrainGenerator('phase8-demo', godCraftedDiscoverySystem);
-  const chunkManager = new ChunkManager(3);
+
+  // Create ChunkManager - will be upgraded to ServerBackedChunkManager if using shared planet
+  let chunkManager: ChunkManager | ServerBackedChunkManager = new ChunkManager(3);
+  let serverBackedChunkManager: ServerBackedChunkManager | null = null;
+
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
 
@@ -4044,7 +4086,7 @@ async function main() {
 
   // Setup window manager
   const { windowManager, menuBar, controlsPanel, skillTreePanel, divineChatPanel } = setupWindowManager(
-    canvas, renderer, panels, keyboardRegistry, showNotification
+    canvas, renderer, panels, keyboardRegistry, showNotification, gameLoop.systemRegistry
   );
 
   // Store reference for 3D entity selection callback
@@ -4350,12 +4392,65 @@ async function main() {
       });
     }
 
+    // Check for existing planet with matching type on the server (shared planet mode)
+    let existingPlanetBiosphere: any = null;
+    let serverPlanetId: string | null = null;
+
+    if (planetServerAvailable && existingPlanets.length > 0) {
+      // Look for a planet with the same type that has a biosphere
+      const matchingPlanet = existingPlanets.find(
+        p => p.type === homeworldConfig.type && p.hasBiosphere
+      );
+
+      if (matchingPlanet) {
+        console.log(`[WorldInit] Found existing planet: ${matchingPlanet.name} (${matchingPlanet.id})`);
+        selectedPlanet = matchingPlanet;
+        serverPlanetId = matchingPlanet.id;
+        useSharedPlanet = true;
+
+        // Try to load biosphere from server
+        try {
+          existingPlanetBiosphere = await planetClient.getBiosphere(matchingPlanet.id);
+          if (existingPlanetBiosphere) {
+            console.log(`[WorldInit] Loaded cached biosphere: ${existingPlanetBiosphere.species?.length || 0} species`);
+            if (universeConfigScreen) {
+              universeConfigScreen.updateProgress('Using existing planet biosphere (skipping 57s generation)');
+            }
+          }
+        } catch (error) {
+          console.warn('[WorldInit] Failed to load biosphere from server:', error);
+        }
+
+        // Upgrade to ServerBackedChunkManager for shared terrain
+        try {
+          serverBackedChunkManager = new ServerBackedChunkManager(
+            matchingPlanet.id,
+            planetClient,
+            { loadRadius: 3, autoFlushInterval: 30000 }
+          );
+          chunkManager = serverBackedChunkManager;
+          (gameLoop.world as any).setChunkManager(chunkManager);
+          console.log('[WorldInit] Using ServerBackedChunkManager for shared terrain');
+
+          // Subscribe to real-time chunk updates
+          planetClient.subscribeToChunkUpdates(matchingPlanet.id, (chunk) => {
+            console.log(`[WorldInit] Received remote chunk update: ${chunk.x},${chunk.y}`);
+            // The ServerBackedChunkManager will handle applying the update
+          });
+        } catch (error) {
+          console.warn('[WorldInit] Failed to create ServerBackedChunkManager:', error);
+          useSharedPlanet = false;
+        }
+      }
+    }
+
     try {
       const homeworld = await initializePlanet(homeworldConfig, {
         llmProvider,
         godCraftedSpawner: godCraftedDiscoverySystem,
-        generateBiosphere: true,
+        generateBiosphere: !existingPlanetBiosphere,  // Skip if we have cached biosphere
         queueSprites: true,
+        existingBiosphere: existingPlanetBiosphere,   // Use cached biosphere if available
         onProgress: (message: string) => {
           if (universeConfigScreen) {
             universeConfigScreen.updateProgress(message);
@@ -4368,7 +4463,43 @@ async function main() {
 
       console.log(`[WorldInit] Homeworld initialized: ${homeworld.name} (${homeworld.type})`);
       if (homeworld.biosphere) {
-        console.log(`[WorldInit] Biosphere generated: ${homeworld.biosphere.species.length} species, ${homeworld.biosphere.sapientSpecies.length} sapient`);
+        console.log(`[WorldInit] Biosphere: ${homeworld.biosphere.species.length} species, ${homeworld.biosphere.sapientSpecies.length} sapient`);
+
+        // Save new biosphere to server if we generated it
+        if (planetServerAvailable && !existingPlanetBiosphere) {
+          try {
+            // Create planet on server if not using existing
+            if (!serverPlanetId) {
+              const newPlanet = await planetClient.createPlanet({
+                name: homeworld.name,
+                type: homeworld.type as any,
+                seed: homeworldConfig.seed,
+                config: { seed: homeworldConfig.seed, type: homeworldConfig.type },
+              });
+              serverPlanetId = newPlanet.id;
+              selectedPlanet = newPlanet;
+              console.log(`[WorldInit] Created planet on server: ${serverPlanetId}`);
+            }
+
+            // Save the generated biosphere
+            await planetClient.saveBiosphere(serverPlanetId, {
+              species: homeworld.biosphere.species.map((s: any) => ({
+                id: s.id || s.name,
+                name: s.name,
+                type: s.type || 'animal',
+                traits: s.traits || {},
+                habitat: s.habitat || [],
+                diet: s.diet,
+              })),
+              foodWeb: homeworld.biosphere.foodWeb || [],
+              niches: [],
+              generatedAt: Date.now(),
+            });
+            console.log('[WorldInit] Saved biosphere to server for future reuse');
+          } catch (error) {
+            console.warn('[WorldInit] Failed to save biosphere to server:', error);
+          }
+        }
       }
     } catch (error) {
       console.error('[WorldInit] Failed to initialize homeworld:', error);

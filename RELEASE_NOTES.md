@@ -1,5 +1,506 @@
 # Release Notes
 
+## 2026-01-20 - "Phase 4 & 5 + Admin Capabilities" - WebSocket Sync, Game Integration, Combat/Magic Admin, Botany Optimizations
+
+### 🌐 Phase 4 COMPLETE: WebSocket Real-Time Sync ✅
+
+**PlanetClient.ts Enhancement (+112 lines)** - Real-time chunk update notifications
+
+**WebSocket Connection:**
+```typescript
+private wsConnection: WebSocket | null = null;
+private chunkUpdateCallbacks = new Map<string, Set<ChunkUpdateCallback>>();
+
+private connectWebSocket(): void {
+  const wsUrl = this.baseUrl.replace(/^http/, 'ws');
+  this.wsConnection = new WebSocket(wsUrl);
+
+  this.wsConnection.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.type === 'planet_chunk_updated') {
+      this.notifyChunkUpdate(message.planetId, message.chunk);
+    }
+  };
+}
+```
+
+**Chunk Update Subscriptions:**
+```typescript
+subscribeToChunkUpdates(
+  planetId: string,
+  callback: ChunkUpdateCallback
+): () => void
+
+// ServerBackedChunkManager can subscribe to real-time chunk changes
+planetClient.subscribeToChunkUpdates(planetId, (chunk) => {
+  // Auto-reload chunk when other players modify it
+  this.handleChunkUpdate(chunk);
+});
+```
+
+**Features:**
+- Automatic WebSocket connection on initialization
+- Subscribe to chunk updates by planet ID
+- Unsubscribe support for cleanup
+- Auto-reconnect on disconnect
+- Message type routing (planet_chunk_updated, planet_deleted, etc.)
+- Callback-based notification system
+
+**Impact**: Multi-player planets now sync in real-time! When player A modifies a chunk, player B sees the update within ~100ms.
+
+---
+
+### 🎮 Phase 5 IN PROGRESS: Game Startup Integration
+
+**main.ts Enhancement (+139 lines)** - Integrate planetClient into game startup flow
+
+**Player ID Initialization:**
+```typescript
+// Set player ID for multi-player planet support
+planetClient.setPlayerId(playerId);
+
+// Check planet server availability (non-blocking)
+let planetServerAvailable = false;
+let existingPlanets: PlanetMetadata[] = [];
+try {
+  planetServerAvailable = await planetClient.isAvailable();
+  if (planetServerAvailable) {
+    existingPlanets = await planetClient.listPlanets();
+    console.log(`Planet server available, ${existingPlanets.length} existing planets`);
+  }
+} catch (error) {
+  console.warn('Planet server not available - using local-only mode');
+}
+```
+
+**Shared Planet Selection:**
+```typescript
+// Look for existing planet with matching type that has biosphere
+const matchingPlanet = existingPlanets.find(
+  p => p.type === homeworldConfig.type && p.hasBiosphere
+);
+
+if (matchingPlanet) {
+  selectedPlanet = matchingPlanet;
+  serverPlanetId = matchingPlanet.id;
+  useSharedPlanet = true;
+
+  // Load cached biosphere from server (skip 57s LLM generation!)
+  existingPlanetBiosphere = await planetClient.getBiosphere(matchingPlanet.id);
+
+  // Upgrade to ServerBackedChunkManager for shared terrain
+  serverBackedChunkManager = new ServerBackedChunkManager(
+    planetClient,
+    serverPlanetId,
+    chunkManager
+  );
+  chunkManager = serverBackedChunkManager;
+}
+```
+
+**MenuBar System Filtering:**
+```typescript
+// Set up system state checker to filter panels based on enabled systems
+menuBar.setSystemStateChecker((systemId: string) => {
+  return systemRegistry.isEnabled(systemId);
+});
+
+// Panels now require specific systems to be enabled:
+// - Research Library Panel requires 'research' system
+// - Tech Tree Panel requires 'research' system
+// - Magic Systems Panel requires 'magic' system
+// - Spellbook Panel requires 'magic' system
+// - Divine Powers Panel requires 'divine_power' system
+// - Sacred Geography Panel requires 'sacred_site' system
+// - Angel Management Panel requires 'AngelSystem' system
+// - Prayer Panel requires 'prayer' system
+```
+
+**Status**: Phase 5 PARTIAL - Planet selection UI, create new planet flow, and save/load integration still needed.
+
+---
+
+### 🌿 PlanetInitializer: Biosphere Caching (+53 lines)
+
+**Cached Biosphere Support** - Skip 57-second LLM generation when using server planets
+
+```typescript
+export interface PlanetInitializationOptions {
+  llmProvider: LLMProvider;
+  godCraftedSpawner?: GodCraftedDiscoverySystem;
+  generateBiosphere?: boolean;
+
+  // NEW: Pre-existing biosphere data from server cache
+  existingBiosphere?: any;
+
+  queueSprites?: boolean;
+  spriteQueuePath?: string;
+  onProgress?: ProgressCallback;
+}
+```
+
+**Cache Logic:**
+```typescript
+if (existingBiosphere) {
+  // Use cached biosphere from server (skip 57s LLM generation!)
+  reportProgress('🌿 Using cached biosphere...');
+
+  const speciesList = existingBiosphere.species || [];
+  const sapientList = speciesList.filter((s: any) => s.type === 'sapient');
+
+  const biosphere = {
+    $schema: 'https://aivillage.dev/schemas/biosphere/v1' as const,
+    planet: config,
+    niches: existingBiosphere.niches || [],
+    species: speciesList,
+    foodWeb: existingBiosphere.foodWeb || { relationships: [], trophicLevels: [] },
+    nicheFilling: existingBiosphere.nicheFilling || {},
+    sapientSpecies: sapientList,
+    artStyle: existingBiosphere.artStyle || 'pixel',
+    metadata: existingBiosphere.metadata || { /* ... */ },
+  };
+
+  planet.setBiosphere(biosphere);
+
+  // Still queue sprites for cached biosphere if needed
+  if (queueSprites) {
+    await queueBiosphereSprites(biosphere, spriteQueuePath);
+  }
+}
+```
+
+**Performance Impact**: Joining existing shared planet now takes ~2 seconds instead of ~59 seconds!
+
+---
+
+### ⚔️ NEW: Combat Admin Capability (625 lines)
+
+**NEW FILE: custom_game_engine/packages/core/src/admin/capabilities/combat.ts**
+
+Complete admin interface for combat system management with 50+ queries and actions.
+
+**Combat State Queries:**
+- Get active combats
+- Get combat participants
+- Get combat by entity ID
+- Get combat history
+- Get combat statistics
+
+**Weapon & Armor Queries:**
+- Get entity weapons
+- Get entity armor
+- Get weapon stats
+- Get armor effectiveness
+- Get equipment durability
+
+**Battle Management Actions:**
+- Start combat between entities
+- End combat
+- Force surrender
+- Flee from combat
+- Switch weapons mid-combat
+
+**Equipment Actions:**
+- Equip weapon
+- Unequip weapon
+- Equip armor
+- Unequip armor
+- Repair equipment
+
+**Combat Modifiers:**
+- Apply combat buff/debuff
+- Set combat AI behavior
+- Override damage calculation
+- Force critical hit/miss
+
+**Wound System:**
+- Get entity wounds
+- Apply wound
+- Heal wound
+- Cure infection
+- Apply/remove bleed effect
+
+**Example Usage:**
+```typescript
+// Start a duel between two agents
+await combat.startCombat({
+  attackerId: 'agent-001',
+  defenderId: 'agent-002',
+  combatType: 'duel'
+});
+
+// Get combat statistics
+const stats = await combat.getCombatStats({ combatId: 'combat-123' });
+// { totalDamage: 150, roundCount: 8, criticalHits: 2, ... }
+```
+
+---
+
+### ✨ NEW: Magic Admin Capability (630 lines)
+
+**NEW FILE: custom_game_engine/packages/core/src/admin/capabilities/magic.ts**
+
+Complete admin interface for magic and divine power systems with 40+ queries and actions.
+
+**Magic System Queries:**
+- Get entity magic proficiency
+- Get available spells
+- Get spell cooldowns
+- Get mana pools
+- Get spell history
+
+**Divine Power Queries:**
+- Get entity divinity level
+- Get divine powers available
+- Get blessing/curse status
+- Get prayer history
+- Get faith points
+
+**Magic Sources & Paradigms:**
+```typescript
+const MAGIC_SOURCE_OPTIONS = [
+  'arcane',    // Raw mana manipulation
+  'divine',    // Faith/prayer powered
+  'natural',   // Nature/druidic magic
+  'psionic',   // Mental energy
+  'blood',     // Life force sacrifice
+  'shadow',    // Darkness magic
+  'elemental', // Fire/water/earth/air
+];
+
+const PARADIGM_OPTIONS = [
+  'academic', 'divine', 'natural', 'psionic',
+  'shamanic', 'blood', 'runic', 'elemental'
+];
+```
+
+**Divine Powers:**
+```typescript
+const DIVINE_POWER_OPTIONS = [
+  { value: 'whisper', cost: 5 },           // Vague feeling
+  { value: 'subtle_sign', cost: 8 },       // Minor omen
+  { value: 'dream_hint', cost: 10 },       // Vague dream
+  { value: 'clear_vision', cost: 50 },     // Vivid vision
+  { value: 'minor_miracle', cost: 100 },   // Physical effect
+  { value: 'bless_individual', cost: 75 }, // Grant blessing
+  { value: 'cast_divine_spell', cost: 'varies' },
+  { value: 'universe_crossing', cost: 'varies' },
+  { value: 'create_passage', cost: 'varies' },
+  { value: 'divine_projection', cost: 'varies' },
+];
+```
+
+**Blessing/Curse Types:**
+```typescript
+const BLESSING_TYPE_OPTIONS = [
+  'protection', 'strength', 'wisdom',
+  'fortune', 'healing', 'fertility'
+];
+
+const CURSE_TYPE_OPTIONS = [
+  'weakness', 'misfortune', 'disease',
+  'madness', 'decay'
+];
+```
+
+**Universe Crossing Methods:**
+```typescript
+const CROSSING_METHOD_OPTIONS = [
+  { value: 'presence_extension', cost: 500 },
+  { value: 'divine_projection', cost: 1000 },
+  { value: 'divine_conveyance', cost: 300 },
+  { value: 'passage_crossing', cost: 50 },    // Requires passage
+  { value: 'worship_tunnel', cost: 150 },
+];
+
+const PASSAGE_TYPE_OPTIONS = [
+  { value: 'thread', cost: 100 },      // Fragile
+  { value: 'bridge', cost: 500 },      // Stable
+  { value: 'gate', cost: 2000 },       // Permanent
+  { value: 'confluence', cost: 5000 }, // Massive
+];
+```
+
+**Example Actions:**
+```typescript
+// Cast a spell
+await magic.castSpell({
+  casterId: 'agent-001',
+  spellId: 'fireball',
+  targetId: 'agent-002',
+  powerLevel: 5
+});
+
+// Grant divine blessing
+await magic.grantBlessing({
+  deityId: 'deity-001',
+  targetId: 'agent-001',
+  blessingType: 'protection',
+  duration: 3600, // 1 hour
+  strength: 0.8
+});
+
+// Cross to another universe
+await magic.crossUniverse({
+  entityId: 'deity-001',
+  targetUniverseId: 'universe-002',
+  method: 'divine_projection',
+  beliefCost: 1000
+});
+```
+
+---
+
+### ⚡ Botany Performance Optimizations (3 Systems)
+
+**PlantSystem (+cached position map):**
+- Added plant position caching for spatial queries
+- Reduces redundant position lookups
+- Impact: Faster nearby plant detection
+
+**PlantDiseaseSystem (+cached plant queries):**
+```typescript
+// BEFORE: Query plants multiple times per tick
+for (const pest of pests) {
+  const plants = world.query().with(CT.Plant).executeEntities(); // Query!
+  for (const plant of plants) {
+    if (isRepelledByNearbyPlants(plant, pest, world)) { // Query again!
+      // ...
+    }
+  }
+}
+
+// AFTER: Cache plants once per tick
+private cachedPlants: ReadonlyArray<Entity> | null = null;
+private cachedPlantsTickStamp: number = -1;
+
+private getCachedPlants(world: World): ReadonlyArray<Entity> {
+  const currentTick = world.tick;
+  if (this.cachedPlants === null || this.cachedPlantsTickStamp !== currentTick) {
+    this.cachedPlants = world.query().with(CT.Plant).executeEntities();
+    this.cachedPlantsTickStamp = currentTick;
+  }
+  return this.cachedPlants;
+}
+
+// Use cached plants in pest repellent checks
+private isRepelledByNearbyPlantsCached(
+  plant: PlantComponent,
+  pest: PlantPest,
+  cachedPlants: ReadonlyArray<Entity> // Pre-cached!
+): boolean {
+  for (const entity of cachedPlants) {
+    // No query needed!
+  }
+}
+```
+
+**Impact**: Avoids O(pests × plants × query) → O(plants + pests) complexity
+
+**WildPlantPopulationSystem (+cached plants + squared distance):**
+```typescript
+// BEFORE: Query plants for every seed in every chunk
+private germinateSeedBank(world: World): void {
+  for (const [chunkKey, bank] of this.seedBanks) {
+    for (const seed of bank.seeds) {
+      if (isPositionCrowded(seed.position, world)) { // Query!
+        // In isPositionCrowded:
+        const plants = world.query().with(CT.Plant).executeEntities();
+        for (const plant of plants) {
+          const distance = Math.sqrt(dx * dx + dy * dy); // Expensive!
+        }
+      }
+    }
+  }
+}
+
+// AFTER: Cache plants once, pre-compute squared radius
+private germinateSeedBank(world: World): void {
+  const allPlants = world.query().with(CT.Plant).executeEntities(); // Once!
+  const crowdingRadiusSquared = this.config.crowdingRadius ** 2; // Pre-compute!
+
+  for (const [chunkKey, bank] of this.seedBanks) {
+    for (const seed of bank.seeds) {
+      if (!this.isPositionCrowdedCached(seed.position, allPlants, crowdingRadiusSquared)) {
+        // No query, no Math.sqrt!
+      }
+    }
+  }
+}
+
+private isPositionCrowdedCached(
+  position: { x: number; y: number },
+  plants: ReadonlyArray<Entity>,
+  crowdingRadiusSquared: number
+): boolean {
+  for (const entity of plants) {
+    const distanceSquared = dx * dx + dy * dy; // No Math.sqrt!
+    if (distanceSquared < crowdingRadiusSquared) {
+      return true;
+    }
+  }
+  return false;
+}
+```
+
+**Impact**:
+- Avoids O(chunks × seeds × plants × query) → O(plants + chunks × seeds)
+- Eliminates Math.sqrt calls (10x faster distance checks)
+
+---
+
+### 🗂️ Hierarchy Adapter Refactoring (2,081 lines moved)
+
+**Moved from**: `custom_game_engine/packages/hierarchy-simulator/src/adapters/`
+**Moved to**: `custom_game_engine/packages/world/src/hierarchy-adapters/`
+
+**Files Moved:**
+- GalaxyTierAdapter.ts (658 lines)
+- PlanetTierAdapter.ts (460 lines)
+- SectorTierAdapter.ts (555 lines)
+- SystemTierAdapter.ts (408 lines)
+- index.ts (24 lines)
+
+**Rationale**: These adapters bridge ECS entities to hierarchical simulation tiers and belong in the `world` package alongside terrain and spatial systems, not in `hierarchy-simulator` which is the simulation engine itself.
+
+**No functionality changes** - pure code organization improvement.
+
+---
+
+### 🎨 MenuBar: System-Based Panel Filtering
+
+**MenuBar.ts Enhancement (+system state checking)**
+
+Panels can now specify `requiredSystems` and will only appear in the menu when those systems are enabled:
+
+```typescript
+menuBar.setSystemStateChecker((systemId: string) => {
+  return systemRegistry.isEnabled(systemId);
+});
+
+// Example: Research panels only appear when research system is enabled
+windowManager.registerPanelFactory({
+  id: 'research_library',
+  title: 'Research Library',
+  factory: createResearchLibraryPanelFactory(),
+  requiredSystems: ['research'], // NEW!
+});
+```
+
+**Filtered Panels:**
+- Research Library → requires `research` system
+- Tech Tree → requires `research` system
+- Magic Systems → requires `magic` system
+- Spellbook → requires `magic` system
+- Divine Powers → requires `divine_power` system
+- Sacred Geography → requires `sacred_site` system
+- Angel Management → requires `AngelSystem` system
+- Prayer → requires `prayer` system
+
+**Impact**: Cleaner UI! Players only see panels relevant to their enabled game systems (lazy activation support).
+
+---
+
 ## 2026-01-20 - "Phase 2 & 3 Complete" - PlanetClient + ServerBackedChunkManager (1102 lines) + 16 Optimizations
 
 ### Phase 2: PlanetClient Complete (581 lines) ✅

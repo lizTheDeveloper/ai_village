@@ -949,6 +949,20 @@ export class PlantSystem extends BaseSystem {
       return;
     }
 
+    // PERFORMANCE: Cache plant positions query before loop - avoids O(seeds × plants) → O(plants + seeds)
+    const existingPlants = world.query().with(CT.Plant).with(CT.Position).executeEntities();
+    const plantPositions: Array<{ x: number; y: number }> = [];
+    for (const plantEntity of existingPlants) {
+      const plantImpl = plantEntity as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(CT.Plant);
+      if (plantComp && plantComp.position) {
+        plantPositions.push({
+          x: Math.floor(plantComp.position.x),
+          y: Math.floor(plantComp.position.y)
+        });
+      }
+    }
+
     const dispersalRadius = species.seedDispersalRadius ?? PLANT_CONSTANTS.DEFAULT_DISPERSAL_RADIUS; // Default dispersal radius
     for (let i = 0; i < seedsToDrop; i++) {
       // Random position near parent
@@ -959,8 +973,8 @@ export class PlantSystem extends BaseSystem {
         y: Math.round(plant.position.y + Math.sin(angle) * distance)
       };
 
-      // Check if tile is suitable
-      if (!this.isTileSuitable(dropPos, world)) {
+      // Check if tile is suitable (using cached plant positions)
+      if (!this.isTileSuitableCached(dropPos, world, plantPositions)) {
         continue;
       }
 
@@ -990,9 +1004,14 @@ export class PlantSystem extends BaseSystem {
   }
 
   /**
-   * Check if tile is suitable for seed placement
+   * Check if tile is suitable for seed placement (using cached plant positions)
+   * PERFORMANCE: Uses pre-cached plant positions to avoid repeated queries
    */
-  private isTileSuitable(position: { x: number; y: number }, world: World): boolean {
+  private isTileSuitableCached(
+    position: { x: number; y: number },
+    world: World,
+    plantPositions: Array<{ x: number; y: number }>
+  ): boolean {
     // Check if world has tile access
     const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
     if (typeof worldWithTiles.getTileAt !== 'function') {
@@ -1011,17 +1030,10 @@ export class PlantSystem extends BaseSystem {
       return false; // Wrong terrain type
     }
 
-    // Check if tile is already occupied by a plant
-    const existingPlants = world.query().with(CT.Plant).with(CT.Position).executeEntities();
-    for (const plantEntity of existingPlants) {
-      const plantImpl = plantEntity as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(CT.Plant);
-      if (plantComp && plantComp.position) {
-        const plantX = Math.floor(plantComp.position.x);
-        const plantY = Math.floor(plantComp.position.y);
-        if (plantX === position.x && plantY === position.y) {
-          return false; // Already has a plant
-        }
+    // Check if tile is already occupied by a plant (using cached positions)
+    for (const plantPos of plantPositions) {
+      if (plantPos.x === position.x && plantPos.y === position.y) {
+        return false; // Already has a plant
       }
     }
 

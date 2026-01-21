@@ -17,3 +17,7 @@ import './saves.js';
 import './diagnostics.js';
 import './dimensional-dev-tools.js';
 import './grand-strategy.js';
+import './combat.js';
+import './magic.js';
+import './economy.js';
+import './planets.js';
