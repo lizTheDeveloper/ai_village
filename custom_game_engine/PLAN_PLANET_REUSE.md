@@ -6,6 +6,7 @@
 2. **Parallel chunk loading** - Begin terrain generation the moment we commit to a planet
 3. **Faster startup** - Reuse biosphere generation (57s) when planet already exists
 4. **Multi-colony gameplay** - God can have colonies in different areas of the same planet
+5. **Multi-browser multiplayer** - Two windows = two views into same world; different profiles = different gods
 
 ## User Design Decisions
 
@@ -14,8 +15,49 @@
 | **Terrain sharing** | Shared | All saves share terrain modifications - persistent world model |
 | **Named locations** | Global registry | Names persist across all saves for shared lore |
 | **Registry cleanup** | Never | Keep all planets forever (disk space permitting) |
+| **Multi-browser** | Enable | SharedWorker architecture already 95% built |
 
-**Key Implication**: This creates a **persistent world** architecture. Multiple saves are different "views" (entity states) into the same shared planet terrain. One player's buildings appear in another's game.
+## Existing Infrastructure (Already Built!)
+
+The **SharedWorker package** already provides the foundation for shared world state:
+
+```
+packages/shared-worker/
+├── shared-universe-worker.ts   # Authoritative 20 TPS simulation
+├── UniverseClient.ts           # Window-side connector (thin client)
+├── game-bridge.ts              # Compatibility layer for existing code
+├── PathPredictionSystem.ts     # 95-99% bandwidth reduction
+└── DeltaSyncSystem.ts          # Only sync changed entities
+```
+
+**Key capabilities already working:**
+- Single SharedWorker runs simulation across all tabs (same origin)
+- Windows are view-only renderers + input forwarders
+- IndexedDB persistence owned by worker (single-writer)
+- Player ID from localStorage (`ai-village-player-id`)
+- Different Chrome profiles = different player IDs = different gods
+
+**What the SharedWorker enables:**
+```
+Same Chrome Profile (Player A)              Different Profile (Player B)
+┌─────────┐  ┌─────────┐                   ┌─────────┐
+│ Tab 1   │  │ Tab 2   │                   │ Tab 3   │
+│ God A   │  │ God A   │                   │ God B   │
+└────┬────┘  └────┬────┘                   └────┬────┘
+     │            │                              │
+     └──────┬─────┘                              │
+            ▼                                    ▼
+     SharedWorker A                       SharedWorker B
+     (localStorage: player:abc)           (localStorage: player:xyz)
+            ▼                                    ▼
+     IndexedDB A                          IndexedDB B
+     (isolated)                           (isolated)
+```
+
+**For true cross-profile shared world**, we need the PlanetRegistry to live OUTSIDE per-profile IndexedDB - options:
+1. **Server-side planet storage** (multiverse server already exists)
+2. **Shared IndexedDB** via service worker (complex)
+3. **Filesystem storage** (Electron/Tauri only)
 
 ---
 

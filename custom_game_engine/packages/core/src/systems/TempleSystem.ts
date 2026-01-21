@@ -99,8 +99,8 @@ export class TempleSystem extends BaseSystem {
     // Note: Temple building type does not exist yet - this system is a placeholder
     // Buildings are ALWAYS simulated entities
     // TODO: Add 'temple' to BuildingType enum when temples are implemented
-    const templeBuildings: typeof ctx.world extends { getEntity: infer T } ? never[] : never[] = [];
-    // Currently disabled until temple building type is added to BuildingType enum
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const templeBuildings: any[] = []; // Empty array - temples not implemented yet
 
     for (const templeEntity of templeBuildings) {
       const building = templeEntity.components.get(CT.Building) as BuildingComponent;

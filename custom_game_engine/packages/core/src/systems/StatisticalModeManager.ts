@@ -21,8 +21,8 @@
  */
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
-import type { SystemId, ComponentType } from '../types.js';
-import { ComponentType as CT } from '../types/ComponentType.js';
+import type { SystemId } from '../types.js';
+import { ComponentType, ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { TimeCompressionComponent } from '../components/TimeCompressionComponent.js';
@@ -323,13 +323,41 @@ export class StatisticalModeManager extends BaseSystem {
       }
     }
 
+    // Compute entity's previous scheduler mode from component configs
+    const previousSchedulerMode = this.computeEntitySchedulerMode(entity);
+
     return {
       entityId: entity.id,
       components,
       componentCount,
-      previousSchedulerMode: SimulationMode.ALWAYS, // TODO: Get from SimulationScheduler
+      previousSchedulerMode,
       wasActive: true,
     };
+  }
+
+  /**
+   * Compute the scheduler mode for an entity based on its components
+   * Logic mirrors SimulationScheduler.shouldSimulate() for consistency
+   */
+  private computeEntitySchedulerMode(entity: EntityImpl): SimulationMode {
+    let mode = SimulationMode.PASSIVE;
+
+    // Check all components to find the most permissive simulation mode
+    for (const [componentType] of entity.components.entries()) {
+      const config = getSimulationConfig(componentType as ComponentType);
+
+      // ALWAYS takes precedence
+      if (config.mode === SimulationMode.ALWAYS || config.essential) {
+        return SimulationMode.ALWAYS;
+      }
+
+      // PROXIMITY takes precedence over PASSIVE
+      if (config.mode === SimulationMode.PROXIMITY && mode === SimulationMode.PASSIVE) {
+        mode = SimulationMode.PROXIMITY;
+      }
+    }
+
+    return mode;
   }
 
   /**

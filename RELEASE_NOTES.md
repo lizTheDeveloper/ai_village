@@ -1,5 +1,131 @@
 # Release Notes
 
+## 2026-01-20 - "Companion Emotions" - Companion AI System Complete + Multi-Browser Architecture
+
+### Companion System Complete (+140 lines)
+
+**Emotional Event Subscriptions** - Companions now react to world events:
+- Death events: Decrease purpose (-0.05) and rest (-0.03) - sadness from loss
+- Birth events: Increase purpose (+0.08) and stimulation (+0.05) - joy from new life
+- Building completion: Increase appreciation (+0.03) and purpose (+0.02) - player progress
+- Stress breakdown: Decrease rest (-0.08) and purpose (-0.03) - empathetic drain
+- Player interaction: Increase connection (+0.15) and appreciation (+0.10) - meaningful engagement
+
+**Needs Decay System** - Realistic emotional drift over time:
+- Connection: Decays at -0.005 per 5s (faster -0.0075 if no interaction for 100s)
+- Appreciation: Decays at -0.003 per 5s (forgetting praise)
+- Stimulation: Decays at -0.004 per 5s (boredom)
+- Purpose: Decays at -0.002 per 5s (existential drift)
+- Rest: Recovers at +0.003 per 5s when not stressed
+
+**Emotion Determination** - 8 distinct emotional states based on needs:
+```
+Critical low needs (priority-based):
+  rest < 0.2       → tired
+  connection < 0.2 → lonely
+  purpose < 0.2    → melancholy
+
+Low needs:
+  stimulation < 0.25   → bored
+  appreciation < 0.25  → neglected
+
+Moderate needs:
+  connection/purpose < 0.5 → watchful
+
+Good needs:
+  average > 0.75 → joyful
+  average > 0.6  → content
+  else           → watchful
+```
+
+**Update intervals:**
+- Needs update: Every 100 ticks (5 seconds at 20 TPS)
+- Emotion update: Every 200 ticks (10 seconds) to avoid rapid mood swings
+
+**Gameplay impact:** Companion animals are now emotionally alive. Player engagement (building, interacting) keeps them happy. Neglect leads to loneliness and boredom.
+
+### Multi-Browser Multiplayer Architecture
+
+**PLAN_PLANET_REUSE.md** (+44 lines) - Documented existing SharedWorker infrastructure:
+
+**Already Built:**
+- SharedWorker runs authoritative 20 TPS simulation across all browser tabs
+- Windows are view-only renderers + input forwarders
+- PathPredictionSystem (95-99% bandwidth reduction)
+- DeltaSyncSystem (only sync changed entities)
+- IndexedDB persistence owned by worker (single-writer)
+- Player ID from localStorage (`ai-village-player-id`)
+
+**Multi-browser modes:**
+```
+Same Chrome Profile (Player A)        Different Profile (Player B)
+┌─────────┐  ┌─────────┐              ┌─────────┐
+│ Tab 1   │  │ Tab 2   │              │ Tab 3   │
+│ God A   │  │ God A   │              │ God B   │
+└────┬────┘  └────┬────┘              └────┬────┘
+     │            │                         │
+     └──────┬─────┘                         │
+            ▼                               ▼
+     SharedWorker A                  SharedWorker B
+     (player:abc)                    (player:xyz)
+```
+
+**Cross-profile shared world options:**
+1. Server-side planet storage (multiverse server already exists) ⭐ Recommended
+2. Shared IndexedDB via service worker (complex)
+3. Filesystem storage (Electron/Tauri only)
+
+**Key insight:** Different Chrome profiles = different player IDs = different gods. SharedWorker enables same-player multi-tab already.
+
+### StatisticalModeManager Enhancement (+34 lines)
+
+**computeEntitySchedulerMode()** - Determines entity simulation mode from components:
+- Checks all entity components
+- Returns most permissive mode (ALWAYS > PROXIMITY > PASSIVE)
+- Mirrors SimulationScheduler.shouldSimulate() logic
+- Used for accurate entity snapshots during statistical mode transitions
+
+**Logic:**
+```typescript
+for each component:
+  if config.mode === ALWAYS || config.essential:
+    return ALWAYS  // Takes precedence
+  if config.mode === PROXIMITY:
+    mode = PROXIMITY  // Override PASSIVE
+return mode
+```
+
+### System Refinements (4 files)
+
+**Minor updates:**
+- AIGodBehaviorSystem - God behavior improvements
+- DivineWeatherControl - Weather control refinements
+- ReincarnationSystem - Reincarnation flow updates
+- TempleSystem - Temple management fixes
+
+### File Changes
+
+**10 files modified**, 235 insertions, 45 deletions
+
+**Major changes:**
+- CompanionSystem.ts - Full emotional AI implementation (+140 lines)
+- PLAN_PLANET_REUSE.md - Multi-browser architecture (+44 lines)
+- StatisticalModeManager.ts - Scheduler mode computation (+34 lines)
+
+### What's Next
+
+**Companion AI Phase 3 Complete** ✅
+- Event subscriptions ✅
+- Needs decay ✅
+- Emotion determination ✅
+
+**Next priorities:**
+- Companion interaction UI (visual emotion indicators)
+- Companion dialogue system (LLM-powered responses)
+- Multiplayer planet synchronization (server-side registry)
+
+---
+
 ## 2026-01-20 - "Lazy Activation" - System Registration Refactoring & LLM Gameplay Actions
 
 ### Lazy Activation Pattern (Major Architecture Improvement)

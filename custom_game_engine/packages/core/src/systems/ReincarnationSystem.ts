@@ -77,6 +77,7 @@ import {
 } from '../components/SoulWisdomComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import { addIncarnationRecord } from '../components/SoulIdentityComponent.js';
+import { getSpeciesTemplate, createSpeciesFromTemplate } from '../species/SpeciesRegistry.js';
 
 /** Event data for soul:reincarnation_queued */
 interface ReincarnationQueuedEventData {
@@ -354,9 +355,8 @@ export class ReincarnationSystem extends BaseSystem {
     // Determine spawn location
     const spawnLocation = this.determineSpawnLocation(world, soul);
 
-    // Determine species (for future use with species-specific components)
-    // TODO: Use species to add species-specific components when implemented
-    this.determineSpecies(soul);
+    // Determine species and add species-specific components
+    const speciesId = this.determineSpecies(soul);
 
     // Create new entity
     const newEntity = new EntityImpl(createEntityId(), world.tick);
@@ -366,6 +366,13 @@ export class ReincarnationSystem extends BaseSystem {
     newEntity.addComponent(createPhysicsComponent(false, 1, 1));
     newEntity.addComponent(createRenderableComponent('agent', 'entity'));
     newEntity.addComponent(createTagsComponent('agent', 'reincarnated'));
+
+    // Add species-specific components from SpeciesRegistry
+    const speciesTemplate = getSpeciesTemplate(speciesId);
+    if (speciesTemplate) {
+      const speciesComponent = createSpeciesFromTemplate(speciesTemplate);
+      newEntity.addComponent(speciesComponent);
+    }
 
     // Identity - use soul's true name if available, otherwise use body name
     const soulName = soul.preserved.soulIdentity?.soulName ?? soul.preserved.name ?? generateRandomName();
@@ -377,7 +384,7 @@ export class ReincarnationSystem extends BaseSystem {
       const incarnationRecord = {
         incarnationTick: world.tick,
         bodyName: soulName,
-        bodySpecies: this.determineSpecies(soul),
+        bodySpecies: speciesId,
       };
 
       addIncarnationRecord(soul.preserved.soulIdentity, incarnationRecord);

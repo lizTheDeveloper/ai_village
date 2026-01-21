@@ -379,25 +379,147 @@ export class CompanionSystem extends BaseSystem {
   /**
    * Subscribe to events that affect companion emotions
    */
-  private subscribeToEmotionalEvents(_eventBus: EventBus): void {
-    // TODO: Phase 3 - Subscribe to events that trigger emotional responses
-    // For now, stub implementation
+  private subscribeToEmotionalEvents(eventBus: EventBus): void {
+    // Death events decrease connection and purpose (sadness)
+    eventBus.subscribe('death:occurred', (_event) => {
+      const companion = this.getCompanionComponent();
+      if (companion) {
+        updateNeed(companion, 'purpose', -0.05); // Loss reduces sense of purpose
+        updateNeed(companion, 'rest', -0.03); // Emotional toll on energy
+      }
+    });
+
+    // Birth events increase purpose and stimulation (joy)
+    eventBus.subscribe('agent:born', (_event) => {
+      const companion = this.getCompanionComponent();
+      if (companion) {
+        updateNeed(companion, 'purpose', 0.08); // New life gives purpose
+        updateNeed(companion, 'stimulation', 0.05); // Something new happened
+      }
+    });
+
+    // Building completion increases appreciation and purpose
+    eventBus.subscribe('building:placement:complete', (_event) => {
+      const companion = this.getCompanionComponent();
+      if (companion) {
+        updateNeed(companion, 'appreciation', 0.03); // Player is building, companion feels valued
+        updateNeed(companion, 'purpose', 0.02); // Progress gives purpose
+      }
+    });
+
+    // Stress events affect companion empathetically
+    eventBus.subscribe('stress:breakdown', (_event) => {
+      const companion = this.getCompanionComponent();
+      if (companion) {
+        updateNeed(companion, 'rest', -0.08); // Watching stress is draining
+        updateNeed(companion, 'purpose', -0.03); // Feeling like they couldn't help
+      }
+    });
+
+    // Player interaction increases connection
+    eventBus.subscribe('companion:interaction', (_event) => {
+      const companion = this.getCompanionComponent();
+      if (companion) {
+        updateNeed(companion, 'connection', 0.15); // Direct interaction is meaningful
+        updateNeed(companion, 'appreciation', 0.10); // Player engaged with companion
+        updateNeed(companion, 'rest', -0.02); // Interaction takes some energy
+      }
+    });
+  }
+
+  /** Helper to get the current companion component */
+  private getCompanionComponent(): CompanionComponent | null {
+    if (!this.companionEntityId || !this.worldRef) return null;
+    const entity = this.worldRef.getEntity(this.companionEntityId);
+    return entity?.getComponent<CompanionComponent>(CT.Companion) ?? null;
   }
 
   /**
    * Update companion needs (decay over time)
    */
-  private updateNeeds(_companion: CompanionComponent, _tick: number): void {
-    // TODO: Phase 3 - Implement needs decay
-    // For now, stub implementation
+  private updateNeeds(companion: CompanionComponent, tick: number): void {
+    // Only update needs every ~100 ticks (5 seconds at 20 TPS)
+    const NEEDS_UPDATE_INTERVAL = 100;
+    if (tick - companion.lastNeedsUpdateTick < NEEDS_UPDATE_INTERVAL) return;
+
+    companion.lastNeedsUpdateTick = tick;
+
+    // Calculate time since last player interaction (affects connection decay)
+    const ticksSinceInteraction = tick - companion.lastInteractionTick;
+    const interactionDecayMultiplier = ticksSinceInteraction > 2000 ? 1.5 : 1.0; // Faster decay if no interaction
+
+    // Connection decays over time (loneliness)
+    updateNeed(companion, 'connection', -0.005 * interactionDecayMultiplier);
+
+    // Appreciation decays slowly (forgetting praise)
+    updateNeed(companion, 'appreciation', -0.003);
+
+    // Stimulation decays (boredom)
+    updateNeed(companion, 'stimulation', -0.004);
+
+    // Purpose decays very slowly (existential drift)
+    updateNeed(companion, 'purpose', -0.002);
+
+    // Rest recovers slowly when not stressed
+    if (companion.needs.rest < 0.8) {
+      updateNeed(companion, 'rest', 0.003);
+    }
   }
 
   /**
    * Update companion emotion based on needs
    */
-  private updateEmotionFromNeeds(_companion: CompanionComponent, _entity: any, _tick: number): void {
-    // TODO: Phase 3 - Map needs to emotions
-    // For now, stub implementation
+  private updateEmotionFromNeeds(companion: CompanionComponent, _entity: any, tick: number): void {
+    // Only update emotion every ~200 ticks (10 seconds at 20 TPS) to avoid rapid changes
+    const EMOTION_UPDATE_INTERVAL = 200;
+    if (tick - companion.lastEmotionUpdateTick < EMOTION_UPDATE_INTERVAL) return;
+
+    const { needs } = companion;
+    let newEmotion: string;
+
+    // Priority-based emotion determination
+    // Critical low needs take priority over positive states
+
+    // Very low rest = exhausted/tired
+    if (needs.rest < 0.2) {
+      newEmotion = 'tired';
+    }
+    // Very low connection = lonely/sad
+    else if (needs.connection < 0.2) {
+      newEmotion = 'lonely';
+    }
+    // Very low purpose = melancholy
+    else if (needs.purpose < 0.2) {
+      newEmotion = 'melancholy';
+    }
+    // Low stimulation = bored
+    else if (needs.stimulation < 0.25) {
+      newEmotion = 'bored';
+    }
+    // Low appreciation = neglected
+    else if (needs.appreciation < 0.25) {
+      newEmotion = 'neglected';
+    }
+    // Moderate needs - neutral or watchful
+    else if (needs.connection < 0.5 || needs.purpose < 0.5) {
+      newEmotion = 'watchful';
+    }
+    // Good needs = content or happy based on overall average
+    else {
+      const avgNeed = (needs.connection + needs.purpose + needs.rest + needs.stimulation + needs.appreciation) / 5;
+      if (avgNeed > 0.75) {
+        newEmotion = 'joyful';
+      } else if (avgNeed > 0.6) {
+        newEmotion = 'content';
+      } else {
+        newEmotion = 'alert';
+      }
+    }
+
+    // Only change emotion if it's different (avoid unnecessary updates)
+    if (companion.currentEmotion !== newEmotion) {
+      setEmotion(companion, newEmotion, tick);
+    }
   }
 
   // ========================================================================

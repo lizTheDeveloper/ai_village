@@ -781,17 +781,12 @@ export class AIGodBehaviorSystem extends BaseSystem {
   }
 
   /**
-   * Get a random item from a Set without creating an array
+   * Get a random item from a Set (uses Array.from for TS compatibility)
    */
   private getRandomFromSet<T>(set: Set<T>): T | undefined {
     if (set.size === 0) return undefined;
-    const targetIndex = Math.floor(Math.random() * set.size);
-    let i = 0;
-    for (const item of set) {
-      if (i === targetIndex) return item;
-      i++;
-    }
-    return undefined;
+    const arr = Array.from(set);
+    return arr[Math.floor(Math.random() * arr.length)];
   }
 
   /**
