@@ -327,3 +327,4 @@ function generateStageSpecificGuidance(
 
   // Fallback to general guidance
   return `[${plotName}] ${stage.name}: Consider how this ${actionType} relates to your journey - ${stage.description}`;
+}

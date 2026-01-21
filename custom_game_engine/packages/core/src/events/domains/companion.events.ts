@@ -52,6 +52,13 @@ export interface CompanionEvents {
     description: string;
   };
 
+  /** When player interacts with companion */
+  'companion:interaction': {
+    companionId: EntityId;
+    interactionType: 'pet' | 'talk' | 'play' | 'feed' | 'command' | 'gesture';
+    duration?: number;
+  };
+
   // EXOTIC PLOT EVENTS - for Fates Council
   /** When agent encounters a dimensional entity (Ophanim, β-space horror) */
   'companion:dimensional_encounter': {

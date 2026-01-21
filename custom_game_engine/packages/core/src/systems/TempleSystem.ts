@@ -7,6 +7,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import { BuildingType } from '../types/BuildingType.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -95,12 +96,16 @@ export class TempleSystem extends BaseSystem {
 
     this.lastUpdate = currentTick;
 
-    // Find all temple buildings
-    // Note: Temple building type does not exist yet - this system is a placeholder
+    // Find all temple and shrine buildings
     // Buildings are ALWAYS simulated entities
-    // TODO: Add 'temple' to BuildingType enum when temples are implemented
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const templeBuildings: any[] = []; // Empty array - temples not implemented yet
+    const buildingEntities = ctx.world.query().with(CT.Building).executeEntities();
+    const templeBuildings = buildingEntities.filter((entity) => {
+      const building = entity.components.get(CT.Building) as BuildingComponent | undefined;
+      return building && (
+        building.buildingType === BuildingType.Temple ||
+        building.buildingType === BuildingType.Shrine
+      );
+    });
 
     for (const templeEntity of templeBuildings) {
       const building = templeEntity.components.get(CT.Building) as BuildingComponent;

@@ -1,5 +1,142 @@
 # Release Notes
 
+## 2026-01-20 - "Memory & Mining" - Fates Council Memory Integration + Temple System
+
+### Fates Council Memory Integration (+33 lines)
+
+**FatesCouncilSystem.ts** - Integrated episodic memory into plot context:
+
+**extractRecentActions()** - New method for narrative action extraction:
+- Pulls significant actions from entity's episodic memory
+- Filters by importance (>= 0.5) or emotional intensity (>= 0.6)
+- Returns narrative-friendly action summaries
+- Limits to top 5 most recent significant memories
+- Works for both souls and deities
+
+**Context enrichment:**
+- Soul context now includes recent significant actions
+- Deity context includes recent divine activities
+- Fates Council receives richer narrative context for plot assignment
+
+**Example actions extracted:**
+```
+"Witnessed a miracle that restored a dying forest"
+"Discovered ancient ruins beneath the temple"
+"Fought off a band of raiders threatening the village"
+"Formed a deep bond with a mysterious stranger"
+```
+
+**Impact:** Fates Council can now assign plots based on character history, making plot choices feel personalized and coherent.
+
+### Stellar Mining Accident Events (+27 lines)
+
+**StellarMiningSystem.ts** - Full mining accident event implementation:
+
+**Accident types:**
+- Radiation exposure (solar flare damage)
+- Structural failure (hull breach)
+- Equipment malfunction (mining laser overload)
+- Asteroid impact (unexpected collision)
+
+**Event emission:**
+```typescript
+'exploration:mining_accident' {
+  operationId: string;
+  shipId: string;
+  accidentType: 'radiation_exposure' | 'structural_failure' |
+                'equipment_malfunction' | 'asteroid_impact';
+  damage: number;
+  casualties: number;
+  shipDestroyed: boolean;
+  locationId: string;
+  civilizationId: string;
+}
+```
+
+**Gameplay impact:**
+- Mining operations now have narrative-rich accident reporting
+- Event system can trigger rescue missions, investigations, safety protocols
+- Civilization-level consequences (morale, safety regulations)
+
+### Temple System Implementation (+15 lines)
+
+**TempleSystem.ts** - Moved from placeholder to functional:
+
+**Before:** Empty array placeholder (temples not implemented)
+**After:** Real ECS query for temple and shrine buildings
+
+**Implementation:**
+```typescript
+const buildingEntities = ctx.world.query().with(CT.Building).executeEntities();
+const templeBuildings = buildingEntities.filter(entity =>
+  building.buildingType === BuildingType.Temple ||
+  building.buildingType === BuildingType.Shrine
+);
+```
+
+**BuildingType enum additions:**
+- `Temple` - Major religious center
+- `Shrine` - Minor prayer site
+
+**Impact:** TempleSystem can now track prayers, divine favor, and religious activities at actual temple buildings.
+
+### Companion Interaction Event (+7 lines)
+
+**companion.events.ts** - New interaction event:
+
+```typescript
+'companion:interaction' {
+  companionId: EntityId;
+  interactionType: 'pet' | 'talk' | 'play' | 'feed' | 'command' | 'gesture';
+  duration?: number;
+}
+```
+
+**Interaction types:**
+- **pet** - Physical affection
+- **talk** - Verbal communication
+- **play** - Playful engagement
+- **feed** - Giving food treats
+- **command** - Training/directive
+- **gesture** - Non-verbal communication
+
+**Connected to CompanionSystem:** This event triggers connection (+0.15) and appreciation (+0.10) need increases, keeping companions emotionally engaged.
+
+### Minor Updates (2 files)
+
+- **PlotNarrativePressure.ts** (+1 line): Minor guidance fix
+- **AngelsView.ts** (~3 lines): Dashboard view update
+
+### File Changes
+
+**8 files modified**, 88 insertions, 22 deletions
+
+**Major changes:**
+- FatesCouncilSystem.ts - Episodic memory integration (+33 lines)
+- StellarMiningSystem.ts - Accident event emission (+27 lines)
+- TempleSystem.ts - Temple building query implementation (+15 lines)
+- companion.events.ts - Interaction event (+7 lines)
+- BuildingType.ts - Temple and Shrine enums (+4 lines)
+
+### What's Next
+
+**Temple system expansion:**
+- Prayer tracking and divine favor mechanics
+- Ceremony scheduling (weddings, funerals, festivals)
+- Priestly NPC behaviors
+
+**Mining event chain:**
+- Rescue missions triggered by mining accidents
+- Investigation and safety improvement mechanics
+- Memorial services for fallen miners
+
+**Fates Council AI:**
+- LLM integration for personalized plot selection based on memories
+- Multi-character story arc coordination
+- Dynamic difficulty adjustment
+
+---
+
 ## 2026-01-20 - "Performance Blitz" - 18 Performance Fixes + Plot Guidance AI
 
 ### Performance Optimization Round 2 (18 Fixes)

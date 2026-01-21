@@ -47,6 +47,10 @@ export enum BuildingType {
   CensusBureau = 'census-bureau',
   WeatherStation = 'weather-station',
   HealthClinic = 'health-clinic',
+
+  // Religious Buildings
+  Temple = 'temple',
+  Shrine = 'shrine',
 }
 
 /**

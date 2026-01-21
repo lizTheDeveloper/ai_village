@@ -31,6 +31,7 @@ import type { SilverThreadComponent } from '../soul/SilverThreadComponent.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
 import type { ConversationExchange } from '../divinity/SoulCreationCeremony.js';
 import { FATE_PERSONAS } from '../divinity/SoulCreationCeremony.js';
+import { EpisodicMemoryComponent, type EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 
 /** Ticks per game day (20 TPS * 60 sec * 60 min * 24 hr = 1,728,000 ticks) */
 const TICKS_PER_DAY = 20 * 60 * 60 * 24;
@@ -338,6 +339,9 @@ export class FatesCouncilSystem extends BaseSystem {
     // Build context summary
     const context = this.buildEntityContext(soul, world);
 
+    // Extract recent actions from episodic memory
+    const recentActions = this.extractRecentActions(soul);
+
     return {
       entityId: soul.id,
       entityType: 'soul',
@@ -345,7 +349,7 @@ export class FatesCouncilSystem extends BaseSystem {
       activePlots: activePlotIds,
       completedPlots: plotLines.completed.length,
       wisdom: soulIdentity.wisdom_level ?? 0,
-      recentActions: [],  // TODO: Extract from recent events
+      recentActions,
       storyPotential,
       needsChallenge,
       overwhelmed,
@@ -363,6 +367,9 @@ export class FatesCouncilSystem extends BaseSystem {
     // Deities can also have plots!
     const plotLines = deity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
 
+    // Extract recent actions from deity's episodic memory
+    const recentActions = this.extractRecentActions(deity);
+
     return {
       entityId: deity.id,
       entityType: 'deity',
@@ -370,7 +377,7 @@ export class FatesCouncilSystem extends BaseSystem {
       activePlots: plotLines?.active.map(p => p.instance_id) || [],
       completedPlots: plotLines?.completed.length || 0,
       wisdom: (deityComp as any).divinePower || 100,  // Use divine power as "wisdom"
-      recentActions: [],  // TODO: deity activities
+      recentActions,
       storyPotential: 0.5,  // Deities always have potential
       needsChallenge: false,
       overwhelmed: false,
@@ -401,6 +408,28 @@ export class FatesCouncilSystem extends BaseSystem {
     // TODO: Build rich context from entity state
     // For now, simple placeholder
     return 'Entity in the world';
+  }
+
+  /**
+   * Extract recent significant actions from an entity's episodic memory
+   * Returns narrative-friendly action summaries for the Fates to consider
+   */
+  private extractRecentActions(entity: Entity, limit: number = 5): string[] {
+    const memory = entity.getComponent(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
+    if (!memory) return [];
+
+    // Get recent memories sorted by importance and recency
+    const memories = memory.episodicMemories;
+    if (memories.length === 0) return [];
+
+    // Filter to significant memories (high importance or emotional intensity)
+    const significantMemories = memories
+      .filter((m: EpisodicMemory) => m.importance >= 0.5 || m.emotionalIntensity >= 0.6)
+      .sort((a: EpisodicMemory, b: EpisodicMemory) => b.timestamp - a.timestamp)
+      .slice(0, limit);
+
+    // Convert to narrative action summaries
+    return significantMemories.map((m: EpisodicMemory) => m.summary);
   }
 
   /**

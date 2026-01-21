@@ -436,11 +436,32 @@ export class StellarMiningSystem extends BaseSystem {
       });
     }
 
-    // TODO: Emit accident event when mining domain events are added to exploration.events.ts
-    // For now, we handle accidents silently (they still apply damage and casualties)
+    // Determine accident type based on context
+    const accidentTypes = [
+      'radiation_exposure',
+      'structural_failure',
+      'equipment_malfunction',
+      'asteroid_impact',
+    ] as const;
+    const accidentType = accidentTypes[Math.floor(Math.random() * accidentTypes.length)]!;
+
+    // Check if ship will be destroyed
+    const shipDestroyed = ship.hull.integrity - damageAmount <= 0;
+
+    // Emit mining accident event
+    this.events.emit('exploration:mining_accident', {
+      operationId: operationEntity.id,
+      shipId: shipEntity.id,
+      accidentType,
+      damage: damageAmount,
+      casualties,
+      shipDestroyed,
+      locationId: operation.locationId,
+      civilizationId: operation.civilizationId,
+    });
 
     // If ship destroyed, remove from operation
-    if (ship.hull.integrity - damageAmount <= 0) {
+    if (shipDestroyed) {
       removeShipsFromMining(
         operation,
         [shipEntity.id],

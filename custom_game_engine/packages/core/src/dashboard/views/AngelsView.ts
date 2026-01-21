@@ -134,8 +134,7 @@ export const AngelsView: DashboardView<AngelsViewData> = {
       const angels: AngelInfo[] = [];
 
       for (const entity of world.entities.values()) {
-        // TODO: Check for angel component when implemented
-        // For now, check if entity has angel tag or specific component
+        // Check for angel component
         const angelComp = entity.components.get(CT.Angel);
         if (!angelComp) continue;
 
