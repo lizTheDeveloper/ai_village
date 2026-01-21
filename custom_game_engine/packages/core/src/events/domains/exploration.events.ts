@@ -98,6 +98,18 @@ export interface ExplorationEvents {
     civilizationId: EntityId;
   };
 
+  /** Mining accident occurred at operation */
+  'exploration:mining_accident': {
+    operationId: EntityId;
+    shipId: EntityId;
+    accidentType: 'radiation_exposure' | 'structural_failure' | 'equipment_malfunction' | 'asteroid_impact';
+    damage: number;
+    casualties: number;
+    shipDestroyed: boolean;
+    locationId: string;
+    civilizationId: EntityId;
+  };
+
   // === Era Progression Events ===
 
   /** Era advancement blocked due to missing gated resources */

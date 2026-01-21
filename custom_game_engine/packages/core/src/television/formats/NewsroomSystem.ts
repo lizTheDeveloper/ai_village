@@ -154,6 +154,11 @@ export class NewsDeskManager {
     return Array.from(this.desks.values()).filter(d => d.stationId === stationId);
   }
 
+  /** Get all news desks */
+  getAllDesks(): NewsDesk[] {
+    return Array.from(this.desks.values());
+  }
+
   // ============================================================================
   // ANCHOR MANAGEMENT
   // ============================================================================

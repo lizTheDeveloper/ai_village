@@ -432,9 +432,8 @@ export class EventReportingSystem extends BaseSystem {
     const newsroomSystem = getNewsroomSystem();
     const deskManager = newsroomSystem.getDeskManager();
 
-    // Find all news desks - accessing private field via type casting
-    // TODO: Add public method to DeskManager to get all desks
-    const desks = Array.from((deskManager as unknown as { desks: Map<string, NewsDesk> }).desks.values());
+    // Find all news desks
+    const desks = deskManager.getAllDesks();
 
     for (const desk of desks) {
       // Find available field reporter
@@ -466,9 +465,8 @@ export class EventReportingSystem extends BaseSystem {
     const newsroomSystem = getNewsroomSystem();
     const deskManager = newsroomSystem.getDeskManager();
 
-    // Find all news desks - accessing private field via type casting
-    // TODO: Add public method to DeskManager to get all desks
-    const desks = Array.from((deskManager as unknown as { desks: Map<string, NewsDesk> }).desks.values());
+    // Find all news desks
+    const desks = deskManager.getAllDesks();
 
     // Lazy loading: Skip if no news desks exist
     if (desks.length === 0) {

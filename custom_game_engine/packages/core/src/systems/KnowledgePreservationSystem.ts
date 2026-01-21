@@ -159,9 +159,8 @@ export class KnowledgePreservationSystem extends BaseSystem {
     for (const entity of civEntities) {
       const impl = entity as EntityImpl;
       const era = impl.getComponent<TechnologyEraComponent>(CT.TechnologyEra);
-      // Match by some identifier (we'll assume first match for now)
-      // TODO: Add civilizationId field to TechnologyEraComponent
-      if (era) {
+      // Match by civilizationId field
+      if (era && era.civilizationId === civilizationId) {
         civEntity = impl;
         eraComponent = era;
         break;
@@ -255,8 +254,8 @@ export class KnowledgePreservationSystem extends BaseSystem {
     for (const entity of civEntities) {
       const impl = entity as EntityImpl;
       const era = impl.getComponent<TechnologyEraComponent>(CT.TechnologyEra);
-      // TODO: Match by civilizationId when available
-      if (era) {
+      // Match by civilizationId
+      if (era && era.civilizationId === civId) {
         eraComponent = era;
         break;
       }

@@ -74,6 +74,11 @@ export interface TechBreakthrough {
 export interface TechnologyEraComponent extends Component {
   type: 'technology_era';
 
+  // ========== Ownership ==========
+
+  /** ID of the civilization this tech era belongs to */
+  civilizationId: string;
+
   // ========== Current State ==========
 
   /** Current technological era */
@@ -174,12 +179,16 @@ export interface TechnologyEraComponent extends Component {
  * Starts in Paleolithic era by default.
  */
 export function createTechnologyEraComponent(
+  civilizationId: string,
   startingEra: TechnologyEra = 'paleolithic',
   tick: number = 0
 ): TechnologyEraComponent {
   return {
     type: 'technology_era',
     version: 1,
+
+    // Ownership
+    civilizationId,
 
     // Current state
     currentEra: startingEra,

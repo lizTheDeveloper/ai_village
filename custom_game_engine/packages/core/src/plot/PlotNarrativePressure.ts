@@ -207,7 +207,123 @@ export function getPlotGuidanceForAction(
   const stage = template.stages.find((s: PlotStage) => s.stage_id === primary.current_stage);
   if (!stage) return null;
 
-  // TODO: Add stage-specific action guidance based on stage metadata
-  // For now, return general guidance
-  return `Consider how this ${actionType} relates to your current journey: ${stage.description}`;
+  // Generate stage-specific guidance based on stage attractors and action type
+  const guidance = generateStageSpecificGuidance(stage, actionType, template.name);
+  return guidance;
 }
+
+/**
+ * Generate guidance text specific to the stage's attractors and action type
+ */
+function generateStageSpecificGuidance(
+  stage: PlotStage,
+  actionType: string,
+  plotName: string
+): string {
+  const attractors = stage.stage_attractors || [];
+
+  // If no attractors, return basic guidance
+  if (attractors.length === 0) {
+    return `Consider how this ${actionType} relates to your current journey: ${stage.description}`;
+  }
+
+  // Map goal types to action guidance hints
+  const goalToActionHints: Record<string, Record<string, string>> = {
+    // Relationship goals
+    'relationship_change': {
+      'talk': 'This conversation could shape an important relationship.',
+      'gift': 'A thoughtful gift might shift how someone feels about you.',
+      'work': 'Working alongside others builds bonds.',
+      'default': 'Your interactions matter more than usual right now.',
+    },
+    'relationship_threshold': {
+      'talk': 'Keep building this connection through meaningful conversation.',
+      'gift': 'Gifts can push a relationship past a critical threshold.',
+      'default': 'Focus on deepening your key relationships.',
+    },
+    // Event goals
+    'event_occurrence': {
+      'travel': 'Your journey may lead to something significant.',
+      'explore': 'Exploration often triggers important events.',
+      'default': 'Stay alert - the moment you seek may be near.',
+    },
+    'event_prevention': {
+      'guard': 'Vigilance may prevent what you fear.',
+      'talk': 'A word of warning could change everything.',
+      'default': 'Act carefully to prevent unwanted outcomes.',
+    },
+    // Discovery/exploration goals
+    'discovery': {
+      'explore': 'What you seek may lie just beyond the next horizon.',
+      'read': 'Knowledge opens doors to discovery.',
+      'talk': 'Others may hold clues to what you seek.',
+      'default': 'Keep your eyes open for hidden truths.',
+    },
+    'exploration': {
+      'travel': 'The path ahead calls to you.',
+      'explore': 'Uncharted territory awaits your footsteps.',
+      'default': 'Venture forth into the unknown.',
+    },
+    // Conflict goals
+    'conflict_escalation': {
+      'fight': 'This conflict demands decisive action.',
+      'talk': 'Your words could fan the flames.',
+      'default': 'Tensions are rising around you.',
+    },
+    'conflict_resolution': {
+      'talk': 'Diplomacy might end this strife.',
+      'gift': 'An offering of peace could change hearts.',
+      'mediate': 'You could be the bridge between warring sides.',
+      'default': 'Seek ways to bring peace.',
+    },
+    // Mystery/revelation goals
+    'mystery_revelation': {
+      'explore': 'The truth hides in plain sight.',
+      'talk': 'Someone knows more than they let on.',
+      'read': 'Records may hold the key.',
+      'default': 'The mystery deepens - stay observant.',
+    },
+    // Skill goals
+    'skill_mastery': {
+      'practice': 'Practice brings mastery ever closer.',
+      'work': 'Hone your craft through dedicated labor.',
+      'default': 'Each action is a step toward mastery.',
+    },
+    // Emotional state goals
+    'emotional_state': {
+      'rest': 'Take time to center yourself.',
+      'talk': 'Connection with others shapes your spirit.',
+      'default': 'Be mindful of your inner state.',
+    },
+    // Survival/death goals
+    'survival': {
+      'eat': 'Sustenance is survival.',
+      'rest': 'Rest preserves your strength.',
+      'flee': 'Retreat is wisdom, not cowardice.',
+      'default': 'Stay alive - you still have purpose.',
+    },
+    'death': {
+      'fight': 'Face danger with courage.',
+      'default': 'The shadow of mortality looms.',
+    },
+  };
+
+  // Find the best matching guidance for this action
+  const primaryAttractor = attractors[0]; // Use first/strongest attractor
+  if (primaryAttractor) {
+    const goalType = primaryAttractor.goal.type;
+    const hints = goalToActionHints[goalType];
+
+    if (hints) {
+      const actionHint = hints[actionType] || hints['default'] || '';
+      if (actionHint) {
+        // Include the attractor's description if available for richer context
+        const attractorDesc = primaryAttractor.description || primaryAttractor.goal.description || '';
+        const context = attractorDesc ? ` (${attractorDesc})` : '';
+        return `[${plotName}] ${stage.name}: ${actionHint}${context}`;
+      }
+    }
+  }
+
+  // Fallback to general guidance
+  return `[${plotName}] ${stage.name}: Consider how this ${actionType} relates to your journey - ${stage.description}`;
