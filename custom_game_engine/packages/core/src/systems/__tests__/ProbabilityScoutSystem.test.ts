@@ -10,26 +10,28 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
-import { EntityImpl } from '../../ecs/Entity.js';
+import { WorldImpl, type Entity } from '../../ecs/World.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { ProbabilityScoutSystem } from '../ProbabilityScoutSystem.js';
 import type { SpaceshipComponent } from '../../navigation/SpaceshipComponent.js';
 import type { ProbabilityScoutMissionComponent } from '../../components/ProbabilityScoutMissionComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 describe('ProbabilityScoutSystem', () => {
-  let world: World;
+  let world: WorldImpl;
   let system: ProbabilityScoutSystem;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
     system = new ProbabilityScoutSystem();
   });
 
   /**
    * Helper: Create a test probability scout ship
    */
-  function createScoutShip(name: string, observationPrecision = 0.9): EntityImpl {
+  function createScoutShip(name: string, observationPrecision = 0.9): Entity {
     const ship = world.createEntity();
 
     ship.addComponent<SpaceshipComponent>({

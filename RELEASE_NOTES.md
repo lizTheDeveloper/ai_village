@@ -1,5 +1,170 @@
 # Release Notes
 
+## 2026-01-20 - "Life + Navigation Admin Capabilities" - 2 More Dashboards (1581 lines), Capability Registry
+
+### 🌱 NEW: Life Admin Capability (787 lines)
+
+**NEW FILE: custom_game_engine/packages/core/src/admin/capabilities/life.ts**
+
+Comprehensive life simulation dashboard for LLM-controlled wildlife and agriculture.
+
+**Creature Types (6):**
+- mammal, bird, reptile, fish, insect, mythical
+
+**Plant Types (6):**
+- crop, tree, flower, herb, grass, fungus
+
+**Growth Stages (7):**
+- seed, sprout, growing, mature, flowering, fruiting, dying
+
+**Life Stages (4):**
+- infant, juvenile, adult, elder
+
+**Queries:**
+- List animals (filter by creature type)
+- List plants (filter by plant type)
+- Get population statistics
+- Get breeding pairs
+- Get plant health and growth
+- Get animal health and behavior
+
+**Actions:**
+- Spawn animal/plant
+- Set life stage
+- Set growth stage
+- Trigger breeding
+- Set health status
+- Apply disease/pest
+- Harvest plant
+- Domesticate animal
+
+**Example Usage:**
+```typescript
+// List all mammals
+await life.listAnimals({ creatureType: 'mammal' });
+
+// Spawn new plant
+await life.spawnPlant({
+  plantType: 'crop',
+  species: 'wheat',
+  position: { x: 100, y: 200 },
+  growthStage: 'seed'
+});
+
+// Trigger breeding
+await life.triggerBreeding({
+  parent1Id: 'animal-001',
+  parent2Id: 'animal-002'
+});
+```
+
+**Impact**: Admin can manage wildlife populations, agriculture, breeding programs, and ecosystem dynamics!
+
+---
+
+### 🧭 NEW: Navigation Admin Capability (794 lines)
+
+**NEW FILE: custom_game_engine/packages/core/src/admin/capabilities/navigation.ts**
+
+Comprehensive navigation control dashboard for LLM-managed movement and pathfinding.
+
+**Movement Modes (6):**
+- walking, running, sneaking, swimming, flying, climbing
+
+**Pathfinding Algorithms (4):**
+- astar (default), dijkstra, bfs, direct
+
+**Destination Types (6):**
+- point, entity, building, resource, home, work
+
+**Queries:**
+- Get agent movement state
+- Get pathfinding status
+- List traveling agents
+- Get movement statistics
+- Get stuck agents
+- Get path visualization
+
+**Actions:**
+- Set destination
+- Clear destination
+- Set movement mode
+- Set pathfinding algorithm
+- Override movement speed
+- Teleport agent
+- Add waypoint
+- Clear path
+- Enable/disable collision
+
+**Example Usage:**
+```typescript
+// Set agent destination
+await navigation.setDestination({
+  agentId: 'agent-001',
+  destinationType: 'building',
+  targetId: 'building-012'
+});
+
+// Override movement speed
+await navigation.setMovementSpeed({
+  agentId: 'agent-001',
+  speed: 2.5,  // 2.5x normal speed
+  duration: 300  // 300 ticks = 15 seconds
+});
+
+// Teleport agent
+await navigation.teleport({
+  agentId: 'agent-001',
+  x: 500,
+  y: 300
+});
+```
+
+**Impact**: Admin can debug movement issues, manage agent travel, override pathfinding, and teleport entities!
+
+---
+
+### 📋 Admin Capabilities Registry Update
+
+**index.ts** - Registered 5 new capabilities:
+
+```typescript
+import './politics.js';
+import './social.js';
+import './environment.js';
+import './life.js';
+import './navigation.js';
+```
+
+**Total Admin Capabilities: 9**
+1. combat.ts (625 lines) - Combat and weapons
+2. magic.ts (630 lines) - Magic and divine powers
+3. economy.ts (596 lines) - Resources and economy
+4. planets.ts (426 lines) - Planet registry
+5. politics.ts (880 lines) - Political governance
+6. social.ts - Social interactions
+7. environment.ts - Weather and environment
+8. life.ts (787 lines) - Wildlife and agriculture
+9. navigation.ts (794 lines) - Movement and pathfinding
+
+**Total: ~5,738+ lines of admin capabilities!**
+
+**Impact**: Comprehensive admin dashboard covering every major game system. LLM agents can query and control all aspects of the simulation through standardized capability interfaces!
+
+---
+
+### 📖 Spec Updates
+
+**angel-delegation-system.md** (+66 lines)
+- New integration sections:
+  - God's Phone (angel chat with memory integration)
+  - PixelLab (sprite generation for angels)
+- Reorganized implementation phases
+- Added Phase 28.6: God's Phone (Angel Chat)
+- Added Phase 28.7: Custom Angel Species
+
+---
+
 ## 2026-01-20 - "Politics Admin + Grand Strategy Docs + Action Optimizations" - Politics Capability, Comprehensive Guide, 6 Math.sqrt Eliminations
 
 ### 🏛️ NEW: Politics Admin Capability (880 lines)

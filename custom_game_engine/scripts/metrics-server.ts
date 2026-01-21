@@ -7128,7 +7128,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   if (req.method === 'OPTIONS' && pathname.startsWith('/api/planet')) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type, Content-Type');
     res.setHeader('Access-Control-Max-Age', '86400');
     res.statusCode = 204;
     res.end();

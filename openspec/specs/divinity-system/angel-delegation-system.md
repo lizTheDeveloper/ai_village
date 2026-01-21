@@ -1808,61 +1808,107 @@ Angels use the same vision delivery system as the player, but:
 - Angel's personality affects vision tone
 - Angel's expertise affects vision quality
 
-### 10.2 With Metrics System
+### 13.2 With Metrics System
 
 Angels query metrics to generate informed responses:
 - NetworkAnalyzer for social prayers
 - Health metrics for wellbeing prayers
 - Resource metrics for economic prayers
 
-### 10.3 With Faith System
+### 13.3 With Faith System
 
 Angel performance affects agent faith:
 - Good responses → faith increases
 - Bad responses → faith decreases
 - Unanswered prayers → doubt accumulates
 
-### 10.4 With Sacred Sites
+### 13.4 With Sacred Sites
 
 Angels can direct agents to sacred sites for stronger visions.
 
-### 10.5 With Rituals
+### 13.5 With Rituals
 
 Rituals can be dedicated to specific angels, boosting their power.
 
+### 13.6 With God's Phone
+
+See Section 10. Angel chat integrates with:
+- Memory system (conversations become memories)
+- LLM system (Groq for responses)
+- Event bus (message events for UI)
+
+### 13.7 With PixelLab
+
+Sprite generation for:
+- Initial angel species definition
+- Tier evolution sprites
+- Individual angel customization
+
 ---
 
-## 11. Implementation Plan
+## 14. Implementation Plan
 
-### Phase 28.1: Core Angel System (Week 1)
+### Phase 28.1: Core Angel System
 - [ ] AngelComponent
 - [ ] Angel AI system (prayer assignment)
 - [ ] Angel creation system
 - [ ] Basic angel UI dashboard
 
-### Phase 28.2: Angel Response Generation (Week 2)
+### Phase 28.2: Angel Response Generation
 - [ ] LLM integration for angel responses
 - [ ] Energy management
 - [ ] Approval workflow
 - [ ] Performance tracking
 
-### Phase 28.3: Angel Progression (Week 3)
+### Phase 28.3: Angel Progression
 - [ ] Experience and leveling
 - [ ] Ability unlocking
 - [ ] Autonomy progression
 - [ ] Statistics and analytics
 
-### Phase 28.4: Angel Hierarchy (Week 4)
+### Phase 28.4: Angel Hierarchy
 - [ ] Archangel promotion
 - [ ] Task delegation
 - [ ] Subordinate management
 - [ ] Conflict resolution
 
-### Phase 28.5: Failure & Corruption (Week 5)
+### Phase 28.5: Failure & Corruption
 - [ ] Outcome tracking
 - [ ] Mistake detection
 - [ ] Corruption system
 - [ ] Redemption/banishment mechanics
+
+### Phase 28.6: God's Phone (Angel Chat)
+- [ ] AngelMessagingComponent
+- [ ] ChatRoom and ChatMessage types
+- [ ] AngelPhoneSystem (phone checking behavior)
+- [ ] Conversation memory integration
+- [ ] Angel Phone UI panel
+- [ ] Group chat, DM, and custom room support
+- [ ] Groq integration for angel responses
+
+### Phase 28.7: Custom Angel Species
+- [ ] AngelSpeciesDefinition type
+- [ ] First angel creation flow / species naming UI
+- [ ] PixelLab integration for species sprite generation
+- [ ] Species stored on DeityComponent
+- [ ] Tier names configuration
+
+### Phase 28.8: Evolution & Tier System
+- [ ] AngelEvolutionComponent
+- [ ] TierUnlockRequirements and TIER_REQUIREMENTS config
+- [ ] Promotion eligibility checking
+- [ ] Promotion UI (select angels to promote)
+- [ ] Evolved sprite generation (same color scheme)
+- [ ] Tier stat bonuses
+- [ ] Individual angel upgrades shop
+
+### Phase 28.9: Angel Independence (Resource Model)
+- [ ] AngelResourceComponent (own mana pool)
+- [ ] Mana regeneration system (from prayers, rituals, worship)
+- [ ] Remove continuous belief drain from angels
+- [ ] Belief-based upgrade purchases
+- [ ] Angel disruption/reformation mechanics
 
 ---
 

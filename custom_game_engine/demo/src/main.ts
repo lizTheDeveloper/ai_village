@@ -612,7 +612,7 @@ async function createInitialPlants(world: WorldMutator) {
 async function createInitialAnimals(world: WorldMutator, spawningSystem: WildAnimalSpawningSystem) {
   const animalsToSpawn = [
     { species: 'chicken', position: { x: 3, y: 2 } },
-    { species: 'sheep_white', position: { x: -4, y: 3 } },
+    { species: 'sheep', position: { x: -4, y: 3 } },
     { species: 'rabbit', position: { x: 5, y: -2 } },
     { species: 'rabbit', position: { x: -3, y: -4 } },
   ];

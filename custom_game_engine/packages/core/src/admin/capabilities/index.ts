@@ -21,3 +21,8 @@ import './combat.js';
 import './magic.js';
 import './economy.js';
 import './planets.js';
+import './politics.js';
+import './social.js';
+import './environment.js';
+import './life.js';
+import './navigation.js';

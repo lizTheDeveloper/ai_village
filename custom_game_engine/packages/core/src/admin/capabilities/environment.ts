@@ -8,8 +8,7 @@
  * - Temperature and climate
  */
 
-import { defineCapability, defineQuery, defineAction, capabilityRegistry } from '../capability-registry.js';
-import type { AdminContext, QueryResult, ActionResult } from '../types.js';
+import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
 
 // ============================================================================
 // OPTIONS

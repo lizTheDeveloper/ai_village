@@ -11,26 +11,28 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
-import { EntityImpl } from '../../ecs/Entity.js';
+import { WorldImpl, type Entity } from '../../ecs/World.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { SvetzRetrievalSystem } from '../SvetzRetrievalSystem.js';
 import type { SpaceshipComponent } from '../../navigation/SpaceshipComponent.js';
 import type { SvetzRetrievalMissionComponent } from '../../components/SvetzRetrievalMissionComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 describe('SvetzRetrievalSystem', () => {
-  let world: World;
+  let world: WorldImpl;
   let system: SvetzRetrievalSystem;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
     system = new SvetzRetrievalSystem();
   });
 
   /**
    * Helper: Create a test Svetz retrieval ship
    */
-  function createRetrievalShip(name: string, mass = 800): EntityImpl {
+  function createRetrievalShip(name: string, mass = 800): Entity {
     const ship = world.createEntity();
 
     ship.addComponent<SpaceshipComponent>({
