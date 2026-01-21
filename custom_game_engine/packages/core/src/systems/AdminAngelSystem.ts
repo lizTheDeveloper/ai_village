@@ -16,8 +16,7 @@ import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
-import { createEntityId } from '../ecs/EntityIdGenerator.js';
+import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import {
   type AdminAngelComponent,
   type AdminAngelMemory,
@@ -27,6 +26,7 @@ import {
   addPendingObservation,
   popPendingObservation,
 } from '../components/AdminAngelComponent.js';
+import { createIdentityComponent } from '../components/IdentityComponent.js';
 
 // ============================================================================
 // Types
@@ -176,30 +176,34 @@ export class AdminAngelSystem extends BaseSystem {
    */
   private getGameStateSummary(world: World): GameStateSummary {
     const timeEntity = world.query().with(CT.Time).executeEntities()[0];
-    const timeComp = timeEntity?.getComponent(CT.Time) as { day?: number; hour?: number } | undefined;
+    const timeComp = timeEntity?.getComponent(CT.Time) as {
+      day?: number;
+      timeOfDay?: number;
+      speedMultiplier?: number;
+    } | undefined;
 
     const agents = world.query().with(CT.Agent).executeEntities();
 
     // TODO: Get selected agent from somewhere
-    // TODO: Get game speed and pause state
     // TODO: Get recent events
 
-    let timeOfDay = 'day';
-    if (timeComp?.hour !== undefined) {
-      if (timeComp.hour < 6) timeOfDay = 'night';
-      else if (timeComp.hour < 12) timeOfDay = 'morning';
-      else if (timeComp.hour < 18) timeOfDay = 'afternoon';
-      else timeOfDay = 'evening';
-    }
+    let timeOfDayStr = 'day';
+    const hour = timeComp?.timeOfDay ?? 12;
+    if (hour < 6) timeOfDayStr = 'night';
+    else if (hour < 12) timeOfDayStr = 'morning';
+    else if (hour < 18) timeOfDayStr = 'afternoon';
+    else timeOfDayStr = 'evening';
+
+    const speed = timeComp?.speedMultiplier ?? 1;
 
     return {
       tick: Number(world.tick),
       day: timeComp?.day ?? 1,
-      timeOfDay,
+      timeOfDay: timeOfDayStr,
       agentCount: agents.length,
       recentEvents: [],
-      gameSpeed: 1,
-      isPaused: false,
+      gameSpeed: speed,
+      isPaused: speed === 0,
     };
   }
 
@@ -246,10 +250,23 @@ export class AdminAngelSystem extends BaseSystem {
   }
 
   /**
-   * Handle LLM response
+   * Handle LLM response (from system context)
    */
   private handleAngelResponse(
     ctx: SystemContext,
+    angel: AdminAngelComponent,
+    angelEntity: Entity,
+    response: string
+  ): void {
+    this.handleAngelResponseDirect(ctx.world, angel, angelEntity, response);
+    angel.memory.conversation.lastResponseTick = Number(ctx.tick);
+  }
+
+  /**
+   * Handle LLM response (direct world access, for event handler)
+   */
+  private handleAngelResponseDirect(
+    world: World,
     angel: AdminAngelComponent,
     angelEntity: Entity,
     response: string
@@ -262,7 +279,7 @@ export class AdminAngelSystem extends BaseSystem {
 
     // Execute commands
     for (const cmd of commands) {
-      this.executeCommand(ctx, cmd);
+      this.executeCommandDirect(world, cmd);
     }
 
     // Send chat message if there's text
@@ -271,13 +288,17 @@ export class AdminAngelSystem extends BaseSystem {
       const messages = this.splitIntoMessages(cleanResponse);
 
       for (const msg of messages) {
-        ctx.emit('chat:send_message', {
-          roomId: 'divine_chat',
-          senderId: angelEntity.id,
-          senderName: angel.name,
-          message: msg,
-          type: 'message',
-        }, angelEntity.id);
+        world.eventBus.emit({
+          type: 'chat:send_message',
+          data: {
+            roomId: 'divine_chat',
+            senderId: angelEntity.id,
+            senderName: angel.name,
+            message: msg,
+            type: 'message',
+          },
+          source: angelEntity.id,
+        });
 
         // Add to memory
         addMessageToContext(angel.memory, 'angel', msg, angel.contextWindowSize);
@@ -285,7 +306,7 @@ export class AdminAngelSystem extends BaseSystem {
     }
 
     // Update last response tick
-    angel.memory.conversation.lastResponseTick = Number(ctx.tick);
+    angel.memory.conversation.lastResponseTick = Number(world.tick);
   }
 
   /**
@@ -314,48 +335,63 @@ export class AdminAngelSystem extends BaseSystem {
   }
 
   /**
-   * Execute a parsed command
+   * Execute a parsed command (via SystemContext)
    */
   private executeCommand(ctx: SystemContext, cmd: { type: string; args: string[] }): void {
+    this.executeCommandDirect(ctx.world, cmd);
+  }
+
+  /**
+   * Execute a parsed command (direct world access)
+   */
+  private executeCommandDirect(world: World, cmd: { type: string; args: string[] }): void {
+    const emit = (type: string, data: Record<string, unknown>) => {
+      world.eventBus.emit({ type: type as keyof import('../events/EventMap.js').GameEventMap, data, source: 'admin_angel' });
+    };
+
     switch (cmd.type) {
       case 'pause':
-        ctx.emit('time:request_pause', {}, 'admin_angel');
+        emit('time:request_pause', {});
         break;
       case 'resume':
       case 'unpause':
-        ctx.emit('time:request_resume', {}, 'admin_angel');
+        emit('time:request_resume', {});
         break;
-      case 'speed':
+      case 'speed': {
         const speed = parseInt(cmd.args[0] || '1', 10);
-        ctx.emit('time:request_speed', { speed }, 'admin_angel');
+        emit('time:request_speed', { speed });
         break;
-      case 'open':
+      }
+      case 'open': {
         const panel = cmd.args.join('-');
-        ctx.emit('ui:open_panel', { panelId: panel }, 'admin_angel');
+        emit('ui:open_panel', { panelId: panel });
         break;
-      case 'close':
+      }
+      case 'close': {
         const closePanel = cmd.args.join('-');
-        ctx.emit('ui:close_panel', { panelId: closePanel }, 'admin_angel');
+        emit('ui:close_panel', { panelId: closePanel });
         break;
+      }
       case 'look':
         if (cmd.args[0] === 'at') {
           const target = cmd.args.slice(1).join(' ');
-          ctx.emit('camera:focus', { target }, 'admin_angel');
+          emit('camera:focus', { target });
         }
         break;
-      case 'agent':
+      case 'agent': {
         // [agent NAME behavior args...]
         const agentName = cmd.args[0];
         const behavior = cmd.args[1];
         const behaviorArgs = cmd.args.slice(2);
         if (agentName && behavior) {
-          ctx.emit('admin_angel:trigger_behavior', {
+          emit('admin_angel:trigger_behavior', {
             agentName,
             behavior,
             args: behaviorArgs,
-          }, 'admin_angel');
+          });
         }
         break;
+      }
     }
   }
 
@@ -449,17 +485,8 @@ export class AdminAngelSystem extends BaseSystem {
       const angel = angelEntity.getComponent(CT.AdminAngel) as AdminAngelComponent | undefined;
       if (!angel) return;
 
-      // Create a minimal context for handling
-      const ctx: SystemContext = {
-        world,
-        tick: world.tick,
-        deltaTime: 0.05,
-        emit: (type, eventData, source) => {
-          world.eventBus.emit({ type, data: eventData, source: source || 'admin_angel' });
-        },
-      };
-
-      this.handleAngelResponse(ctx, angel, angelEntity, data.response);
+      // Handle response directly (we have access to world from closure)
+      this.handleAngelResponseDirect(world, angel, angelEntity, data.response);
     });
 
     // Listen for game events to generate observations
@@ -522,11 +549,8 @@ export function spawnAdminAngel(
   entity.addComponent(angelComp);
 
   // Add identity for chat display
-  entity.addComponent({
-    type: CT.Identity,
-    name,
-    title: 'helper angel',
-  });
+  // Note: Using deity species since angels are divine entities
+  entity.addComponent(createIdentityComponent(name, 'deity', 0));
 
   world.addEntity(entity);
 

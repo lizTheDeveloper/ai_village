@@ -98,6 +98,14 @@ export interface WorldEvents {
     timestamp?: number;
   };
 
+  // === Time Control Events (Admin Angel) ===
+  'time:request_pause': Record<string, never>;
+  'time:request_resume': Record<string, never>;
+  'time:request_speed': { speed: number };
+  'time:paused': Record<string, never>;
+  'time:resumed': { speed: number };
+  'time:speed_changed': { speed: number };
+
   // === Checkpoint Events (Time Travel) ===
   /** Automatic checkpoint created at midnight */
   'checkpoint:created': {

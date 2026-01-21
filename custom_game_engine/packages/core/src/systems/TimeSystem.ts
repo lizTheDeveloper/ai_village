@@ -130,6 +130,7 @@ export class TimeSystem extends BaseSystem {
   private lastDay: number = 1; // Track previous day to detect week changes
   private lastSeason: Season | null = null; // Track previous season to detect season changes
   private universeId: string = 'universe:main'; // Default universe ID
+  private savedSpeed: number = 1; // Saved speed for pause/resume
 
   /**
    * Set the universe ID for this time system.
@@ -137,6 +138,64 @@ export class TimeSystem extends BaseSystem {
    */
   setUniverseId(universeId: string): void {
     this.universeId = universeId;
+  }
+
+  /**
+   * Initialize event listeners for time control
+   */
+  public onInit(world: World): void {
+    // Pause time
+    world.eventBus.on('time:request_pause', () => {
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      const timeEntity = timeEntities[0] as EntityImpl | undefined;
+      if (!timeEntity) return;
+
+      const time = timeEntity.getComponent<TimeComponent>(CT.Time);
+      if (!time || time.speedMultiplier === 0) return;
+
+      this.savedSpeed = time.speedMultiplier;
+      timeEntity.updateComponent<TimeComponent>(CT.Time, (current) => ({
+        ...current,
+        speedMultiplier: 0,
+      }));
+
+      world.eventBus.emit({ type: 'time:paused', data: {}, source: 'time_system' });
+    });
+
+    // Resume time
+    world.eventBus.on('time:request_resume', () => {
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      const timeEntity = timeEntities[0] as EntityImpl | undefined;
+      if (!timeEntity) return;
+
+      const time = timeEntity.getComponent<TimeComponent>(CT.Time);
+      if (!time || time.speedMultiplier !== 0) return;
+
+      timeEntity.updateComponent<TimeComponent>(CT.Time, (current) => ({
+        ...current,
+        speedMultiplier: this.savedSpeed || 1,
+      }));
+
+      world.eventBus.emit({ type: 'time:resumed', data: { speed: this.savedSpeed }, source: 'time_system' });
+    });
+
+    // Set time speed
+    world.eventBus.on('time:request_speed', (event) => {
+      const data = event.data as { speed: number };
+      const speed = Math.max(0, Math.min(10, data.speed)); // Clamp 0-10
+
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      const timeEntity = timeEntities[0] as EntityImpl | undefined;
+      if (!timeEntity) return;
+
+      timeEntity.updateComponent<TimeComponent>(CT.Time, (current) => ({
+        ...current,
+        speedMultiplier: speed,
+      }));
+
+      this.savedSpeed = speed > 0 ? speed : this.savedSpeed;
+      world.eventBus.emit({ type: 'time:speed_changed', data: { speed }, source: 'time_system' });
+    });
   }
 
   protected onUpdate(ctx: SystemContext): void {

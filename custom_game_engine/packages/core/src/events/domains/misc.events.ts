@@ -777,6 +777,30 @@ export interface MiscEvents {
     curseType: string;
   };
 
+  // === Admin Angel Events ===
+  'admin_angel:request_response': {
+    angelId: string;
+    prompt: string;
+    isProactive: boolean;
+  };
+
+  'admin_angel:response_ready': {
+    angelId: string;
+    response: string;
+  };
+
+  'admin_angel:trigger_behavior': {
+    agentName: string;
+    behavior: string;
+    args: string[];
+  };
+
+  'agent:needs_critical': {
+    agentId?: EntityId;
+    agentName?: string;
+    need?: string;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

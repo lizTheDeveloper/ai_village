@@ -107,6 +107,17 @@ export interface UIEvents {
   'camera:focus': {
     entityId?: EntityId;
     position?: { x: number; y: number };
+    target?: string;  // Name or descriptor for LLM-driven camera control
+  };
+
+  /** Open a panel */
+  'ui:open_panel': {
+    panelId: string;
+  };
+
+  /** Close a panel */
+  'ui:close_panel': {
+    panelId: string;
   };
 
   /** Stance changed for entities */
@@ -134,7 +145,22 @@ export interface UIEvents {
     roomId?: string;
     message: string;
     senderId?: EntityId;
+    senderName?: string;
+    type?: 'message' | 'action' | 'whisper';
     data?: unknown;
+  };
+
+  /** Chat join room */
+  'chat:join_room': {
+    roomId: string;
+    entityId: EntityId;
+    entityName?: string;
+  };
+
+  /** Chat leave room */
+  'chat:leave_room': {
+    roomId: string;
+    entityId: EntityId;
   };
 }
 

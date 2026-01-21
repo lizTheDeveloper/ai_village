@@ -118,25 +118,28 @@ export class PlantTargeting {
         if (!classification?.producesSeeds || plant.seedsProduced <= 0) continue;
       }
 
-      // Calculate distance
-      const dist = this.distance(position, plantPos);
+      // Calculate squared distance for comparison
+      const distSquared = this.distanceSquared(position, plantPos);
 
-      // Check max distance
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      // Check max distance (using squared distance)
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       // Track nearest
-      if (dist < nearestDist) {
+      if (distSquared < nearestDist) {
         nearest = {
           entity: plantEntity,
           speciesId: plant.speciesId,
           fruitCount: plant.fruitCount || 0,
           seedsProduced: plant.seedsProduced || 0,
           growthStage: plant.growthStage || 0,
-          distance: dist,
+          distance: Math.sqrt(distSquared), // Only compute actual distance for the result
           position: { x: plantPos.x, y: plantPos.y },
           isEdible: isEdibleSpecies(plant.speciesId),
         };
-        nearestDist = dist;
+        nearestDist = distSquared;
       }
     }
 
@@ -194,8 +197,11 @@ export class PlantTargeting {
         if (!classification?.producesSeeds || plant.seedsProduced <= 0) continue;
       }
 
-      const dist = this.distance(position, plantPos);
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      const distSquared = this.distanceSquared(position, plantPos);
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       results.push({
         entity: plantEntity,
@@ -203,7 +209,7 @@ export class PlantTargeting {
         fruitCount: plant.fruitCount || 0,
         seedsProduced: plant.seedsProduced || 0,
         growthStage: plant.growthStage || 0,
-        distance: dist,
+        distance: Math.sqrt(distSquared), // Compute actual distance for result
         position: { x: plantPos.x, y: plantPos.y },
         isEdible: isEdibleSpecies(plant.speciesId),
       });
@@ -307,8 +313,17 @@ export class PlantTargeting {
 
     const remembered = this.getRemembered(entity, memoryCategory);
     if (remembered) {
-      const dist = this.distance(position, remembered);
-      if (!options.maxDistance || dist <= options.maxDistance) {
+      if (!options.maxDistance) {
+        return {
+          type: 'remembered',
+          position: { x: remembered.x, y: remembered.y },
+          tick: remembered.tick,
+          category: `plant:${memoryCategory}`,
+        };
+      }
+      const distSquared = this.distanceSquared(position, remembered);
+      const maxDistSquared = options.maxDistance * options.maxDistance;
+      if (distSquared <= maxDistSquared) {
         return {
           type: 'remembered',
           position: { x: remembered.x, y: remembered.y },
@@ -322,13 +337,13 @@ export class PlantTargeting {
   }
 
   /**
-   * Calculate distance between two positions.
-   * PERFORMANCE: Returns actual distance - used for display purposes.
+   * Calculate squared distance between two positions.
+   * PERFORMANCE: Avoids expensive Math.sqrt - use for distance comparisons.
    */
-  private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  private distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
-    return Math.sqrt(dx * dx + dy * dy);
+    return dx * dx + dy * dy;
   }
 }
 

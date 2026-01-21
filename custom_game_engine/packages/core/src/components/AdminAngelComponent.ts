@@ -127,6 +127,7 @@ export interface AdminAngelMemory {
  */
 export interface AdminAngelComponent extends Component {
   type: 'admin_angel';
+  version: number;
 
   /** Angel's display name (player can rename) */
   name: string;
@@ -212,6 +213,7 @@ export function createAdminAngelComponent(
 ): AdminAngelComponent {
   return {
     type: 'admin_angel',
+    version: 1,
     name,
     memory: existingMemory ?? createAdminAngelMemory(),
     active: true,
