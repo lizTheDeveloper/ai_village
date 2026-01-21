@@ -32,10 +32,20 @@ export interface UniverseConfig {
   magicSpectrum?: MagicSpectrumConfig;  // Full spectrum configuration
   spectrumEffects?: SpectrumEffects;  // Resolved effects from spectrum
   planetType?: string;  // Selected planet type for homeworld
+  planetId?: string;  // ID of existing planet from registry (if reusing)
   scenarioPresetId: string;  // The first memory / intro scenario
   customScenarioText?: string;  // Custom text when scenarioPresetId is 'custom'
   universeName?: string;
   seed?: number;
+}
+
+export interface UniverseConfigScreenOptions {
+  /** Skip planet selection step (planet will be selected via UniversePlanetsScreen) */
+  skipPlanetStep?: boolean;
+  /** Pre-selected planet type (if planet was already chosen) */
+  preselectedPlanetType?: string;
+  /** Pre-selected planet ID (if using existing planet from registry) */
+  preselectedPlanetId?: string;
 }
 
 export interface ScenarioPreset {
@@ -70,11 +80,13 @@ export interface PresetParadigm {
 export class UniverseConfigScreen {
   private container: HTMLElement;
   private selectedPlanetType: string = 'terrestrial';
+  private selectedPlanetId: string | undefined = undefined;
   private selectedScenario: string = 'cooperative-survival';
   private customScenarioText: string = '';
   private currentStep: 'magic' | 'planet' | 'scenario' | 'naming' | 'souls' = 'magic';  // Magic → planet → scenario → naming → souls
   private universeName: string = '';
   private fateSuffix: string = '';
+  private options: UniverseConfigScreenOptions = {};
 
   // Planet type configurations
   private static readonly PLANET_TYPES: Record<string, { name: string; description: string; icon: string }> = {
@@ -165,9 +177,20 @@ export class UniverseConfigScreen {
     this.render();
   }
 
-  show(onCreateCallback: (config: UniverseConfig) => void): void {
+  show(onCreateCallback: (config: UniverseConfig) => void, options?: UniverseConfigScreenOptions): void {
     this._onCreate = onCreateCallback;
+    this.options = options || {};
+
+    // Apply pre-selections if provided
+    if (this.options.preselectedPlanetType) {
+      this.selectedPlanetType = this.options.preselectedPlanetType;
+    }
+    if (this.options.preselectedPlanetId) {
+      this.selectedPlanetId = this.options.preselectedPlanetId;
+    }
+
     this.container.style.display = 'flex';
+    this.render();
   }
 
   hide(): void {
@@ -177,40 +200,41 @@ export class UniverseConfigScreen {
   private render(): void {
     this.container.innerHTML = '';
 
+    // Determine which steps to show based on options
+    const skipPlanet = this.options.skipPlanetStep;
+    const steps = skipPlanet
+      ? ['magic', 'scenario', 'naming', 'souls'] as const
+      : ['magic', 'planet', 'scenario', 'naming', 'souls'] as const;
+
     // Step indicator
     const stepIndicator = document.createElement('div');
     stepIndicator.style.cssText = 'display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;';
 
-    const step1 = document.createElement('div');
-    step1.textContent = '1. Magic System';
-    step1.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'magic' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'magic' ? '#fff' : '#888'};`;
-    step1.onclick = () => { this.currentStep = 'magic'; this.render(); };
+    const stepLabels: Record<string, string> = {
+      magic: 'Magic System',
+      planet: 'Choose Homeworld',
+      scenario: 'Your Story',
+      naming: 'Name Your Universe',
+      souls: 'Soul Ceremonies',
+    };
 
-    const step2 = document.createElement('div');
-    step2.textContent = '2. Choose Homeworld';
-    step2.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'planet' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'planet' ? '#fff' : '#888'};`;
-    step2.onclick = () => { this.currentStep = 'planet'; this.render(); };
+    steps.forEach((step, index) => {
+      const stepDiv = document.createElement('div');
+      stepDiv.textContent = `${index + 1}. ${stepLabels[step]}`;
+      const isActive = this.currentStep === step;
+      const canClick = step !== 'souls' || this.pendingConfig;
+      stepDiv.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: ${canClick ? 'pointer' : 'default'}; background: ${isActive ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${isActive ? '#fff' : '#888'};`;
+      if (canClick) {
+        stepDiv.onclick = () => {
+          // Handle navigation based on skipPlanet mode
+          if (step === 'planet' && skipPlanet) return;
+          this.currentStep = step as any;
+          this.render();
+        };
+      }
+      stepIndicator.appendChild(stepDiv);
+    });
 
-    const step3 = document.createElement('div');
-    step3.textContent = '3. Your Story';
-    step3.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'scenario' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'scenario' ? '#fff' : '#888'};`;
-    step3.onclick = () => { this.currentStep = 'scenario'; this.render(); };
-
-    const step4 = document.createElement('div');
-    step4.textContent = '4. Name Your Universe';
-    step4.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'naming' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'naming' ? '#fff' : '#888'};`;
-    step4.onclick = () => { this.currentStep = 'naming'; this.render(); };
-
-    const step5 = document.createElement('div');
-    step5.textContent = '5. Soul Ceremonies';
-    step5.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; background: ${this.currentStep === 'souls' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'souls' ? '#fff' : '#888'};`;
-    step5.onclick = () => { if (this.pendingConfig) { this.currentStep = 'souls'; this.render(); } };
-
-    stepIndicator.appendChild(step1);
-    stepIndicator.appendChild(step2);
-    stepIndicator.appendChild(step3);
-    stepIndicator.appendChild(step4);
-    stepIndicator.appendChild(step5);
     this.container.appendChild(stepIndicator);
 
     const title = document.createElement('h1');
@@ -362,9 +386,11 @@ export class UniverseConfigScreen {
     buttonContainer.style.cssText = 'display: flex; gap: 20px; margin-top: 20px;';
 
     const backButton = document.createElement('button');
-    backButton.textContent = 'Back to Homeworld';
+    const backStep = this.options.skipPlanetStep ? 'magic' : 'planet';
+    const backLabel = this.options.skipPlanetStep ? 'Back to Magic System' : 'Back to Homeworld';
+    backButton.textContent = backLabel;
     backButton.style.cssText = 'padding: 15px 30px; font-size: 16px; font-family: monospace; background: #333; color: #aaa; border: 1px solid #555; border-radius: 8px; cursor: pointer;';
-    backButton.onclick = () => { this.currentStep = 'planet'; this.render(); };
+    backButton.onclick = () => { this.currentStep = backStep; this.render(); };
 
     const createButton = document.createElement('button');
     createButton.textContent = 'Next: Name Your Universe';
@@ -587,6 +613,7 @@ export class UniverseConfigScreen {
         magicSpectrum: spectrum,
         spectrumEffects: effects,
         planetType: this.selectedPlanetType,
+        planetId: this.selectedPlanetId,
         scenarioPresetId: this.selectedScenario,
         universeName: fullUniverseName,
         seed: Date.now(),
@@ -656,9 +683,11 @@ export class UniverseConfigScreen {
 
     // Next button
     const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next: Choose Homeworld';
+    const nextStep = this.options.skipPlanetStep ? 'scenario' : 'planet';
+    const nextLabel = this.options.skipPlanetStep ? 'Next: Choose Your Story' : 'Next: Choose Homeworld';
+    nextButton.textContent = nextLabel;
     nextButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-top: 30px;';
-    nextButton.onclick = () => { this.currentStep = 'planet'; this.render(); };
+    nextButton.onclick = () => { this.currentStep = nextStep; this.render(); };
     this.container.appendChild(nextButton);
   }
 

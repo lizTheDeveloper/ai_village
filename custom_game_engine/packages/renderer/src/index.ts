@@ -40,6 +40,7 @@ export * from './ShopPanel.js';
 export * from './TimelinePanel.js';
 export * from './UniverseConfigScreen.js';
 export * from './UniverseBrowserScreen.js';
+export * from './UniversePlanetsScreen.js';
 export * from './MultiverseTimelineView.js';
 export * from './RemoteUniverseView.js';
 export * from './NetworkPanel.js';

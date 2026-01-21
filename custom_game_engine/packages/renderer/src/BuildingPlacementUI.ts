@@ -266,9 +266,9 @@ export class BuildingPlacementUI {
     const agents = world.query().with('agent').with('inventory').with('position').executeEntities();
 
     if (agents.length > 0) {
-      // Find nearest agent
+      // Find nearest agent using squared distance (avoids sqrt)
       let nearestAgent = null;
-      let nearestDistance = Infinity;
+      let nearestDistanceSquared = Infinity;
 
       for (const agent of agents) {
         const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
@@ -276,10 +276,10 @@ export class BuildingPlacementUI {
 
         const dx = agentPos.x - position.x;
         const dy = agentPos.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
+        if (distanceSquared < nearestDistanceSquared) {
+          nearestDistanceSquared = distanceSquared;
           nearestAgent = agent;
         }
       }

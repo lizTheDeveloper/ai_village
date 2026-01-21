@@ -14,6 +14,7 @@
  */
 
 import type { World, DeityComponent, IdentityComponent } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
@@ -137,6 +138,7 @@ export class DivineChatPanel implements IWindowPanel {
 
   /**
    * Refresh chat state from the World
+   * PERFORMANCE: Uses ECS query to get only deity entities (avoids full scan)
    */
   private refreshFromWorld(world: World): void {
     this.world = world;
@@ -152,7 +154,8 @@ export class DivineChatPanel implements IWindowPanel {
     }
 
     // Find player-controlled deity
-    for (const entity of world.entities.values()) {
+    const deityEntities = world.query().with(CT.Deity).executeEntities();
+    for (const entity of deityEntities) {
       const deityComp = entity.components.get('deity') as DeityComponent | undefined;
       if (deityComp && deityComp.controller === 'player') {
         this.playerDeityId = entity.id;

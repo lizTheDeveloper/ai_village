@@ -1,4 +1,5 @@
 import type { World, PlantComponent, BuildingComponent, PositionComponent } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
@@ -606,6 +607,7 @@ export class FarmManagementPanel implements IWindowPanel {
 
   /**
    * Get farm buildings with effects.
+   * PERFORMANCE: Uses ECS query to get only building entities (avoids full scan)
    */
   private getFarmBuildings(world: World): FarmBuilding[] {
     const buildings: FarmBuilding[] = [];
@@ -615,7 +617,8 @@ export class FarmManagementPanel implements IWindowPanel {
       'fumigation_station', 'drying_rack', 'root_cellar', 'trellis'
     ]);
 
-    for (const entity of world.entities.values()) {
+    const buildingEntities = world.query().with(CT.Building).executeEntities();
+    for (const entity of buildingEntities) {
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (!building || !farmingBuildingTypes.has(building.buildingType)) continue;
 

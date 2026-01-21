@@ -333,6 +333,125 @@ export interface PlanetSnapshot {
  */
 export type PlanetPreset = Partial<Omit<PlanetConfig, 'id' | 'name' | 'seed'>>;
 
+// ============================================================================
+// Planet Categories (for UI organization)
+// ============================================================================
+
+/**
+ * Planet category for UI grouping.
+ * Organizes planet types into meaningful gameplay categories.
+ */
+export type PlanetCategory =
+  | 'early_world'   // Primordial, harsh conditions - great for survival gameplay
+  | 'habitable'     // Balanced for life - classic gameplay
+  | 'exotic'        // Unusual physics or composition
+  | 'fantasy'       // Supernatural/magical realms
+  | 'satellite';    // Moons and smaller bodies
+
+/**
+ * Metadata for each planet category.
+ */
+export interface PlanetCategoryInfo {
+  id: PlanetCategory;
+  name: string;
+  description: string;
+  icon: string;
+  types: PlanetType[];
+}
+
+/**
+ * Planet categories with their constituent types.
+ * Used by UI to organize planet selection.
+ */
+export const PLANET_CATEGORIES: PlanetCategoryInfo[] = [
+  {
+    id: 'habitable',
+    name: 'Habitable Worlds',
+    description: 'Balanced conditions suitable for diverse life',
+    icon: '🌍',
+    types: ['terrestrial', 'super_earth', 'ocean', 'hycean'],
+  },
+  {
+    id: 'early_world',
+    name: 'Early Worlds',
+    description: 'Primordial conditions - harsh but resource-rich',
+    icon: '🌋',
+    types: ['volcanic', 'desert', 'ice', 'rogue'],
+  },
+  {
+    id: 'exotic',
+    name: 'Exotic Worlds',
+    description: 'Unusual physics or composition',
+    icon: '💫',
+    types: ['tidally_locked', 'carbon', 'iron', 'gas_dwarf'],
+  },
+  {
+    id: 'fantasy',
+    name: 'Fantasy Realms',
+    description: 'Supernatural worlds with impossible physics',
+    icon: '✨',
+    types: ['magical', 'crystal', 'fungal', 'corrupted'],
+  },
+  {
+    id: 'satellite',
+    name: 'Moons & Satellites',
+    description: 'Smaller bodies orbiting larger worlds',
+    icon: '🌙',
+    types: ['moon'],
+  },
+];
+
+/**
+ * Get the category for a given planet type.
+ */
+export function getPlanetCategory(type: PlanetType): PlanetCategory {
+  for (const category of PLANET_CATEGORIES) {
+    if (category.types.includes(type)) {
+      return category.id;
+    }
+  }
+  return 'habitable'; // Default fallback
+}
+
+/**
+ * Get category info by ID.
+ */
+export function getCategoryInfo(category: PlanetCategory): PlanetCategoryInfo | undefined {
+  return PLANET_CATEGORIES.find(c => c.id === category);
+}
+
+/**
+ * Detailed information about each planet type for UI display.
+ */
+export const PLANET_TYPE_INFO: Record<PlanetType, { name: string; description: string; icon: string; difficulty: 'easy' | 'medium' | 'hard' | 'extreme' }> = {
+  // Habitable
+  terrestrial: { name: 'Terrestrial', description: 'Earth-like world with diverse biomes', icon: '🌍', difficulty: 'easy' },
+  super_earth: { name: 'Super Earth', description: 'Massive rocky world with high gravity', icon: '🏔️', difficulty: 'medium' },
+  ocean: { name: 'Ocean World', description: 'Global water world with no dry land', icon: '🌊', difficulty: 'medium' },
+  hycean: { name: 'Hycean', description: 'Hydrogen-rich warm ocean world', icon: '💧', difficulty: 'medium' },
+
+  // Early Worlds
+  volcanic: { name: 'Volcanic', description: 'Extreme volcanism and lava flows', icon: '🌋', difficulty: 'hard' },
+  desert: { name: 'Desert World', description: 'Arid Mars-like planet', icon: '🏜️', difficulty: 'hard' },
+  ice: { name: 'Ice World', description: 'Frozen planet with subsurface oceans', icon: '❄️', difficulty: 'hard' },
+  rogue: { name: 'Rogue Planet', description: 'Starless wanderer in eternal darkness', icon: '🌑', difficulty: 'extreme' },
+
+  // Exotic
+  tidally_locked: { name: 'Tidally Locked', description: 'Permanent day/night eyeball planet', icon: '🌗', difficulty: 'hard' },
+  carbon: { name: 'Carbon World', description: 'Graphite plains and diamond mountains', icon: '💎', difficulty: 'hard' },
+  iron: { name: 'Iron World', description: 'Dense metallic world with extreme temperatures', icon: '⚙️', difficulty: 'extreme' },
+  gas_dwarf: { name: 'Gas Dwarf', description: 'Mini-Neptune with thick atmosphere', icon: '🔵', difficulty: 'extreme' },
+
+  // Fantasy
+  magical: { name: 'Magical Realm', description: 'Floating islands and arcane zones', icon: '✨', difficulty: 'easy' },
+  crystal: { name: 'Crystal World', description: 'Crystalline terrain and refractive beauty', icon: '💎', difficulty: 'medium' },
+  fungal: { name: 'Fungal World', description: 'Giant fungi and mycelium networks', icon: '🍄', difficulty: 'medium' },
+  corrupted: { name: 'Corrupted', description: 'Twisted terrain with eldritch influence', icon: '👁️', difficulty: 'extreme' },
+
+  // Satellite
+  moon: { name: 'Planetary Moon', description: 'Satellite with low gravity', icon: '🌙', difficulty: 'medium' },
+};
+
 /**
  * Planet creation options (id, name, and type are required).
  */

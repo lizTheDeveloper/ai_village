@@ -40,7 +40,9 @@ This document catalogs every system in the game engine. Systems are organized by
 22. [Automation & Factories](#automation--factories)
 23. [Governance & Metrics](#governance--metrics)
 24. [Consciousness](#consciousness)
-25. [Utility Systems](#utility-systems)
+25. [Space & Multiverse](#space--multiverse)
+26. [Civilization & Archaeology](#civilization--archaeology)
+27. [Utility Systems](#utility-systems)
 
 ---
 

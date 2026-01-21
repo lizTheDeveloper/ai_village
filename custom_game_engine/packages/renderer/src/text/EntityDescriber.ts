@@ -143,12 +143,12 @@ export function getDistanceCategory(
 ): EntitySummary['distance'] {
   const dx = x2 - x1;
   const dy = y2 - y1;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  const distanceSquared = dx * dx + dy * dy; // Use squared distance for comparison (avoids sqrt)
 
-  // Distance thresholds (in tiles/meters)
-  if (distance < 2) return 'immediate';
-  if (distance < 10) return 'close';
-  if (distance < 50) return 'area';
+  // Distance thresholds (in tiles/meters) - pre-squared
+  if (distanceSquared < 4) return 'immediate';      // 2^2 = 4
+  if (distanceSquared < 100) return 'close';        // 10^2 = 100
+  if (distanceSquared < 2500) return 'area';        // 50^2 = 2500
   return 'distant';
 }
 

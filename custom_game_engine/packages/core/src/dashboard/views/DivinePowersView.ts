@@ -13,6 +13,7 @@ import type {
   RenderTheme,
 } from '../types.js';
 import { createProgressBar } from '../theme.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * A divine power entry
@@ -81,19 +82,18 @@ const TIER_THRESHOLDS = {
 
 /**
  * Find the player-controlled deity entity
+ * PERFORMANCE: Use ECS query instead of scanning all entities
  */
 function findPlayerDeity(world: any): { id: string; deityComponent: any } | null {
-  const CT = { Deity: 'deity' };
+  const deityEntities = world.query().with(CT.Deity).executeEntities();
 
-  for (const entity of world.entities.values()) {
-    if (entity.components.has(CT.Deity)) {
-      const deityComp = entity.components.get(CT.Deity);
-      if (deityComp && deityComp.controller === 'player') {
-        return {
-          id: entity.id,
-          deityComponent: deityComp,
-        };
-      }
+  for (const entity of deityEntities) {
+    const deityComp = entity.components.get(CT.Deity);
+    if (deityComp && deityComp.controller === 'player') {
+      return {
+        id: entity.id,
+        deityComponent: deityComp,
+      };
     }
   }
 
@@ -330,12 +330,9 @@ export const DivinePowersView: DashboardView<DivinePowersViewData> = {
       const beliefPerHour = deityComp.belief.beliefPerTick * 20 * 3600; // ticks per second * seconds per hour
 
       // Count angels
-      let angelCount = 0;
-      for (const entity of world.entities.values()) {
-        if (entity.components.has('angel')) {
-          angelCount++;
-        }
-      }
+      // PERFORMANCE: Use ECS query instead of scanning all entities
+      const angelEntities = world.query().with(CT.Angel).executeEntities();
+      const angelCount = angelEntities.length;
 
       return {
         timestamp: Date.now(),

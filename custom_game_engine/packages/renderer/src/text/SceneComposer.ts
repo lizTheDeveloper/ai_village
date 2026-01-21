@@ -139,11 +139,11 @@ export class SceneComposer {
     const { cameraX, cameraY, entities } = context;
     const summaries: EntitySummary[] = [];
 
-    // Sort entities by distance
+    // Sort entities by distance using squared distance (avoids sqrt, preserves order)
     const sortedEntities = [...entities].sort((a, b) => {
-      const distA = Math.sqrt((a.x - cameraX) ** 2 + (a.y - cameraY) ** 2);
-      const distB = Math.sqrt((b.x - cameraX) ** 2 + (b.y - cameraY) ** 2);
-      return distA - distB;
+      const distASquared = (a.x - cameraX) ** 2 + (a.y - cameraY) ** 2;
+      const distBSquared = (b.x - cameraX) ** 2 + (b.y - cameraY) ** 2;
+      return distASquared - distBSquared;
     });
 
     // Limit based on detail level

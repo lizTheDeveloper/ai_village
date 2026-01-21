@@ -224,7 +224,7 @@ export class PlanetClient {
     }
 
     const data = await response.json();
-    return data.planets;
+    return data.planets ?? [];
   }
 
   /**

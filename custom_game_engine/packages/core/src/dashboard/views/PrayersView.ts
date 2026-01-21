@@ -15,6 +15,7 @@ import type {
 import type { DeityComponent } from '../../components/DeityComponent.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
 import type { SpiritualComponent, Prayer } from '../../components/SpiritualComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Prayer information
@@ -43,8 +44,6 @@ export interface PrayersViewData extends ViewData {
   /** Total prayers answered (lifetime) */
   totalAnswered: number;
 }
-
-const CT = { Deity: 'deity', Identity: 'identity', Spiritual: 'spiritual' } as const;
 
 /**
  * Prayers View Definition
@@ -305,17 +304,17 @@ export const PrayersView: DashboardView<PrayersViewData> = {
 
 /**
  * Helper: Find player deity
+ * PERFORMANCE: Use ECS query instead of scanning all entities
  */
 function findPlayerDeity(world: any): { id: string; deityComponent: DeityComponent } | null {
-  for (const entity of world.entities.values()) {
-    if (entity.components.has(CT.Deity)) {
-      const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
-      if (deityComp && deityComp.controller === 'player') {
-        return {
-          id: entity.id,
-          deityComponent: deityComp,
-        };
-      }
+  const deityEntities = world.query().with(CT.Deity).executeEntities();
+  for (const entity of deityEntities) {
+    const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
+    if (deityComp && deityComp.controller === 'player') {
+      return {
+        id: entity.id,
+        deityComponent: deityComp,
+      };
     }
   }
   return null;

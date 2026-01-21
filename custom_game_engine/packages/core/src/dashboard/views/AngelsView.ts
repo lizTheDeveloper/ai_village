@@ -15,6 +15,7 @@ import type { DeityComponent } from '../../components/DeityComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Angel information
@@ -46,8 +47,6 @@ export interface AngelsViewData extends ViewData {
   /** Angel types available */
   angelTypes: Array<{ id: string; name: string; cost: number; description: string }>;
 }
-
-const CT = { Deity: 'deity', Angel: 'angel', Agent: 'agent', Position: 'position', Identity: 'identity' } as const;
 
 /**
  * Angels View Definition
@@ -109,14 +108,14 @@ export const AngelsView: DashboardView<AngelsViewData> = {
 
     try {
       // Find player deity
+      // PERFORMANCE: Use ECS query instead of scanning all entities
       let playerDeity: { id: string; component: DeityComponent } | null = null;
-      for (const entity of world.entities.values()) {
-        if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
-          if (deityComp && deityComp.controller === 'player') {
-            playerDeity = { id: entity.id, component: deityComp };
-            break;
-          }
+      const deityEntities = world.query().with(CT.Deity).executeEntities();
+      for (const entity of deityEntities) {
+        const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
+        if (deityComp && deityComp.controller === 'player') {
+          playerDeity = { id: entity.id, component: deityComp };
+          break;
         }
       }
 
@@ -131,12 +130,12 @@ export const AngelsView: DashboardView<AngelsViewData> = {
       const creationCost = 2000;
 
       // Find all angels
+      // PERFORMANCE: Use ECS query instead of scanning all entities
       const angels: AngelInfo[] = [];
 
-      for (const entity of world.entities.values()) {
-        // Check for angel component
+      const angelEntities = world.query().with(CT.Angel).executeEntities();
+      for (const entity of angelEntities) {
         const angelComp = entity.components.get(CT.Angel);
-        if (!angelComp) continue;
 
         const identityComp = entity.components.get(CT.Identity) as IdentityComponent | undefined;
         const posComp = entity.components.get(CT.Position) as PositionComponent | undefined;

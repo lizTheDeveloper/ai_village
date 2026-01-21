@@ -11,6 +11,7 @@
  */
 
 import type { World, DeityComponent, IdentityComponent, SpiritualComponent } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 import { DivineParameterModal, type DivineParameterResult } from './DivineParameterModal.js';
 
@@ -170,12 +171,14 @@ export class DivinePowersPanel implements IWindowPanel {
 
   /**
    * Refresh deity state from the World
+   * PERFORMANCE: Uses ECS query to get only deity entities (avoids full scan)
    */
   private refreshFromWorld(world: World): void {
     this.world = world;
 
     // Find player-controlled deity
-    for (const entity of world.entities.values()) {
+    const deityEntities = world.query().with(CT.Deity).executeEntities();
+    for (const entity of deityEntities) {
       const deityComp = entity.components.get('deity') as DeityComponent | undefined;
       if (deityComp && deityComp.controller === 'player') {
         this.playerDeityId = entity.id;
@@ -210,12 +213,9 @@ export class DivinePowersPanel implements IWindowPanel {
         believerList.sort((a, b) => b.faith - a.faith);
 
         // Count angels - entities with 'angel' component
-        let angelCount = 0;
-        for (const angelEntity of world.entities.values()) {
-          if (angelEntity.components.has('angel')) {
-            angelCount++;
-          }
-        }
+        // PERFORMANCE: Uses ECS query to get only angel entities (avoids full scan)
+        const angelEntities = world.query().with(CT.Angel).executeEntities();
+        const angelCount = angelEntities.length;
 
         // Build domains from identity
         const domains: Record<string, number> = {};

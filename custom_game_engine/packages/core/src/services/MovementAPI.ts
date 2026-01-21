@@ -62,14 +62,16 @@ export class MovementAPI {
 
     const dx = target.x - position.x;
     const dy = target.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    // PERFORMANCE: Use squared distance for comparison to avoid sqrt
+    const distanceSquared = dx * dx + dy * dy;
 
-    if (distance < 0.1) {
+    if (distanceSquared < 0.01) { // 0.1 * 0.1
       this.stop(entity);
       return;
     }
 
-    // Calculate velocity toward target
+    // Calculate velocity toward target (need actual distance for normalization)
+    const distance = Math.sqrt(distanceSquared);
     const vx = (dx / distance) * movement.speed;
     const vy = (dy / distance) * movement.speed;
 
@@ -118,9 +120,11 @@ export class MovementAPI {
 
     const dx = (movement.targetX ?? 0) - position.x;
     const dy = (movement.targetY ?? 0) - position.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    // PERFORMANCE: Use squared distance for comparison
+    const thresholdSquared = threshold * threshold;
+    const distSquared = dx * dx + dy * dy;
 
-    return dist <= threshold;
+    return distSquared <= thresholdSquared;
   }
 
   /**
@@ -158,6 +162,7 @@ export class MovementAPI {
     // Calculate direction away from threat
     const dx = position.x - threat.x;
     const dy = position.y - threat.y;
+    // PERFORMANCE: Need actual distance for normalization (cannot avoid sqrt here)
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
     this.moveToward(entity, {
@@ -168,6 +173,7 @@ export class MovementAPI {
 
   /**
    * Calculate distance between entity and target position.
+   * PERFORMANCE: Returns actual distance - use isAdjacent for comparisons where possible.
    */
   distanceTo(entity: EntityImpl, target: Position): number {
     const position = entity.getComponent<PositionComponent>(CT.Position);
@@ -182,7 +188,15 @@ export class MovementAPI {
    * Check if entity is adjacent to target (within threshold).
    */
   isAdjacent(entity: EntityImpl, target: Position, threshold: number = 1.5): boolean {
-    return this.distanceTo(entity, target) < threshold;
+    const position = entity.getComponent<PositionComponent>(CT.Position);
+    if (!position) return false;
+
+    // PERFORMANCE: Use squared distance for comparison
+    const dx = target.x - position.x;
+    const dy = target.y - position.y;
+    const thresholdSquared = threshold * threshold;
+    const distSquared = dx * dx + dy * dy;
+    return distSquared < thresholdSquared;
   }
 
   /**

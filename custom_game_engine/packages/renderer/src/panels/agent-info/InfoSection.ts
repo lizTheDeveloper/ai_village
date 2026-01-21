@@ -15,6 +15,7 @@ import type {
   GoalsComponent,
 } from './types.js';
 import type { PersonalGoal, SpiritualComponent, SoulIdentityComponent, DeityComponent, Component } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import {
   wrapText,
   renderWrappedText,
@@ -579,6 +580,7 @@ export class InfoSection {
 
   /**
    * Check if an agent believes in the player deity (the player/AI God).
+   * PERFORMANCE: Uses ECS query to get only deity entities (avoids full scan)
    */
   private checkBelievesInCreator(entity: any, world: any): boolean {
     if (!world || !entity) return false;
@@ -589,27 +591,26 @@ export class InfoSection {
 
     // Find the player deity entity
     let playerDeityId: string | null = null;
-    if (typeof world.entities?.values === 'function') {
-      for (const ent of world.entities.values()) {
-        const deity = ent.components?.get('deity') as DeityComponent | undefined;
-        if (deity) {
-          // Primary check: controller === 'player' (matches DivinePowersPanel)
-          if (deity.controller === 'player') {
-            playerDeityId = ent.id;
-            break;
-          }
-          // Fallback: check domain if available (domain is typed as DeityDomain, but 'player' may not be in the enum)
-          const identity = deity.identity as { domain?: string } | undefined;
-          if (identity?.domain === 'player') {
-            playerDeityId = ent.id;
-            break;
-          }
-        }
-        // Also check for supreme_creator as fallback
-        if (ent.components?.has('supreme_creator')) {
+    const deityEntities = world.query().with(CT.Deity).executeEntities();
+    for (const ent of deityEntities) {
+      const deity = ent.components?.get('deity') as DeityComponent | undefined;
+      if (deity) {
+        // Primary check: controller === 'player' (matches DivinePowersPanel)
+        if (deity.controller === 'player') {
           playerDeityId = ent.id;
           break;
         }
+        // Fallback: check domain if available (domain is typed as DeityDomain, but 'player' may not be in the enum)
+        const identity = deity.identity as { domain?: string } | undefined;
+        if (identity?.domain === 'player') {
+          playerDeityId = ent.id;
+          break;
+        }
+      }
+      // Also check for supreme_creator as fallback
+      if (ent.components?.has('supreme_creator')) {
+        playerDeityId = ent.id;
+        break;
       }
     }
 

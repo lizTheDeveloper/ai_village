@@ -13,6 +13,7 @@ import type {
   RenderTheme,
 } from '../types.js';
 import { DeityComponent, type DeityIdentity } from '../../components/DeityComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Myth/story information
@@ -42,8 +43,6 @@ export interface MythologyViewData extends ViewData {
   /** Sacred symbols */
   symbols: string[];
 }
-
-const CT = { Deity: 'deity' };
 
 /**
  * Mythology View Definition
@@ -83,14 +82,14 @@ export const MythologyView: DashboardView<MythologyViewData> = {
 
     try {
       // Find player deity
+      // PERFORMANCE: Use ECS query instead of scanning all entities
       let playerDeity: { id: string; component: DeityComponent } | null = null;
-      for (const entity of world.entities.values()) {
-        if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity);
-          if (deityComp instanceof DeityComponent && deityComp.controller === 'player') {
-            playerDeity = { id: entity.id, component: deityComp };
-            break;
-          }
+      const deityEntities = world.query().with(CT.Deity).executeEntities();
+      for (const entity of deityEntities) {
+        const deityComp = entity.components.get(CT.Deity);
+        if (deityComp instanceof DeityComponent && deityComp.controller === 'player') {
+          playerDeity = { id: entity.id, component: deityComp };
+          break;
         }
       }
 

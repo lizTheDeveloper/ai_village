@@ -39,6 +39,7 @@ export class InteractionOverlay {
     const buildings = world.query().with('building', 'position').executeEntities();
 
     const interactionRadius = 2.0; // tiles
+    const interactionRadiusSquared = interactionRadius * interactionRadius; // Pre-compute squared threshold
 
     for (const agent of agents) {
       const agentPos = agent.components.get('position') as PositionComponent | undefined;
@@ -54,12 +55,12 @@ export class InteractionOverlay {
 
         if (!buildingPos || !buildingComp) continue;
 
-        // Calculate distance
+        // Calculate squared distance for comparison (avoids expensive sqrt)
         const dx = agentPos.x - buildingPos.x;
         const dy = agentPos.y - buildingPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
-        if (distance <= interactionRadius) {
+        if (distanceSquared <= interactionRadiusSquared) {
           // Agent is near building - determine interaction type
           let interactionType: string | null = null;
           let interactionColor = '#FFFFFF';

@@ -229,10 +229,10 @@ export class ThreatIndicatorRenderer {
       return;
     }
 
-    // Calculate distance
+    // Calculate distance (sqrt needed here for display to user)
     const dx = threatPos.x - playerPos.x;
     const dy = threatPos.y - playerPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distance = Math.sqrt(dx * dx + dy * dy); // Keep sqrt: actual distance displayed to user
 
     // Render distance text
     this.ctx.save();

@@ -310,10 +310,10 @@ export class ContextMenuRenderer {
     clickX: number,
     clickY: number
   ): string | null {
-    // Calculate distance and angle from menu center
+    // Calculate distance from menu center
     const dx = clickX - menuX;
     const dy = clickY - menuY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy; // Use squared distance for comparison
     let angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
     // Normalize angle to 0-360
@@ -323,8 +323,10 @@ export class ContextMenuRenderer {
       if (item.innerRadius === undefined || item.outerRadius === undefined) continue;
       if (item.startAngle === undefined || item.endAngle === undefined) continue;
 
-      // Check radius
-      if (distance < item.innerRadius || distance > item.outerRadius) continue;
+      // Check radius using squared distance (avoids sqrt)
+      const innerRadiusSquared = item.innerRadius * item.innerRadius;
+      const outerRadiusSquared = item.outerRadius * item.outerRadius;
+      if (distanceSquared < innerRadiusSquared || distanceSquared > outerRadiusSquared) continue;
 
       // Check angle
       let startAngle = item.startAngle;

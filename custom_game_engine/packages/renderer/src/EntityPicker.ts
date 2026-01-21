@@ -103,43 +103,43 @@ export class EntityPicker {
       const centerX = screen.x + tilePixelSize / 2;
       const centerY = screen.y + tilePixelSize / 2;
 
-      // Calculate distance from click to entity center
-      const distance = Math.sqrt((screenX - centerX) ** 2 + (screenY - centerY) ** 2);
+      // Calculate squared distance from click to entity center (avoids sqrt)
+      const distanceSquared = (screenX - centerX) ** 2 + (screenY - centerY) ** 2;
 
-      // Determine click radius based on entity type
+      // Determine click radius based on entity type (pre-squared for comparison)
       // Agents need a VERY large radius to be easily clickable (16 tiles = 256 pixels at zoom 1.0)
       // Animals need a large radius to be easily clickable (8 tiles)
       // Plants and resources (trees, bushes) need a moderate radius to be clickable (3 tiles)
       // Other entities use default (0.5 tiles)
-      let clickRadius = tilePixelSize / 2;
+      let clickRadiusSquared = (tilePixelSize / 2) * (tilePixelSize / 2);
       if (hasAgent) {
-        clickRadius = tilePixelSize * 16; // Increased from 8 to 16 for more forgiving clicks
+        clickRadiusSquared = (tilePixelSize * 16) * (tilePixelSize * 16); // Increased from 8 to 16 for more forgiving clicks
       } else if (hasAnimal) {
-        clickRadius = tilePixelSize * 8; // Same as original agent radius
+        clickRadiusSquared = (tilePixelSize * 8) * (tilePixelSize * 8); // Same as original agent radius
       } else if (hasPlant || hasResource) {
-        clickRadius = tilePixelSize * 3; // Trees, plants, berry bushes
+        clickRadiusSquared = (tilePixelSize * 3) * (tilePixelSize * 3); // Trees, plants, berry bushes
       }
 
       if (hasAgent) {
         agentCount++;
       }
 
-      // Check if click is within radius
-      const passesDistanceCheck = distance <= clickRadius;
-      const passesClosestCheck = distance < closestDistance;
+      // Check if click is within radius using squared distance
+      const passesDistanceCheck = distanceSquared <= clickRadiusSquared;
+      const passesClosestCheck = distanceSquared < closestDistance;
       if (hasAgent) {
       }
 
       // Track closest agent separately (for prioritization)
-      if (hasAgent && passesDistanceCheck && distance < closestAgentDistance) {
+      if (hasAgent && passesDistanceCheck && distanceSquared < closestAgentDistance) {
         closestAgent = entity;
-        closestAgentDistance = distance;
+        closestAgentDistance = distanceSquared;
       }
 
       // Track closest entity overall
       if (passesDistanceCheck && passesClosestCheck) {
         closestEntity = entity;
-        closestDistance = distance;
+        closestDistance = distanceSquared;
       }
     }
 
@@ -147,9 +147,9 @@ export class EntityPicker {
     // PRIORITY: Only prefer agent if click is actually close to the agent (within 2 tiles)
     // This prevents agents from "stealing" clicks meant for nearby plants/animals
     const tilePixelSize = this.tileSize * camera.zoom;
-    const agentPriorityRadius = tilePixelSize * 2; // Only prioritize agent if click is very close
+    const agentPriorityRadiusSquared = (tilePixelSize * 2) * (tilePixelSize * 2); // Only prioritize agent if click is very close
 
-    if (closestAgent && closestAgentDistance <= agentPriorityRadius) {
+    if (closestAgent && closestAgentDistance <= agentPriorityRadiusSquared) {
       return closestAgent;
     }
 
@@ -167,9 +167,9 @@ export class EntityPicker {
     // FIXED: Increased max search distance to full viewport since clicks can be anywhere on screen
     if (agentCount > 0) {
       let nearestAgent: Entity | null = null;
-      let nearestDistance = Infinity;
-      // Use full viewport diagonal distance as maximum
-      const maxSearchDistance = Math.sqrt(camera.viewportWidth ** 2 + camera.viewportHeight ** 2);
+      let nearestDistanceSquared = Infinity;
+      // Use full viewport diagonal distance as maximum (squared for comparison)
+      const maxSearchDistanceSquared = camera.viewportWidth ** 2 + camera.viewportHeight ** 2;
 
       for (const entity of entities) {
         if (!entity || !entity.components) continue;
@@ -189,12 +189,12 @@ export class EntityPicker {
         const tilePixelSize = this.tileSize * camera.zoom;
         const centerX = screen.x + tilePixelSize / 2;
         const centerY = screen.y + tilePixelSize / 2;
-        const distance = Math.sqrt((screenX - centerX) ** 2 + (screenY - centerY) ** 2);
+        const distanceSquared = (screenX - centerX) ** 2 + (screenY - centerY) ** 2; // Use squared distance
 
 
-        if (distance < nearestDistance && distance < maxSearchDistance) {
+        if (distanceSquared < nearestDistanceSquared && distanceSquared < maxSearchDistanceSquared) {
           nearestAgent = entity;
-          nearestDistance = distance;
+          nearestDistanceSquared = distanceSquared;
         }
       }
 

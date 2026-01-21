@@ -13,6 +13,7 @@ import type {
 } from '../types.js';
 import type { DeityComponent } from '../../components/DeityComponent.js';
 import { calculateInitialRelationship } from '../../divinity/DeityRelations.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Deity summary information
@@ -54,8 +55,6 @@ export interface PantheonViewData extends ViewData {
   /** Total belief in the world */
   totalBelief: number;
 }
-
-const CT = { Deity: 'deity' };
 
 /**
  * Calculate power tier from belief
@@ -110,9 +109,9 @@ export const PantheonView: DashboardView<PantheonViewData> = {
       let totalBelief = 0;
 
       // Find all deities
-      for (const entity of world.entities.values()) {
-        if (!entity.components.has(CT.Deity)) continue;
-
+      // PERFORMANCE: Use ECS query instead of scanning all entities
+      const deityEntities = world.query().with(CT.Deity).executeEntities();
+      for (const entity of deityEntities) {
         const deityComp = entity.components.get(CT.Deity) as DeityComponent;
         if (!deityComp) continue;
 
@@ -147,9 +146,10 @@ export const PantheonView: DashboardView<PantheonViewData> = {
       // Only calculate relationships if there are multiple deities
       if (deities.length > 1) {
         // Build a map of deity entities for quick lookup
+        // PERFORMANCE: Use ECS query instead of scanning all entities
+        const deityEntityList = world.query().with(CT.Deity).executeEntities();
         const deityEntities = new Map<string, { entity: any; component: DeityComponent }>();
-        for (const entity of world.entities.values()) {
-          if (!entity.components.has(CT.Deity)) continue;
+        for (const entity of deityEntityList) {
           const deityComp = entity.components.get(CT.Deity) as DeityComponent;
           if (deityComp) {
             deityEntities.set(entity.id, { entity, component: deityComp });

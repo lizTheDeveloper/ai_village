@@ -13,6 +13,7 @@ import type {
   RenderTheme,
 } from '../types.js';
 import type { DeityComponent, DeityIdentity } from '../../components/DeityComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Data returned by the DeityIdentity view
@@ -50,8 +51,6 @@ export interface DeityIdentityViewData extends ViewData {
   /** Believer count */
   believerCount: number;
 }
-
-const CT = { Deity: 'deity' };
 
 /**
  * DeityIdentity View Definition
@@ -105,14 +104,14 @@ export const DeityIdentityView: DashboardView<DeityIdentityViewData> = {
 
     try {
       // Find player deity
+      // PERFORMANCE: Use ECS query instead of scanning all entities
       let playerDeity: { id: string; component: DeityComponent } | null = null;
-      for (const entity of world.entities.values()) {
-        if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.getComponent<DeityComponent>(CT.Deity);
-          if (deityComp && deityComp.controller === 'player') {
-            playerDeity = { id: entity.id, component: deityComp };
-            break;
-          }
+      const deityEntities = world.query().with(CT.Deity).executeEntities();
+      for (const entity of deityEntities) {
+        const deityComp = entity.getComponent<DeityComponent>(CT.Deity);
+        if (deityComp && deityComp.controller === 'player') {
+          playerDeity = { id: entity.id, component: deityComp };
+          break;
         }
       }
 

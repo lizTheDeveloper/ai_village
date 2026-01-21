@@ -12,6 +12,16 @@ export type {
   PlanetSnapshot,
   PlanetPreset,
   CreatePlanetOptions,
+  PlanetCategory,
+  PlanetCategoryInfo,
+} from './PlanetTypes.js';
+
+// Planet category constants and helpers
+export {
+  PLANET_CATEGORIES,
+  PLANET_TYPE_INFO,
+  getPlanetCategory,
+  getCategoryInfo,
 } from './PlanetTypes.js';
 
 // Presets
