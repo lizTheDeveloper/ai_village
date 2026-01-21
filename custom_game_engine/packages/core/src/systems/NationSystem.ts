@@ -189,7 +189,7 @@ export class NationSystem extends BaseSystem {
 
   /**
    * Aggregate data from all provinces in nation
-   * TODO: Implement actual province querying once Province component exists
+   * Queries actual ProvinceGovernance components to get live data
    */
   private aggregateProvinceData(
     world: World,
@@ -201,17 +201,52 @@ export class NationSystem extends BaseSystem {
     let totalMilitary = 0;
     const updatedProvinces: NationProvinceRecord[] = [];
 
-    // TODO: Query actual provinces once Province component exists
-    // For now, use province records from component
-    for (const provinceRecord of nation.provinceRecords) {
-      totalPopulation += provinceRecord.population;
-      totalGDP += provinceRecord.gdp;
-      totalMilitary += provinceRecord.militaryContribution;
+    // Query actual provinces that belong to this nation
+    const provinces = world
+      .query()
+      .with(CT.ProvinceGovernance)
+      .executeEntities();
 
+    for (const provinceEntity of provinces) {
+      const province = provinceEntity.getComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance);
+      if (!province || province.parentNationId !== entity.id) {
+        continue; // Skip provinces not belonging to this nation
+      }
+
+      // Calculate province totals from live data
+      const provincePopulation = province.cities.reduce((sum, city) => sum + city.population, 0);
+      const provinceGDP = province.economy.taxRevenue * 10; // Estimate GDP from tax revenue
+      const provinceMilitary = province.military?.garrisonStrength ?? 0;
+
+      totalPopulation += provincePopulation;
+      totalGDP += provinceGDP;
+      totalMilitary += provinceMilitary;
+
+      // Update or create province record
+      const existingRecord = nation.provinceRecords.find(r => r.provinceId === provinceEntity.id);
       updatedProvinces.push({
-        ...provinceRecord,
+        provinceId: provinceEntity.id,
+        provinceName: province.provinceName,
+        population: provincePopulation,
+        gdp: provinceGDP,
+        militaryContribution: provinceMilitary,
+        loyaltyToNation: existingRecord?.loyaltyToNation ?? province.loyalty,
         lastUpdateTick: world.tick,
       });
+    }
+
+    // Fall back to stored records if no live provinces found
+    if (updatedProvinces.length === 0) {
+      for (const provinceRecord of nation.provinceRecords) {
+        totalPopulation += provinceRecord.population;
+        totalGDP += provinceRecord.gdp;
+        totalMilitary += provinceRecord.militaryContribution;
+
+        updatedProvinces.push({
+          ...provinceRecord,
+          lastUpdateTick: world.tick,
+        });
+      }
     }
 
     entity.updateComponent<NationComponent>(CT.Nation, (current) => ({

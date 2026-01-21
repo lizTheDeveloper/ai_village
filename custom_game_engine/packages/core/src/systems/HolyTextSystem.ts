@@ -101,9 +101,8 @@ export class HolyTextSystem extends BaseSystem {
   private rebuildDeityCache(world: World): void {
     this.deityCache.clear();
 
-    for (const entity of world.entities.values()) {
-      if (!entity.components.has(CT.Deity)) continue;
-
+    const deities = world.query().with(CT.Deity).executeEntities();
+    for (const entity of deities) {
       const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
       if (deity) {
         this.deityCache.set(entity.id, deity);

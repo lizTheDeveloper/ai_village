@@ -277,36 +277,57 @@ export class MassEventSystem extends BaseSystem {
   ): Array<{ id: string }> {
     const affected: Array<{ id: string }> = [];
 
-    // Mass events target agents (ALWAYS simulated), so we iterate all
-    for (const entity of world.entities.values()) {
+    // Query based on target type first
+    let targetEntities: ReadonlyArray<import('../ecs/Entity.js').Entity>;
+
+    switch (target) {
+      case 'all_believers':
+      case 'rival_believers':
+        // Both need spiritual entities
+        targetEntities = world.query().with(CT.Spiritual).executeEntities();
+        break;
+
+      case 'all_mortals':
+        // All agents
+        targetEntities = world.query().with(CT.Agent).executeEntities();
+        break;
+
+      case 'specific_group':
+      case 'geographic_area':
+        // In full implementation, would use group/location criteria
+        targetEntities = [];
+        break;
+
+      default:
+        targetEntities = [];
+    }
+
+    // Filter for specific conditions
+    for (const entity of targetEntities) {
       let shouldAffect = false;
 
       switch (target) {
         case 'all_believers':
           // Only deity's believers
-          if (entity.components.has(CT.Spiritual)) {
-            const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
-            shouldAffect = spiritual?.believedDeity === deityId;
-          }
+          const spiritual1 = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+          shouldAffect = spiritual1?.believedDeity === deityId;
           break;
 
         case 'all_mortals':
-          // All agents
-          shouldAffect = entity.components.has(CT.Agent);
+          // All agents already queried
+          shouldAffect = true;
+          break;
+
+        case 'rival_believers':
+          // Believers of other deities
+          const spiritual2 = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+          shouldAffect = spiritual2?.believedDeity !== deityId && spiritual2?.believedDeity !== undefined;
           break;
 
         case 'specific_group':
         case 'geographic_area':
           // In full implementation, would use group/location criteria
           shouldAffect = false;
-          break;
-
-        case 'rival_believers':
-          // Believers of other deities
-          if (entity.components.has(CT.Spiritual)) {
-            const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
-            shouldAffect = spiritual?.believedDeity !== deityId && spiritual?.believedDeity !== undefined;
-          }
           break;
       }
 

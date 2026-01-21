@@ -604,16 +604,12 @@ export class DeathTransitionSystem extends BaseSystem {
 
     // Get or create knowledge loss singleton entity
     if (!this.knowledgeLossEntityId) {
-      // Try to find existing singleton
-      for (const e of world.entities.values()) {
-        if (e.components.has('knowledge_loss')) {
-          this.knowledgeLossEntityId = e.id;
-          break;
-        }
-      }
-
-      // Create if not found
-      if (!this.knowledgeLossEntityId) {
+      // Try to find existing singleton using query
+      const knowledgeLossEntities = world.query().with('knowledge_loss').executeEntities();
+      if (knowledgeLossEntities.length > 0) {
+        this.knowledgeLossEntityId = knowledgeLossEntities[0]!.id;
+      } else {
+        // Create if not found
         const mutator = world as WorldMutator;
         const knowledgeLossEntity = mutator.createEntity();
         const knowledgeLossComponent = createKnowledgeLossComponent();

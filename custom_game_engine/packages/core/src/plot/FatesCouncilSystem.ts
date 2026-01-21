@@ -143,6 +143,8 @@ export class FatesCouncilSystem extends BaseSystem {
   public readonly id: SystemId = 'fates_council';
   public readonly priority: number = 999;  // Last system, end of day
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  // Only run when souls or deities exist for the Fates to weave plots for
+  public readonly activationComponents = [CT.SoulIdentity, CT.Deity] as const;
   protected readonly throttleInterval = 1;  // Check every tick for evening
 
   private lastCouncilDay = -1;

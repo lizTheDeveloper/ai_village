@@ -117,12 +117,10 @@ export class PriesthoodSystem extends BaseSystem {
    * Check for believers who could become priests
    */
   private checkForNewPriests(world: World, currentTick: number): void {
-    // Believers are agents (ALWAYS simulated), so we iterate all
-    for (const entity of world.entities.values()) {
-      if (!entity.components.has(CT.Agent) || !entity.components.has(CT.Spiritual)) {
-        continue;
-      }
+    // Query candidates: agents with spiritual component
+    const candidates = world.query().with(CT.Agent, CT.Spiritual).executeEntities();
 
+    for (const entity of candidates) {
       // Skip if already a priest
       if (this.priests.has(entity.id)) {
         continue;

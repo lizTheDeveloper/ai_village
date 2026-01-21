@@ -320,13 +320,11 @@ export class TradeNetworkSystem extends BaseSystem {
     const wealthDist = this.calculateWealthDistribution(graph, tradeBalance);
 
     // Calculate aggregate flow
-    const totalFlowRate = Array.from(graph.edges.values()).reduce(
-      (sum, edge) => {
-        const tradeEdge = network.edges.get(edge.edgeId);
-        return sum + (tradeEdge?.flowRate ?? 0);
-      },
-      0
-    );
+    let totalFlowRate = 0;
+    for (const edge of graph.edges.values()) {
+      const tradeEdge = network.edges.get(edge.edgeId);
+      totalFlowRate += tradeEdge?.flowRate ?? 0;
+    }
 
     // Update component
     const updatedNetwork: TradeNetworkComponent = {
@@ -504,7 +502,8 @@ export class TradeNetworkSystem extends BaseSystem {
 
     const hubs: NetworkHub[] = [];
 
-    // Sort nodes by betweenness
+    // Sort nodes by betweenness - Array.from acceptable here for sort operation
+    // (only alternative is manual heap-based top-N, not worth complexity for <100 nodes typically)
     const sortedNodes = Array.from(centrality.entries())
       .sort((a, b) => b[1] - a[1]);
 
@@ -651,27 +650,39 @@ export class TradeNetworkSystem extends BaseSystem {
     const components = findConnectedComponents(graph);
     const chokepointComponent = components.components.get(chokepointId);
 
-    // Remove chokepoint temporarily
+    // Remove chokepoint temporarily - build modified graph without Array.from allocations
+    const modifiedNodes = new Set<EntityId>();
+    for (const id of graph.nodes) {
+      if (id !== chokepointId) {
+        modifiedNodes.add(id);
+      }
+    }
+
+    const modifiedEdges = new Map<string, {edgeId: string, fromNodeId: EntityId, toNodeId: EntityId, weight: number}>();
+    for (const [edgeId, edge] of graph.edges) {
+      if (edge.fromNodeId !== chokepointId && edge.toNodeId !== chokepointId) {
+        modifiedEdges.set(edgeId, edge);
+      }
+    }
+
+    const modifiedAdjacencyList = new Map<EntityId, Set<string>>();
+    for (const [nodeId, edges] of graph.adjacencyList) {
+      if (nodeId !== chokepointId) {
+        const filteredEdges = new Set<string>();
+        for (const edgeId of edges) {
+          const edge = graph.edges.get(edgeId);
+          if (edge && edge.fromNodeId !== chokepointId && edge.toNodeId !== chokepointId) {
+            filteredEdges.add(edgeId);
+          }
+        }
+        modifiedAdjacencyList.set(nodeId, filteredEdges);
+      }
+    }
+
     const modifiedGraph: Graph = {
-      nodes: new Set(Array.from(graph.nodes).filter(id => id !== chokepointId)),
-      edges: new Map(
-        Array.from(graph.edges.entries()).filter(([, edge]) =>
-          edge.fromNodeId !== chokepointId && edge.toNodeId !== chokepointId
-        )
-      ),
-      adjacencyList: new Map(
-        Array.from(graph.adjacencyList.entries())
-          .filter(([nodeId]) => nodeId !== chokepointId)
-          .map(([nodeId, edges]) => [
-            nodeId,
-            new Set(
-              Array.from(edges).filter(edgeId => {
-                const edge = graph.edges.get(edgeId);
-                return edge && edge.fromNodeId !== chokepointId && edge.toNodeId !== chokepointId;
-              })
-            ),
-          ])
-      ),
+      nodes: modifiedNodes,
+      edges: modifiedEdges,
+      adjacencyList: modifiedAdjacencyList,
     };
 
     const modifiedComponents = findConnectedComponents(modifiedGraph);
@@ -703,7 +714,11 @@ export class TradeNetworkSystem extends BaseSystem {
     tradeVolume: number,
     graph: Graph
   ): number {
-    const maxVolume = Math.max(...Array.from(graph.nodes).map(id => this.calculateNodeFlow(graph, id)));
+    let maxVolume = 0;
+    for (const id of graph.nodes) {
+      const flow = this.calculateNodeFlow(graph, id);
+      if (flow > maxVolume) maxVolume = flow;
+    }
 
     const normalizedVolume = maxVolume > 0 ? tradeVolume / maxVolume : 0;
     const normalizedAlternatives = 1.0 / Math.max(1, alternativeRoutes);
@@ -746,15 +761,17 @@ export class TradeNetworkSystem extends BaseSystem {
     graph: Graph,
     chokepoints: NetworkChokepoint[]
   ): EntityId[] {
-    const vulnerable: EntityId[] = [];
+    const vulnerableSet = new Set<EntityId>();
 
     for (const chokepoint of chokepoints) {
       if (chokepoint.alternativeRoutes < 2) {
-        vulnerable.push(...chokepoint.affectedNodes);
+        for (const nodeId of chokepoint.affectedNodes) {
+          vulnerableSet.add(nodeId);
+        }
       }
     }
 
-    return Array.from(new Set(vulnerable)); // Deduplicate
+    return Array.from(vulnerableSet); // Convert Set to Array once
   }
 
   // ===========================================================================
@@ -798,10 +815,11 @@ export class TradeNetworkSystem extends BaseSystem {
     bottomHalf: number;
   } {
     // Get absolute trade volumes per node
-    const volumes = Array.from(graph.nodes).map(nodeId => {
+    const volumes: Array<{nodeId: EntityId, volume: number}> = [];
+    for (const nodeId of graph.nodes) {
       const flow = this.calculateNodeFlow(graph, nodeId);
-      return { nodeId, volume: flow };
-    });
+      volumes.push({ nodeId, volume: flow });
+    }
 
     // Sort by volume
     volumes.sort((a, b) => a.volume - b.volume);

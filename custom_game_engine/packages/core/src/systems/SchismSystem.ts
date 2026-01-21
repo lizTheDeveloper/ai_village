@@ -116,10 +116,9 @@ export class SchismSystem extends BaseSystem {
    * Check for potential schisms
    */
   private checkForSchisms(world: World, currentTick: number): void {
-    // Deities are ALWAYS simulated entities, so we iterate all
-    for (const entity of world.entities.values()) {
-      if (!entity.components.has(CT.Deity)) continue;
-
+    // Deities are ALWAYS simulated entities, so we use ECS query
+    const deities = world.query().with(CT.Deity).executeEntities();
+    for (const entity of deities) {
       const deity = entity.components.get(CT.Deity) as DeityComponent | undefined;
       if (!deity) continue;
 

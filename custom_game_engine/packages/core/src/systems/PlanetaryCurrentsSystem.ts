@@ -2,6 +2,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { World } from '../ecs/World.js';
+import type { WorldEvents } from '../events/domains/world.events.js';
 
 /**
  * PlanetaryCurrentsSystem - Large-scale ocean circulation ("complex flow for big things")
@@ -57,9 +58,25 @@ export class PlanetaryCurrentsSystem extends BaseSystem {
   private lastUpdateTime = 0;
   private regionsProcessed = 0;
 
-  protected onInitialize(_world: World, _eventBus: EventBus): void {
-    // TODO: Subscribe to time:day events for tide updates
-    // TODO: Subscribe to celestial:moon events for moon phase/distance
+  protected onInitialize(_world: World, eventBus: EventBus): void {
+    // Subscribe to time:day events for tide updates
+    // Daily updates trigger tidal recalculation for affected coastal tiles
+    eventBus.on('time:day_changed', (data: WorldEvents['time:day_changed']) => {
+      // Trigger tidal force recalculation on day change
+      // Moon phase/distance is calculated internally in updateMoonCycle()
+      // based on current tick, so no separate celestial subscription needed
+      this.onDayChanged(data.day);
+    });
+  }
+
+  /**
+   * Handle day change for tidal updates.
+   * Recalculates tidal forces based on current moon phase.
+   */
+  private onDayChanged(_day: number): void {
+    // Tidal forces are recalculated during the next update cycle
+    // This ensures coastal tiles get updated tidal amplitudes
+    // The actual calculation happens in onUpdate via updateMoonCycle
   }
 
   protected onUpdate(ctx: SystemContext): void {

@@ -210,20 +210,16 @@ export class TempleSystem extends BaseSystem {
     const nearby: Array<{ id: string }> = [];
     const radiusSq = this.config.influenceRadius * this.config.influenceRadius;
 
-    // Believers are agents (ALWAYS simulated), so we iterate all
-    for (const entity of world.entities.values()) {
-      if (!entity.components.has(CT.Agent) || !entity.components.has(CT.Spiritual)) {
+    // Query agents with spiritual components and positions
+    const spiritualAgents = world.query().with(CT.Agent, CT.Spiritual, CT.Position).executeEntities();
+
+    for (const entity of spiritualAgents) {
+      const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
+      if (spiritual.believedDeity !== deityId) {
         continue;
       }
 
-      const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
-      if (!spiritual || spiritual.believedDeity !== deityId) {
-        continue;
-      }
-
-      const pos = entity.components.get(CT.Position) as PositionComponent | undefined;
-      if (!pos) continue;
-
+      const pos = entity.components.get(CT.Position) as PositionComponent;
       const dx = pos.x - x;
       const dy = pos.y - y;
       const distSq = dx * dx + dy * dy;

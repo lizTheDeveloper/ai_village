@@ -221,12 +221,11 @@ export class SyncretismSystem extends BaseSystem {
   private findSharedBelievers(world: World, deity1Id: string, deity2Id: string): string[] {
     const shared: string[] = [];
 
-    // Believers are agents (ALWAYS simulated), so we iterate all
-    for (const entity of world.entities.values()) {
-      if (!entity.components.has(CT.Spiritual)) continue;
+    // Query entities with spiritual components
+    const spiritualEntities = world.query().with(CT.Spiritual).executeEntities();
 
-      const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
-      if (!spiritual) continue;
+    for (const entity of spiritualEntities) {
+      const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
 
       // In full implementation, agents could worship multiple gods
       // For now, just check if they've switched between these two

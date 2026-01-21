@@ -158,11 +158,14 @@ export class LoreSpawnSystem extends BaseSystem {
     const creatorIntervention = interventionSystem as any;
 
     // Count entities with Mark of the Sinner
+    // Note: Cannot optimize with queries as marks/silence are stored in CreatorInterventionSystem's
+    // activeInterventions Map, not as components. Only agents can have these, so query for agents.
     let markedCount = 0;
     let silencedCount = 0;
 
-    // Iterate through all entities to check for marks and silence
-    for (const entity of world.entities.values()) {
+    // Only check agents (entities with CT.Agent) instead of all entities
+    const agentEntities = world.query().with(ComponentType.Agent).executeEntities();
+    for (const entity of agentEntities) {
       if (creatorIntervention.hasMarkOfSinner && creatorIntervention.hasMarkOfSinner(entity.id)) {
         markedCount++;
       }

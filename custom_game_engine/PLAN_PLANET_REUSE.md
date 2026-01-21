@@ -54,10 +54,47 @@ Same Chrome Profile (Player A)              Different Profile (Player B)
      (isolated)                           (isolated)
 ```
 
-**For true cross-profile shared world**, we need the PlanetRegistry to live OUTSIDE per-profile IndexedDB - options:
-1. **Server-side planet storage** (multiverse server already exists)
-2. **Shared IndexedDB** via service worker (complex)
-3. **Filesystem storage** (Electron/Tauri only)
+**For true cross-profile shared world**, we use the **existing multiverse server** (localhost:3001):
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│              MULTIVERSE SERVER (localhost:3001/api)                  │
+│  Already exists! Has: universes, snapshots, players, passages       │
+│                                                                      │
+│  EXTEND WITH:                                                        │
+│  ├── /api/planet/:planetId                    # Planet CRUD         │
+│  ├── /api/planet/:planetId/chunk/:x,:y        # Chunk CRUD          │
+│  ├── /api/planet/:planetId/biosphere          # Biosphere data      │
+│  ├── /api/planet/:planetId/named-locations    # Shared names        │
+│  └── /ws/planet/:planetId/sync                # Real-time chunks    │
+└─────────────────────────────────────────────────────────────────────┘
+        │                              │                    │
+        ▼                              ▼                    ▼
+   ┌─────────┐                  ┌─────────┐           ┌─────────┐
+   │ Player A│                  │ Player B│           │ Player C│
+   │ (profile │                 │ (profile │          │ (mobile)│
+   │  Chrome)│                  │  Firefox)│          │         │
+   └────┬────┘                  └────┬────┘          └────┬────┘
+        │                             │                    │
+        └─────────────────────────────┴────────────────────┘
+                              ▼
+                   Same planet, same terrain
+                   Different gods/saves
+```
+
+**Existing server capabilities** (MultiverseClient.ts):
+- `createUniverse()`, `getUniverse()`, `listUniverses()`
+- `uploadSnapshot()`, `downloadSnapshot()` (compressed)
+- `forkUniverse()` (time travel)
+- `createPassage()` (universe links)
+- `registerPlayer()`, `getPlayer()`
+
+**New capabilities needed for planets**:
+- `createPlanet()`, `getPlanet()`, `listPlanets()`
+- `getChunk()`, `saveChunk()` (terrain sync)
+- `getPlanetBiosphere()`, `savePlanetBiosphere()`
+- `nameLocation()`, `getNamedLocations()`
+- WebSocket subscription for real-time chunk updates
 
 ---
 
@@ -465,99 +502,383 @@ interface WorldImpl {
 
 ## Implementation Order
 
-### Batch 1: Foundation (Required for anything else)
-1. **Add World methods** for multi-planet management
-2. **Fix WorldSerializer** to use `planets[]` array
-3. **Add migration** for existing saves (single terrain → planets array)
+### Phase 1: Server-Side Planet Storage (Backend)
 
-### Batch 2: Planet Registry
-4. **Create PlanetRegistry** class
-5. **Create IndexedDB storage backend** for planets
-6. **Integrate with planet initialization** - register after biosphere generation
+**Location**: `custom_game_engine/scripts/metrics-server.ts` (extend existing server)
 
-### Batch 3: Early Loading
-7. **Create EarlyChunkLoader** service
-8. **Modify startup sequence** in main.ts
-9. **Transfer pre-loaded chunks** after initialization
+**New endpoints**:
+```typescript
+// Planet CRUD
+POST   /api/planet                           # Create planet
+GET    /api/planet/:planetId                 # Get planet metadata
+GET    /api/planets                          # List planets
+DELETE /api/planet/:planetId                 # Delete planet
 
-### Batch 4: UI & Polish
-10. **Planet selection UI** for new game
-11. **Location picker** for existing planets
-12. **Registry browser** in admin dashboard
+// Terrain chunks (the key feature)
+GET    /api/planet/:planetId/chunk/:x,:y     # Get chunk
+PUT    /api/planet/:planetId/chunk/:x,:y     # Save/update chunk
+GET    /api/planet/:planetId/chunks          # List generated chunks
+POST   /api/planet/:planetId/chunks/batch    # Batch get chunks
+
+// Biosphere
+GET    /api/planet/:planetId/biosphere       # Get biosphere
+PUT    /api/planet/:planetId/biosphere       # Save biosphere (once)
+
+// Named locations
+GET    /api/planet/:planetId/locations       # Get all named locations
+POST   /api/planet/:planetId/location        # Name a location
+```
+
+**Storage**: Filesystem under `multiverse-data/planets/`
+```
+multiverse-data/
+├── players/                    # Existing
+├── universes/                  # Existing
+└── planets/                    # NEW
+    └── planet:magical:abc123/
+        ├── metadata.json       # { config, stats }
+        ├── biosphere.json      # { species, foodWeb, niches }
+        ├── locations.json      # [{ name, chunkX, chunkY, ... }]
+        └── chunks/
+            ├── 0,0.json        # Compressed chunk
+            ├── 0,1.json
+            └── ...
+```
+
+### Phase 2: PlanetClient (Frontend API)
+
+**New file**: `packages/persistence/src/PlanetClient.ts`
+
+```typescript
+export class PlanetClient {
+  private baseUrl: string;
+
+  // Planet CRUD
+  async createPlanet(config: PlanetConfig): Promise<PlanetMetadata>;
+  async getPlanet(planetId: string): Promise<PlanetMetadata | null>;
+  async listPlanets(): Promise<PlanetMetadata[]>;
+
+  // Chunks - the core feature
+  async getChunk(planetId: string, x: number, y: number): Promise<SerializedChunk | null>;
+  async saveChunk(planetId: string, chunk: SerializedChunk): Promise<void>;
+  async batchGetChunks(planetId: string, coords: Array<{x: number, y: number}>): Promise<Map<string, SerializedChunk>>;
+
+  // Biosphere
+  async getBiosphere(planetId: string): Promise<BiosphereData | null>;
+  async saveBiosphere(planetId: string, biosphere: BiosphereData): Promise<void>;
+
+  // Named locations
+  async getNamedLocations(planetId: string): Promise<NamedLocation[]>;
+  async nameLocation(planetId: string, location: NamedLocation): Promise<void>;
+}
+
+export const planetClient = new PlanetClient();
+```
+
+### Phase 3: ChunkManager Server Integration
+
+**Modify**: `packages/world/src/chunks/ChunkManager.ts`
+
+Change ChunkManager to fetch/save chunks via PlanetClient:
+
+```typescript
+class ChunkManager {
+  private planetId: string;
+  private planetClient: PlanetClient;
+  private localCache = new Map<string, Chunk>();  // In-memory cache
+  private dirtyChunks = new Set<string>();        // Modified, need sync
+
+  async getChunk(x: number, y: number): Promise<Chunk> {
+    const key = `${x},${y}`;
+
+    // Check local cache
+    if (this.localCache.has(key)) {
+      return this.localCache.get(key)!;
+    }
+
+    // Fetch from server
+    const serialized = await this.planetClient.getChunk(this.planetId, x, y);
+    if (serialized) {
+      const chunk = this.deserialize(serialized);
+      this.localCache.set(key, chunk);
+      return chunk;
+    }
+
+    // Not generated - create empty chunk
+    const chunk = createEmptyChunk(x, y);
+    this.localCache.set(key, chunk);
+    return chunk;
+  }
+
+  markDirty(x: number, y: number): void {
+    this.dirtyChunks.add(`${x},${y}`);
+  }
+
+  async flushDirtyChunks(): Promise<void> {
+    for (const key of this.dirtyChunks) {
+      const chunk = this.localCache.get(key);
+      if (chunk) {
+        await this.planetClient.saveChunk(this.planetId, this.serialize(chunk));
+      }
+    }
+    this.dirtyChunks.clear();
+  }
+}
+```
+
+### Phase 4: Real-Time Multiplayer Sync (WebSocket)
+
+**Extend server** with WebSocket for chunk updates:
+
+```typescript
+// Server-side (metrics-server.ts)
+wss.on('connection', (ws, req) => {
+  const planetId = extractPlanetId(req.url);  // /ws/planet/:planetId/sync
+
+  // Subscribe to planet updates
+  planetSubscribers.get(planetId)?.add(ws);
+
+  ws.on('message', (data) => {
+    const msg = JSON.parse(data);
+
+    if (msg.type === 'chunk_update') {
+      // Save chunk
+      saveChunk(planetId, msg.chunk);
+
+      // Broadcast to all other subscribers
+      for (const subscriber of planetSubscribers.get(planetId) ?? []) {
+        if (subscriber !== ws) {
+          subscriber.send(JSON.stringify({
+            type: 'chunk_updated',
+            chunk: msg.chunk,
+          }));
+        }
+      }
+    }
+  });
+});
+
+// Client-side (PlanetClient.ts)
+subscribeToUpdates(planetId: string, onChunkUpdate: (chunk) => void): () => void {
+  const ws = new WebSocket(`ws://localhost:3001/ws/planet/${planetId}/sync`);
+
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'chunk_updated') {
+      onChunkUpdate(msg.chunk);
+    }
+  };
+
+  // Return unsubscribe function
+  return () => ws.close();
+}
+```
+
+### Phase 5: Game Startup Integration
+
+**Modify**: `demo/src/main.ts`
+
+```typescript
+async function main() {
+  // 1. Get player ID
+  const playerId = getOrCreatePlayerId();
+  planetClient.setPlayerId(playerId);
+
+  // 2. Check for existing planet or create new
+  let planet: PlanetMetadata;
+  const existingPlanets = await planetClient.listPlanets();
+
+  if (existingPlanets.length > 0 && !forceNewPlanet) {
+    // Use existing planet - skip biosphere generation!
+    planet = existingPlanets[0];
+    console.log(`[Main] Using existing planet: ${planet.name}`);
+  } else {
+    // Create new planet - generate biosphere
+    const config = generatePlanetConfig('magical', universeSeed);
+    planet = await planetClient.createPlanet(config);
+
+    // Generate biosphere (57s) - only once per planet!
+    const biosphere = await generateBiosphere(config);
+    await planetClient.saveBiosphere(planet.id, biosphere);
+  }
+
+  // 3. Create ChunkManager connected to server
+  const chunkManager = new ChunkManager(planet.id, planetClient);
+
+  // 4. Subscribe to real-time updates (multiplayer)
+  const unsubscribe = planetClient.subscribeToUpdates(planet.id, (chunk) => {
+    chunkManager.applyRemoteUpdate(chunk);
+  });
+
+  // 5. Start game with shared planet
+  const world = new World(eventBus, chunkManager);
+  // ... rest of initialization
+}
+```
+
+### Phase 6: Dirty Chunk Auto-Sync
+
+**New system**: `packages/core/src/systems/ChunkSyncSystem.ts`
+
+```typescript
+export class ChunkSyncSystem extends BaseSystem {
+  readonly id = 'chunk_sync';
+  readonly priority = 999;  // Run last
+  protected readonly throttleInterval = THROTTLE.SLOW;  // Every 100 ticks (5s)
+
+  protected async onUpdate(ctx: SystemContext): Promise<void> {
+    const chunkManager = ctx.world.getChunkManager();
+
+    // Flush any modified chunks to server
+    await chunkManager.flushDirtyChunks();
+  }
+}
+```
+
+### Phase 7: Admin Dashboard Integration
+
+**Extend**: `packages/core/src/admin/capabilities/`
+
+Add `planets.ts` capability:
+- List all planets
+- View planet stats (chunks generated, visits)
+- View biosphere summary
+- Delete planet (with confirmation)
+
+---
+
+## Implementation Files
+
+### New Files
+- `packages/persistence/src/PlanetClient.ts` - Frontend API client
+- `packages/core/src/systems/ChunkSyncSystem.ts` - Auto-sync dirty chunks
+- `packages/core/src/admin/capabilities/planets.ts` - Admin dashboard
+
+### Modified Files
+- `scripts/metrics-server.ts` - Add planet endpoints + WebSocket
+- `packages/world/src/chunks/ChunkManager.ts` - Server-backed storage
+- `demo/src/main.ts` - Startup with planet selection
+- `packages/persistence/src/WorldSerializer.ts` - Save only entity state, not terrain
 
 ---
 
 ## Data Flow Diagrams
 
-### New Game (New Planet)
+### New Game (New Planet - First Player)
 
 ```
-User clicks "New Game"
+Player A clicks "New Game"
          │
+         ▼
+┌─────────────────┐
+│ Check server:   │
+│ planetClient.   │
+│ listPlanets()   │
+└────────┬────────┘
+         │ (empty list)
          ▼
 ┌─────────────────┐
 │ Generate Config │ (PlanetConfig from type + seed)
 └────────┬────────┘
          │
          ▼
-┌─────────────────┐     ┌──────────────────┐
-│ Start EarlyChunk│────▶│ Worker Pool      │
-│ Loader (async)  │     │ generates chunks │
-└────────┬────────┘     └──────────────────┘
-         │                        │
-         ▼                        │ (parallel)
-┌─────────────────┐               │
-│ Generate        │               │
-│ Biosphere (57s) │               │
-└────────┬────────┘               │
-         │                        │
-         ▼                        │
-┌─────────────────┐               │
-│ Register in     │               │
-│ PlanetRegistry  │               │
-└────────┬────────┘               │
-         │                        │
-         ▼                        ▼
-┌─────────────────┐     ┌──────────────────┐
-│ Initialize World│     │ Chunks ready     │
-└────────┬────────┘     └────────┬─────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────────────────────────────┐
-│ Transfer pre-loaded chunks to           │
-│ ChunkManager, start game loop           │
-└─────────────────────────────────────────┘
-```
-
-### New Game (Existing Planet)
-
-```
-User selects existing planet
+┌─────────────────┐
+│ planetClient.   │
+│ createPlanet()  │◀──── Server stores metadata
+└────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│ Load from       │ (PlanetSnapshot with biosphere)
-│ PlanetRegistry  │
+│ Generate        │
+│ Biosphere (57s) │
 └────────┬────────┘
          │
-         ├────────────────────────┐
-         ▼                        │
-┌─────────────────┐               │
-│ Start EarlyChunk│               │
-│ Loader (async)  │               │
-└────────┬────────┘               │
-         │                        │ (SKIPPED - already have biosphere)
-         ▼                        │
-┌─────────────────┐               │
-│ Create Planet   │               │
-│ from snapshot   │               │
-└────────┬────────┘               │
-         │                        │
-         ▼                        ▼
+         ▼
+┌─────────────────┐
+│ planetClient.   │
+│ saveBiosphere() │◀──── Server stores biosphere (ONCE, reused forever)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Connect to      │
+│ WebSocket sync  │
+└────────┬────────┘
+         │
+         ▼
 ┌─────────────────────────────────────────┐
-│ Initialize world + transfer chunks      │
-│ (Much faster - no 57s biosphere gen)    │
+│ Initialize World with server-backed     │
+│ ChunkManager. Chunks generated on-demand│
+│ and saved to server as explored.        │
 └─────────────────────────────────────────┘
+```
+
+### New Game (Existing Planet - Instant Start)
+
+```
+Player B clicks "New Game" (or Player A returns)
+         │
+         ▼
+┌─────────────────┐
+│ Check server:   │
+│ planetClient.   │
+│ listPlanets()   │
+└────────┬────────┘
+         │ (finds planet:magical:abc123)
+         ▼
+┌─────────────────┐
+│ planetClient.   │
+│ getBiosphere()  │◀──── INSTANT! No 57s wait
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Connect to      │
+│ WebSocket sync  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────────────┐
+│ Initialize World with server-backed     │
+│ ChunkManager. Existing chunks load from │
+│ server (terrain already generated!)     │
+└─────────────────────────────────────────┘
+```
+
+### Multiplayer Flow (Two Players Online)
+
+```
+Player A (active)                        Player B (active)
+      │                                        │
+      ▼                                        ▼
+┌─────────────┐                        ┌─────────────┐
+│ Modify tile │                        │ Exploring   │
+│ (build wall)│                        │ same planet │
+└──────┬──────┘                        └──────┬──────┘
+       │                                      │
+       ▼                                      │
+┌─────────────┐                               │
+│ markDirty() │                               │
+│ chunk 5,10  │                               │
+└──────┬──────┘                               │
+       │                                      │
+       ▼ (every 5s or immediate)              │
+┌─────────────────────────────────────────────┤
+│           WebSocket: chunk_update            │
+│           { planetId, x:5, y:10, data }     │
+└──────┬──────────────────────────────────────┘
+       │                                      │
+       ▼                                      ▼
+┌─────────────┐                        ┌─────────────┐
+│ Server saves│                        │ Server sends│
+│ chunk 5,10  │                        │ chunk_update│
+└─────────────┘                        └──────┬──────┘
+                                              │
+                                              ▼
+                                       ┌─────────────┐
+                                       │ Player B    │
+                                       │ sees wall!  │
+                                       └─────────────┘
 ```
 
 ---
@@ -566,41 +887,50 @@ User selects existing planet
 
 | Risk | Mitigation |
 |------|------------|
-| **IndexedDB quota** | Compress planet snapshots, limit registry size |
-| **Migration failures** | Keep legacy terrain path, don't delete old format |
-| **Worker pool browser support** | Fallback to main thread generation |
-| **Race conditions** | Clear ownership: EarlyChunkLoader owns pre-init, BackgroundChunkGenerator owns post-init |
+| **Server unavailable** | Fallback to local IndexedDB if server unreachable |
+| **Network latency** | Local chunk cache, batch operations, optimistic updates |
+| **Concurrent modifications** | Last-write-wins for now; add timestamps for conflict detection later |
+| **Large biosphere data** | Compress with existing compress() function |
+| **WebSocket disconnects** | Auto-reconnect with exponential backoff |
+| **Migration** | Keep local IndexedDB path as fallback; migrate incrementally |
 
 ---
 
 ## Success Metrics
 
-1. **Startup time reduction**: Existing planet should load in <5s vs 60s+ for new planet
-2. **Chunk availability**: 7x7 grid (49 chunks) ready before first tick
-3. **Memory efficiency**: Planet snapshots should be <1MB each (biosphere + config)
-4. **Backward compatibility**: Existing saves load without migration errors
+1. **Startup time (existing planet)**: <5s vs 60s+ for new planet (skip biosphere gen)
+2. **Multiplayer sync latency**: <500ms for chunk updates between players
+3. **Server storage**: ~10KB per chunk (compressed), ~500KB per biosphere
+4. **Backward compatibility**: Existing IndexedDB saves still work (migration path)
+5. **Offline capability**: Game works without server, syncs when reconnected
 
 ---
 
-## Files to Create/Modify
+## Multiplayer Test Scenarios
 
-### New Files
-- `packages/persistence/src/PlanetRegistry.ts`
-- `packages/persistence/src/storage/IndexedDBPlanetStorage.ts`
-- `packages/core/src/startup/EarlyChunkLoader.ts`
+### Scenario 1: Same Planet, Different Tabs (Same God)
+1. Open two tabs in same Chrome profile
+2. Both show same world state
+3. Build wall in Tab 1 → appears in Tab 2
 
-### Modified Files
-- `packages/persistence/src/WorldSerializer.ts` - Multi-planet serialization
-- `packages/core/src/ecs/World.ts` - Add planet management methods
-- `packages/persistence/src/migrations/` - Add planet migration
-- `custom_game_engine/demo/src/main.ts` - Startup sequence changes
+### Scenario 2: Same Planet, Different Profiles (Different Gods)
+1. Open Chrome Profile A → creates planet
+2. Open Chrome Profile B → same planet (from server)
+3. Player A builds village in north
+4. Player B builds village in south
+5. Both villages coexist, terrain modifications shared
+
+### Scenario 3: Resume After Biosphere Generated
+1. Player A creates planet (57s biosphere gen)
+2. Player A closes game
+3. Player A reopens → instant load (biosphere from server)
 
 ---
 
-## Questions for User
+## Future Enhancements (Not in this plan)
 
-1. **Planet terrain sharing**: Should two saves on the same planet share terrain modifications? (Current plan: No - each save has independent terrain)
-
-2. **Named locations**: Should named locations persist in PlanetRegistry (shared across saves) or per-save?
-
-3. **Maximum registry size**: How many planets should the registry hold before cleanup?
+1. **Conflict resolution UI**: Show "Player B modified this chunk" notifications
+2. **Access control**: Private planets with invite codes
+3. **Planet discovery**: Find other players' planets via portals
+4. **Cross-machine multiplayer**: Players on different machines (already supported by server architecture)
+5. **Chunk versioning**: History of chunk modifications for rollback
