@@ -4243,7 +4243,7 @@ async function main() {
 
     // Create fallback "Unknown" deity for initial prayers
     // This deity receives prayers before any real deities emerge
-    const unknownDeity = gameLoop.world.createEntity('deity:unknown');
+    const unknownDeity = gameLoop.world.createEntity('deity');
     const unknownDeityComponent = new DeityComponent('The Unknown', 'dormant');
 
     // Configure the Unknown deity

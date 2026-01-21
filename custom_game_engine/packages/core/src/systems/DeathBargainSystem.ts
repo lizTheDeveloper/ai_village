@@ -137,6 +137,10 @@ export class DeathBargainSystem extends BaseSystem {
   private useLLM: boolean = true;
   private useGeneratedRiddles: boolean = false; // Default to mythic riddles for stability
 
+  // Player focus tracking state
+  private playerCameraFocus: { entityId?: string; position?: { x: number; y: number } } = {};
+  private playerFocusRadius: number = 20; // Tiles radius to consider "player is watching"
+
   setLLMProvider(provider: LLMProvider): void {
     this.llmProvider = provider;
     this.riddleGenerator = new RiddleGenerator(provider);
@@ -745,8 +749,8 @@ Answer ONLY with "YES" or "NO".`;
     witnessCount: number;
     observingGods: string[];
   } {
-    // TODO: Check if player is watching (player interest/focus system)
-    const playerIsWatching = false; // Placeholder
+    // Check if player is watching (via window.game API or camera focus)
+    const playerIsWatching = this.isPlayerWatchingLocation(world, bargain.deathLocation);
 
     // Count nearby mortal witnesses
     const witnessCount = this.countNearbyWitnesses(world, bargain.deathLocation);
@@ -814,6 +818,84 @@ Answer ONLY with "YES" or "NO".`;
     // Get members of the divine chat room
     const members = chatRoomSystem.getRoomMembers(world, 'divine_chat');
     return members ? members.map((m) => m.name) : [];
+  }
+
+  /**
+   * Check if player is watching a specific location.
+   *
+   * Detection methods (in order of priority):
+   * 1. window.game.devPanel.getSelectedAgentId() - directly selected entity
+   * 2. Camera focus tracking via playerCameraFocus state
+   * 3. Falls back to false if no player focus data available
+   */
+  private isPlayerWatchingLocation(
+    world: World,
+    location: { x: number; y: number }
+  ): boolean {
+    // Method 1: Check if player has selected an entity near the death location
+    // via window.game API (browser environment)
+    if (typeof window !== 'undefined') {
+      const gameWindow = window as WindowWithGame;
+      const selectedAgentId = gameWindow.game?.devPanel?.getSelectedAgentId?.();
+
+      if (selectedAgentId) {
+        const selectedEntity = world.getEntity(selectedAgentId);
+        if (selectedEntity) {
+          const position = selectedEntity.getComponent<PositionComponent>(ComponentType.Position);
+          if (position) {
+            const dx = position.x - location.x;
+            const dy = position.y - location.y;
+            const distSq = dx * dx + dy * dy;
+
+            // Player is watching if their selected entity is within focus radius
+            if (distSq <= this.playerFocusRadius * this.playerFocusRadius) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    // Method 2: Check camera focus position (if tracked via events)
+    if (this.playerCameraFocus.position) {
+      const dx = this.playerCameraFocus.position.x - location.x;
+      const dy = this.playerCameraFocus.position.y - location.y;
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq <= this.playerFocusRadius * this.playerFocusRadius) {
+        return true;
+      }
+    }
+
+    // Method 3: Check if camera is focused on an entity near the location
+    if (this.playerCameraFocus.entityId) {
+      const focusedEntity = world.getEntity(this.playerCameraFocus.entityId);
+      if (focusedEntity) {
+        const position = focusedEntity.getComponent<PositionComponent>(ComponentType.Position);
+        if (position) {
+          const dx = position.x - location.x;
+          const dy = position.y - location.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq <= this.playerFocusRadius * this.playerFocusRadius) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Update player camera focus from external source (e.g., renderer events).
+   * Call this when handling camera:focus events.
+   */
+  public updatePlayerCameraFocus(focus: {
+    entityId?: string;
+    position?: { x: number; y: number };
+  }): void {
+    this.playerCameraFocus = focus;
   }
 
   /**

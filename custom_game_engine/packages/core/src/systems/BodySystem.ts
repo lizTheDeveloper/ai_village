@@ -340,11 +340,29 @@ export class BodySystem extends BaseSystem {
   ): void {
     for (const part of Object.values(body.parts)) {
       if (part.infected) {
-        // Infection causes pain
-        // (already handled in pain calculation)
+        // Infection causes pain (already handled in pain calculation)
 
         // Infection spreads if untreated
-        // TODO: Implement infection spreading logic
+        // Spread chance increases with time and severity
+        const spreadChance = 0.00005 * deltaTime; // ~0.5% per 100 ticks
+
+        if (Math.random() < spreadChance) {
+          // Find adjacent parts to spread to (parent or children)
+          const adjacentParts = this.getAdjacentParts(body, part.id);
+
+          for (const adjacentPart of adjacentParts) {
+            if (!adjacentPart.infected && !adjacentPart.bandaged) {
+              // Spread to adjacent part
+              adjacentPart.infected = true;
+            }
+          }
+        }
+
+        // Infection damages the part over time if untreated
+        if (!part.bandaged) {
+          const infectionDamage = 0.1 * deltaTime; // Slow damage over time
+          part.health = Math.max(0, part.health - infectionDamage);
+        }
       } else {
         // Check if any untreated wounds might get infected
         const hasUntreatedWounds = part.injuries.some(
@@ -360,6 +378,34 @@ export class BodySystem extends BaseSystem {
         }
       }
     }
+  }
+
+  /**
+   * Get adjacent body parts for infection spread.
+   * Adjacency is determined by parent/child relationships.
+   * @returns Array of adjacent BodyPart objects (parent and children)
+   */
+  private getAdjacentParts(body: BodyComponent, partId: string): BodyPart[] {
+    const adjacentParts: BodyPart[] = [];
+    const currentPart = body.parts[partId];
+    if (!currentPart) return adjacentParts;
+
+    // Add parent part if exists
+    if (currentPart.parent) {
+      const parentPart = body.parts[currentPart.parent];
+      if (parentPart) {
+        adjacentParts.push(parentPart);
+      }
+    }
+
+    // Add child parts (parts that have this part as parent)
+    for (const [otherId, otherPart] of Object.entries(body.parts)) {
+      if (otherId !== partId && otherPart.parent === partId) {
+        adjacentParts.push(otherPart);
+      }
+    }
+
+    return adjacentParts;
   }
 
   // ==========================================================================

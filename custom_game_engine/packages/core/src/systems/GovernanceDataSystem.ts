@@ -46,6 +46,10 @@ export class GovernanceDataSystem extends BaseSystem {
   // Performance: Government data updates at midnight (once per game day)
   private needsUpdate = true; // Update on first tick, then wait for day change events
 
+  // Performance: Cache parenting entities and generation calculations per update cycle
+  private parentingCache: ReadonlyArray<Entity> | null = null;
+  private generationCache = new Map<string, number>();
+
   /**
    * Initialize event listeners for death/birth tracking and day change events.
    */
@@ -131,14 +135,16 @@ export class GovernanceDataSystem extends BaseSystem {
     }
     this.needsUpdate = false; // Reset flag
 
-    // Performance: Early exit if no governance buildings exist
-    // Check all governance building types in a single pass
+    // Performance: Cache governance building queries (reused by update methods anyway)
+    const townHalls = ctx.world.query().with(CT.TownHall, CT.Building).executeEntities();
+    const bureaus = ctx.world.query().with(CT.CensusBureau, CT.Building).executeEntities();
+    const warehouses = ctx.world.query().with(CT.Warehouse, CT.Building).executeEntities();
+    const stations = ctx.world.query().with(CT.WeatherStation, CT.Building).executeEntities();
+    const clinics = ctx.world.query().with(CT.HealthClinic, CT.Building).executeEntities();
+
     const hasAnyGovernanceBuilding =
-      ctx.world.query().with(CT.TownHall).executeEntities().length > 0 ||
-      ctx.world.query().with(CT.CensusBureau).executeEntities().length > 0 ||
-      ctx.world.query().with(CT.Warehouse).executeEntities().length > 0 ||
-      ctx.world.query().with(CT.WeatherStation).executeEntities().length > 0 ||
-      ctx.world.query().with(CT.HealthClinic).executeEntities().length > 0;
+      townHalls.length > 0 || bureaus.length > 0 || warehouses.length > 0 ||
+      stations.length > 0 || clinics.length > 0;
 
     if (!hasAnyGovernanceBuilding) {
       return;
@@ -150,11 +156,15 @@ export class GovernanceDataSystem extends BaseSystem {
     // Single query for agents with needs (used by HealthClinics)
     const agentsWithNeeds = ctx.world.query().with(CT.Agent, CT.Needs).executeEntities();
 
-    this.updateTownHalls(ctx.world, agentsWithIdentity);
-    this.updateCensusBureaus(ctx.world, agentsWithIdentity);
-    this.updateWarehouses(ctx.world);
-    this.updateWeatherStations(ctx.world);
-    this.updateHealthClinics(ctx.world, agentsWithNeeds);
+    // Cache parenting data and clear generation cache for this update cycle
+    this.parentingCache = ctx.world.query().with(CT.Parenting).executeEntities();
+    this.generationCache.clear();
+
+    this.updateTownHalls(ctx.world, agentsWithIdentity, townHalls);
+    this.updateCensusBureaus(ctx.world, agentsWithIdentity, bureaus);
+    this.updateWarehouses(ctx.world, warehouses);
+    this.updateWeatherStations(ctx.world, stations);
+    this.updateHealthClinics(ctx.world, agentsWithNeeds, clinics);
   }
 
   /**
@@ -175,11 +185,17 @@ export class GovernanceDataSystem extends BaseSystem {
    * First settlers (no parents) = generation 0
    * Their children = generation 1, etc.
    * Returns 0 if unable to determine generation.
+   * Performance: Uses memoization cache and pre-cached parenting entities.
    */
   private calculateGeneration(world: World, agentEntity: Entity): number {
-    // Check if agent is listed as a child in someone's ParentingComponent
-    // This requires querying all agents with parenting components
-    const parentsWithChildren = world.query().with(CT.Parenting).executeEntities();
+    // Check memoization cache first
+    if (this.generationCache.has(agentEntity.id)) {
+      return this.generationCache.get(agentEntity.id)!;
+    }
+
+    // Use cached parenting entities instead of querying
+    const parentsWithChildren = this.parentingCache || [];
+
     for (const parentEntity of parentsWithChildren) {
       const parentImpl = parentEntity as EntityImpl;
       const parentingComp = parentImpl.getComponent<ParentingComponent>(CT.Parenting);
@@ -190,21 +206,23 @@ export class GovernanceDataSystem extends BaseSystem {
         );
         if (isChild) {
           // Found a parent - recurse to get parent's generation + 1
-          return this.calculateGeneration(world, parentEntity) + 1;
+          const generation = this.calculateGeneration(world, parentEntity) + 1;
+          this.generationCache.set(agentEntity.id, generation);
+          return generation;
         }
       }
     }
 
     // No parents found - first generation (settlers)
+    this.generationCache.set(agentEntity.id, 0);
     return 0;
   }
 
   /**
    * Update TownHall components with population data.
-   * Performance: Uses pre-queried agents to avoid repeated queries
+   * Performance: Uses pre-queried agents and buildings to avoid repeated queries
    */
-  private updateTownHalls(world: World, agents: ReadonlyArray<Entity>): void {
-    const townHalls = world.query().with(CT.TownHall, CT.Building).executeEntities();
+  private updateTownHalls(world: World, agents: ReadonlyArray<Entity>, townHalls: ReadonlyArray<Entity>): void {
 
     for (const entity of townHalls) {
       const impl = entity as EntityImpl;
@@ -270,10 +288,9 @@ export class GovernanceDataSystem extends BaseSystem {
 
   /**
    * Update CensusBureau components with demographics data.
-   * Performance: Uses pre-queried agents to avoid repeated queries
+   * Performance: Uses pre-queried agents and buildings to avoid repeated queries
    */
-  private updateCensusBureaus(world: World, agents: ReadonlyArray<Entity>): void {
-    const bureaus = world.query().with(CT.CensusBureau, CT.Building).executeEntities();
+  private updateCensusBureaus(world: World, agents: ReadonlyArray<Entity>, bureaus: ReadonlyArray<Entity>): void {
 
     for (const entity of bureaus) {
       const impl = entity as EntityImpl;
@@ -350,9 +367,9 @@ export class GovernanceDataSystem extends BaseSystem {
 
   /**
    * Update Warehouse components with resource tracking.
+   * Performance: Uses pre-queried buildings to avoid repeated queries
    */
-  private updateWarehouses(world: World): void {
-    const warehouses = world.query().with(CT.Warehouse, CT.Building).executeEntities();
+  private updateWarehouses(world: World, warehouses: ReadonlyArray<Entity>): void {
 
     for (const entity of warehouses) {
       const impl = entity as EntityImpl;
@@ -370,9 +387,9 @@ export class GovernanceDataSystem extends BaseSystem {
 
   /**
    * Update WeatherStation components with forecasts.
+   * Performance: Uses pre-queried buildings to avoid repeated queries
    */
-  private updateWeatherStations(world: World): void {
-    const stations = world.query().with(CT.WeatherStation, CT.Building).executeEntities();
+  private updateWeatherStations(world: World, stations: ReadonlyArray<Entity>): void {
 
     for (const entity of stations) {
       const impl = entity as EntityImpl;
@@ -391,10 +408,9 @@ export class GovernanceDataSystem extends BaseSystem {
 
   /**
    * Update HealthClinic components with population health stats.
-   * Performance: Uses pre-queried agents to avoid repeated queries
+   * Performance: Uses pre-queried agents and buildings to avoid repeated queries
    */
-  private updateHealthClinics(world: World, agents: ReadonlyArray<Entity>): void {
-    const clinics = world.query().with(CT.HealthClinic, CT.Building).executeEntities();
+  private updateHealthClinics(world: World, agents: ReadonlyArray<Entity>, clinics: ReadonlyArray<Entity>): void {
 
     for (const entity of clinics) {
       const impl = entity as EntityImpl;

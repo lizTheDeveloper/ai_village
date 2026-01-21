@@ -384,8 +384,208 @@ export class EmpireSystem extends BaseSystem {
         }
       }
 
-      // TODO: Add negotiation, suppression, and independence mechanics
+      // Process active movement mechanics
+      if (movement.status === 'active') {
+        // Empire response depends on strength relative to empire resources
+        const empireResponse = this.calculateEmpireResponse(world, empire, movement);
+
+        if (empireResponse === 'negotiate') {
+          // Begin negotiations if movement is strong enough
+          movement.status = 'negotiating';
+          this.events.emitGeneric('empire:negotiation_started', {
+            empireName: empire.empireName,
+            movementId: movement.id,
+            movementName: movement.name,
+            demands: movement.demands,
+            tick,
+          });
+        } else if (empireResponse === 'suppress') {
+          // Military suppression reduces movement strength
+          const suppressionEffectiveness = this.calculateSuppressionEffectiveness(world, empire, movement);
+          movement.strength = Math.max(0, movement.strength - suppressionEffectiveness);
+
+          this.events.emitGeneric('empire:separatist_suppression', {
+            empireName: empire.empireName,
+            movementId: movement.id,
+            movementName: movement.name,
+            suppressionEffectiveness,
+            newStrength: movement.strength,
+            tick,
+          });
+
+          // Check if movement is crushed
+          if (movement.strength <= 0.1) {
+            movement.status = 'crushed';
+            this.events.emitGeneric('empire:separatist_movement_crushed', {
+              empireName: empire.empireName,
+              movementId: movement.id,
+              movementName: movement.name,
+              tick,
+            });
+          }
+        }
+
+        // Movement strength grows while unresolved (popular support)
+        movement.strength = Math.min(1.0, movement.strength + 0.02);
+
+        // Check for successful independence
+        if (movement.strength >= 1.0) {
+          movement.status = 'successful';
+          this.processIndependenceDeclaration(world, empire, empireEntity, movement, tick);
+        }
+      }
+
+      // Process ongoing negotiations
+      if (movement.status === 'negotiating') {
+        // Negotiations can succeed (autonomy granted) or fail (return to active)
+        const negotiationOutcome = this.processNegotiation(world, empire, movement, tick);
+
+        if (negotiationOutcome === 'autonomy_granted') {
+          // Grant autonomy but keep in empire
+          movement.status = 'crushed'; // Marking as resolved
+          for (const nationId of movement.nationIds) {
+            this.grantAutonomy(world, empire, empireEntity, nationId, tick);
+          }
+        } else if (negotiationOutcome === 'failed') {
+          movement.status = 'active';
+          movement.strength = Math.min(1.0, movement.strength + 0.1); // Anger boost
+        }
+      }
     }
+  }
+
+  /**
+   * Determine empire's response to a separatist movement
+   */
+  private calculateEmpireResponse(
+    world: World,
+    empire: EmpireComponent,
+    movement: SeparatistMovement
+  ): 'negotiate' | 'suppress' | 'ignore' {
+    // Strong movements (>0.7) should be negotiated with
+    if (movement.strength > 0.7) {
+      return 'negotiate';
+    }
+
+    // Moderate movements (0.3-0.7) get suppressed if empire has military strength
+    if (movement.strength > 0.3) {
+      const { shipCount } = this.calculateNavyStrength(world, empire);
+      return shipCount > 0 ? 'suppress' : 'negotiate';
+    }
+
+    // Weak movements can be ignored or suppressed
+    return 'suppress';
+  }
+
+  /**
+   * Calculate how effective military suppression will be
+   */
+  private calculateSuppressionEffectiveness(
+    world: World,
+    empire: EmpireComponent,
+    movement: SeparatistMovement
+  ): number {
+    const { shipCount } = this.calculateNavyStrength(world, empire);
+
+    // Base effectiveness from military strength (diminishing returns)
+    const militaryFactor = Math.min(0.3, shipCount * 0.01);
+
+    // Popularity reduces effectiveness (can't easily suppress popular movements)
+    const popularityPenalty = movement.strength * 0.2;
+
+    // Duration penalty (longer movements are harder to crush)
+    const durationTicks = world.tick - movement.startedTick;
+    const durationPenalty = Math.min(0.1, durationTicks / 100000);
+
+    return Math.max(0.05, militaryFactor - popularityPenalty - durationPenalty);
+  }
+
+  /**
+   * Process negotiation between empire and separatists
+   */
+  private processNegotiation(
+    world: World,
+    empire: EmpireComponent,
+    movement: SeparatistMovement,
+    tick: number
+  ): 'autonomy_granted' | 'failed' | 'ongoing' {
+    // Simple negotiation: 30% chance per cycle to reach agreement
+    const negotiationDuration = tick - movement.startedTick;
+
+    // Negotiations take time (at least 1000 ticks)
+    if (negotiationDuration < 1000) {
+      return 'ongoing';
+    }
+
+    // Random outcome weighted by movement demands and empire flexibility
+    const demandWeight = movement.demands.length * 0.1;
+    const successChance = 0.3 - demandWeight;
+
+    if (Math.random() < successChance) {
+      return 'autonomy_granted';
+    }
+
+    // 20% chance negotiations break down entirely
+    if (Math.random() < 0.2) {
+      return 'failed';
+    }
+
+    return 'ongoing';
+  }
+
+  /**
+   * Grant autonomy to a nation within the empire
+   */
+  private grantAutonomy(
+    world: World,
+    empire: EmpireComponent,
+    empireEntity: EntityImpl,
+    nationId: string,
+    tick: number
+  ): void {
+    // Update nation record autonomy level
+    const nationRecord = empire.nationRecords.find((n: EmpireNationRecord) => n.nationId === nationId);
+    if (nationRecord) {
+      nationRecord.autonomyLevel = Math.min(1.0, nationRecord.autonomyLevel + 0.3);
+      nationRecord.loyaltyToEmpire = Math.min(1.0, nationRecord.loyaltyToEmpire + 0.2);
+    }
+
+    this.events.emitGeneric('empire:autonomy_granted', {
+      empireName: empire.empireName,
+      nationId,
+      newAutonomyLevel: nationRecord?.autonomyLevel ?? 0.3,
+      tick,
+    });
+  }
+
+  /**
+   * Process independence declaration by a separatist movement
+   */
+  private processIndependenceDeclaration(
+    world: World,
+    empire: EmpireComponent,
+    empireEntity: EntityImpl,
+    movement: SeparatistMovement,
+    tick: number
+  ): void {
+    // Remove nations from empire
+    const releasedNationIds: string[] = [];
+
+    for (const nationId of movement.nationIds) {
+      const nationIndex = empire.nationRecords.findIndex((n: EmpireNationRecord) => n.nationId === nationId);
+      if (nationIndex !== -1) {
+        releasedNationIds.push(nationId);
+        empire.nationRecords.splice(nationIndex, 1);
+      }
+    }
+
+    this.events.emitGeneric('empire:independence_declared', {
+      empireName: empire.empireName,
+      movementId: movement.id,
+      movementName: movement.name,
+      independentNationIds: releasedNationIds,
+      tick,
+    });
   }
 
   // ========================================================================

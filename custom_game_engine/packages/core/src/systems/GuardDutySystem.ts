@@ -418,8 +418,7 @@ export class GuardDutySystem extends BaseSystem {
     if (!alertingGuardDuty) return;
 
     // Find other guards within response radius
-    const allEntities = Array.from(world.entities.values());
-    for (const entity of allEntities) {
+    for (const entity of world.entities.values()) {
       if (entity.id === alertingGuard.id) continue;
 
       // Check if entity is a guard
@@ -428,8 +427,8 @@ export class GuardDutySystem extends BaseSystem {
       const guardPos = entity.getComponent('position') as PositionComponent | undefined;
       if (!guardPos) continue;
 
-      const distance = this.calculateDistance(alertingGuardPos, guardPos);
-      if (distance > alertingGuardDuty.responseRadius) continue;
+      const distanceSquared = this.calculateDistanceSquared(alertingGuardPos, guardPos);
+      if (distanceSquared > alertingGuardDuty.responseRadius * alertingGuardDuty.responseRadius) continue;
 
       // Alert this guard
       const entityImpl = entity as EntityImpl;
@@ -466,8 +465,8 @@ export class GuardDutySystem extends BaseSystem {
     }
 
     // Check if arrived at waypoint
-    const distance = this.calculateDistance(entityPos, currentWaypoint);
-    if (distance < 1.0) {
+    const distanceSquared = this.calculateDistanceSquared(entityPos, currentWaypoint);
+    if (distanceSquared < 1.0) { // 1.0 squared is still 1.0
       // Move to next waypoint
       const entityImpl = entity as EntityImpl;
       const nextIndex = ((duty.patrolIndex || 0) + 1) % duty.patrolRoute.length;
@@ -487,5 +486,15 @@ export class GuardDutySystem extends BaseSystem {
     const dy = pos1.y - pos2.y;
     const dz = pos1.z - pos2.z;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  private calculateDistanceSquared(
+    pos1: { x: number; y: number; z: number },
+    pos2: { x: number; y: number; z: number }
+  ): number {
+    const dx = pos1.x - pos2.x;
+    const dy = pos1.y - pos2.y;
+    const dz = pos1.z - pos2.z;
+    return dx * dx + dy * dy + dz * dz;
   }
 }

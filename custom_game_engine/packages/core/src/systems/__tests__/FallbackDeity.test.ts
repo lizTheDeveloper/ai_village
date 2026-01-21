@@ -10,26 +10,26 @@ import { DeityComponent } from '../../components/DeityComponent.js';
 import { createTagsComponent } from '../../components/TagsComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { createSpiritualComponent } from '../../components/SpiritualComponent.js';
-import { createPersonalityComponent } from '../../components/PersonalityComponent.js';
+import { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
-import { EventBus } from '../../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
+import type { EventBus } from '../../events/EventBus.js';
 
 describe('Fallback Deity', () => {
   let world: World;
   let prayerSystem: PrayerSystem;
   let eventBus: EventBus;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     world = new World();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     prayerSystem = new PrayerSystem();
-    prayerSystem.setEventBus(eventBus);
-    prayerSystem.initialize(world);
+    await prayerSystem.initialize(world, eventBus);
   });
 
   it('should route unresolved prayers to fallback deity if one exists', () => {
     // Create fallback deity
-    const fallbackDeity = world.createEntity('deity:unknown');
+    const fallbackDeity = world.createEntity('deity');
     const deityComp = new DeityComponent('The Unknown', 'dormant');
     deityComp.identity.domain = 'mystery';
     (fallbackDeity as any).addComponent(deityComp);
@@ -37,15 +37,21 @@ describe('Fallback Deity', () => {
     (fallbackDeity as any).addComponent(createIdentityComponent('The Unknown', 'deity'));
 
     // Create agent with spiritual component (no specific deity belief)
-    const agent = world.createEntity('agent:1');
+    const agent = world.createEntity('agent');
     const spiritual = createSpiritualComponent('animist');
     spiritual.faith = 0.8;
     spiritual.prayerFrequency = 1; // Pray every tick
     spiritual.lastPrayerTime = -1000; // Long time ago
     (agent as any).addComponent(spiritual);
 
-    const personality = createPersonalityComponent();
-    personality.spirituality = 0.8;
+    const personality = new PersonalityComponent({
+      openness: 0.5,
+      conscientiousness: 0.5,
+      extraversion: 0.5,
+      agreeableness: 0.5,
+      neuroticism: 0.3,
+      spirituality: 0.8,
+    });
     (agent as any).addComponent(personality);
 
     // Track prayer events
@@ -61,7 +67,7 @@ describe('Fallback Deity', () => {
 
     // Verify prayer was routed to fallback deity
     expect(prayerOffered).toBe(true);
-    expect(prayerDeityId).toBe('deity:unknown');
+    expect(prayerDeityId).toBe(fallbackDeity.id);
 
     // Verify fallback deity received the prayer
     const updatedDeity = world.query().with(CT.Deity).executeEntities()[0];
@@ -71,15 +77,21 @@ describe('Fallback Deity', () => {
 
   it('should emit proto_deity_belief event when no fallback deity exists', () => {
     // Create agent with spiritual component (no specific deity belief)
-    const agent = world.createEntity('agent:1');
+    const agent = world.createEntity('agent');
     const spiritual = createSpiritualComponent('animist');
     spiritual.faith = 0.8;
     spiritual.prayerFrequency = 1;
     spiritual.lastPrayerTime = -1000;
     (agent as any).addComponent(spiritual);
 
-    const personality = createPersonalityComponent();
-    personality.spirituality = 0.8;
+    const personality = new PersonalityComponent({
+      openness: 0.5,
+      conscientiousness: 0.5,
+      extraversion: 0.5,
+      agreeableness: 0.5,
+      neuroticism: 0.3,
+      spirituality: 0.8,
+    });
     (agent as any).addComponent(personality);
 
     // Track proto_deity events
@@ -96,7 +108,7 @@ describe('Fallback Deity', () => {
   });
 
   it('should configure fallback deity with mystery domain', () => {
-    const fallbackDeity = world.createEntity('deity:unknown');
+    const fallbackDeity = world.createEntity('deity');
     const deityComp = new DeityComponent('The Unknown', 'dormant');
 
     // Configure as described in requirements
@@ -129,6 +141,6 @@ describe('Fallback Deity', () => {
     expect(retrievedComp?.belief.currentBelief).toBe(10);
 
     const tags = retrievedDeity?.getComponent(CT.Tags);
-    expect(tags?.tags.has('fallback_deity')).toBe(true);
+    expect(tags?.tags.includes('fallback_deity')).toBe(true);
   });
 });

@@ -12,6 +12,7 @@
     "src/**/*.bench.ts"
   ],
   "references": [
-    { "path": "../building-designer" }
+    { "path": "../building-designer" },
+    { "path": "../hierarchy-simulator" }
   ]
 }

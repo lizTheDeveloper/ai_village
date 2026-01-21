@@ -265,20 +265,8 @@ export function createWanderingAgent(
   };
   entity.addComponent(initialInjury);
 
-  // Guard duty - not assigned initially (using minimal object)
-  const initialGuardDuty: GuardDutyComponent = {
-    type: 'guard_duty',
-    version: 1,
-    assignmentType: 'location', // Required by interface but unused when no assignment
-    targetLocation: undefined,
-    targetPerson: undefined,
-    patrolRoute: undefined,
-    patrolIndex: 0,
-    alertness: 1.0,
-    responseRadius: 10,
-    lastCheckTime: 0,
-  };
-  entity.addComponent(initialGuardDuty);
+  // Guard duty - NOT added on creation. Only add when agent is assigned to guard duty.
+  // Adding with assignmentType: 'location' but targetLocation: undefined is invalid.
 
   // Dominance rank - neutral rank for non-hierarchical species
   entity.addComponent(createDominanceRankComponent({
@@ -499,20 +487,8 @@ export function createLLMAgent(
   };
   entity.addComponent(initialInjuryLLM);
 
-  // Guard duty - not assigned initially (using minimal object)
-  const initialGuardDutyLLM: GuardDutyComponent = {
-    type: 'guard_duty',
-    version: 1,
-    assignmentType: 'location', // Required by interface but unused when no assignment
-    targetLocation: undefined,
-    targetPerson: undefined,
-    patrolRoute: undefined,
-    patrolIndex: 0,
-    alertness: 1.0,
-    responseRadius: 10,
-    lastCheckTime: 0,
-  };
-  entity.addComponent(initialGuardDutyLLM);
+  // Guard duty - NOT added on creation. Only add when agent is assigned to guard duty.
+  // Adding with assignmentType: 'location' but targetLocation: undefined is invalid.
 
   // Dominance rank - neutral rank for non-hierarchical species
   entity.addComponent(createDominanceRankComponent({

@@ -305,6 +305,15 @@ export class SpaceshipManagementSystem extends BaseSystem {
         const technique = chamber.activeSession.technique;
         const participantIds = chamber.activeSession.participantIds;
 
+        // Calculate effectiveness from technique, duration, biofeedback, and participants
+        const effectivenessRating = this.calculateMeditationEffectiveness(
+          technique,
+          elapsed,
+          chamber.activeSession.targetDuration,
+          participantIds.length,
+          chamber.biofeedback
+        );
+
         // Record in history
         impl.updateComponent<MeditationChamberComponent>(CT.MeditationChamber, (c) => ({
           ...c,
@@ -317,7 +326,7 @@ export class SpaceshipManagementSystem extends BaseSystem {
               participantIds,
               duration: elapsed,
               completedAt: tick,
-              effectivenessRating: 0.7 + Math.random() * 0.3, // TODO: Calculate from biofeedback
+              effectivenessRating,
             },
           ],
         }));
@@ -350,6 +359,72 @@ export class SpaceshipManagementSystem extends BaseSystem {
         updateHeartSynchronization(heart, tick);
       }
     }
+  }
+
+  /**
+   * Calculate meditation session effectiveness based on technique, duration, and biofeedback.
+   *
+   * Factors:
+   * - Technique base effectiveness (some techniques are inherently more effective)
+   * - Duration factor (optimal around target duration, diminishing returns)
+   * - Participant count bonus (group sessions can enhance effectiveness)
+   * - Biofeedback monitoring bonus (better feedback = better regulation)
+   *
+   * @returns Effectiveness rating 0.0-1.0
+   */
+  private calculateMeditationEffectiveness(
+    technique: string,
+    actualDuration: number,
+    targetDuration: number,
+    participantCount: number,
+    biofeedback: { enabled: boolean; monitoringHeartRate: boolean; monitoringBreathing: boolean; monitoringBrainwaves: boolean }
+  ): number {
+    // Base effectiveness by technique type
+    const techniqueEffectiveness: Record<string, number> = {
+      'breath_focus': 0.70,           // Simple but effective
+      'emotional_grounding': 0.75,    // Good for stability
+      'perspective_shift': 0.65,      // Challenging, moderate effectiveness
+      'collective_harmony': 0.80,     // Group-focused, high potential
+      'trauma_release': 0.60,         // Difficult, variable results
+      'gratitude_cultivation': 0.72,  // Positive, reliable
+    };
+
+    const baseEffectiveness = techniqueEffectiveness[technique] ?? 0.65;
+
+    // Duration factor: optimal at target, diminishing returns beyond
+    // 0.5 at 50% of target, 1.0 at 100%, 0.95 at 150%, 0.85 at 200%
+    const durationRatio = targetDuration > 0 ? actualDuration / targetDuration : 1.0;
+    let durationFactor: number;
+    if (durationRatio < 1.0) {
+      // Below target: linear increase
+      durationFactor = 0.5 + (durationRatio * 0.5);
+    } else {
+      // At or above target: diminishing returns
+      durationFactor = 1.0 - Math.min(0.15, (durationRatio - 1.0) * 0.1);
+    }
+
+    // Participant bonus: group meditation can enhance effectiveness
+    // Solo: 1.0, 2-3: 1.05, 4-6: 1.10, 7+: 1.12 (cap)
+    let participantBonus = 1.0;
+    if (participantCount >= 2 && participantCount <= 3) {
+      participantBonus = 1.05;
+    } else if (participantCount >= 4 && participantCount <= 6) {
+      participantBonus = 1.10;
+    } else if (participantCount >= 7) {
+      participantBonus = 1.12;
+    }
+
+    // Biofeedback bonus: each monitored metric improves effectiveness
+    let biofeedbackBonus = 1.0;
+    if (biofeedback.enabled) {
+      if (biofeedback.monitoringHeartRate) biofeedbackBonus += 0.03;
+      if (biofeedback.monitoringBreathing) biofeedbackBonus += 0.04;
+      if (biofeedback.monitoringBrainwaves) biofeedbackBonus += 0.05;
+    }
+
+    // Calculate final effectiveness (clamped to 0.0-1.0)
+    const rawEffectiveness = baseEffectiveness * durationFactor * participantBonus * biofeedbackBonus;
+    return Math.max(0.0, Math.min(1.0, rawEffectiveness));
   }
 }
 

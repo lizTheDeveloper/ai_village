@@ -30,6 +30,7 @@ import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js
 import { BuildingType } from '../../types/BuildingType.js';
 import { CHUNK_SIZE } from '../../types.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { isPlantComponent } from '../../components/typeGuards.js';
 
 /**
  * ChunkSpatialQuery is now available via world.spatialQuery
@@ -241,8 +242,8 @@ export class SeekFoodBehavior extends BaseBehavior {
 
         // Check if it's an edible plant with fruit
         const plantComp = entityImpl.getComponent(ComponentType.Plant);
-        const plant = plantComp as unknown as { speciesId: string; fruitCount: number } | undefined;
-        if (plant && isEdibleSpecies(plant.speciesId) && plant.fruitCount > 0) {
+        if (plantComp && isPlantComponent(plantComp) && isEdibleSpecies(plantComp.speciesId) && plantComp.fruitCount > 0) {
+          const plant = plantComp;
           const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
           const fruitItemId = isBerry ? 'berry' : 'fruit';
           const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
@@ -495,16 +496,12 @@ export class SeekFoodBehavior extends BaseBehavior {
       for (const { entity: plantEntity } of plantsInRadius) {
         const plantImpl = plantEntity as EntityImpl;
         const plantComp = plantImpl.getComponent(ComponentType.Plant);
-        const plant = plantComp as unknown as {
-          speciesId: string;
-          fruitCount: number;
-        } | undefined;
 
-        if (!plant) continue;
+        if (!plantComp || !isPlantComponent(plantComp)) continue;
 
         // Check if it's an edible species with fruit
-        if (!isEdibleSpecies(plant.speciesId)) continue;
-        if (plant.fruitCount <= 0) continue;
+        if (!isEdibleSpecies(plantComp.speciesId)) continue;
+        if (plantComp.fruitCount <= 0) continue;
 
         // Try to eat from this plant
         const result = eatFromPlant(entity, plantEntity, world);
@@ -526,16 +523,12 @@ export class SeekFoodBehavior extends BaseBehavior {
       const plantImpl = plantEntity as EntityImpl;
       const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
       const plantComp = plantImpl.getComponent(ComponentType.Plant);
-      const plant = plantComp as unknown as {
-        speciesId: string;
-        fruitCount: number;
-      } | undefined;
 
-      if (!plantPos || !plant) continue;
+      if (!plantPos || !plantComp || !isPlantComponent(plantComp)) continue;
 
       // Check if it's an edible species with fruit
-      if (!isEdibleSpecies(plant.speciesId)) continue;
-      if (plant.fruitCount <= 0) continue;
+      if (!isEdibleSpecies(plantComp.speciesId)) continue;
+      if (plantComp.fruitCount <= 0) continue;
 
       // Check distance (using squared distance for performance)
       const dx = position.x - plantPos.x;
@@ -737,14 +730,10 @@ function tryEatFromNearbyPlant(ctx: BehaviorContext): InteractionResult | null {
   for (const { entity: plantEntity } of plantsInRadius) {
     const plantImpl = plantEntity as EntityImpl;
     const plantComp = plantImpl.getComponent(CT.Plant);
-    const plant = plantComp as unknown as {
-      speciesId: string;
-      fruitCount: number;
-    } | undefined;
 
-    if (!plant) continue;
-    if (!isEdibleSpecies(plant.speciesId)) continue;
-    if (plant.fruitCount <= 0) continue;
+    if (!plantComp || !isPlantComponent(plantComp)) continue;
+    if (!isEdibleSpecies(plantComp.speciesId)) continue;
+    if (plantComp.fruitCount <= 0) continue;
 
     // Try to eat from this plant
     const result = eatFromPlant(ctx.entity, plantEntity, ctx.world);
@@ -800,11 +789,10 @@ function findNearestFoodSourceWithContext(
   for (const { entity: plantEntity, distance, position } of plantsInRadius) {
     const plantImpl = plantEntity as EntityImpl;
     const plantComp = plantImpl.getComponent(CT.Plant);
-    const plant = plantComp as unknown as { speciesId: string; fruitCount: number } | undefined;
 
-    if (!plant || !isEdibleSpecies(plant.speciesId) || plant.fruitCount <= 0) continue;
+    if (!plantComp || !isPlantComponent(plantComp) || !isEdibleSpecies(plantComp.speciesId) || plantComp.fruitCount <= 0) continue;
 
-    const isBerry = plant.speciesId === 'blueberry-bush' || plant.speciesId === 'raspberry-bush' || plant.speciesId === 'blackberry-bush';
+    const isBerry = plantComp.speciesId === 'blueberry-bush' || plantComp.speciesId === 'raspberry-bush' || plantComp.speciesId === 'blackberry-bush';
     const fruitItemId = isBerry ? 'berry' : 'fruit';
     const hungerRestored = itemRegistry.getHungerRestored(fruitItemId) || DEFAULT_HUNGER_RESTORED;
     const score = distance - (hungerRestored * 2);

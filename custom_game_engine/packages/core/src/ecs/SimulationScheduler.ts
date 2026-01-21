@@ -148,6 +148,48 @@ export const SIMULATION_CONFIGS: Record<string, ComponentSimulationConfig> = {
   cross_realm_phone: { mode: SimulationMode.ALWAYS },
 
   // ============================================================================
+  // Player Investments - Always simulate (work off-screen)
+  // ============================================================================
+
+  /** Robots are player-built automation - should work off-screen */
+  robot: { mode: SimulationMode.ALWAYS },
+
+  /** Spaceships are player vehicles - should stay operational */
+  spaceship: { mode: SimulationMode.ALWAYS },
+
+  /** Military units should remain active */
+  squad: { mode: SimulationMode.ALWAYS },
+  fleet: { mode: SimulationMode.ALWAYS },
+  armada: { mode: SimulationMode.ALWAYS },
+
+  // ============================================================================
+  // Important entities - Always simulate
+  // ============================================================================
+
+  /** Spirits have religious significance */
+  spirit: { mode: SimulationMode.ALWAYS },
+
+  /** Companions are special to the player */
+  companion: { mode: SimulationMode.ALWAYS },
+
+  // ============================================================================
+  // Items and Equipment - Passive (zero per-tick cost)
+  // ============================================================================
+
+  /** Items don't need per-tick updates */
+  item: { mode: SimulationMode.PASSIVE },
+
+  /** Equipment is passive until used */
+  equipment: { mode: SimulationMode.PASSIVE },
+
+  /** Corpses don't need frequent updates */
+  corpse: {
+    mode: SimulationMode.PROXIMITY,
+    range: 15,
+    updateFrequency: 86400, // Daily decay check
+  },
+
+  // ============================================================================
   // Special cases - can override based on entity tags
   // ============================================================================
 

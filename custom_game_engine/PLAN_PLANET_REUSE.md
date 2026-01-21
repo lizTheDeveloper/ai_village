@@ -1,0 +1,455 @@
+# Planet Reuse Architecture Plan
+
+## Goals
+
+1. **Same planet in multiple saves** - Start new games on existing planets at different locations
+2. **Parallel chunk loading** - Begin terrain generation the moment we commit to a planet
+3. **Faster startup** - Reuse biosphere generation (57s) when planet already exists
+4. **Multi-colony gameplay** - God can have colonies in different areas of the same planet
+
+## User Design Decisions
+
+| Decision | Choice | Implication |
+|----------|--------|-------------|
+| **Terrain sharing** | Shared | All saves share terrain modifications - persistent world model |
+| **Named locations** | Global registry | Names persist across all saves for shared lore |
+| **Registry cleanup** | Never | Keep all planets forever (disk space permitting) |
+
+**Key Implication**: This creates a **persistent world** architecture. Multiple saves are different "views" (entity states) into the same shared planet terrain. One player's buildings appear in another's game.
+
+---
+
+## Current State Analysis
+
+### What Exists (Good Foundations)
+
+| Component | Status | Location |
+|-----------|--------|----------|
+| `PlanetSnapshot` type | ✅ Complete | `packages/world/src/planet/PlanetTypes.ts` |
+| `Planet.toSnapshot()` / `fromSnapshot()` | ✅ Complete | `packages/world/src/planet/Planet.ts` |
+| `WorldSnapshot.planets[]` array | ✅ Defined | `packages/persistence/src/types.ts:217-218` |
+| `PlanetTerrainSnapshot` type | ✅ Complete | `packages/persistence/src/types.ts:148-156` |
+| `BackgroundChunkGenerator` | ✅ Complete | `packages/world/src/chunks/BackgroundChunkGenerator.ts` |
+| `ChunkSerializer` with compression | ✅ Complete | `packages/world/src/chunks/ChunkSerializer.ts` |
+| Worker pool for chunk generation | ✅ Complete | `packages/world/src/workers/ChunkGenerationWorkerPool.ts` |
+
+### What's Missing
+
+| Gap | Impact |
+|-----|--------|
+| **WorldSerializer ignores `planets[]`** | Only active planet terrain is saved |
+| **No PlanetRegistry** | Planets regenerate from scratch every new game |
+| **No early chunk queuing** | Chunks don't generate until after game fully loads |
+| **Planet tied to save identity** | Can't share planet across different save games |
+
+---
+
+## Architecture Design
+
+### Phase 1: Fix Multi-Planet Persistence (WorldSerializer)
+
+**Problem**: `WorldSerializer.serializeWorldState()` only saves active planet terrain to legacy `terrain` field, ignoring the existing `planets[]` array.
+
+**Files to modify**:
+- `packages/persistence/src/WorldSerializer.ts`
+
+**Changes**:
+
+```typescript
+// In serializeWorldState()
+private serializeWorldState(world: World): WorldSnapshot {
+  const worldImpl = world as WorldImpl;
+
+  // NEW: Serialize ALL registered planets
+  const planets: PlanetTerrainSnapshot[] = [];
+  for (const [planetId, planet] of worldImpl.getPlanets()) {
+    planets.push({
+      $schema: 'https://aivillage.dev/schemas/planet-terrain/v1',
+      $version: 1,
+      planet: planet.toSnapshot(),
+      terrain: chunkSerializer.serializeChunks(planet.chunkManager),
+    });
+  }
+
+  // Legacy terrain for backward compatibility
+  const chunkManager = worldImpl.getChunkManager();
+  const terrain = chunkManager
+    ? chunkSerializer.serializeChunks(chunkManager as any)
+    : null;
+
+  return {
+    terrain,  // Legacy (backward compat)
+    zones: zoneManager.serializeZones(),
+    planets,  // NEW: All planets
+    activePlanetId: worldImpl.getActivePlanetId(),
+  };
+}
+```
+
+**Deserialization changes**:
+
+```typescript
+// In deserializeWorld()
+if (snapshot.worldState.planets && snapshot.worldState.planets.length > 0) {
+  // NEW: Restore all planets
+  for (const planetTerrain of snapshot.worldState.planets) {
+    const planet = Planet.fromSnapshot(planetTerrain.planet, godCraftedSpawner);
+
+    // Restore terrain into planet's ChunkManager
+    if (planetTerrain.terrain) {
+      await chunkSerializer.deserializeChunks(
+        planetTerrain.terrain,
+        planet.chunkManager
+      );
+    }
+
+    worldImpl.registerPlanet(planet);
+  }
+
+  // Set active planet
+  if (snapshot.worldState.activePlanetId) {
+    worldImpl.setActivePlanet(snapshot.worldState.activePlanetId);
+  }
+} else if (snapshot.worldState.terrain) {
+  // Legacy: single terrain (backward compatibility)
+  // ... existing code ...
+}
+```
+
+**Dependencies**: Need to add `getPlanets()` and `registerPlanet()` methods to WorldImpl.
+
+---
+
+### Phase 2: PlanetRegistry (Cross-Save Planet Cache)
+
+**New file**: `packages/persistence/src/PlanetRegistry.ts`
+
+**Purpose**: Global cache of planet snapshots that persists independently of save games.
+
+```typescript
+/**
+ * PlanetRegistry - Cross-save planet cache
+ *
+ * Stores PlanetSnapshots (config + biosphere) separately from save files.
+ * Terrain chunks are still per-save (player modifications differ).
+ * Biosphere generation (57s) is cached and reused.
+ */
+export class PlanetRegistry {
+  private planets = new Map<string, PlanetSnapshot>();
+  private storage: StorageBackend;
+
+  constructor(storage: StorageBackend) {
+    this.storage = storage;
+  }
+
+  /**
+   * Get planet by ID. Returns cached snapshot or null.
+   */
+  async getPlanet(planetId: string): Promise<PlanetSnapshot | null>;
+
+  /**
+   * Register a newly generated planet.
+   * Called after biosphere generation completes.
+   */
+  async registerPlanet(snapshot: PlanetSnapshot): Promise<void>;
+
+  /**
+   * Check if planet exists in registry.
+   */
+  async hasPlanet(planetId: string): Promise<boolean>;
+
+  /**
+   * List all registered planets.
+   */
+  async listPlanets(): Promise<PlanetSnapshot[]>;
+
+  /**
+   * Generate planet ID from seed for deterministic lookup.
+   * Same seed + type = same planet ID.
+   */
+  static generatePlanetId(seed: string, type: PlanetType): string {
+    return `planet:${type}:${hashSeed(seed)}`;
+  }
+}
+
+// Singleton
+export const planetRegistry = new PlanetRegistry(indexedDBStorage);
+```
+
+**Storage structure**:
+```
+IndexedDB: ai_village_planets
+├── planet:magical:abc123 → PlanetSnapshot { config, biosphere, namedLocations }
+├── planet:terrestrial:def456 → PlanetSnapshot { ... }
+└── planet:crystal:ghi789 → PlanetSnapshot { ... }
+```
+
+**Key insight**: Terrain is NOT cached in registry (differs per save due to player modifications). Only config + biosphere + named locations are cached.
+
+---
+
+### Phase 3: Early Chunk Pre-Generation
+
+**Goal**: Start generating chunks the moment we commit to a planet, not after full game load.
+
+**New file**: `packages/core/src/startup/EarlyChunkLoader.ts`
+
+```typescript
+/**
+ * EarlyChunkLoader - Starts chunk generation during startup
+ *
+ * Called immediately after planet selection, before full game initialization.
+ * Uses worker pool for parallel generation.
+ */
+export class EarlyChunkLoader {
+  private workerPool: ChunkGenerationWorkerPool;
+  private queue: ChunkRequest[] = [];
+  private generated = new Map<string, Tile[]>();
+
+  /**
+   * Start pre-generating chunks around spawn location.
+   * Runs in parallel with other initialization tasks.
+   */
+  async preloadChunks(
+    planetConfig: PlanetConfig,
+    spawnLocation: { x: number; y: number },
+    radius: number = 3  // 7x7 grid
+  ): Promise<void>;
+
+  /**
+   * Get pre-generated chunk tiles (if ready).
+   * Returns null if chunk not yet generated.
+   */
+  getPreloadedChunk(chunkX: number, chunkY: number): Tile[] | null;
+
+  /**
+   * Transfer pre-generated chunks to ChunkManager.
+   * Called once game is fully initialized.
+   */
+  transferToChunkManager(chunkManager: ChunkManager): number;
+}
+```
+
+**Integration in main.ts startup sequence**:
+
+```typescript
+// CURRENT (sequential):
+// 1. Initialize world
+// 2. Generate/load planet (57s biosphere)
+// 3. Initialize systems
+// 4. Start game loop
+// 5. ChunkLoadingSystem queues chunks
+// 6. BackgroundChunkGenerator processes queue
+
+// NEW (parallel):
+// 1. Determine planet (new or from registry)
+// 2. START: EarlyChunkLoader.preloadChunks() in background
+// 3. Initialize world (parallel with chunk loading)
+// 4. Generate biosphere if needed (parallel with chunk loading)
+// 5. Initialize systems
+// 6. Transfer pre-loaded chunks to ChunkManager
+// 7. Start game loop (many chunks already ready)
+```
+
+---
+
+### Phase 4: New Game Flow with Planet Selection
+
+**New UI/Flow**:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    NEW GAME                              │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  Choose Planet:                                          │
+│  ┌────────────────────────────────────────────────┐     │
+│  │ ○ Generate New Planet                           │     │
+│  │   Type: [Magical ▼]  Seed: [random]            │     │
+│  │                                                 │     │
+│  │ ○ Use Existing Planet                          │     │
+│  │   ┌─────────────────────────────────────────┐  │     │
+│  │   │ • Homeworld (magical) - 3 visits        │  │     │
+│  │   │ • Crystal Moon (crystal) - 1 visit      │  │     │
+│  │   │ • The Wastes (desert) - 0 visits        │  │     │
+│  │   └─────────────────────────────────────────┘  │     │
+│  └────────────────────────────────────────────────┘     │
+│                                                          │
+│  Starting Location:                                      │
+│  ○ Random location (unexplored)                         │
+│  ○ Named location: [Valley of Dawn ▼]                   │
+│  ○ Coordinates: X: [___] Y: [___]                       │
+│                                                          │
+│                         [Create World]                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Key behaviors**:
+1. **New planet**: Generate config → Generate biosphere (57s) → Register in PlanetRegistry
+2. **Existing planet**: Load PlanetSnapshot from registry → Skip biosphere generation → New terrain (deterministic from seed)
+3. **Same planet, different saves**: Each save has independent terrain modifications
+
+---
+
+### Phase 5: World Methods for Multi-Planet
+
+**Add to WorldImpl** (`packages/core/src/ecs/World.ts`):
+
+```typescript
+interface WorldImpl {
+  // Existing
+  private _planets: Map<string, IPlanet>;
+  private _activePlanetId?: string;
+
+  // NEW methods needed
+  getPlanets(): ReadonlyMap<string, IPlanet>;
+  getActivePlanetId(): string | undefined;
+  registerPlanet(planet: IPlanet): void;
+  setActivePlanet(planetId: string): void;
+  getPlanet(planetId: string): IPlanet | undefined;
+}
+```
+
+---
+
+## Implementation Order
+
+### Batch 1: Foundation (Required for anything else)
+1. **Add World methods** for multi-planet management
+2. **Fix WorldSerializer** to use `planets[]` array
+3. **Add migration** for existing saves (single terrain → planets array)
+
+### Batch 2: Planet Registry
+4. **Create PlanetRegistry** class
+5. **Create IndexedDB storage backend** for planets
+6. **Integrate with planet initialization** - register after biosphere generation
+
+### Batch 3: Early Loading
+7. **Create EarlyChunkLoader** service
+8. **Modify startup sequence** in main.ts
+9. **Transfer pre-loaded chunks** after initialization
+
+### Batch 4: UI & Polish
+10. **Planet selection UI** for new game
+11. **Location picker** for existing planets
+12. **Registry browser** in admin dashboard
+
+---
+
+## Data Flow Diagrams
+
+### New Game (New Planet)
+
+```
+User clicks "New Game"
+         │
+         ▼
+┌─────────────────┐
+│ Generate Config │ (PlanetConfig from type + seed)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌──────────────────┐
+│ Start EarlyChunk│────▶│ Worker Pool      │
+│ Loader (async)  │     │ generates chunks │
+└────────┬────────┘     └──────────────────┘
+         │                        │
+         ▼                        │ (parallel)
+┌─────────────────┐               │
+│ Generate        │               │
+│ Biosphere (57s) │               │
+└────────┬────────┘               │
+         │                        │
+         ▼                        │
+┌─────────────────┐               │
+│ Register in     │               │
+│ PlanetRegistry  │               │
+└────────┬────────┘               │
+         │                        │
+         ▼                        ▼
+┌─────────────────┐     ┌──────────────────┐
+│ Initialize World│     │ Chunks ready     │
+└────────┬────────┘     └────────┬─────────┘
+         │                       │
+         ▼                       ▼
+┌─────────────────────────────────────────┐
+│ Transfer pre-loaded chunks to           │
+│ ChunkManager, start game loop           │
+└─────────────────────────────────────────┘
+```
+
+### New Game (Existing Planet)
+
+```
+User selects existing planet
+         │
+         ▼
+┌─────────────────┐
+│ Load from       │ (PlanetSnapshot with biosphere)
+│ PlanetRegistry  │
+└────────┬────────┘
+         │
+         ├────────────────────────┐
+         ▼                        │
+┌─────────────────┐               │
+│ Start EarlyChunk│               │
+│ Loader (async)  │               │
+└────────┬────────┘               │
+         │                        │ (SKIPPED - already have biosphere)
+         ▼                        │
+┌─────────────────┐               │
+│ Create Planet   │               │
+│ from snapshot   │               │
+└────────┬────────┘               │
+         │                        │
+         ▼                        ▼
+┌─────────────────────────────────────────┐
+│ Initialize world + transfer chunks      │
+│ (Much faster - no 57s biosphere gen)    │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Risk Assessment
+
+| Risk | Mitigation |
+|------|------------|
+| **IndexedDB quota** | Compress planet snapshots, limit registry size |
+| **Migration failures** | Keep legacy terrain path, don't delete old format |
+| **Worker pool browser support** | Fallback to main thread generation |
+| **Race conditions** | Clear ownership: EarlyChunkLoader owns pre-init, BackgroundChunkGenerator owns post-init |
+
+---
+
+## Success Metrics
+
+1. **Startup time reduction**: Existing planet should load in <5s vs 60s+ for new planet
+2. **Chunk availability**: 7x7 grid (49 chunks) ready before first tick
+3. **Memory efficiency**: Planet snapshots should be <1MB each (biosphere + config)
+4. **Backward compatibility**: Existing saves load without migration errors
+
+---
+
+## Files to Create/Modify
+
+### New Files
+- `packages/persistence/src/PlanetRegistry.ts`
+- `packages/persistence/src/storage/IndexedDBPlanetStorage.ts`
+- `packages/core/src/startup/EarlyChunkLoader.ts`
+
+### Modified Files
+- `packages/persistence/src/WorldSerializer.ts` - Multi-planet serialization
+- `packages/core/src/ecs/World.ts` - Add planet management methods
+- `packages/persistence/src/migrations/` - Add planet migration
+- `custom_game_engine/demo/src/main.ts` - Startup sequence changes
+
+---
+
+## Questions for User
+
+1. **Planet terrain sharing**: Should two saves on the same planet share terrain modifications? (Current plan: No - each save has independent terrain)
+
+2. **Named locations**: Should named locations persist in PlanetRegistry (shared across saves) or per-save?
+
+3. **Maximum registry size**: How many planets should the registry hold before cleanup?

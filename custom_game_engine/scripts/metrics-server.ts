@@ -4336,6 +4336,8 @@ async function handleSetLLMConfig(client: WebSocket, params: Record<string, unkn
 // HTTP Server for querying metrics
 const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  // Required for cross-origin isolation (COEP: require-corp) in browsers
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
   const url = new URL(req.url || '/', `http://localhost:${HTTP_PORT}`);
   const pathname = url.pathname;

@@ -51,6 +51,7 @@ export interface VoicemailMessage {
 
 export interface CrossRealmPhoneComponent extends Component {
   readonly type: 'cross_realm_phone';
+  readonly version: number;
 
   /** Phone device owned by this entity */
   phone: CrossRealmPhone;
@@ -100,6 +101,7 @@ export function createCrossRealmPhoneComponent(
 ): CrossRealmPhoneComponent {
   return {
     type: 'cross_realm_phone',
+    version: 1,
     phone,
     activeCall: null,
     incomingCall: null,

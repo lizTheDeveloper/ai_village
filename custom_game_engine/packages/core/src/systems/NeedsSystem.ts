@@ -179,18 +179,19 @@ export class NeedsSystem extends BaseSystem {
 
       const needsComp = needs as NeedsComponent;
       let ticksAtZeroHunger = needsComp.ticksAtZeroHunger || 0;
-      let starvationDayMemoriesIssued = new Set<number>(
-        Array.isArray(needsComp.starvationDayMemoriesIssued)
-          ? needsComp.starvationDayMemoriesIssued
-          : []
-      );
+      // Use existing Set from component directly - only clone when modifying
+      let starvationDayMemoriesIssued = needsComp.starvationDayMemoriesIssued;
+      let setModified = false;
 
       if (needsComp.hunger === 0) {
         ticksAtZeroHunger += 1;
       } else {
         // Reset counter if hunger is above 0
         ticksAtZeroHunger = 0;
-        starvationDayMemoriesIssued = new Set<number>();
+        if (starvationDayMemoriesIssued.size > 0) {
+          starvationDayMemoriesIssued = new Set<number>(); // Only create empty Set if clearing
+          setModified = true;
+        }
       }
 
       // Calculate which day of starvation we're on
@@ -204,6 +205,12 @@ export class NeedsSystem extends BaseSystem {
       // Emit progressive starvation memories (days 1, 2, 3, 4)
       if (daysAtZeroHunger >= 1 && daysAtZeroHunger <= 4) {
         if (!starvationDayMemoriesIssued.has(daysAtZeroHunger)) {
+          // Clone Set before modifying (lazy copy)
+          if (!setModified) {
+            starvationDayMemoriesIssued = new Set(starvationDayMemoriesIssued);
+            setModified = true;
+          }
+
           // Type-safe emission - compile error if data shape is wrong
           ctx.emit('need:starvation_day', {
             agentId: entity.id,

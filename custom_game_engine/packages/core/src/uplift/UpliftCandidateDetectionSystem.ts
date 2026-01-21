@@ -23,6 +23,7 @@ import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import type { GeneticComponent } from '../components/GeneticComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { getClarketechSystem } from '../clarketech/ClarketechSystem.js';
+import { shouldEmergeBehaviors } from './UpliftHelpers.js';
 
 /**
  * Evaluation thresholds for uplift suitability
@@ -220,8 +221,10 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
     // Social intelligence
     const socialIntelligence = this.estimateSocialIntelligence(species, animalComp);
 
-    // Tool use (placeholder - would track observations)
-    const toolUse = false; // TODO: Track actual tool use observations
+    // Tool use based on species intelligence threshold (0.45+)
+    // Uses shouldEmergeBehaviors which determines if species intelligence
+    // is high enough for tool use capability to emerge
+    const toolUse = shouldEmergeBehaviors(neuralComplexity).toolUse;
 
     // Communication level
     const communication = this.estimateCommunication(species);

@@ -7,8 +7,35 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import type { Entity } from '../ecs/Entity.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
+import { createRenderableComponent } from '../components/RenderableComponent.js';
+import { createBuildingComponent, type BuildingType } from '../components/BuildingComponent.js';
+import { getPosition } from '../utils/componentHelpers.js';
+
+/**
+ * Effect data structure for spell cast events
+ */
+interface SpellEffect {
+  type: string;
+  buildingType?: string;
+  location?: string | { x: number; y: number };
+  duration?: number;
+  sourceDimensions?: number;
+  targetDimensions?: number;
+  stability?: number;
+  radius?: number;
+}
+
+/**
+ * Spell cast event data structure
+ */
+interface SpellCastData {
+  casterId: string;
+  effects: SpellEffect[];
+  targetPosition?: { x: number; y: number };
+}
 
 export class BuildingSummoningSystem extends BaseSystem {
   public readonly id: SystemId = 'building_summoning' as SystemId;
@@ -30,27 +57,33 @@ export class BuildingSummoningSystem extends BaseSystem {
     const eventBus = world.getEventBus();
     const allEvents = eventBus.getHistory(world.tick - 1);
 
-    const summoningEvents = allEvents
-      .filter(e => e.type === 'magic:spell_cast' && (e.data as any).effects?.some((eff: any) => eff.type === 'summon_building'));
+    const summoningEvents = allEvents.filter(
+      e => e.type === 'magic:spell_cast' &&
+           (e.data as SpellCastData).effects?.some(eff => eff.type === 'summon_building')
+    );
 
     for (const event of summoningEvents) {
-      this.handleBuildingSummoning(world, event.data as any);
+      this.handleBuildingSummoning(world, event.data as SpellCastData);
     }
 
     // Also handle rift creation events
-    const riftEvents = allEvents
-      .filter(e => e.type === 'magic:spell_cast' && (e.data as any).effects?.some((eff: any) => eff.type === 'create_dimensional_rift'));
+    const riftEvents = allEvents.filter(
+      e => e.type === 'magic:spell_cast' &&
+           (e.data as SpellCastData).effects?.some(eff => eff.type === 'create_dimensional_rift')
+    );
 
     for (const event of riftEvents) {
-      this.handleRiftCreation(world, event.data as any);
+      this.handleRiftCreation(world, event.data as SpellCastData);
     }
   }
 
-  private handleBuildingSummoning(world: World, event: any): void {
+  private handleBuildingSummoning(world: World, event: SpellCastData): void {
     const caster = world.getEntity(event.casterId);
     if (!caster) return;
 
-    const summonEffect = event.effects.find((e: any) => e.type === 'summon_building');
+    const summonEffect = event.effects.find(e => e.type === 'summon_building');
+    if (!summonEffect?.buildingType) return;
+
     const buildingType = summonEffect.buildingType;
     const location = summonEffect.location;
 
@@ -61,55 +94,26 @@ export class BuildingSummoningSystem extends BaseSystem {
     }
 
     // Determine spawn position
-    let spawnX: number, spawnY: number;
-    if (location === 'target_position' && event.targetPosition) {
-      spawnX = event.targetPosition.x;
-      spawnY = event.targetPosition.y;
-    } else if (typeof location === 'object') {
-      spawnX = location.x;
-      spawnY = location.y;
-    } else {
-      // Default to caster position
-      const pos = caster.components.get(CT.Position) as { x: number; y: number } | undefined;
-      if (!pos) return;
-      spawnX = pos.x + 5; // Offset slightly
-      spawnY = pos.y;
-    }
+    const spawnPos = this.determineSpawnPosition(caster, location, event.targetPosition);
+    if (!spawnPos) return;
 
     // Create building entity
-    const building = world.createEntity() as EntityImpl;
+    const building = world.createEntity();
 
-    building.addComponent({
-      type: CT.Position,
-      version: 1,
-      x: spawnX,
-      y: spawnY,
-      z: 0,
-      chunkX: Math.floor(spawnX / 32),
-      chunkY: Math.floor(spawnY / 32)
-    } as any);
+    // Add position component using helper
+    this.addComponentSafely(building, createPositionComponent(spawnPos.x, spawnPos.y));
 
-    building.addComponent({
-      type: CT.Building,
-      version: 1,
-      buildingType: buildingType,
-      constructionProgress: 100, // Instantly built (it's magic!)
-      built: true,
-      summonedBy: caster.id,
-      summonedAt: world.tick
-    } as any);
+    // Add building component using helper - already complete (progress = 100)
+    const buildingComponent = createBuildingComponent(buildingType as BuildingType, 1, 100);
+    // Note: Summoning metadata is tracked via magical_construct component (lines 117-126)
+    this.addComponentSafely(building, buildingComponent);
 
-    building.addComponent({
-      type: CT.Renderable,
-      version: 1,
-      spriteId: `building_${buildingType}`,
-      width: blueprint.width,
-      height: blueprint.height
-    } as any);
+    // Add renderable component using helper
+    this.addComponentSafely(building, createRenderableComponent(`building_${buildingType}`, 'building'));
 
     // Add dimensional marker if dimensional building
     if (blueprint.dimensional || blueprint.realmPocket) {
-      building.addComponent({
+      this.addComponentSafely(building, {
         type: 'magical_construct' as ComponentType,
         version: 1,
         constructType: 'summoned_building',
@@ -117,7 +121,7 @@ export class BuildingSummoningSystem extends BaseSystem {
         summoner: caster.id,
         duration: summonEffect.duration || 0, // 0 = permanent
         dispellable: true
-      } as any);
+      });
     }
 
     // Emit summoning visual effect
@@ -128,51 +132,36 @@ export class BuildingSummoningSystem extends BaseSystem {
         buildingId: building.id,
         buildingType: buildingType,
         cityId: '', // No city for summoned buildings
-        position: { x: spawnX, y: spawnY },
+        position: { x: spawnPos.x, y: spawnPos.y },
         isComplete: true
       }
     });
 
-    console.log(`✨ ${caster.id} summoned ${blueprint.name} at (${spawnX}, ${spawnY})`);
+    console.log(`✨ ${caster.id} summoned ${blueprint.name} at (${spawnPos.x}, ${spawnPos.y})`);
   }
 
-  private handleRiftCreation(world: World, event: any): void {
+  private handleRiftCreation(world: World, event: SpellCastData): void {
     const caster = world.getEntity(event.casterId);
     if (!caster) return;
 
-    const riftEffect = event.effects.find((e: any) => e.type === 'create_dimensional_rift');
+    const riftEffect = event.effects.find(e => e.type === 'create_dimensional_rift');
+    if (!riftEffect) return;
+
     const location = riftEffect.location;
 
     // Determine spawn position
-    let spawnX: number, spawnY: number;
-    if (location === 'target_position' && event.targetPosition) {
-      spawnX = event.targetPosition.x;
-      spawnY = event.targetPosition.y;
-    } else if (typeof location === 'object') {
-      spawnX = location.x;
-      spawnY = location.y;
-    } else {
-      const pos = caster.components.get(CT.Position) as { x: number; y: number } | undefined;
-      if (!pos) return;
-      spawnX = pos.x + 3;
-      spawnY = pos.y;
-    }
+    const spawnPos = this.determineSpawnPosition(caster, location, event.targetPosition);
+    if (!spawnPos) return;
 
     // Create rift entity
-    const rift = world.createEntity() as EntityImpl;
+    const rift = world.createEntity();
 
-    rift.addComponent({
-      type: CT.Position,
-      version: 1,
-      x: spawnX,
-      y: spawnY,
-      z: 0,
-      chunkX: Math.floor(spawnX / 32),
-      chunkY: Math.floor(spawnY / 32)
-    } as any);
+    // Add position component using helper
+    this.addComponentSafely(rift, createPositionComponent(spawnPos.x, spawnPos.y));
 
-    rift.addComponent({
-      type: 'dimensional_rift' as ComponentType,
+    // Add dimensional rift component
+    this.addComponentSafely(rift, {
+      type: CT.DimensionalRift,
       version: 1,
       sourceDimensions: riftEffect.sourceDimensions || 3,
       targetDimensions: riftEffect.targetDimensions || 4,
@@ -184,27 +173,24 @@ export class BuildingSummoningSystem extends BaseSystem {
       createdAt: world.tick,
       creator: caster.id,
       expiresAt: riftEffect.duration ? world.tick + riftEffect.duration : undefined
-    } as any);
+    });
 
-    // Visual effect
-    rift.addComponent({
-      type: CT.Renderable,
-      version: 1,
-      spriteId: 'dimensional_rift',
-      width: (riftEffect.radius || 2) * 2,
-      height: (riftEffect.radius || 2) * 2
-    } as any);
+    // Visual effect - use helper
+    const radius = riftEffect.radius || 2;
+    this.addComponentSafely(rift, createRenderableComponent('dimensional_rift', 'entity'));
 
     // Add particle effect
     const targetDim = riftEffect.targetDimensions || 4;
-    rift.addComponent({
+    const color = targetDim === 4 ? '#00FFFF' :
+                  targetDim === 5 ? '#FF00FF' : '#FFFF00';
+
+    this.addComponentSafely(rift, {
       type: 'particle_emitter' as ComponentType,
       version: 1,
       particleType: 'dimensional_shimmer',
       rate: 5,
-      color: targetDim === 4 ? '#00FFFF' :
-             targetDim === 5 ? '#FF00FF' : '#FFFF00'
-    } as any);
+      color
+    });
 
     // Emit rift creation event
     world.getEventBus().emit({
@@ -212,10 +198,46 @@ export class BuildingSummoningSystem extends BaseSystem {
       source: caster.id,
       data: {
         riftId: rift.id,
-        position: { x: spawnX, y: spawnY }
+        position: { x: spawnPos.x, y: spawnPos.y }
       }
     });
 
-    console.log(`🌀 ${caster.id} tore a rift at (${spawnX}, ${spawnY})`);
+    console.log(`🌀 ${caster.id} tore a rift at (${spawnPos.x}, ${spawnPos.y})`);
+  }
+
+  /**
+   * Determine spawn position from location spec and caster position.
+   * Returns undefined if caster has no position and no explicit location given.
+   */
+  private determineSpawnPosition(
+    caster: Entity,
+    location: string | { x: number; y: number } | undefined,
+    targetPosition?: { x: number; y: number }
+  ): { x: number; y: number } | undefined {
+    // Target position takes precedence
+    if (location === 'target_position' && targetPosition) {
+      return { x: targetPosition.x, y: targetPosition.y };
+    }
+
+    // Explicit position object
+    if (typeof location === 'object' && location.x !== undefined && location.y !== undefined) {
+      return { x: location.x, y: location.y };
+    }
+
+    // Default to caster position with offset
+    const casterPos = getPosition(caster);
+    if (!casterPos) return undefined;
+
+    return { x: casterPos.x + 5, y: casterPos.y };
+  }
+
+  /**
+   * Add component to entity safely.
+   * Uses EntityImpl.addComponent directly for proper type handling.
+   */
+  private addComponentSafely(entity: Entity, component: any): void {
+    // Cast to any to access internal addComponent method
+    // This is safe because world.createEntity() returns EntityImpl
+    (entity as any).addComponent(component);
   }
 }

@@ -512,6 +512,7 @@ export class BuildingSystem extends BaseSystem {
     // cancel all other campfire construction/plans within 200 tiles to prevent clustering
     if (blueprintId === 'campfire') {
       const CAMPFIRE_PROXIMITY_THRESHOLD = 200;
+      const CAMPFIRE_PROXIMITY_THRESHOLD_SQUARED = CAMPFIRE_PROXIMITY_THRESHOLD * CAMPFIRE_PROXIMITY_THRESHOLD;
       const entitiesToRemove: string[] = [];
       const buildingPositions: Map<string, PositionComponent> = new Map();
 
@@ -527,9 +528,9 @@ export class BuildingSystem extends BaseSystem {
         if (bc?.buildingType === 'campfire' && !bc.isComplete && bp) {
           const dx = position.x - bp.x;
           const dy = position.y - bp.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const distanceSquared = dx * dx + dy * dy;
 
-          if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+          if (distanceSquared <= CAMPFIRE_PROXIMITY_THRESHOLD_SQUARED) {
             entitiesToRemove.push(building.id);
             buildingPositions.set(building.id, bp);
           }
@@ -556,9 +557,9 @@ export class BuildingSystem extends BaseSystem {
         if (agentComp?.plannedBuilds && agentPos) {
           const dx = position.x - agentPos.x;
           const dy = position.y - agentPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const distanceSquared = dx * dx + dy * dy;
 
-          if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+          if (distanceSquared <= CAMPFIRE_PROXIMITY_THRESHOLD_SQUARED) {
             // Remove campfire from planned builds
             const filteredBuilds = agentComp.plannedBuilds.filter(p => p.buildingType !== 'campfire');
             if (filteredBuilds.length !== agentComp.plannedBuilds.length) {

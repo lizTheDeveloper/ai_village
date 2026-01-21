@@ -141,6 +141,12 @@ export { createTechnologyEraComponent, getEraMetadata, getEraIndex, getEraByInde
 export type { TechnologyEraComponent, TechnologyEra, TechBreakthrough, EraTransition, EraMetadata } from './TechnologyEraComponent.js';
 export { createKnowledgeRepositoryComponent, canPreserveKnowledge, getEffectiveCapacity, getEffectiveDiscoveryBonus, preserveTechnology, removeTechnology, calculateDegradationRate, REPOSITORY_TYPE_METADATA } from './KnowledgeRepositoryComponent.js';
 export type { KnowledgeRepositoryComponent, RepositoryType } from './KnowledgeRepositoryComponent.js';
+
+// Uplift Diplomacy (Civilization Technological Uplift)
+export { createUpliftAgreementComponent, calculateSuccessProbability, calculateCulturalContamination, determineUpliftOutcome, isUpliftActive, isUpliftComplete } from './UpliftAgreementComponent.js';
+export type { UpliftAgreementComponent, UpliftOutcome, UpliftPhase } from './UpliftAgreementComponent.js';
+export { createCivilizationReputationComponent, calculateEthicalStance, updateReputationFromUplift, getTrustLevel, updateKnownCivilization, calculateSuccessRate } from './CivilizationReputationComponent.js';
+export type { CivilizationReputationComponent } from './CivilizationReputationComponent.js';
 // Production scaling (Grand Strategy Phase 5)
 export { createProductionCapabilityComponent, calculateProductionMultiplier, calculateItemsPerDay, getTierFromTechLevel, addBottleneckResource, isBottleneckedResource, getEffectiveProductionRate, updateFactoryStats, getEffectiveWorkforce } from './ProductionCapabilityComponent.js';
 export type { ProductionCapabilityComponent, ProductionTier, ResourceBottleneck } from './ProductionCapabilityComponent.js';
@@ -1208,3 +1214,14 @@ export { createBlockadeComponent } from './BlockadeComponent.js';
 // Mining Operation (Stellar Resource Extraction)
 export * from './MiningOperationComponent.js';
 export { createMiningOperationComponent, type MiningOperationComponent } from './MiningOperationComponent.js';
+
+// Megastructure (Grand Strategy - 09-MEGASTRUCTURES.md)
+export * from './MegastructureComponent.js';
+export {
+  createMegastructureComponent,
+  type MegastructureComponent,
+  type MegastructureCategory,
+  type MegastructureTier,
+  type MegastructureLocation,
+  type MegastructureConstruction,
+} from './MegastructureComponent.js';

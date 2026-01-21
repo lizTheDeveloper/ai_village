@@ -5,6 +5,7 @@
  */
 
 import { HeadlessCitySimulator, type SimulatorStats } from './HeadlessCitySimulator.js';
+import { GrandStrategySimulator } from './GrandStrategySimulator.js';
 import type { StrategicPriorities, CityDecision } from '@ai-village/core';
 
 // =============================================================================
@@ -257,13 +258,27 @@ class UI {
 
   // Get preset from URL query param (default: 'basic')
   const params = new URLSearchParams(window.location.search);
-  const preset = (params.get('preset') as 'basic' | 'large-city' | 'population-growth') || 'basic';
+  const preset = (params.get('preset') as 'basic' | 'large-city' | 'population-growth' | 'grand-strategy') || 'basic';
 
-  const simulator = new HeadlessCitySimulator({
-    preset,
-    ticksPerBatch: 1,
-    autoRun: false,
-  });
+  let simulator: HeadlessCitySimulator | GrandStrategySimulator;
+
+  if (preset === 'grand-strategy') {
+    // Use Grand Strategy Simulator for interstellar scale
+    simulator = new GrandStrategySimulator({
+      preset: 'large-city', // Base on large-city
+      empireCount: 3,
+      federationCount: 1,
+      createGalacticCouncil: true,
+      naviesPerEmpire: 1,
+      megastructureCount: 2,
+    });
+  } else {
+    simulator = new HeadlessCitySimulator({
+      preset,
+      ticksPerBatch: 1,
+      autoRun: false,
+    });
+  }
 
   await simulator.initialize();
 
@@ -271,7 +286,7 @@ class UI {
 
   // Expose for debugging
   interface WindowWithDebug extends Window {
-    simulator: HeadlessCitySimulator;
+    simulator: HeadlessCitySimulator | GrandStrategySimulator;
     ui: UI;
   }
   (window as unknown as WindowWithDebug).simulator = simulator;
@@ -286,4 +301,16 @@ class UI {
   console.log('  - basic: 50 agents, farm + storage, minimal systems');
   console.log('  - large-city: 200 agents, 9 storage buildings, full economy');
   console.log('  - population-growth: 20 agents, reproduction systems enabled');
+  console.log('  - grand-strategy: Empires, Federations, Fleets, Megastructures');
+
+  // Log Grand Strategy stats if applicable
+  if (preset === 'grand-strategy' && simulator instanceof GrandStrategySimulator) {
+    const gsStats = simulator.getGrandStrategyStats();
+    console.log('\n🌌 Grand Strategy Stats:');
+    console.log(`  - Empires: ${gsStats.empires}`);
+    console.log(`  - Federations: ${gsStats.federations}`);
+    console.log(`  - Galactic Councils: ${gsStats.galacticCouncils}`);
+    console.log(`  - Naval Forces: ${gsStats.totalNavalForces}`);
+    console.log(`  - Megastructures: ${gsStats.megastructures}`);
+  }
 })();

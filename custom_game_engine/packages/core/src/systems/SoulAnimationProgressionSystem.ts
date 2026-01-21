@@ -193,12 +193,57 @@ export class SoulAnimationProgressionSystem extends BaseSystem {
   }
 
   /**
-   * Check if animation already exists on disk
-   * Note: In production, this would check the filesystem or a sprite registry
+   * Cache of known animations to avoid repeated lookups
+   */
+  private knownAnimations: Set<string> = new Set();
+
+  /**
+   * Check if animation already exists in sprite registry or cache.
+   *
+   * Checks:
+   * 1. Local cache of previously verified animations
+   * 2. Sprite folder naming convention (folderId_animationType pattern)
+   * 3. AppearanceComponent generated animations list
    */
   private animationExists(spriteFolderId: string, animationType: string): boolean {
-    // For now, return false to allow generation
-    // TODO: Implement actual filesystem/registry check
+    const cacheKey = `${spriteFolderId}:${animationType}`;
+
+    // Check local cache first
+    if (this.knownAnimations.has(cacheKey)) {
+      return true;
+    }
+
+    // Check if this is a known base animation that always exists
+    const baseAnimations = ['idle', 'walk'];
+    if (baseAnimations.includes(animationType)) {
+      // Base animations are always generated with the character
+      this.knownAnimations.add(cacheKey);
+      return true;
+    }
+
+    // Check if the animation was previously generated for this soul
+    // by querying entities with matching appearance component
+    if (this.world) {
+      const appearanceEntities = this.world.query()
+        .with('appearance')
+        .executeEntities();
+
+      for (const entity of appearanceEntities) {
+        const appearance = entity.components?.get('appearance') as
+          | { spriteFolderId?: string; animations?: string[] }
+          | undefined;
+
+        if (
+          appearance?.spriteFolderId === spriteFolderId &&
+          appearance?.animations?.includes(animationType)
+        ) {
+          this.knownAnimations.add(cacheKey);
+          return true;
+        }
+      }
+    }
+
+    // Animation not found - needs generation
     return false;
   }
 

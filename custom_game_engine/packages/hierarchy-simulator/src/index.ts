@@ -42,19 +42,17 @@ export type {
 export { TIER_SCALES, RESOURCE_TYPES } from './abstraction/types.js';
 
 // ============================================================================
-// Adapters (Phase 2)
+// Adapters - MOVED TO @ai-village/world
 // ============================================================================
-
-export {
-  PlanetTierAdapter,
-  SystemTierAdapter,
-} from './adapters/index.js';
-
-export type {
-  ResourceSummary,
-  SystemConfig,
-  SystemResourceSummary,
-} from './adapters/index.js';
+//
+// The tier adapters (PlanetTierAdapter, SystemTierAdapter, SectorTierAdapter,
+// GalaxyTierAdapter) have been moved to @ai-village/world to break the circular
+// dependency: core → hierarchy-simulator → world → core
+//
+// Import adapters from:
+//   import { PlanetTierAdapter, SystemTierAdapter } from '@ai-village/world';
+//
+// See: packages/world/src/hierarchy-adapters/
 
 // ============================================================================
 // Renormalization Engine

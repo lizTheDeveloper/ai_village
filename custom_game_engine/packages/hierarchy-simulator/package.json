@@ -19,7 +19,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@ai-village/core": "*",
     "chart.js": "^4.4.1"
   },
   "devDependencies": {

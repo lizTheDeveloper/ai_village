@@ -20,6 +20,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type {
   InvasionComponent,
@@ -29,6 +30,7 @@ import type {
 import type { InvasionTriggeredEvent } from '../multiverse/BackgroundUniverseTypes.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 import type { PlotLinesComponent, PlotLineInstance, PlotLineTemplate } from '../plot/PlotTypes.js';
+import type { GovernorComponent } from '../components/GovernorComponent.js';
 import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
 
 /**
@@ -363,8 +365,11 @@ export class InvasionPlotHandler extends BaseSystem {
       .executeEntities();
 
     for (const entity of governorQuery) {
-      // TODO: Filter by political entity membership when that's implemented
-      leaders.push(entity);
+      // Filter by political entity membership
+      const governor = entity.getComponent(CT.Governor) as GovernorComponent | undefined;
+      if (governor && governor.jurisdiction === politicalEntity.id) {
+        leaders.push(entity);
+      }
     }
 
     // If no governors, look for any souls with high wisdom
@@ -423,7 +428,119 @@ export class InvasionPlotHandler extends BaseSystem {
       });
     }
 
-    // TODO: More sophisticated progression based on military strength, etc.
+    // Sophisticated progression for in-progress invasions
+    if (invasion.status === 'in_progress') {
+      // Calculate military strength comparison
+      const militaryBalance = this.calculateMilitaryBalance(world, entity, invasion);
+
+      // Determine invasion outcome based on military balance and time
+      const progressFactor = Math.min(1.0, ticksSinceStart / 10000); // Max at 10k ticks
+
+      // Military balance affects progression speed
+      // Positive balance = attacker advantage, negative = defender advantage
+      const effectiveProgress = progressFactor * (1 + militaryBalance * 0.5);
+
+      // Check for invasion resolution conditions
+      if (effectiveProgress >= 1.0 && militaryBalance > 0.3) {
+        // Attacker wins - invasion succeeds
+        invasion.status = 'completed';
+        this.events.emitGeneric('invasion:victory', {
+          invasionId: invasion.invasionId,
+          outcome: 'attacker_victory',
+          militaryBalance,
+          tick: currentTick,
+        });
+      } else if (effectiveProgress >= 0.5 && militaryBalance < -0.5) {
+        // Strong defense repels invasion early
+        invasion.status = 'failed';
+        this.events.emitGeneric('invasion:repelled', {
+          invasionId: invasion.invasionId,
+          outcome: 'defender_victory',
+          militaryBalance,
+          tick: currentTick,
+        });
+      } else if (effectiveProgress >= 1.2) {
+        // Stalemate - invasion fails after prolonged conflict
+        invasion.status = 'failed';
+        this.events.emitGeneric('invasion:stalemate', {
+          invasionId: invasion.invasionId,
+          outcome: 'stalemate',
+          militaryBalance,
+          tick: currentTick,
+        });
+      }
+
+      // Emit progress updates periodically (every 1000 ticks)
+      if (ticksSinceStart % 1000 < this.throttleInterval) {
+        this.events.emitGeneric('invasion:progress_update', {
+          invasionId: invasion.invasionId,
+          progress: effectiveProgress,
+          militaryBalance,
+          tick: currentTick,
+        });
+      }
+    }
+  }
+
+  /**
+   * Calculate military balance between attacker and defender
+   *
+   * @returns Value from -1 to 1 where:
+   *   - Positive = attacker advantage
+   *   - Negative = defender advantage
+   *   - Near 0 = balanced/stalemate
+   */
+  private calculateMilitaryBalance(
+    world: World,
+    entity: Entity,
+    invasion: ActiveInvasion
+  ): number {
+    let attackerStrength = 0.5; // Default attacker strength
+    let defenderStrength = 0.5; // Default defender strength
+
+    // Get attacker fleet strength if available
+    if (invasion.attackerFleetId) {
+      const fleetEntity = world.getEntity(invasion.attackerFleetId);
+      if (fleetEntity) {
+        const navy = fleetEntity.getComponent('navy') as { shipCount?: number; fleetStrength?: number } | undefined;
+        if (navy) {
+          attackerStrength = (navy.fleetStrength ?? navy.shipCount ?? 1) / 100;
+        }
+      }
+    }
+
+    // Get defender strength from defense strategy or empire
+    if (invasion.defenseStrategy) {
+      // Defense strategy provides bonus
+      const strategyBonus: Record<string, number> = {
+        'fortification': 0.3,
+        'guerrilla': 0.2,
+        'diplomatic': 0.1,
+        'scorched_earth': 0.25,
+        'alliance_call': 0.4,
+      };
+      defenderStrength += strategyBonus[invasion.defenseStrategy as string] ?? 0;
+    }
+
+    // Query for defender's navy if available (entity with invasion component often is the defender)
+    const defenderNavy = entity.getComponent('navy') as { shipCount?: number; fleetStrength?: number } | undefined;
+    if (defenderNavy) {
+      defenderStrength = (defenderNavy.fleetStrength ?? defenderNavy.shipCount ?? 1) / 100;
+    }
+
+    // Invasion type modifiers
+    const typeModifier: Record<string, number> = {
+      'military': 0,      // Balanced
+      'cultural': -0.2,   // Harder to win militarily
+      'economic': -0.3,   // Requires economic victory conditions
+    };
+    const modifier = typeModifier[invasion.type] ?? 0;
+
+    // Calculate balance: (attacker - defender) / (attacker + defender) + type modifier
+    const total = attackerStrength + defenderStrength;
+    if (total === 0) return modifier;
+
+    return ((attackerStrength - defenderStrength) / total) + modifier;
   }
 
   /**
@@ -446,13 +563,117 @@ export class InvasionPlotHandler extends BaseSystem {
       if (invasion) {
         invasion.status = 'completed';
 
-        // TODO: Update associated plot stages to completion/failure
-        // TODO: Award wisdom to souls who participated
+        // Update associated plot stages to completion/failure
+        this.updateInvasionPlots(invasionId, outcome);
+
+        // Award wisdom to souls who participated
+        this.awardWisdomToParticipants(invasion, outcome);
 
         console.log(
           `[InvasionPlotHandler] Invasion ${invasionId} resolved with outcome: ${outcome}`
         );
       }
+    }
+  }
+
+  /**
+   * Update invasion-related plots to completed/failed status
+   */
+  private updateInvasionPlots(invasionId: string, outcome: string): void {
+    if (!this.world) return;
+
+    // Query all souls with plot lines
+    const soulEntities = this.world.query()
+      .with(CT.SoulIdentity)
+      .with(CT.PlotLines)
+      .executeEntities();
+
+    const isVictory = outcome === 'victory' || outcome === 'defender_victory';
+    const newStatus = isVictory ? 'completed' : 'failed';
+
+    for (const soulEntity of soulEntities) {
+      const plotLines = soulEntity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
+      if (!plotLines) continue;
+
+      // Find invasion-related active plots
+      let hasUpdates = false;
+      const updatedPlots = plotLines.active.map((plot: PlotLineInstance) => {
+        // Check if this plot is invasion-related
+        if (plot.template_id.startsWith('invasion_') && plot.status === 'active') {
+          // Check if it's related to this invasion (via parameters)
+          const plotInvasionId = plot.parameters?.invasionId;
+          if (!plotInvasionId || plotInvasionId === invasionId) {
+            hasUpdates = true;
+            return {
+              ...plot,
+              status: newStatus as 'completed' | 'failed',
+              current_stage: isVictory ? 'resolution_victory' : 'resolution_defeat',
+            };
+          }
+        }
+        return plot;
+      });
+
+      if (hasUpdates) {
+        (soulEntity as EntityImpl).updateComponent(CT.PlotLines, (old) => {
+          const typed = old as PlotLinesComponent;
+          return {
+            ...typed,
+            active: updatedPlots,
+          };
+        });
+      }
+    }
+  }
+
+  /**
+   * Award wisdom to souls who participated in the invasion
+   */
+  private awardWisdomToParticipants(invasion: ActiveInvasion, outcome: string): void {
+    if (!this.world) return;
+
+    // Collect participant IDs from invasion
+    const participantIds = new Set<string>();
+
+    // Add defenders
+    if (invasion.defenderIds) {
+      invasion.defenderIds.forEach(id => participantIds.add(id));
+    }
+
+    // Add from attacker strength sources if available
+    if (invasion.attackerStrengthSource) {
+      participantIds.add(invasion.attackerStrengthSource);
+    }
+
+    // Calculate wisdom award based on outcome and invasion type
+    const baseWisdom = 5;
+    const outcomeMultiplier = outcome === 'victory' || outcome === 'defender_victory' ? 1.5 :
+                              outcome === 'stalemate' ? 1.0 : 0.8;
+    const wisdomAward = Math.floor(baseWisdom * outcomeMultiplier);
+
+    // Award wisdom to each participant
+    for (const participantId of participantIds) {
+      const entity = this.world.getEntity(participantId);
+      if (!entity) continue;
+
+      const soul = entity.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
+      if (!soul) continue;
+
+      (entity as EntityImpl).updateComponent(CT.SoulIdentity, (old) => {
+        const typed = old as SoulIdentityComponent;
+        return {
+          ...typed,
+          wisdom_level: (typed.wisdom_level ?? 0) + wisdomAward,
+        };
+      });
+
+      // Emit wisdom award event
+      this.events.emitGeneric('soul:wisdom_awarded', {
+        soulId: participantId,
+        amount: wisdomAward,
+        reason: `invasion_${outcome}`,
+        invasionId: invasion.invasionId,
+      });
     }
   }
 

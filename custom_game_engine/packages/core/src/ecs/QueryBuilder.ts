@@ -2,6 +2,7 @@ import type { EntityId, ComponentType } from '../types.js';
 import type { Entity } from './Entity.js';
 import type { World } from './World.js';
 import { generateQuerySignature } from './QuerySignature.js';
+import { isPositionComponent, isTagsComponent } from '../components/typeGuards.js';
 
 /**
  * Query builder for finding entities.
@@ -200,11 +201,8 @@ export class QueryBuilder implements IQueryBuilder {
       case 'tags': {
         const tags = filter.data as string[];
         const tagsCompRaw = entity.components.get('tags');
-        const tagsComp = tagsCompRaw as unknown as
-          | { tags: string[] }
-          | undefined;
-        if (!tagsComp) return false;
-        return tags.some((t) => tagsComp.tags.includes(t));
+        if (!tagsCompRaw || !isTagsComponent(tagsCompRaw)) return false;
+        return tags.some((t) => tagsCompRaw.tags.includes(t));
       }
 
       case 'rect': {
@@ -214,11 +212,8 @@ export class QueryBuilder implements IQueryBuilder {
           width: number;
           height: number;
         };
-        const posRaw = entity.components.get('position');
-        const pos = posRaw as unknown as
-          | { x: number; y: number }
-          | undefined;
-        if (!pos) return false;
+        const pos = entity.components.get('position');
+        if (!pos || !isPositionComponent(pos)) return false;
         return (
           pos.x >= x &&
           pos.x < x + width &&
@@ -232,11 +227,8 @@ export class QueryBuilder implements IQueryBuilder {
           chunkX: number;
           chunkY: number;
         };
-        const posRaw = entity.components.get('position');
-        const pos = posRaw as unknown as
-          | { chunkX: number; chunkY: number }
-          | undefined;
-        if (!pos) return false;
+        const pos = entity.components.get('position');
+        if (!pos || !isPositionComponent(pos)) return false;
         return pos.chunkX === chunkX && pos.chunkY === chunkY;
       }
 
@@ -250,17 +242,11 @@ export class QueryBuilder implements IQueryBuilder {
         const targetEntity = this.world.getEntity(entityId);
         if (!targetEntity) return false;
 
-        const targetPosRaw = targetEntity.components.get('position');
-        const targetPos = targetPosRaw as unknown as
-          | { x: number; y: number }
-          | undefined;
-        if (!targetPos) return false;
+        const targetPos = targetEntity.components.get('position');
+        if (!targetPos || !isPositionComponent(targetPos)) return false;
 
-        const posRaw = entity.components.get('position');
-        const pos = posRaw as unknown as
-          | { x: number; y: number }
-          | undefined;
-        if (!pos) return false;
+        const pos = entity.components.get('position');
+        if (!pos || !isPositionComponent(pos)) return false;
 
         const dx = pos.x - targetPos.x;
         const dy = pos.y - targetPos.y;

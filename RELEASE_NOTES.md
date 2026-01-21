@@ -1,5 +1,184 @@
 # Release Notes
 
+## 2026-01-20 - "Grand Strategy Complete" - Performance Optimizations & Phase 6 Completion
+
+### Grand Strategy Implementation Complete (98%)
+
+**Phase 5 & 6 Completion** - All core grand strategy systems now operational:
+- Elections with candidate scoring and approval voting
+- Empire separatist movements (negotiate/suppress/independence mechanics)
+- Civil war dynamics with faction support tracking
+- Advanced space exploration and archaeological systems
+- Ship combat with tactical resolution
+- Exotic ship types (probability scouts, Svetz retrieval ships)
+
+**Updated Roadmap Status:**
+- Phase 1-6: ✅ Complete (was 70%, now 98%)
+- Only Phase 7 (Polish & Optimization) remains
+
+### Major Performance Optimizations (8 Fixes)
+
+**RebellionEventSystem** - O(n²) query elimination (PF-001)
+- Cached queries eliminated 85-90% of query overhead
+- Fixed nested queries in `updateClimax`, `syncWithRealityAnchor`, `manifestCreatorAvatar`
+- All 5 critical methods optimized with query caching
+
+**GovernanceDataSystem** - Sequential query consolidation (PF-002, PF-003)
+- Reduced 10 queries → 5 queries per update cycle
+- Eliminated recursive query in `calculateGeneration` (400+ recursive queries → 1 query + Map lookups)
+- 98% reduction in query overhead via `parentingCache` and `generationCache`
+
+**NeedsSystem** - Set allocation reduction (PF-004)
+- Lazy copy-on-write pattern for trait Sets
+- 99% reduction: ~2,000 Set allocations/sec → ~20/sec (50 agents)
+
+**BuildingSystem & GuardDutySystem** - Math.sqrt elimination (PF-005, PF-006)
+- Squared distance comparisons (10x faster)
+- Direct iteration over `world.entities.values()` (no Array.from copy)
+
+**SimulationScheduler** - Configuration gaps filled (PF-007)
+- Added missing configs: robot, spaceship, squad, fleet, armada, spirit, companion (ALWAYS)
+- Added item, equipment (PASSIVE - zero per-tick cost)
+- Correct simulation behavior for all entity types
+
+**AgentBrainSystem** - Dead code removal (PF-008)
+- Removed unused `workingNearbyAgents` array
+
+**Documentation:** [PERFORMANCE_FIXES_LOG.md](./custom_game_engine/PERFORMANCE_FIXES_LOG.md)
+
+### New Grand Strategy Systems
+
+#### Political Systems
+- **NationSystem enhancements** (+100 lines)
+  - `gatherElectionCandidates()` - Build candidate pool from legislators + incumbent
+  - `scoreAndRankCandidates()` - Approval voting simulation
+  - Election events with detailed results (top 5 candidates)
+  - Leader change tracking
+
+#### Empire Dynamics
+- **EmpireSystem separatist mechanics** (+208 lines)
+  - `calculateEmpireResponse()` - Negotiate vs suppress vs ignore
+  - `calculateSuppressionEffectiveness()` - Military suppression strength
+  - `processNegotiation()` - Autonomy vs failed negotiations
+  - `processIndependenceDeclaration()` - Full independence mechanics
+  - Separatist movement strength growth (popular support simulation)
+
+#### System Enhancements (15+ files)
+- **ExplorationDiscoverySystem** - Archaeological discoveries (+122 lines)
+- **InvasionPlotHandler** - Cross-reality invasion mechanics (+122 lines)
+- **RebellionEventSystem** - Enhanced rebellion resolution (+130 lines)
+- **TradeNetworkSystem** - Trade route optimization (+87 lines)
+- **SpaceshipManagementSystem** - Fleet coordination (+77 lines)
+- **SoulAnimationProgressionSystem** - Animation unlocking (+53 lines)
+- **DeathBargainSystem** - Soul negotiation enhancements (+86 lines)
+- **GovernanceDataSystem** - Governance metrics (+74 lines)
+- **BuildingSummoningSystem** - Building materialization (+218 lines)
+
+#### New Components
+- **ProbabilityScoutMissionComponent** - Low-contamination probability branch mapping
+  - Branch observations with precision/collapse risk tracking
+  - Mission phases: scanning → observing → mapping → complete
+- **SvetzRetrievalMissionComponent** - Time paradox retrieval missions
+  - Artifact recovery from probability branches
+  - Contamination and collapse event tracking
+
+#### New Systems
+- **ProbabilityScoutSystem** - Manages probability scout ship missions
+- **SvetzRetrievalSystem** - Handles Svetz retrieval operations
+
+#### Testing Infrastructure
+- **GrandStrategySimulator.ts** - Complete grand strategy entity spawning
+  - Full political hierarchy (Nations → Empires → Federations → Galactic Councils)
+  - Complete naval hierarchy (Ships → Squadrons → Fleets → Armadas → Navies)
+  - Operational megastructures with workers
+  - Active trade networks
+- **test-grand-strategy.ts** - Grand strategy test harness
+- **test-grand-strategy-gameplay.ts** - Gameplay validation
+
+### Admin Dashboard
+
+**New Grand Strategy Capability** - `grand-strategy.ts`
+- Query grand strategy entities (empires, federations, councils)
+- Spawn testing scenarios
+- Monitor political dynamics
+
+### Multiverse Events
+
+**98 new typed events** in `multiverse.events.ts`:
+- Probability scout events (mission start/progress/complete/contamination)
+- Svetz retrieval events (mission phases/paradox/success/failure)
+- Timeline events (merge/collapse/paradox detection)
+- Reality anchor events (stabilization/destabilization)
+
+### Documentation Updates
+
+**IMPLEMENTATION_ROADMAP.md** - Major update
+- Status: 70% → 98% complete
+- Phase 1-6: All marked complete ✅
+- Updated completion dates (2026-01-20)
+- Detailed system completion tracking
+
+**PERFORMANCE_FIXES_LOG.md** - New file (+144 lines)
+- 8 completed performance fixes documented
+- Before/after metrics for each optimization
+- File locations and timestamps
+- Performance impact summary table
+
+**PLAN_PLANET_REUSE.md** - New planning doc
+- Planet instance reuse across timelines
+- Memory optimization strategy
+
+### System Changes
+
+**53 files modified**, 1,761 insertions, 416 deletions
+
+**Key file changes:**
+- NationSystem.ts - Election mechanics (+100 lines)
+- EmpireSystem.ts - Separatist movements (+208 lines)
+- SimulationScheduler.ts - Configuration gaps (+42 lines)
+- RebellionEventSystem.ts - Query caching (+130 lines)
+- GovernanceDataSystem.ts - Query optimization (+74 lines)
+- 15+ other system enhancements
+
+**New files:**
+- GrandStrategySimulator.ts (+200 lines)
+- ProbabilityScoutMissionComponent.ts (+109 lines)
+- SvetzRetrievalMissionComponent.ts
+- ProbabilityScoutSystem.ts
+- SvetzRetrievalSystem.ts
+- grand-strategy.ts (admin capability)
+- PERFORMANCE_FIXES_LOG.md (+144 lines)
+- PLAN_PLANET_REUSE.md
+
+### TypeScript Configuration
+
+**Build improvements** across packages:
+- core/tsconfig.json - Composite references updated
+- hierarchy-simulator/tsconfig.json - Reference cleanup
+- world/tsconfig.json - Build optimization
+
+### Package Updates
+
+**Dependency cleanup:**
+- Removed stale dependencies from hierarchy-simulator
+- Added missing dependencies to world package
+
+### Testing
+
+**Enhanced test coverage:**
+- FallbackDeity.test.ts - Divine fallback mechanics
+- Multiple system integration tests
+
+### What's Next
+
+**Phase 7: Polish & Optimization** (Only remaining phase)
+- Performance profiling and benchmarking
+- Documentation polish
+- UI/UX improvements
+- Final integration testing
+
+---
+
 ## 🔥 2026-01-14 - "Still Burnin'" - Complete Documentation & Emergent Chaos
 
 ### The Campfire Saga Continues

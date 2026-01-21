@@ -65,12 +65,19 @@ const preservationEventData = {
   tick: 0,
 };
 
-const rediscoveryEventData = {
+const rediscoveryEventData: {
+  civilizationId: string;
+  repositoryId: string;
+  technologyId: string;
+  repositoryType: string;
+  rediscoveryMethod: 'archaeological_discovery' | 'reinvention';
+  tick: number;
+} = {
   civilizationId: '',
   repositoryId: '',
   technologyId: '',
   repositoryType: '',
-  rediscoveryMethod: '',
+  rediscoveryMethod: 'archaeological_discovery',
   tick: 0,
 };
 
@@ -222,11 +229,11 @@ export class KnowledgePreservationSystem extends BaseSystem {
         preservationEventData.repositoryType = repo.repositoryType;
         preservationEventData.tick = tick;
 
-        this.events.emit({
-          type: 'knowledge:technology_preserved',
-          source: repoId,
-          data: { ...preservationEventData },
-        });
+        this.events.emit(
+          'knowledge:technology_preserved',
+          { ...preservationEventData },
+          repoId
+        );
       }
     }
   }
@@ -376,11 +383,11 @@ export class KnowledgePreservationSystem extends BaseSystem {
     rediscoveryEventData.rediscoveryMethod = method;
     rediscoveryEventData.tick = world.tick;
 
-    this.events.emit({
-      type: 'knowledge:technology_rediscovered',
-      source: repositoryEntity.id,
-      data: { ...rediscoveryEventData },
-    });
+    this.events.emit(
+      'knowledge:technology_rediscovered',
+      { ...rediscoveryEventData },
+      repositoryEntity.id
+    );
   }
 
   // ========== Degradation ==========
@@ -440,11 +447,11 @@ export class KnowledgePreservationSystem extends BaseSystem {
       degradationEventData.technologiesLost = technologiesLost;
       degradationEventData.tick = world.tick;
 
-      this.events.emit({
-        type: 'knowledge:repository_degraded',
-        source: repositoryEntity.id,
-        data: { ...degradationEventData },
-      });
+      this.events.emit(
+        'knowledge:repository_degraded',
+        { ...degradationEventData },
+        repositoryEntity.id
+      );
 
       if (repo.conditionLevel === 0) {
         console.warn(

@@ -286,4 +286,8 @@ export enum ComponentType {
   Megastructure = 'megastructure',           // Massive engineering projects (Dyson swarms, wormholes)
   ConstructionProject = 'construction_project', // Active megastructure construction tracking
   ArchaeologicalSite = 'archaeological_site', // Excavation sites for discovering ancient technologies
+
+  // Exotic Ship Missions (Grand Strategy Phase 6)
+  ProbabilityScoutMission = 'probability_scout_mission', // Scout ship mapping unobserved timelines
+  SvetzRetrievalMission = 'svetz_retrieval_mission',     // Retrieval ship fetching items from extinct timelines
 }

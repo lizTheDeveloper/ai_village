@@ -6,7 +6,7 @@
  *
  * Supports two handler signatures:
  * 1. Legacy: (entity, world) => void
- * 2. Modern: (ctx: BehaviorContext) => BehaviorResult | void
+ * 2. Modern: (ctx: BehaviorContext) => BehaviorResult
  *
  * Modern handlers receive a BehaviorContext which provides:
  * - Pre-fetched components (position, agent, movement, etc.)
@@ -31,8 +31,11 @@ export type BehaviorHandler = (entity: EntityImpl, world: World) => void;
 /**
  * Modern handler function signature using BehaviorContext.
  * This is the preferred signature for new behaviors.
+ *
+ * MUST return BehaviorResult - use ctx.complete() or ctx.switchTo()
+ * to produce a valid result. Never return void.
  */
-export type ContextBehaviorHandler = (ctx: BehaviorContext) => BehaviorResult | void;
+export type ContextBehaviorHandler = (ctx: BehaviorContext) => BehaviorResult;
 
 /**
  * Union type for both handler signatures
@@ -170,9 +173,7 @@ export class BehaviorRegistry {
       if (meta.usesContext) {
         // Modern handler - create context and pass it
         const ctx = createBehaviorContext(entity, world);
-        const result = (meta.handler as ContextBehaviorHandler)(ctx);
-        // Ensure we always return BehaviorResult (not void)
-        return result !== undefined ? result : { complete: false };
+        return (meta.handler as ContextBehaviorHandler)(ctx);
       } else {
         // Legacy handler - call directly
         (meta.handler as BehaviorHandler)(entity, world);

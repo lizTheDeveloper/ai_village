@@ -618,8 +618,78 @@ export class ExplorationDiscoverySystem extends BaseSystem {
       },
     });
 
-    // TODO: Apply damage to ship based on phenomenon danger
-    // TODO: Potentially lose crew members
+    // Apply damage to ship based on phenomenon danger
+    const shipEntity = world.getEntity(mission.shipId);
+    if (shipEntity) {
+      const ship = shipEntity.getComponent('spaceship') as SpaceshipComponent | undefined;
+      if (ship) {
+        // Calculate damage based on phenomenon danger level
+        const baseDanger = PHENOMENON_DANGER[phenomenon.type] ?? 0.05;
+        // Damage scales with danger: 10-50% hull damage
+        const damageAmount = baseDanger * 2 + Math.random() * baseDanger;
+
+        // Apply hull damage
+        const newIntegrity = Math.max(0, ship.hull.integrity - damageAmount);
+        (shipEntity as EntityImpl).updateComponent('spaceship', (old) => {
+          const typed = old as SpaceshipComponent;
+          return {
+            ...typed,
+            hull: {
+              ...typed.hull,
+              integrity: newIntegrity,
+            },
+          };
+        });
+
+        // Potentially lose crew members based on danger
+        if (ship.crew.member_ids.length > 0 && baseDanger > 0.05) {
+          // Higher danger = higher casualty chance
+          const casualtyChance = baseDanger * 0.5; // Max ~10% for black holes
+          const casualties: string[] = [];
+
+          for (const crewId of ship.crew.member_ids) {
+            if (Math.random() < casualtyChance) {
+              casualties.push(crewId);
+            }
+          }
+
+          if (casualties.length > 0) {
+            // Remove casualties from crew roster
+            const survivingCrew = ship.crew.member_ids.filter(id => !casualties.includes(id));
+
+            (shipEntity as EntityImpl).updateComponent('spaceship', (old) => {
+              const typed = old as SpaceshipComponent;
+              return {
+                ...typed,
+                crew: {
+                  ...typed.crew,
+                  member_ids: survivingCrew,
+                  // Reduce coherence due to loss
+                  coherence: Math.max(0, typed.crew.coherence - casualties.length * 0.1),
+                },
+              };
+            });
+
+            // Emit crew casualty event
+            this.events.emitGeneric('exploration:crew_casualties', {
+              shipId: mission.shipId,
+              casualties,
+              phenomenonType: phenomenon.type,
+              remainingCrew: survivingCrew.length,
+            });
+          }
+        }
+
+        // Emit ship damage event
+        this.events.emitGeneric('exploration:ship_damaged', {
+          shipId: mission.shipId,
+          damageAmount,
+          newIntegrity,
+          phenomenonType: phenomenon.type,
+          phenomenonId: phenomenon.id,
+        });
+      }
+    }
   }
 
   // ===========================================================================
@@ -629,6 +699,10 @@ export class ExplorationDiscoverySystem extends BaseSystem {
   /**
    * Get stellar phenomenon by ID
    * Uses cache for performance
+   *
+   * Phenomena are stored as entities with components that contain
+   * the StellarPhenomenon data structure. This method attempts to
+   * find and extract that data.
    */
   private getPhenomenon(
     world: World,
@@ -639,9 +713,47 @@ export class ExplorationDiscoverySystem extends BaseSystem {
       return this.phenomenaCache.get(phenomenonId);
     }
 
-    // TODO: Query world for stellar phenomenon entities
-    // For now, return undefined - phenomena will be stored as entities
-    // with stellar_phenomenon component in future implementation
+    // Query world for entity with this ID
+    const entity = world.getEntity(phenomenonId);
+    if (!entity) {
+      return undefined;
+    }
+
+    // Check for stellar phenomenon data in entity components
+    // Phenomena are stored with a 'stellar_phenomenon' component that contains
+    // the StellarPhenomenon data structure (excluding the component 'type' field)
+    const phenomenonComp = entity.components?.get('stellar_phenomenon');
+
+    if (phenomenonComp) {
+      // Cast through unknown for type safety
+      const compData = phenomenonComp as unknown as Record<string, unknown>;
+
+      // The component has 'type' as component type identifier
+      // StellarPhenomenon also has 'type' as phenomenon type
+      // We need to extract the phenomenon data
+      const phenomenonType = compData.phenomenonType ?? compData.type;
+
+      // Validate minimum required fields exist
+      if (compData.id && phenomenonType && compData.coordinates) {
+        const phenomenon: StellarPhenomenon = {
+          id: compData.id as string,
+          name: (compData.name as string) ?? `Phenomenon ${phenomenonId}`,
+          type: phenomenonType as StellarPhenomenonType,
+          coordinates: compData.coordinates as { x: number; y: number; z: number },
+          mass: (compData.mass as number) ?? 1.0,
+          radius: (compData.radius as number) ?? 1000,
+          age: (compData.age as number) ?? 1000,
+          resources: (compData.resources as ResourceSpawn[]) ?? [],
+          systemId: (compData.systemId as string) ?? 'unknown',
+          discoveredBy: compData.discoveredBy as string | undefined,
+          discoveredAt: compData.discoveredAt as number | undefined,
+        };
+
+        // Cache and return
+        this.phenomenaCache.set(phenomenonId, phenomenon);
+        return phenomenon;
+      }
+    }
 
     return undefined;
   }

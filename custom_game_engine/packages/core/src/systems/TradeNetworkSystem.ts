@@ -158,8 +158,10 @@ export class TradeNetworkSystem extends BaseSystem {
       const lane = laneEntity.getComponent<ShippingLaneComponent>('shipping_lane');
       if (!lane) continue;
 
-      // TODO: Filter by spatial scope (planet/system/sector)
-      // For now, include all lanes
+      // Filter by spatial scope (planet/system/sector)
+      if (!this.laneMatchesSpatialScope(world, lane, network)) {
+        continue;
+      }
 
       // Add nodes
       graph.nodes.add(lane.originId);
@@ -200,6 +202,87 @@ export class TradeNetworkSystem extends BaseSystem {
     }
 
     return graph;
+  }
+
+  /**
+   * Check if a shipping lane belongs to the network's spatial scope.
+   *
+   * Spatial scope filtering:
+   * - 'planet': Both endpoints must be on the same planet as spatialTierId
+   * - 'system': Both endpoints must be in the same star system (same planet prefix)
+   * - 'sector': All lanes included (sector is the broadest scope)
+   *
+   * Falls back to including the lane if spatial information is unavailable.
+   */
+  private laneMatchesSpatialScope(
+    world: World,
+    lane: ShippingLaneComponent,
+    network: TradeNetworkComponent
+  ): boolean {
+    // Sector scope includes all lanes (broadest scope)
+    if (network.scope === 'sector') {
+      return true;
+    }
+
+    // Get endpoint entities to check their spatial location
+    const originEntity = world.getEntity(lane.originId);
+    const destEntity = world.getEntity(lane.destinationId);
+
+    // If either endpoint doesn't exist, include the lane (graceful fallback)
+    if (!originEntity || !destEntity) {
+      return true;
+    }
+
+    // Check for planet_location components
+    const originLocation = originEntity.getComponent('planet_location') as
+      | { type: 'planet_location'; currentPlanetId: string }
+      | undefined;
+    const destLocation = destEntity.getComponent('planet_location') as
+      | { type: 'planet_location'; currentPlanetId: string }
+      | undefined;
+
+    // If no location data, include the lane (backward compatibility)
+    if (!originLocation || !destLocation) {
+      return true;
+    }
+
+    // Get the spatial tier entity to determine what planet/system it represents
+    const spatialTierEntity = world.getEntity(network.spatialTierId);
+    if (!spatialTierEntity) {
+      return true; // Fallback: include all if spatial tier entity not found
+    }
+
+    if (network.scope === 'planet') {
+      // Planet scope: both endpoints must be on the same planet as spatialTierId
+      // The spatialTierId might be a planet entity ID or match planet IDs
+      const targetPlanetId = network.spatialTierId;
+
+      return (
+        originLocation.currentPlanetId === targetPlanetId &&
+        destLocation.currentPlanetId === targetPlanetId
+      );
+    }
+
+    if (network.scope === 'system') {
+      // System scope: both endpoints must be in the same star system
+      // Convention: planets in the same system share a prefix (e.g., 'sol:earth', 'sol:mars')
+      const getSystemId = (planetId: string): string => {
+        const colonIndex = planetId.indexOf(':');
+        return colonIndex > 0 ? planetId.substring(0, colonIndex) : planetId;
+      };
+
+      const targetSystemId = getSystemId(network.spatialTierId);
+      const originSystemId = getSystemId(originLocation.currentPlanetId);
+      const destSystemId = getSystemId(destLocation.currentPlanetId);
+
+      return (
+        originSystemId === targetSystemId &&
+        destSystemId === targetSystemId
+      );
+    }
+
+    // Unknown scope, include the lane
+    return true;
   }
 
   /**

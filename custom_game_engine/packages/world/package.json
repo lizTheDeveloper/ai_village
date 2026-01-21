@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
+    "@ai-village/hierarchy-simulator": "*",
     "@ai-village/reproduction": "*"
   },
   "devDependencies": {

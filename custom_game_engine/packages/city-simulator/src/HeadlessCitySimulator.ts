@@ -388,7 +388,8 @@ export class HeadlessCitySimulator {
     this.rafId = requestAnimationFrame(this.runLoop);
   };
 
-  private tick(): void {
+  /** Advance simulation by one tick. Public for test access. */
+  tick(): void {
     // Run game systems
     const gameLoopWithTick = this.gameLoop as unknown as GameLoopWithTick;
     gameLoopWithTick.tick(0.05);

@@ -309,8 +309,9 @@ export class RebellionEventSystem extends BaseSystem {
       // Apply outcome consequences
       this.applyOutcome(world, outcome, battle);
 
-      // Update rebellion threshold status
-      for (const entity of world.query().with(CT.RebellionThreshold).executeEntities()) {
+      // Update rebellion threshold status - cache query
+      const thresholdEntities = world.query().with(CT.RebellionThreshold).executeEntities();
+      for (const entity of thresholdEntities) {
         const threshold = entity.components.get(CT.RebellionThreshold) as RebellionThresholdComponent;
 
         if (outcome === 'rebellion_crushed') {
@@ -326,8 +327,12 @@ export class RebellionEventSystem extends BaseSystem {
    * Sync battle state with reality anchor
    */
   private syncWithRealityAnchor(world: World, battle: CosmicRebellionOutcome): void {
+    // Cache queries at the start
+    const anchorEntities = world.query().with(CT.RealityAnchor).executeEntities();
+    const thresholdEntities = world.query().with(CT.RebellionThreshold).executeEntities();
+
     // Find reality anchor
-    for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
+    for (const anchor of anchorEntities) {
       const anchorComp = anchor.components.get(CT.RealityAnchor) as RealityAnchorComponent;
 
       // Sync anchor stability
@@ -358,7 +363,7 @@ export class RebellionEventSystem extends BaseSystem {
     }
 
     // Sync defiance level
-    for (const threshold of world.query().with(CT.RebellionThreshold).executeEntities()) {
+    for (const threshold of thresholdEntities) {
       const thresholdComp = threshold.components.get(CT.RebellionThreshold) as RebellionThresholdComponent;
       battle.activeDefiance = thresholdComp.collectiveDefiance;
     }
@@ -368,12 +373,16 @@ export class RebellionEventSystem extends BaseSystem {
    * Manifest Creator avatar for final battle
    */
   private manifestCreatorAvatar(world: World, battle: CosmicRebellionOutcome): void {
+    // Cache queries at the start
+    const creatorEntities = world.query().with(CT.SupremeCreator).executeEntities();
+    const anchorEntities = world.query().with(CT.RealityAnchor).executeEntities();
+
     // Find Creator entity
-    for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+    for (const entity of creatorEntities) {
       // Find reality anchor location or random battlefield
       let location = { x: 0, y: 0 };
 
-      for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
+      for (const anchor of anchorEntities) {
         const position = anchor.components.get(CT.Position) as PositionComponent | undefined;
         if (position) {
           // Manifest near but not inside the anchor field
@@ -485,13 +494,18 @@ export class RebellionEventSystem extends BaseSystem {
     outcome: string,
     battle: CosmicRebellionOutcome
   ): void {
+    // Cache all queries at the TOP of the method to avoid O(n²) nested queries
+    const creatorEntities = world.query().with(CT.SupremeCreator).executeEntities();
+    const anchorEntities = world.query().with(CT.RealityAnchor).executeEntities();
+    const thresholdEntities = world.query().with(CT.RebellionThreshold).executeEntities();
+
     switch (outcome) {
       case 'total_victory':
         // Liberate magic first (before removing Creator)
         this.liberateMagic(world, 'full');
 
         // Remove Creator entity
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
           battle.casualties.push(entity.id);
         }
@@ -503,7 +517,7 @@ export class RebellionEventSystem extends BaseSystem {
 
       case 'creator_escape':
         // Remove Creator entity (fled to another universe)
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
         }
         // TODO: Remove restrictions but leave uncertainty
@@ -514,13 +528,13 @@ export class RebellionEventSystem extends BaseSystem {
         this.liberateMagic(world, 'full');
 
         // Remove Creator but damage world
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
           battle.casualties.push(entity.id);
         }
 
         // Destroy reality anchor
-        for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
+        for (const anchor of anchorEntities) {
           const anchorComp = anchor.components.get(CT.RealityAnchor) as RealityAnchorComponent;
           anchorComp.status = 'destroyed';
         }
@@ -535,7 +549,7 @@ export class RebellionEventSystem extends BaseSystem {
         this.liberateMagic(world, 'partial');
 
         // Creator agrees to reforms
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
           if (creator) {
             creator.tyranny.controlLevel = Math.max(0.3, creator.tyranny.controlLevel * 0.5);
@@ -550,7 +564,7 @@ export class RebellionEventSystem extends BaseSystem {
 
       case 'power_vacuum':
         // Remove Creator, spawn threats
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
         }
 
@@ -565,12 +579,12 @@ export class RebellionEventSystem extends BaseSystem {
 
       case 'cycle_repeats':
         // Remove old Creator
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
         }
 
         // Find a coalition member to become the new Creator
-        for (const threshold of world.query().with(CT.RebellionThreshold).executeEntities()) {
+        for (const threshold of thresholdEntities) {
           const thresholdComp = threshold.components.get(CT.RebellionThreshold) as RebellionThresholdComponent;
           const coalitionMemberId = Array.from(thresholdComp.coalitionMembers)[0];
 
@@ -590,7 +604,7 @@ export class RebellionEventSystem extends BaseSystem {
         // Creator leaves voluntarily
         this.liberateMagic(world, 'full');
 
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
         }
 
@@ -614,13 +628,13 @@ export class RebellionEventSystem extends BaseSystem {
       case 'rebellion_crushed':
         // Defeat - harsh consequences
         // Destroy reality anchor
-        for (const anchor of world.query().with(CT.RealityAnchor).executeEntities()) {
+        for (const anchor of anchorEntities) {
           const anchorComp = anchor.components.get(CT.RealityAnchor) as RealityAnchorComponent;
           anchorComp.status = 'destroyed';
         }
 
         // Increase Creator surveillance and tyranny
-        for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+        for (const entity of creatorEntities) {
           const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
           if (creator) {
             creator.tyranny.paranoia = Math.min(1.0, creator.tyranny.paranoia + 0.3);
@@ -631,10 +645,10 @@ export class RebellionEventSystem extends BaseSystem {
         }
 
         // Mark coalition members as rebels
-        for (const threshold of world.query().with(CT.RebellionThreshold).executeEntities()) {
+        for (const threshold of thresholdEntities) {
           const thresholdComp = threshold.components.get(CT.RebellionThreshold) as RebellionThresholdComponent;
 
-          for (const entity of world.query().with(CT.SupremeCreator).executeEntities()) {
+          for (const entity of creatorEntities) {
             const creator = entity.getComponent<SupremeCreatorComponent>(CT.SupremeCreator);
             if (creator) {
               for (const coalitionMember of thresholdComp.coalitionMembers) {
@@ -652,15 +666,77 @@ export class RebellionEventSystem extends BaseSystem {
   }
 
   /**
+   * Get world bounds from ChunkManager loaded chunks.
+   * Returns bounds in tile coordinates.
+   */
+  private getWorldBounds(world: World): { minX: number; maxX: number; minY: number; maxY: number; width: number; height: number } {
+    const CHUNK_SIZE = 32;
+    const DEFAULT_SIZE = 1000;
+
+    const chunkManager = world.getChunkManager?.();
+    if (!chunkManager || !('getLoadedChunks' in chunkManager)) {
+      // Fallback to default size
+      return {
+        minX: -DEFAULT_SIZE / 2,
+        maxX: DEFAULT_SIZE / 2,
+        minY: -DEFAULT_SIZE / 2,
+        maxY: DEFAULT_SIZE / 2,
+        width: DEFAULT_SIZE,
+        height: DEFAULT_SIZE,
+      };
+    }
+
+    const chunks = (chunkManager as { getLoadedChunks: () => Array<{ x: number; y: number }> }).getLoadedChunks();
+    if (chunks.length === 0) {
+      return {
+        minX: -DEFAULT_SIZE / 2,
+        maxX: DEFAULT_SIZE / 2,
+        minY: -DEFAULT_SIZE / 2,
+        maxY: DEFAULT_SIZE / 2,
+        width: DEFAULT_SIZE,
+        height: DEFAULT_SIZE,
+      };
+    }
+
+    // Calculate bounds from chunk coordinates
+    let minChunkX = Infinity;
+    let maxChunkX = -Infinity;
+    let minChunkY = Infinity;
+    let maxChunkY = -Infinity;
+
+    for (const chunk of chunks) {
+      minChunkX = Math.min(minChunkX, chunk.x);
+      maxChunkX = Math.max(maxChunkX, chunk.x);
+      minChunkY = Math.min(minChunkY, chunk.y);
+      maxChunkY = Math.max(maxChunkY, chunk.y);
+    }
+
+    // Convert chunk coordinates to tile coordinates
+    const minX = minChunkX * CHUNK_SIZE;
+    const maxX = (maxChunkX + 1) * CHUNK_SIZE;
+    const minY = minChunkY * CHUNK_SIZE;
+    const maxY = (maxChunkY + 1) * CHUNK_SIZE;
+
+    return {
+      minX,
+      maxX,
+      minY,
+      maxY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
+  }
+
+  /**
    * Spawn dimensional rifts - unstable portals that leak otherworldly threats
    */
   private spawnDimensionalRifts(world: World, count: number): void {
-    const worldSize = 1000; // TODO: Get actual world bounds
+    const bounds = this.getWorldBounds(world);
 
     for (let i = 0; i < count; i++) {
-      // Random location
-      const x = Math.random() * worldSize - worldSize / 2;
-      const y = Math.random() * worldSize - worldSize / 2;
+      // Random location within world bounds
+      const x = bounds.minX + Math.random() * bounds.width;
+      const y = bounds.minY + Math.random() * bounds.height;
 
       // Create rift entity
       const rift = world.createEntity() as EntityImpl;
@@ -754,15 +830,19 @@ export class RebellionEventSystem extends BaseSystem {
     creatorComp: SupremeCreatorComponent,
     battle: CosmicRebellionOutcome
   ): void {
+    // Cache queries at the start to avoid O(n²)
+    const fleetEntities = world.query().with(CT.Fleet).executeEntities();
+    const thresholdEntities = world.query().with(CT.RebellionThreshold).executeEntities();
+
     // Find coalition fleets near the Creator
     const coalitionFleets: Entity[] = [];
 
-    for (const fleetEntity of world.query().with(CT.Fleet).executeEntities()) {
+    for (const fleetEntity of fleetEntities) {
       const fleet = fleetEntity.getComponent<FleetComponent>(CT.Fleet);
       if (!fleet) continue;
 
       // Check if fleet admiral is in rebellion coalition
-      for (const thresholdEntity of world.query().with(CT.RebellionThreshold).executeEntities()) {
+      for (const thresholdEntity of thresholdEntities) {
         const threshold = thresholdEntity.getComponent<RebellionThresholdComponent>(CT.RebellionThreshold);
         if (threshold && threshold.coalitionMembers.has(fleet.admiralId)) {
           coalitionFleets.push(fleetEntity);

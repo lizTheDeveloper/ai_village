@@ -17,3 +17,6 @@ export * from './biosphere/index.js';
 export * from './stellar/index.js';
 export * from './workers/chunk-generation-types.js';
 export { ChunkGenerationWorkerPool } from './workers/ChunkGenerationWorkerPool.js';
+
+// Hierarchy adapters - bridge world.Planet with hierarchy-simulator abstractions
+export * from './hierarchy-adapters/index.js';

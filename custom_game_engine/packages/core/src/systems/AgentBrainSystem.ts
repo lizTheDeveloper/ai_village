@@ -140,10 +140,6 @@ export class AgentBrainSystem extends BaseSystem {
   private allAgentsCacheTick: number = -1;
   private agentIndexMap: Map<string, number> = new Map();
 
-  // ========== PERFORMANCE OPTIMIZATION: Zero Allocations ==========
-  // Reusable working objects to avoid allocations in hot paths
-  private readonly workingNearbyAgents: Entity[] = [];
-
   // ========== PERFORMANCE OPTIMIZATION: Precomputed Constants ==========
   private readonly SOCIAL_BEHAVIOR_RANGE = 15;
   private readonly SOCIAL_BEHAVIOR_RANGE_SQ = 15 * 15;

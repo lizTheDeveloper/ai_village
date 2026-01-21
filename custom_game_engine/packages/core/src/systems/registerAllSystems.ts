@@ -179,6 +179,8 @@ import { PublishingProductionSystem } from './PublishingProductionSystem.js';
 import { PublishingUnlockSystem } from './PublishingUnlockSystem.js';
 import { TechnologyUnlockSystem } from './TechnologyUnlockSystem.js';
 import { TechnologyEraSystem } from './TechnologyEraSystem.js';
+import { CollapseSystem } from './CollapseSystem.js';
+import { KnowledgePreservationSystem } from './KnowledgePreservationSystem.js';
 import { ProductionScalingSystem } from './ProductionScalingSystem.js';
 import { CityBuildingGenerationSystem } from './CityBuildingGenerationSystem.js';
 import { ProfessionWorkSimulationSystem } from './ProfessionWorkSimulationSystem.js';
@@ -299,6 +301,8 @@ import { ThreatResponseSystem } from './ThreatResponseSystem.js';
 import { PassageSystem } from './PassageSystem.js';
 import { PassageTraversalSystem } from './PassageTraversalSystem.js';
 import { TimelineMergerSystem } from './TimelineMergerSystem.js';
+import { ProbabilityScoutSystem } from './ProbabilityScoutSystem.js';
+import { SvetzRetrievalSystem } from './SvetzRetrievalSystem.js';
 import { InvasionSystem } from './InvasionSystem.js';
 import { PortalSystem } from './PortalSystem.js';
 import { RealmTimeSystem } from './RealmTimeSystem.js';
@@ -851,6 +855,12 @@ export function registerAllSystems(
   const technologyEraSystem = new TechnologyEraSystem();
   gameLoop.systemRegistry.register(technologyEraSystem);
 
+  const collapseSystem = new CollapseSystem();
+  gameLoop.systemRegistry.register(collapseSystem);
+
+  const knowledgePreservationSystem = new KnowledgePreservationSystem();
+  gameLoop.systemRegistry.register(knowledgePreservationSystem);
+
   const productionScalingSystem = new ProductionScalingSystem();
   gameLoop.systemRegistry.register(productionScalingSystem);
 
@@ -1007,6 +1017,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PassageSystem());
   gameLoop.systemRegistry.register(new PassageTraversalSystem());  // Inter-universe passage traversal (priority 90)
   gameLoop.systemRegistry.register(new TimelineMergerSystem());  // Timeline merge compatibility and operations (priority 95)
+  gameLoop.systemRegistry.register(new ProbabilityScoutSystem());  // Probability scout ship missions (priority 96)
+  gameLoop.systemRegistry.register(new SvetzRetrievalSystem());  // Svetz retrieval ship missions (priority 97)
   gameLoop.systemRegistry.register(new InvasionSystem());  // Multiverse invasion mechanics (priority 100)
   gameLoop.systemRegistry.register(new ParadoxDetectionSystem());  // Paradox detection and resolution (priority 220)
   gameLoop.systemRegistry.register(new PortalSystem());

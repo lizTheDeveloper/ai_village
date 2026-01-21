@@ -59,6 +59,7 @@ import type { InterestsComponent } from './InterestsComponent.js';
 import type { CityDirectorComponent } from './CityDirectorComponent.js';
 import type { ProfessionComponent } from './ProfessionComponent.js';
 import type { BuildingComponent } from './BuildingComponent.js';
+import type { TagsComponent } from './TagsComponent.js';
 
 // VelocityComponent is a class, so we import it differently
 import { VelocityComponent } from './VelocityComponent.js';
@@ -81,6 +82,7 @@ import { ExplorationStateComponent } from './ExplorationStateComponent.js';
 import { JealousyComponent } from './JealousyComponent.js';
 import { PersonalityComponent } from './PersonalityComponent.js';
 import { PlantKnowledgeComponent } from './PlantKnowledgeComponent.js';
+import { PlantComponent } from './PlantComponent.js';
 
 // =============================================================================
 // Core Components
@@ -108,6 +110,10 @@ export function isVisionComponent(comp: Component): comp is VisionComponent {
 
 export function isIdentityComponent(comp: Component): comp is IdentityComponent {
   return comp.type === 'identity';
+}
+
+export function isTagsComponent(comp: Component): comp is TagsComponent {
+  return comp.type === 'tags';
 }
 
 export function isRenderableComponent(comp: Component): comp is RenderableComponent {
@@ -272,6 +278,10 @@ export function isBioluminescentComponent(comp: Component): comp is Bioluminesce
 
 export function isPlantKnowledgeComponent(comp: Component): comp is PlantKnowledgeComponent {
   return comp.type === 'plant_knowledge';
+}
+
+export function isPlantComponent(comp: Component): comp is PlantComponent {
+  return comp.type === 'plant';
 }
 
 // =============================================================================

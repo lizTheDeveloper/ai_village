@@ -28,6 +28,7 @@ import type {
   NationComponent,
   NationProvinceRecord,
   WarState,
+  Battle,
   Treaty,
   ResearchProject,
 } from '../components/NationComponent.js';
@@ -384,7 +385,6 @@ export class NationSystem extends BaseSystem {
 
   /**
    * Check and conduct elections if needed
-   * TODO: Implement actual election mechanics with LLM-driven campaigns
    */
   private checkElections(
     world: World,
@@ -394,16 +394,23 @@ export class NationSystem extends BaseSystem {
     if (!nation.leadership.nextElectionTick) return;
     if (world.tick < nation.leadership.nextElectionTick) return;
 
-    // TODO: Conduct actual election with candidate agents
-    // For now, just extend term or select from legislators
+    // Conduct election with candidate scoring
+    const candidates = this.gatherElectionCandidates(world, nation);
+    const electionResults = this.scoreAndRankCandidates(world, candidates, nation);
 
-    const newLeader = nation.leadership.legislatorIds?.[0] || nation.leadership.leaderId;
+    // Select winner (highest score)
+    const winner = electionResults.length > 0 && electionResults[0]
+      ? electionResults[0].candidateId
+      : nation.leadership.leaderId ?? '';
+
+    const previousLeader = nation.leadership.leaderId;
+    const leaderChanged = winner !== previousLeader;
 
     entity.updateComponent<NationComponent>(CT.Nation, (current) => ({
       ...current,
       leadership: {
         ...current.leadership,
-        leaderId: newLeader,
+        leaderId: winner,
         termStartTick: world.tick,
         nextElectionTick: current.leadership.termLength
           ? world.tick + current.leadership.termLength
@@ -411,17 +418,100 @@ export class NationSystem extends BaseSystem {
       },
     }));
 
-    world.eventBus.emit({
-      type: 'nation:election_completed',
-      source: entity.id,
-      data: {
-        nationId: entity.id,
-        nationName: nation.nationName,
-        newLeader: newLeader || '',
-        leadershipType: nation.leadership.type,
-        tick: world.tick,
-      },
+    this.events.emitGeneric('nation:election_completed', {
+      nationId: entity.id,
+      nationName: nation.nationName,
+      newLeader: winner || '',
+      previousLeader: previousLeader || '',
+      leaderChanged,
+      leadershipType: nation.leadership.type,
+      candidateCount: candidates.length,
+      electionResults: electionResults.slice(0, 5), // Top 5 results
+      tick: world.tick,
     });
+  }
+
+  /**
+   * Gather election candidates from legislators and current leader
+   */
+  private gatherElectionCandidates(world: World, nation: NationComponent): string[] {
+    const candidates: string[] = [];
+
+    // Add current leader as incumbent candidate
+    if (nation.leadership.leaderId) {
+      candidates.push(nation.leadership.leaderId);
+    }
+
+    // Add legislators as challenger candidates
+    if (nation.leadership.legislatorIds) {
+      for (const legislatorId of nation.leadership.legislatorIds) {
+        if (!candidates.includes(legislatorId)) {
+          candidates.push(legislatorId);
+        }
+      }
+    }
+
+    return candidates;
+  }
+
+  /**
+   * Score and rank election candidates
+   */
+  private scoreAndRankCandidates(
+    world: World,
+    candidateIds: string[],
+    nation: NationComponent
+  ): Array<{ candidateId: string; score: number; factors: Record<string, number> }> {
+    const results: Array<{ candidateId: string; score: number; factors: Record<string, number> }> = [];
+
+    for (const candidateId of candidateIds) {
+      const candidateEntity = world.getEntity(candidateId);
+      if (!candidateEntity) continue;
+
+      const factors: Record<string, number> = {};
+      let totalScore = 0;
+
+      // Factor 1: Incumbent advantage (current leader gets bonus)
+      if (candidateId === nation.leadership.leaderId) {
+        factors['incumbent_bonus'] = 15;
+        totalScore += 15;
+      }
+
+      // Factor 2: Charisma from soul (if available)
+      const soul = candidateEntity.getComponent(CT.SoulIdentity) as { charisma_level?: number } | undefined;
+      if (soul && soul.charisma_level !== undefined) {
+        const charismaScore = soul.charisma_level * 8; // 0-5 levels → 0-40 points
+        factors['charisma'] = charismaScore;
+        totalScore += charismaScore;
+      }
+
+      // Factor 3: Governor approval rating (if they govern)
+      const governor = candidateEntity.getComponent(CT.Governor) as { approvalRating?: number } | undefined;
+      if (governor && governor.approvalRating !== undefined) {
+        const approvalScore = governor.approvalRating * 30; // 0-1 → 0-30 points
+        factors['approval'] = approvalScore;
+        totalScore += approvalScore;
+      }
+
+      // Factor 4: Random campaign success factor (simulates campaign quality)
+      const campaignFactor = Math.random() * 20;
+      factors['campaign'] = campaignFactor;
+      totalScore += campaignFactor;
+
+      // Factor 5: Economic conditions affect incumbent negatively if poor
+      if (candidateId === nation.leadership.leaderId && nation.economy.treasury < 0) {
+        const economicPenalty = -10;
+        factors['economic_penalty'] = economicPenalty;
+        totalScore += economicPenalty;
+      }
+
+      results.push({ candidateId, score: totalScore, factors });
+    }
+
+    // Sort by score (highest first)
+    results.sort((a, b) => b.score - a.score);
+
+    return results;
   }
 
   /**
@@ -488,8 +578,7 @@ export class NationSystem extends BaseSystem {
   }
 
   /**
-   * Process active wars
-   * TODO: Implement battle resolution, casualties, territory changes
+   * Process active wars with battle resolution
    */
   private processWars(
     world: World,
@@ -497,6 +586,7 @@ export class NationSystem extends BaseSystem {
     nation: NationComponent
   ): void {
     const updatedWars: WarState[] = [];
+    const isAggressor = (warState: WarState) => warState.aggressorNationIds.includes(entity.id);
 
     for (const war of nation.military.activeWars) {
       if (war.status !== 'active') {
@@ -507,24 +597,67 @@ export class NationSystem extends BaseSystem {
       // Update war duration
       war.duration = world.tick - war.startedTick;
 
-      // TODO: Process battles, update casualties, determine outcomes
-      // For now, just increment duration
+      // Process battles every ~50 ticks (2.5 seconds)
+      const battleChance = 0.02; // ~2% per tick = battles roughly every 50 ticks
+      if (Math.random() < battleChance) {
+        const battle = this.resolveBattle(world, entity, nation, war, isAggressor(war));
+
+        // Add battle to war record
+        war.battles.push(battle);
+
+        // Update casualties
+        const ourLosses = isAggressor(war) ? battle.attackerLosses : battle.defenderLosses;
+        war.totalCasualties += ourLosses;
+
+        // Update military losses map
+        const currentLosses = war.militaryLosses.get(entity.id) || 0;
+        war.militaryLosses.set(entity.id, currentLosses + ourLosses);
+
+        // Emit battle event
+        this.events.emitGeneric('nation:battle_resolved', {
+          nationId: entity.id,
+          nationName: nation.nationName,
+          warId: war.id,
+          battleId: battle.id,
+          location: battle.location,
+          outcome: battle.outcome,
+          ourLosses,
+          enemyLosses: isAggressor(war) ? battle.defenderLosses : battle.attackerLosses,
+          tick: world.tick,
+        });
+      }
+
+      // Check for war ending conditions
+      const warEndStatus = this.checkWarEndConditions(world, war, nation, isAggressor(war));
+      if (warEndStatus) {
+        war.status = warEndStatus;
+
+        this.events.emitGeneric('nation:war_ended', {
+          nationId: entity.id,
+          nationName: nation.nationName,
+          warId: war.id,
+          warName: war.name,
+          endStatus: warEndStatus,
+          totalCasualties: war.totalCasualties,
+          totalBattles: war.battles.length,
+          duration: war.duration,
+          tick: world.tick,
+        });
+      }
+
       updatedWars.push(war);
 
       // Emit war progress event
       if (war.duration % 100 === 0) { // Every ~5 seconds
-        world.eventBus.emit({
-          type: 'nation:war_progress',
-          source: entity.id,
-          data: {
-            nationId: entity.id,
-            nationName: nation.nationName,
-            warId: war.id,
-            warName: war.name,
-            duration: war.duration,
-            casualties: war.totalCasualties,
-            tick: world.tick,
-          },
+        this.events.emitGeneric('nation:war_progress', {
+          nationId: entity.id,
+          nationName: nation.nationName,
+          warId: war.id,
+          warName: war.name,
+          duration: war.duration,
+          casualties: war.totalCasualties,
+          battleCount: war.battles.length,
+          tick: world.tick,
         });
       }
     }
@@ -534,8 +667,104 @@ export class NationSystem extends BaseSystem {
       military: {
         ...current.military,
         activeWars: updatedWars,
+        // Reduce army strength based on total losses
+        armyStrength: Math.max(0, current.military.armyStrength -
+          updatedWars.reduce((sum, w) => sum + (w.militaryLosses.get(entity.id) || 0), 0) / 100),
       },
     }));
+  }
+
+  /**
+   * Resolve a battle between warring nations
+   */
+  private resolveBattle(
+    world: World,
+    entity: EntityImpl,
+    nation: NationComponent,
+    war: WarState,
+    isAggressor: boolean
+  ): Battle {
+    // Get our military strength
+    const ourForces = Math.floor(nation.military.armyStrength * nation.military.militaryReadiness);
+
+    // Estimate enemy forces (could be improved with cross-nation lookup)
+    const enemyForces = ourForces * (0.7 + Math.random() * 0.6); // 70-130% of our forces
+
+    const attackerForces = isAggressor ? ourForces : enemyForces;
+    const defenderForces = isAggressor ? enemyForces : ourForces;
+
+    // Calculate battle outcome
+    // Base combat power includes forces + readiness bonus + random factor
+    const attackerPower = attackerForces * (0.8 + Math.random() * 0.4);
+    const defenderPower = defenderForces * (1.0 + Math.random() * 0.3); // Defender slight advantage
+
+    let outcome: 'attacker_victory' | 'defender_victory' | 'stalemate';
+    let attackerLosses: number;
+    let defenderLosses: number;
+
+    const powerRatio = attackerPower / (defenderPower || 1);
+
+    if (powerRatio > 1.3) {
+      outcome = 'attacker_victory';
+      attackerLosses = Math.floor(attackerForces * (0.05 + Math.random() * 0.1));
+      defenderLosses = Math.floor(defenderForces * (0.15 + Math.random() * 0.2));
+    } else if (powerRatio < 0.7) {
+      outcome = 'defender_victory';
+      attackerLosses = Math.floor(attackerForces * (0.15 + Math.random() * 0.2));
+      defenderLosses = Math.floor(defenderForces * (0.05 + Math.random() * 0.1));
+    } else {
+      outcome = 'stalemate';
+      attackerLosses = Math.floor(attackerForces * (0.08 + Math.random() * 0.12));
+      defenderLosses = Math.floor(defenderForces * (0.08 + Math.random() * 0.12));
+    }
+
+    // Generate battle location from provinces or generic
+    const locations = nation.provinceRecords.map(p => p.provinceId);
+    const location = locations.length > 0
+      ? (locations[Math.floor(Math.random() * locations.length)] ?? 'frontier')
+      : 'frontier';
+
+    return {
+      id: `battle_${entity.id}_${world.tick}`,
+      location,
+      tick: world.tick,
+      attackerForces,
+      defenderForces,
+      attackerLosses,
+      defenderLosses,
+      outcome,
+    };
+  }
+
+  /**
+   * Check if war should end based on conditions
+   */
+  private checkWarEndConditions(
+    _world: World,
+    war: WarState,
+    nation: NationComponent,
+    _isAggressor: boolean
+  ): 'truce' | 'white_peace' | 'victory' | 'defeat' | null {
+    // Check for exhaustion (high casualties relative to army)
+    const totalOurLosses = war.militaryLosses.get(nation.nationName) || 0;
+    const exhaustionRatio = totalOurLosses / (nation.military.armyStrength || 1);
+
+    // If we've lost 50%+ of army, we're likely to surrender
+    if (exhaustionRatio > 0.5) {
+      return Math.random() < 0.3 ? 'defeat' : null; // 30% chance to surrender
+    }
+
+    // Check for war weariness (long duration)
+    if (war.duration > 10000 && Math.random() < 0.01) { // ~500 seconds of war, 1% chance
+      return 'white_peace';
+    }
+
+    // Check for battle count threshold
+    if (war.battles.length >= 20 && Math.random() < 0.05) { // After 20 battles, 5% chance of truce
+      return 'truce';
+    }
+
+    return null;
   }
 
   /**

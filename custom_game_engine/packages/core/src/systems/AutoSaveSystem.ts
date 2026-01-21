@@ -23,6 +23,7 @@ import { saveLoadService, type CanonEvent as ServerCanonEvent } from '../persist
 import { canonEventDetector, type CanonEvent as LocalCanonEvent } from './CanonEventDetector.js';
 import { checkpointRetentionPolicy } from './CheckpointRetentionPolicy.js';
 import type { LLMDecisionQueue } from '../decision/LLMDecisionProcessor.js';
+import { MagicSystemStateManager } from '../magic/MagicSystemState.js';
 
 /** Time component shape for duck typing */
 interface TimeData {
@@ -234,28 +235,49 @@ export class AutoSaveSystem extends BaseSystem {
   /**
    * Generate a hash of the magic law configuration.
    * Universes with the same magic laws share the same universe ID.
+   *
+   * Uses MagicSystemStateManager to get paradigm states and creates
+   * a deterministic hash based on enabled/active paradigms.
    */
-  private getMagicLawsHash(world: World): string {
-    // TODO: Get actual magic system configuration
-    // For now, use a placeholder based on world seed or configuration
+  private getMagicLawsHash(_world: World): string {
+    // Get magic system state manager singleton
+    const magicState = MagicSystemStateManager.getInstance();
+    const paradigmIds = magicState.getParadigmIds();
 
-    // Check if there's a magic system configuration
-    const magicEntities = world.query().with(CT.Magic as ComponentType).executeEntities();
-
-    if (magicEntities.length === 0) {
-      // No magic system = base universe
+    if (paradigmIds.length === 0) {
+      // No magic paradigms registered = base universe
       return 'base';
     }
 
-    // Hash the magic system configuration
-    // This would include things like:
-    // - Which magic sources are enabled
-    // - Cost multipliers
-    // - Allowed schools/elements
-    // - Special rules/restrictions
+    // Build deterministic hash from paradigm states
+    // Sort paradigm IDs for consistent ordering
+    const sortedIds = [...paradigmIds].sort();
 
-    // Placeholder: just count magic entities for now
-    return `magic_${magicEntities.length}`;
+    // Collect state information for each paradigm
+    const stateData: string[] = [];
+    for (const paradigmId of sortedIds) {
+      const state = magicState.getState(paradigmId);
+      // Only include enabled or active paradigms in hash
+      if (state !== 'disabled') {
+        stateData.push(`${paradigmId}:${state}`);
+      }
+    }
+
+    if (stateData.length === 0) {
+      // All paradigms disabled = base universe
+      return 'base';
+    }
+
+    // Create simple hash from joined state string
+    const stateString = stateData.join('|');
+    let hash = 0;
+    for (let i = 0; i < stateString.length; i++) {
+      const char = stateString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    return `magic_${Math.abs(hash).toString(16)}`;
   }
 
   /**
