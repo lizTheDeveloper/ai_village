@@ -281,6 +281,50 @@ export type { DivineAbilityComponent } from './DivineAbilityComponent.js';
 // Angel system (divine servants/messengers - Phase 7)
 export * from './AngelComponent.js';
 export { createAngelComponent, type AngelComponent } from './AngelComponent.js';
+// Angel Messaging (God's Phone - Phase 28.6)
+export * from './AngelMessagingComponent.js';
+export {
+  createAngelMessagingComponent,
+  createChatRoom,
+  createChatMessage,
+  generateChatRoomId,
+  generateMessageId,
+  type AngelMessagingComponent,
+  type ChatMessage,
+  type ChatRoom,
+  type ConversationMemoryRef,
+} from './AngelMessagingComponent.js';
+// Angel Evolution (Tier System - Phase 28.8)
+export * from './AngelEvolutionComponent.js';
+export {
+  createAngelEvolutionComponent,
+  getTierRequirements,
+  canUnlockTier,
+  TIER_REQUIREMENTS,
+  DEFAULT_TIER_NAMES,
+  TIER_BONUSES,
+  PROMOTION_REQUIREMENTS,
+  type AngelEvolutionComponent,
+  type TierBonus,
+  type PromotionRequirements,
+  type TierUnlockRequirements,
+} from './AngelEvolutionComponent.js';
+// Angel Resource (Independence - Phase 28.9)
+export * from './AngelResourceComponent.js';
+export {
+  createAngelResourceComponent,
+  getAvailableUpgrades,
+  getUpgradeById,
+  MANA_POOL_BY_TIER,
+  MANA_REGEN_BY_TIER,
+  MANA_GAIN_AMOUNTS,
+  DEFAULT_REFORM_TIME,
+  ANGEL_UPGRADES,
+  type AngelResourceComponent,
+  type ManaGainSource,
+  type AngelUpgrade,
+  type AngelDisruption,
+} from './AngelResourceComponent.js';
 // Player control/possession system (Phase 16: Polish & Player)
 export * from './PlayerControlComponent.js';
 export { createPlayerControlComponent, type PlayerControlComponent, calculatePossessionCost, shouldEndPossession } from './PlayerControlComponent.js';

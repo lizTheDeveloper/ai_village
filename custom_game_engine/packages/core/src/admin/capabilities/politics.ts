@@ -69,19 +69,19 @@ const listGovernanceEntities = defineQuery({
   id: 'list-governance-entities',
   name: 'List Governance Entities',
   description: 'List all political entities (villages, cities, nations, etc.)',
-  parameters: [
+  params: [
     {
       name: 'tier',
       type: 'select',
       description: 'Filter by political tier',
       required: false,
-      options: POLITICAL_TIER_OPTIONS.map(o => o.value),
+      options: POLITICAL_TIER_OPTIONS,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<QueryResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const tier = params.tier as string | undefined;
@@ -144,12 +144,28 @@ const listGovernanceEntities = defineQuery({
     }
 
     return {
-      success: true,
-      data: {
-        count: entities.length,
-        entities,
-      },
+      count: entities.length,
+      entities,
     };
+  },
+  renderResult: (data: unknown) => {
+    const result = data as { count: number; entities: Array<any> };
+    let output = 'GOVERNANCE ENTITIES\n\n';
+    output += `Total: ${result.count}\n\n`;
+
+    for (const entity of result.entities) {
+      output += `${entity.name} (${entity.tier})\n`;
+      output += `  ID: ${entity.id}\n`;
+      output += `  Type: ${entity.governanceType}\n`;
+      output += `  Population: ${entity.population}\n`;
+      output += `  Leaders/Elders: ${entity.elderCount}\n\n`;
+    }
+
+    if (result.count === 0) {
+      output += 'No governance entities found';
+    }
+
+    return output;
   },
 });
 
@@ -157,24 +173,24 @@ const getGovernanceDetails = defineQuery({
   id: 'get-governance-details',
   name: 'Get Governance Details',
   description: 'Get detailed information about a governance entity',
-  parameters: [
+  params: [
     {
       name: 'entityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID of the governance body',
       required: true,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<QueryResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const entityId = params.entityId as string;
     const entity = world.getEntity(entityId);
     if (!entity) {
-      return { success: false, error: `Entity ${entityId} not found` };
+      throw new Error(`Entity ${entityId} not found`);
     }
 
     // Try to get governance component
@@ -185,61 +201,80 @@ const getGovernanceDetails = defineQuery({
 
     if (villageGov) {
       return {
-        success: true,
-        data: {
-          tier: 'village',
-          name: villageGov.villageName,
-          governanceType: villageGov.governanceType,
-          elderIds: villageGov.elderAgentIds || [],
-          chiefElderId: villageGov.chiefElderId,
-          resourcePriority: villageGov.resourcePriority,
-          activeProposals: villageGov.activeProposals || [],
-          lastElectionTick: villageGov.lastElectionTick,
-          nextElectionTick: villageGov.nextElectionTick,
-          termLengthTicks: villageGov.termLengthTicks,
-          meetingInterval: villageGov.meetingInterval,
-          lastMeetingTick: villageGov.lastMeetingTick,
-          population: townHall?.populationCount || 0,
-          recentDeaths: townHall?.recentDeaths?.length || 0,
-        },
+        tier: 'village',
+        name: villageGov.villageName,
+        governanceType: villageGov.governanceType,
+        elderIds: villageGov.elderAgentIds || [],
+        chiefElderId: villageGov.chiefElderId,
+        resourcePriority: villageGov.resourcePriority,
+        activeProposals: villageGov.activeProposals || [],
+        lastElectionTick: villageGov.lastElectionTick,
+        nextElectionTick: villageGov.nextElectionTick,
+        termLengthTicks: villageGov.termLengthTicks,
+        meetingInterval: villageGov.meetingInterval,
+        lastMeetingTick: villageGov.lastMeetingTick,
+        population: townHall?.populationCount || 0,
+        recentDeaths: townHall?.recentDeaths?.length || 0,
       };
     }
 
     if (cityGov) {
       return {
-        success: true,
-        data: {
-          tier: 'city',
-          name: cityGov.cityName,
-          governanceType: cityGov.governanceType,
-          councilMemberIds: cityGov.councilMemberIds || [],
-          mayorId: cityGov.mayorId,
-          population: cityGov.population,
-          activeOrdinances: cityGov.activeOrdinances || [],
-        },
+        tier: 'city',
+        name: cityGov.cityName,
+        governanceType: cityGov.governanceType,
+        councilMemberIds: cityGov.councilMemberIds || [],
+        mayorId: cityGov.mayorId,
+        population: cityGov.population,
+        activeOrdinances: cityGov.activeOrdinances || [],
       };
     }
 
     if (nationComp) {
       return {
-        success: true,
-        data: {
-          tier: 'nation',
-          name: nationComp.nationName,
-          governmentType: nationComp.governmentType,
-          leaderId: nationComp.leaderId,
-          parliamentMemberIds: nationComp.parliamentMemberIds || [],
-          totalPopulation: nationComp.totalPopulation,
-          provinceCount: nationComp.provinces?.length || 0,
-          laws: nationComp.laws || [],
-          policies: nationComp.policies || [],
-          economy: nationComp.economy,
-          military: nationComp.military,
-        },
+        tier: 'nation',
+        name: nationComp.nationName,
+        governmentType: nationComp.governmentType,
+        leaderId: nationComp.leaderId,
+        parliamentMemberIds: nationComp.parliamentMemberIds || [],
+        totalPopulation: nationComp.totalPopulation,
+        provinceCount: nationComp.provinces?.length || 0,
+        laws: nationComp.laws || [],
+        policies: nationComp.policies || [],
+        economy: nationComp.economy,
+        military: nationComp.military,
       };
     }
 
-    return { success: false, error: 'No governance component found on entity' };
+    throw new Error('No governance component found on entity');
+  },
+  renderResult: (data: unknown) => {
+    const gov = data as any;
+    let output = 'GOVERNANCE DETAILS\n\n';
+    output += `Name: ${gov.name}\n`;
+    output += `Tier: ${gov.tier}\n`;
+    output += `Type: ${gov.governanceType || gov.governmentType}\n`;
+    output += `Population: ${gov.population || gov.totalPopulation || 0}\n\n`;
+
+    if (gov.tier === 'village') {
+      output += `Chief Elder: ${gov.chiefElderId || 'None'}\n`;
+      output += `Elders: ${gov.elderIds.length}\n`;
+      output += `Resource Priority: ${gov.resourcePriority}\n`;
+      output += `Active Proposals: ${gov.activeProposals.length}\n`;
+      output += `Last Election: tick ${gov.lastElectionTick || 'N/A'}\n`;
+      output += `Next Election: tick ${gov.nextElectionTick || 'N/A'}\n`;
+    } else if (gov.tier === 'city') {
+      output += `Mayor: ${gov.mayorId || 'None'}\n`;
+      output += `Council Members: ${gov.councilMemberIds.length}\n`;
+      output += `Ordinances: ${gov.activeOrdinances.length}\n`;
+    } else if (gov.tier === 'nation') {
+      output += `Leader: ${gov.leaderId || 'None'}\n`;
+      output += `Parliament: ${gov.parliamentMemberIds.length}\n`;
+      output += `Provinces: ${gov.provinceCount}\n`;
+      output += `Laws: ${gov.laws.length}\n`;
+    }
+
+    return output;
   },
 });
 
@@ -247,19 +282,19 @@ const listActiveProposals = defineQuery({
   id: 'list-active-proposals',
   name: 'List Active Proposals',
   description: 'List all proposals currently being voted on',
-  parameters: [
+  params: [
     {
       name: 'tier',
       type: 'select',
       description: 'Filter by political tier',
       required: false,
-      options: POLITICAL_TIER_OPTIONS.map(o => o.value),
+      options: POLITICAL_TIER_OPTIONS,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<QueryResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const proposals: Array<{
@@ -300,13 +335,30 @@ const listActiveProposals = defineQuery({
     }
 
     return {
-      success: true,
-      data: {
-        count: proposals.length,
-        currentTick: world.tick,
-        proposals,
-      },
+      count: proposals.length,
+      currentTick: world.tick,
+      proposals,
     };
+  },
+  renderResult: (data: unknown) => {
+    const result = data as { count: number; currentTick: number; proposals: Array<any> };
+    let output = 'ACTIVE PROPOSALS\n\n';
+    output += `Current Tick: ${result.currentTick}\n`;
+    output += `Total Active: ${result.count}\n\n`;
+
+    for (const prop of result.proposals) {
+      output += `${prop.entityName} - ${prop.description}\n`;
+      output += `  ID: ${prop.proposalId}\n`;
+      output += `  Type: ${prop.type}\n`;
+      output += `  Votes: ${prop.votesFor} for, ${prop.votesAgainst} against\n`;
+      output += `  Deadline: tick ${prop.votingDeadline}\n\n`;
+    }
+
+    if (result.count === 0) {
+      output += 'No active proposals';
+    }
+
+    return output;
   },
 });
 
@@ -314,11 +366,11 @@ const getElectionStatus = defineQuery({
   id: 'get-election-status',
   name: 'Get Election Status',
   description: 'Get election status and upcoming elections',
-  parameters: [],
-  execute: async (_params: Record<string, unknown>, ctx: AdminContext): Promise<QueryResult> => {
-    const { world } = ctx;
+  params: [],
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const elections: Array<{
@@ -348,13 +400,26 @@ const getElectionStatus = defineQuery({
     }
 
     return {
-      success: true,
-      data: {
-        currentTick: world.tick,
-        count: elections.length,
-        elections: elections.sort((a, b) => a.ticksUntilElection - b.ticksUntilElection),
-      },
+      currentTick: world.tick,
+      count: elections.length,
+      elections: elections.sort((a, b) => a.ticksUntilElection - b.ticksUntilElection),
     };
+  },
+  renderResult: (data: unknown) => {
+    const result = data as { currentTick: number; count: number; elections: Array<any> };
+    let output = 'ELECTION STATUS\n\n';
+    output += `Current Tick: ${result.currentTick}\n`;
+    output += `Entities: ${result.count}\n\n`;
+
+    output += 'Upcoming Elections:\n';
+    for (const election of result.elections) {
+      output += `  ${election.entityName} - ${election.ticksUntilElection} ticks\n`;
+      output += `    Current Leader: ${election.currentLeaderId || 'None'}\n`;
+      output += `    Last Election: tick ${election.lastElectionTick}\n`;
+      output += `    Next Election: tick ${election.nextElectionTick}\n\n`;
+    }
+
+    return output;
   },
 });
 
@@ -362,13 +427,18 @@ const queryGovernanceHistory = defineQuery({
   id: 'query-governance-history',
   name: 'Query Governance History',
   description: 'Query audit trail of governance decisions',
-  parameters: [
+  params: [
     {
       name: 'actionType',
       type: 'select',
       description: 'Filter by action type',
       required: false,
-      options: ['directive_issued', 'directive_received', 'vote_concluded', 'crisis_escalated'],
+      options: [
+        { value: 'directive_issued', label: 'Directive Issued' },
+        { value: 'directive_received', label: 'Directive Received' },
+        { value: 'vote_concluded', label: 'Vote Concluded' },
+        { value: 'crisis_escalated', label: 'Crisis Escalated' },
+      ],
     },
     {
       name: 'limit',
@@ -377,24 +447,21 @@ const queryGovernanceHistory = defineQuery({
       required: false,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<QueryResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     // Find governance history entity
     const historyEntities = world.query().with('governance_history').executeEntities();
     if (historyEntities.length === 0) {
-      return {
-        success: true,
-        data: { entries: [], message: 'No governance history recorded yet' },
-      };
+      return { entries: [], message: 'No governance history recorded yet' };
     }
 
     const history = historyEntities[0]?.getComponent('governance_history') as any;
     if (!history) {
-      return { success: true, data: { entries: [] } };
+      return { entries: [] };
     }
 
     let entries = history.entries || [];
@@ -410,13 +477,29 @@ const queryGovernanceHistory = defineQuery({
     entries = entries.slice(-limit);
 
     return {
-      success: true,
-      data: {
-        totalEntries: history.entries?.length || 0,
-        filteredCount: entries.length,
-        entries,
-      },
+      totalEntries: history.entries?.length || 0,
+      filteredCount: entries.length,
+      entries,
     };
+  },
+  renderResult: (data: unknown) => {
+    const result = data as { totalEntries: number; filteredCount: number; entries: Array<any>; message?: string };
+    let output = 'GOVERNANCE HISTORY\n\n';
+
+    if (result.message) {
+      output += result.message;
+      return output;
+    }
+
+    output += `Total Entries: ${result.totalEntries}\n`;
+    output += `Showing: ${result.filteredCount}\n\n`;
+
+    for (const entry of result.entries) {
+      output += `[${entry.tick || 'N/A'}] ${entry.actionType}\n`;
+      output += `  ${JSON.stringify(entry)}\n\n`;
+    }
+
+    return output;
   },
 });
 
@@ -428,24 +511,24 @@ const triggerElection = defineAction({
   id: 'trigger-election',
   name: 'Trigger Election',
   description: 'Force an immediate election in a governance entity',
-  parameters: [
+  params: [
     {
       name: 'entityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID of the governance body',
       required: true,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<ActionResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const entityId = params.entityId as string;
     const entity = world.getEntity(entityId);
     if (!entity) {
-      return { success: false, error: `Entity ${entityId} not found` };
+      throw new Error(`Entity ${entityId} not found`);
     }
 
     // Try village governance
@@ -462,7 +545,7 @@ const triggerElection = defineAction({
       };
     }
 
-    return { success: false, error: 'No governance component found on entity' };
+    throw new Error('No governance component found on entity');
   },
 });
 
@@ -470,10 +553,10 @@ const createProposal = defineAction({
   id: 'create-proposal',
   name: 'Create Proposal',
   description: 'Create a new proposal for voting',
-  parameters: [
+  params: [
     {
       name: 'entityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID of the governance body',
       required: true,
     },
@@ -482,7 +565,7 @@ const createProposal = defineAction({
       type: 'select',
       description: 'Type of proposal',
       required: true,
-      options: PROPOSAL_TYPE_OPTIONS.map(o => o.value),
+      options: PROPOSAL_TYPE_OPTIONS,
     },
     {
       name: 'description',
@@ -492,7 +575,8 @@ const createProposal = defineAction({
     },
     {
       name: 'proposerId',
-      type: 'string',
+      type: 'entity-id',
+      entityType: 'agent',
       description: 'Agent ID proposing this (optional)',
       required: false,
     },
@@ -503,16 +587,16 @@ const createProposal = defineAction({
       required: false,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<ActionResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const entityId = params.entityId as string;
     const entity = world.getEntity(entityId);
     if (!entity) {
-      return { success: false, error: `Entity ${entityId} not found` };
+      throw new Error(`Entity ${entityId} not found`);
     }
 
     const proposalType = params.type as string;
@@ -546,7 +630,7 @@ const createProposal = defineAction({
       };
     }
 
-    return { success: false, error: 'No governance component found on entity' };
+    throw new Error('No governance component found on entity');
   },
 });
 
@@ -554,10 +638,10 @@ const castVote = defineAction({
   id: 'cast-vote',
   name: 'Cast Vote',
   description: 'Cast a vote on a proposal as an agent',
-  parameters: [
+  params: [
     {
       name: 'entityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID of the governance body',
       required: true,
     },
@@ -569,7 +653,8 @@ const castVote = defineAction({
     },
     {
       name: 'voterId',
-      type: 'string',
+      type: 'entity-id',
+      entityType: 'agent',
       description: 'Agent ID casting the vote',
       required: true,
     },
@@ -578,13 +663,16 @@ const castVote = defineAction({
       type: 'select',
       description: 'Vote stance',
       required: true,
-      options: ['for', 'against'],
+      options: [
+        { value: 'for', label: 'For' },
+        { value: 'against', label: 'Against' },
+      ],
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<ActionResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const entityId = params.entityId as string;
@@ -594,7 +682,7 @@ const castVote = defineAction({
 
     const entity = world.getEntity(entityId);
     if (!entity) {
-      return { success: false, error: `Entity ${entityId} not found` };
+      throw new Error(`Entity ${entityId} not found`);
     }
 
     const villageGov = entity.getComponent('village_governance') as any;
@@ -631,7 +719,7 @@ const castVote = defineAction({
       };
     }
 
-    return { success: false, error: 'No governance component found on entity' };
+    throw new Error('No governance component found on entity');
   },
 });
 
@@ -639,10 +727,10 @@ const setResourcePriority = defineAction({
   id: 'set-resource-priority',
   name: 'Set Resource Priority',
   description: 'Set the resource priority for a governance entity',
-  parameters: [
+  params: [
     {
       name: 'entityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID of the governance body',
       required: true,
     },
@@ -651,13 +739,13 @@ const setResourcePriority = defineAction({
       type: 'select',
       description: 'Resource priority',
       required: true,
-      options: RESOURCE_PRIORITY_OPTIONS.map(o => o.value),
+      options: RESOURCE_PRIORITY_OPTIONS,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<ActionResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const entityId = params.entityId as string;
@@ -665,7 +753,7 @@ const setResourcePriority = defineAction({
 
     const entity = world.getEntity(entityId);
     if (!entity) {
-      return { success: false, error: `Entity ${entityId} not found` };
+      throw new Error(`Entity ${entityId} not found`);
     }
 
     const villageGov = entity.getComponent('village_governance') as any;
@@ -682,7 +770,7 @@ const setResourcePriority = defineAction({
       };
     }
 
-    return { success: false, error: 'No governance component found on entity' };
+    throw new Error('No governance component found on entity');
   },
 });
 
@@ -690,24 +778,25 @@ const appointLeader = defineAction({
   id: 'appoint-leader',
   name: 'Appoint Leader',
   description: 'Appoint a new leader/chief for a governance entity',
-  parameters: [
+  params: [
     {
       name: 'entityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID of the governance body',
       required: true,
     },
     {
       name: 'leaderId',
-      type: 'string',
+      type: 'entity-id',
+      entityType: 'agent',
       description: 'Agent ID to appoint as leader',
       required: true,
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<ActionResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const entityId = params.entityId as string;
@@ -715,13 +804,13 @@ const appointLeader = defineAction({
 
     const entity = world.getEntity(entityId);
     if (!entity) {
-      return { success: false, error: `Entity ${entityId} not found` };
+      throw new Error(`Entity ${entityId} not found`);
     }
 
     // Verify the leader exists
     const leaderEntity = world.getEntity(leaderId);
     if (!leaderEntity) {
-      return { success: false, error: `Agent ${leaderId} not found` };
+      throw new Error(`Agent ${leaderId} not found`);
     }
 
     const villageGov = entity.getComponent('village_governance') as any;
@@ -768,7 +857,7 @@ const appointLeader = defineAction({
       };
     }
 
-    return { success: false, error: 'No governance component found on entity' };
+    throw new Error('No governance component found on entity');
   },
 });
 
@@ -776,16 +865,16 @@ const issueDirecive = defineAction({
   id: 'issue-directive',
   name: 'Issue Directive',
   description: 'Issue a directive from higher tier to lower tier',
-  parameters: [
+  params: [
     {
       name: 'fromEntityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID issuing the directive',
       required: true,
     },
     {
       name: 'toEntityId',
-      type: 'string',
+      type: 'entity-id',
       description: 'Entity ID receiving the directive',
       required: true,
     },
@@ -800,13 +889,17 @@ const issueDirecive = defineAction({
       type: 'select',
       description: 'Directive priority',
       required: false,
-      options: ['routine', 'urgent', 'critical'],
+      options: [
+        { value: 'routine', label: 'Routine' },
+        { value: 'urgent', label: 'Urgent' },
+        { value: 'critical', label: 'Critical' },
+      ],
     },
   ],
-  execute: async (params: Record<string, unknown>, ctx: AdminContext): Promise<ActionResult> => {
-    const { world } = ctx;
+  handler: async (params, gameClient, context) => {
+    const { world } = context;
     if (!world) {
-      return { success: false, error: 'No active world' };
+      throw new Error('No active world');
     }
 
     const fromEntityId = params.fromEntityId as string;
@@ -818,10 +911,10 @@ const issueDirecive = defineAction({
     const toEntity = world.getEntity(toEntityId);
 
     if (!fromEntity) {
-      return { success: false, error: `Source entity ${fromEntityId} not found` };
+      throw new Error(`Source entity ${fromEntityId} not found`);
     }
     if (!toEntity) {
-      return { success: false, error: `Target entity ${toEntityId} not found` };
+      throw new Error(`Target entity ${toEntityId} not found`);
     }
 
     // Emit directive event

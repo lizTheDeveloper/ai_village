@@ -164,6 +164,17 @@ export interface WindowConfig {
    * Example: ['FleetSystem', 'NavySystem'] - panel only shows when fleet systems are enabled.
    */
   requiredSystems?: string[];
+
+  /**
+   * Optional callback to check if the panel has content to display.
+   * Panel only appears in menus when this returns true.
+   * Used for progressive disclosure - panels "pop in" as game content develops.
+   * Example: Relationships panel only shows when agents have formed relationships.
+   *
+   * @param world - The game world to query for content
+   * @returns true if panel has content to show, false to hide from menus
+   */
+  contentChecker?: (world: unknown) => boolean;
 }
 
 /**

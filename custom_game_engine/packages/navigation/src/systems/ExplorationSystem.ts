@@ -111,11 +111,13 @@ export class ExplorationSystem extends BaseSystem {
       throw new Error('position component missing');
     }
 
+    // PERFORMANCE: Use squared distance comparison to avoid sqrt
     // Check if current target reached
     const currentTarget = explorationState.currentTarget;
     if (currentTarget) {
-      const distance = this._distance(position, currentTarget);
-      if (distance < this.TARGET_REACHED_DISTANCE) {
+      const distanceSquared = this._distanceSquared(position, currentTarget);
+      const thresholdSquared = this.TARGET_REACHED_DISTANCE * this.TARGET_REACHED_DISTANCE;
+      if (distanceSquared < thresholdSquared) {
         // Target reached, clear it
         explorationState.currentTarget = undefined;
       }
@@ -126,13 +128,14 @@ export class ExplorationSystem extends BaseSystem {
       const frontier = this._identifyFrontier(explorationState);
 
       if (frontier.length > 0) {
+        // PERFORMANCE: Use squared distance for comparison to avoid sqrt
         // Find closest frontier sector
         const closest = frontier.reduce((prev, curr) => {
           const prevWorld = this.sectorToWorld(prev);
           const currWorld = this.sectorToWorld(curr);
-          const prevDist = this._distance(position, prevWorld);
-          const currDist = this._distance(position, currWorld);
-          return currDist < prevDist ? curr : prev;
+          const prevDistSq = this._distanceSquared(position, prevWorld);
+          const currDistSq = this._distanceSquared(position, currWorld);
+          return currDistSq < prevDistSq ? curr : prev;
         });
 
         // Set as target
@@ -170,11 +173,13 @@ export class ExplorationSystem extends BaseSystem {
       throw new Error('Spiral exploration mode requires homeBase in ExplorationState');
     }
 
+    // PERFORMANCE: Use squared distance comparison to avoid sqrt
     // Check if current target reached
     const currentTarget = explorationState.currentTarget;
     if (currentTarget) {
-      const distance = this._distance(position, currentTarget);
-      if (distance < this.TARGET_REACHED_DISTANCE) {
+      const distanceSquared = this._distanceSquared(position, currentTarget);
+      const thresholdSquared = this.TARGET_REACHED_DISTANCE * this.TARGET_REACHED_DISTANCE;
+      if (distanceSquared < thresholdSquared) {
         // Target reached, get next spiral position
         explorationState.spiralStep = (explorationState.spiralStep ?? 0) + 1;
         const nextPos = this._getNextSpiralPosition(explorationState);
@@ -357,7 +362,19 @@ export class ExplorationSystem extends BaseSystem {
   }
 
   /**
+   * Calculate squared distance between two points (faster - no sqrt)
+   * PERFORMANCE: Use this for distance comparisons to avoid expensive sqrt operations
+   */
+  private _distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
    * Calculate distance between two points
+   * PERFORMANCE: sqrt required for actual distance value - prefer _distanceSquared for comparisons
+   * Only use when you need the actual distance value (not for comparisons)
    */
   private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = a.x - b.x;

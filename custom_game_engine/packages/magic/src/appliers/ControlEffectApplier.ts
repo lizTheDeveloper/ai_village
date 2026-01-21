@@ -628,9 +628,12 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     if (direction === 'away' || direction === 'toward') {
       const dx = targetPos.x - sourcePos.x;
       const dy = targetPos.y - sourcePos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSquared = dx * dx + dy * dy;
 
-      if (dist > 0) {
+      if (distSquared > 0) {
+        // PERFORMANCE: Use sqrt only when needed for normalization
+        // We need the actual distance to normalize the direction vector
+        const dist = Math.sqrt(distSquared);
         const dirMultiplier = direction === 'away' ? 1 : -1;
         velocity.vx = (dx / dist) * force * dirMultiplier;
         velocity.vy = (dy / dist) * force * dirMultiplier;
@@ -661,9 +664,12 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
       // Flee away from source
       const dx = targetPos.x - sourcePos.x;
       const dy = targetPos.y - sourcePos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSquared = dx * dx + dy * dy;
 
-      if (dist > 0) {
+      if (distSquared > 0) {
+        // PERFORMANCE: Use sqrt only when needed for normalization
+        // We need the actual distance to normalize the direction vector
+        const dist = Math.sqrt(distSquared);
         const fleeSpeed = 2.0;
         velocity.vx = (dx / dist) * fleeSpeed;
         velocity.vy = (dy / dist) * fleeSpeed;

@@ -182,6 +182,7 @@ export class SteeringSystem extends BaseSystem {
       y: steering.target.y - position.y,
     };
 
+    // PERFORMANCE: sqrt required for normalization to create unit vector
     // Normalize and scale to max speed
     const distance = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
     if (distance === 0) return { x: 0, y: 0 };
@@ -267,6 +268,7 @@ export class SteeringSystem extends BaseSystem {
       return { x: -velocity.vx, y: -velocity.vy };
     }
 
+    // PERFORMANCE: sqrt required for normalization to create unit vector
     // Compute actual distance only when needed for normalization
     const distance = Math.sqrt(distanceSquared);
 
@@ -302,6 +304,7 @@ export class SteeringSystem extends BaseSystem {
   private _avoidObstacles(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
     const lookAheadDistance = steering.lookAheadDistance ?? steeringConfig.obstacleAvoidance.lookAheadDistance;
 
+    // PERFORMANCE: sqrt required for normalization to create unit direction vector
     // Ray-cast ahead
     const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
     if (speed === 0) return { x: 0, y: 0 };
@@ -439,6 +442,7 @@ export class SteeringSystem extends BaseSystem {
     // Jitter the wander angle
     steering.wanderAngle += (Math.random() - 0.5) * wanderJitter;
 
+    // PERFORMANCE: sqrt required for normalization to create unit direction vector
     // Calculate circle center (ahead of agent)
     const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
     let circleCenter = { x: 0, y: 0 };
@@ -554,6 +558,7 @@ export class SteeringSystem extends BaseSystem {
    * Limit vector magnitude
    */
   private _limit(vector: Vector2, max: number): Vector2 {
+    // PERFORMANCE: sqrt required for normalization when clamping vector to max length
     const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
     if (magnitude > max) {
       return {
@@ -576,6 +581,7 @@ export class SteeringSystem extends BaseSystem {
 
   /**
    * Calculate distance between two points
+   * PERFORMANCE: sqrt required for actual distance value - prefer _distanceSquared for comparisons
    * Only use when you need the actual distance value (not for comparisons)
    */
   private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {

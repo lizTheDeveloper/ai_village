@@ -100,6 +100,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     if (teleportType === 'target' || teleportType === 'target_to_caster' || teleportType === 'swap' || teleportType === 'mass') {
       // Range check is caster-to-target distance (can we reach the target to teleport them?)
       if (casterPos) {
+        // PERFORMANCE: Keep sqrt here as value is used for error message display
         rangeCheckDistance = Math.sqrt(
           (pos.x - casterPos.x) ** 2 + (pos.y - casterPos.y) ** 2
         );
@@ -108,6 +109,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
       }
     } else {
       // Range check is distance we're teleporting
+      // PERFORMANCE: Keep sqrt here as value is used for error message display
       rangeCheckDistance = Math.sqrt(
         (destination.x - pos.x) ** 2 + (destination.y - pos.y) ** 2
       );
@@ -133,6 +135,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     // Store actual teleport distance for result
+    // PERFORMANCE: Keep sqrt here as value is stored in result for logging/analytics
     const teleportDistance = Math.sqrt(
       (destination.x - pos.x) ** 2 + (destination.y - pos.y) ** 2
     );

@@ -1264,19 +1264,23 @@ export class PackMindSystem extends BaseSystem {
     pack.bodiesInRange.clear();
     pack.bodiesOutOfRange.clear();
 
+    const coherenceRangeSquared = coherenceRange * coherenceRange;
+
     let totalCoherence = 0;
     for (const body of pack.bodies) {
       const dx = body.positionX - pack.centerX;
       const dy = body.positionY - pack.centerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= coherenceRange) {
+      // PERFORMANCE: Use squared distance comparison first to avoid sqrt
+      if (distanceSquared <= coherenceRangeSquared) {
         pack.bodiesInRange.add(body.entityId);
         // Full coherence for this body
         totalCoherence += 1.0;
       } else {
         pack.bodiesOutOfRange.add(body.entityId);
-        // Degraded coherence based on decay rate
+        // Degraded coherence based on decay rate - need actual distance for decay calculation
+        const distance = Math.sqrt(distanceSquared);
         const excessDistance = distance - coherenceRange;
         const bodyCoherence = Math.max(0, 1.0 - excessDistance * coherenceDecayRate);
         totalCoherence += bodyCoherence;

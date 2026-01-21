@@ -1,6 +1,6 @@
 # Multiverse: The End of Eternity - Game Engine
 
-A production-ready TypeScript game engine powering Multiverse: The End of Eternity. Built with Entity-Component-System architecture, featuring 211+ systems across 19 specialized packages.
+A production-ready TypeScript game engine powering Multiverse: The End of Eternity. Built with Entity-Component-System architecture, featuring 220+ systems across 19 specialized packages.
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See the [project README](../README.md) for our philosophy and inspirations.*
 
@@ -8,9 +8,10 @@ A production-ready TypeScript game engine powering Multiverse: The End of Eterni
 
 **Multiverse: The End of Eternity** runs on a custom TypeScript game engine designed for complex emergent gameplay. The engine features:
 
-- **Entity-Component-System (ECS)** architecture with 211+ systems
+- **Entity-Component-System (ECS)** architecture with 220+ systems
 - **19 specialized packages** covering gameplay, AI, rendering, and infrastructure
-- **125+ component types** for rich entity composition
+- **135+ component types** for rich entity composition
+- **Grand Strategy Layer** enabling civilization progression from villages to galactic empires
 - **20 TPS fixed timestep** with performance optimization
 - **Complete save/load system** with time travel support
 - **LLM integration** for autonomous agents and dynamic content generation

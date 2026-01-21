@@ -19,6 +19,7 @@ import { DeityComponent } from '../components/DeityComponent.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -958,11 +959,11 @@ export class LiveEntityAPI {
   private handleEntitiesQuery(query: QueryRequest): QueryResponse {
     const entities: EntitySummary[] = [];
 
-    for (const entity of this.world.entities.values()) {
+    // PERFORMANCE: Use ECS query instead of scanning all entities
+    const agents = this.world.query().with(CT.Agent).executeEntities();
+    for (const entity of agents) {
       const summary = this.getEntitySummary(entity);
-      if (summary.type === 'agent') {
-        entities.push(summary);
-      }
+      entities.push(summary);
     }
 
     return {
@@ -986,9 +987,9 @@ export class LiveEntityAPI {
       alpha: number;
     }> = [];
 
-    for (const entity of this.world.entities.values()) {
-      if (!entity.components.has('plant')) continue;
-
+    // PERFORMANCE: Use ECS query instead of scanning all entities
+    const plantEntities = this.world.query().with(CT.Plant).executeEntities();
+    for (const entity of plantEntities) {
       const plant = entity.components.get('plant') as {
         plantType?: string;
         stage?: string;
@@ -1343,13 +1344,8 @@ export class LiveEntityAPI {
       const magicManager = magicSystemAny.getMagicSystemState?.();
       const paradigmCount = magicManager?.getAllParadigms?.()?.length || 0;
 
-      // Count deities
-      let deityCount = 0;
-      for (const entity of this.world.entities.values()) {
-        if (entity.components.has('deity')) {
-          deityCount++;
-        }
-      }
+      // PERFORMANCE: Use ECS query instead of scanning all entities
+      const deityCount = this.world.query().with(CT.Deity).executeEntities().length;
 
       const universeInfo = {
         // Basic universe properties
@@ -1454,153 +1450,152 @@ export class LiveEntityAPI {
       let totalAddiction = 0;
       let addictedCount = 0;
 
-      // Scan all entities for magic components
-      for (const entity of this.world.entities.values()) {
-        if (entity.components.has('magic')) {
-          const magic = entity.components.get('magic') as unknown as {
-            magicUser?: boolean;
-            homeParadigmId?: string;
-            knownParadigmIds?: string[];
-            activeParadigmId?: string;
-            knownSpells?: unknown[];
-            totalSpellsCast?: number;
-            totalMishaps?: number;
-            manaPools?: Array<{ source: string; current: number; maximum: number; locked: number; regenRate: number }>;
-            resourcePools?: Record<string, { type: string; current: number; maximum: number; locked: number }>;
-            casting?: boolean;
-            activeEffects?: string[];
-            techniqueProficiency?: Record<string, number>;
-            formProficiency?: Record<string, number>;
-            paradigmState?: Record<string, unknown>;
-            corruption?: number;
-            attentionLevel?: number;
-            favorLevel?: number;
-            addictionLevel?: number;
-            primarySource?: string;
-          };
+      // PERFORMANCE: Use ECS query instead of scanning all entities
+      const magicEntities = this.world.query().with(CT.Magic).executeEntities();
+      for (const entity of magicEntities) {
+        const magic = entity.components.get('magic') as unknown as {
+          magicUser?: boolean;
+          homeParadigmId?: string;
+          knownParadigmIds?: string[];
+          activeParadigmId?: string;
+          knownSpells?: unknown[];
+          totalSpellsCast?: number;
+          totalMishaps?: number;
+          manaPools?: Array<{ source: string; current: number; maximum: number; locked: number; regenRate: number }>;
+          resourcePools?: Record<string, { type: string; current: number; maximum: number; locked: number }>;
+          casting?: boolean;
+          activeEffects?: string[];
+          techniqueProficiency?: Record<string, number>;
+          formProficiency?: Record<string, number>;
+          paradigmState?: Record<string, unknown>;
+          corruption?: number;
+          attentionLevel?: number;
+          favorLevel?: number;
+          addictionLevel?: number;
+          primarySource?: string;
+        };
 
-          if (!magic.magicUser) continue;
+        if (!magic || !magic.magicUser) continue;
 
-          totalMagicUsers++;
-          totalSpellsCast += magic.totalSpellsCast || 0;
-          totalMishaps += magic.totalMishaps || 0;
-          const spellsKnown = magic.knownSpells?.length || 0;
-          totalSpellsKnown += spellsKnown;
+        totalMagicUsers++;
+        totalSpellsCast += magic.totalSpellsCast || 0;
+        totalMishaps += magic.totalMishaps || 0;
+        const spellsKnown = magic.knownSpells?.length || 0;
+        totalSpellsKnown += spellsKnown;
 
-          if (magic.casting) {
-            currentlyCasting++;
-          }
-
-          // Track sustained effects
-          const sustainedCount = magic.activeEffects?.length || 0;
-          totalSustainedEffects += sustainedCount;
-
-          // Track corruption
-          if (magic.corruption !== undefined && magic.corruption > 0) {
-            totalCorruption += magic.corruption;
-            corruptedCount++;
-          }
-
-          // Track attention
-          if (magic.attentionLevel !== undefined && magic.attentionLevel > 0) {
-            totalAttention += magic.attentionLevel;
-            attentionCount++;
-          }
-
-          // Track addiction
-          if (magic.addictionLevel !== undefined && magic.addictionLevel > 0) {
-            totalAddiction += magic.addictionLevel;
-            addictedCount++;
-          }
-
-          // Track paradigm usage
-          const paradigms = magic.knownParadigmIds || [];
-          for (const paradigmId of paradigms) {
-            paradigmUsage.set(paradigmId, (paradigmUsage.get(paradigmId) || 0) + 1);
-          }
-
-          // Get entity name
-          const identity = entity.components.get('identity') as { name?: string } | undefined;
-          const name = identity?.name || entity.id;
-
-          // Collect mana pool info
-          const manaInfo = (magic.manaPools || []).map(pool => ({
-            source: pool.source,
-            current: pool.current,
-            max: pool.maximum,
-            locked: pool.locked,
-            regenRate: pool.regenRate,
-            available: Math.max(0, pool.current - pool.locked),
-          }));
-
-          // Collect resource pools (non-mana)
-          const resourcePools: Array<{
-            type: string;
-            current: number;
-            max: number;
-            locked: number;
-          }> = [];
-
-          if (magic.resourcePools) {
-            for (const [type, pool] of Object.entries(magic.resourcePools)) {
-              resourcePools.push({
-                type,
-                current: pool.current,
-                max: pool.maximum,
-                locked: pool.locked,
-              });
-            }
-          }
-
-          // Extract paradigm-specific state
-          const paradigmSpecificState: Record<string, unknown> = {};
-          if (magic.paradigmState) {
-            for (const [paradigmId, state] of Object.entries(magic.paradigmState)) {
-              paradigmSpecificState[paradigmId] = state;
-            }
-          }
-
-          // Build proficiency summaries
-          const techniques = magic.techniqueProficiency || {};
-          const forms = magic.formProficiency || {};
-
-          // Top techniques (>0 proficiency)
-          const topTechniques = Object.entries(techniques)
-            .filter(([_, prof]) => prof > 0)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([tech, prof]) => ({ technique: tech, proficiency: prof }));
-
-          // Top forms (>0 proficiency)
-          const topForms = Object.entries(forms)
-            .filter(([_, prof]) => prof > 0)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([form, prof]) => ({ form, proficiency: prof }));
-
-          magicUsers.push({
-            id: entity.id,
-            name,
-            paradigms,
-            activeParadigm: magic.activeParadigmId,
-            primarySource: magic.primarySource,
-            spellsKnown,
-            totalSpellsCast: magic.totalSpellsCast || 0,
-            manaInfo,
-            resourcePools,
-            casting: magic.casting || false,
-            activeEffects: magic.activeEffects || [],
-            sustainedEffectCount: magic.activeEffects?.length || 0,
-            topTechniques,
-            topForms,
-            paradigmState: paradigmSpecificState,
-            // Consequence tracking
-            corruption: magic.corruption,
-            attentionLevel: magic.attentionLevel,
-            favorLevel: magic.favorLevel,
-            addictionLevel: magic.addictionLevel,
-          });
+        if (magic.casting) {
+          currentlyCasting++;
         }
+
+        // Track sustained effects
+        const sustainedCount = magic.activeEffects?.length || 0;
+        totalSustainedEffects += sustainedCount;
+
+        // Track corruption
+        if (magic.corruption !== undefined && magic.corruption > 0) {
+          totalCorruption += magic.corruption;
+          corruptedCount++;
+        }
+
+        // Track attention
+        if (magic.attentionLevel !== undefined && magic.attentionLevel > 0) {
+          totalAttention += magic.attentionLevel;
+          attentionCount++;
+        }
+
+        // Track addiction
+        if (magic.addictionLevel !== undefined && magic.addictionLevel > 0) {
+          totalAddiction += magic.addictionLevel;
+          addictedCount++;
+        }
+
+        // Track paradigm usage
+        const paradigms = magic.knownParadigmIds || [];
+        for (const paradigmId of paradigms) {
+          paradigmUsage.set(paradigmId, (paradigmUsage.get(paradigmId) || 0) + 1);
+        }
+
+        // Get entity name
+        const identity = entity.components.get('identity') as { name?: string } | undefined;
+        const name = identity?.name || entity.id;
+
+        // Collect mana pool info
+        const manaInfo = (magic.manaPools || []).map(pool => ({
+          source: pool.source,
+          current: pool.current,
+          max: pool.maximum,
+          locked: pool.locked,
+          regenRate: pool.regenRate,
+          available: Math.max(0, pool.current - pool.locked),
+        }));
+
+        // Collect resource pools (non-mana)
+        const resourcePools: Array<{
+          type: string;
+          current: number;
+          max: number;
+          locked: number;
+        }> = [];
+
+        if (magic.resourcePools) {
+          for (const [type, pool] of Object.entries(magic.resourcePools)) {
+            resourcePools.push({
+              type,
+              current: pool.current,
+              max: pool.maximum,
+              locked: pool.locked,
+            });
+          }
+        }
+
+        // Extract paradigm-specific state
+        const paradigmSpecificState: Record<string, unknown> = {};
+        if (magic.paradigmState) {
+          for (const [paradigmId, state] of Object.entries(magic.paradigmState)) {
+            paradigmSpecificState[paradigmId] = state;
+          }
+        }
+
+        // Build proficiency summaries
+        const techniques = magic.techniqueProficiency || {};
+        const forms = magic.formProficiency || {};
+
+        // Top techniques (>0 proficiency)
+        const topTechniques = Object.entries(techniques)
+          .filter(([_, prof]) => prof > 0)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([tech, prof]) => ({ technique: tech, proficiency: prof }));
+
+        // Top forms (>0 proficiency)
+        const topForms = Object.entries(forms)
+          .filter(([_, prof]) => prof > 0)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([form, prof]) => ({ form, proficiency: prof }));
+
+        magicUsers.push({
+          id: entity.id,
+          name,
+          paradigms,
+          activeParadigm: magic.activeParadigmId,
+          primarySource: magic.primarySource,
+          spellsKnown,
+          totalSpellsCast: magic.totalSpellsCast || 0,
+          manaInfo,
+          resourcePools,
+          casting: magic.casting || false,
+          activeEffects: magic.activeEffects || [],
+          sustainedEffectCount: magic.activeEffects?.length || 0,
+          topTechniques,
+          topForms,
+          paradigmState: paradigmSpecificState,
+          // Consequence tracking
+          corruption: magic.corruption,
+          attentionLevel: magic.attentionLevel,
+          favorLevel: magic.favorLevel,
+          addictionLevel: magic.addictionLevel,
+        });
       }
 
       // Build paradigm summary
@@ -1695,67 +1690,67 @@ export class LiveEntityAPI {
       let totalPrayers = 0;
       let totalAnsweredPrayers = 0;
 
-      // Find all deity entities
-      for (const entity of this.world.entities.values()) {
-        if (entity.components.has('deity')) {
-          const deityComp = entity.components.get('deity') as unknown as {
-            identity?: { primaryName?: string; domain?: string };
-            belief?: {
-              currentBelief?: number;
-              beliefPerTick?: number;
-              totalBeliefEarned?: number;
-              totalBeliefSpent?: number;
-            };
-            believers?: Set<string> | { size?: number };
-            sacredSites?: Set<string> | { size?: number };
-            controller?: string;
-            prayerQueue?: unknown[];
+      // PERFORMANCE: Use ECS query instead of scanning all entities
+      const deityEntities = this.world.query().with(CT.Deity).executeEntities();
+      for (const entity of deityEntities) {
+        const deityComp = entity.components.get('deity') as unknown as {
+          identity?: { primaryName?: string; domain?: string };
+          belief?: {
+            currentBelief?: number;
+            beliefPerTick?: number;
+            totalBeliefEarned?: number;
+            totalBeliefSpent?: number;
           };
+          believers?: Set<string> | { size?: number };
+          sacredSites?: Set<string> | { size?: number };
+          controller?: string;
+          prayerQueue?: unknown[];
+        };
 
-          const identity = deityComp.identity || {};
-          const belief = deityComp.belief || {};
-          const believersSet = deityComp.believers;
-          const sacredSitesSet = deityComp.sacredSites;
+        if (!deityComp) continue;
 
-          const believerCount = believersSet instanceof Set ? believersSet.size : (believersSet?.size || 0);
-          const sacredSiteCount = sacredSitesSet instanceof Set ? sacredSitesSet.size : (sacredSitesSet?.size || 0);
-          const prayerQueueLength = Array.isArray(deityComp.prayerQueue) ? deityComp.prayerQueue.length : 0;
+        const identity = deityComp.identity || {};
+        const belief = deityComp.belief || {};
+        const believersSet = deityComp.believers;
+        const sacredSitesSet = deityComp.sacredSites;
 
-          const currentBelief = belief.currentBelief || 0;
-          const totalEarned = belief.totalBeliefEarned || 0;
+        const believerCount = believersSet instanceof Set ? believersSet.size : (believersSet?.size || 0);
+        const sacredSiteCount = sacredSitesSet instanceof Set ? sacredSitesSet.size : (sacredSitesSet?.size || 0);
+        const prayerQueueLength = Array.isArray(deityComp.prayerQueue) ? deityComp.prayerQueue.length : 0;
 
-          totalBeliefGenerated += totalEarned;
-          totalBelieverCount += believerCount;
+        const currentBelief = belief.currentBelief || 0;
+        const totalEarned = belief.totalBeliefEarned || 0;
 
-          deities.push({
-            id: entity.id,
-            name: identity.primaryName || 'The Nameless',
-            domain: identity.domain,
-            currentBelief,
-            beliefPerTick: belief.beliefPerTick || 0,
-            totalBeliefEarned: totalEarned,
-            totalBeliefSpent: belief.totalBeliefSpent || 0,
-            believerCount,
-            sacredSites: sacredSiteCount,
-            controller: deityComp.controller || 'dormant',
-            unansweredPrayers: prayerQueueLength,
-          });
-        }
+        totalBeliefGenerated += totalEarned;
+        totalBelieverCount += believerCount;
+
+        deities.push({
+          id: entity.id,
+          name: identity.primaryName || 'The Nameless',
+          domain: identity.domain,
+          currentBelief,
+          beliefPerTick: belief.beliefPerTick || 0,
+          totalBeliefEarned: totalEarned,
+          totalBeliefSpent: belief.totalBeliefSpent || 0,
+          believerCount,
+          sacredSites: sacredSiteCount,
+          controller: deityComp.controller || 'dormant',
+          unansweredPrayers: prayerQueueLength,
+        });
       }
 
-      // Count believers with spiritual component
-      for (const entity of this.world.entities.values()) {
-        if (entity.components.has('spiritual')) {
-          const spiritual = entity.components.get('spiritual') as unknown as {
-            totalPrayers?: number;
-            answeredPrayers?: number;
-            believedDeity?: string;
-          };
+      // PERFORMANCE: Use ECS query instead of scanning all entities
+      const spiritualEntities = this.world.query().with(CT.Spiritual).executeEntities();
+      for (const entity of spiritualEntities) {
+        const spiritual = entity.components.get('spiritual') as unknown as {
+          totalPrayers?: number;
+          answeredPrayers?: number;
+          believedDeity?: string;
+        };
 
-          if (spiritual.believedDeity) {
-            totalPrayers += spiritual.totalPrayers || 0;
-            totalAnsweredPrayers += spiritual.answeredPrayers || 0;
-          }
+        if (spiritual && spiritual.believedDeity) {
+          totalPrayers += spiritual.totalPrayers || 0;
+          totalAnsweredPrayers += spiritual.answeredPrayers || 0;
         }
       }
 

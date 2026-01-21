@@ -65,6 +65,7 @@ export class MenuBar {
   private hoveredMenuItem: string | null = null;
   private devMode: boolean = true; // Can be toggled
   private systemStateChecker: SystemStateChecker | null = null;
+  private world: unknown = null; // World reference for content checkers
 
   // Menu definitions
   private menus: MenuDefinition[] = [
@@ -143,24 +144,42 @@ export class MenuBar {
   }
 
   /**
-   * Check if a window should be shown in menus based on its required systems.
-   * If any required system is disabled, the window won't appear in menus.
+   * Set the world reference for content checkers.
+   * Content checkers use this to query the world for relevant entities.
+   * @param world The game world
+   */
+  setWorld(world: unknown): void {
+    this.world = world;
+  }
+
+  /**
+   * Check if a window should be shown in menus based on its required systems
+   * and content availability.
+   * - If any required system is disabled, the window won't appear in menus.
+   * - If contentChecker returns false, the window won't appear in menus.
    */
   private isWindowAvailable(window: ManagedWindow): boolean {
-    const requiredSystems = window.config.requiredSystems;
+    const { requiredSystems, contentChecker } = window.config;
 
-    // If no required systems specified, always available
-    if (!requiredSystems || requiredSystems.length === 0) {
-      return true;
+    // Check required systems first
+    if (requiredSystems && requiredSystems.length > 0) {
+      // If no system state checker set, assume all systems available
+      if (this.systemStateChecker) {
+        // Check if all required systems are enabled
+        if (!requiredSystems.every(systemId => this.systemStateChecker!(systemId))) {
+          return false;
+        }
+      }
     }
 
-    // If no system state checker set, assume all systems available
-    if (!this.systemStateChecker) {
-      return true;
+    // Check content availability
+    if (contentChecker && this.world) {
+      if (!contentChecker(this.world)) {
+        return false;
+      }
     }
 
-    // Check if all required systems are enabled
-    return requiredSystems.every(systemId => this.systemStateChecker!(systemId));
+    return true;
   }
 
   /**

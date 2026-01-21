@@ -1055,12 +1055,15 @@ export class HiveMindSystem extends BaseSystem {
 
     const dx = positionX - hive.territoryCenterX;
     const dy = positionY - hive.territoryCenterY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
+    const telepathyRangeSquared = telepathyRange * telepathyRange;
 
+    // PERFORMANCE: Use squared distance comparison first to avoid sqrt
     // Out of range = zero control
-    if (distance > telepathyRange) return 0;
+    if (distanceSquared > telepathyRangeSquared) return 0;
 
-    // Within range but degraded by distance
+    // Within range but degraded by distance - need actual distance for decay calculation
+    const distance = Math.sqrt(distanceSquared);
     return Math.max(0, 1.0 - distance * controlDecayPerDistance);
   }
 

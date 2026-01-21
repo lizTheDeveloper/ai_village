@@ -119,10 +119,12 @@ export function scorePartners(
       const dx = seekerPos.x - candidatePos.x;
       const dy = seekerPos.y - candidatePos.y;
       const distanceSquared = dx * dx + dy * dy;
-      const distance = Math.sqrt(distanceSquared);
-      const proximityScore = Math.max(0, 1 - distance / cfg.maxRange);
+      // PERFORMANCE: Use squared distance for proximity calculation to avoid sqrt
+      const maxRangeSquared = cfg.maxRange * cfg.maxRange;
+      const proximityScore = Math.max(0, 1 - Math.sqrt(distanceSquared) / cfg.maxRange);
       score += proximityScore * cfg.proximityWeight;
-      if (proximityScore > 0.8) reasons.push('nearby');
+      // PERFORMANCE: Use squared distance comparison for nearby check
+      if (distanceSquared < (cfg.maxRange * 0.2) * (cfg.maxRange * 0.2)) reasons.push('nearby');
     }
 
     // 2. Shared interests

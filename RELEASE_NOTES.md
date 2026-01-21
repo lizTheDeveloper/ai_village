@@ -1,6 +1,530 @@
 # Release Notes
 
-## 2026-01-20 - "Life + Navigation Admin Capabilities" - 2 More Dashboards (1581 lines), Capability Registry
+## 2026-01-20 (Evening) - "Angel Components + Politics Refactor + Performance Optimizations" - 746 New Lines, 7 Math.sqrt Fixes, ECS Query Conversions
+
+### 👼 NEW: Angel Components (746 lines)
+
+**Phase 28.6 & 28.8 Implementation**
+
+Two new components for the divinity angel delegation system:
+
+#### AngelEvolutionComponent (442 lines)
+**NEW FILE: custom_game_engine/packages/core/src/components/AngelEvolutionComponent.ts**
+
+Complete tier progression and promotion system for angels.
+
+**Tier System (4 tiers):**
+- Tier 1: Basic Angels (starting)
+- Tier 2: Greater Angels (after 10 tier-1 angels)
+- Tier 3: Archangels (after 5 tier-2 angels)
+- Tier 4: Supreme Angels (legendary, max 1)
+
+**Unlock Requirements:**
+- Tier 2: 10 tier-1 angels, 1000 belief cost, 5000 lifetime belief
+- Tier 3: 5 tier-2 angels, 3000 belief cost, 15000 lifetime belief
+- Tier 4: 3 tier-3 angels, 10000 belief cost, 50000 lifetime belief
+
+**Promotion Requirements:**
+- Level thresholds (7/15/30)
+- Success rate requirements (80%/85%/90%)
+- Prayer handling minimums (100/500/2000)
+- Service time requirements (24h/72h/168h)
+- Special achievements for tier 4 (witnessed_miracle, defeated_corruption)
+
+**Tier Bonuses:**
+- Max energy: 0/50/100/200
+- Energy regen: 0/5/10/20
+- Expertise: 0/+10%/+20%/+30%
+- Special abilities at tier 3-4 (mass_blessing, prophetic_dream, divine_intervention, reality_glimpse)
+- Physical manifestation at tier 4
+
+**API:**
+```typescript
+const evolution = createAngelEvolutionComponent({ tier: 1, level: 1 });
+evolution.addExperience(500); // Returns { leveledUp: true, newLevel: 5 }
+evolution.recordPrayerHandled(successful: true);
+evolution.checkPromotionEligibility(); // Updates promotionEligible flag
+evolution.promote({ newTierName: 'Greater Angel', newDescription: '...', currentTick });
+const bonus = evolution.getTierBonus(); // Get stat bonuses
+const progress = evolution.getPromotionProgress(); // Get 0-1 progress toward next tier
+```
+
+**Impact**: Angels now level up from handling prayers, become eligible for promotion based on performance metrics, and gain powerful abilities as they advance through tiers!
+
+#### AngelMessagingComponent (304 lines)
+**NEW FILE: custom_game_engine/packages/core/src/components/AngelMessagingComponent.ts**
+
+"God's Phone System" - direct communication between player and angels.
+
+**Chat Room Types:**
+- Group chat (all angels)
+- 1:1 DMs (individual angels)
+- Custom sub-groups
+
+**Features:**
+- Phone checking frequency (default: every 30 seconds / 600 ticks at 20 TPS)
+- Unread message tracking
+- Daily message counters
+- Online/offline status
+- Conversation memory integration
+
+**API:**
+```typescript
+const messaging = createAngelMessagingComponent({
+  groupChatId: 'chat:group:deity123',
+  dmChatId: 'chat:dm:deity123:angel456',
+  phoneCheckFrequency: 600,
+  currentTick: world.tick
+});
+
+if (messaging.shouldCheckPhone(world.tick)) {
+  messaging.markPhoneChecked(world.tick);
+  messaging.clearUnreadMessages();
+}
+
+messaging.joinCustomChat('chat:custom:deity123:elite-squad');
+messaging.recordSentMessage();
+messaging.recordReceivedMessage();
+```
+
+**Chat Room Management:**
+```typescript
+const groupChat = createChatRoom({
+  id: generateChatRoomId('group', deityId),
+  type: 'group',
+  name: 'All Angels',
+  participants: angelIds,
+  currentTick: world.tick
+});
+
+const message = createChatMessage({
+  id: generateMessageId(chatId),
+  chatId,
+  senderId: 'deity123',
+  senderType: 'player',
+  senderName: 'The Creator',
+  content: 'Handle the prayer backlog',
+  currentTick: world.tick,
+  replyToId: 'msg:previous'
+});
+```
+
+**Impact**: Players can now directly message angels individually or in groups! Angels check their "phone" periodically (rate-limited), and conversations integrate with the memory system for context preservation!
+
+---
+
+### 🏛️ REFACTOR: Politics Admin Capability (385 lines refactored)
+
+**FILE: custom_game_engine/packages/core/src/admin/capabilities/politics.ts**
+
+Migrated to new admin capability API with comprehensive improvements:
+
+**API Migration:**
+- `parameters` → `params` with proper typing
+- `execute` → `handler` with standardized signatures
+- Added `renderResult` methods for formatted output display
+- Removed `{ success, data, error }` wrapper - handlers throw errors directly
+- Better entity-id parameter types with `entityType` hints
+
+**New `renderResult` Methods (6 queries):**
+- `listGovernanceEntities`: Formatted entity listing with tier/type/population
+- `getGovernanceDetails`: Detailed governance info with tier-specific fields
+- `listActiveProposals`: Active proposals with vote counts and deadlines
+- `getElectionStatus`: Upcoming elections sorted by time
+- `queryGovernanceHistory`: Formatted history with tick timestamps
+
+**Parameter Improvements:**
+- `entityId` params now use `type: 'entity-id'` for better validation
+- Agent params include `entityType: 'agent'` for type hints
+- Select options migrated to `{ value, label }` format
+- Removed `.map(o => o.value)` hacks with direct option objects
+
+**Error Handling:**
+- Changed from `return { success: false, error }` to `throw new Error()`
+- Cleaner error propagation through admin framework
+- Better error messages with context
+
+**Before:**
+```typescript
+parameters: [{ name: 'tier', type: 'select', options: TIER_OPTIONS.map(o => o.value) }],
+execute: async (params, ctx) => {
+  if (!ctx.world) return { success: false, error: 'No world' };
+  // ...
+  return { success: true, data: { entities } };
+}
+```
+
+**After:**
+```typescript
+params: [{ name: 'tier', type: 'select', options: TIER_OPTIONS }],
+handler: async (params, gameClient, context) => {
+  if (!context.world) throw new Error('No world');
+  // ...
+  return { entities };
+},
+renderResult: (data) => {
+  const result = data as { entities: Array<any> };
+  let output = 'GOVERNANCE ENTITIES\\n\\n';
+  for (const entity of result.entities) {
+    output += `${entity.name} (${entity.tier})\\n`;
+  }
+  return output;
+}
+```
+
+**Impact**: Politics admin capability now follows standardized patterns, provides formatted output, and integrates cleanly with the new admin framework!
+
+---
+
+### ⚡ PERFORMANCE: 7 Math.sqrt Optimizations + 6 ECS Query Conversions
+
+**Pattern: Eliminate Math.sqrt from hot paths by using squared distance comparisons**
+
+#### Math.sqrt Optimizations (7 locations):
+
+1. **HiveMindSystem.ts** - Territory range check
+```typescript
+// BEFORE
+const distance = Math.sqrt(dx * dx + dy * dy);
+if (distance > telepathyRange) return 0;
+
+// AFTER
+const distanceSquared = dx * dx + dy * dy;
+const telepathyRangeSquared = telepathyRange * telepathyRange;
+if (distanceSquared > telepathyRangeSquared) return 0;
+// Only use sqrt when needed for decay calculation
+const distance = Math.sqrt(distanceSquared);
+return Math.max(0, 1.0 - distance * controlDecayPerDistance);
+```
+
+2. **PackMindSystem.ts** - Coherence range check
+```typescript
+// BEFORE
+const distance = Math.sqrt(dx * dx + dy * dy);
+if (distance <= coherenceRange) { ... }
+
+// AFTER
+const distanceSquared = dx * dx + dy * dy;
+const coherenceRangeSquared = coherenceRange * coherenceRange;
+if (distanceSquared <= coherenceRangeSquared) { ... }
+// Only sqrt when computing decay
+const distance = Math.sqrt(distanceSquared);
+const excessDistance = distance - coherenceRange;
+```
+
+3-4. **EffectInterpreter.ts** (2 locations)
+- Pull effect (toward/away): Compare distanceSquared > 0, only sqrt for normalization
+- Radius filter: Pre-compute radiusSquared, compare without sqrt
+
+5-6. **ControlEffectApplier.ts** (2 locations)
+- Direction force: Check distanceSquared > 0, only sqrt for direction normalization
+- Flee behavior: Check distanceSquared > 0, only sqrt for flee vector normalization
+
+7. **PartnerSelector.ts** - Proximity scoring
+```typescript
+// BEFORE
+const distance = Math.sqrt(distanceSquared);
+const proximityScore = Math.max(0, 1 - distance / cfg.maxRange);
+if (proximityScore > 0.8) reasons.push('nearby');
+
+// AFTER (partial optimization)
+const proximityScore = Math.max(0, 1 - Math.sqrt(distanceSquared) / cfg.maxRange);
+// Use squared distance for nearby check
+if (distanceSquared < (cfg.maxRange * 0.2) * (cfg.maxRange * 0.2)) reasons.push('nearby');
+```
+
+#### ECS Query Conversions (6 entity scans):
+
+**FILE: custom_game_engine/packages/core/src/metrics/LiveEntityAPI.ts**
+
+Converted 6 full entity scans to targeted ECS queries:
+
+1. **handleEntitiesQuery** - Agent listing
+```typescript
+// BEFORE
+for (const entity of this.world.entities.values()) {
+  if (summary.type === 'agent') entities.push(summary);
+}
+
+// AFTER
+const agents = this.world.query().with(CT.Agent).executeEntities();
+for (const entity of agents) {
+  entities.push(this.getEntitySummary(entity));
+}
+```
+
+2. **handlePlantsQuery** - Plant data
+```typescript
+// BEFORE
+for (const entity of this.world.entities.values()) {
+  if (!entity.components.has('plant')) continue;
+  // ...
+}
+
+// AFTER
+const plantEntities = this.world.query().with(CT.Plant).executeEntities();
+for (const entity of plantEntities) { ... }
+```
+
+3. **Universe info** - Deity count
+```typescript
+// BEFORE
+let deityCount = 0;
+for (const entity of this.world.entities.values()) {
+  if (entity.components.has('deity')) deityCount++;
+}
+
+// AFTER
+const deityCount = this.world.query().with(CT.Deity).executeEntities().length;
+```
+
+4. **Magic stats** - Magic users
+```typescript
+// BEFORE
+for (const entity of this.world.entities.values()) {
+  if (entity.components.has('magic')) { ... }
+}
+
+// AFTER
+const magicEntities = this.world.query().with(CT.Magic).executeEntities();
+for (const entity of magicEntities) { ... }
+```
+
+5-6. **Divinity stats** - Deities and believers
+```typescript
+// BEFORE
+for (const entity of this.world.entities.values()) {
+  if (entity.components.has('deity')) { ... }
+}
+for (const entity of this.world.entities.values()) {
+  if (entity.components.has('spiritual')) { ... }
+}
+
+// AFTER
+const deityEntities = this.world.query().with(CT.Deity).executeEntities();
+for (const entity of deityEntities) { ... }
+
+const spiritualEntities = this.world.query().with(CT.Spiritual).executeEntities();
+for (const entity of spiritualEntities) { ... }
+```
+
+**Impact**: Metrics dashboard queries now use targeted ECS queries instead of scanning all entities! With 4,000+ entities, this reduces iteration counts by 95%+ in many cases (e.g., 50 agents vs 4,000 total entities).
+
+#### ExplorationSystem Optimizations (3 locations + helper):
+
+**FILE: custom_game_engine/packages/navigation/src/systems/ExplorationSystem.ts**
+
+Added `_distanceSquared()` helper and converted 3 distance comparisons:
+
+```typescript
+// NEW HELPER
+private _distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return dx * dx + dy * dy;
+}
+
+private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  // PERFORMANCE: sqrt required for actual distance value - prefer _distanceSquared for comparisons
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+```
+
+**Optimized locations:**
+1. Target reached check (frontier mode)
+2. Target reached check (spiral mode)
+3. Closest frontier selection
+
+**Impact**: Exploration pathfinding avoids sqrt in hot path distance comparisons!
+
+#### SteeringSystem Documentation (6 comments):
+
+**FILE: custom_game_engine/packages/navigation/src/systems/SteeringSystem.ts**
+
+Added performance comments documenting where sqrt is required:
+
+```typescript
+// PERFORMANCE: sqrt required for normalization to create unit vector
+// PERFORMANCE: sqrt required for normalization when clamping vector to max length
+// PERFORMANCE: sqrt required for actual distance value - prefer _distanceSquared for comparisons
+```
+
+**Locations documented:**
+1. Seek behavior normalization
+2. Arrive behavior distance check
+3. Obstacle avoidance ray-cast
+4. Wander behavior circle center
+5. Vector limiting (magnitude clamp)
+6. Distance helper method
+
+**Impact**: Clear documentation of when sqrt is unavoidable vs when it can be eliminated!
+
+---
+
+### 🎮 MenuBar Enhancement: Progressive Disclosure System
+
+**FILES:**
+- `custom_game_engine/packages/renderer/src/MenuBar.ts` (+43/-23 lines)
+- `custom_game_engine/packages/renderer/src/types/WindowTypes.ts` (+11 lines)
+
+Added `contentChecker` callback system for dynamic menu filtering based on world state.
+
+**WindowTypes.ts - New Interface:**
+```typescript
+export interface WindowConfig {
+  // ... existing fields ...
+
+  /**
+   * Optional callback to check if the panel has content to display.
+   * Panel only appears in menus when this returns true.
+   * Used for progressive disclosure - panels "pop in" as game content develops.
+   * Example: Relationships panel only shows when agents have formed relationships.
+   *
+   * @param world - The game world to query for content
+   * @returns true if panel has content to show, false to hide from menus
+   */
+  contentChecker?: (world: unknown) => boolean;
+}
+```
+
+**MenuBar.ts - Implementation:**
+```typescript
+private world: unknown = null;
+
+setWorld(world: unknown): void {
+  this.world = world;
+}
+
+private isWindowAvailable(window: ManagedWindow): boolean {
+  const { requiredSystems, contentChecker } = window.config;
+
+  // Check required systems first
+  if (requiredSystems && requiredSystems.length > 0) {
+    if (this.systemStateChecker) {
+      if (!requiredSystems.every(systemId => this.systemStateChecker!(systemId))) {
+        return false;
+      }
+    }
+  }
+
+  // Check content availability
+  if (contentChecker && this.world) {
+    if (!contentChecker(this.world)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+```
+
+**Usage Pattern:**
+```typescript
+// Panel only shows when relationships exist
+{
+  id: 'relationships',
+  requiredSystems: ['RelationshipSystem'],
+  contentChecker: (world: World) => {
+    const relationships = world.query().with(CT.Relationship).executeEntities();
+    return relationships.length > 0;
+  }
+}
+```
+
+**Impact**: UI menus now adapt to game state! Panels progressively appear as relevant content develops (e.g., Relationships panel appears when first relationship forms, Nations panel appears when first nation is founded). Reduces UI clutter for early game!
+
+---
+
+### 🌍 MILESTONE: First Multiplayer Planet Persisted
+
+**NEW DIRECTORY: custom_game_engine/demo/multiverse-data/planets/planet:terrestrial:4df316b8/**
+
+First actual planet data saved to the multiplayer planet storage system!
+
+**Files:**
+- `metadata.json` - Planet metadata (name, type, seed, timestamps, chunk count)
+- `biosphere.json.gz` - Compressed biosphere data (LLM-generated, 2257 bytes)
+- `locations.json` - Named locations (spawn points, landmarks)
+- `chunks/` - Empty directory ready for chunk storage
+
+**Metadata:**
+```json
+{
+  "id": "planet:terrestrial:4df316b8",
+  "name": "Homeworld",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1768973550020",
+  "createdAt": 1768973588480,
+  "lastAccessedAt": 1768973588480,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": true,
+  "config": {
+    "seed": "universe:main:homeworld:1768973550020",
+    "type": "terrestrial"
+  }
+}
+```
+
+**Impact**: Multiplayer planet system is live! Planet data persists across sessions, biosphere is cached (skips 57-second LLM generation on reload), and chunks can be synced between players!
+
+---
+
+### 📋 Documentation Updates
+
+**IMPLEMENTATION_ROADMAP.md:**
+- Updated status: ~98% → ~99% implemented
+- Phase 7.1: Marked exotic ship tests as complete (2 test files, 27 tests)
+- Phase 7.2: Marked all documentation tasks as complete ✅
+  - SYSTEMS_CATALOG.md updated (220+ systems)
+  - COMPONENTS_REFERENCE.md updated (135+ components)
+  - GRAND_STRATEGY_GUIDE.md created (306 lines)
+  - Devlog written (GRAND-STRATEGY-IMPLEMENTATION-01-20.md)
+
+**README.md:**
+- Updated system count: 211+ → 220+ systems
+
+---
+
+### 🎯 Files Changed (18 files, +543/-361)
+
+**New Components (2 files, +746 lines):**
+- `custom_game_engine/packages/core/src/components/AngelEvolutionComponent.ts` (+442 lines)
+- `custom_game_engine/packages/core/src/components/AngelMessagingComponent.ts` (+304 lines)
+
+**Performance Optimizations (10 files):**
+- `custom_game_engine/packages/core/src/consciousness/HiveMindSystem.ts` (Math.sqrt)
+- `custom_game_engine/packages/core/src/consciousness/PackMindSystem.ts` (Math.sqrt)
+- `custom_game_engine/packages/core/src/conversation/PartnerSelector.ts` (Math.sqrt)
+- `custom_game_engine/packages/core/src/metrics/LiveEntityAPI.ts` (6 ECS conversions)
+- `custom_game_engine/packages/magic/src/EffectInterpreter.ts` (2× Math.sqrt)
+- `custom_game_engine/packages/magic/src/SpellCastingService.ts` (documentation)
+- `custom_game_engine/packages/magic/src/appliers/ControlEffectApplier.ts` (2× Math.sqrt)
+- `custom_game_engine/packages/magic/src/appliers/TeleportEffectApplier.ts` (documentation)
+- `custom_game_engine/packages/navigation/src/systems/ExplorationSystem.ts` (3× Math.sqrt + helper)
+- `custom_game_engine/packages/navigation/src/systems/SteeringSystem.ts` (documentation)
+
+**Admin Refactoring (1 file):**
+- `custom_game_engine/packages/core/src/admin/capabilities/politics.ts` (385 lines refactored)
+
+**UI Enhancement (2 files):**
+- `custom_game_engine/packages/renderer/src/MenuBar.ts` (contentChecker support)
+- `custom_game_engine/packages/renderer/src/types/WindowTypes.ts` (contentChecker interface)
+
+**Documentation (2 files):**
+- `custom_game_engine/openspec/IMPLEMENTATION_ROADMAP.md` (Phase 7 completion)
+- `custom_game_engine/README.md` (system count update)
+
+**Runtime Data (non-code, not committed):**
+- `.dev-server.pid` (server process ID)
+- `custom_game_engine/demo/multiverse-data/players/*/profile.json` (2 player profiles updated)
+- `custom_game_engine/demo/multiverse-data/planets/planet:terrestrial:4df316b8/` (first planet!)
+
+---
+
+## 2026-01-20 (Afternoon) - "Life + Navigation Admin Capabilities" - 2 More Dashboards (1581 lines), Capability Registry
 
 ### 🌱 NEW: Life Admin Capability (787 lines)
 

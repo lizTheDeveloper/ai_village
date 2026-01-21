@@ -516,9 +516,12 @@ export class EffectInterpreter {
     if (position) {
       const dx = toward.x - position.x;
       const dy = toward.y - position.y;
-      const currentDistance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (currentDistance > 0) {
+      if (distanceSquared > 0) {
+        // PERFORMANCE: Use sqrt only when needed for ratio calculation
+        // We need the actual distance here for computing the movement ratio
+        const currentDistance = Math.sqrt(distanceSquared);
         const ratio = Math.min(distance, currentDistance) / currentDistance;
         position.x += dx * ratio;
         position.y += dy * ratio;
@@ -820,12 +823,14 @@ export class EffectInterpreter {
     const casterPos = this.getEntityPosition(context.caster);
     const allEntities = this.selectAllTargets(context);
 
+    // PERFORMANCE: Use squared distance comparison to avoid sqrt
+    const radiusSquared = radius * radius;
     return allEntities.filter((entity) => {
       const pos = this.getEntityPosition(entity);
       const dx = pos.x - casterPos.x;
       const dy = pos.y - casterPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance <= radius;
+      const distanceSquared = dx * dx + dy * dy;
+      return distanceSquared <= radiusSquared;
     });
   }
 

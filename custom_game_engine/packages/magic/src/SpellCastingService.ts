@@ -297,6 +297,8 @@ export class SpellCastingService {
 
     const dx = pos1.x - pos2.x;
     const dy = pos1.y - pos2.y;
+    // PERFORMANCE: Keep sqrt here as actual distance value is needed for display
+    // This is called during validation (not hot path) and the value is shown in error messages
     return Math.sqrt(dx * dx + dy * dy);
   }
 
