@@ -1164,11 +1164,9 @@ export class ExecutorLLMProcessor {
       const buildPos = build.position.x === 0 && build.position.y === 0
         ? { x: position.x, y: position.y }
         : build.position;
-      const distToBuild = Math.sqrt(
-        (position.x - buildPos.x) ** 2 + (position.y - buildPos.y) ** 2
-      );
+      const distToBuildSquared = (position.x - buildPos.x) ** 2 + (position.y - buildPos.y) ** 2;
 
-      if (distToBuild <= PLANNED_BUILD_REACH || (build.position.x === 0 && build.position.y === 0)) {
+      if (distToBuildSquared <= PLANNED_BUILD_REACH * PLANNED_BUILD_REACH || (build.position.x === 0 && build.position.y === 0)) {
         // Start building
         this.removePlannedBuild(entity, build);
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({

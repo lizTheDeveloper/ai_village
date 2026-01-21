@@ -327,10 +327,10 @@ export class RepairBehavior extends BaseBehavior {
       // Skip if too far
       if (distanceSquared > searchRadiusSquared) continue;
 
-      // Calculate actual distance only when needed for scoring
+      // Use squared distance directly in scoring to avoid sqrt
       const distance = Math.sqrt(distanceSquared);
 
-      // Score: prioritize lower condition and closer distance
+      // Score: prioritize lower condition and closer distance (using actual distance for scoring)
       // Critical buildings get bonus
       const urgencyBonus = building.condition < REPAIR_CONFIG.CRITICAL_THRESHOLD ? 50 : 0;
       const score = (100 - building.condition) + urgencyBonus - (distance * 2);

@@ -586,6 +586,41 @@ export class ChatRoomSystem extends BaseSystem {
     }
   }
 
+  /**
+   * Initialize event listeners
+   */
+  public onInit(world: World): void {
+    // Listen for send_message events from UI panels
+    world.eventBus.on('chat:send_message', (event) => {
+      const data = event.data as {
+        roomId: string;
+        senderId: string;
+        message: string;
+        type?: 'message' | 'action' | 'whisper';
+        replyTo?: string;
+        whisperTo?: string[];
+      };
+
+      this.sendMessage(world, data.roomId, data.senderId, data.message, {
+        type: data.type,
+        replyTo: data.replyTo,
+        whisperTo: data.whisperTo,
+      });
+    });
+
+    // Listen for join_room events
+    world.eventBus.on('chat:join_room', (event) => {
+      const data = event.data as { roomId: string; entityId: string };
+      this.addMember(world, data.roomId, data.entityId);
+    });
+
+    // Listen for leave_room events
+    world.eventBus.on('chat:leave_room', (event) => {
+      const data = event.data as { roomId: string; entityId: string };
+      this.removeMember(world, data.roomId, data.entityId);
+    });
+  }
+
   protected onCleanup(): void {
     this.roomEntities.clear();
     this.knownMembers.clear();

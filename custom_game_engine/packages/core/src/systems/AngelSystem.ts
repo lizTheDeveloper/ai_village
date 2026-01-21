@@ -262,7 +262,7 @@ export class AngelSystem extends BaseSystem {
       tier,
       currentTick: world.tick,
     });
-    angelEntity.components.set('angel_resource', resourceComponent);
+    (angelEntity as EntityImpl).addComponent(resourceComponent);
 
     // Set up messaging (Phase 28.6 - God's Phone)
     setupAngelMessaging(

@@ -150,7 +150,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
 
     if (distanceSquared > MAX_GATHER_DISTANCE_SQUARED) {
       const distance = Math.sqrt(distanceSquared); // Only for error message
-      const MAX_GATHER_DISTANCE = Math.sqrt(2);
+      const MAX_GATHER_DISTANCE = 1.414; // √2 pre-computed
       return {
         valid: false,
         reason: `Plant at (${plantPos.x},${plantPos.y}) is too far from actor at (${actorPos.x},${actorPos.y}). Distance: ${distance.toFixed(2)}, max: ${MAX_GATHER_DISTANCE.toFixed(2)}`,

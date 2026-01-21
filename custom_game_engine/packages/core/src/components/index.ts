@@ -281,6 +281,23 @@ export type { DivineAbilityComponent } from './DivineAbilityComponent.js';
 // Angel system (divine servants/messengers - Phase 7)
 export * from './AngelComponent.js';
 export { createAngelComponent, type AngelComponent } from './AngelComponent.js';
+// Admin Angel (NUX helper angel in chat)
+export * from './AdminAngelComponent.js';
+export {
+  createAdminAngelComponent,
+  createAdminAngelMemory,
+  addMessageToContext,
+  addPendingObservation,
+  popPendingObservation,
+  inferPlaystyle,
+  recordFavoriteAgent,
+  type AdminAngelComponent,
+  type AdminAngelMemory,
+  type PlayerKnowledge,
+  type PlayerRelationship,
+  type TutorialProgress,
+  type ConversationContext,
+} from './AdminAngelComponent.js';
 // Angel Messaging (God's Phone - Phase 28.6)
 export * from './AngelMessagingComponent.js';
 export {

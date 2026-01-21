@@ -771,10 +771,8 @@ export class LLMDecisionProcessor {
 
                 // Check for ANY campfire (complete OR in-progress) within range
                 if (bc?.buildingType === 'campfire' && bp) {
-                  const distance = Math.sqrt(
-                    Math.pow(agentPosition.x - bp.x, 2) + Math.pow(agentPosition.y - bp.y, 2)
-                  );
-                  if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+                  const distanceSquared = (agentPosition.x - bp.x) ** 2 + (agentPosition.y - bp.y) ** 2;
+                  if (distanceSquared <= CAMPFIRE_PROXIMITY_THRESHOLD * CAMPFIRE_PROXIMITY_THRESHOLD) {
                     // There's already a campfire (or one being built) within 200 tiles - don't build another
                     return { changed: false, source: 'llm' };
                   }
@@ -793,10 +791,8 @@ export class LLMDecisionProcessor {
                   if (hasCampfirePlanned) {
                     // Check if the planned location would be within our threshold
                     // Use the other agent's position as proxy for where they'll build
-                    const distance = Math.sqrt(
-                      Math.pow(agentPosition.x - otherAgentPos.x, 2) + Math.pow(agentPosition.y - otherAgentPos.y, 2)
-                    );
-                    if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+                    const distanceSquared = (agentPosition.x - otherAgentPos.x) ** 2 + (agentPosition.y - otherAgentPos.y) ** 2;
+                    if (distanceSquared <= CAMPFIRE_PROXIMITY_THRESHOLD * CAMPFIRE_PROXIMITY_THRESHOLD) {
                       // Another agent nearby is already planning a campfire - don't duplicate
                       return { changed: false, source: 'llm' };
                     }
@@ -1127,10 +1123,8 @@ export class LLMDecisionProcessor {
       const buildPos = build.position.x === 0 && build.position.y === 0
         ? { x: position.x, y: position.y }
         : build.position;
-      const distToBuild = Math.sqrt(
-        (position.x - buildPos.x) ** 2 + (position.y - buildPos.y) ** 2
-      );
-      if (distToBuild <= PLANNED_BUILD_REACH || (build.position.x === 0 && build.position.y === 0)) {
+      const distToBuildSquared = (position.x - buildPos.x) ** 2 + (position.y - buildPos.y) ** 2;
+      if (distToBuildSquared <= PLANNED_BUILD_REACH * PLANNED_BUILD_REACH || (build.position.x === 0 && build.position.y === 0)) {
         // Near enough OR no specific position - start building!
         this.removePlannedBuild(entity, build);
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({

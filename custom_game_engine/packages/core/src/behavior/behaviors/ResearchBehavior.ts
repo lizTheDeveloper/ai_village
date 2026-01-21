@@ -135,13 +135,13 @@ export class ResearchBehavior extends BaseBehavior {
       const hasResearch = blueprint.functionality.some((f: { type: string }) => f.type === 'research');
       if (!hasResearch) continue;
 
-      // Calculate distance
+      // Calculate distance (using squared distance for performance)
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance < nearestDistance && distance < MAX_BUILDING_SEARCH_DISTANCE) {
-        nearestDistance = distance;
+      if (distanceSquared < nearestDistance && distanceSquared < MAX_BUILDING_SEARCH_DISTANCE * MAX_BUILDING_SEARCH_DISTANCE) {
+        nearestDistance = distanceSquared;
         nearestBuilding = buildingImpl;
       }
     }
@@ -184,13 +184,13 @@ export class ResearchBehavior extends BaseBehavior {
       return { complete: true, reason: 'Target building has no position' };
     }
 
-    // Calculate distance
+    // Calculate distance (using squared distance for performance)
     const dx = targetPos.x - position.x;
     const dy = targetPos.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
 
     // If within research distance, start researching
-    if (distance <= RESEARCH_DISTANCE) {
+    if (distanceSquared <= RESEARCH_DISTANCE * RESEARCH_DISTANCE) {
       state.phase = 'researching';
       this.updateAgentState(entity, state);
       return;

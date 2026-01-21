@@ -245,6 +245,7 @@ import { SacredSiteSystem } from './SacredSiteSystem.js';
 // Divinity - Avatar & Angels
 import { AvatarSystem } from './AvatarSystem.js';
 import { AngelSystem } from './AngelSystem.js';
+import { AdminAngelSystem } from './AdminAngelSystem.js';
 import { PossessionSystem } from './PossessionSystem.js';
 import { PlayerInputSystem } from './PlayerInputSystem.js';
 
@@ -1002,6 +1003,12 @@ export function registerAllSystems(
   // Keep enabled - player can possess agents from the start
   gameLoop.systemRegistry.register(new PlayerInputSystem());
   gameLoop.systemRegistry.register(new PossessionSystem());
+
+  // ============================================================================
+  // ADMIN ANGEL (NUX Helper)
+  // ============================================================================
+  // Keep enabled - the admin angel helps players learn the game via divine chat
+  gameLoop.systemRegistry.register(new AdminAngelSystem());
 
   // ============================================================================
   // DIVINITY - ADVANCED THEOLOGY

@@ -270,15 +270,15 @@ export class CraftBehavior extends BaseBehavior {
       if (buildingComp.buildingType !== stationType) continue;
       if (!buildingComp.isComplete) continue;
 
-      // Calculate distance
+      // Calculate distance (using squared distance for performance)
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance > MAX_STATION_SEARCH_DISTANCE) continue;
+      if (distanceSquared > MAX_STATION_SEARCH_DISTANCE * MAX_STATION_SEARCH_DISTANCE) continue;
 
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
+      if (distanceSquared < nearestDistance) {
+        nearestDistance = distanceSquared;
         nearest = { entityId: building.id, position: buildingPos };
       }
     }

@@ -234,13 +234,13 @@ export class CastSpellBehavior extends BaseBehavior {
       return;
     }
 
-    // Calculate distance
+    // Calculate distance (using squared distance for performance)
     const dx = targetPos.x - position.x;
     const dy = targetPos.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
 
     // Check if in range
-    if (distance <= spell.range) {
+    if (distanceSquared <= spell.range * spell.range) {
       this.stopAllMovement(entity);
       this.updateState(entity, { phase: 'casting' });
       return;
@@ -369,12 +369,12 @@ export class CastSpellBehavior extends BaseBehavior {
 
         if (!allyPos || !allyNeeds) continue;
 
-        // Check distance
+        // Check distance (using squared distance for performance)
         const dx = allyPos.x - position.x;
         const dy = allyPos.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
-        if (distance > MAX_TARGET_SEARCH_DISTANCE) continue;
+        if (distanceSquared > MAX_TARGET_SEARCH_DISTANCE * MAX_TARGET_SEARCH_DISTANCE) continue;
 
         // Check health
         if (allyNeeds.health < lowestHealth) {
@@ -406,10 +406,10 @@ export class CastSpellBehavior extends BaseBehavior {
 
         const dx = animalPos.x - position.x;
         const dy = animalPos.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
+        if (distanceSquared < nearestDistance) {
+          nearestDistance = distanceSquared;
           nearestAnimal = animalImpl;
         }
       }

@@ -109,14 +109,15 @@ export class BuildingTargeting {
         .executeEntities();
 
       const visionRange = vision.range || 15;
+      const visionRangeSquared = visionRange * visionRange;
 
       for (const buildingEntity of allBuildings) {
         const impl = buildingEntity as EntityImpl;
         const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
         if (!buildingPos) continue;
 
-        const dist = this.distance(position, buildingPos);
-        if (dist <= visionRange) {
+        const distSquared = this.distanceSquared(position, buildingPos);
+        if (distSquared <= visionRangeSquared) {
           candidates.push(buildingEntity.id);
         }
       }
@@ -162,27 +163,30 @@ export class BuildingTargeting {
         continue;
       }
 
-      // Calculate distance
-      const dist = this.distance(position, buildingPos);
+      // Calculate squared distance for comparison
+      const distSquared = this.distanceSquared(position, buildingPos);
 
-      // Check max distance
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      // Check max distance (using squared distance)
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       // Track nearest
-      if (dist < nearestDist) {
+      if (distSquared < nearestDist) {
         nearest = {
           entity: buildingEntity,
           buildingType: building.buildingType,
           isComplete,
           constructionProgress: building.progress,
-          distance: dist,
+          distance: Math.sqrt(distSquared), // Only compute actual distance for the result
           position: { x: buildingPos.x, y: buildingPos.y },
           capacity: building.storageCapacity,
           currentItems: 0, // BuildingComponent doesn't track current items
           providesWarmth: building.heatAmount > 0 || building.baseTemperature > 0 || building.insulation > 0,
           warmthBonus: building.heatAmount + building.baseTemperature,
         };
-        nearestDist = dist;
+        nearestDist = distSquared;
       }
     }
 
@@ -223,14 +227,15 @@ export class BuildingTargeting {
         .executeEntities();
 
       const visionRange = vision.range || 15;
+      const visionRangeSquared = visionRange * visionRange;
 
       for (const buildingEntity of allBuildings) {
         const impl = buildingEntity as EntityImpl;
         const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
         if (!buildingPos) continue;
 
-        const dist = this.distance(position, buildingPos);
-        if (dist <= visionRange) {
+        const distSquared = this.distanceSquared(position, buildingPos);
+        if (distSquared <= visionRangeSquared) {
           candidates.push(buildingEntity.id);
         }
       }
@@ -267,15 +272,18 @@ export class BuildingTargeting {
         continue;
       }
 
-      const dist = this.distance(position, buildingPos);
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      const distSquared = this.distanceSquared(position, buildingPos);
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       results.push({
         entity: buildingEntity,
         buildingType: building.buildingType,
         isComplete,
         constructionProgress: building.progress,
-        distance: dist,
+        distance: Math.sqrt(distSquared), // Compute actual distance for result
         position: { x: buildingPos.x, y: buildingPos.y },
         capacity: building.storageCapacity,
         currentItems: 0, // BuildingComponent doesn't track current items
@@ -390,8 +398,17 @@ export class BuildingTargeting {
     if (options.buildingType) {
       const remembered = this.getRemembered(entity, options.buildingType);
       if (remembered) {
-        const dist = this.distance(position, remembered);
-        if (!options.maxDistance || dist <= options.maxDistance) {
+        if (!options.maxDistance) {
+          return {
+            type: 'remembered',
+            position: { x: remembered.x, y: remembered.y },
+            tick: remembered.tick,
+            category: `building:${options.buildingType}`,
+          };
+        }
+        const distSquared = this.distanceSquared(position, remembered);
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared <= maxDistSquared) {
           return {
             type: 'remembered',
             position: { x: remembered.x, y: remembered.y },
@@ -406,13 +423,13 @@ export class BuildingTargeting {
   }
 
   /**
-   * Calculate distance between two positions.
-   * PERFORMANCE: Returns actual distance - used for display and sorting.
+   * Calculate squared distance between two positions.
+   * PERFORMANCE: Avoids expensive Math.sqrt - use for distance comparisons.
    */
-  private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  private distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
-    return Math.sqrt(dx * dx + dy * dy);
+    return dx * dx + dy * dy;
   }
 }
 

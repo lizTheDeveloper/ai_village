@@ -342,6 +342,17 @@ export const DIVINE_COLORS = {
   faithMedium: '#87CEEB',   // 50-79%
   faithLow: '#F0E68C',      // 30-49%
   faithCritical: '#FF6B6B', // <30%
+
+  // UI Panel colors (Phase 28.6 - God's Phone)
+  background: '#1a1a2e',       // Dark background
+  headerBackground: '#252540', // Header/toolbar background
+  textBright: '#ffffff',       // Bright text
+  textDim: '#888899',          // Dimmed/secondary text
+  selectedBackground: '#3a3a5e', // Selected item background
+  rowEven: '#202035',          // Even row background
+  rowOdd: '#252545',           // Odd row background
+  playerMessageBg: '#1a4a6e',  // Player message bubble
+  angelMessageBg: '#3a2a4a',   // Angel message bubble
 } as const;
 
 export const URGENCY_COLORS: Record<PrayerUrgency, string> = {

@@ -185,8 +185,8 @@ export function calculateFarmingContext(
     // Check distance
     const dx = plantPos.x - position.x;
     const dy = plantPos.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance > PLANT_SEARCH_RADIUS) continue;
+    const distanceSquared = dx * dx + dy * dy;
+    if (distanceSquared > PLANT_SEARCH_RADIUS * PLANT_SEARCH_RADIUS) continue;
 
     // Skip dead plants
     if (plant.stage === 'dead' || plant.stage === 'decay') continue;

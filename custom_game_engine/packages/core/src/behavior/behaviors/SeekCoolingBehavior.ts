@@ -119,7 +119,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
       // Move towards the cooling source
       const dx = coolingSource.position.x - position.x;
       const dy = coolingSource.position.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distance = Math.sqrt(dx * dx + dy * dy); // Keep sqrt for velocity calculation
 
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
@@ -494,7 +494,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
       const MIN_MAGNITUDE_THRESHOLD = 0.5;
 
       if (magnitude >= MIN_MAGNITUDE_THRESHOLD) {
-        // Clear direction - move that way and save it as escape direction
+        // Clear direction - move that way and save it as escape direction (keep sqrt for normalization)
         const velocityX = (totalAvoidanceX / magnitude) * movement.speed;
         const velocityY = (totalAvoidanceY / magnitude) * movement.speed;
         this.setVelocity(entity, velocityX, velocityY);
@@ -529,7 +529,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
           // Escape direction is away from center of mass
           const dx = position.x - centerX;
           const dy = position.y - centerY;
-          const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+          const distFromCenter = Math.sqrt(dx * dx + dy * dy); // Keep sqrt for angle calculation
 
           if (distFromCenter > 0.1) {
             // Clear direction away from center - use it
@@ -911,7 +911,7 @@ function fleeHeatSourcesWithContext(ctx: BehaviorContext): void {
 
         const dx = ctx.position.x - centerX;
         const dy = ctx.position.y - centerY;
-        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+        const distFromCenter = Math.sqrt(dx * dx + dy * dy); // Keep sqrt for angle calculation
 
         if (distFromCenter > 0.1) {
           escapeAngle = Math.atan2(dy, dx);

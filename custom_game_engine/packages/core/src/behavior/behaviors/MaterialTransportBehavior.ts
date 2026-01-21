@@ -379,18 +379,16 @@ export class MaterialTransportBehavior extends BaseBehavior {
 
       if (!hasItem) continue;
 
-      // Calculate distance
-      const distance = agentPos
-        ? Math.sqrt(
-            Math.pow(pos.x - agentPos.x, 2) + Math.pow(pos.y - agentPos.y, 2)
-          )
+      // Calculate distance (using squared distance for performance in sorting)
+      const distanceSquared = agentPos
+        ? Math.pow(pos.x - agentPos.x, 2) + Math.pow(pos.y - agentPos.y, 2)
         : Infinity;
 
-      if (!closest || distance < closest.distance) {
+      if (!closest || distanceSquared < closest.distance) {
         closest = {
           entityId: storage.id,
           position: { x: pos.x, y: pos.y },
-          distance,
+          distance: distanceSquared,
         };
       }
     }

@@ -196,6 +196,7 @@ export enum ComponentType {
   Spirit = 'spirit',
   Deity = 'deity',
   Angel = 'angel',
+  AdminAngel = 'admin_angel',  // NUX helper angel in chat
   Mythology = 'mythology',
   DivineChat = 'divine_chat',
   DivineAbility = 'divine_ability',

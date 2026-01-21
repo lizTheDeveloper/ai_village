@@ -354,12 +354,12 @@ export class GroupPrayBehavior extends BaseBehavior {
 
       if (!agentPos || !spiritual || !agentComp) continue;
 
-      // Check distance
+      // Check distance (using squared distance for performance)
       const dx = agentPos.x - leaderPos.x;
       const dy = agentPos.y - leaderPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance > GROUP_PRAYER_CONFIG.GATHER_RADIUS) continue;
+      if (distanceSquared > GROUP_PRAYER_CONFIG.GATHER_RADIUS * GROUP_PRAYER_CONFIG.GATHER_RADIUS) continue;
 
       // Check if agent is busy with critical behavior
       const busyBehaviors = ['flee', 'seek_food', 'seek_sleep', 'forced_sleep'];

@@ -110,7 +110,7 @@ export class PlantActionHandler implements ActionHandler {
 
     if (distanceSquared > MAX_PLANT_DISTANCE_SQUARED) {
       const distance = Math.sqrt(distanceSquared); // Only for error message
-      const MAX_PLANT_DISTANCE = Math.sqrt(2);
+      const MAX_PLANT_DISTANCE = 1.414; // √2 pre-computed
       return {
         valid: false,
         reason: `Target tile (${targetPos.x},${targetPos.y}) is too far from actor at (${actorPos.x.toFixed(1)},${actorPos.y.toFixed(1)}). Distance: ${distance.toFixed(2)}, max: ${MAX_PLANT_DISTANCE.toFixed(2)}`,

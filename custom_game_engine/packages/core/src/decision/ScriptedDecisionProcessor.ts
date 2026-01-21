@@ -239,15 +239,15 @@ export class ScriptedDecisionProcessor {
             if (resourceComp.resourceType === 'stone' && hasStone) continue;
             if (resourceComp.resourceType === 'food' && hasFood) continue;
 
-            const distance = this.distance(position, entityPos);
-            if (distance > DETECTION_RANGE) continue;
+            const distanceSquared = this.distanceSquared(position, entityPos);
+            if (distanceSquared > DETECTION_RANGE * DETECTION_RANGE) continue;
 
-            if (resourceComp.resourceType === 'food' && (!result.food || distance < result.food.distance)) {
-              result.food = { type: 'food', distance, isPlant: false };
-            } else if (resourceComp.resourceType === 'wood' && (!result.wood || distance < result.wood.distance)) {
-              result.wood = { type: 'wood', distance };
-            } else if (resourceComp.resourceType === 'stone' && (!result.stone || distance < result.stone.distance)) {
-              result.stone = { type: 'stone', distance };
+            if (resourceComp.resourceType === 'food' && (!result.food || distanceSquared < result.food.distance)) {
+              result.food = { type: 'food', distance: distanceSquared, isPlant: false };
+            } else if (resourceComp.resourceType === 'wood' && (!result.wood || distanceSquared < result.wood.distance)) {
+              result.wood = { type: 'wood', distance: distanceSquared };
+            } else if (resourceComp.resourceType === 'stone' && (!result.stone || distanceSquared < result.stone.distance)) {
+              result.stone = { type: 'stone', distance: distanceSquared };
             }
             continue;
           }
@@ -261,9 +261,9 @@ export class ScriptedDecisionProcessor {
               const isHarvestable = ['fruiting', 'mature', 'seeding'].includes(plantComp.stage);
 
               if (isEdible && hasFruit && isHarvestable) {
-                const distance = this.distance(position, entityPos);
-                if (distance <= DETECTION_RANGE && (!result.food || distance < result.food.distance)) {
-                  result.food = { type: 'food', distance, isPlant: true };
+                const distanceSquared = this.distanceSquared(position, entityPos);
+                if (distanceSquared <= DETECTION_RANGE * DETECTION_RANGE && (!result.food || distanceSquared < result.food.distance)) {
+                  result.food = { type: 'food', distance: distanceSquared, isPlant: true };
                 }
               }
             }
@@ -394,8 +394,8 @@ export class ScriptedDecisionProcessor {
           const manhattanDist = Math.abs(plantPos.x - position.x) + Math.abs(plantPos.y - position.y);
           if (manhattanDist > DETECTION_RANGE * 1.5) continue;
 
-          const distance = this.distance(position, plantPos);
-          if (distance <= DETECTION_RANGE) {
+          const distanceSquared = this.distanceSquared(position, plantPos);
+          if (distanceSquared <= DETECTION_RANGE * DETECTION_RANGE) {
             plantsWithSeeds.push(nearbyEntity);
           }
         }
@@ -500,8 +500,8 @@ export class ScriptedDecisionProcessor {
     }
     // If we have all resources, check if we're near the build location
     if (Object.keys(missing).length === 0) {
-      const distToBuild = this.distance(position, build.position);
-      if (distToBuild <= PLANNED_BUILD_REACH) {
+      const distToBuildSquared = this.distanceSquared(position, build.position);
+      if (distToBuildSquared <= PLANNED_BUILD_REACH * PLANNED_BUILD_REACH) {
         // Near enough - start building!
         this.removePlannedBuild(entity, build);
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
@@ -649,8 +649,8 @@ export class ScriptedDecisionProcessor {
                 const rp = rImpl.getComponent<PositionComponent>(ComponentType.Position);
                 if (!rc || !rp || !rc.harvestable || rc.amount <= 0) return false;
                 if (rc.resourceType !== resourceType) return false;
-                const dist = this.distance(position, rp);
-                return dist <= DETECTION_RANGE;
+                const distSquared = this.distanceSquared(position, rp);
+                return distSquared <= DETECTION_RANGE * DETECTION_RANGE;
               });
               if (hasNearbyResource) {
                 candidates.push({
@@ -847,7 +847,16 @@ export class ScriptedDecisionProcessor {
     };
   }
   /**
-   * Calculate distance between two positions.
+   * Calculate squared distance between two positions (for distance comparisons).
+   */
+  private distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
+   * Calculate distance between two positions (only use when actual distance value is needed).
    */
   private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;

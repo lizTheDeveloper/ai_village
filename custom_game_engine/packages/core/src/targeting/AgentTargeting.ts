@@ -145,28 +145,31 @@ export class AgentTargeting {
         if (score < options.minRelationship) continue;
       }
 
-      // Calculate distance
-      const dist = this.distance(position, agentPos);
+      // Calculate squared distance for comparison
+      const distSquared = this.distanceSquared(position, agentPos);
 
-      // Check max distance
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      // Check max distance (using squared distance)
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       // Get relationship score if available
       const relationshipScore = relationships?.relationships.get(agentId)?.familiarity;
 
       // Track nearest
-      if (dist < nearestDist) {
+      if (distSquared < nearestDist) {
         nearest = {
           entity: agentEntity,
           name: agentName,
           behavior: agent.behavior,
-          distance: dist,
+          distance: Math.sqrt(distSquared), // Only compute actual distance for the result
           position: { x: agentPos.x, y: agentPos.y },
           isIdle,
           inConversation,
           relationshipScore,
         };
-        nearestDist = dist;
+        nearestDist = distSquared;
       }
     }
 
@@ -227,8 +230,11 @@ export class AgentTargeting {
         if (score < options.minRelationship) continue;
       }
 
-      const dist = this.distance(position, agentPos);
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      const distSquared = this.distanceSquared(position, agentPos);
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       const relationshipScore = relationships?.relationships.get(agentId)?.familiarity;
 
@@ -236,7 +242,7 @@ export class AgentTargeting {
         entity: agentEntity,
         name: agentName,
         behavior: agent.behavior,
-        distance: dist,
+        distance: Math.sqrt(distSquared), // Compute actual distance for result
         position: { x: agentPos.x, y: agentPos.y },
         isIdle,
         inConversation,
@@ -351,8 +357,17 @@ export class AgentTargeting {
     if (options.name) {
       const remembered = this.getRemembered(entity, options.name);
       if (remembered) {
-        const dist = this.distance(position, remembered);
-        if (!options.maxDistance || dist <= options.maxDistance) {
+        if (!options.maxDistance) {
+          return {
+            type: 'remembered',
+            position: { x: remembered.x, y: remembered.y },
+            tick: remembered.tick,
+            category: `agent:${options.name}`,
+          };
+        }
+        const distSquared = this.distanceSquared(position, remembered);
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared <= maxDistSquared) {
           return {
             type: 'remembered',
             position: { x: remembered.x, y: remembered.y },
@@ -367,13 +382,13 @@ export class AgentTargeting {
   }
 
   /**
-   * Calculate distance between two positions.
-   * PERFORMANCE: Returns actual distance - used for display and sorting.
+   * Calculate squared distance between two positions.
+   * PERFORMANCE: Avoids expensive Math.sqrt - use for distance comparisons.
    */
-  private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  private distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
-    return Math.sqrt(dx * dx + dy * dy);
+    return dx * dx + dy * dy;
   }
 }
 

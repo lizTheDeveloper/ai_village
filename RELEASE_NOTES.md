@@ -1,5 +1,334 @@
 # Release Notes
 
+## 2026-01-20 (Evening IV) - "Admin Angel NUX System" - 1622 New Lines + API Migration Doc + Targeting Performance
+
+### 👼 NEW: Admin Angel - NUX Helper System (1490 lines)
+
+Complete New User Experience (NUX) system with chat-based helper angel.
+
+**3 New Files:**
+
+#### AdminAngelComponent.ts (321 lines)
+Special angel component for player assistance.
+
+**Key Features:**
+- Lives in chat room (no physical body)
+- Helps players learn the game
+- Memory persists across sessions
+- Speaks casually like a gamer friend, not an AI assistant
+- Gets turns: on player message + periodic (1/min proactive)
+- Can use admin tools (time control, camera, panels, behaviors)
+
+**Data Structures:**
+```typescript
+interface PlayerKnowledge {
+  playerName?: string;           // Preferred name
+  firstMetAt: number;             // When we first met
+  totalPlaytime: number;          // Total ticks played
+  sessionsPlayed: number;
+  preferredSpeed: 'slow' | 'normal' | 'fast' | 'unknown';
+  playstyle: string[];            // Observed tags (builder, explorer, etc.)
+  favoriteAgents: string[];       // Frequently selected agents
+  frequentTopics: string[];       // Common questions
+}
+
+interface PlayerRelationship {
+  insideJokes: string[];          // Natural conversation callbacks
+  thingsTheyDislike: string[];    // Observed dislikes
+  thingsTheyEnjoy: string[];      // Observed interests
+  messageCount: number;
+  rapport: number;                // 0-100 rapport level
+}
+
+interface TutorialProgress {
+  hasSeenBasicControls: boolean;
+  hasBuiltSomething: boolean;
+  hasTamedAnimal: boolean;
+  understandsNeeds: boolean;
+  understandsCrafting: boolean;
+  understandsTime: boolean;
+  understandsAgentSelection: boolean;
+  hasAskedAboutMagic: boolean;
+  // ... soft gates, not rigid checkpoints
+}
+
+interface ConversationContext {
+  messages: AdminAngelMemory[];    // Last N messages
+  pendingObservations: string[];   // Things to mention next turn
+  currentTopic?: string;
+  recentActions: string[];         // Recent player actions
+}
+```
+
+**API:**
+```typescript
+createAdminAngelComponent(options): AdminAngelComponent
+createAdminAngelMemory(role, content, tick): AdminAngelMemory
+addMessageToContext(component, message): void
+addPendingObservation(component, observation): void
+popPendingObservation(component): string | undefined
+inferPlaystyle(component): void
+recordFavoriteAgent(component, agentId): void
+```
+
+**Impact**: Players now have a friendly in-game helper! Angel learns their playstyle, builds rapport, and proactively offers context-aware guidance. No rigid tutorial gates—adaptive to player behavior!
+
+#### AdminAngelSystem.ts (576 lines)
+System managing admin angel lifecycle and AI responses.
+
+**Features:**
+- Proactive turn system (1/min when idle)
+- LLM-powered responses with full game context
+- Observes player actions (camera movement, agent selection, panel opening)
+- Can trigger admin commands (time control, camera focus, open panels)
+- Memory management (keep last N messages, prune old context)
+
+**Turn Triggers:**
+- Player sends message → immediate response
+- 1 minute idle → proactive observation/suggestion
+- Game events (first building, first animal tamed) → contextual tip
+
+**Admin Commands Available:**
+```typescript
+// Time control
+pauseGame(), resumeGame(), setSpeed(multiplier)
+
+// Camera
+focusOnAgent(agentId), focusOnBuilding(buildingId), focusOnPosition(x, y)
+
+// Panels
+openPanel('memories' | 'relationships' | 'inventory' | 'crafting' | ...)
+
+// Agent control
+selectAgent(agentId), assignBehavior(agentId, behaviorType)
+```
+
+**Impact**: Admin angel actively helps players! Watches gameplay, offers tips, can directly manipulate UI/time for teaching moments!
+
+#### AngelPhonePanel.ts (593 lines)
+UI panel for angel chat interface.
+
+**Features:**
+- Chat message display with timestamps
+- Message input with send button
+- Typing indicator
+- Unread message badges
+- Auto-scroll to latest message
+- Mobile-friendly layout
+- Light/dark theme support
+
+**Integration:**
+- Registered in MenuBar under "Divine" category
+- Keyboard shortcut: `A` (Angel)
+- Shows unread count in window list
+- Progressive disclosure (only shows when admin angel exists)
+
+**Impact**: Clean, modern chat UI for talking to admin angel! Familiar chat interface players already know!
+
+---
+
+### 📖 NEW: API Namespace Migration Plan (132 lines)
+
+**NEW FILE: custom_game_engine/docs/API_NAMESPACE_MIGRATION.md**
+
+Complete plan for reorganizing API namespaces between two servers.
+
+**Current Problem:**
+- Two servers (8766 metrics-server, 3001 api-server)
+- Both use `/api/*` namespace with no clear separation
+- Confusion about routing, potential conflicts
+- PlanetClient initially pointed to wrong port
+
+**Proposed Solution - Option A (Recommended):**
+
+**Port 8766 (metrics-server) - Game Runtime:**
+```
+/api/game/*     - Live game queries (was /api/live/*)
+/api/actions/*  - Game actions
+/api/llm/*      - LLM queue
+/api/planets/*  - Planet sharing (was /api/planet*)
+/api/sprites/*  - Sprite generation
+/api/pixellab/* - PixelLab daemon
+/api/headless/* - Headless games
+/api/server/*   - Game server management (was /api/game-server/*)
+/api/saves/*    - Save/load/fork (was /api/save*)
+/api/canon/*    - Canon events
+/api/microgen/* - Microgen/riddles
+/api/animations/* - Animation queue
+/dashboard/*    - LLM-friendly dashboards
+/admin/*        - Admin interface
+/metrics/*      - Raw metrics
+```
+
+**Port 3001 (api-server) - Persistence & Multiverse:**
+```
+/api/multiverse/*  - Universe management
+  /api/multiverse/universes     - List universes
+  /api/multiverse/universe/:id  - CRUD operations
+  /api/multiverse/snapshots/*   - Snapshot management
+  /api/multiverse/passages/*    - Inter-universe passages
+  /api/multiverse/players/*     - Player management
+  /api/multiverse/stats         - Multiverse statistics
+
+/api/souls/*       - Soul repository
+  /api/souls           - List souls
+  /api/souls/:id       - Get soul
+  /api/souls/save      - Save soul
+  /api/souls/stats     - Repository stats
+  /api/souls/sprite    - Generate soul sprite
+
+/api/species/*     - Alien species
+  /api/species         - List species
+  /api/species/save    - Save species
+  /api/species/sprite  - Generate sprite
+```
+
+**Migration Strategy:**
+1. Phase 1: Add new routes alongside old (backwards compatibility)
+2. Phase 2: Add deprecation warnings to old routes
+3. Phase 3: Update client code (PlanetClient, saveLoadService)
+4. Phase 4: Remove deprecated routes
+
+**Impact**: Clear API organization plan! Distinct namespaces prevent conflicts, easier to understand which server handles what!
+
+---
+
+### ⚡ PERFORMANCE: Targeting System Optimizations
+
+**FILES:**
+- `custom_game_engine/packages/core/src/targeting/AgentTargeting.ts` (47 lines refactored)
+- `custom_game_engine/packages/core/src/targeting/BuildingTargeting.ts` (47 lines refactored)
+
+Converted distance calculations to use squared distance for comparisons.
+
+**Pattern Applied:**
+```typescript
+// BEFORE
+const dist = this.distance(position, agentPos);
+if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+
+// AFTER
+const distSquared = this.distanceSquared(position, agentPos);
+if (options.maxDistance !== undefined) {
+  const maxDistSquared = options.maxDistance * options.maxDistance;
+  if (distSquared > maxDistSquared) continue;
+}
+
+// Only compute actual distance when needed for result
+distance: Math.sqrt(distSquared)
+```
+
+**Locations Optimized:**
+
+**AgentTargeting.ts:**
+1. `findNearestAgent()` - Nearest agent search (hot path during pathfinding)
+2. `findAllNearbyAgents()` - Nearby agent queries (social interactions)
+3. `getRememberedLocation()` - Memory-based targeting
+
+**BuildingTargeting.ts:**
+1. `findNearestBuilding()` - Nearest building search
+2. `findAllNearbyBuildings()` - Building proximity queries
+3. `getRememberedLocation()` - Memory-based building targeting
+
+**Added Helper:**
+```typescript
+private distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  return dx * dx + dy * dy;
+}
+```
+
+**Impact**: Targeting system now uses squared distance! Eliminates expensive `Math.sqrt` calls in hot paths. Agent/building targeting is critical for pathfinding and AI decision-making—huge performance win!
+
+---
+
+### 🔧 Component & System Exports
+
+**components/index.ts (+17 lines):**
+```typescript
+export * from './AdminAngelComponent.js';
+export {
+  createAdminAngelComponent,
+  createAdminAngelMemory,
+  addMessageToContext,
+  addPendingObservation,
+  popPendingObservation,
+  inferPlaystyle,
+  recordFavoriteAgent,
+  type AdminAngelComponent,
+  type AdminAngelMemory,
+  type PlayerKnowledge,
+  type PlayerRelationship,
+  type TutorialProgress,
+  type ConversationContext,
+} from './AdminAngelComponent.js';
+```
+
+**systems/index.ts (+2 lines):**
+```typescript
+export * from './AdminAngelSystem.js';
+export { AdminAngelSystem } from './AdminAngelSystem.js';
+```
+
+**ComponentType.ts (+1 line):**
+```typescript
+AdminAngel = 'admin_angel',
+```
+
+**DivineUITypes.ts (+11 lines):**
+- Added angel phone panel type definitions
+
+---
+
+### 🐛 Minor Fixes
+
+**Decision Processors (5 files):**
+- `ResearchBehavior.ts` (8 lines)
+- `ExecutorLLMProcessor.ts` (6 lines)
+- `FarmingUtilityCalculator.ts` (4 lines)
+- `LLMDecisionProcessor.ts` (18 lines)
+- `ScriptedDecisionProcessor.ts` (45 lines)
+- `SpellUtilityCalculator.ts` (6 lines)
+
+**AngelSystem.ts:**
+- Minor 2-line fix
+
+---
+
+### 🎯 Files Changed (21 files, +1765/-102 = +1663 net)
+
+**New Files (4 files, +1622 lines):**
+- `AdminAngelComponent.ts` (321 lines)
+- `AdminAngelSystem.ts` (576 lines)
+- `AngelPhonePanel.ts` (593 lines)
+- `API_NAMESPACE_MIGRATION.md` (132 lines)
+
+**Performance Optimizations (2 files, +94 lines):**
+- `AgentTargeting.ts` (47 lines refactored)
+- `BuildingTargeting.ts` (47 lines refactored)
+
+**Exports & Types (4 files, +31 lines):**
+- `components/index.ts` (+17 lines)
+- `systems/index.ts` (+2 lines)
+- `ComponentType.ts` (+1 line)
+- `DivineUITypes.ts` (+11 lines)
+
+**Minor Fixes (11 files, +18 lines):**
+- 6 decision processors/calculators
+- 1 behavior
+- 1 angel system
+
+**Runtime Data (non-code, not committed):**
+- Old planet files deleted (3 files)
+- Player profiles updated (2 files)
+- Build artifacts (.pid files)
+
+**Devlog Ready:**
+- `GRAND-STRATEGY-IMPLEMENTATION-01-20.md` (205 lines, still untracked)
+
+---
+
 ## 2026-01-20 (Evening III) - "Admin Capabilities API Migration" - 4 Capabilities Refactored (-618 lines), Angel System Fixes
 
 ### 🔧 REFACTOR: 4 Admin Capabilities Migrated to New API (-618 lines)

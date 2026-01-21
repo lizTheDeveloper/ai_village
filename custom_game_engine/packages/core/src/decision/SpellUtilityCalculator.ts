@@ -157,13 +157,13 @@ export class SpellUtilityCalculator {
 
         const dx = allyPos.x - position.x;
         const dy = allyPos.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
-        if (distance < 30 && allyNeeds.health < 0.8) {
+        if (distanceSquared < 30 * 30 && allyNeeds.health < 0.8) {
           context.injuredAllies.push({
             id: allyImpl.id,
             health: allyNeeds.health,
-            distance
+            distance: Math.sqrt(distanceSquared)
           });
         }
       }

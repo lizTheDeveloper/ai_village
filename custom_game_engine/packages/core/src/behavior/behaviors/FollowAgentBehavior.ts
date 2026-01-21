@@ -59,16 +59,17 @@ export class FollowAgentBehavior extends BaseBehavior {
 
     const dx = targetPos.x - position.x;
     const dy = targetPos.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
+    const distance = Math.sqrt(distanceSquared);
 
-    if (distance < MIN_FOLLOW_DISTANCE) {
+    if (distanceSquared < MIN_FOLLOW_DISTANCE * MIN_FOLLOW_DISTANCE) {
       // Too close, stop
       entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         velocityX: 0,
         velocityY: 0,
       }));
-    } else if (distance > MAX_FOLLOW_DISTANCE) {
+    } else if (distanceSquared > MAX_FOLLOW_DISTANCE * MAX_FOLLOW_DISTANCE) {
       // Too far, speed up to catch up
       const velocityX = (dx / distance) * movement.speed * CATCH_UP_SPEED;
       const velocityY = (dy / distance) * movement.speed * CATCH_UP_SPEED;

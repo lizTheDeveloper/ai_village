@@ -145,6 +145,8 @@ export * from './PossessionSystem.js';
 export * from './PlayerInputSystem.js';
 // Phase 7: Angels
 export * from './AngelSystem.js';
+// Admin Angel (NUX helper in divine chat)
+export * from './AdminAngelSystem.js';
 // Phase 28.6: Angel Phone System (God's Phone)
 export * from './AngelPhoneSystem.js';
 // Phase 8: Advanced Theology

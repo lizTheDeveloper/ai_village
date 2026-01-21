@@ -172,7 +172,7 @@ export class PlanetClient {
     config?: Partial<PlanetConfig>;
     id?: string;
   }): Promise<PlanetMetadata> {
-    const response = await fetch(`${this.baseUrl}/api/planet`, {
+    const response = await fetch(`${this.baseUrl}/api/planets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -197,7 +197,7 @@ export class PlanetClient {
    * Get planet metadata
    */
   async getPlanet(planetId: string): Promise<PlanetMetadata | null> {
-    const response = await fetch(`${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}`);
+    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}`);
 
     if (response.status === 404) {
       return null;
@@ -231,7 +231,7 @@ export class PlanetClient {
    * Delete a planet (marks as deleted)
    */
   async deletePlanet(planetId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}`, {
+    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}`, {
       method: 'DELETE',
     });
 
@@ -245,7 +245,7 @@ export class PlanetClient {
    * Record that this save is accessing the planet (increments saveCount)
    */
   async recordAccess(planetId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/access`, {
+    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/access`, {
       method: 'POST',
     });
 
@@ -278,7 +278,7 @@ export class PlanetClient {
    * Get biosphere data (if exists)
    */
   async getBiosphere(planetId: string): Promise<BiosphereData | null> {
-    const response = await fetch(`${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/biosphere`);
+    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/biosphere`);
 
     if (response.status === 404) {
       return null;
@@ -297,7 +297,7 @@ export class PlanetClient {
    * Save biosphere data (usually done once after generation)
    */
   async saveBiosphere(planetId: string, biosphere: BiosphereData): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/biosphere`, {
+    const response = await fetch(`${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/biosphere`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(biosphere),
@@ -318,7 +318,7 @@ export class PlanetClient {
    */
   async getChunk(planetId: string, x: number, y: number): Promise<SerializedChunk | null> {
     const response = await fetch(
-      `${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/chunk/${x},${y}`
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/chunk/${x},${y}`
     );
 
     if (response.status === 404) {
@@ -344,7 +344,7 @@ export class PlanetClient {
     }
 
     const response = await fetch(
-      `${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/chunk/${chunk.x},${chunk.y}`,
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/chunk/${chunk.x},${chunk.y}`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -369,7 +369,7 @@ export class PlanetClient {
     coords: Array<{ x: number; y: number }>
   ): Promise<Map<string, SerializedChunk>> {
     const response = await fetch(
-      `${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/chunks/batch`,
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/chunks/batch`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -398,7 +398,7 @@ export class PlanetClient {
    */
   async listChunks(planetId: string): Promise<ChunkListEntry[]> {
     const response = await fetch(
-      `${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/chunks`
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/chunks`
     );
 
     if (!response.ok) {
@@ -419,7 +419,7 @@ export class PlanetClient {
    */
   async getNamedLocations(planetId: string): Promise<NamedLocation[]> {
     const response = await fetch(
-      `${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/locations`
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/locations`
     );
 
     if (!response.ok) {
@@ -446,7 +446,7 @@ export class PlanetClient {
     };
 
     const response = await fetch(
-      `${this.baseUrl}/api/planet/${encodeURIComponent(planetId)}/location`,
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/location`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

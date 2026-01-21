@@ -272,15 +272,15 @@ export class TradeBehavior extends BaseBehavior {
       }
       // For selling, we assume all shops accept all items (shop will check funds)
 
-      // Calculate distance
+      // Calculate distance (using squared distance for performance)
       const dx = shopPos.x - position.x;
       const dy = shopPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance > MAX_SHOP_SEARCH_DISTANCE) continue;
+      if (distanceSquared > MAX_SHOP_SEARCH_DISTANCE * MAX_SHOP_SEARCH_DISTANCE) continue;
 
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
+      if (distanceSquared < nearestDistance) {
+        nearestDistance = distanceSquared;
         nearest = { entityId: shopEntity.id, position: shopPos };
       }
     }

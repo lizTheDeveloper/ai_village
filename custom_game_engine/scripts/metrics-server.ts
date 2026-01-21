@@ -1,10 +1,18 @@
 /**
- * Metrics Streaming Server
+ * Metrics Streaming Server (Port 8766)
  *
- * WebSocket server that receives metrics from the browser client
- * and persists them using MetricsStorage.
+ * Game runtime server handling live queries, LLM, sprites, planets, and admin.
+ * WebSocket server that receives metrics from the browser client and persists them.
  *
  * Usage: npx tsx scripts/metrics-server.ts
+ *
+ * NAMESPACE MIGRATION (see docs/API_NAMESPACE_MIGRATION.md):
+ *   Preferred namespaces (use these for new code):
+ *     /api/game/*    → Live game queries (was /api/live/*)
+ *     /api/planets/* → Planet sharing (was /api/planet*)
+ *     /api/saves/*   → Save/load/fork (was /api/save*)
+ *     /api/server/*  → Game server mgmt (was /api/game-server/*)
+ *   Old namespaces still work but emit deprecation warnings.
  *
  * HTTP Endpoints:
  *   GET /                    - Session browser (start here)
@@ -17,34 +25,34 @@
  *   GET /metrics/building    - Building-related metrics
  *   GET /metrics/summary     - Summary statistics
  *
- * Save/Load/Fork API (Time Manipulation Dev Tools):
+ * Save/Load/Fork API - /api/saves/* (Time Manipulation Dev Tools):
  *   GET    /api/saves?session=<id>     - List saves for a session
- *   POST   /api/load                   - Load a save (rewind)
- *   POST   /api/fork                   - Fork a new universe from a save
- *   DELETE /api/save?session=<id>&save=<name> - Delete a save
- *   GET    /api/save-load              - API help and documentation
+ *   POST   /api/saves/load             - Load a save (rewind)
+ *   POST   /api/saves/fork             - Fork a new universe from a save
+ *   DELETE /api/saves/:name?session=<id> - Delete a save
+ *   GET    /api/saves/help             - API help and documentation
  *
- * Planet Sharing API (Persistent World):
+ * Planet Sharing API - /api/planets/* (Persistent World):
  *   GET    /api/planets                - List all planets
  *   GET    /api/planets/stats          - Get planet statistics
- *   POST   /api/planet                 - Create a new planet
- *   GET    /api/planet/:id             - Get planet metadata
- *   DELETE /api/planet/:id             - Delete planet (marks as deleted)
- *   POST   /api/planet/:id/access      - Record planet access
- *   GET    /api/planet/:id/biosphere   - Get biosphere data
- *   PUT    /api/planet/:id/biosphere   - Save biosphere data
- *   GET    /api/planet/:id/chunks      - List all chunks
- *   POST   /api/planet/:id/chunks/batch - Batch get chunks
- *   GET    /api/planet/:id/chunk/:x,:y - Get specific chunk
- *   PUT    /api/planet/:id/chunk/:x,:y - Save/update chunk
- *   GET    /api/planet/:id/locations   - Get named locations
- *   POST   /api/planet/:id/location    - Add named location
- *   GET    /api/planet                 - API help and documentation
+ *   POST   /api/planets                - Create a new planet
+ *   GET    /api/planets/:id            - Get planet metadata
+ *   DELETE /api/planets/:id            - Delete planet (marks as deleted)
+ *   POST   /api/planets/:id/access     - Record planet access
+ *   GET    /api/planets/:id/biosphere  - Get biosphere data
+ *   PUT    /api/planets/:id/biosphere  - Save biosphere data
+ *   GET    /api/planets/:id/chunks     - List all chunks
+ *   POST   /api/planets/:id/chunks/batch - Batch get chunks
+ *   GET    /api/planets/:id/chunk/:x,:y - Get specific chunk
+ *   PUT    /api/planets/:id/chunk/:x,:y - Save/update chunk
+ *   GET    /api/planets/:id/locations  - Get named locations
+ *   POST   /api/planets/:id/location   - Add named location
+ *   GET    /api/planets/help           - API help and documentation
  *
- * Sprite Generation API (On-Demand Asset Creation):
+ * Sprite Generation API - /api/sprites/* (On-Demand Asset Creation):
  *   POST /api/sprites/generate          - Queue sprite generation for missing assets
  *   GET  /api/sprites/generate/status/:folderId - Check generation status
- *   GET  /api/sprites/queue              - List pending sprite generation jobs
+ *   GET  /api/sprites/queue             - List pending sprite generation jobs
  *
  * Unified Dashboard Views (shared with Player UI):
  *   GET /views               - List all available views
@@ -52,26 +60,26 @@
  *   GET /view/:id?format=json - Get view data as JSON
  *   GET /view/:id?session=<id> - Get view for specific session
  *
- * Live Entity API (queries running game in real-time):
- *   All Live Query endpoints support optional ?session=<id> parameter to target specific game sessions
- *   GET  /api/live/status      - Check if game is connected
- *   GET  /api/live/entities?session=<id>    - List all agents (live)
- *   GET  /api/live/entity?id=<id>&session=<id>      - Get entity state by ID (live)
- *   GET  /api/live/prompt?id=<id>&session=<id>      - Get LLM prompt for agent (live, original/legacy)
- *   GET  /api/live/prompt/talker?id=<id>&session=<id> - Get Talker prompt (Layer 2: conversation, goals, social)
- *   GET  /api/live/prompt/executor?id=<id>&session=<id> - Get Executor prompt (Layer 3: strategic planning, tasks)
- *   POST /api/live/set-llm?session=<id>     - Set custom LLM config for agent (live)
- *   GET  /api/live/universe?session=<id> - Get universe config
- *   GET  /api/live/magic?session=<id>       - Get magic system info (enabled paradigms, etc.)
- *   GET  /api/live/pending-approvals - Get pending creations awaiting divine approval
- *   POST /api/live/approve-creation?id=<id> - Approve a pending creation
- *   POST /api/live/reject-creation?id=<id>  - Reject a pending creation
- *   GET  /api/live/divinity?session=<id>    - Get divinity info (gods, belief, pantheons, etc.)
- *   GET  /api/live/research?session=<id>    - Get research info (discovered papers, in-progress, completed)
- *   GET  /api/live/scheduler?session=<id>   - Get LLM scheduler metrics (layer selection, cooldowns, success/failure)
- *   GET  /api/live/conversation?id=<id>&session=<id> - Get conversation history for an agent
+ * Game Query API - /api/game/* (queries running game in real-time):
+ *   All endpoints support optional ?session=<id> parameter to target specific game sessions
+ *   GET  /api/game/status      - Check if game is connected
+ *   GET  /api/game/entities    - List all agents (live)
+ *   GET  /api/game/entity?id=<id>      - Get entity state by ID (live)
+ *   GET  /api/game/prompt?id=<id>      - Get LLM prompt for agent (live, original/legacy)
+ *   GET  /api/game/prompt/talker?id=<id> - Get Talker prompt (Layer 2: conversation, goals, social)
+ *   GET  /api/game/prompt/executor?id=<id> - Get Executor prompt (Layer 3: strategic planning, tasks)
+ *   POST /api/game/set-llm     - Set custom LLM config for agent (live)
+ *   GET  /api/game/universe    - Get universe config
+ *   GET  /api/game/magic       - Get magic system info (enabled paradigms, etc.)
+ *   GET  /api/game/pending-approvals - Get pending creations awaiting divine approval
+ *   POST /api/game/approve-creation?id=<id> - Approve a pending creation
+ *   POST /api/game/reject-creation?id=<id>  - Reject a pending creation
+ *   GET  /api/game/divinity    - Get divinity info (gods, belief, pantheons, etc.)
+ *   GET  /api/game/research    - Get research info (discovered papers, in-progress, completed)
+ *   GET  /api/game/scheduler   - Get LLM scheduler metrics (layer selection, cooldowns, success/failure)
+ *   GET  /api/game/conversation?id=<id> - Get conversation history for an agent
  *
- * LLM Queue API (server-side LLM with queuing and multi-game fair-share rate limiting):
+ * LLM Queue API - /api/llm/* (server-side LLM with queuing and multi-game fair-share rate limiting):
  *   POST /api/llm/generate     - Generate LLM response (queued, rate-limited, fallback support)
  *   POST /api/llm/heartbeat    - Heartbeat to keep game session active (for cooldown tracking)
  *   GET  /api/llm/stats        - Get queue stats (queue lengths, session info, rate limits)
@@ -4470,8 +4478,45 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
   const url = new URL(req.url || '/', `http://localhost:${HTTP_PORT}`);
-  const pathname = url.pathname;
+  let pathname = url.pathname;
   const sessionParam = url.searchParams.get('session');
+
+  // === API NAMESPACE MIGRATION ===
+  // Phase 1: Add new route aliases with backwards compatibility
+  // New namespaces map to existing handlers; old namespaces emit deprecation warnings
+  // See docs/API_NAMESPACE_MIGRATION.md for the full migration plan
+
+  // Route aliasing: NEW namespace → OLD namespace (silent, for new clients)
+  const namespaceAliases: Array<[string, string]> = [
+    ['/api/game/', '/api/live/'],           // Live game queries
+    ['/api/planets', '/api/planet'],         // Planet sharing (note: no trailing slash)
+    ['/api/saves', '/api/save'],             // Save/load/fork (note: no trailing slash)
+    ['/api/server/', '/api/game-server/'],   // Game server management
+  ];
+
+  let wasRewritten = false;
+  for (const [newPrefix, oldPrefix] of namespaceAliases) {
+    if (pathname.startsWith(newPrefix)) {
+      pathname = oldPrefix + pathname.slice(newPrefix.length);
+      wasRewritten = true;
+      break;
+    }
+  }
+
+  // Deprecation warnings: OLD namespace (emit warning, still works)
+  const deprecatedPrefixes: Array<[string, string]> = [
+    ['/api/live/', '/api/game/'],
+    ['/api/game-server/', '/api/server/'],
+  ];
+
+  if (!wasRewritten) {
+    for (const [oldPrefix, newPrefix] of deprecatedPrefixes) {
+      if (pathname.startsWith(oldPrefix)) {
+        console.warn(`[DEPRECATED] Use ${newPrefix}* instead of ${oldPrefix}* - see docs/API_NAMESPACE_MIGRATION.md`);
+        break;
+      }
+    }
+  }
 
   // === UNIFIED ADMIN DASHBOARD ===
   // Routes /admin/* to the capability-based admin interface

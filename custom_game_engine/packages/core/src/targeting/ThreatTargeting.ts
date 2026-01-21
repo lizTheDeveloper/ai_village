@@ -142,28 +142,31 @@ export class ThreatTargeting {
       const threatInfo = this.evaluateThreat(visibleEntity as EntityImpl, entity, options);
       if (!threatInfo) continue;
 
-      // Calculate distance
-      const dist = this.distance(position, threatPos);
+      // Calculate squared distance for comparison
+      const distSquared = this.distanceSquared(position, threatPos);
 
-      // Check max distance
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      // Check max distance (using squared distance)
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
 
       // Check if moving only
       if (options.movingOnly && !threatInfo.isMoving) continue;
 
       // Track nearest
-      if (dist < nearestDist) {
+      if (distSquared < nearestDist) {
         nearest = {
           entity: visibleEntity,
           threatType: threatInfo.threatType,
           threatLevel: threatInfo.threatLevel,
-          distance: dist,
+          distance: Math.sqrt(distSquared), // Compute actual distance for result
           position: { x: threatPos.x, y: threatPos.y },
           velocity: threatInfo.velocity,
           isMoving: threatInfo.isMoving,
           isApproaching: this.isApproaching(position, threatPos, threatInfo.velocity),
         };
-        nearestDist = dist;
+        nearestDist = distSquared;
       }
     }
 
@@ -213,15 +216,18 @@ export class ThreatTargeting {
       const threatInfo = this.evaluateThreat(visibleEntity as EntityImpl, entity, options);
       if (!threatInfo) continue;
 
-      const dist = this.distance(position, threatPos);
-      if (options.maxDistance !== undefined && dist > options.maxDistance) continue;
+      const distSquared = this.distanceSquared(position, threatPos);
+      if (options.maxDistance !== undefined) {
+        const maxDistSquared = options.maxDistance * options.maxDistance;
+        if (distSquared > maxDistSquared) continue;
+      }
       if (options.movingOnly && !threatInfo.isMoving) continue;
 
       results.push({
         entity: visibleEntity,
         threatType: threatInfo.threatType,
         threatLevel: threatInfo.threatLevel,
-        distance: dist,
+        distance: Math.sqrt(distSquared), // Compute actual distance for result
         position: { x: threatPos.x, y: threatPos.y },
         velocity: threatInfo.velocity,
         isMoving: threatInfo.isMoving,
@@ -437,13 +443,13 @@ export class ThreatTargeting {
   }
 
   /**
-   * Calculate distance between two positions.
-   * PERFORMANCE: Returns actual distance - needed for threat assessment weighting.
+   * Calculate squared distance between two positions.
+   * PERFORMANCE: Avoids expensive Math.sqrt - use for distance comparisons.
    */
-  private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  private distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
-    return Math.sqrt(dx * dx + dy * dy);
+    return dx * dx + dy * dy;
   }
 }
 
