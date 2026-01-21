@@ -86,8 +86,9 @@ export class ChunkSerializer {
 
   /**
    * Serialize a single chunk with compression.
+   * Public method for ServerBackedChunkManager integration.
    */
-  private serializeChunk(chunk: Chunk): SerializedChunk {
+  serializeChunk(chunk: Chunk): SerializedChunk {
     // Select compression strategy
     const strategy = this.selectCompressionStrategy(chunk.tiles);
 
@@ -352,6 +353,19 @@ export class ChunkSerializer {
         (chunkManager as unknown as { chunks: Map<string, Chunk> }).chunks.set(key, corruptedChunk);
       }
     }
+  }
+
+  /**
+   * Deserialize server data into an existing chunk object.
+   * Public method for ServerBackedChunkManager integration.
+   */
+  deserializeIntoChunk(chunk: Chunk, serialized: SerializedChunk): void {
+    const deserialized = this.deserializeChunk(serialized);
+
+    // Copy deserialized data into existing chunk
+    chunk.tiles = deserialized.tiles;
+    chunk.entities = deserialized.entities;
+    chunk.generated = deserialized.generated;
   }
 
   /**

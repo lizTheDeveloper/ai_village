@@ -61,10 +61,11 @@ export class PlanetaryCurrentsSystem extends BaseSystem {
   protected onInitialize(_world: World, eventBus: EventBus): void {
     // Subscribe to time:day events for tide updates
     // Daily updates trigger tidal recalculation for affected coastal tiles
-    eventBus.on('time:day_changed', (data: WorldEvents['time:day_changed']) => {
+    eventBus.on('time:day_changed', (event) => {
       // Trigger tidal force recalculation on day change
       // Moon phase/distance is calculated internally in updateMoonCycle()
       // based on current tick, so no separate celestial subscription needed
+      const data = event.data as WorldEvents['time:day_changed'];
       this.onDayChanged(data.day);
     });
   }

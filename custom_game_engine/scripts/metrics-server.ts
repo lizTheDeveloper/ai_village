@@ -331,6 +331,118 @@ const wsSessions = new Map<WebSocket, string>();
 let messageCount = 0;
 let lastLogTime = Date.now();
 
+// ============================================================
+// Planet Real-Time Sync (WebSocket)
+// ============================================================
+
+// Track planet subscriptions: planetId -> Set of subscribed WebSocket clients
+const planetSubscriptions = new Map<string, Set<WebSocket>>();
+
+// Track which planets each client is subscribed to: ws -> Set of planetIds
+const clientPlanetSubscriptions = new Map<WebSocket, Set<string>>();
+
+/**
+ * Subscribe a client to planet chunk updates
+ */
+function subscribeToPlanet(ws: WebSocket, planetId: string): void {
+  // Add to planet -> clients map
+  let subscribers = planetSubscriptions.get(planetId);
+  if (!subscribers) {
+    subscribers = new Set();
+    planetSubscriptions.set(planetId, subscribers);
+  }
+  subscribers.add(ws);
+
+  // Add to client -> planets map
+  let clientPlanets = clientPlanetSubscriptions.get(ws);
+  if (!clientPlanets) {
+    clientPlanets = new Set();
+    clientPlanetSubscriptions.set(ws, clientPlanets);
+  }
+  clientPlanets.add(planetId);
+
+  console.log(`[PlanetSync] Client subscribed to planet ${planetId} (${subscribers.size} total subscribers)`);
+}
+
+/**
+ * Unsubscribe a client from planet chunk updates
+ */
+function unsubscribeFromPlanet(ws: WebSocket, planetId: string): void {
+  // Remove from planet -> clients map
+  const subscribers = planetSubscriptions.get(planetId);
+  if (subscribers) {
+    subscribers.delete(ws);
+    if (subscribers.size === 0) {
+      planetSubscriptions.delete(planetId);
+    }
+  }
+
+  // Remove from client -> planets map
+  const clientPlanets = clientPlanetSubscriptions.get(ws);
+  if (clientPlanets) {
+    clientPlanets.delete(planetId);
+    if (clientPlanets.size === 0) {
+      clientPlanetSubscriptions.delete(ws);
+    }
+  }
+
+  console.log(`[PlanetSync] Client unsubscribed from planet ${planetId}`);
+}
+
+/**
+ * Unsubscribe a client from all planets (called on disconnect)
+ */
+function unsubscribeFromAllPlanets(ws: WebSocket): void {
+  const clientPlanets = clientPlanetSubscriptions.get(ws);
+  if (clientPlanets) {
+    for (const planetId of clientPlanets) {
+      const subscribers = planetSubscriptions.get(planetId);
+      if (subscribers) {
+        subscribers.delete(ws);
+        if (subscribers.size === 0) {
+          planetSubscriptions.delete(planetId);
+        }
+      }
+    }
+    clientPlanetSubscriptions.delete(ws);
+  }
+}
+
+/**
+ * Broadcast a chunk update to all subscribers of a planet (except the sender)
+ */
+function broadcastChunkUpdate(
+  planetId: string,
+  chunkData: { x: number; y: number; tiles: unknown; compression: string; modifiedAt: number; modifiedBy?: string },
+  senderWs?: WebSocket
+): void {
+  const subscribers = planetSubscriptions.get(planetId);
+  if (!subscribers || subscribers.size === 0) {
+    return;
+  }
+
+  const message = JSON.stringify({
+    type: 'planet_chunk_updated',
+    planetId,
+    chunk: chunkData,
+  });
+
+  let sent = 0;
+  for (const ws of subscribers) {
+    // Don't send back to the sender
+    if (ws === senderWs) continue;
+
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(message);
+      sent++;
+    }
+  }
+
+  if (sent > 0) {
+    console.log(`[PlanetSync] Broadcast chunk (${chunkData.x},${chunkData.y}) to ${sent} clients for planet ${planetId}`);
+  }
+}
+
 const HTTP_PORT = 8766;
 
 // ============================================================
@@ -8497,6 +8609,73 @@ wss.on('connection', (ws: WebSocket) => {
           }
           break;
 
+        // ============================================================
+        // Planet Real-Time Sync Messages
+        // ============================================================
+
+        case 'planet_subscribe':
+          // Client wants to receive real-time chunk updates for a planet
+          if (message.planetId) {
+            subscribeToPlanet(ws, message.planetId);
+            ws.send(JSON.stringify({
+              type: 'planet_subscribed',
+              planetId: message.planetId,
+              success: true,
+            }));
+          }
+          break;
+
+        case 'planet_unsubscribe':
+          // Client no longer wants updates for a planet
+          if (message.planetId) {
+            unsubscribeFromPlanet(ws, message.planetId);
+            ws.send(JSON.stringify({
+              type: 'planet_unsubscribed',
+              planetId: message.planetId,
+              success: true,
+            }));
+          }
+          break;
+
+        case 'planet_chunk_update':
+          // Client is sending a chunk update to be broadcast to other subscribers
+          if (message.planetId && message.chunk) {
+            // Save the chunk to storage
+            try {
+              await planetStorage.saveChunk(message.planetId, {
+                x: message.chunk.x,
+                y: message.chunk.y,
+                tiles: message.chunk.tiles,
+                compression: message.chunk.compression || 'full',
+                modifiedAt: message.chunk.modifiedAt || Date.now(),
+                modifiedBy: message.chunk.modifiedBy,
+                checksum: message.chunk.checksum || '',
+              });
+
+              // Broadcast to other subscribers
+              broadcastChunkUpdate(message.planetId, message.chunk, ws);
+
+              ws.send(JSON.stringify({
+                type: 'planet_chunk_saved',
+                planetId: message.planetId,
+                x: message.chunk.x,
+                y: message.chunk.y,
+                success: true,
+              }));
+            } catch (error) {
+              console.error(`[PlanetSync] Failed to save chunk:`, error);
+              ws.send(JSON.stringify({
+                type: 'planet_chunk_saved',
+                planetId: message.planetId,
+                x: message.chunk.x,
+                y: message.chunk.y,
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+              }));
+            }
+          }
+          break;
+
         default:
           console.warn(`Unknown message type: ${message.type}`);
       }
@@ -8508,6 +8687,9 @@ wss.on('connection', (ws: WebSocket) => {
   ws.on('close', () => {
     console.log(`[${new Date().toISOString()}] Client disconnected: ${sessionId}`);
     wsSessions.delete(ws);
+
+    // Unsubscribe from all planet updates
+    unsubscribeFromAllPlanets(ws);
 
     // Mark session as ended and save
     const session = gameSessions.get(sessionId);

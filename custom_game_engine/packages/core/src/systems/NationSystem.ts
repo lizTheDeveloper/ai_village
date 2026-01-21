@@ -216,7 +216,7 @@ export class NationSystem extends BaseSystem {
       // Calculate province totals from live data
       const provincePopulation = province.cities.reduce((sum, city) => sum + city.population, 0);
       const provinceGDP = province.economy.taxRevenue * 10; // Estimate GDP from tax revenue
-      const provinceMilitary = province.military?.garrisonStrength ?? 0;
+      const provinceMilitary = province.military?.garrisoned ?? 0;
 
       totalPopulation += provincePopulation;
       totalGDP += provinceGDP;
@@ -230,7 +230,7 @@ export class NationSystem extends BaseSystem {
         population: provincePopulation,
         gdp: provinceGDP,
         militaryContribution: provinceMilitary,
-        loyaltyToNation: existingRecord?.loyaltyToNation ?? province.loyalty,
+        loyaltyToNation: existingRecord?.loyaltyToNation ?? province.stability,
         lastUpdateTick: world.tick,
       });
     }

@@ -903,7 +903,7 @@ export class CreatorInterventionSystem extends BaseSystem {
 
     // This is a targeted singleton query - Supreme Creator always exists
     const creators = this.world.query().with(CT.SupremeCreator).executeEntities();
-    return creators.length > 0 ? creators[0] : null;
+    return creators.length > 0 ? creators[0]! : null;
   }
 
   /**

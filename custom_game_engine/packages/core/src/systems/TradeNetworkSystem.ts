@@ -327,25 +327,26 @@ export class TradeNetworkSystem extends BaseSystem {
     }
 
     // Update component
+    const updatedEdges = new Map<string, TradeEdge>();
+    for (const [id, graphEdge] of graph.edges) {
+      const existingEdge = network.edges.get(id);
+      const tradeEdge: TradeEdge = existingEdge ?? {
+        edgeId: graphEdge.edgeId,
+        laneId: '', // Will be filled from shipping lane
+        fromNodeId: graphEdge.fromNodeId,
+        toNodeId: graphEdge.toNodeId,
+        flowRate: 0,
+        capacity: 0,
+        congestion: 0,
+        active: true,
+      };
+      updatedEdges.set(id, tradeEdge);
+    }
+
     const updatedNetwork: TradeNetworkComponent = {
       ...network,
       nodes: graph.nodes,
-      edges: new Map(
-        Array.from(graph.edges.entries()).map(([id, graphEdge]) => {
-          const existingEdge = network.edges.get(id);
-          const tradeEdge: TradeEdge = existingEdge ?? {
-            edgeId: graphEdge.edgeId,
-            laneId: '', // Will be filled from shipping lane
-            fromNodeId: graphEdge.fromNodeId,
-            toNodeId: graphEdge.toNodeId,
-            flowRate: 0,
-            capacity: 0,
-            congestion: 0,
-            active: true,
-          };
-          return [id, tradeEdge];
-        })
-      ),
+      edges: updatedEdges,
       adjacencyList: graph.adjacencyList,
       totalFlowRate,
       networkDensity: metrics.density,
@@ -619,14 +620,17 @@ export class TradeNetworkSystem extends BaseSystem {
 
     // For each pair of neighbors, check if alternative path exists
     const edgeIds = graph.adjacencyList.get(nodeId) ?? new Set<string>();
-    const neighbors = Array.from(edgeIds)
-      .map((edgeId: string) => {
-        const edge = graph.edges.get(edgeId);
-        if (!edge) return undefined;
+    const neighbors: EntityId[] = [];
+    for (const edgeId of edgeIds) {
+      const edge = graph.edges.get(edgeId);
+      if (edge) {
         // Get the neighbor (the "other end" of the edge)
-        return edge.fromNodeId === nodeId ? edge.toNodeId : edge.fromNodeId;
-      })
-      .filter((id): id is EntityId => id !== undefined && id !== nodeId);
+        const neighborId = edge.fromNodeId === nodeId ? edge.toNodeId : edge.fromNodeId;
+        if (neighborId !== nodeId) {
+          neighbors.push(neighborId);
+        }
+      }
+    }
 
     for (let i = 0; i < neighbors.length; i++) {
       for (let j = i + 1; j < neighbors.length; j++) {
@@ -692,8 +696,12 @@ export class TradeNetworkSystem extends BaseSystem {
     for (const [nodeId, compId] of components.components) {
       if (compId === chokepointComponent && nodeId !== chokepointId) {
         const newCompId = modifiedComponents.components.get(nodeId);
-        const newCompSize = Array.from(modifiedComponents.components.values())
-          .filter(id => id === newCompId).length;
+
+        // Count nodes in the new component
+        let newCompSize = 0;
+        for (const id of modifiedComponents.components.values()) {
+          if (id === newCompId) newCompSize++;
+        }
 
         // If node is now in smaller component, it's affected
         if (newCompSize < components.components.size / 2) {
@@ -963,7 +971,9 @@ export class TradeNetworkSystem extends BaseSystem {
     const cascadeNodes = this.calculateCascadeEffect(laneEntities, blockade.targetNodeId, affectedNodes);
     affectedNodes.push(...cascadeNodes);
 
-    return Array.from(new Set(affectedNodes)); // Deduplicate
+    // Deduplicate using Set
+    const uniqueNodes = new Set(affectedNodes);
+    return Array.from(uniqueNodes);
   }
 
   /**
@@ -1308,12 +1318,19 @@ export class TradeNetworkSystem extends BaseSystem {
       return undefined;
     }
 
-    const nodes = Array.from(network.nodes);
-    const edges = Array.from(network.edges.values()).map(edge => ({
-      from: edge.fromNodeId,
-      to: edge.toNodeId,
-      flow: edge.flowRate,
-    }));
+    const nodes: EntityId[] = [];
+    for (const nodeId of network.nodes) {
+      nodes.push(nodeId);
+    }
+
+    const edges: Array<{ from: EntityId; to: EntityId; flow: number }> = [];
+    for (const edge of network.edges.values()) {
+      edges.push({
+        from: edge.fromNodeId,
+        to: edge.toNodeId,
+        flow: edge.flowRate,
+      });
+    }
 
     return { nodes, edges };
   }

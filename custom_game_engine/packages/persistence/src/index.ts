@@ -69,6 +69,22 @@ export {
 } from './LocalSavesMigration.js';
 export type { MigrationProgress, MigrationOptions } from './LocalSavesMigration.js';
 
+// Planet sharing client (persistent world / multiplayer)
+export {
+  PlanetClient,
+  planetClient,
+} from './PlanetClient.js';
+export type {
+  PlanetMetadata,
+  PlanetConfig,
+  PlanetType,
+  BiosphereData,
+  NamedLocation,
+  SerializedChunk,
+  ChunkListEntry,
+  PlanetStats,
+} from './PlanetClient.js';
+
 // Type re-exports
 export type {
   SaveOptions,
