@@ -17,6 +17,7 @@ import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { EntityId, Tick, SystemId } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import { ParasiticColonizationComponent } from './ParasiticColonizationComponent.js';
 import { CollectiveMindComponent, type BreedingAssignment } from './CollectiveMindComponent.js';
 
@@ -238,7 +239,8 @@ export class ParasiticReproductionSystem extends BaseSystem {
   }
 
   private findCollective(world: World, collectiveId: string): Entity | null {
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with collective_mind component
+    for (const entity of world.query().with(CT.CollectiveMind).executeEntities()) {
       const impl = entity as EntityImpl;
       const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');
       if (collective?.collectiveId === collectiveId) return entity;
@@ -292,7 +294,8 @@ export class ParasiticReproductionSystem extends BaseSystem {
    * Get all hosts currently assigned for breeding in a collective.
    */
   public getBreedingAssignments(collectiveId: string, world: World): BreedingAssignment[] {
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with collective_mind component
+    for (const entity of world.query().with(CT.CollectiveMind).executeEntities()) {
       const impl = entity as EntityImpl;
       const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');
       if (collective?.collectiveId === collectiveId) {

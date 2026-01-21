@@ -336,7 +336,7 @@ export async function validateSaveFile(saveFile: SaveFile): Promise<void> {
  */
 export function validateWorldState(world: World): void {
   // Check that world has entities
-  const entityCount = Array.from(world.entities.values()).length;
+  const entityCount = world.entities.size;
   if (entityCount === 0) {
     throw new InvariantViolationError('Cannot save empty world (no entities)');
   }

@@ -5,7 +5,7 @@
  * and available actions.
  */
 
-import { EntityImpl } from '@ai-village/core';
+import { EntityImpl, ComponentType as CT } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { Camera } from '../Camera.js';
@@ -269,6 +269,7 @@ export class MenuContext {
 
   /**
    * Get entities near a world position.
+   * PERFORMANCE: Uses ECS query to only check entities with position components
    * @param x - X coordinate in TILE units (not pixels)
    * @param y - Y coordinate in TILE units (not pixels)
    * @param radius - Detection radius in TILE units
@@ -282,9 +283,10 @@ export class MenuContext {
     const entities: Entity[] = [];
     const radiusSquared = radius * radius;
 
-    // Query all entities with position components
+    // Query only entities with position components (avoids scanning all entities)
     // NOTE: Entity positions are stored in TILE coordinates
-    for (const entity of Array.from(world.entities.values())) {
+    const positionedEntities = world.query().with(CT.Position).executeEntities();
+    for (const entity of positionedEntities) {
       const pos = (entity as EntityImpl).getComponent('position') as PositionComponent | undefined;
       if (!pos) continue;
 
@@ -302,11 +304,15 @@ export class MenuContext {
 
   /**
    * Get IDs of all selected entities.
+   * NOTE: Selection is tracked by renderer via 'selectable' component, which is not in ComponentType enum.
+   * This is a UI-only component, so we keep the manual iteration here.
    */
   private static getSelectedEntityIds(world: World): string[] {
     const selected: string[] = [];
 
-    for (const entity of Array.from(world.entities.values())) {
+    // 'selectable' is a renderer-only component not in core ComponentType
+    // We iterate entities with this component manually
+    for (const entity of world.entities.values()) {
       const entityImpl = entity as EntityImpl;
       const selectable = entityImpl.getComponent('selectable') as SelectableComponent | undefined;
       if (selectable && selectable.selected === true) {

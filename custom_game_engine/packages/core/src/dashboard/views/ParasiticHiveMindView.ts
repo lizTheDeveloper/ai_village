@@ -16,6 +16,7 @@ import { createProgressBar } from '../theme.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { ParasiticColonizationComponent } from '../../reproduction/parasitic/ParasiticColonizationComponent.js';
 import type { CollectiveMindComponent } from '../../reproduction/parasitic/CollectiveMindComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Data for an individual colonized host
@@ -111,12 +112,10 @@ export const ParasiticHiveMindView: DashboardView<ParasiticHiveMindViewData> = {
       let potentialHostCount = 0;
       let totalHivePressure = 0;
 
-      // Find all entities with parasitic colonization or collective mind components
-      for (const entity of world.entities.values()) {
+      // Find all entities with collective mind components
+      for (const entity of world.query().with(CT.CollectiveMind).executeEntities()) {
         const impl = entity as EntityImpl;
-
-        // Check for collective mind
-        const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');
+        const collective = impl.getComponent<CollectiveMindComponent>(CT.CollectiveMind);
         if (collective) {
           collectives.push({
             collectiveId: collective.collectiveId,
@@ -127,9 +126,12 @@ export const ParasiticHiveMindView: DashboardView<ParasiticHiveMindViewData> = {
             lineages: collective.lineages.size,
           });
         }
+      }
 
-        // Check for colonization status
-        const colonization = impl.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
+      // Find all entities with parasitic colonization
+      for (const entity of world.query().with(CT.ParasiticColonization).executeEntities()) {
+        const impl = entity as EntityImpl;
+        const colonization = impl.getComponent<ParasiticColonizationComponent>(CT.ParasiticColonization);
         if (colonization) {
           if (colonization.isColonized) {
             colonizedCount++;
@@ -148,7 +150,7 @@ export const ParasiticHiveMindView: DashboardView<ParasiticHiveMindViewData> = {
 
             // Add to hosts list (limit to 10 for performance)
             if (hosts.length < 10) {
-              const agent = impl.components.get('agent') as { name?: string } | undefined;
+              const agent = impl.components.get(CT.Agent) as { name?: string } | undefined;
               hosts.push({
                 entityId: entity.id,
                 name: agent?.name ?? `Entity-${entity.id.slice(0, 6)}`,

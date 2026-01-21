@@ -28,6 +28,13 @@ import {
 } from '../components/AdminAngelComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
 
+// LLM Configuration - Uses environment variables or defaults
+const LLM_CONFIG = {
+  model: typeof process !== 'undefined' ? (process.env?.LLM_MODEL || 'qwen/qwen3-32b') : 'qwen/qwen3-32b',
+  baseUrl: typeof process !== 'undefined' ? (process.env?.LLM_BASE_URL || 'https://api.groq.com/openai/v1') : 'https://api.groq.com/openai/v1',
+  apiKey: typeof process !== 'undefined' ? (process.env?.GROQ_API_KEY || process.env?.LLM_API_KEY || '') : '',
+};
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -148,6 +155,60 @@ export class AdminAngelSystem extends BaseSystem {
 
   private angelEntityId: string | null = null;
   private lastProactiveTick: number = 0;
+  private pendingRequests = new Set<string>(); // Track in-flight requests
+
+  /**
+   * Call the LLM for a casual chat response.
+   * Uses Qwen via Groq API for fast, cheap responses.
+   */
+  private async callLLM(prompt: string): Promise<string> {
+    const { model, baseUrl, apiKey } = LLM_CONFIG;
+
+    // Check if we're in browser environment - use proxy
+    const isBrowser = typeof window !== 'undefined';
+    const url = isBrowser
+      ? `/api/llm/chat`  // Vite proxy route
+      : `${baseUrl}/chat/completions`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (apiKey && !isBrowser) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+
+    // Simple chat completion - no tools, just casual conversation
+    const body = {
+      model,
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.8, // A bit creative for casual chat
+      max_tokens: 512,  // Short responses
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(isBrowser ? { ...body, baseUrl, apiKey } : body),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`LLM API error: ${response.status} - ${errorText.substring(0, 200)}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || '';
+
+      // Strip any thinking tags if present (qwen sometimes uses them)
+      return content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    } catch (error) {
+      console.error('[AdminAngelSystem] LLM call failed:', error);
+      throw error;
+    }
+  }
 
   /**
    * Initialize or get the admin angel entity
@@ -232,21 +293,44 @@ export class AdminAngelSystem extends BaseSystem {
   ): Promise<void> {
     if (angel.awaitingResponse) return;
 
+    // Prevent duplicate requests
+    const requestKey = `${angelEntity.id}-${ctx.tick}`;
+    if (this.pendingRequests.has(requestKey)) return;
+    this.pendingRequests.add(requestKey);
+
     const gameState = this.getGameStateSummary(ctx.world);
     const prompt = buildAngelPrompt(angel, gameState, playerMessage);
 
     // Mark as awaiting
     angel.awaitingResponse = true;
 
-    // TODO: Actually call LLM
-    // For now, emit an event that the LLM system can pick up
-    ctx.emit('admin_angel:request_response', {
-      angelId: angelEntity.id,
-      prompt,
-      isProactive: !playerMessage,
-    }, angelEntity.id);
+    // Call LLM asynchronously
+    this.callLLM(prompt)
+      .then((response) => {
+        this.handleAngelResponseDirect(ctx.world, angel, angelEntity, response);
+      })
+      .catch((error) => {
+        console.error('[AdminAngelSystem] Failed to get LLM response:', error);
+        angel.awaitingResponse = false;
 
-    // The response will come back via event
+        // Send a fallback message so player doesn't think it's broken
+        if (playerMessage) {
+          ctx.world.eventBus.emit({
+            type: 'chat:send_message',
+            data: {
+              roomId: 'divine_chat',
+              senderId: angelEntity.id,
+              senderName: angel.name,
+              message: 'hmm having some trouble thinking rn, try again in a sec',
+              type: 'message',
+            },
+            source: angelEntity.id,
+          });
+        }
+      })
+      .finally(() => {
+        this.pendingRequests.delete(requestKey);
+      });
   }
 
   /**

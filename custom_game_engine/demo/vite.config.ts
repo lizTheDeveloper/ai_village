@@ -133,6 +133,80 @@ export default defineConfig({
       },
     },
     {
+      name: 'llm-chat-proxy',
+      configureServer(server) {
+        server.middlewares.use('/api/llm/chat', async (req, res, next) => {
+          if (req.method !== 'POST') {
+            next();
+            return;
+          }
+
+          let body = '';
+          req.on('data', (chunk: Buffer) => {
+            body += chunk.toString();
+          });
+
+          req.on('end', async () => {
+            try {
+              const requestData = JSON.parse(body);
+              const baseUrl = requestData.baseUrl || 'https://api.groq.com/openai/v1';
+
+              // Determine API key based on provider URL
+              let apiKey = requestData.apiKey || '';
+              if (!apiKey) {
+                if (baseUrl.includes('groq.com')) {
+                  apiKey = envConfig.GROQ_API_KEY || process.env.GROQ_API_KEY || '';
+                } else if (baseUrl.includes('cerebras.ai')) {
+                  apiKey = envConfig.CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY || '';
+                } else if (baseUrl.includes('api.openai.com')) {
+                  apiKey = envConfig.OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+                }
+              }
+
+              const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+              };
+              if (apiKey) {
+                headers['Authorization'] = `Bearer ${apiKey}`;
+              }
+
+              // Remove our proxy-specific fields before forwarding
+              const { baseUrl: _, apiKey: __, ...forwardBody } = requestData;
+
+              // Forward to LLM provider
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+              const response = await fetch(`${baseUrl}/chat/completions`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(forwardBody),
+                signal: controller.signal,
+              });
+
+              clearTimeout(timeoutId);
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error('[llm-chat-proxy] Error:', response.status, errorText.substring(0, 200));
+                res.writeHead(response.status, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: errorText }));
+                return;
+              }
+
+              const data = await response.json();
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(data));
+            } catch (error) {
+              console.error('[llm-chat-proxy] Error:', error);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: String(error) }));
+            }
+          });
+        });
+      },
+    },
+    {
       name: 'animation-queue-api',
       configureServer(server) {
         server.middlewares.use('/api/animations/generate', (req, res, next) => {

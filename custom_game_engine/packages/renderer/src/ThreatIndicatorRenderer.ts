@@ -1,4 +1,5 @@
 import type { World, Entity } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import type { EventBus } from '@ai-village/core';
 
 /**
@@ -204,10 +205,9 @@ export class ThreatIndicatorRenderer {
    */
   private getPlayerEntity(): Entity | null {
     if (!this.cachedPlayerEntity || !this.world.entities.has(this.cachedPlayerEntity.id)) {
-      // Cache miss or player died - find player
-      this.cachedPlayerEntity = Array.from(this.world.entities.values()).find(
-        (e: Entity) => e.components.has('agent')
-      ) ?? null;
+      // Cache miss or player died - find player using ECS query
+      const agents = this.world.query().with(CT.Agent).executeEntities();
+      this.cachedPlayerEntity = agents.length > 0 ? agents[0]! : null;
     }
     return this.cachedPlayerEntity;
   }

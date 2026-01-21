@@ -175,21 +175,38 @@ export class MidwiferySystem extends BaseSystem {
     this.infantCache.clear();
     this.nursingCache.clear();
 
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Use ECS queries instead of scanning all entities
+    // Build pregnancy cache
+    for (const entity of world.query().with(ComponentType.Pregnancy).executeEntities()) {
       const impl = entity as EntityImpl;
-
       const pregnancy = impl.getComponent<PregnancyComponent>('pregnancy');
       if (pregnancy) this.pregnancyCache.set(entity.id, pregnancy);
+    }
 
+    // Build labor cache
+    for (const entity of world.query().with(ComponentType.Labor).executeEntities()) {
+      const impl = entity as EntityImpl;
       const labor = impl.getComponent<LaborComponent>('labor');
       if (labor) this.laborCache.set(entity.id, labor);
+    }
 
+    // Build postpartum cache
+    for (const entity of world.query().with(ComponentType.Postpartum).executeEntities()) {
+      const impl = entity as EntityImpl;
       const postpartum = impl.getComponent<PostpartumComponent>('postpartum');
       if (postpartum) this.postpartumCache.set(entity.id, postpartum);
+    }
 
+    // Build infant cache
+    for (const entity of world.query().with(ComponentType.Infant).executeEntities()) {
+      const impl = entity as EntityImpl;
       const infant = impl.getComponent<InfantComponent>('infant');
       if (infant) this.infantCache.set(entity.id, infant);
+    }
 
+    // Build nursing cache
+    for (const entity of world.query().with(ComponentType.Nursing).executeEntities()) {
+      const impl = entity as EntityImpl;
       const nursing = impl.getComponent<NursingComponent>('nursing');
       if (nursing) this.nursingCache.set(entity.id, nursing);
     }

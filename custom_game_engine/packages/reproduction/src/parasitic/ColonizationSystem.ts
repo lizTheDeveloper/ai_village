@@ -262,7 +262,8 @@ export class ColonizationSystem extends BaseSystem {
     // PERFORMANCE: Use squared distance to avoid Math.sqrt
     const hivePressureRadiusSquared = this.config.hivePressureRadius * this.config.hivePressureRadius;
 
-    for (const otherEntity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with parasitic_colonization and position
+    for (const otherEntity of world.query().with(CT.ParasiticColonization).with(CT.Position).executeEntities()) {
       if (otherEntity.id === entity.id) continue;
 
       const otherImpl = otherEntity as EntityImpl;
@@ -462,7 +463,8 @@ export class ColonizationSystem extends BaseSystem {
   }
 
   private findCollective(world: World, collectiveId: string): Entity | null {
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with collective_mind component
+    for (const entity of world.query().with(CT.CollectiveMind).executeEntities()) {
       const impl = entity as EntityImpl;
       const collective = impl.getComponent<CollectiveMindComponent>('collective_mind');
       if (collective?.collectiveId === collectiveId) return entity;
@@ -471,7 +473,8 @@ export class ColonizationSystem extends BaseSystem {
   }
 
   private findNearbyUncolonizedEntity(world: World, excludeId: EntityId): Entity | null {
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query all agents - check for absence of colonization or uncolonized status
+    for (const entity of world.query().with(CT.Agent).executeEntities()) {
       if (entity.id === excludeId) continue;
 
       const impl = entity as EntityImpl;
@@ -495,7 +498,8 @@ export class ColonizationSystem extends BaseSystem {
   public getColonizedHosts(world: World, collectiveId: string): Entity[] {
     const hosts: Entity[] = [];
 
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with parasitic_colonization component
+    for (const entity of world.query().with(CT.ParasiticColonization).executeEntities()) {
       const impl = entity as EntityImpl;
       const colonization = impl.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
 
@@ -513,7 +517,8 @@ export class ColonizationSystem extends BaseSystem {
   public getResistingHosts(world: World): Entity[] {
     const resisting: Entity[] = [];
 
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with parasitic_colonization component
+    for (const entity of world.query().with(CT.ParasiticColonization).executeEntities()) {
       const impl = entity as EntityImpl;
       const colonization = impl.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
 
@@ -531,7 +536,8 @@ export class ColonizationSystem extends BaseSystem {
   public getDetectedHosts(world: World): Array<{ host: Entity; detectedBy: EntityId[] }> {
     const detected: Array<{ host: Entity; detectedBy: EntityId[] }> = [];
 
-    for (const entity of world.entities.values()) {
+    // PERFORMANCE: Query only entities with parasitic_colonization component
+    for (const entity of world.query().with(CT.ParasiticColonization).executeEntities()) {
       const impl = entity as EntityImpl;
       const colonization = impl.getComponent<ParasiticColonizationComponent>('parasitic_colonization');
 

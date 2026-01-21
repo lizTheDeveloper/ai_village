@@ -168,15 +168,14 @@ export class DivineChatPanel implements IWindowPanel {
 
   /**
    * Find the divine chat singleton entity
+   * PERFORMANCE: Uses ECS query instead of scanning all entities
    */
   private findChatEntity(world: World): any {
-    for (const entity of world.entities.values()) {
-      // Check for new chat_room component with divine_chat config
-      if (entity.components.has('chat_room')) {
-        const chatComp = entity.components.get('chat_room') as unknown as ChatRoomComponent;
-        if (chatComp.config.id === 'divine_chat') {
-          return entity;
-        }
+    const chatEntities = world.query().with(CT.ChatRoom).executeEntities();
+    for (const entity of chatEntities) {
+      const chatComp = entity.components.get('chat_room') as unknown as ChatRoomComponent;
+      if (chatComp.config.id === 'divine_chat') {
+        return entity;
       }
     }
     return null;

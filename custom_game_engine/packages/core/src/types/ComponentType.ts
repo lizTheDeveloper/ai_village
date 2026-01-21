@@ -233,6 +233,11 @@ export enum ComponentType {
   Jealousy = 'jealousy',
   Pregnancy = 'pregnancy',
   Labor = 'labor',
+  Postpartum = 'postpartum',  // Midwifery: postpartum recovery tracking
+  Infant = 'infant',  // Midwifery: infant/newborn care tracking
+  Nursing = 'nursing',  // Midwifery: nursing/lactation tracking
+  ParasiticColonization = 'parasitic_colonization',  // Parasitic reproduction: host colonization tracking
+  CollectiveMind = 'collective_mind',  // Parasitic reproduction: collective hive mind
 
   // Death, Afterlife & Souls
   DeathJudgment = 'death_judgment',

@@ -16,6 +16,7 @@ import type {
 import type { DeityComponent } from '../../components/DeityComponent.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
 import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
 
 /**
  * Vision type info
@@ -128,17 +129,13 @@ export const VisionComposerView: DashboardView<VisionComposerViewData> = {
     }
 
     try {
-      const CT = { Deity: 'deity', Identity: 'identity', Spiritual: 'spiritual' } as const;
-
       // Find player deity
       let playerDeity: { id: string; component: DeityComponent } | null = null;
-      for (const entity of world.entities.values()) {
-        if (entity.components.has(CT.Deity)) {
-          const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
-          if (deityComp && deityComp.controller === 'player') {
-            playerDeity = { id: entity.id, component: deityComp };
-            break;
-          }
+      for (const entity of world.query().with(CT.Deity).executeEntities()) {
+        const deityComp = entity.components.get(CT.Deity) as DeityComponent | undefined;
+        if (deityComp && deityComp.controller === 'player') {
+          playerDeity = { id: entity.id, component: deityComp };
+          break;
         }
       }
 
@@ -197,9 +194,7 @@ export const VisionComposerView: DashboardView<VisionComposerViewData> = {
       // Find potential targets
       const targets: VisionTarget[] = [];
 
-      for (const entity of world.entities.values()) {
-        if (!entity.components.has(CT.Identity)) continue;
-
+      for (const entity of world.query().with(CT.Identity).with(CT.Spiritual).executeEntities()) {
         const identityComp = entity.components.get(CT.Identity) as IdentityComponent | undefined;
         const spiritualComp = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
 

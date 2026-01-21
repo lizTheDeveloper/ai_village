@@ -442,12 +442,15 @@ export class AngelPhonePanel implements IWindowPanel {
   // Input Handling
   // ============================================================================
 
-  handleClick(localX: number, localY: number, width: number, height: number): boolean {
+  handleClick(x: number, y: number, _world?: unknown): boolean {
+    const width = this.getDefaultWidth();
+    const height = this.getDefaultHeight();
+
     // Chat list click
-    if (localX < this.chatListWidth) {
+    if (x < this.chatListWidth) {
       const listY = 30;
       const itemHeight = 50;
-      const clickedIndex = Math.floor((localY - listY + this.chatListScrollOffset) / itemHeight);
+      const clickedIndex = Math.floor((y - listY + this.chatListScrollOffset) / itemHeight);
 
       if (clickedIndex >= 0 && clickedIndex < this.state.chatRooms.length) {
         const room = this.state.chatRooms[clickedIndex];
@@ -467,8 +470,8 @@ export class AngelPhonePanel implements IWindowPanel {
     const sendX = messagesX + (width - this.chatListWidth - 1) - 55;
 
     if (
-      localX >= sendX && localX <= sendX + 45 &&
-      localY >= inputY + 5 && localY <= inputY + this.inputHeight - 5
+      x >= sendX && x <= sendX + 45 &&
+      y >= inputY + 5 && y <= inputY + this.inputHeight - 5
     ) {
       if (this.state.selectedChatId && this.state.inputText.trim()) {
         this.callbacks.onSendMessage(this.state.selectedChatId, this.state.inputText.trim());
@@ -480,7 +483,10 @@ export class AngelPhonePanel implements IWindowPanel {
     return false;
   }
 
-  handleScroll(deltaY: number, localX: number): void {
+  /**
+   * Handle scroll events (call from external scroll handler)
+   */
+  onScroll(deltaY: number, localX: number): void {
     if (localX < this.chatListWidth) {
       this.chatListScrollOffset = Math.max(0, this.chatListScrollOffset + deltaY);
     } else {
@@ -488,7 +494,10 @@ export class AngelPhonePanel implements IWindowPanel {
     }
   }
 
-  handleKeyPress(key: string): void {
+  /**
+   * Handle key press events (call from external keyboard handler)
+   */
+  onKeyPress(key: string): void {
     if (key === 'Enter' && this.state.selectedChatId && this.state.inputText.trim()) {
       this.callbacks.onSendMessage(this.state.selectedChatId, this.state.inputText.trim());
       this.callbacks.onInputChange('');
