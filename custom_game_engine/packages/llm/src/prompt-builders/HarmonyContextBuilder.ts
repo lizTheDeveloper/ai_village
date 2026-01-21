@@ -460,14 +460,15 @@ export class HarmonyContextBuilder {
     }
 
     // Warning about nearby Sha Qi
+    // PERFORMANCE: Use squared distance for comparison
+    const maxDistanceSquared = 100; // 10 * 10
     const nearbyDangers = harmony.aerialShaQi.filter((shaQi: any) => {
       const midX = (shaQi.from.x + shaQi.to.x) / 2;
       const midY = (shaQi.from.y + shaQi.to.y) / 2;
-      const dist = Math.sqrt(
-        Math.pow(midX - agentPosition.x, 2) +
-        Math.pow(midY - agentPosition.y, 2)
-      );
-      return dist < 10 && shaQi.affectedAltitudes.includes(agentPosition.z);
+      const dx = midX - agentPosition.x;
+      const dy = midY - agentPosition.y;
+      const distanceSquared = dx * dx + dy * dy;
+      return distanceSquared < maxDistanceSquared && shaQi.affectedAltitudes.includes(agentPosition.z);
     });
 
     if (nearbyDangers.length > 0) {
@@ -478,12 +479,13 @@ export class HarmonyContextBuilder {
     }
 
     // Nearby thermals for energy-efficient flight
+    // PERFORMANCE: Use squared distance for comparison
+    const thermalMaxDistanceSquared = 64; // 8 * 8
     const nearbyThermals = harmony.thermals.filter((t: any) => {
-      const dist = Math.sqrt(
-        Math.pow(t.center.x - agentPosition.x, 2) +
-        Math.pow(t.center.y - agentPosition.y, 2)
-      );
-      return dist < 8;
+      const dx = t.center.x - agentPosition.x;
+      const dy = t.center.y - agentPosition.y;
+      const distanceSquared = dx * dx + dy * dy;
+      return distanceSquared < thermalMaxDistanceSquared;
     });
 
     if (nearbyThermals.length > 0) {

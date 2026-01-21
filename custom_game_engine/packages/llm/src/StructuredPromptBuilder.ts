@@ -393,6 +393,7 @@ export class StructuredPromptBuilder {
       const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (animal) {
         // Calculate actual distance between agent and animal
+        // PERFORMANCE: sqrt needed here because distance value is shown in prompt
         const animalPos = entity.components.get('position') as { x: number; y: number } | undefined;
         const distance = agentPos && animalPos
           ? Math.sqrt((agentPos.x - animalPos.x) ** 2 + (agentPos.y - animalPos.y) ** 2)

@@ -266,6 +266,7 @@ export class TerrainFeatureAnalyzer {
     const dzdy = (southElev - northElev) / 2;
 
     // Slope magnitude
+    // PERFORMANCE: Math.sqrt required here - result used in Math.atan for angle calculation
     const slopeMagnitude = Math.sqrt(dzdx * dzdx + dzdy * dzdy);
 
     // Convert to degrees
@@ -474,12 +475,16 @@ export class TerrainFeatureAnalyzer {
     observerY: number,
     maxDistance: number = 20
   ): string {
+    // PERFORMANCE: Use squared distances to avoid Math.sqrt in hot path
+    const maxDistanceSquared = maxDistance * maxDistance;
+    const immediateDistanceSquared = 10 * 10; // 100
+
     // Filter to nearby features
     const nearby = features
       .map(f => {
         const dx = f.x - observerX;
         const dy = f.y - observerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
         // Get cardinal direction
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -489,10 +494,10 @@ export class TerrainFeatureAnalyzer {
         else if (angle > 135 || angle <= -135) direction = 'west';
         else direction = 'north';
 
-        return { ...f, distance, direction };
+        return { ...f, distanceSquared, direction };
       })
-      .filter(f => f.distance <= maxDistance)
-      .sort((a, b) => a.distance - b.distance);
+      .filter(f => f.distanceSquared <= maxDistanceSquared)
+      .sort((a, b) => a.distanceSquared - b.distanceSquared);
 
     if (nearby.length === 0) {
       return 'You are in unremarkable terrain.';
@@ -503,7 +508,7 @@ export class TerrainFeatureAnalyzer {
 
     // Describe only the most significant immediate features (< 10 tiles, max 3)
     const immediate = nearby
-      .filter(f => f.distance && f.distance < 10)
+      .filter(f => f.distanceSquared && f.distanceSquared < immediateDistanceSquared)
       .slice(0, 3); // Only top 3 closest significant features
 
     if (immediate.length > 0) {
@@ -514,7 +519,7 @@ export class TerrainFeatureAnalyzer {
     // Describe distant features by direction (max 2 per direction)
     const byDirection = new Map<string, TerrainFeature[]>();
     nearby
-      .filter(f => f.distance && f.distance >= 10)
+      .filter(f => f.distanceSquared && f.distanceSquared >= immediateDistanceSquared)
       .forEach(f => {
         if (!byDirection.has(f.direction!)) {
           byDirection.set(f.direction!, []);

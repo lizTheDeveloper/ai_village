@@ -11,7 +11,7 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { type Entity, EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -255,14 +255,14 @@ export class AngelSystem extends BaseSystem {
       level: 1,
       currentDescription: `A ${tierName} serving ${deity.identity.primaryName}`,
     });
-    angelEntity.addComponent(evolutionComponent);
+    (angelEntity as EntityImpl).addComponent(evolutionComponent);
 
     // Add resource component (Phase 28.9 - independent mana pool)
     const resourceComponent = createAngelResourceComponent({
       tier,
       currentTick: world.tick,
     });
-    angelEntity.addComponent(resourceComponent);
+    angelEntity.components.set('angel_resource', resourceComponent);
 
     // Set up messaging (Phase 28.6 - God's Phone)
     setupAngelMessaging(
@@ -306,9 +306,9 @@ export class AngelSystem extends BaseSystem {
     const middles = ['ra', 'ri', 'pha', 'bri', 'tha', 'di', 'li', 'mi', 'ni', 'vi'];
     const suffixes = ['el', 'iel', 'ael', 'ith', 'on', 'im', 'oth', 'iah', 'ael'];
 
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const middle = middles[Math.floor(Math.random() * middles.length)];
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]!;
+    const middle = middles[Math.floor(Math.random() * middles.length)]!;
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)]!;
 
     return prefix + middle + suffix;
   }

@@ -286,7 +286,7 @@ export * from './AngelMessagingComponent.js';
 export {
   createAngelMessagingComponent,
   createChatRoom,
-  createChatMessage,
+  createAngelChatMessage,
   generateChatRoomId,
   generateMessageId,
   type AngelMessagingComponent,

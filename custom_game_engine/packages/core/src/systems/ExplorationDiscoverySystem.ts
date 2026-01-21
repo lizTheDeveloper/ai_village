@@ -224,10 +224,12 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     const dy = position.y - mission.targetCoordinates.y;
     const dz = position.z - mission.targetCoordinates.z;
     const distanceSquared = dx * dx + dy * dy + dz * dz;
-    const distance = Math.sqrt(distanceSquared);
+
+    // PERFORMANCE: Use squared distance for comparison (avoid sqrt)
+    const arrivalThresholdSquared = ARRIVAL_DISTANCE_THRESHOLD * ARRIVAL_DISTANCE_THRESHOLD;
 
     // Check if within arrival threshold
-    if (distance <= ARRIVAL_DISTANCE_THRESHOLD) {
+    if (distanceSquared <= arrivalThresholdSquared) {
       // Mark as arrived
       (missionEntity as EntityImpl).updateComponent(
         'exploration_mission',

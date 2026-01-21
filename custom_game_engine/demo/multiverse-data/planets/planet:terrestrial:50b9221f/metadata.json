@@ -1,0 +1,15 @@
+{
+  "id": "planet:terrestrial:50b9221f",
+  "name": "Homeworld",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1768975063673",
+  "createdAt": 1768975114562,
+  "lastAccessedAt": 1768975114562,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": true,
+  "config": {
+    "seed": "universe:main:homeworld:1768975063673",
+    "type": "terrestrial"
+  }
+}

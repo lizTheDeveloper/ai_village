@@ -147,8 +147,12 @@ export class SocialGradientSystem extends BaseSystem {
       if (speakerPos) {
         const listenerPos = getPosition(e);
         if (listenerPos) {
-          const distance = this._distance(speakerPos, listenerPos);
-          return distance < 20; // 20 tile hearing range
+          // PERFORMANCE: Use squared distance for comparison (avoid sqrt)
+          const dx = speakerPos.x - listenerPos.x;
+          const dy = speakerPos.y - listenerPos.y;
+          const distanceSquared = dx * dx + dy * dy;
+          const hearingRangeSquared = 20 * 20; // 20 tile hearing range
+          return distanceSquared < hearingRangeSquared;
         }
       }
 
@@ -214,10 +218,12 @@ export class SocialGradientSystem extends BaseSystem {
 
   /**
    * Calculate distance between two points
+   * DEPRECATED: Use squared distance for comparisons instead
    */
   private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = a.x - b.x;
     const dy = a.y - b.y;
+    // PERFORMANCE: sqrt required here - actual distance value needed by caller
     return Math.sqrt(dx * dx + dy * dy);
   }
 

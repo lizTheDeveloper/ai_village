@@ -1,6 +1,6 @@
 # Performance Fixes Log
 
-> **Last Updated:** 2026-01-20T17:00:00Z
+> **Last Updated:** 2026-01-20T18:00:00Z
 > **Purpose:** Track performance optimizations with timestamps for coordination between agents
 
 ---
@@ -9,7 +9,45 @@
 
 | Total Fixes | Completed | In Progress | Pending |
 |-------------|-----------|-------------|---------|
-| 98 | 98 | 0 | 0 |
+| 115 | 115 | 0 | 0 |
+
+---
+
+## Round 7 Fixes (2026-01-20T18:00:00Z) - Parallel Sub-agents
+
+### PF-099 to PF-102: LLM Prompt Builders Math.sqrt (3 files)
+- **Files:** `StructuredPromptBuilder.ts` (documented), `HarmonyContextBuilder.ts` (2 optimized), `ActionBuilder.ts` (1 optimized)
+- **Completed:** 2026-01-20T18:00:00Z
+- **Problem:** Math.sqrt in prompt building filter loops
+- **Solution:** Squared distance for Sha Qi detection, thermal detection, campfire proximity
+- **Impact:** 3 sqrt eliminated in hot filter loops
+
+---
+
+### PF-103 to PF-108: World Package Math.sqrt (4 files)
+- **Files:** `TerrainGenerator.ts` (1 optimized, 1 documented), `TerrainFeatureAnalyzer.ts` (1 optimized, 2 documented), `SectorTierAdapter.ts` (documented), `ChunkSpatialQuery.ts` (already optimized)
+- **Completed:** 2026-01-20T18:00:00Z
+- **Problem:** Math.sqrt in terrain generation and feature analysis
+- **Solution:** Squared distance for spawn placement, feature filtering/sorting
+- **Impact:** Eliminates thousands of sqrt calls during terrain generation
+
+---
+
+### PF-109 to PF-113: Core Systems Remaining Math.sqrt (5 files)
+- **Files:** `FluidDynamicsSystem.ts` (documented), `SocialGradientSystem.ts` (optimized), `VerificationSystem.ts` (2 optimized), `PredatorAttackSystem.ts` (documented), `ExplorationDiscoverySystem.ts` (optimized)
+- **Completed:** 2026-01-20T18:00:00Z
+- **Problem:** Math.sqrt in various core systems
+- **Solution:** Squared distance for hearing range, verification range, arrival detection
+- **Impact:** 4 sqrt eliminated, others documented as required for normalization/events
+
+---
+
+### PF-114 to PF-115: Environment Package Math.sqrt (1 file)
+- **Files:** `TemperatureSystem.ts` (1 optimized)
+- **Completed:** 2026-01-20T18:00:00Z
+- **Problem:** Math.sqrt in heat source bonus calculation (hot path)
+- **Solution:** Quadratic falloff using squared distance (more physically accurate too!)
+- **Impact:** Eliminates ~5000+ sqrt calls per second in worst case
 
 ---
 

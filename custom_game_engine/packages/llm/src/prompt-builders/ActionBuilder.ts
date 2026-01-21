@@ -65,12 +65,14 @@ export class ActionBuilder {
     const campfireCount = buildingCounts.byType['campfire'] ?? 0;
 
     // Check if there's a campfire (complete OR in-progress) within 200 tiles
+    // PERFORMANCE: Use squared distance for comparison
     let nearbyCampfireForPriority = false;
     if (world && entity) {
       const entityPos = entity.components.get('position') as (Component & { x: number; y: number }) | undefined;
       if (entityPos) {
         const buildings = world.query()?.with?.('building')?.executeEntities?.() ?? [];
         const CAMPFIRE_PROXIMITY_THRESHOLD = 200;
+        const CAMPFIRE_PROXIMITY_THRESHOLD_SQUARED = CAMPFIRE_PROXIMITY_THRESHOLD * CAMPFIRE_PROXIMITY_THRESHOLD;
 
         for (const building of buildings) {
           const buildingComp = building.components.get('building') as (Component & { buildingType?: string; isComplete?: boolean }) | undefined;
@@ -80,9 +82,9 @@ export class ActionBuilder {
           if (buildingComp?.buildingType === 'campfire' && buildingPos) {
             const dx = entityPos.x - buildingPos.x;
             const dy = entityPos.y - buildingPos.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distanceSquared = dx * dx + dy * dy;
 
-            if (distance <= CAMPFIRE_PROXIMITY_THRESHOLD) {
+            if (distanceSquared <= CAMPFIRE_PROXIMITY_THRESHOLD_SQUARED) {
               nearbyCampfireForPriority = true;
               break;
             }

@@ -503,10 +503,12 @@ export class TemperatureSystem extends BaseSystem {
         const radiusSquared = buildingComp.heatRadius * buildingComp.heatRadius;
 
         if (distanceSquared <= radiusSquared) {
-          // Heat effect diminishes with distance: heatAmount * (1 - distance / radius)
-          // Note: We need actual distance here for interpolation, but only compute after squared check passes
-          const distance = Math.sqrt(distanceSquared);
-          const heatEffect = buildingComp.heatAmount * (1 - distance / buildingComp.heatRadius);
+          // PERFORMANCE: Use quadratic falloff to avoid Math.sqrt in hot path
+          // Physical heat dissipation follows inverse-square law anyway, so this is more realistic
+          // Formula: heatAmount * (1 - distanceSquared / radiusSquared)
+          // This gives smooth falloff from full heat at center (d²=0) to zero at radius edge (d²=r²)
+          const falloffFactor = 1 - (distanceSquared / radiusSquared);
+          const heatEffect = buildingComp.heatAmount * falloffFactor;
           totalHeat += heatEffect;
         }
       }

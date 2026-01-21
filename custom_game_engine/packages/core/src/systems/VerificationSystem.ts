@@ -68,8 +68,12 @@ export class VerificationSystem extends BaseSystem {
       if (!gradient.sourceAgentId) continue;
 
       // Check if verifier is close enough to claimed location
-      const distance = this._distance(position, gradient.claimPosition);
-      if (distance > this.verificationRange) {
+      // PERFORMANCE: Use squared distance for comparison (avoid sqrt)
+      const dx = position.x - gradient.claimPosition.x;
+      const dy = position.y - gradient.claimPosition.y;
+      const distanceSquared = dx * dx + dy * dy;
+      const verificationRangeSquared = this.verificationRange * this.verificationRange;
+      if (distanceSquared > verificationRangeSquared) {
         continue; // Too far to verify
       }
 
@@ -169,11 +173,16 @@ export class VerificationSystem extends BaseSystem {
    */
   private _checkClaim(gradient: Gradient, _verifierPos: { x: number; y: number }, entities: ReadonlyArray<Entity>, currentTick: number): VerificationResult {
     // Look for resources near claimed position
+    // PERFORMANCE: Use squared distance for comparison (avoid sqrt)
+    const claimRadius = 10; // Within 10 tiles of claim
+    const claimRadiusSquared = claimRadius * claimRadius;
     const nearbyResources = entities.filter(e => {
       const resourcePos = getPosition(e);
       if (!resourcePos) return false;
-      const dist = this._distance(gradient.claimPosition!, resourcePos);
-      return dist < 10; // Within 10 tiles of claim
+      const dx = gradient.claimPosition!.x - resourcePos.x;
+      const dy = gradient.claimPosition!.y - resourcePos.y;
+      const distSquared = dx * dx + dy * dy;
+      return distSquared < claimRadiusSquared;
     });
 
     // Check for exact match
@@ -251,10 +260,12 @@ export class VerificationSystem extends BaseSystem {
 
   /**
    * Calculate distance between two points
+   * DEPRECATED: Use squared distance for comparisons instead
    */
   private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = a.x - b.x;
     const dy = a.y - b.y;
+    // PERFORMANCE: sqrt required here - actual distance value needed by caller
     return Math.sqrt(dx * dx + dy * dy);
   }
 

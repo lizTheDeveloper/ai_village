@@ -1207,8 +1207,10 @@ export class TerrainGenerator {
         }
 
         // Scatter some rocks near spawn point (within ~30 tiles of origin) for early game
-        const distFromOrigin = Math.sqrt(worldX * worldX + worldY * worldY);
-        if (distFromOrigin < 30 && tile.terrain === 'grass') {
+        // PERFORMANCE: Use squared distance to avoid Math.sqrt in hot path
+        const distFromOriginSquared = worldX * worldX + worldY * worldY;
+        const maxSpawnDistSquared = 30 * 30; // 900
+        if (distFromOriginSquared < maxSpawnDistSquared && tile.terrain === 'grass') {
           if (Math.random() > 0.95) {
             // 5% chance for rocks on grass near spawn
             createRock(world, worldX, worldY);
@@ -1318,6 +1320,7 @@ export class TerrainGenerator {
     );
 
     // Flatten spawn area (within 500 tiles / 500m of origin for gentler starting terrain)
+    // PERFORMANCE: Math.sqrt required here - result used for division in spawnFlatten calculation
     const distanceFromSpawn = Math.sqrt(worldX * worldX + worldY * worldY);
     const spawnFlatten = Math.max(0, 1 - distanceFromSpawn / 500); // 1.0 at origin, 0.0 at distance 500+
 

@@ -509,8 +509,9 @@ export class PlanetClient {
       return;
     }
 
-    // Convert http to ws protocol
-    const wsUrl = this.baseUrl.replace(/^http/, 'ws');
+    // Convert http to ws protocol and use the correct WebSocket port (8765)
+    // HTTP is on 8766, WebSocket is on 8765
+    const wsUrl = this.baseUrl.replace(/^http/, 'ws').replace(':8766', ':8765');
 
     try {
       this.wsConnection = new WebSocket(wsUrl);

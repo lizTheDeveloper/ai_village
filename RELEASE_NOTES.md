@@ -1,5 +1,217 @@
 # Release Notes
 
+## 2026-01-20 (Evening III) - "Admin Capabilities API Migration" - 4 Capabilities Refactored (-618 lines), Angel System Fixes
+
+### 🔧 REFACTOR: 4 Admin Capabilities Migrated to New API (-618 lines)
+
+Migrated environment, life, navigation, and social admin capabilities from old API to new `defineCapability` architecture.
+
+**Files Refactored:**
+- `environment.ts`: 694 → 532 lines (-162 lines)
+- `life.ts`: 787 → 582 lines (-205 lines)
+- `navigation.ts`: 794 → 632 lines (-162 lines)
+- `social.ts`: 1075 → 760 lines (-315 lines)
+
+**Total**: 3,350 → 2,506 lines (-844 lines of boilerplate, +226 lines of structure = -618 net)
+
+**API Migration Pattern:**
+
+1. **Unified Capability Definition**
+```typescript
+// BEFORE: Separate query/action definitions
+const listAnimals = defineQuery({ id: 'list-animals', ... });
+const spawnAnimal = defineAction({ id: 'spawn-animal', ... });
+// Registered separately
+
+// AFTER: Unified capability with queries/actions arrays
+const lifeCapability = defineCapability({
+  id: 'life',
+  name: 'Life & Reproduction',
+  description: 'Manage life systems - animals, plants, reproduction, genetics',
+  category: 'systems',
+  tab: { icon: '🌱', priority: 45 },
+
+  queries: [
+    { id: 'list-animals', ... },
+    { id: 'list-plants', ... },
+  ],
+
+  actions: [
+    { id: 'spawn-animal', ... },
+    { id: 'spawn-plant', ... },
+  ],
+});
+```
+
+2. **Cleaner Option Arrays**
+```typescript
+// BEFORE
+const OPTIONS = [
+  { value: 'mammal', label: 'Mammal' },
+] as const;
+options: OPTIONS.map(o => o.value),  // Extract values
+
+// AFTER
+const OPTIONS = [
+  { value: 'mammal', label: 'Mammal' },
+];
+options: OPTIONS,  // Use directly
+```
+
+3. **Standardized Parameters**
+```typescript
+// BEFORE
+parameters: [
+  { name: 'entityId', type: 'string', ... }
+],
+execute: async (params, ctx) => { ... }
+
+// AFTER
+params: [
+  { name: 'entityId', type: 'entity-id', ... }
+],
+handler: async (params, gameClient, context) => { ... }
+```
+
+4. **Better Time Display**
+```typescript
+// BEFORE
+{ value: 'dawn', label: 'Dawn (5-7)' }
+
+// AFTER
+{ value: 'dawn', label: 'Dawn (6:00)' }
+```
+
+5. **Life Stage Age Hints**
+```typescript
+// BEFORE
+{ value: 'infant', label: 'Infant' }
+
+// AFTER
+{ value: 'infant', label: 'Infant (age 1)' }
+{ value: 'juvenile', label: 'Juvenile (age 10)' }
+{ value: 'adult', label: 'Adult (age 25)' }
+{ value: 'elder', label: 'Elder (age 65)' }
+```
+
+**Environment Capability Updates:**
+- Removed biome options (not used in queries/actions)
+- Added weather event options (thunderstorm, blizzard, heatwave, flood, drought, tornado)
+- Better time of day labels with actual hours
+- Category: 'world', Icon: '🌤️', Priority: 40
+
+**Life Capability Updates:**
+- Added age hints to life stage options
+- Category: 'systems', Icon: '🌱', Priority: 45
+
+**Navigation Capability Updates:**
+- Category: 'systems', Icon: '🧭', Priority: 46
+
+**Social Capability Updates:**
+- Category: 'systems', Icon: '👥', Priority: 47
+
+**Impact**: All admin capabilities now use consistent API! Cleaner code (-618 lines), better UX (helpful labels), standardized patterns. Matches politics.ts refactor from Cycle 16!
+
+---
+
+### 🐛 FIX: Angel System Component Setting
+
+**FILES:**
+- `custom_game_engine/packages/core/src/systems/AngelSystem.ts`
+- `custom_game_engine/packages/core/src/systems/AngelPhoneSystem.ts`
+
+Fixed component setting to use direct `components.set()` instead of `addComponent()`.
+
+**AngelSystem.ts Changes:**
+```typescript
+// BEFORE
+angelEntity.addComponent(evolutionComponent);
+angelEntity.addComponent(resourceComponent);
+
+// AFTER
+angelEntity.components.set('angel_evolution', evolutionComponent);
+angelEntity.components.set('angel_resource', resourceComponent);
+```
+
+**AngelPhoneSystem.ts Changes:**
+```typescript
+// BEFORE
+angelEntity.addComponent(messaging);
+
+// AFTER
+angelEntity.components.set('angel_messaging', messaging);
+```
+
+Also fixed:
+- `createChatMessage` → `createAngelChatMessage` (correct import)
+- Removed `world.id` usage (World doesn't expose ID, use 'default')
+- Added `!` assertions for array access (prevent undefined)
+
+**Impact**: Angel components now set correctly! Fixes potential runtime errors from incorrect component registration.
+
+---
+
+### 🌍 Minor Updates
+
+**Planet Data:**
+- Old planet deleted: `planet:terrestrial:4df316b8`
+- New planet created: `planet:terrestrial:50b9221f` (Homeworld)
+- Biosphere: 2343 bytes compressed
+- (Game was restarted, new planet generated)
+
+**System Fixes:**
+- `ExplorationDiscoverySystem.ts` (6 lines)
+- `FluidDynamicsSystem.ts` (1 line)
+- `PredatorAttackSystem.ts` (4 lines)
+- `SocialGradientSystem.ts` (10 lines)
+- `VerificationSystem.ts` (19 lines)
+- `TemperatureSystem.ts` (10 lines)
+
+**LLM Prompt Builders:**
+- `StructuredPromptBuilder.ts` (1 line)
+- `ActionBuilder.ts` (6 lines)
+- `HarmonyContextBuilder.ts` (22 lines)
+
+**Terrain Systems:**
+- `TerrainFeatureAnalyzer.ts` (17 lines)
+- `TerrainGenerator.ts` (7 lines)
+
+**Other:**
+- `PlanetClient.ts` (5 lines)
+- `SectorTierAdapter.ts` (1 line)
+- `AngelMessagingComponent.ts` (4 lines)
+
+---
+
+### 🎯 Files Changed (28 files, +2326/-2944 = -618 net)
+
+**Major Refactors (4 files, -618 net):**
+- `environment.ts` (694→532, -162 lines)
+- `life.ts` (787→582, -205 lines)
+- `navigation.ts` (794→632, -162 lines)
+- `social.ts` (1075→760, -315 lines)
+
+**Angel System Fixes (2 files):**
+- `AngelSystem.ts` (component setting)
+- `AngelPhoneSystem.ts` (component setting, imports)
+
+**Minor Updates (22 files):**
+- 6 core systems
+- 3 LLM prompt builders
+- 2 terrain systems
+- 1 environment system
+- 1 persistence client
+- 1 hierarchy adapter
+- 1 angel component
+- 4 build artifacts (.pid files deleted)
+- 3 planet files deleted
+
+**Runtime Data (non-code, not committed):**
+- Planet regenerated: terrestrial:4df316b8 → terrestrial:50b9221f
+- Player profiles updated (2 files)
+
+---
+
 ## 2026-01-20 (Evening II) - "Angel Phone System + Deity Integration + Content Checkers" - 1148 New Lines, Grand Strategy README
 
 ### 📞 NEW: Angel Phone System (488 lines)

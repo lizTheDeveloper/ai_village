@@ -19,13 +19,13 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import { type Entity, EntityImpl } from '../ecs/Entity.js';
 import {
   type AngelMessagingComponent,
   type ChatRoom,
   type ChatMessage,
   createChatRoom,
-  createChatMessage,
+  createAngelChatMessage,
   createAngelMessagingComponent,
   generateChatRoomId,
   generateMessageId,
@@ -98,10 +98,11 @@ const MAX_MESSAGES_PER_CHAT = 500;
 const phoneSystemStates = new Map<string, AngelPhoneSystemState>();
 
 /**
- * Get state key for a world (uses world ID or default)
+ * Get state key for a world
+ * Uses 'default' since World doesn't expose an ID - in practice there's one world per game
  */
-function getStateKey(world: World): string {
-  return world.id || 'default';
+function getStateKey(_world: World): string {
+  return 'default';
 }
 
 // ============================================================================
@@ -241,7 +242,7 @@ export class AngelPhoneSystem extends BaseSystem {
       return null;
     }
 
-    const message = createChatMessage({
+    const message = createAngelChatMessage({
       id: generateMessageId(request.chatId),
       chatId: request.chatId,
       senderId: request.senderId,
@@ -443,14 +444,13 @@ export function setupAngelMessaging(
   AngelPhoneSystem.addAngelToGroupChat(world, deityId, angelEntity.id);
 
   // Add messaging component to angel
-  const { createAngelMessagingComponent } = require('../components/AngelMessagingComponent.js');
   const messaging = createAngelMessagingComponent({
     groupChatId: groupChat.id,
     dmChatId: dmChat.id,
     currentTick,
   });
 
-  angelEntity.addComponent(messaging);
+  (angelEntity as EntityImpl).addComponent(messaging);
 }
 
 /**

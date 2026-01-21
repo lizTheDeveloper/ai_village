@@ -237,6 +237,7 @@ export class FluidDynamicsSystem extends BaseSystem {
     const avgFlowX = flowTargets.reduce((sum, t) => sum + (t.x - x), 0) / flowTargets.length;
     const avgFlowY = flowTargets.reduce((sum, t) => sum + (t.y - y), 0) / flowTargets.length;
     const avgFlowZ = flowTargets.reduce((sum, t) => sum + (t.z - z), 0) / flowTargets.length;
+    // PERFORMANCE: sqrt required here - normalizing vector to create unit direction
     const length = Math.sqrt(avgFlowX * avgFlowX + avgFlowY * avgFlowY + avgFlowZ * avgFlowZ);
 
     tile.fluid.flowDirection = length > 0

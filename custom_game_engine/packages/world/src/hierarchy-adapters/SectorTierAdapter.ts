@@ -103,6 +103,7 @@ export class SectorTierAdapter {
     // Override spatial coordinates if provided
     if (config.galacticCoords) {
       abstractSector.spatial.galacticCoords = config.galacticCoords;
+      // PERFORMANCE: Math.sqrt required here - distance value stored and used for game logic
       abstractSector.spatial.distanceFromCore = Math.sqrt(
         config.galacticCoords.x ** 2 + config.galacticCoords.y ** 2
       );

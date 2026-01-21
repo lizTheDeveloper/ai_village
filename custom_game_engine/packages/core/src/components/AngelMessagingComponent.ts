@@ -258,9 +258,9 @@ export function createChatRoom(options: {
 }
 
 /**
- * Create a new chat message
+ * Create a new chat message for angel phone system
  */
-export function createChatMessage(options: {
+export function createAngelChatMessage(options: {
   id: string;
   chatId: string;
   senderId: string;

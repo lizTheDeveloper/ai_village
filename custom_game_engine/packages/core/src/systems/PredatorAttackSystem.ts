@@ -582,7 +582,7 @@ export class PredatorAttackSystem extends BaseSystem {
           location: { x: targetPos.x, y: targetPos.y, z: targetPos.z },
         } as AlertComponent);
 
-        // PERFORMANCE: Calculate actual distance only when needed (for event emission)
+        // PERFORMANCE: sqrt required here - actual distance value needed for event data
         const distance = Math.sqrt(this.workingDistance.distanceSq);
 
         // Emit guard:threat_detected event
@@ -614,6 +614,7 @@ export class PredatorAttackSystem extends BaseSystem {
 
   /**
    * Calculate distance with sqrt (used in territory checks where exact distance needed)
+   * DEPRECATED: Prefer squared distance comparisons for performance
    */
   private calculateDistance(
     pos1: { x: number; y: number; z: number },
@@ -622,6 +623,7 @@ export class PredatorAttackSystem extends BaseSystem {
     const dx = pos1.x - pos2.x;
     const dy = pos1.y - pos2.y;
     const dz = pos1.z - pos2.z;
+    // PERFORMANCE: sqrt required here - actual distance value needed by caller
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 }
