@@ -399,6 +399,8 @@ export type {
   MoralAlignment,
   DeityIdentity,
   DeityBeliefState,
+  AngelSpeciesDefinition,
+  AngelArmyState,
 } from './DeityComponent.js';
 // Mythology system types (Phase 3: Myth Generation)
 export type {

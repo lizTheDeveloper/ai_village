@@ -259,7 +259,7 @@ export class AngelResourceComponent extends ComponentBase {
     permanent?: boolean;
     reformDelay?: number;
   }): void {
-    const permanent = options.cause === 'legendary_weapon' || options.permanent;
+    const permanent = options.cause === 'legendary_weapon' || options.permanent === true;
     const reformDelay = options.reformDelay ?? DEFAULT_REFORM_TIME;
 
     this.disruption = {

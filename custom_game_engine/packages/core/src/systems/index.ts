@@ -145,6 +145,8 @@ export * from './PossessionSystem.js';
 export * from './PlayerInputSystem.js';
 // Phase 7: Angels
 export * from './AngelSystem.js';
+// Phase 28.6: Angel Phone System (God's Phone)
+export * from './AngelPhoneSystem.js';
 // Phase 8: Advanced Theology
 export * from './SchismSystem.js';
 export * from './SyncretismSystem.js';

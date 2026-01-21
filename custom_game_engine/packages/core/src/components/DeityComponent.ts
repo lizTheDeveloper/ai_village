@@ -71,6 +71,70 @@ export type MoralAlignment =
   | 'unknown';      // Not enough data
 
 /**
+ * Angel Species Definition - Custom naming for a deity's angels
+ *
+ * When the player creates their first angel, they name what their
+ * divine servants are called (Nazgul, fae, seraphim, etc.).
+ * This enables lore-appropriate theming.
+ */
+export interface AngelSpeciesDefinition {
+  // Basic naming
+  singularName: string;       // e.g., "Seraph", "Nazgul", "Fae"
+  pluralName: string;         // e.g., "Seraphim", "Nazgul", "Fae"
+
+  // Tier names (player can customize)
+  tierNames: {
+    tier1: string;            // e.g., "Angel", "Imp", "Sprite"
+    tier2: string;            // e.g., "Greater Angel", "Fiend", "Sylph"
+    tier3: string;            // e.g., "Archangel", "Demon", "Dryad"
+    tier4: string;            // e.g., "Supreme Angel", "Archfiend", "Nymph"
+  };
+
+  // Visual theming
+  colorScheme: {
+    primary: string;          // Main color (hex or name)
+    secondary: string;        // Accent color
+    glow?: string;            // Optional glow/aura color
+  };
+
+  // Optional base sprite (PixelLab) configuration
+  baseSpriteConfig?: {
+    characterId?: string;     // PixelLab character ID if generated
+    description: string;      // Description for sprite generation
+    style: 'ethereal' | 'dark' | 'nature' | 'elemental' | 'mechanical' | 'cosmic';
+  };
+
+  // Lore
+  description?: string;       // Player-written or generated description
+  createdAt: number;          // Tick when species was defined
+
+  // State
+  namingCompleted: boolean;   // Has the player finished the naming flow?
+}
+
+/**
+ * Angel Army State - Tracking all angels for a deity
+ */
+export interface AngelArmyState {
+  // Counts by tier
+  tier1Count: number;
+  tier2Count: number;
+  tier3Count: number;
+  tier4Count: number;
+
+  // Tier unlocks
+  tier2Unlocked: boolean;
+  tier3Unlocked: boolean;
+  tier4Unlocked: boolean;
+
+  // Angel entity IDs
+  angelIds: string[];
+
+  // Group chat ID for all angels
+  groupChatId?: string;
+}
+
+/**
  * Identity of a deity - emergent, not pre-defined
  */
 export interface DeityIdentity {
@@ -175,6 +239,10 @@ export class DeityComponent extends ComponentBase {
   // Emergence tracking
   public emergenceTick?: number;  // Tick when deity first gained a believer
 
+  // Angel System (Phase 28)
+  public angelSpecies?: AngelSpeciesDefinition;
+  public angelArmy: AngelArmyState;
+
   constructor(
     primaryName: string = 'The Nameless',
     controller: 'player' | 'ai' | 'dormant' = 'dormant'
@@ -219,6 +287,18 @@ export class DeityComponent extends ComponentBase {
     this.myths = [];
     this.controller = controller;
     this.totalAnsweredPrayers = 0;
+
+    // Angel System - starts empty until first angel is created
+    this.angelArmy = {
+      tier1Count: 0,
+      tier2Count: 0,
+      tier3Count: 0,
+      tier4Count: 0,
+      tier2Unlocked: false,
+      tier3Unlocked: false,
+      tier4Unlocked: false,
+      angelIds: [],
+    };
   }
 
   /**
@@ -355,5 +435,185 @@ export class DeityComponent extends ComponentBase {
     // For now, just return the oldest prayer
     // In the future, could prioritize by urgency
     return this.prayerQueue[0];
+  }
+
+  // ============================================================================
+  // Angel System Methods (Phase 28)
+  // ============================================================================
+
+  /**
+   * Define the angel species (called when first angel is created)
+   */
+  defineAngelSpecies(species: AngelSpeciesDefinition): void {
+    this.angelSpecies = species;
+  }
+
+  /**
+   * Check if angel species has been defined
+   */
+  hasAngelSpecies(): boolean {
+    return this.angelSpecies !== undefined && this.angelSpecies.namingCompleted;
+  }
+
+  /**
+   * Get the name for angels at a given tier
+   */
+  getAngelTierName(tier: number): string {
+    if (!this.angelSpecies) {
+      // Default names if species not defined
+      const defaults = ['Angel', 'Greater Angel', 'Archangel', 'Supreme Angel'];
+      return defaults[tier - 1] || 'Angel';
+    }
+
+    switch (tier) {
+      case 1: return this.angelSpecies.tierNames.tier1;
+      case 2: return this.angelSpecies.tierNames.tier2;
+      case 3: return this.angelSpecies.tierNames.tier3;
+      case 4: return this.angelSpecies.tierNames.tier4;
+      default: return this.angelSpecies.tierNames.tier1;
+    }
+  }
+
+  /**
+   * Add an angel to the army
+   */
+  addAngel(angelId: string, tier: number): void {
+    if (!this.angelArmy.angelIds.includes(angelId)) {
+      this.angelArmy.angelIds.push(angelId);
+    }
+
+    switch (tier) {
+      case 1: this.angelArmy.tier1Count++; break;
+      case 2: this.angelArmy.tier2Count++; break;
+      case 3: this.angelArmy.tier3Count++; break;
+      case 4: this.angelArmy.tier4Count++; break;
+    }
+  }
+
+  /**
+   * Remove an angel from the army
+   */
+  removeAngel(angelId: string, tier: number): void {
+    const index = this.angelArmy.angelIds.indexOf(angelId);
+    if (index !== -1) {
+      this.angelArmy.angelIds.splice(index, 1);
+    }
+
+    switch (tier) {
+      case 1: this.angelArmy.tier1Count = Math.max(0, this.angelArmy.tier1Count - 1); break;
+      case 2: this.angelArmy.tier2Count = Math.max(0, this.angelArmy.tier2Count - 1); break;
+      case 3: this.angelArmy.tier3Count = Math.max(0, this.angelArmy.tier3Count - 1); break;
+      case 4: this.angelArmy.tier4Count = Math.max(0, this.angelArmy.tier4Count - 1); break;
+    }
+  }
+
+  /**
+   * Check if a tier can be unlocked
+   */
+  canUnlockAngelTier(tier: number): { canUnlock: boolean; reason?: string } {
+    // Tier 2 requirements
+    if (tier === 2) {
+      if (this.angelArmy.tier2Unlocked) {
+        return { canUnlock: false, reason: 'Tier 2 already unlocked' };
+      }
+      if (this.angelArmy.tier1Count < 10) {
+        return { canUnlock: false, reason: `Need 10 tier-1 angels (have ${this.angelArmy.tier1Count})` };
+      }
+      if (this.belief.currentBelief < 1000) {
+        return { canUnlock: false, reason: `Need 1000 belief (have ${Math.floor(this.belief.currentBelief)})` };
+      }
+      if (this.belief.totalBeliefEarned < 5000) {
+        return { canUnlock: false, reason: `Need 5000 lifetime belief (have ${Math.floor(this.belief.totalBeliefEarned)})` };
+      }
+      return { canUnlock: true };
+    }
+
+    // Tier 3 requirements
+    if (tier === 3) {
+      if (!this.angelArmy.tier2Unlocked) {
+        return { canUnlock: false, reason: 'Must unlock tier 2 first' };
+      }
+      if (this.angelArmy.tier3Unlocked) {
+        return { canUnlock: false, reason: 'Tier 3 already unlocked' };
+      }
+      if (this.angelArmy.tier2Count < 5) {
+        return { canUnlock: false, reason: `Need 5 tier-2 angels (have ${this.angelArmy.tier2Count})` };
+      }
+      if (this.belief.currentBelief < 3000) {
+        return { canUnlock: false, reason: `Need 3000 belief (have ${Math.floor(this.belief.currentBelief)})` };
+      }
+      if (this.belief.totalBeliefEarned < 15000) {
+        return { canUnlock: false, reason: `Need 15000 lifetime belief (have ${Math.floor(this.belief.totalBeliefEarned)})` };
+      }
+      return { canUnlock: true };
+    }
+
+    // Tier 4 requirements
+    if (tier === 4) {
+      if (!this.angelArmy.tier3Unlocked) {
+        return { canUnlock: false, reason: 'Must unlock tier 3 first' };
+      }
+      if (this.angelArmy.tier4Unlocked) {
+        return { canUnlock: false, reason: 'Tier 4 already unlocked' };
+      }
+      if (this.angelArmy.tier3Count < 3) {
+        return { canUnlock: false, reason: `Need 3 tier-3 angels (have ${this.angelArmy.tier3Count})` };
+      }
+      if (this.belief.currentBelief < 10000) {
+        return { canUnlock: false, reason: `Need 10000 belief (have ${Math.floor(this.belief.currentBelief)})` };
+      }
+      if (this.belief.totalBeliefEarned < 50000) {
+        return { canUnlock: false, reason: `Need 50000 lifetime belief (have ${Math.floor(this.belief.totalBeliefEarned)})` };
+      }
+      return { canUnlock: true };
+    }
+
+    return { canUnlock: false, reason: 'Invalid tier' };
+  }
+
+  /**
+   * Unlock an angel tier (costs belief)
+   */
+  unlockAngelTier(tier: number): boolean {
+    const check = this.canUnlockAngelTier(tier);
+    if (!check.canUnlock) {
+      return false;
+    }
+
+    // Spend belief
+    const costs: Record<number, number> = { 2: 1000, 3: 3000, 4: 10000 };
+    const cost = costs[tier];
+    if (!cost || !this.spendBelief(cost)) {
+      return false;
+    }
+
+    // Unlock the tier
+    switch (tier) {
+      case 2: this.angelArmy.tier2Unlocked = true; break;
+      case 3: this.angelArmy.tier3Unlocked = true; break;
+      case 4: this.angelArmy.tier4Unlocked = true; break;
+    }
+
+    return true;
+  }
+
+  /**
+   * Get total angel count
+   */
+  getTotalAngelCount(): number {
+    return this.angelArmy.tier1Count +
+           this.angelArmy.tier2Count +
+           this.angelArmy.tier3Count +
+           this.angelArmy.tier4Count;
+  }
+
+  /**
+   * Get highest unlocked tier
+   */
+  getHighestUnlockedTier(): number {
+    if (this.angelArmy.tier4Unlocked) return 4;
+    if (this.angelArmy.tier3Unlocked) return 3;
+    if (this.angelArmy.tier2Unlocked) return 2;
+    return 1;
   }
 }

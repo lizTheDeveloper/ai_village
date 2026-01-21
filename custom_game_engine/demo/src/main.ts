@@ -64,6 +64,8 @@ import {
   DeityComponent,
   createTagsComponent,
   createIdentityComponent,
+  // Component type enum for content checkers
+  ComponentType as CT,
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
@@ -276,6 +278,92 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
     case 'night':
       return 0.1;
   }
+}
+
+// ============================================================================
+// CONTENT CHECKERS - Progressive Disclosure
+// These functions check if there's content to display in a panel.
+// Panels only appear in menus when their content checker returns true.
+// ============================================================================
+
+/**
+ * Check if any agents have relationships
+ */
+function hasRelationships(world: unknown): boolean {
+  const w = world as World;
+  const entities = w.query().with(CT.Relationship).executeEntities();
+  return entities.length > 0;
+}
+
+/**
+ * Check if any agents have memories
+ */
+function hasMemories(world: unknown): boolean {
+  const w = world as World;
+  const entities = w.query().with(CT.Memory).executeEntities();
+  return entities.length > 0;
+}
+
+/**
+ * Check if any agents have items in inventory
+ */
+function hasInventoryItems(world: unknown): boolean {
+  const w = world as World;
+  const entities = w.query().with(CT.Inventory).executeEntities();
+  // Check if any inventory actually has items
+  for (const entity of entities) {
+    const inv = entity.getComponent(CT.Inventory) as { items?: unknown[] } | undefined;
+    if (inv?.items && inv.items.length > 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if there are any shops/merchants
+ */
+function hasShops(world: unknown): boolean {
+  const w = world as World;
+  const entities = w.query().with(CT.Shop).executeEntities();
+  return entities.length > 0;
+}
+
+/**
+ * Check if crafting is available (recipes discovered)
+ */
+function hasCrafting(world: unknown): boolean {
+  // Crafting is always available from start (basic recipes)
+  return true;
+}
+
+/**
+ * Check if governance structures exist
+ */
+function hasGovernance(world: unknown): boolean {
+  const w = world as World;
+  // Check for any governance-related components
+  const villages = w.query().with(CT.VillageGovernance).executeEntities();
+  const cities = w.query().with(CT.CityGovernance).executeEntities();
+  return villages.length > 0 || cities.length > 0;
+}
+
+/**
+ * Check if there are wild animals to show
+ */
+function hasAnimals(world: unknown): boolean {
+  const w = world as World;
+  const entities = w.query().with(CT.Animal).executeEntities();
+  return entities.length > 0;
+}
+
+/**
+ * Check if there are plants growing
+ */
+function hasPlants(world: unknown): boolean {
+  const w = world as World;
+  const entities = w.query().with(CT.Plant).executeEntities();
+  return entities.length > 0;
 }
 
 // ============================================================================
@@ -1025,6 +1113,7 @@ function setupWindowManager(
     minHeight: 300,
     showInWindowList: true,
     menuCategory: 'animals',
+    contentChecker: hasAnimals,
   });
 
   windowManager.registerWindow('plant-info', plantInfoAdapter, {
@@ -1038,6 +1127,7 @@ function setupWindowManager(
     minHeight: 350,
     showInWindowList: true,
     menuCategory: 'farming',
+    contentChecker: hasPlants,
   });
 
   windowManager.registerWindow('resources', resourcesAdapter, {
@@ -1066,6 +1156,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'M',
     menuCategory: 'social',
+    contentChecker: hasMemories,
   });
 
   windowManager.registerWindow('relationships', relationshipsAdapter, {
@@ -1080,6 +1171,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'L',
     menuCategory: 'social',
+    contentChecker: hasRelationships,
   });
 
   windowManager.registerWindow('tile-inspector', tileInspectorAdapter, {
@@ -1109,6 +1201,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'I',
     menuCategory: 'economy',
+    contentChecker: hasInventoryItems,
   });
 
   windowManager.registerWindow('settings', settingsAdapter, {
@@ -1178,6 +1271,7 @@ function setupWindowManager(
     isModal: true,
     showInWindowList: false,
     menuCategory: 'economy',
+    contentChecker: hasShops,
   });
 
   windowManager.registerWindow('governance', governanceAdapter, {
@@ -1192,6 +1286,7 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'G',
     menuCategory: 'social',
+    contentChecker: hasGovernance,
   });
 
   // Register governance keyboard shortcut
@@ -4088,6 +4183,9 @@ async function main() {
   const { windowManager, menuBar, controlsPanel, skillTreePanel, divineChatPanel } = setupWindowManager(
     canvas, renderer, panels, keyboardRegistry, showNotification, gameLoop.systemRegistry
   );
+
+  // Set world reference for content checkers (progressive disclosure of panels)
+  menuBar.setWorld(gameLoop.world);
 
   // Store reference for 3D entity selection callback
   windowManagerRef = windowManager;

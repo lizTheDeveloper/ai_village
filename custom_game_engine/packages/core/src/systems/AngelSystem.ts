@@ -2,17 +2,33 @@
  * AngelSystem - Phase 7: Angels
  *
  * Manages angel creation, AI behavior, and interactions with believers.
+ *
+ * Phase 28 Updates:
+ * - Angels have their own mana pool (independent resource model)
+ * - Evolution/tier system for angel promotion
+ * - Integration with AngelPhoneSystem for communication
  */
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
-import type { EventBus } from '../events/EventBus.js';
+import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { Prayer } from '../components/SpiritualComponent.js';
 import { AngelAIDecisionProcessor } from './AngelAIDecisionProcessor.js';
 import { isFeatureAvailable, type AngelConfig as DivineAngelConfig, type RestrictionConfig } from '../divinity/UniverseConfig.js';
+// Phase 28 components
+import {
+  createAngelEvolutionComponent,
+  type AngelEvolutionComponent,
+  TIER_BONUSES,
+} from '../components/AngelEvolutionComponent.js';
+import {
+  createAngelResourceComponent,
+  type AngelResourceComponent,
+} from '../components/AngelResourceComponent.js';
+import { setupAngelMessaging } from './AngelPhoneSystem.js';
 
 /**
  * LLM Provider interface (matches AngelAIDecisionProcessor requirements)
@@ -36,6 +52,9 @@ export interface AngelData {
   active: boolean;
   autonomousAI: boolean;
   currentTask?: AngelTask;
+  // Phase 28: Tier system
+  tier: number;
+  name: string;
 }
 
 export type AngelRank =
@@ -164,14 +183,23 @@ export class AngelSystem extends BaseSystem {
 
   /**
    * Create an angel
+   *
+   * Phase 28 update: Angels now have their own mana pool and evolution components.
+   * Big upfront cost, then they're self-sustaining.
    */
   createAngel(
     deityId: string,
     world: World,
     rank: AngelRank,
     purpose: AngelPurpose,
-    autonomousAI: boolean = true
+    options: {
+      autonomousAI?: boolean;
+      tier?: number;
+      name?: string;
+    } = {}
   ): AngelData | null {
+    const { autonomousAI = true, tier = 1, name } = options;
+
     // Check if angels are enabled in this universe
     if (!this.areAngelsEnabled(world)) {
       return null;
@@ -184,24 +212,69 @@ export class AngelSystem extends BaseSystem {
     const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
     if (!deity) return null;
 
+    // Check tier is unlocked (tier 1 is always available)
+    if (tier > 1) {
+      const isUnlocked = (tier === 2 && deity.angelArmy.tier2Unlocked) ||
+                         (tier === 3 && deity.angelArmy.tier3Unlocked) ||
+                         (tier === 4 && deity.angelArmy.tier4Unlocked);
+      if (!isUnlocked) {
+        return null;
+      }
+    }
+
     // Get divine config multipliers
     const divineAngelConfig = this.getDivineAngelConfig(world);
     const creationMultiplier = divineAngelConfig?.creationCostMultiplier ?? 1.0;
 
-    // Calculate cost with config multiplier
+    // Calculate cost with config multiplier and tier
+    // Higher tier = higher creation cost
+    const tierMultiplier = Math.pow(2, tier - 1); // 1x, 2x, 4x, 8x
     const baseCost = this.config.creationCosts[rank];
-    const cost = Math.ceil(baseCost * creationMultiplier);
+    const cost = Math.ceil(baseCost * creationMultiplier * tierMultiplier);
 
     if (deity.belief.currentBelief < cost) {
       return null;
     }
 
-    // Spend belief
+    // Spend belief (big upfront cost)
     deity.spendBelief(cost);
 
     // Create angel entity
     const angelEntity = world.createEntity();
 
+    // Generate name if not provided
+    const angelName = name || this.generateAngelName(deity, tier);
+
+    // Get tier name from deity's angel species or use default
+    const tierName = deity.getAngelTierName(tier);
+
+    // Add evolution component (Phase 28.8)
+    const evolutionComponent = createAngelEvolutionComponent({
+      tier,
+      tierName,
+      level: 1,
+      currentDescription: `A ${tierName} serving ${deity.identity.primaryName}`,
+    });
+    angelEntity.addComponent(evolutionComponent);
+
+    // Add resource component (Phase 28.9 - independent mana pool)
+    const resourceComponent = createAngelResourceComponent({
+      tier,
+      currentTick: world.tick,
+    });
+    angelEntity.addComponent(resourceComponent);
+
+    // Set up messaging (Phase 28.6 - God's Phone)
+    setupAngelMessaging(
+      world,
+      angelEntity,
+      deityId,
+      deity.identity.primaryName,
+      angelName,
+      world.tick
+    );
+
+    // Create angel data
     const angel: AngelData = {
       id: angelEntity.id,
       deityId,
@@ -209,52 +282,149 @@ export class AngelSystem extends BaseSystem {
       rank,
       purpose,
       createdAt: world.tick,
-      beliefCostPerTick: this.config.maintenanceCosts[rank],
+      beliefCostPerTick: 0, // Phase 28: No longer drains deity belief
       active: true,
       autonomousAI,
+      tier,
+      name: angelName,
     };
 
     this.angels.set(angel.id, angel);
+
+    // Register angel with deity's army
+    deity.addAngel(angelEntity.id, tier);
 
     return angel;
   }
 
   /**
-   * Update all active angels
+   * Generate a name for an angel
    */
-  private updateAngels(world: World, _currentTick: number): void {
-    // Get maintenance cost multiplier from divine config
-    const divineAngelConfig = this.getDivineAngelConfig(world);
-    const maintenanceMultiplier = divineAngelConfig?.maintenanceCostMultiplier ?? 1.0;
+  private generateAngelName(deity: DeityComponent, _tier: number): string {
+    // Generate angel-like names with suffix based on deity
+    const prefixes = ['Ae', 'An', 'Ar', 'Az', 'Ca', 'Ce', 'Da', 'El', 'Ga', 'Ha', 'Is', 'Je', 'Ka', 'La', 'Ma', 'Me', 'Mi', 'Na', 'Or', 'Ra', 'Sa', 'Se', 'Ta', 'Ur', 'Za'];
+    const middles = ['ra', 'ri', 'pha', 'bri', 'tha', 'di', 'li', 'mi', 'ni', 'vi'];
+    const suffixes = ['el', 'iel', 'ael', 'ith', 'on', 'im', 'oth', 'iah', 'ael'];
 
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const middle = middles[Math.floor(Math.random() * middles.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+
+    return prefix + middle + suffix;
+  }
+
+  /**
+   * Promote an angel to the next tier
+   */
+  promoteAngel(
+    angelId: string,
+    world: World,
+    newTierName: string,
+    newDescription: string,
+    newSpriteId?: string
+  ): boolean {
+    const angel = this.angels.get(angelId);
+    if (!angel || !angel.active) return false;
+
+    const angelEntity = world.getEntity(angel.entityId);
+    if (!angelEntity) return false;
+
+    const evolution = angelEntity.getComponent<AngelEvolutionComponent>('angel_evolution');
+    const resource = angelEntity.getComponent<AngelResourceComponent>('angel_resource');
+
+    if (!evolution || !resource) return false;
+
+    // Check if eligible for promotion
+    if (!evolution.promotionEligible) return false;
+
+    // Promote evolution component
+    const success = evolution.promote({
+      newTierName,
+      newDescription,
+      newSpriteId,
+      currentTick: world.tick,
+    });
+
+    if (!success) return false;
+
+    // Update resource component for new tier
+    resource.updateForTier(evolution.tier);
+
+    // Update angel data
+    angel.tier = evolution.tier;
+
+    // Update deity's army counts
+    const deityEntity = world.getEntity(angel.deityId);
+    if (deityEntity) {
+      const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
+      if (deity) {
+        // Remove from old tier, add to new
+        deity.removeAngel(angelId, angel.tier - 1);
+        deity.addAngel(angelId, angel.tier);
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Update all active angels
+   *
+   * Phase 28: Angels are now self-sustaining with their own mana pool.
+   * They no longer drain deity belief for maintenance.
+   */
+  private updateAngels(world: World, currentTick: number): void {
     for (const angel of this.angels.values()) {
       if (!angel.active) continue;
 
-      // Find deity
-      const deityEntity = world.getEntity(angel.deityId);
-      if (!deityEntity) {
+      // Get angel entity
+      const angelEntity = world.getEntity(angel.entityId);
+      if (!angelEntity) {
         this.dismissAngel(angel.id);
         continue;
       }
 
-      const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
-      if (!deity) {
+      // Get resource component
+      const resource = angelEntity.getComponent<AngelResourceComponent>('angel_resource');
+      const evolution = angelEntity.getComponent<AngelEvolutionComponent>('angel_evolution');
+
+      if (!resource) {
+        // Legacy angel without resource component - still works
+        if (angel.autonomousAI) {
+          this.performAngelAI(angel, world);
+        }
+        continue;
+      }
+
+      // Check if angel is disrupted
+      if (resource.isDisrupted()) {
+        // Check if can reform
+        if (resource.canReform(currentTick)) {
+          resource.reform(currentTick);
+          // Angel is back!
+        } else {
+          // Still disrupted, skip
+          continue;
+        }
+      }
+
+      // Check if permanently destroyed
+      if (resource.isPermanentlyDestroyed()) {
         this.dismissAngel(angel.id);
         continue;
       }
 
-      // Deduct maintenance cost with config multiplier
-      const adjustedCost = Math.ceil(angel.beliefCostPerTick * maintenanceMultiplier);
-      const canMaintain = deity.spendBelief(adjustedCost);
-
-      if (!canMaintain) {
-        this.dismissAngel(angel.id);
-        continue;
-      }
+      // Regenerate mana
+      resource.regenerateMana(currentTick);
 
       // If autonomous AI, perform tasks
       if (angel.autonomousAI) {
         this.performAngelAI(angel, world);
+
+        // Record service time for evolution (1 tick = small amount of time)
+        if (evolution && currentTick % 1200 === 0) { // Every minute at 20 TPS
+          evolution.addServiceTime(1 / 60); // 1 minute = 1/60 hour
+        }
       }
     }
   }

@@ -20,9 +20,11 @@ A production-ready TypeScript game engine powering Multiverse: The End of Eterni
 ### Scale
 
 - **432,000+ lines of code** across 11,500+ TypeScript files
-- **211+ systems** organized by priority and category
-- **125+ component types** with versioning and migrations
+- **220+ systems** organized by priority and category
+- **135+ component types** with versioning and migrations
 - **19 packages** with comprehensive documentation
+- **15 technology eras** from Paleolithic to Transcendent
+- **7-tier political hierarchy** from Village to Galactic Council
 - **Production deployment** on Google Cloud Platform
 
 ## Quick Start
@@ -213,7 +215,7 @@ Headless simulation mode for testing and benchmarking. Runs game loop without re
 
 ## Systems Overview
 
-The engine features **211+ systems** organized into these categories:
+The engine features **220+ systems** organized into these categories:
 
 - **Time & Environment** (6 systems) - TimeSystem, WeatherSystem, SeasonSystem, etc.
 - **Plants** (12 systems) - PlantGrowthSystem, GeneticsSystem, PollinationSystem, etc.
@@ -234,9 +236,55 @@ The engine features **211+ systems** organized into these categories:
 - **Automation & Factories** (5 systems) - AutomationSystem, FactorySystem, etc.
 - **Governance & Metrics** (8 systems) - GovernanceSystem, MetricsSystem, etc.
 - **Consciousness** (5 systems) - ConsciousnessSystem, QualiaMappingSystem, etc.
+- **Space & Multiverse** (5 systems) - ShipCombatSystem, TimelineMergerSystem, ProbabilityScoutSystem, SvetzRetrievalSystem, InvasionSystem
+- **Civilization & Archaeology** (4 systems) - UpliftDiplomacySystem, CollapseSystem, KnowledgePreservationSystem, ArchaeologySystem
 - **Utility** (4 systems) - AutoSaveSystem, DebugSystem, etc.
 
 See [SYSTEMS_CATALOG.md](SYSTEMS_CATALOG.md) for complete details on every system.
+
+## Grand Strategy Gameplay
+
+The engine supports civilization progression from primitive villages to multiverse-spanning empires through the **Grand Strategy Abstraction Layer**.
+
+### Political Hierarchy (7 Tiers)
+
+```
+Tier 0: Village (50-500 pop)       → Village Council
+Tier 1: City (500-10K pop)         → City Director
+Tier 1.5: Province (10K-100K)      → Provincial Governor
+Tier 2: Nation (100K-10M)          → National Government
+Tier 3: Empire (10M-1B)            → Emperor + Dynasty
+Tier 4: Federation (1B-100B)       → Federal Council
+Tier 5: Galactic Council (100B+)   → Representative Assembly
+```
+
+### Technology Eras (15 Eras)
+
+```
+Era 0-2:   Paleolithic → Mesolithic → Neolithic (Survival)
+Era 3-6:   Bronze → Iron → Classical → Medieval (Civilization)
+Era 7-10:  Renaissance → Industrial → Modern → Information (Progress)
+Era 11-14: Interstellar → Post-Scarcity → Galactic → Transcendent (Space)
+```
+
+### Gameplay Example: Village to Empire
+
+**Early Game (Era 0-2):** A small group of 20 agents discovers a fertile valley. The VillageGovernanceSystem creates a village council. Agents develop basic skills (foraging, tool-making) through the SkillProgressionSystem. The village grows to 200 population.
+
+**Mid Game (Era 3-6):** Population reaches 600, triggering CityDirectorSystem to promote the settlement to a city. Trade routes form via ShippingLaneSystem. Multiple cities establish a province with ProvinceGovernanceSystem. Bronze Age technologies unlock through TechnologyUnlockSystem.
+
+**Late Game (Era 7-10):** The nation industrializes. Population explodes to millions. EmpireExpansionSystem enables conquest and diplomacy. Research unlocks electricity, computing, and early space flight.
+
+**Endgame (Era 11-14):** Interstellar colonies spread across the galaxy. β-space navigation enables faster-than-light travel. ProbabilityScoutSystem maps alternate timelines. SvetzRetrievalSystem fetches artifacts from extinct branches. The civilization approaches transcendence.
+
+### Exotic Ship Types (Era 14)
+
+- **Brainship**: Ship-brain symbiosis with perfect coherence for delicate β-space navigation
+- **Probability Scout**: Solo explorers mapping unobserved timeline branches
+- **Svetz Retrieval**: Temporal archaeology ships fetching items from extinct timelines
+- **Timeline Merger**: Ships that collapse compatible probability branches into one
+
+See [GRAND_STRATEGY_GUIDE.md](GRAND_STRATEGY_GUIDE.md) for complete mechanics reference.
 
 ## Development
 

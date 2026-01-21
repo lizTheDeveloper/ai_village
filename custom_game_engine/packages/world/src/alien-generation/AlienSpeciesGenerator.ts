@@ -250,11 +250,14 @@ Return ONLY valid JSON in this exact format:
       const response = await this.llmProvider.generate({
         prompt,
         temperature: 0.8,
-        maxTokens: 400,
+        // Let the model think as long as needed - no restrictive limit
       });
 
-      // Extract JSON
-      const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+      // Extract thinking tags first (Qwen3 format: <think>...</think>)
+      const textForParsing = this.extractThinkingAndGetRemaining(response.text);
+
+      // Extract JSON from the remaining text
+      const jsonMatch = textForParsing.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
 
@@ -582,10 +585,13 @@ Return ONLY valid JSON:
       const response = await this.llmProvider.generate({
         prompt,
         temperature: 0.9,
-        maxTokens: 300,
+        // Let the model think as long as needed - no restrictive limit
       });
 
-      const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+      // Extract thinking tags first (Qwen3 format: <think>...</think>)
+      const textForParsing = this.extractThinkingAndGetRemaining(response.text);
+
+      const jsonMatch = textForParsing.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
 
@@ -786,6 +792,20 @@ Return ONLY valid JSON:
     const common = `${this.capitalize(traits.bodyPlan.replace(/_/g, ' '))} ${this.capitalize(traits.locomotion.split('_')[0]!)}`;
 
     return { scientific, common };
+  }
+
+  /**
+   * Extract thinking tags (Qwen3 format) and return the remaining text.
+   * This handles models that use <think>...</think> for chain-of-thought reasoning.
+   */
+  private extractThinkingAndGetRemaining(text: string): string {
+    // Match <think>...</think> tags (case-insensitive, allows whitespace)
+    const thinkRegex = /<think>([\s\S]*?)<\/think>/gi;
+
+    // Remove think tags from the text, keeping only the actual response
+    const remaining = text.replace(thinkRegex, '').trim();
+
+    return remaining || text; // Fall back to original if nothing remains
   }
 
   /**
