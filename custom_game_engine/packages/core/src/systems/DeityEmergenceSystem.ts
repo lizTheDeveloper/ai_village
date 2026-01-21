@@ -791,16 +791,16 @@ If the prayer doesn't clearly fit any domain, use "mystery" as the domain.`;
       deityPersonality: personalityDesc,
     });
 
-    // Note: Event emission commented out until event types are updated
-    // world.eventBus.emit({
-    //   type: 'deity_emerged',
-    //   deityId: deityEntity.id,
-    //   deityName: identity.primaryName,
-    //   domain: pattern.concept,
-    //   origin: pattern.trigger,
-    //   believerCount: pattern.agentIds.length,
-    //   tick: currentTick,
-    // });
+    // Emit deity:emerged event for tracking and Fates Council processing
+    this.events.emit('deity:emerged', {
+      deityId: deityEntity.id,
+      deityName: identity.primaryName,
+      domain: pattern.concept,
+      origin: 'proto_belief',
+      believerCount: pattern.agentIds.length,
+      initialBelief: pattern.totalBelief,
+      tick: currentTick,
+    });
   }
 
   /**

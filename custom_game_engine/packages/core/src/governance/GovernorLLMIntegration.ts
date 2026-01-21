@@ -362,12 +362,13 @@ export function executeDirectiveInterpretation(
   switch (interpretation.action) {
     case 'implement':
       // Update governor's governance component with new priority
-      // This would be implemented based on specific governance component structure
       console.log(
         `[GovernorLLM] ${governor.id} implementing directive: ${directive.directive}`
       );
       console.log(`[GovernorLLM] Implementation plan: ${interpretation.implementation_plan}`);
-      // TODO: Update appropriate governance component (VillageGovernance, ProvinceGovernance, etc.)
+
+      // Update the appropriate governance component with the new directive/priority
+      updateGovernanceComponentWithDirective(governor, directive, interpretation, world);
       break;
 
     case 'delegate':
@@ -473,5 +474,97 @@ export function addCrisisToGovernorQueue(
 
   console.warn(
     `[GovernorLLM] Could not find governance component with activeCrises array on ${governor.id}`
+  );
+}
+
+/**
+ * Update governance component with directive implementation
+ *
+ * @param governor Governor entity
+ * @param directive The delegation chain directive
+ * @param interpretation The LLM's interpretation of how to implement
+ * @param world World instance
+ */
+function updateGovernanceComponentWithDirective(
+  governor: Entity,
+  directive: DelegationChain,
+  interpretation: DirectiveInterpretation,
+  world: World
+): void {
+  const { ComponentType: CT } = require('../types/ComponentType.js');
+
+  // Governance component types that support directives
+  const governanceComponentTypes = [
+    CT.VillageGovernance,
+    CT.ProvinceGovernance,
+    CT.NationGovernance,
+    CT.EmpireGovernance,
+    CT.GalacticCouncil,
+  ];
+
+  for (const componentType of governanceComponentTypes) {
+    const governance = governor.components?.get(componentType) as any;
+    if (!governance) continue;
+
+    // Create directive record
+    const directiveRecord = {
+      id: `directive_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      directive: directive.directive,
+      origin: directive.origin,
+      targetTier: directive.targetTier,
+      implementationPlan: interpretation.implementation_plan || '',
+      status: 'implementing' as const,
+      receivedTick: world.tick,
+      interpretation: interpretation.reasoning,
+    };
+
+    // Update component with directive - different components may have different structures
+    if (Array.isArray(governance.activeDirectives)) {
+      governance.activeDirectives.push(directiveRecord);
+      console.log(
+        `[GovernorLLM] Added directive ${directiveRecord.id} to ${governor.id}'s active directives`
+      );
+    } else if (governance.currentPriorities && typeof governance.currentPriorities === 'object') {
+      // For components using priority-based structure
+      governance.currentPriorities[directive.directive] = {
+        priority: 'high',
+        source: directive.origin,
+        plan: interpretation.implementation_plan,
+        addedTick: world.tick,
+      };
+      console.log(
+        `[GovernorLLM] Added priority "${directive.directive}" to ${governor.id}'s governance`
+      );
+    } else {
+      // Generic fallback: add to a pendingActions array if exists
+      if (Array.isArray(governance.pendingActions)) {
+        governance.pendingActions.push({
+          type: 'directive',
+          content: directive.directive,
+          plan: interpretation.implementation_plan,
+          tick: world.tick,
+        });
+      }
+    }
+
+    // Emit event for tracking
+    world.eventBus.emit({
+      type: 'governance:directive_accepted',
+      source: governor.id,
+      data: {
+        governorId: governor.id,
+        directiveId: directiveRecord.id,
+        directive: directive.directive,
+        origin: directive.origin,
+        implementationPlan: interpretation.implementation_plan,
+        tick: world.tick,
+      },
+    });
+
+    return; // Found and updated a governance component
+  }
+
+  console.warn(
+    `[GovernorLLM] Could not find governance component to update on ${governor.id}`
   );
 }

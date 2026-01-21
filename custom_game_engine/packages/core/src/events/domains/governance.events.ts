@@ -997,4 +997,14 @@ export interface GovernanceEvents {
     estimatedRecoveryTime: number;
     tick: number;
   };
+
+  // === Directive Implementation Events ===
+  'governance:directive_accepted': {
+    governorId: EntityId;
+    directiveId: string;
+    directive: string;
+    origin: string;
+    implementationPlan?: string;
+    tick: number;
+  };
 }

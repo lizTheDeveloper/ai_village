@@ -164,6 +164,16 @@ export interface MagicEvents {
     /** Potential deity concept forming */
     concept?: string;
   };
+  /** Emitted when a new deity emerges from collective belief */
+  'deity:emerged': {
+    deityId: EntityId;
+    deityName: string;
+    domain: string;
+    origin: 'proto_belief' | 'miracle' | 'ascension' | 'external';
+    believerCount: number;
+    initialBelief: number;
+    tick: number;
+  };
   'divinity:magic_detected': {
     casterId: string;
     spellId: string;

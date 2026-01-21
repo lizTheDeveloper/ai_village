@@ -24,6 +24,23 @@
  *   DELETE /api/save?session=<id>&save=<name> - Delete a save
  *   GET    /api/save-load              - API help and documentation
  *
+ * Planet Sharing API (Persistent World):
+ *   GET    /api/planets                - List all planets
+ *   GET    /api/planets/stats          - Get planet statistics
+ *   POST   /api/planet                 - Create a new planet
+ *   GET    /api/planet/:id             - Get planet metadata
+ *   DELETE /api/planet/:id             - Delete planet (marks as deleted)
+ *   POST   /api/planet/:id/access      - Record planet access
+ *   GET    /api/planet/:id/biosphere   - Get biosphere data
+ *   PUT    /api/planet/:id/biosphere   - Save biosphere data
+ *   GET    /api/planet/:id/chunks      - List all chunks
+ *   POST   /api/planet/:id/chunks/batch - Batch get chunks
+ *   GET    /api/planet/:id/chunk/:x,:y - Get specific chunk
+ *   PUT    /api/planet/:id/chunk/:x,:y - Save/update chunk
+ *   GET    /api/planet/:id/locations   - Get named locations
+ *   POST   /api/planet/:id/location    - Add named location
+ *   GET    /api/planet                 - API help and documentation
+ *
  * Sprite Generation API (On-Demand Asset Creation):
  *   POST /api/sprites/generate          - Queue sprite generation for missing assets
  *   GET  /api/sprites/generate/status/:folderId - Check generation status
@@ -89,6 +106,7 @@ import { MetricsStorage, type StoredMetric } from '../packages/metrics/src/Metri
 import { type CanonEvent } from '../packages/metrics/src/CanonEventRecorder.js';
 import { viewRegistry, registerBuiltInViews, hasTextFormatter, type ViewContext } from '../packages/core/src/dashboard/index.js';
 import { SaveStateManager } from '../packages/persistence/src/index.js';
+import { planetStorage, type PlanetMetadata, type SerializedChunk, type NamedLocation, type BiosphereData } from '../demo/src/planet-storage.js';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
 import { RateLimiter } from '../packages/llm/src/RateLimiter.js';
@@ -6984,6 +7002,483 @@ NOTE: The POST /api/save endpoint for creating saves is not yet integrated with
 
 ================================================================================
 See TIME_MANIPULATION_DEVTOOLS.md for more details
+================================================================================
+`;
+    res.end(helpText);
+    return;
+  }
+
+  // === Planet Sharing API (Persistent World) ===
+  // Enables same planet across multiple saves, shared terrain modifications,
+  // and multiplayer via cross-profile world sharing.
+
+  // CORS preflight for planet endpoints
+  if (req.method === 'OPTIONS' && pathname.startsWith('/api/planet')) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
+  // List all planets
+  if (pathname === '/api/planets' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      const planets = await planetStorage.listPlanets();
+      res.end(JSON.stringify({ success: true, planets }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to list planets' }));
+    }
+    return;
+  }
+
+  // Get planet statistics
+  if (pathname === '/api/planets/stats' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      const stats = await planetStorage.getStats();
+      res.end(JSON.stringify({ success: true, stats }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to get planet stats' }));
+    }
+    return;
+  }
+
+  // Create a new planet
+  if (pathname === '/api/planet' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+
+        if (!params.name || !params.type || !params.seed) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'name, type, and seed are required' }));
+          return;
+        }
+
+        // Generate planet ID if not provided
+        const planetId = params.id || planetStorage.constructor.prototype.constructor.generatePlanetId
+          ? (planetStorage as any).constructor.generatePlanetId(params.seed, params.type)
+          : `planet:${params.type}:${Date.now().toString(16)}`;
+
+        const metadata: PlanetMetadata = {
+          id: planetId,
+          name: params.name,
+          type: params.type,
+          seed: params.seed,
+          createdAt: Date.now(),
+          lastAccessedAt: Date.now(),
+          saveCount: 0,
+          chunkCount: 0,
+          hasBiosphere: false,
+          config: params.config || { seed: params.seed, type: params.type },
+        };
+
+        await planetStorage.createPlanet(metadata);
+        res.end(JSON.stringify({ success: true, planet: metadata }, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to create planet' }));
+      }
+    });
+    return;
+  }
+
+  // Get planet metadata by ID
+  if (pathname.match(/^\/api\/planet\/[^\/]+$/) && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', ''));
+
+    try {
+      const planet = await planetStorage.getPlanetMetadata(planetId);
+      if (!planet) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'Planet not found' }));
+        return;
+      }
+      res.end(JSON.stringify({ success: true, planet }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to get planet' }));
+    }
+    return;
+  }
+
+  // Delete planet (marks as deleted per conservation rules)
+  if (pathname.match(/^\/api\/planet\/[^\/]+$/) && req.method === 'DELETE') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', ''));
+
+    try {
+      await planetStorage.deletePlanet(planetId);
+      res.end(JSON.stringify({ success: true, planetId, message: 'Planet marked as deleted (preserved per conservation rules)' }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to delete planet' }));
+    }
+    return;
+  }
+
+  // Record planet access (increments saveCount)
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/access$/) && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/access', ''));
+
+    try {
+      await planetStorage.recordPlanetAccess(planetId);
+      res.end(JSON.stringify({ success: true, planetId }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to record access' }));
+    }
+    return;
+  }
+
+  // Get biosphere for planet
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/biosphere$/) && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/biosphere', ''));
+
+    try {
+      const biosphere = await planetStorage.getBiosphere(planetId);
+      if (!biosphere) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'Biosphere not found (not yet generated)' }));
+        return;
+      }
+      res.end(JSON.stringify({ success: true, biosphere }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to get biosphere' }));
+    }
+    return;
+  }
+
+  // Save biosphere for planet (compressed)
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/biosphere$/) && req.method === 'PUT') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/biosphere', ''));
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const biosphere: BiosphereData = JSON.parse(body);
+
+        if (!biosphere.species || !Array.isArray(biosphere.species)) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Invalid biosphere data: species array required' }));
+          return;
+        }
+
+        biosphere.generatedAt = biosphere.generatedAt || Date.now();
+        await planetStorage.saveBiosphere(planetId, biosphere);
+        res.end(JSON.stringify({ success: true, planetId, speciesCount: biosphere.species.length }));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to save biosphere' }));
+      }
+    });
+    return;
+  }
+
+  // List all chunks for planet
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/chunks$/) && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/chunks', ''));
+
+    try {
+      const chunks = await planetStorage.listChunks(planetId);
+      res.end(JSON.stringify({ success: true, planetId, chunkCount: chunks.length, chunks }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to list chunks' }));
+    }
+    return;
+  }
+
+  // Batch get chunks
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/chunks\/batch$/) && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/chunks/batch', ''));
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+        const coords: Array<{ x: number; y: number }> = params.coords;
+
+        if (!coords || !Array.isArray(coords)) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'coords array required' }));
+          return;
+        }
+
+        const chunksMap = await planetStorage.batchGetChunks(planetId, coords);
+
+        // Convert Map to object for JSON serialization
+        const chunks: Record<string, SerializedChunk> = {};
+        for (const [key, chunk] of chunksMap) {
+          chunks[key] = chunk;
+        }
+
+        res.end(JSON.stringify({
+          success: true,
+          planetId,
+          requested: coords.length,
+          found: chunksMap.size,
+          chunks,
+        }, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to batch get chunks' }));
+      }
+    });
+    return;
+  }
+
+  // Get specific chunk
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/chunk\/-?\d+,-?\d+$/) && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Parse: /api/planet/{planetId}/chunk/{x},{y}
+    const match = pathname.match(/^\/api\/planet\/([^\/]+)\/chunk\/(-?\d+),(-?\d+)$/);
+    if (!match) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Invalid chunk path' }));
+      return;
+    }
+
+    const planetId = decodeURIComponent(match[1]);
+    const x = parseInt(match[2], 10);
+    const y = parseInt(match[3], 10);
+
+    try {
+      const chunk = await planetStorage.getChunk(planetId, x, y);
+      if (!chunk) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'Chunk not found (not yet generated)' }));
+        return;
+      }
+      res.end(JSON.stringify({ success: true, chunk }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to get chunk' }));
+    }
+    return;
+  }
+
+  // Save/update specific chunk
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/chunk\/-?\d+,-?\d+$/) && req.method === 'PUT') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Parse: /api/planet/{planetId}/chunk/{x},{y}
+    const match = pathname.match(/^\/api\/planet\/([^\/]+)\/chunk\/(-?\d+),(-?\d+)$/);
+    if (!match) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Invalid chunk path' }));
+      return;
+    }
+
+    const planetId = decodeURIComponent(match[1]);
+    const x = parseInt(match[2], 10);
+    const y = parseInt(match[3], 10);
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const chunkData: SerializedChunk = JSON.parse(body);
+
+        // Validate required fields
+        if (chunkData.x === undefined || chunkData.y === undefined || !chunkData.tiles) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Chunk must have x, y, and tiles fields' }));
+          return;
+        }
+
+        // Ensure coordinates match URL
+        if (chunkData.x !== x || chunkData.y !== y) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Chunk coordinates do not match URL' }));
+          return;
+        }
+
+        // Add modification timestamp and compute checksum if not provided
+        chunkData.modifiedAt = chunkData.modifiedAt || Date.now();
+        if (!chunkData.checksum) {
+          chunkData.checksum = planetStorage.computeChecksum(JSON.stringify(chunkData.tiles));
+        }
+
+        await planetStorage.saveChunk(planetId, chunkData);
+        res.end(JSON.stringify({ success: true, planetId, x, y }));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to save chunk' }));
+      }
+    });
+    return;
+  }
+
+  // Get named locations for planet
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/locations$/) && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/locations', ''));
+
+    try {
+      const locations = await planetStorage.getNamedLocations(planetId);
+      res.end(JSON.stringify({ success: true, planetId, locations }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to get named locations' }));
+    }
+    return;
+  }
+
+  // Add named location
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/location$/) && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/location', ''));
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const location: NamedLocation = JSON.parse(body);
+
+        if (location.chunkX === undefined || location.chunkY === undefined || !location.name || !location.namedBy) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Location must have chunkX, chunkY, name, and namedBy fields' }));
+          return;
+        }
+
+        location.namedAt = location.namedAt || Date.now();
+
+        await planetStorage.addNamedLocation(planetId, location);
+        res.end(JSON.stringify({ success: true, planetId, location }));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to add named location' }));
+      }
+    });
+    return;
+  }
+
+  // Planet API help
+  if (pathname === '/api/planet' || pathname === '/api/planet/') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const helpText = `================================================================================
+PLANET SHARING API - Persistent World System
+================================================================================
+Enables same planet across multiple saves with shared terrain modifications.
+This allows multiplayer via cross-profile world sharing.
+
+CONCEPTS:
+- Planets store terrain separately from save files
+- Multiple saves can share the same planet (shared terrain)
+- Biosphere (species, food webs) is cached per-planet (saves 57s LLM generation)
+- Named locations are global across all saves using the planet
+
+ENDPOINTS:
+--------------------------------------------------------------------------------
+
+1. LIST ALL PLANETS
+   curl http://localhost:${HTTP_PORT}/api/planets
+
+   Returns: Array of planet metadata with stats
+
+2. GET PLANET STATISTICS
+   curl http://localhost:${HTTP_PORT}/api/planets/stats
+
+3. CREATE A NEW PLANET
+   curl -X POST http://localhost:${HTTP_PORT}/api/planet \\
+     -H "Content-Type: application/json" \\
+     -d '{"name": "Homeworld", "type": "magical", "seed": "my-seed-123"}'
+
+   Parameters:
+     - name (string, required): Display name for the planet
+     - type (string, required): Planet type (magical, terrestrial, crystal, etc.)
+     - seed (string, required): Deterministic seed for terrain generation
+     - config (object, optional): Additional configuration parameters
+
+4. GET PLANET METADATA
+   curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123
+
+5. DELETE PLANET (marks as deleted, preserved per conservation rules)
+   curl -X DELETE http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123
+
+6. RECORD PLANET ACCESS (increments saveCount)
+   curl -X POST http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/access
+
+7. GET BIOSPHERE
+   curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/biosphere
+
+8. SAVE BIOSPHERE
+   curl -X PUT http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/biosphere \\
+     -H "Content-Type: application/json" \\
+     -d '{"species": [...], "foodWeb": [...], "generatedAt": 1234567890}'
+
+9. LIST ALL CHUNKS
+   curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunks
+
+10. GET SPECIFIC CHUNK
+    curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunk/5,10
+
+11. SAVE/UPDATE CHUNK
+    curl -X PUT http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunk/5,10 \\
+      -H "Content-Type: application/json" \\
+      -d '{"x": 5, "y": 10, "tiles": [...], "compression": "rle", "modifiedAt": 1234567890}'
+
+12. BATCH GET CHUNKS
+    curl -X POST http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunks/batch \\
+      -H "Content-Type: application/json" \\
+      -d '{"coords": [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 0, "y": 1}]}'
+
+13. GET NAMED LOCATIONS
+    curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/locations
+
+14. ADD NAMED LOCATION
+    curl -X POST http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/location \\
+      -H "Content-Type: application/json" \\
+      -d '{"chunkX": 5, "chunkY": 10, "name": "Valley of Dawn", "namedBy": "player:abc"}'
+
 ================================================================================
 `;
     res.end(helpText);
