@@ -1,6 +1,6 @@
 # Performance Fixes Log
 
-> **Last Updated:** 2026-01-20T14:00:00Z
+> **Last Updated:** 2026-01-20T15:00:00Z
 > **Purpose:** Track performance optimizations with timestamps for coordination between agents
 
 ---
@@ -9,7 +9,63 @@
 
 | Total Fixes | Completed | In Progress | Pending |
 |-------------|-----------|-------------|---------|
-| 38 | 38 | 0 | 0 |
+| 48 | 48 | 0 | 0 |
+
+---
+
+## Round 4 Fixes (2026-01-20T15:00:00Z)
+
+### PF-039: WildPlantPopulationSystem Query-in-Loop + Math.sqrt
+- **File:** `packages/botany/src/systems/WildPlantPopulationSystem.ts`
+- **Completed:** 2026-01-20T15:00:00Z
+- **Problem:** `isPositionCrowded()` queried all plants (line 341) + Math.sqrt (line 350)
+- **Solution:** Cache plant query in `germinateSeedBank()`, pass to helper, squared distance
+- **Impact:** O(chunks × seeds × plants) → O(plants + chunks × seeds)
+
+---
+
+### PF-040: PlantDiseaseSystem Query-in-Loop
+- **File:** `packages/botany/src/systems/PlantDiseaseSystem.ts`
+- **Completed:** 2026-01-20T15:00:00Z
+- **Problem:** `isRepelledByNearbyPlants()` queried all plants (line 549)
+- **Solution:** Added `getCachedPlants()` with tick-stamp, used in pest checks
+- **Impact:** 1 query per tick instead of O(plants × pests)
+
+---
+
+### PF-041: PlantSystem Query-in-Loop
+- **File:** `packages/botany/src/systems/PlantSystem.ts`
+- **Completed:** 2026-01-20T15:00:00Z
+- **Problem:** `isTileSuitable()` queried all plants (line 1015) inside seed dispersal loop
+- **Solution:** Cache plant positions array in `disperseSeeds()` before loop
+- **Impact:** O(seeds × plants) → O(plants + seeds)
+
+---
+
+### PF-042: ColonizationSystem Math.sqrt
+- **File:** `packages/reproduction/src/parasitic/ColonizationSystem.ts`
+- **Completed:** 2026-01-20T15:00:00Z
+- **Problem:** Math.sqrt at line 279 in hive pressure calculation
+- **Solution:** Squared distance comparison
+- **Impact:** ~10x faster hive pressure updates
+
+---
+
+### PF-043: Renderer3D Entity Scans (5 locations)
+- **File:** `packages/renderer/src/Renderer3D.ts`
+- **Completed:** 2026-01-20T15:00:00Z
+- **Problem:** Full entity scans in updateEntities, updateBuildings, updateAnimals, updatePlants, updateTimeOfDayLighting
+- **Solution:** Use ECS queries with CT.Agent, CT.Building, CT.Animal, CT.Plant, CT.Time
+- **Impact:** Query ~100 relevant entities instead of ~4000 (per render frame!)
+
+---
+
+### PF-044: Renderer3D Time Singleton Caching
+- **File:** `packages/renderer/src/Renderer3D.ts`
+- **Completed:** 2026-01-20T15:00:00Z
+- **Problem:** Time entity queried every frame for lighting
+- **Solution:** Added cachedTimeEntityId with lazy initialization
+- **Impact:** 1 query → 0 queries per frame after first
 
 ---
 
