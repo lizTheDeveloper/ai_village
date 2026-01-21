@@ -78,6 +78,9 @@ export class SleepSystem extends BaseSystem {
     energyRecovery?: () => void;
   }>();
 
+  // Singleton entity caching
+  private timeEntityId: string | null = null;
+
   /**
    * Set the StateMutatorSystem reference (called during system registration)
    */
@@ -92,22 +95,31 @@ export class SleepSystem extends BaseSystem {
 
     const shouldUpdateDeltas = ctx.tick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
-    // Get time component from world entity (should be only one)
-    const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
-    let timeOfDay = 12; // Default noon if no time entity
+    // Get time component from world entity (cached singleton)
+    if (!this.timeEntityId) {
+      const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length === 0) return;
+      const firstEntity = timeEntities[0];
+      if (!firstEntity) return;
+      this.timeEntityId = firstEntity.id;
+    }
+    const timeEntity = ctx.world.getEntity(this.timeEntityId) as EntityImpl | undefined;
+    if (!timeEntity) {
+      this.timeEntityId = null; // Reset cache if entity disappeared
+      return;
+    }
+
+    let timeOfDay = 12; // Default noon if no time component
     let hoursElapsed = 0;
 
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
-      if (timeComp) {
-        timeOfDay = timeComp.timeOfDay;
-        // Calculate effective day length based on speed multiplier
-        // This ensures sleep drive accumulates correctly at different time speeds
-        const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
-        // Calculate hours elapsed based on deltaTime and effective day length
-        hoursElapsed = (ctx.deltaTime / effectiveDayLength) * 24;
-      }
+    const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
+    if (timeComp) {
+      timeOfDay = timeComp.timeOfDay;
+      // Calculate effective day length based on speed multiplier
+      // This ensures sleep drive accumulates correctly at different time speeds
+      const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
+      // Calculate hours elapsed based on deltaTime and effective day length
+      hoursElapsed = (ctx.deltaTime / effectiveDayLength) * 24;
     }
 
     for (const entity of ctx.activeEntities) {

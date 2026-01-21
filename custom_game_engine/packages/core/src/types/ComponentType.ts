@@ -223,6 +223,7 @@ export enum ComponentType {
   PackMember = 'pack_member',      // Individual pack member marker
   HiveQueen = 'hive_queen',        // Hive queen marker
   HiveWorker = 'hive_worker',      // Hive worker marker
+  Projectile = 'projectile',       // Projectile entity (arrows, spells, thrown objects)
 
   // Reproduction & Life
   Sexuality = 'sexuality',

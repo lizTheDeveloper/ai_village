@@ -110,7 +110,8 @@ export class GrandStrategySimulator extends HeadlessCitySimulator {
       federationCount: config.federationCount ?? 1,
       createGalacticCouncil: config.createGalacticCouncil ?? true,
       naviesPerEmpire: config.naviesPerEmpire ?? 1,
-      shipsPerSquadron: config.shipsPerSquadron ?? 3,
+      // Squadron requires 3-10 ships, enforce minimum
+      shipsPerSquadron: Math.max(3, config.shipsPerSquadron ?? 3),
       megastructureCount: config.megastructureCount ?? 2,
       workersPerMegastructure: config.workersPerMegastructure ?? 5,
     };

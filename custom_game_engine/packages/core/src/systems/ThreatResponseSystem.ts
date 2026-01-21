@@ -120,8 +120,12 @@ export class ThreatResponseSystem extends BaseSystem {
       if (threat) threats.push(threat);
     }
 
-    // TODO: Scan for incoming projectiles (when projectile system exists)
-    // This would check for entities with ProjectileComponent heading toward agent
+    // Scan for incoming projectiles
+    const allProjectiles = world.query()?.with?.(CT.Projectile)?.executeEntities?.() ?? [];
+    for (const projectile of allProjectiles) {
+      const threat = this.createThreatFromProjectile(projectile, position, entity.id, world);
+      if (threat) threats.push(threat);
+    }
 
     threatComp.threats = threats;
   }
@@ -291,11 +295,12 @@ export class ThreatResponseSystem extends BaseSystem {
 
     const dx = hostilePos.x - agentPos.x;
     const dy = hostilePos.y - agentPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
 
-    // Only detect within 30 tiles
-    if (distance > 30) return null;
+    // Only detect within 30 tiles (use squared distance)
+    if (distanceSquared > 30 * 30) return null;
 
+    const distance = Math.sqrt(distanceSquared);
     const direction = { x: dx / distance, y: dy / distance };
 
     // Calculate hostile's power
@@ -330,11 +335,12 @@ export class ThreatResponseSystem extends BaseSystem {
 
     const dx = animalPos.x - agentPos.x;
     const dy = animalPos.y - agentPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
 
-    // Only detect aggressive animals within 20 tiles
-    if (distance > 20 || animalComp.danger < 3) return null;
+    // Only detect aggressive animals within 20 tiles (use squared distance)
+    if (distanceSquared > 20 * 20 || animalComp.danger < 3) return null;
 
+    const distance = Math.sqrt(distanceSquared);
     const direction = { x: dx / distance, y: dy / distance };
 
     // Animal power based on danger level
@@ -347,6 +353,79 @@ export class ThreatResponseSystem extends BaseSystem {
       powerLevel,
       distance,
       direction,
+      detectedAt: world.tick,
+    };
+  }
+
+  private createThreatFromProjectile(
+    projectile: Entity,
+    agentPos: PositionComponent,
+    agentId: string,
+    world: World
+  ): DetectedThreat | null {
+    const projectilePos = projectile.getComponent<PositionComponent>(CT.Position);
+    const projectileComp = projectile.getComponent<any>(CT.Projectile);
+    if (!projectilePos || !projectileComp) return null;
+
+    // Skip projectiles fired by this agent
+    if (projectileComp.sourceId === agentId) return null;
+
+    // Skip projectiles already past the agent
+    if (projectileComp.expired || projectileComp.hit) return null;
+
+    // Calculate distance to projectile
+    const dx = projectilePos.x - agentPos.x;
+    const dy = projectilePos.y - agentPos.y;
+    const distSq = dx * dx + dy * dy;
+    const distance = Math.sqrt(distSq);
+
+    // Only detect projectiles within 25 tiles
+    if (distance > 25) return null;
+
+    // Get projectile velocity
+    const velocity = projectile.getComponent<any>(CT.Velocity) ?? projectileComp.velocity;
+    if (!velocity || (velocity.x === 0 && velocity.y === 0)) return null;
+
+    // Check if projectile is heading toward agent
+    // Dot product of (agent - projectile) and velocity
+    // If positive, projectile is heading toward agent
+    const toAgent = { x: -dx, y: -dy }; // Vector from projectile to agent
+    const dotProduct = toAgent.x * velocity.x + toAgent.y * velocity.y;
+
+    // Only consider if projectile is moving toward agent
+    if (dotProduct <= 0) return null;
+
+    // Calculate time to impact (approximate)
+    const speed = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+    const timeToImpact = distance / speed;
+
+    // Only alert if impact within 3 seconds (60 ticks at 20 TPS)
+    if (timeToImpact > 3) return null;
+
+    // Calculate miss distance (perpendicular distance from trajectory to agent)
+    // Using cross product magnitude: |toAgent x velocity| / |velocity|
+    const crossProduct = Math.abs(toAgent.x * velocity.y - toAgent.y * velocity.x);
+    const missDistance = crossProduct / speed;
+
+    // Only alert if projectile will pass within 3 tiles
+    if (missDistance > 3) return null;
+
+    const direction = distance > 0 ? { x: dx / distance, y: dy / distance } : { x: 0, y: 0 };
+
+    // Power level based on projectile damage
+    const powerLevel = Math.min(100, (projectileComp.damage ?? 20) * 2);
+
+    // Determine attack type from projectile type
+    const attackType = projectileComp.type === 'spell' ? 'magic' : 'ranged';
+
+    return {
+      threatId: projectile.id,
+      type: 'projectile',
+      attackType,
+      powerLevel,
+      distance,
+      direction,
+      velocity: { x: velocity.x, y: velocity.y },
       detectedAt: world.tick,
     };
   }

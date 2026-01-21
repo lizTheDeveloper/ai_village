@@ -122,9 +122,8 @@ export class SyncretismSystem extends BaseSystem {
    * Check for potential syncretism between deities
    */
   private checkForSyncretism(world: World, currentTick: number): void {
-    // Deities are ALWAYS simulated entities, so we iterate all
-    const deities = Array.from(world.entities.values())
-      .filter(e => e.components.has(CT.Deity));
+    // Deities are ALWAYS simulated entities
+    const deities = world.query().with(CT.Deity).executeEntities();
 
     // Check each pair of deities
     for (let i = 0; i < deities.length; i++) {

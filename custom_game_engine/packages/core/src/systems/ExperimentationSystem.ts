@@ -80,6 +80,8 @@ export class ExperimentationSystem extends BaseSystem {
 
   /** Maximum distance from crafting station to experiment */
   private readonly MAX_STATION_DISTANCE = 2;
+  /** Squared distance for performance */
+  private readonly MAX_STATION_DISTANCE_SQUARED = 4; // 2^2
 
   /**
    * Set the recipe registry for looking up recipes.
@@ -438,9 +440,9 @@ export class ExperimentationSystem extends BaseSystem {
       // Check distance
       const dx = agentPos.x - pos.x;
       const dy = agentPos.y - pos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= this.MAX_STATION_DISTANCE) {
+      if (distanceSquared <= this.MAX_STATION_DISTANCE_SQUARED) {
         return building;
       }
     }

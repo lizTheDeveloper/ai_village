@@ -350,16 +350,71 @@ export class ShipyardProductionSystem extends BaseSystem {
   /**
    * Check if resources are available for construction
    *
-   * In full implementation, would query nation/empire warehouse
-   * For now, returns true (assumes resources are available)
+   * Queries the faction's warehouse to verify resource availability
    */
   private checkResourceAvailability(
     world: World,
     navy: NavyComponent,
     project: ShipConstructionProject
   ): boolean {
-    // TODO: Query warehouse component for resource availability
-    // For now, assume resources are available
+    // Look up the faction entity that owns this navy
+    const factionEntity = world.getEntity(navy.factionId);
+    if (!factionEntity) {
+      // No faction found - assume resources are available (graceful fallback)
+      return true;
+    }
+
+    // Check for warehouse on the faction entity
+    const warehouse = factionEntity.getComponent('warehouse') as {
+      stockpiles?: Record<string, number>;
+      inventory?: Record<string, number>;
+    } | undefined;
+
+    if (!warehouse) {
+      // No warehouse component - try to find a warehouse entity linked to this faction
+      const warehouseEntities = world.query().with(CT.Warehouse).executeEntities();
+      for (const whEntity of warehouseEntities) {
+        const wh = whEntity.getComponent('warehouse') as {
+          stockpiles?: Record<string, number>;
+          inventory?: Record<string, number>;
+          factionId?: string;
+          ownerEntityId?: string;
+        } | undefined;
+
+        if (wh && (wh.factionId === navy.factionId || wh.ownerEntityId === navy.factionId)) {
+          return this.verifyResourcesInWarehouse(wh, project);
+        }
+      }
+
+      // No warehouse found - assume resources are available
+      return true;
+    }
+
+    return this.verifyResourcesInWarehouse(warehouse, project);
+  }
+
+  /**
+   * Verify a warehouse has sufficient resources for the project
+   */
+  private verifyResourcesInWarehouse(
+    warehouse: { stockpiles?: Record<string, number>; inventory?: Record<string, number> },
+    project: ShipConstructionProject
+  ): boolean {
+    const stockpiles = warehouse.stockpiles ?? warehouse.inventory ?? {};
+
+    // Check each required resource
+    for (const [resourceId, required] of project.resourcesRequired.entries()) {
+      const allocated = project.resourcesAllocated.get(resourceId) ?? 0;
+      const stillNeeded = required - allocated;
+
+      if (stillNeeded > 0) {
+        const available = stockpiles[resourceId] ?? 0;
+        if (available < stillNeeded) {
+          return false; // Insufficient resources
+        }
+      }
+    }
+
     return true;
   }
 

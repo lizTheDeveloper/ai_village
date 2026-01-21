@@ -696,10 +696,15 @@ export function registerAllSystems(
   // gameLoop.systemRegistry.register(new InterestEvolutionSystem());
 
   // Cross-realm communication
-  gameLoop.systemRegistry.register(new CrossRealmPhoneSystem());
-  gameLoop.systemRegistry.register(new CellPhoneSystem());
-  gameLoop.systemRegistry.register(new WalkieTalkieSystem());
-  gameLoop.systemRegistry.register(new RadioBroadcastingSystem());
+  // LAZY ACTIVATION: Communication systems - disabled until communication tech exists
+  // Tech requirement: cross_realm_phones (enables cross-realm communication)
+  registerDisabled(new CrossRealmPhoneSystem());
+  // Tech requirement: cell_phone (enables cellular communication)
+  registerDisabled(new CellPhoneSystem());
+  // Tech requirement: walkie_talkie (enables short-range radio)
+  registerDisabled(new WalkieTalkieSystem());
+  // Tech requirement: radio_broadcasting (enables radio stations)
+  registerDisabled(new RadioBroadcastingSystem());
 
   // ============================================================================
   // EXPLORATION & NAVIGATION
@@ -710,56 +715,60 @@ export function registerAllSystems(
   }
   gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
   gameLoop.systemRegistry.register(new ExplorationDiscoverySystem());
-  gameLoop.systemRegistry.register(new StellarMiningSystem()); // Priority 185: Resource extraction from stellar phenomena
+  // LAZY ACTIVATION: Stellar mining - disabled until space mining tech exists
+  // Tech requirement: stellar_mining (enables asteroid/star mining)
+  registerDisabled(new StellarMiningSystem()); // Priority 185: Resource extraction from stellar phenomena
 
   // ============================================================================
   // FLEET & SQUADRON MANAGEMENT
   // ============================================================================
+  // LAZY ACTIVATION: Disabled by default - no ships/fleets at planet spawn
+  // Tech requirement: shipyard (enables navy, fleet, squadron systems)
   // Navy management (priority 70): Nation-scale naval forces
   // Armada management (priority 75): Multi-fleet campaign forces (3-10 fleets)
   // Fleet management (priority 80): Strategic fleet groups (3-10 squadrons)
   // Squadron management (priority 85): Tactical ship squadrons (3-10 ships)
-  gameLoop.systemRegistry.register(new NavySystem());
-  gameLoop.systemRegistry.register(new NavyPersonnelSystem());
-  gameLoop.systemRegistry.register(new ShipyardProductionSystem());
-  gameLoop.systemRegistry.register(new ArmadaSystem());
-  gameLoop.systemRegistry.register(new FleetSystem());
-  gameLoop.systemRegistry.register(new SquadronSystem());
+  registerDisabled(new NavySystem());
+  registerDisabled(new NavyPersonnelSystem());
+  registerDisabled(new ShipyardProductionSystem());
+  registerDisabled(new ArmadaSystem());
+  registerDisabled(new FleetSystem());
+  registerDisabled(new SquadronSystem());
   // Fleet coherence (priority 400): Squadron→Fleet→Armada coherence aggregation
-  gameLoop.systemRegistry.register(new FleetCoherenceSystem());
+  registerDisabled(new FleetCoherenceSystem());
   // Crew stress (priority 420): Stress accumulation/recovery during β-space navigation
-  gameLoop.systemRegistry.register(new CrewStressSystem());
+  registerDisabled(new CrewStressSystem());
   // Straggler recovery (priority 430): Handle ships left behind during fleet β-jumps
-  gameLoop.systemRegistry.register(new StragglerRecoverySystem());
+  registerDisabled(new StragglerRecoverySystem());
   // Heart Chamber Network (priority 450): Fleet-wide emotional sync for β-jumps
-  gameLoop.systemRegistry.register(new HeartChamberNetworkSystem());
+  registerDisabled(new HeartChamberNetworkSystem());
   // Fleet combat (priority 600): Lanchester's Laws fleet battle resolution
-  gameLoop.systemRegistry.register(new FleetCombatSystem());
+  registerDisabled(new FleetCombatSystem());
   // Squadron combat (priority 610): Formation-based tactical combat between squadrons
-  gameLoop.systemRegistry.register(new SquadronCombatSystem());
+  registerDisabled(new SquadronCombatSystem());
   // Ship combat (priority 620): Individual ship-to-ship combat with phases
-  gameLoop.systemRegistry.register(new ShipCombatSystem());
+  registerDisabled(new ShipCombatSystem());
   // Navy budget (priority 850): Annual budget cycle, shipyard production
-  gameLoop.systemRegistry.register(new NavyBudgetSystem());
+  registerDisabled(new NavyBudgetSystem());
 
   // ============================================================================
   // MEGASTRUCTURES (Phase 5: Grand Strategy)
   // ============================================================================
+  // LAZY ACTIVATION: Disabled by default - no megastructures at planet spawn
+  // Tech requirement: megastructure_engineering (advanced construction tech)
   // Megastructure Construction (priority 300): Manages construction projects
   // Advances construction progress, consumes resources, handles phases
-  // Lazy activation: requires 'megastructure' component
-  gameLoop.systemRegistry.register(new MegastructureConstructionSystem());
+  registerDisabled(new MegastructureConstructionSystem());
 
   // Megastructure Maintenance (priority 310): Handles maintenance, degradation, and decay
   // Runs after construction systems to process operational structures
-  // Lazy activation: requires 'megastructure' component
-  gameLoop.systemRegistry.register(new MegastructureMaintenanceSystem());
+  registerDisabled(new MegastructureMaintenanceSystem());
 
   // Archaeology System (priority 235): Excavates ruins and discovers artifacts
   // Listens for megastructure collapse events to create archaeological sites
   // Processes excavation progress and artifact reverse engineering
-  // Lazy activation: requires 'archaeological_site' component
-  gameLoop.systemRegistry.register(new ArchaeologySystem());
+  // Tech requirement: archaeology (requires historical research)
+  registerDisabled(new ArchaeologySystem());
 
   // ============================================================================
   // VIRTUAL REALITY
@@ -797,27 +806,31 @@ export function registerAllSystems(
   // ============================================================================
   // AUTOMATION & PRODUCTION (Phase 38)
   // ============================================================================
+  // LAZY ACTIVATION: Factory systems - disabled until factory buildings exist
+  // Tech requirement: factory_automation (enables factory systems)
   // Factory AI (priority 48 - autonomous management)
-  gameLoop.systemRegistry.register(new FactoryAISystem());
+  registerDisabled(new FactoryAISystem());
   // Off-screen optimization (priority 49 - runs before full simulation)
-  gameLoop.systemRegistry.register(new OffScreenProductionSystem());
+  registerDisabled(new OffScreenProductionSystem());
   // Full simulation systems (priority 50+)
-  gameLoop.systemRegistry.register(new PowerGridSystem());
-  gameLoop.systemRegistry.register(new DirectConnectionSystem());
-  gameLoop.systemRegistry.register(new BeltSystem());
+  registerDisabled(new PowerGridSystem());
+  registerDisabled(new DirectConnectionSystem());
+  registerDisabled(new BeltSystem());
   // AssemblyMachineSystem - Uses StateMutatorSystem for batched crafting progress
   const assemblyMachineSystem = new AssemblyMachineSystem();
   assemblyMachineSystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(assemblyMachineSystem);
+  registerDisabled(assemblyMachineSystem);
 
   // ============================================================================
   // ECONOMY & TRADE
   // ============================================================================
-  gameLoop.systemRegistry.register(new TradingSystem());
+  // LAZY ACTIVATION: Trade systems - disabled until market/trade infrastructure exists
+  // Tech requirement: marketplace (enables trading systems)
+  registerDisabled(new TradingSystem());
   const marketEventSystem = new MarketEventSystem();
-  gameLoop.systemRegistry.register(marketEventSystem);
-  gameLoop.systemRegistry.register(new TradeAgreementSystem());
-  gameLoop.systemRegistry.register(new TradeEscortSystem());
+  registerDisabled(marketEventSystem);
+  registerDisabled(new TradeAgreementSystem());
+  registerDisabled(new TradeEscortSystem());
 
   // ============================================================================
   // SKILLS & CRAFTING
@@ -830,64 +843,79 @@ export function registerAllSystems(
   // ============================================================================
   // RESEARCH
   // ============================================================================
+  // Basic research system - keep enabled for early game discovery
   const researchSystem = new ResearchSystem();
   gameLoop.systemRegistry.register(researchSystem);
 
+  // LAZY ACTIVATION: Academic systems - disabled until university/academia exists
   const academicPaperSystem = new AcademicPaperSystem();
   academicPaperSystem.initialize(gameLoop.world, eventBus);
-  gameLoop.systemRegistry.register(academicPaperSystem);
+  registerDisabled(academicPaperSystem);
 
-  gameLoop.systemRegistry.register(new CookInfluencerSystem());
+  // LAZY ACTIVATION: Fame/influencer systems - disabled until social infrastructure exists
+  registerDisabled(new CookInfluencerSystem());
+  // HerbalistDiscoverySystem - keep enabled, basic herbalism works early
   gameLoop.systemRegistry.register(new HerbalistDiscoverySystem());
-  gameLoop.systemRegistry.register(new InventorFameSystem());
-  gameLoop.systemRegistry.register(new PublicationSystem());
-  gameLoop.systemRegistry.register(new ChroniclerSystem());
+  registerDisabled(new InventorFameSystem());
+  registerDisabled(new PublicationSystem());
+  registerDisabled(new ChroniclerSystem());
 
   // ============================================================================
   // PUBLISHING & KNOWLEDGE INFRASTRUCTURE
   // ============================================================================
+  // LAZY ACTIVATION: Publishing systems - disabled until printing press tech
   const publishingUnlockSystem = new PublishingUnlockSystem(eventBus);
-  gameLoop.systemRegistry.register(publishingUnlockSystem);
+  registerDisabled(publishingUnlockSystem);
 
+  // TechnologyUnlockSystem - MUST stay enabled, it enables disabled systems!
   const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus, gameLoop.systemRegistry);
   gameLoop.systemRegistry.register(technologyUnlockSystem);
 
+  // TechnologyEraSystem - keep enabled for era progression
   const technologyEraSystem = new TechnologyEraSystem();
   gameLoop.systemRegistry.register(technologyEraSystem);
 
+  // CollapseSystem - keep enabled for civilization collapse mechanics
   const collapseSystem = new CollapseSystem();
   gameLoop.systemRegistry.register(collapseSystem);
 
+  // LAZY ACTIVATION: Knowledge preservation - disabled until libraries exist
   const knowledgePreservationSystem = new KnowledgePreservationSystem();
-  gameLoop.systemRegistry.register(knowledgePreservationSystem);
+  registerDisabled(knowledgePreservationSystem);
 
+  // LAZY ACTIVATION: Production/city systems - disabled until cities exist
   const productionScalingSystem = new ProductionScalingSystem();
-  gameLoop.systemRegistry.register(productionScalingSystem);
+  registerDisabled(productionScalingSystem);
 
   const cityBuildingGenerationSystem = new CityBuildingGenerationSystem();
-  gameLoop.systemRegistry.register(cityBuildingGenerationSystem);
+  registerDisabled(cityBuildingGenerationSystem);
 
   const professionWorkSimulationSystem = new ProfessionWorkSimulationSystem();
-  gameLoop.systemRegistry.register(professionWorkSimulationSystem);
+  registerDisabled(professionWorkSimulationSystem);
 
+  // EventReportingSystem - keep enabled for event tracking
   const eventReportingSystem = new EventReportingSystem();
   gameLoop.systemRegistry.register(eventReportingSystem);
 
+  // LAZY ACTIVATION: Publishing production - disabled until printing press tech
   const publishingProductionSystem = new PublishingProductionSystem();
-  gameLoop.systemRegistry.register(publishingProductionSystem);
+  registerDisabled(publishingProductionSystem);
 
+  // LAZY ACTIVATION: Library system - disabled until first library built
   const librarySystem = new LibrarySystem();
-  gameLoop.systemRegistry.register(librarySystem);
+  registerDisabled(librarySystem);
 
+  // LAZY ACTIVATION: Bookstore system - disabled until first bookstore built
   const bookstoreSystem = new BookstoreSystem();
-  gameLoop.systemRegistry.register(bookstoreSystem);
+  registerDisabled(bookstoreSystem);
 
+  // LAZY ACTIVATION: University system - disabled until first university built
   const universitySystem = new UniversitySystem(eventBus);
-  gameLoop.systemRegistry.register(universitySystem);
+  registerDisabled(universitySystem);
 
   const universityResearchManagementSystem = new UniversityResearchManagementSystem();
   universityResearchManagementSystem.setUniversitySystem(universitySystem);
-  gameLoop.systemRegistry.register(universityResearchManagementSystem);
+  registerDisabled(universityResearchManagementSystem);
 
   // ============================================================================
   // MAGIC
@@ -951,44 +979,54 @@ export function registerAllSystems(
   // ============================================================================
   // DIVINITY - INSTITUTIONS
   // ============================================================================
-  gameLoop.systemRegistry.register(new TempleSystem());
-  gameLoop.systemRegistry.register(new PriesthoodSystem());
-  gameLoop.systemRegistry.register(new RitualSystem());
-  gameLoop.systemRegistry.register(new HolyTextSystem());
-  gameLoop.systemRegistry.register(new SacredSiteSystem());
+  // LAZY ACTIVATION: Religious institutions - disabled until first temple is built
+  // Tech requirement: temple_construction (enables organized religion)
+  registerDisabled(new TempleSystem());
+  registerDisabled(new PriesthoodSystem());
+  registerDisabled(new RitualSystem());
+  registerDisabled(new HolyTextSystem());
+  registerDisabled(new SacredSiteSystem());
 
   // ============================================================================
   // DIVINITY - AVATAR & ANGELS
   // ============================================================================
-  gameLoop.systemRegistry.register(new AvatarSystem());
-  gameLoop.systemRegistry.register(new AngelSystem());
+  // LAZY ACTIVATION: Divine manifestations - disabled until deity has enough power
+  // Enabled when deity:power_threshold_reached event fires
+  registerDisabled(new AvatarSystem());
+  registerDisabled(new AngelSystem());
 
   // ============================================================================
   // PLAYER AVATAR SYSTEM (Phase 16: Polish & Player)
   // ============================================================================
+  // Keep enabled - player can possess agents from the start
   gameLoop.systemRegistry.register(new PlayerInputSystem());
   gameLoop.systemRegistry.register(new PossessionSystem());
 
   // ============================================================================
   // DIVINITY - ADVANCED THEOLOGY
   // ============================================================================
-  gameLoop.systemRegistry.register(new SchismSystem());
-  gameLoop.systemRegistry.register(new SyncretismSystem());
-  gameLoop.systemRegistry.register(new ReligiousCompetitionSystem());
-  gameLoop.systemRegistry.register(new ConversionWarfareSystem());
+  // LAZY ACTIVATION: Advanced theology - disabled until multiple religions exist
+  // Enabled when religion:second_religion_emerges event fires
+  registerDisabled(new SchismSystem());
+  registerDisabled(new SyncretismSystem());
+  registerDisabled(new ReligiousCompetitionSystem());
+  registerDisabled(new ConversionWarfareSystem());
 
   // ============================================================================
   // DIVINITY - WORLD IMPACT
   // ============================================================================
-  gameLoop.systemRegistry.register(new TerrainModificationSystem());
-  gameLoop.systemRegistry.register(new SpeciesCreationSystem());
-  gameLoop.systemRegistry.register(new DivineWeatherControl());
-  gameLoop.systemRegistry.register(new DivineBodyModification());
-  gameLoop.systemRegistry.register(new MassEventSystem());
+  // LAZY ACTIVATION: Divine world modification - disabled until deity has power
+  // Enabled when deity:power_threshold_reached event fires
+  registerDisabled(new TerrainModificationSystem());
+  registerDisabled(new SpeciesCreationSystem());
+  registerDisabled(new DivineWeatherControl());
+  registerDisabled(new DivineBodyModification());
+  registerDisabled(new MassEventSystem());
 
   // ============================================================================
   // DIVINITY - CREATOR
   // ============================================================================
+  // Keep enabled - player can observe and intervene from the start
   gameLoop.systemRegistry.register(new CreatorSurveillanceSystem());
   gameLoop.systemRegistry.register(new CreatorInterventionSystem());
   gameLoop.systemRegistry.register(new LoreSpawnSystem());
@@ -1011,19 +1049,25 @@ export function registerAllSystems(
   // ============================================================================
   // REALMS & PORTALS
   // ============================================================================
-  gameLoop.systemRegistry.register(new UniverseForkingSystem());  // Multiverse forking mechanics (priority 10)
-  gameLoop.systemRegistry.register(new DivergenceTrackingSystem());  // Multiverse: track timeline differences (priority 250)
-  gameLoop.systemRegistry.register(new CanonEventSystem());  // Multiverse: canon events and convergence (priority 260)
-  gameLoop.systemRegistry.register(new PassageSystem());
-  gameLoop.systemRegistry.register(new PassageTraversalSystem());  // Inter-universe passage traversal (priority 90)
-  gameLoop.systemRegistry.register(new TimelineMergerSystem());  // Timeline merge compatibility and operations (priority 95)
-  gameLoop.systemRegistry.register(new ProbabilityScoutSystem());  // Probability scout ship missions (priority 96)
-  gameLoop.systemRegistry.register(new SvetzRetrievalSystem());  // Svetz retrieval ship missions (priority 97)
-  gameLoop.systemRegistry.register(new InvasionSystem());  // Multiverse invasion mechanics (priority 100)
-  gameLoop.systemRegistry.register(new ParadoxDetectionSystem());  // Paradox detection and resolution (priority 220)
-  gameLoop.systemRegistry.register(new PortalSystem());
+  // LAZY ACTIVATION: Multiverse systems - disabled until multiverse tech unlocked
+  // Tech requirement: universe_forking (enables multiverse mechanics)
+  registerDisabled(new UniverseForkingSystem());  // Multiverse forking mechanics (priority 10)
+  registerDisabled(new DivergenceTrackingSystem());  // Multiverse: track timeline differences (priority 250)
+  registerDisabled(new CanonEventSystem());  // Multiverse: canon events and convergence (priority 260)
+  registerDisabled(new PassageSystem());
+  registerDisabled(new PassageTraversalSystem());  // Inter-universe passage traversal (priority 90)
+  registerDisabled(new TimelineMergerSystem());  // Timeline merge compatibility and operations (priority 95)
+  // Tech requirement: probability_ships (enables scout ships)
+  registerDisabled(new ProbabilityScoutSystem());  // Probability scout ship missions (priority 96)
+  registerDisabled(new SvetzRetrievalSystem());  // Svetz retrieval ship missions (priority 97)
+  registerDisabled(new InvasionSystem());  // Multiverse invasion mechanics (priority 100)
+  registerDisabled(new ParadoxDetectionSystem());  // Paradox detection and resolution (priority 220)
+  // Basic portal system - can be enabled when portal tech is researched
+  registerDisabled(new PortalSystem());
+  // RealmTimeSystem needed for basic realm mechanics
   gameLoop.systemRegistry.register(new RealmTimeSystem());
-  // RealmManager registered below with variable (line 666)
+
+  // Death systems - keep enabled since agents can die at any time
   gameLoop.systemRegistry.register(new DeathJudgmentSystem());
 
   // Death Bargain System - hero challenges to cheat death
@@ -1061,19 +1105,20 @@ export function registerAllSystems(
     });
   }
 
-  // Afterlife systems (process souls in the Underworld)
+  // LAZY ACTIVATION: Afterlife systems - disabled until first death occurs
+  // These process souls in the Underworld; enabled by death:first_soul_arrives event
   // AfterlifeNeedsSystem - Uses StateMutatorSystem for batched spiritual needs decay
   const afterlifeNeedsSystem = new AfterlifeNeedsSystem();
   afterlifeNeedsSystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(afterlifeNeedsSystem);
-  gameLoop.systemRegistry.register(new AncestorTransformationSystem());
-  gameLoop.systemRegistry.register(new ReincarnationSystem());
-  gameLoop.systemRegistry.register(new AfterlifeMemoryFadingSystem());
+  registerDisabled(afterlifeNeedsSystem);
+  registerDisabled(new AncestorTransformationSystem());
+  registerDisabled(new ReincarnationSystem());
+  registerDisabled(new AfterlifeMemoryFadingSystem());
 
   // Wisdom Goddess - manifests when pending approvals pile up, posts to divine chat
   const wisdomGoddessSystem = new WisdomGoddessSystem();
   wisdomGoddessSystem.setChatRoomSystem(chatRoomSystem);
-  gameLoop.systemRegistry.register(wisdomGoddessSystem);
+  registerDisabled(wisdomGoddessSystem);
 
   // ============================================================================
   // TELEVISION & MEDIA
@@ -1116,8 +1161,10 @@ export function registerAllSystems(
   // ============================================================================
   // CONSCIOUSNESS (Collective Minds)
   // ============================================================================
-  gameLoop.systemRegistry.register(new HiveMindSystem());
-  gameLoop.systemRegistry.register(new PackMindSystem());
+  // LAZY ACTIVATION: Collective consciousness - disabled until hive/pack species exist
+  // Tech requirement: collective_consciousness (enables hive/pack minds)
+  registerDisabled(new HiveMindSystem());
+  registerDisabled(new PackMindSystem());
 
   // ============================================================================
   // AUTOMATION & FACTORIES (Phase 38)
@@ -1128,12 +1175,16 @@ export function registerAllSystems(
   // ============================================================================
   // CLARKETECH
   // ============================================================================
-  gameLoop.systemRegistry.register(new ClarketechSystem());
+  // LAZY ACTIVATION: Clarketech - disabled until advanced tech threshold reached
+  // Tech requirement: clarketech_research (enables sufficiently advanced technology)
+  registerDisabled(new ClarketechSystem());
 
   // ============================================================================
   // APPS & ARTIFACTS
   // ============================================================================
-  gameLoop.systemRegistry.register(new AppSystem());
+  // LAZY ACTIVATION: App system - disabled until smartphone/computing tech exists
+  // Tech requirement: smartphone (enables app ecosystem)
+  registerDisabled(new AppSystem());
   // gameLoop.systemRegistry.register(new ArtifactSystem()); // TODO: Fix compilation errors - missing System interface implementation
 
   // ============================================================================
@@ -1144,21 +1195,32 @@ export function registerAllSystems(
   // ============================================================================
   // GOVERNANCE
   // ============================================================================
+  // Basic governance - needed for village/city founding
   const governanceDataSystem = new GovernanceDataSystem();
   gameLoop.systemRegistry.register(governanceDataSystem);
   gameLoop.systemRegistry.register(new CityDirectorSystem());
   gameLoop.systemRegistry.register(new VillageGovernanceSystem());
   gameLoop.systemRegistry.register(new CityGovernanceSystem());
-  gameLoop.systemRegistry.register(new ProvinceGovernanceSystem());
-  gameLoop.systemRegistry.register(new NationSystem());  // Nation-level governance (priority 195)
-  gameLoop.systemRegistry.register(new EmpireSystem());  // Empire-level governance (priority 200)
-  gameLoop.systemRegistry.register(new EmpireDiplomacySystem());  // Inter-empire diplomacy (priority 202)
-  gameLoop.systemRegistry.register(new FederationGovernanceSystem());  // Federation governance (priority 205)
-  gameLoop.systemRegistry.register(new GalacticCouncilSystem());  // Galactic Council governance (priority 210)
-  gameLoop.systemRegistry.register(new InvasionPlotHandler());  // Multiverse invasion plot assignment (priority 215)
-  gameLoop.systemRegistry.register(new UpliftDiplomacySystem());  // Civilization uplift diplomacy (priority 220)
-  gameLoop.systemRegistry.register(new EmpireWarSystem());  // Empire war resolution (priority 605, combat phase)
-  gameLoop.systemRegistry.register(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
+
+  // LAZY ACTIVATION: Advanced governance - disabled until larger political entities form
+  // Tech requirement: provincial_administration (enables province governance)
+  registerDisabled(new ProvinceGovernanceSystem());
+  // Tech requirement: nation_founding (enables nation-level governance)
+  registerDisabled(new NationSystem());  // Nation-level governance (priority 195)
+  // Tech requirement: imperial_administration (enables empire governance)
+  registerDisabled(new EmpireSystem());  // Empire-level governance (priority 200)
+  registerDisabled(new EmpireDiplomacySystem());  // Inter-empire diplomacy (priority 202)
+  registerDisabled(new EmpireWarSystem());  // Empire war resolution (priority 605, combat phase)
+  // Tech requirement: interstellar_federation (enables federation governance)
+  registerDisabled(new FederationGovernanceSystem());  // Federation governance (priority 205)
+  // Tech requirement: galactic_council (enables galactic-scale governance)
+  registerDisabled(new GalacticCouncilSystem());  // Galactic Council governance (priority 210)
+  // Tech requirement: multiverse_diplomacy (enables multiverse invasion plots)
+  registerDisabled(new InvasionPlotHandler());  // Multiverse invasion plot assignment (priority 215)
+  // Tech requirement: uplift_diplomacy (enables civilization uplift)
+  registerDisabled(new UpliftDiplomacySystem());  // Civilization uplift diplomacy (priority 220)
+  // LLM-powered governance decisions - only useful when cities exist
+  registerDisabled(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
 
   // ============================================================================
   // METRICS (Optional)

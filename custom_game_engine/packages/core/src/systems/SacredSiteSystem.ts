@@ -164,15 +164,16 @@ export class SacredSiteSystem extends BaseSystem {
    */
   findNearestSite(position: { x: number; y: number }, maxDistance: number = 50): SacredSite | null {
     let nearest: SacredSite | null = null;
-    let nearestDist = Infinity;
+    let nearestDistSquared = Infinity;
+    const maxDistanceSquared = maxDistance * maxDistance;
 
     for (const site of this.sites.values()) {
       const dx = site.position.x - position.x;
       const dy = site.position.y - position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSquared = dx * dx + dy * dy;
 
-      if (dist < nearestDist && dist <= maxDistance) {
-        nearestDist = dist;
+      if (distSquared < nearestDistSquared && distSquared <= maxDistanceSquared) {
+        nearestDistSquared = distSquared;
         nearest = site;
       }
     }
@@ -377,15 +378,16 @@ export class SacredSiteSystem extends BaseSystem {
       used.add(i);
 
       // Find nearby prayers
+      const CHECK_RADIUS_SQUARED = EMERGENCE_THRESHOLDS.CHECK_RADIUS * EMERGENCE_THRESHOLDS.CHECK_RADIUS;
       for (let j = i + 1; j < this.recentPrayers.length; j++) {
         if (used.has(j)) continue;
 
         const other = this.recentPrayers[j]!;
         const dx = other.position.x - prayer.position.x;
         const dy = other.position.y - prayer.position.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distSquared = dx * dx + dy * dy;
 
-        if (dist <= EMERGENCE_THRESHOLDS.CHECK_RADIUS) {
+        if (distSquared <= CHECK_RADIUS_SQUARED) {
           clusterPrayers.push(other);
           used.add(j);
         }

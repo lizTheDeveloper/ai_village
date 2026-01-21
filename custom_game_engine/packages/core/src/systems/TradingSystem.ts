@@ -518,7 +518,7 @@ export class TradingSystem extends BaseSystem {
     const shops = world.query().with(CT.Shop).with(CT.Position).executeEntities();
 
     let nearestShop: EntityId | null = null;
-    let nearestDistance = Infinity;
+    let nearestDistanceSquared = Infinity;
 
     for (const shop of shops) {
       const shopPos = shop.components.get(CT.Position) as PositionComponent | undefined;
@@ -526,10 +526,10 @@ export class TradingSystem extends BaseSystem {
 
       const dx = shopPos.x - position.x;
       const dy = shopPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
+      if (distanceSquared < nearestDistanceSquared) {
+        nearestDistanceSquared = distanceSquared;
         nearestShop = shop.id;
       }
     }

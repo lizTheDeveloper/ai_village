@@ -745,7 +745,7 @@ export class BuildingSystem extends BaseSystem {
 
     // Find nearest agent
     let nearestAgent: Entity | null = null;
-    let nearestDistance = Infinity;
+    let nearestDistanceSquared = Infinity;
 
     for (const agent of agents) {
       const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
@@ -753,10 +753,10 @@ export class BuildingSystem extends BaseSystem {
 
       const dx = agentPos.x - position.x;
       const dy = agentPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
+      if (distanceSquared < nearestDistanceSquared) {
+        nearestDistanceSquared = distanceSquared;
         nearestAgent = agent;
       }
     }

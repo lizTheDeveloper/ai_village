@@ -59,6 +59,9 @@ export class SoilSystem extends BaseSystem {
   private readonly SECONDS_PER_DAY = 24 * 60 * 60; // 24 hours in seconds
   private initialized = false;
 
+  // Singleton entity caching
+  private timeEntityId: string | null = null;
+
   protected onInitialize(world: World): void {
     if (this.initialized) return;
     this.initialized = true;
@@ -602,13 +605,16 @@ export class SoilSystem extends BaseSystem {
    * Returns null if no time entity exists (season modifiers won't apply)
    */
   private getCurrentSeason(world: World): 'spring' | 'summer' | 'fall' | 'winter' | null {
-    const timeEntities = world.query().with(CT.Time).executeEntities();
-    if (timeEntities.length === 0) {
-      return null;
+    if (!this.timeEntityId) {
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length === 0) return null;
+      const firstEntity = timeEntities[0];
+      if (!firstEntity) return null;
+      this.timeEntityId = firstEntity.id;
     }
-
-    const timeEntity = timeEntities[0];
+    const timeEntity = world.getEntity(this.timeEntityId);
     if (!timeEntity) {
+      this.timeEntityId = null;
       return null;
     }
 

@@ -96,15 +96,11 @@ export class TempleSystem extends BaseSystem {
     this.lastUpdate = currentTick;
 
     // Find all temple buildings
-    // Note: Temple building type may not exist yet - this is a placeholder
-    // Buildings are ALWAYS simulated entities, so we iterate all
-    const templeBuildings = Array.from(ctx.world.entities.values())
-      .filter(e => {
-        const building = e.components.get(CT.Building) as BuildingComponent | undefined;
-        // Check for temple-related building types when they exist
-        return building && (building.isComplete || false);
-      })
-      .slice(0, 0); // Disable until temple building type is added
+    // Note: Temple building type does not exist yet - this system is a placeholder
+    // Buildings are ALWAYS simulated entities
+    // TODO: Add 'temple' to BuildingType enum when temples are implemented
+    const templeBuildings: typeof ctx.world extends { getEntity: infer T } ? never[] : never[] = [];
+    // Currently disabled until temple building type is added to BuildingType enum
 
     for (const templeEntity of templeBuildings) {
       const building = templeEntity.components.get(CT.Building) as BuildingComponent;
@@ -131,8 +127,7 @@ export class TempleSystem extends BaseSystem {
   ): TempleData {
     // Try to find which deity this temple is for
     // For now, assign to first deity we find
-    const deities = Array.from(world.entities.values())
-      .filter(e => e.components.has(CT.Deity));
+    const deities = world.query().with(CT.Deity).executeEntities();
 
     const firstDeity = deities[0];
     const deityId = firstDeity ? firstDeity.id : '';

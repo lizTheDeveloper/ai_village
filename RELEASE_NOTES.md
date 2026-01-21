@@ -1,5 +1,138 @@
 # Release Notes
 
+## 2026-01-20 - "Lazy Activation" - System Registration Refactoring & LLM Gameplay Actions
+
+### Lazy Activation Pattern (Major Architecture Improvement)
+
+**System Registration Refactoring** - 30+ systems moved to lazy activation:
+- Systems only register when their prerequisites exist (buildings, tech, components)
+- Eliminates unnecessary system overhead when features aren't in use
+- Tech-gated activation (e.g., cross-realm phones require `cross_realm_phones` tech)
+
+**Systems now using lazy activation:**
+- Communication: CrossRealmPhoneSystem, CellPhoneSystem, WalkieTalkieSystem, RadioBroadcastingSystem
+- Fleet Management: NavySystem, ArmadaSystem, FleetSystem, SquadronSystem, FleetCombatSystem (9 systems)
+- Megastructures: MegastructureConstructionSystem, MegastructureMaintenanceSystem, ArchaeologySystem
+- Factory Automation: FactoryAISystem, PowerGridSystem, BeltSystem, AssemblyMachineSystem (7 systems)
+- Trade: TradingSystem, MarketEventSystem, TradeAgreementSystem, TradeEscortSystem
+- Mining: StellarMiningSystem (asteroid/star mining)
+
+**Performance benefit:** Zero per-tick overhead for unused systems. Systems activate on-demand when first entity with required components appears.
+
+### System Enhancements (20+ files)
+
+**ThreatResponseSystem** (+95 lines)
+- Added projectile threat detection
+- Calculates time-to-impact for incoming projectiles
+- Only alerts if impact within 3 seconds
+- Squared distance optimizations (no Math.sqrt in hot path)
+
+**ShipyardProductionSystem** (+63 lines)
+- Real warehouse resource checking (was placeholder)
+- Queries faction warehouses for resource availability
+- Falls back gracefully if warehouse missing
+- Verifies each resource before allocating to ship construction
+
+**Other System Updates:**
+- AIGodBehaviorSystem, BuildingSystem, ConversionWarfareSystem
+- DivinePowerSystem, DivineWeatherControl, ExperimentationSystem
+- InvasionPlotHandler, ProfessionWorkSimulationSystem, RealityAnchorSystem
+- ResearchSystem, SacredSiteSystem, SchismSystem, SleepSystem
+- SoilSystem, SyncretismSystem, TempleSystem, TradingSystem
+- TreeFellingSystem
+
+### LLM Gameplay Actions (Grand Strategy Capability)
+
+**grand-strategy.ts** (+148 lines) - Direct game control via metrics server:
+
+**Diplomatic Actions:**
+```bash
+POST /api/grand-strategy/diplomatic-action
+{
+  "empireId": "empire-123",
+  "targetEmpireId": "empire-456",
+  "action": "ally" | "trade_agreement" | "non_aggression" | "declare_war"
+}
+```
+
+**Fleet Movement:**
+```bash
+POST /api/grand-strategy/move-fleet
+{
+  "fleetId": "fleet-789",
+  "targetX": 1000,
+  "targetY": 2000
+}
+```
+
+**Megastructure Control (planned):**
+- Task assignment to workers
+- Construction priority management
+
+**Use case:** LLM agents can now play the grand strategy game programmatically via metrics server API.
+
+### Architecture Documentation
+
+**PLAN_PLANET_REUSE.md** (+153 lines) - Shared World Model
+- Architectural design for persistent terrain across save files
+- Multiple saves share same planet terrain (modifications visible across saves)
+- Entities (agents, items, buildings) remain per-save
+- Detailed diagrams of registry architecture
+- Conflict resolution strategies (last-write-wins, timestamp tracking, optimistic locking)
+
+**Key insight:** Terrain becomes a shared resource, entities remain isolated.
+
+```
+┌─────────────────────────────────────────────────┐
+│           PLANET REGISTRY (Global)              │
+│  planet:magical:abc123                          │
+│  ├── config (seed, parameters)                  │
+│  ├── biosphere (species) - cached              │
+│  └── terrain chunks - SHARED across saves      │
+└─────────────────────────────────────────────────┘
+           │                    │
+           ▼                    ▼
+    ┌──────────┐        ┌──────────┐
+    │ Save A   │        │ Save B   │
+    │ entities │        │ entities │
+    └──────────┘        └──────────┘
+```
+
+### Testing Infrastructure
+
+**test-grand-strategy-entities.ts** - Focused entity spawning test
+- Verifies complete entity hierarchy creation
+- Tests empire → nation → navy → fleet → squadron → ship → crew chain
+- Validates megastructure → worker relationships
+- Prints comprehensive entity statistics
+
+### System Changes
+
+**32 files modified**, 741 insertions, 222 deletions
+
+**Major changes:**
+- registerAllSystems.ts - Lazy activation pattern (+258 insertions, -222 deletions)
+- ThreatResponseSystem.ts - Projectile detection (+95 lines)
+- grand-strategy.ts - Gameplay actions (+148 lines)
+- PLAN_PLANET_REUSE.md - Shared world architecture (+153 lines)
+- ShipyardProductionSystem.ts - Warehouse integration (+63 lines)
+- ComponentType.ts - 1 new component type
+
+**New files:**
+- test-grand-strategy-entities.ts - Entity spawning validation
+
+### What's Next
+
+**Immediate priorities:**
+- PlanetRegistry implementation (persistent terrain storage)
+- Metrics server endpoints for gameplay actions
+- Fleet movement system integration
+- Diplomatic action handlers
+
+**Phase 7 continues:** Polish, testing, performance profiling
+
+---
+
 ## 2026-01-20 - "Grand Strategy Complete" - Performance Optimizations & Phase 6 Completion
 
 ### Grand Strategy Implementation Complete (98%)

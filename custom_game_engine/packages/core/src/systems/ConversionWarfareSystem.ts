@@ -252,9 +252,9 @@ export class ConversionWarfareSystem extends BaseSystem {
     currentTick: number
   ): void {
     // Find target's believers
-    // Believers are agents (ALWAYS simulated), so we iterate all
-    const targetBelievers = Array.from(world.entities.values()).filter(e => {
-      if (!e.components.has(CT.Spiritual)) return false;
+    // Believers are agents (ALWAYS simulated)
+    const spiritualEntities = world.query().with(CT.Spiritual).executeEntities();
+    const targetBelievers = spiritualEntities.filter(e => {
       const spiritual = e.components.get(CT.Spiritual) as SpiritualComponent | undefined;
       return spiritual && spiritual.believedDeity === campaign.targetId;
     });

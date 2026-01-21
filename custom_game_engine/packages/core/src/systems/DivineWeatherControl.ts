@@ -387,11 +387,17 @@ export class DivineWeatherControl extends BaseSystem {
     location: { x: number; y: number },
     radius: number
   ): DivineWeatherEvent[] {
-    return Array.from(this.weatherEvents.values()).filter(e => {
+    // Avoid Array.from allocation and Math.sqrt in hot path
+    const result: DivineWeatherEvent[] = [];
+    for (const e of this.weatherEvents.values()) {
       const dx = e.location.x - location.x;
       const dy = e.location.y - location.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance <= radius + e.radius;
-    });
+      const distanceSquared = dx * dx + dy * dy;
+      const combinedRadius = radius + e.radius;
+      if (distanceSquared <= combinedRadius * combinedRadius) {
+        result.push(e);
+      }
+    }
+    return result;
   }
 }

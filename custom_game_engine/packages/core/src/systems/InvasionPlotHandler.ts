@@ -635,14 +635,15 @@ export class InvasionPlotHandler extends BaseSystem {
     // Collect participant IDs from invasion
     const participantIds = new Set<string>();
 
-    // Add defenders
-    if (invasion.defenderIds) {
-      invasion.defenderIds.forEach(id => participantIds.add(id));
+    // Add attacker fleet if available
+    if (invasion.attackerFleetId) {
+      participantIds.add(invasion.attackerFleetId);
     }
 
-    // Add from attacker strength sources if available
-    if (invasion.attackerStrengthSource) {
-      participantIds.add(invasion.attackerStrengthSource);
+    // Add from result participants if available
+    if (invasion.result && 'participantIds' in invasion.result) {
+      const result = invasion.result as { participantIds?: string[] };
+      result.participantIds?.forEach((id: string) => participantIds.add(id));
     }
 
     // Calculate wisdom award based on outcome and invasion type

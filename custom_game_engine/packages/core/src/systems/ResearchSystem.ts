@@ -207,6 +207,7 @@ export class ResearchSystem extends BaseSystem {
     buildings: ResearchBuildingBonus[]
   ): Array<{ agent: Entity; building: ResearchBuildingBonus }> {
     const result: Array<{ agent: Entity; building: ResearchBuildingBonus }> = [];
+    const MAX_DISTANCE_SQUARED = this.MAX_RESEARCH_DISTANCE * this.MAX_RESEARCH_DISTANCE;
 
     for (const agent of agents) {
       const pos = (agent as EntityImpl).getComponent<PositionComponent>(CT.Position);
@@ -214,15 +215,15 @@ export class ResearchSystem extends BaseSystem {
 
       // Find nearest research building
       let nearestBuilding: ResearchBuildingBonus | null = null;
-      let nearestDistance = Infinity;
+      let nearestDistanceSquared = Infinity;
 
       for (const building of buildings) {
         const dx = pos.x - building.position.x;
         const dy = pos.y - building.position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
 
-        if (distance <= this.MAX_RESEARCH_DISTANCE && distance < nearestDistance) {
-          nearestDistance = distance;
+        if (distanceSquared <= MAX_DISTANCE_SQUARED && distanceSquared < nearestDistanceSquared) {
+          nearestDistanceSquared = distanceSquared;
           nearestBuilding = building;
         }
       }
@@ -611,12 +612,13 @@ export class ResearchSystem extends BaseSystem {
     const pos = (agent as EntityImpl).getComponent<PositionComponent>(CT.Position);
     if (!pos) return false;
 
+    const MAX_DISTANCE_SQUARED = this.MAX_RESEARCH_DISTANCE * this.MAX_RESEARCH_DISTANCE;
     const buildings = this.getResearchBuildings(world);
     for (const building of buildings) {
       const dx = pos.x - building.position.x;
       const dy = pos.y - building.position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance <= this.MAX_RESEARCH_DISTANCE) {
+      const distanceSquared = dx * dx + dy * dy;
+      if (distanceSquared <= MAX_DISTANCE_SQUARED) {
         return true;
       }
     }
@@ -634,15 +636,16 @@ export class ResearchSystem extends BaseSystem {
     const pos = (agent as EntityImpl).getComponent<PositionComponent>(CT.Position);
     if (!pos) return 1.0;
 
+    const MAX_DISTANCE_SQUARED = this.MAX_RESEARCH_DISTANCE * this.MAX_RESEARCH_DISTANCE;
     const buildings = this.getResearchBuildings(world);
     let bestBonus = 1.0;
 
     for (const building of buildings) {
       const dx = pos.x - building.position.x;
       const dy = pos.y - building.position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= this.MAX_RESEARCH_DISTANCE) {
+      if (distanceSquared <= MAX_DISTANCE_SQUARED) {
         if (building.fields.length === 0 || building.fields.includes(researchField)) {
           bestBonus = Math.max(bestBonus, building.bonus);
         }

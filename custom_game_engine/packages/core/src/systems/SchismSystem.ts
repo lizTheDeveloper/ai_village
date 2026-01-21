@@ -145,10 +145,11 @@ export class SchismSystem extends BaseSystem {
     deityId: string,
     _deity: DeityComponent
   ): { score: number; cause: SchismCause; faction1: string[]; faction2: string[] } {
-    // Believers are agents (ALWAYS simulated), so we iterate all
-    const believers = Array.from(world.entities.values())
+    // Believers are agents (ALWAYS simulated)
+    const believers = world.query()
+      .with(CT.Spiritual)
+      .executeEntities()
       .filter(e => {
-        if (!e.components.has(CT.Spiritual)) return false;
         const spiritual = e.components.get(CT.Spiritual) as SpiritualComponent | undefined;
         return spiritual && spiritual.believedDeity === deityId;
       });

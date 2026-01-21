@@ -76,6 +76,9 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
   private eventBus: EventBus | null = null;
   private lastAggregationTick: number = 0;
 
+  // Singleton entity caching
+  private timeEntityId: string | null = null;
+
   protected readonly throttleInterval: number;
 
   constructor(config: Partial<ProfessionWorkConfig> = {}) {
@@ -714,8 +717,19 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
    * Get time entity (singleton).
    */
   private getTimeEntity(world: World): EntityImpl | null {
-    const timeEntities = world.query().with(CT.Time).executeEntities();
-    return timeEntities.length > 0 ? (timeEntities[0] as EntityImpl) : null;
+    if (!this.timeEntityId) {
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length === 0) return null;
+      const firstEntity = timeEntities[0];
+      if (!firstEntity) return null;
+      this.timeEntityId = firstEntity.id;
+    }
+    const entity = world.getEntity(this.timeEntityId);
+    if (!entity) {
+      this.timeEntityId = null;
+      return null;
+    }
+    return entity as EntityImpl;
   }
 
   /**

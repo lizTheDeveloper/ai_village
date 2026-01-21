@@ -19,6 +19,67 @@
 
 ---
 
+## Architectural Shift: Shared World Model
+
+The current architecture has **complete isolation** between saves:
+```
+Save A ──────────────────────────────────────────────────────────
+│   └── Universe:main
+│         └── Planet:homeworld (terrain, biosphere, entities)
+│               └── Chunks, Buildings, Modifications
+│
+Save B ──────────────────────────────────────────────────────────
+│   └── Universe:main
+│         └── Planet:homeworld (SEPARATE terrain, biosphere, entities)
+│               └── Different chunks, different buildings
+```
+
+**NEW architecture with shared terrain:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    PLANET REGISTRY (Global)                      │
+│  Persisted separately from saves in IndexedDB                   │
+│                                                                  │
+│  planet:magical:abc123                                          │
+│  ├── config (seed, type, parameters)                            │
+│  ├── biosphere (species, food webs) - 57s generation cached     │
+│  ├── terrain chunks (tiles) - SHARED across all saves           │
+│  └── named locations (Valley of Dawn, Crystal Caves)            │
+└─────────────────────────────────────────────────────────────────┘
+           │                              │
+           ▼                              ▼
+┌─────────────────────┐       ┌─────────────────────┐
+│ Save A              │       │ Save B              │
+│ ├── Universe:main   │       │ ├── Universe:main   │
+│ │   └── entities[]  │       │ │   └── entities[]  │
+│ │       (agents,    │       │ │       (different  │
+│ │       items,      │       │ │        agents,    │
+│ │       buildings*) │       │ │        items)     │
+│ └── References:     │       │ └── References:     │
+│     planet:magical: │       │     planet:magical: │
+│     abc123          │       │     abc123          │
+└─────────────────────┘       └─────────────────────┘
+
+* Buildings are entities, not terrain - they persist per-save
+  BUT the terrain modifications (walls, floors in tiles) are SHARED
+```
+
+**Key implications:**
+1. **Terrain is shared** - If Save A builds a wall, Save B sees it in terrain
+2. **Building entities are NOT shared** - The "building" component entity is per-save
+3. **Agents are NOT shared** - Each save has its own agent population
+4. **Biosphere is shared** - Same species exist across saves
+5. **Modification conflict** - Need strategy for concurrent terrain modifications
+
+**Conflict resolution strategy:**
+- Last-write-wins for terrain tiles (simple, may cause visual inconsistency)
+- OR: Track modification timestamps, merge on load
+- OR: Optimistic locking with conflict detection (complex)
+
+**Recommendation**: Start with last-write-wins. Most players won't run multiple saves simultaneously.
+
+---
+
 ## Current State Analysis
 
 ### What Exists (Good Foundations)
@@ -120,36 +181,58 @@ if (snapshot.worldState.planets && snapshot.worldState.planets.length > 0) {
 
 ---
 
-### Phase 2: PlanetRegistry (Cross-Save Planet Cache)
+### Phase 2: PlanetRegistry (Persistent World Storage)
 
 **New file**: `packages/persistence/src/PlanetRegistry.ts`
 
-**Purpose**: Global cache of planet snapshots that persists independently of save games.
+**Purpose**: Global persistent world storage. Stores planet config, biosphere, AND terrain chunks. Multiple save games share the same terrain.
 
 ```typescript
 /**
- * PlanetRegistry - Cross-save planet cache
+ * PlanetRegistry - Persistent World Storage
  *
- * Stores PlanetSnapshots (config + biosphere) separately from save files.
- * Terrain chunks are still per-save (player modifications differ).
- * Biosphere generation (57s) is cached and reused.
+ * Stores complete planet state (config + biosphere + terrain) separately from save files.
+ * Multiple save games share the same terrain - modifications by one save appear in others.
+ * This creates a "persistent world" where you explore and modify a shared planet.
+ *
+ * Save files only store:
+ * - Entity states (agents, items, buildings-as-entities)
+ * - Universe time
+ * - Which planet is active
+ *
+ * PlanetRegistry stores:
+ * - Planet config (seed, type, parameters)
+ * - Biosphere (species, food webs) - 57s generation cached
+ * - Terrain chunks (tiles, modifications) - SHARED across saves
+ * - Named locations (global lore)
  */
 export class PlanetRegistry {
-  private planets = new Map<string, PlanetSnapshot>();
-  private storage: StorageBackend;
+  private storage: PlanetStorageBackend;
 
-  constructor(storage: StorageBackend) {
+  constructor(storage: PlanetStorageBackend) {
     this.storage = storage;
   }
 
   /**
-   * Get planet by ID. Returns cached snapshot or null.
+   * Get planet metadata (config + biosphere, without terrain).
    */
-  async getPlanet(planetId: string): Promise<PlanetSnapshot | null>;
+  async getPlanetMetadata(planetId: string): Promise<PlanetSnapshot | null>;
 
   /**
-   * Register a newly generated planet.
-   * Called after biosphere generation completes.
+   * Get specific chunk terrain from planet.
+   * Returns null if chunk not yet generated.
+   */
+  async getChunk(planetId: string, chunkX: number, chunkY: number): Promise<SerializedChunk | null>;
+
+  /**
+   * Save chunk terrain to planet.
+   * Called after terrain generation or modification.
+   */
+  async saveChunk(planetId: string, chunk: SerializedChunk): Promise<void>;
+
+  /**
+   * Register a newly generated planet (metadata only).
+   * Chunks are saved incrementally via saveChunk().
    */
   async registerPlanet(snapshot: PlanetSnapshot): Promise<void>;
 
@@ -159,13 +242,22 @@ export class PlanetRegistry {
   async hasPlanet(planetId: string): Promise<boolean>;
 
   /**
-   * List all registered planets.
+   * List all registered planets with visit stats.
    */
-  async listPlanets(): Promise<PlanetSnapshot[]>;
+  async listPlanets(): Promise<Array<PlanetSnapshot & { chunkCount: number }>>;
+
+  /**
+   * Add/update a named location on a planet.
+   */
+  async nameLocation(planetId: string, location: NamedLocation): Promise<void>;
+
+  /**
+   * Get all named locations for a planet.
+   */
+  async getNamedLocations(planetId: string): Promise<NamedLocation[]>;
 
   /**
    * Generate planet ID from seed for deterministic lookup.
-   * Same seed + type = same planet ID.
    */
   static generatePlanetId(seed: string, type: PlanetType): string {
     return `planet:${type}:${hashSeed(seed)}`;
@@ -176,15 +268,32 @@ export class PlanetRegistry {
 export const planetRegistry = new PlanetRegistry(indexedDBStorage);
 ```
 
-**Storage structure**:
+**Storage structure** (IndexedDB):
 ```
-IndexedDB: ai_village_planets
-├── planet:magical:abc123 → PlanetSnapshot { config, biosphere, namedLocations }
-├── planet:terrestrial:def456 → PlanetSnapshot { ... }
-└── planet:crystal:ghi789 → PlanetSnapshot { ... }
+Database: ai_village_planets
+
+Object Store: planet_metadata
+├── planet:magical:abc123 → { config, biosphere, namedLocations[], stats }
+├── planet:terrestrial:def456 → { config, biosphere, namedLocations[], stats }
+└── planet:crystal:ghi789 → { config, biosphere, namedLocations[], stats }
+
+Object Store: planet_chunks (indexed by planetId + chunkKey)
+├── planet:magical:abc123|0,0 → SerializedChunk { tiles, entityIds }
+├── planet:magical:abc123|0,1 → SerializedChunk { ... }
+├── planet:magical:abc123|1,0 → SerializedChunk { ... }
+└── ...thousands of chunks...
+
+Object Store: named_locations (indexed by planetId)
+├── planet:magical:abc123|valley_of_dawn → { chunkX, chunkY, name, namedBy, description }
+└── planet:magical:abc123|crystal_caves → { ... }
 ```
 
-**Key insight**: Terrain is NOT cached in registry (differs per save due to player modifications). Only config + biosphere + named locations are cached.
+**Chunk save strategy**:
+- Chunks save to registry when:
+  1. First generated (terrain generation)
+  2. Modified (building placed, tile tilled, wall built)
+- Save is debounced (batch modifications, save every 30s or on game pause)
+- Chunks are compressed (RLE/delta encoding from existing ChunkSerializer)
 
 ---
 

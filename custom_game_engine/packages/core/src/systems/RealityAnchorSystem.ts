@@ -390,9 +390,10 @@ export class RealityAnchorSystem extends BaseSystem {
 
       const dx = x - position.x;
       const dy = y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
+      const fieldRadiusSquared = anchorComp.fieldRadius * anchorComp.fieldRadius;
 
-      if (distance <= anchorComp.fieldRadius) {
+      if (distanceSquared <= fieldRadiusSquared) {
         return true;
       }
     }

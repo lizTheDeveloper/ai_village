@@ -28,7 +28,7 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import type { TimeCompressionComponent } from '../components/TimeCompressionComponent.js';
 import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
 import type { Component } from '../ecs/Component.js';
-import { SimulationMode } from '../ecs/SimulationScheduler.js';
+import { SimulationMode, getSimulationConfig } from '../ecs/SimulationScheduler.js';
 
 // ============================================================================
 // TYPES

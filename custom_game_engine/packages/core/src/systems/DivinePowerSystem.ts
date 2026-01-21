@@ -851,14 +851,16 @@ export class DivinePowerSystem extends BaseSystem {
         const pos = target.components.get(CT.Position) as PositionComponent | undefined;
         if (pos) {
           // Find all agents near the miracle (within 10 tiles)
+          const range = 10;
+          const rangeSquared = range * range;
           const allEntities = world.query().with(CT.Agent).with(CT.Position).with(CT.Spiritual).executeEntities();
           for (const entity of allEntities) {
             const entityPos = entity.components.get(CT.Position) as PositionComponent;
             if (entityPos) {
               const dx = entityPos.x - pos.x;
               const dy = entityPos.y - pos.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              if (distance <= 10) {
+              const distanceSquared = dx * dx + dy * dy;
+              if (distanceSquared <= rangeSquared) {
                 witnessIds.push(entity.id);
                 // Get witness faith level
                 const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
@@ -1286,14 +1288,15 @@ export class DivinePowerSystem extends BaseSystem {
         const pos = target.components.get(CT.Position) as PositionComponent | undefined;
         if (pos) {
           // Find all agents near the spell target
+          const rangeSquared = spellDef.range * spellDef.range;
           const allEntities = world.query().with(CT.Agent).with(CT.Position).with(CT.Spiritual).executeEntities();
           for (const entity of allEntities) {
             const entityPos = entity.components.get(CT.Position) as PositionComponent;
             if (entityPos) {
               const dx = entityPos.x - pos.x;
               const dy = entityPos.y - pos.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              if (distance <= spellDef.range) {
+              const distanceSquared = dx * dx + dy * dy;
+              if (distanceSquared <= rangeSquared) {
                 witnessIds.push(entity.id);
                 const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
                 witnessDevotions.push(spiritual?.faith ?? 0.1);

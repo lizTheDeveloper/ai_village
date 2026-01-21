@@ -554,7 +554,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
 
     // Fortune domain - improve luck
     if (domain === 'fortune') {
-      const randomBeliever = Array.from(deity.believers)[Math.floor(Math.random() * deity.believers.size)];
+      const randomBeliever = this.getRandomFromSet(deity.believers);
       if (randomBeliever && deity.spendBelief(200)) {
         world.eventBus.emit({
           type: 'divinity:miracle',
@@ -571,7 +571,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
     }
 
     // Default: Generic blessing for other domains
-    const randomBeliever = Array.from(deity.believers)[Math.floor(Math.random() * deity.believers.size)];
+    const randomBeliever = this.getRandomFromSet(deity.believers);
     if (randomBeliever && deity.spendBelief(200)) {
       const domainEffects: Record<DivineDomain, string> = {
         harvest: 'crops_blessed',
@@ -778,6 +778,20 @@ export class AIGodBehaviorSystem extends BaseSystem {
     }
 
     return injured.sort((a, b) => a.health - b.health); // Most injured first
+  }
+
+  /**
+   * Get a random item from a Set without creating an array
+   */
+  private getRandomFromSet<T>(set: Set<T>): T | undefined {
+    if (set.size === 0) return undefined;
+    const targetIndex = Math.floor(Math.random() * set.size);
+    let i = 0;
+    for (const item of set) {
+      if (i === targetIndex) return item;
+      i++;
+    }
+    return undefined;
   }
 
   /**

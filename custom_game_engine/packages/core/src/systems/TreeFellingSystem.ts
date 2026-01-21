@@ -110,10 +110,11 @@ export class TreeFellingSystem extends BaseSystem {
       // Calculate direction away from harvester
       const dx = pos.x - voxel.lastHarvesterPosition.x;
       const dy = pos.y - voxel.lastHarvesterPosition.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance > 0.01) {
+      if (distanceSquared > 0.0001) { // 0.01^2
         // Normalize to unit vector - tree falls away from harvester
+        const distance = Math.sqrt(distanceSquared); // Only calculate sqrt when needed for normalization
         fallDirection = {
           x: dx / distance,
           y: dy / distance,

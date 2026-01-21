@@ -6,6 +6,12 @@
  * - Naval Hierarchy: Navies, Armadas, Fleets, Squadrons
  * - Megastructures: Dyson Spheres, Orbital Rings, etc.
  * - Trade Networks
+ *
+ * GAMEPLAY ACTIONS: Allows LLM to control the game via metrics server:
+ * - Diplomatic actions between empires
+ * - Fleet movement commands
+ * - Megastructure task assignments
+ * - Entity inspection and state queries
  */
 
 import {
@@ -337,8 +343,148 @@ const simulator = new GrandStrategySimulator({
 });
 await simulator.initialize();
 `,
-          note: 'Each empire gets: Navy → Armada → Fleet → Squadron with placeholder ship IDs',
+          note: 'Each empire gets: Navy → Armada → Fleet → Squadron → Ships with crews',
         };
+      },
+    }),
+
+    // =========================================================================
+    // GAMEPLAY ACTIONS - Direct game control via metrics server
+    // =========================================================================
+    defineAction({
+      id: 'diplomatic-action',
+      name: 'Diplomatic Action',
+      description: 'Issue a diplomatic action between two empires (ally, trade, war)',
+      params: [
+        { name: 'empireId', type: 'entity-id', required: true, entityType: 'empire', description: 'Source Empire ID' },
+        { name: 'targetEmpireId', type: 'entity-id', required: true, entityType: 'empire', description: 'Target Empire ID' },
+        {
+          name: 'action',
+          type: 'select',
+          required: true,
+          description: 'Diplomatic action to take',
+          options: [
+            { value: 'ally', label: 'Form Alliance' },
+            { value: 'trade_agreement', label: 'Trade Agreement' },
+            { value: 'non_aggression', label: 'Non-Aggression Pact' },
+            { value: 'declare_war', label: 'Declare War' },
+          ],
+        },
+      ],
+      handler: async (params, gameClient, context) => {
+        try {
+          const response = await fetch(`${context.baseUrl}/api/grand-strategy/diplomatic-action`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              empireId: params.empireId,
+              targetEmpireId: params.targetEmpireId,
+              action: params.action,
+            }),
+          });
+          if (response.ok) {
+            return await response.json();
+          }
+          return {
+            success: false,
+            message: `Diplomatic action: ${params.empireId} → ${params.action} → ${params.targetEmpireId}`,
+            hint: 'Use GrandStrategySimulator.diplomaticAction() for programmatic control',
+            code: `simulator.diplomaticAction('${params.empireId}', '${params.targetEmpireId}', '${params.action}');`,
+          };
+        } catch {
+          return {
+            success: false,
+            message: 'Metrics server not running. Use GrandStrategySimulator directly.',
+            code: `simulator.diplomaticAction('${params.empireId}', '${params.targetEmpireId}', '${params.action}');`,
+          };
+        }
+      },
+    }),
+
+    defineAction({
+      id: 'move-fleet',
+      name: 'Move Fleet',
+      description: 'Order a fleet to move to target coordinates',
+      params: [
+        { name: 'fleetId', type: 'entity-id', required: true, entityType: 'fleet', description: 'Fleet ID to move' },
+        { name: 'targetX', type: 'number', required: true, description: 'Target X coordinate' },
+        { name: 'targetY', type: 'number', required: true, description: 'Target Y coordinate' },
+      ],
+      handler: async (params, gameClient, context) => {
+        try {
+          const response = await fetch(`${context.baseUrl}/api/grand-strategy/move-fleet`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fleetId: params.fleetId,
+              targetX: params.targetX,
+              targetY: params.targetY,
+            }),
+          });
+          if (response.ok) {
+            return await response.json();
+          }
+          return {
+            success: false,
+            message: `Fleet ${params.fleetId} movement order to (${params.targetX}, ${params.targetY})`,
+            hint: 'Use GrandStrategySimulator.moveFleet() for programmatic control',
+            code: `simulator.moveFleet('${params.fleetId}', ${params.targetX}, ${params.targetY});`,
+          };
+        } catch {
+          return {
+            success: false,
+            message: 'Metrics server not running. Use GrandStrategySimulator directly.',
+            code: `simulator.moveFleet('${params.fleetId}', ${params.targetX}, ${params.targetY});`,
+          };
+        }
+      },
+    }),
+
+    defineAction({
+      id: 'assign-megastructure-task',
+      name: 'Assign Megastructure Task',
+      description: 'Assign workers to a specific task on a megastructure',
+      params: [
+        { name: 'megastructureId', type: 'entity-id', required: true, entityType: 'megastructure', description: 'Megastructure ID' },
+        {
+          name: 'task',
+          type: 'select',
+          required: true,
+          description: 'Task to assign',
+          options: [
+            { value: 'maintenance', label: 'Maintenance (keep operational)' },
+            { value: 'expansion', label: 'Expansion (increase capacity)' },
+            { value: 'research', label: 'Research (generate science)' },
+            { value: 'production', label: 'Production (generate resources)' },
+          ],
+        },
+      ],
+      handler: async (params, gameClient, context) => {
+        try {
+          const response = await fetch(`${context.baseUrl}/api/grand-strategy/megastructure-task`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              megastructureId: params.megastructureId,
+              task: params.task,
+            }),
+          });
+          if (response.ok) {
+            return await response.json();
+          }
+          return {
+            success: false,
+            message: `Megastructure ${params.megastructureId} assigned task: ${params.task}`,
+            hint: 'Use GrandStrategySimulator.assignMegastructureTask() for programmatic control',
+            code: `simulator.assignMegastructureTask('${params.megastructureId}', '${params.task}');`,
+          };
+        } catch {
+          return {
+            success: false,
+            message: 'Metrics server not running. Use GrandStrategySimulator directly.',
+            code: `simulator.assignMegastructureTask('${params.megastructureId}', '${params.task}');`,
+          };
+        }
       },
     }),
   ],
