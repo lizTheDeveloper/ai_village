@@ -1,7 +1,7 @@
 # Components Reference
 
-> **Last Updated:** 2026-01-02
-> **Purpose:** Reference guide for all 125+ component types in the ECS
+> **Last Updated:** 2026-01-20
+> **Purpose:** Reference guide for all 135+ component types in the ECS
 
 ## Overview
 
@@ -35,7 +35,8 @@ export class SteeringComponent extends ComponentBase {
 8. [Divinity Components](#divinity-components)
 9. [Reproduction Components](#reproduction-components)
 10. [Combat Components](#combat-components)
-11. [Special Components](#special-components)
+11. [Space & Multiverse Components](#space--multiverse-components)
+12. [Special Components](#special-components)
 
 ---
 
@@ -1102,6 +1103,203 @@ export class SteeringComponent extends ComponentBase {
 ```
 
 **Usage:** Agents, buildings
+
+---
+
+## Space & Multiverse Components
+
+### SpaceshipComponent
+**Type:** `spaceship`
+**Purpose:** Spaceship properties and configuration
+
+**Fields:**
+```typescript
+{
+  ship_type: 'probability_scout' | 'svetz_retrieval' | 'timeline_merger' | 'brainship';
+  hull: {
+    mass: number;              // Ship mass for anchoring capacity
+    integrity: number;         // 0.0 to 1.0
+  };
+  navigation: {
+    observation_precision: number;  // 0.0 to 1.0 (scouts: 0.9)
+    quantum_coupling: number;       // Coherence factor
+    coherence_threshold: number;    // Minimum for β-jump
+    decoherence_rate: number;       // Per-tick degradation
+    initial_coherence: number;      // Starting coherence
+  };
+  crew: {
+    current: number;
+    max: number;
+  };
+}
+```
+
+**Usage:** Ship entities
+
+---
+
+### ProbabilityScoutMissionComponent
+**Type:** `probability_scout_mission`
+**Purpose:** Tracks probability scout missions for mapping alternate timelines
+
+**Fields:**
+```typescript
+{
+  shipId: string;                     // Reference to ship entity
+  startTick: number;                  // Mission start tick
+  phase: 'scanning' | 'observing' | 'mapping' | 'complete';
+  progress: number;                   // 0-100 for current phase
+  targetBranchId?: string;            // Optional specific target branch
+  observedBranches: BranchObservation[];  // Recorded observations
+  branchesMapped: number;             // Total branches successfully mapped
+  observationPrecision: number;       // From ship config (0.0-1.0)
+  contaminationLevel: number;         // Accumulated contamination
+  collapseEventsTriggered: number;    // Collapse incidents caused
+}
+
+interface BranchObservation {
+  branchId: string;
+  divergenceTick: number;
+  differences: string[];       // 'Population divergence', 'Technology path differs', etc.
+  precision: number;
+  observedTick: number;
+  collapseRisk: number;
+}
+```
+
+**Usage:** Probability scout ships with active missions
+
+---
+
+### SvetzRetrievalMissionComponent
+**Type:** `svetz_retrieval_mission`
+**Purpose:** Tracks Svetz retrieval missions for cross-timeline item recovery
+
+**Fields:**
+```typescript
+{
+  shipId: string;                     // Reference to ship entity
+  startTick: number;                  // Mission start tick
+  phase: 'navigating' | 'searching' | 'retrieving' | 'anchoring' | 'returning' | 'complete';
+  progress: number;                   // 0-100 for current phase
+  targetBranchId: string;             // Extinct/alternate timeline to visit
+  targetSpec: {
+    type: 'item' | 'entity' | 'technology';
+    criteria: string;
+    description: string;
+  };
+  retrievedItems: RetrievedItem[];    // Items successfully retrieved
+  totalContamination: number;         // Sum of all item contamination
+  anchoringCapacity: number;          // Max items (based on ship mass)
+  anchoringSlotsUsed: number;         // Current items being anchored
+  failedAttempts: number;             // Failed retrieval attempts
+  lastFailureReason?: string;         // Most recent failure explanation
+}
+
+interface RetrievedItem {
+  itemId: string;
+  name: string;
+  sourceBranchId: string;
+  sourceTimeTick: number;
+  contamination: number;       // 0.0-1.0 contamination level
+  anchored: boolean;           // True if stabilized in current timeline
+  anchoringProgress: number;   // 0-100 anchoring progress
+  retrievedTick: number;
+}
+```
+
+**Named After:** Larry Niven's time-traveling character Svetz
+
+**Usage:** Svetz retrieval ships with active missions
+
+---
+
+### TimelineMergerOperationComponent
+**Type:** `timeline_merger_operation`
+**Purpose:** Tracks active timeline merger operations
+
+**Fields:**
+```typescript
+{
+  shipId: string;
+  targetBranchIds: string[];          // Branches being merged
+  phase: 'analyzing' | 'merging' | 'stabilizing' | 'complete' | 'aborted';
+  progress: number;
+  compatibility: number;              // 0.0-1.0 merge compatibility
+  contamination: number;
+  paradoxesDetected: number;
+  resolvedParadoxes: number;
+}
+```
+
+**Usage:** Timeline merger ships with active operations
+
+---
+
+### UpliftAgreementComponent
+**Type:** `uplift_agreement`
+**Purpose:** Tracks civilization uplift agreements
+
+**Fields:**
+```typescript
+{
+  advancedCivId: string;       // Uplifting civilization
+  primitiveCivId: string;      // Being uplifted
+  startTick: number;
+  phase: 'negotiating' | 'active' | 'complete' | 'failed';
+  techTransferred: string[];   // Technologies shared
+  ethicsScore: number;         // -1.0 (exploitative) to 1.0 (benevolent)
+  dependencyLevel: number;     // 0.0-1.0 primitive's dependency
+}
+```
+
+**Usage:** Civilization entities with uplift relationships
+
+---
+
+### KnowledgeRepositoryComponent
+**Type:** `knowledge_repository`
+**Purpose:** Knowledge preservation during dark ages
+
+**Fields:**
+```typescript
+{
+  technologies: string[];      // Preserved technology keys
+  capacity: number;            // Max preservable techs
+  preservation: number;        // 0.0-1.0 quality of preservation
+  maintainers: string[];       // Entity IDs of monks/scholars
+  location: { x: number; y: number };
+}
+```
+
+**Usage:** Libraries, monasteries, universities during collapse
+
+---
+
+### ArchaeologicalSiteComponent
+**Type:** `archaeological_site`
+**Purpose:** Excavation site for ancient discoveries
+
+**Fields:**
+```typescript
+{
+  discoveredTick: number;
+  excavationProgress: number;  // 0-100
+  artifacts: Artifact[];
+  targetTech?: string;         // Technology to potentially recover
+  difficulty: number;          // 1-10 excavation difficulty
+  era: number;                 // Original technology era
+}
+
+interface Artifact {
+  id: string;
+  name: string;
+  analyzed: boolean;
+  techHint?: string;
+}
+```
+
+**Usage:** Ancient ruins, collapsed megastructures
 
 ---
 

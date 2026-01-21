@@ -2,8 +2,8 @@
 
 > **Status**: Phase 28 Ready
 > **Dependencies**: Phase 27 (Divine Communication System)
-> **Estimated LOC**: ~4,000
-> **Last Updated**: 2025-12-22
+> **Estimated LOC**: ~6,000
+> **Last Updated**: 2026-01-20
 
 ## Table of Contents
 
@@ -16,8 +16,11 @@
 7. [Angel Failure & Corruption](#7-angel-failure--corruption)
 8. [Divine Resources](#8-divine-resources)
 9. [Player Interface](#9-player-interface)
-10. [Integration Points](#10-integration-points)
-11. [Implementation Plan](#11-implementation-plan)
+10. [God's Phone - Angel Communication](#10-gods-phone---angel-communication)
+11. [Custom Angel Species](#11-custom-angel-species)
+12. [Evolution & Tier System](#12-evolution--tier-system)
+13. [Integration Points](#13-integration-points)
+14. [Implementation Plan](#14-implementation-plan)
 
 ---
 
@@ -1174,9 +1177,631 @@ See divine-communication-system.md for detailed UI mockups.
 
 ---
 
-## 10. Integration Points
+## 10. God's Phone - Angel Communication
 
-### 10.1 With Divine Communication System
+### 10.1 Core Concept
+
+Angels are the player's primary interface layer—the bridge between god and mortals. Unlike villagers who can't directly communicate with the player, angels have a direct line. This is implemented as **God's Phone**: a messaging system where the player can have real-time conversations with their angels.
+
+```
+PLAYER (GOD)                           ANGELS
+     │                                    │
+     │   📱 God's Phone (direct chat)     │
+     │<──────────────────────────────────>│
+     │                                    │
+     │   Angels speak to villagers        │
+     │   (policy-dependent)               │
+     │                    ╲               │
+     │                     ╲──────────────│──> VILLAGERS
+     │                                    │
+```
+
+**Why Angels Matter**:
+- Player can't speak directly to villagers without high belief cost
+- Angels provide free/cheap communication channel
+- Angels can manage complexity as village grows
+- Angels enable plots to complete, research to finish, villagers to survive
+
+### 10.2 Messaging Architecture
+
+```typescript
+interface AngelMessagingComponent {
+  // Chat rooms
+  groupChatId: string;          // All angels group chat
+  dmChatIds: string[];          // 1:1 conversation IDs
+  customChatIds: string[];      // Sub-group chats
+
+  // State
+  lastCheckedPhone: number;     // When angel last read messages
+  phoneCheckFrequency: number;  // How often they check (ms)
+  unreadMessages: number;
+
+  // Memory integration
+  conversationMemoryIds: string[]; // Memories created from chats
+
+  // Rate limiting
+  messagesReceivedToday: number;
+  messagesSentToday: number;
+}
+
+interface ChatMessage {
+  id: string;
+  chatId: string;
+  senderId: string;            // Player or angel ID
+  senderType: 'player' | 'angel';
+  content: string;
+  timestamp: number;
+  readBy: string[];            // Angel IDs who have read
+  replyToId?: string;          // If replying to specific message
+}
+
+interface ChatRoom {
+  id: string;
+  type: 'group' | 'dm' | 'custom';
+  name: string;
+  participants: string[];       // Angel IDs (player always included)
+  createdAt: number;
+  lastMessageAt: number;
+  messageCount: number;
+}
+```
+
+### 10.3 Chat Types
+
+**Group Chat (All Angels)**:
+- Automatically created when first angel is created
+- All angels are members
+- Good for announcements, general direction
+- Angels can see each other's messages
+
+**Direct Messages (1:1)**:
+- Created automatically for each angel
+- Private conversation between player and one angel
+- Good for specific orders, personal feedback
+- Angel remembers conversation as memories
+
+**Custom Sub-Groups**:
+- Player-created chat rooms with subset of angels
+- Example: "Guardian Angels", "Combat Squad", "Research Team"
+- Good for coordinating specialized groups
+
+### 10.4 Phone Checking Behavior
+
+Angels don't constantly monitor messages (rate limiting):
+
+```typescript
+class AngelPhoneSystem extends System {
+  update(world: World): void {
+    const angels = world.getEntitiesWithComponent(AngelMessagingComponent);
+
+    for (const angelEntity of angels) {
+      const messaging = angelEntity.getComponent(AngelMessagingComponent);
+      const angel = angelEntity.getComponent(AngelComponent);
+
+      // Check if it's time to check phone
+      const timeSinceCheck = world.time - messaging.lastCheckedPhone;
+      if (timeSinceCheck < messaging.phoneCheckFrequency) continue;
+
+      // Read new messages
+      const unreadMessages = this.getUnreadMessages(messaging, world);
+
+      if (unreadMessages.length > 0) {
+        for (const message of unreadMessages) {
+          // Process message
+          await this.processMessage(angelEntity, angel, message, world);
+
+          // Create memory from conversation
+          this.createConversationMemory(angelEntity, message, world);
+
+          // Mark as read
+          message.readBy.push(angel.id);
+        }
+
+        messaging.unreadMessages = 0;
+      }
+
+      messaging.lastCheckedPhone = world.time;
+    }
+  }
+
+  private async processMessage(
+    angelEntity: Entity,
+    angel: AngelComponent,
+    message: ChatMessage,
+    world: World
+  ): Promise<void> {
+    // Generate angel response using LLM (Groq for speed/cost)
+    const response = await this.generateAngelResponse(angel, message, world);
+
+    // Send response
+    if (response) {
+      this.sendMessage(message.chatId, angel.id, 'angel', response, world);
+    }
+
+    // Emit event for UI
+    world.eventBus.emit('angel:read_message', {
+      angelId: angel.id,
+      messageId: message.id,
+    });
+  }
+}
+```
+
+### 10.5 Conversation Memory
+
+Conversations become memories for the angel:
+
+```typescript
+private createConversationMemory(
+  angelEntity: Entity,
+  message: ChatMessage,
+  world: World
+): void {
+  const memory = angelEntity.getComponent(MemoryComponent);
+
+  memory.addMemory({
+    type: 'divine_conversation',
+    content: `The player told me: "${message.content}"`,
+    importance: 0.7,
+    timestamp: world.time,
+    metadata: {
+      messageId: message.id,
+      chatId: message.chatId,
+    },
+  });
+}
+```
+
+### 10.6 Player UI: Angel Phone Panel
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║                    📱 ANGEL PHONE                            ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  CHATS                           VIREL, THE MESSENGER        ║
+║  ┌────────────────────┐          ┌──────────────────────────┐║
+║  │ 📢 All Angels (3)  │          │ Player: Check on the     ││
+║  │    └─ 2 new        │          │ northern farms please    ││
+║  ├────────────────────┤          │                          ││
+║  │ 💬 Virel           │◄─────────│ Virel: Of course. I      ││
+║  │    └─ typing...    │          │ will observe and report  ││
+║  ├────────────────────┤          │ back shortly. The last   ││
+║  │ 💬 Shadow          │          │ harvest looked promising.││
+║  │                    │          │                          ││
+║  ├────────────────────┤          │ Player: Also talk to     ││
+║  │ 💬 Guardian Azra   │          │ Elder Holt about the     ││
+║  ├────────────────────┤          │ water situation          ││
+║  │ + New Group        │          │                          ││
+║  └────────────────────┘          │ Virel: I shall deliver   ││
+║                                  │ guidance to Elder Holt   ││
+║                                  │ regarding the water.     ││
+║                                  │                          ││
+║                                  │ [typing...]              ││
+║                                  ├──────────────────────────┤║
+║                                  │ Type message...     [➤]  ││
+║                                  └──────────────────────────┘║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+### 10.7 Cost Model
+
+**Angel Chat = Free/Cheap**:
+- Uses Groq (fast, cheap) for angel responses
+- No belief cost to message angels
+- Contrast with divine visions (expensive belief cost)
+
+This makes angels the economical communication channel, justifying their existence.
+
+### 10.8 Angel Speech to Villagers
+
+Angels can optionally speak to villagers (policy-dependent):
+
+```typescript
+interface AngelSpeechPolicy {
+  // Can angels directly appear to mortals?
+  directAppearance: 'never' | 'rare' | 'common' | 'always';
+
+  // Can angels speak audibly?
+  audibleSpeech: boolean;
+
+  // Must speech be cryptic/prophetic?
+  speechStyle: 'plain' | 'cryptic' | 'prophetic';
+
+  // Do mortals know about angels?
+  mortalAwareness: 'ignorant' | 'legends' | 'common_knowledge';
+}
+```
+
+This is a player policy choice—are your angels working openly with humanity or operating in secret?
+
+---
+
+## 11. Custom Angel Species
+
+### 11.1 Core Concept
+
+When the player creates their **first angel**, they define what angels are called in their universe. This is a disambiguation—angels are your divine servant creatures, but what they're named and how they look is up to you.
+
+### 11.2 First Angel Creation Flow
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║              🌟 CREATE YOUR FIRST DIVINE SERVANT             ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  Your servants need a name. What shall mortals call them?    ║
+║                                                              ║
+║  SPECIES NAME: [    The Fae                              ]   ║
+║                                                              ║
+║  SINGULAR: [    Fae            ]                             ║
+║  PLURAL:   [    Fae            ]                             ║
+║                                                              ║
+║  Examples: Angels, Nazgûl, Fae, Seraphim, Djinn, Valkyrie,   ║
+║           Daemons, Spirits, Emissaries, Heralds, Shades      ║
+║                                                              ║
+║  ─────────────────────────────────────────────────────────── ║
+║                                                              ║
+║  APPEARANCE DESCRIPTION:                                     ║
+║  ┌──────────────────────────────────────────────────────────┐║
+║  │ Ethereal beings of living light, with wings like        ││
+║  │ gossamer moonbeams. Their forms shimmer between         ││
+║  │ visible and invisible, and they speak in whispers       ││
+║  │ that sound like distant wind chimes.                    ││
+║  └──────────────────────────────────────────────────────────┘║
+║                                                              ║
+║  This will be used to generate sprites and influence how    ║
+║  mortals perceive your servants.                            ║
+║                                                              ║
+║                                 [Create First Fae]          ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+### 11.3 Angel Species Component
+
+```typescript
+interface AngelSpeciesDefinition {
+  // Naming
+  speciesName: string;           // "The Fae"
+  singularName: string;          // "Fae"
+  pluralName: string;            // "Fae"
+
+  // Appearance template
+  baseAppearanceDescription: string;
+
+  // Generated sprite info
+  baseSpriteId?: string;         // PixelLab sprite ID
+  colorScheme: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+
+  // Initial powers available
+  startingPowers: string[];
+
+  // Tier information
+  currentMaxTier: number;        // 1 initially, increases with promotions
+  tierNames: string[];           // ["Fae", "High Fae", "Archfae", "Faerie Lord"]
+
+  // When defined
+  definedAt: number;
+  definedByPlayerId: string;
+}
+
+// Stored on player/deity
+interface DeityComponent {
+  // ... existing fields ...
+
+  // Angel species definition
+  angelSpecies?: AngelSpeciesDefinition;
+
+  // Angels created
+  angelIds: string[];
+  totalAngelsCreated: number;
+}
+```
+
+### 11.4 Sprite Generation
+
+When species is defined, generate base sprite via PixelLab:
+
+```typescript
+async function generateAngelSpeciesSprite(
+  species: AngelSpeciesDefinition,
+  world: World
+): Promise<string> {
+  const spriteRequest = {
+    description: species.baseAppearanceDescription,
+    size: 48,
+    view: 'low top-down',
+    n_directions: 8,
+    detail: 'medium detail',
+    outline: 'single color outline',
+  };
+
+  const result = await pixelLab.createCharacter(spriteRequest);
+  return result.characterId;
+}
+```
+
+---
+
+## 12. Evolution & Tier System
+
+### 12.1 Core Concept
+
+Angels can be upgraded and evolved over time. After accumulating enough angels at a tier, you can unlock the next tier and promote a subset of your best angels.
+
+**Progression Path**:
+```
+Tier 1: Basic Angels (starting tier)
+   ↓ (after 10 angels + belief cost)
+Tier 2: Greater Angels (promoted from Tier 1)
+   ↓ (after 5 greater angels + belief cost)
+Tier 3: Arch Angels (promoted from Tier 2)
+   ↓ (after 3 arch angels + belief cost)
+Tier 4: Supreme Angels (legendary, max 1)
+```
+
+### 12.2 Evolution Component
+
+```typescript
+interface AngelEvolutionComponent {
+  // Current tier
+  tier: number;                   // 1-4
+  tierName: string;               // From species definition
+
+  // Evolution readiness
+  promotionEligible: boolean;
+  promotionRequirements: {
+    minLevel: number;
+    minSuccessRate: number;
+    minPrayersHandled: number;
+    minServiceTime: number;       // hours
+    specialRequirements?: string[];
+  };
+
+  // Evolution history
+  promotedAt?: number;
+  promotedFrom?: number;          // Previous tier
+  previousSpriteId?: string;
+
+  // Visual evolution
+  currentSpriteId: string;
+  currentDescription: string;
+}
+
+interface TierUnlockRequirements {
+  tier: number;
+  angelsAtPreviousTier: number;   // Need this many at tier-1
+  beliefCost: number;
+  totalBelief: number;            // Lifetime belief spent on angels
+}
+
+const TIER_REQUIREMENTS: TierUnlockRequirements[] = [
+  { tier: 2, angelsAtPreviousTier: 10, beliefCost: 1000, totalBelief: 5000 },
+  { tier: 3, angelsAtPreviousTier: 5, beliefCost: 3000, totalBelief: 15000 },
+  { tier: 4, angelsAtPreviousTier: 3, beliefCost: 10000, totalBelief: 50000 },
+];
+```
+
+### 12.3 Promotion Flow
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║                   🌟 TIER 2 UNLOCKED! 🌟                     ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  You have 10 Fae serving faithfully. You may now promote    ║
+║  up to 3 of them to become HIGH FAE.                        ║
+║                                                              ║
+║  PROMOTION COST: 1,000 belief (per angel)                   ║
+║  YOUR BELIEF: 4,230                                         ║
+║                                                              ║
+║  ─────────────────────────────────────────────────────────── ║
+║                                                              ║
+║  ELIGIBLE FAE:                              SELECT (max 3)   ║
+║                                                              ║
+║  ☑ Virel the Messenger                                      ║
+║    Level 8 │ 94% success │ 234 prayers │ 48h service        ║
+║                                                              ║
+║  ☑ Shadow the Watcher                                       ║
+║    Level 7 │ 89% success │ 156 prayers │ 36h service        ║
+║                                                              ║
+║  ☐ Azra the Guardian                                        ║
+║    Level 6 │ 82% success │ 98 prayers │ 24h service         ║
+║                                                              ║
+║  ☐ Lumiel the Healer (NOT ELIGIBLE - need level 7)          ║
+║    Level 5 │ 91% success │ 67 prayers │ 18h service         ║
+║                                                              ║
+║  ─────────────────────────────────────────────────────────── ║
+║                                                              ║
+║  HIGH FAE APPEARANCE (evolved from Fae):                     ║
+║  "The High Fae have grown more radiant, their gossamer      ║
+║   wings now traced with veins of golden light. Their        ║
+║   whispers carry further, and their forms hold more         ║
+║   solidly in the mortal realm."                             ║
+║                                                              ║
+║  [Preview New Sprite]                                       ║
+║                                                              ║
+║            [Promote Selected (2,000 belief)]   [Cancel]     ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+### 12.4 Sprite Evolution
+
+When promoted, generate evolved sprite:
+
+```typescript
+async function generateEvolvedSprite(
+  angel: Angel,
+  species: AngelSpeciesDefinition,
+  newTier: number,
+  world: World
+): Promise<string> {
+  // Get previous sprite as reference
+  const previousSprite = angel.currentSpriteId;
+  const previousColors = species.colorScheme;
+
+  // Generate evolved description
+  const evolvedDescription = await generateEvolvedDescription(
+    species.baseAppearanceDescription,
+    species.tierNames[newTier - 1],
+    newTier
+  );
+
+  // Request sprite with same color scheme but evolved appearance
+  const result = await pixelLab.createCharacter({
+    description: evolvedDescription,
+    size: 48,
+    view: 'low top-down',
+    n_directions: 8,
+    // Note: Would ideally pass previousSprite for style matching
+  });
+
+  return result.characterId;
+}
+
+async function generateEvolvedDescription(
+  baseDescription: string,
+  tierName: string,
+  tier: number
+): Promise<string> {
+  // Use LLM to evolve the description
+  const prompt = `
+    Original angel appearance: "${baseDescription}"
+
+    This angel is being promoted to ${tierName} (tier ${tier}).
+    Write an evolved appearance description that:
+    1. Keeps the core visual identity (colors, materials, themes)
+    2. Makes them more impressive/powerful looking
+    3. Adds 1-2 new visual elements appropriate for the tier
+    4. Stays concise (2-3 sentences)
+  `;
+
+  return await llm.generate(prompt);
+}
+```
+
+### 12.5 Tier Benefits
+
+Each tier provides stat bonuses:
+
+```typescript
+const TIER_BONUSES: Record<number, Partial<AngelStats>> = {
+  1: {}, // Base tier
+  2: {
+    maxEnergy: 50,
+    energyRegenRate: 5,
+    expertise: 0.1,
+  },
+  3: {
+    maxEnergy: 100,
+    energyRegenRate: 10,
+    expertise: 0.2,
+    abilities: ['mass_blessing', 'prophetic_dream'],
+  },
+  4: {
+    maxEnergy: 200,
+    energyRegenRate: 20,
+    expertise: 0.3,
+    abilities: ['divine_intervention', 'reality_manipulation'],
+    // Supreme tier: can temporarily take physical form
+  },
+};
+```
+
+### 12.6 Individual Angel Upgrades
+
+Players can also purchase upgrades for individual angels with belief:
+
+```typescript
+interface AngelUpgrade {
+  id: string;
+  name: string;
+  description: string;
+  beliefCost: number;
+  requiresTier: number;
+
+  // Effect
+  type: 'stat_boost' | 'new_ability' | 'mana_increase' | 'cosmetic';
+  effect: {
+    stat?: keyof AngelStats;
+    amount?: number;
+    abilityId?: string;
+    spriteModification?: string;
+  };
+}
+
+const ANGEL_UPGRADES: AngelUpgrade[] = [
+  {
+    id: 'mana_pool_1',
+    name: 'Expanded Mana Pool',
+    description: '+25 max divine energy',
+    beliefCost: 100,
+    requiresTier: 1,
+    type: 'mana_increase',
+    effect: { stat: 'maxEnergy', amount: 25 },
+  },
+  {
+    id: 'speed_blessing',
+    name: 'Swift Wings',
+    description: '+20% movement speed',
+    beliefCost: 150,
+    requiresTier: 1,
+    type: 'stat_boost',
+    effect: { stat: 'speed', amount: 0.2 },
+  },
+  {
+    id: 'danger_sense',
+    name: 'Danger Sense',
+    description: 'Can warn agents of incoming threats',
+    beliefCost: 300,
+    requiresTier: 2,
+    type: 'new_ability',
+    effect: { abilityId: 'danger_sense' },
+  },
+  // ... more upgrades
+];
+```
+
+### 12.7 Angel Independence (Resource Model)
+
+**Key Design**: Once created, angels have their own mana pool that regenerates independently. The player doesn't continuously drain belief to maintain angels.
+
+```typescript
+interface AngelResourceComponent {
+  // Angel's own mana pool (not player's belief)
+  mana: number;
+  maxMana: number;
+  manaRegenRate: number;         // per minute
+
+  // Mana sources
+  manaFromPrayers: number;       // Gains mana when handling prayers
+  manaFromRituals: number;       // Gains mana when rituals dedicated
+  manaFromWorship: number;       // Gains mana when mortals worship
+
+  // Only player belief used for:
+  // - Initial creation (big upfront cost)
+  // - Upgrades/promotions
+  // - Emergency resurrection if "killed"
+
+  // Independence level
+  autonomyLevel: 'dependent' | 'semi-independent' | 'independent';
+}
+```
+
+**Creation Cost**: Big belief payment upfront
+**Maintenance**: Angels sustain themselves through prayer handling
+**Upgrades**: Player spends belief to enhance angels
+**Death**: Angels can be "disrupted" but reform automatically (unless legendary weapon)
+
+---
+
+## 13. Integration Points
+
+### 13.1 With Divine Communication System
 
 Angels use the same vision delivery system as the player, but:
 - Visions marked with `fromAngel: angelId`

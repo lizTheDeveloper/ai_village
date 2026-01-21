@@ -163,9 +163,12 @@ export class TradeActionHandler implements ActionHandler {
     // Check distance to shop
     const dx = shopPos.x - actorPos.x;
     const dy = shopPos.y - actorPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    // PERFORMANCE: Use squared distance for comparison
+    const TRADE_DISTANCE_SQUARED = TRADE_DISTANCE * TRADE_DISTANCE;
+    const distanceSquared = dx * dx + dy * dy;
 
-    if (distance > TRADE_DISTANCE) {
+    if (distanceSquared > TRADE_DISTANCE_SQUARED) {
+      const distance = Math.sqrt(distanceSquared); // Only for error message
       return {
         valid: false,
         reason: `Must be near shop to trade (distance: ${distance.toFixed(1)}, max: ${TRADE_DISTANCE})`,

@@ -283,13 +283,16 @@ export function moveToward(entity: Entity, target: Position, speed?: number): nu
 
   const dx = target.x - position.x;
   const dy = target.y - position.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  // PERFORMANCE: Use squared distance for comparison
+  const distanceSquared = dx * dx + dy * dy;
 
-  if (distance < 0.1) {
+  if (distanceSquared < 0.01) { // 0.1 * 0.1
     stopMovement(entity);
     return 0;
   }
 
+  // Need actual distance for normalization
+  const distance = Math.sqrt(distanceSquared);
   const moveSpeed = speed ?? movement.speed;
   const vx = (dx / distance) * moveSpeed;
   const vy = (dy / distance) * moveSpeed;

@@ -291,10 +291,10 @@ export class InfoSection {
       if (bedEntity) {
         const bedPos = bedEntity.getComponent('position') as PositionComponentData | undefined;
         if (bedPos) {
-          // Calculate distance from home
+          // Calculate distance from home (sqrt needed here for display)
           const dx = position.x - bedPos.x;
           const dy = position.y - bedPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const distance = Math.sqrt(dx * dx + dy * dy); // Keep sqrt: actual distance displayed to user
           const homeRadius = agent.homePreferences?.homeRadius || 20;
 
           ctx.fillStyle = '#AADDFF';
@@ -1195,10 +1195,10 @@ export class InfoSection {
 
     if (!agentPos) return y;
 
-    // Calculate direction and distance
+    // Calculate direction and distance (sqrt needed here for display)
     const dx = target.x - agentPos.x;
     const dy = target.y - agentPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distance = Math.sqrt(dx * dx + dy * dy); // Keep sqrt: actual distance displayed to user
     const angle = Math.atan2(dy, dx);
 
     // Get direction arrow

@@ -4268,6 +4268,9 @@ async function main() {
     agentDebugManager.logTick(gameLoop.world);
   }, 50));
 
+  // Declare soul creation promise at outer scope so it's accessible after the if block
+  let soulCreationPromise: Promise<void> | null = null;
+
   // Only initialize new world if we didn't load a checkpoint
   if (!loadedCheckpoint) {
 
@@ -4509,9 +4512,6 @@ async function main() {
     // Create initial entities
     createInitialBuildings(gameLoop.world);
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
-
-    // Declare soul creation promise at higher scope so it's accessible later
-    let soulCreationPromise: Promise<void> | null = null;
 
     // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
     // (skip in SharedWorker mode - worker is already running)

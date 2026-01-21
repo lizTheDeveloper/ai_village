@@ -148,9 +148,12 @@ export class TillActionHandler implements ActionHandler {
     // Check actor is adjacent to target (distance <= √2 ≈ 1.414)
     const dx = targetPos.x - actorPos.x;
     const dy = targetPos.y - actorPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    // PERFORMANCE: Use squared distance for comparison
+    const DIAGONAL_DISTANCE_SQUARED = DIAGONAL_DISTANCE * DIAGONAL_DISTANCE;
+    const distanceSquared = dx * dx + dy * dy;
 
-    if (distance > DIAGONAL_DISTANCE) {
+    if (distanceSquared > DIAGONAL_DISTANCE_SQUARED) {
+      const distance = Math.sqrt(distanceSquared); // Only for error message
       return {
         valid: false,
         reason: `Target tile (${targetPos.x},${targetPos.y}) is too far from actor at (${actorPos.x},${actorPos.y}). Distance: ${distance.toFixed(2)}, max: ${DIAGONAL_DISTANCE.toFixed(2)}`,

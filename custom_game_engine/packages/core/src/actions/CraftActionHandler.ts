@@ -352,9 +352,11 @@ export class CraftActionHandler implements ActionHandler {
       // Calculate distance
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      // PERFORMANCE: Use squared distance for comparison
+      const CRAFT_DISTANCE_SQUARED = CRAFT_DISTANCE * CRAFT_DISTANCE;
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= CRAFT_DISTANCE) {
+      if (distanceSquared <= CRAFT_DISTANCE_SQUARED) {
         return true;
       }
     }

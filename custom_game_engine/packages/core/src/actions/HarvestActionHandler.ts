@@ -161,10 +161,13 @@ export class HarvestActionHandler implements ActionHandler {
     // Check actor is adjacent to plant (distance <= √2)
     const dx = plantPos.x - actorPos.x;
     const dy = plantPos.y - actorPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const MAX_HARVEST_DISTANCE = Math.sqrt(2); // Allow diagonal harvesting
+    // PERFORMANCE: Use squared distance for comparison
+    const MAX_HARVEST_DISTANCE_SQUARED = 2; // (√2)^2 = 2
+    const distanceSquared = dx * dx + dy * dy;
 
-    if (distance > MAX_HARVEST_DISTANCE) {
+    if (distanceSquared > MAX_HARVEST_DISTANCE_SQUARED) {
+      const distance = Math.sqrt(distanceSquared); // Only for error message
+      const MAX_HARVEST_DISTANCE = Math.sqrt(2);
       return {
         valid: false,
         reason: `Plant at (${plantPos.x},${plantPos.y}) is too far from actor at (${actorPos.x},${actorPos.y}). Distance: ${distance.toFixed(2)}, max: ${MAX_HARVEST_DISTANCE.toFixed(2)}`,

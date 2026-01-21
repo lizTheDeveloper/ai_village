@@ -1,7 +1,7 @@
 # Systems Catalog
 
-> **Last Updated:** 2026-01-04
-> **Purpose:** Complete reference of all 211+ game systems
+> **Last Updated:** 2026-01-20
+> **Purpose:** Complete reference of all 220+ game systems
 
 ## Overview
 
@@ -1812,6 +1812,189 @@ This document catalogs every system in the game engine. Systems are organized by
 
 ---
 
+## Space & Multiverse
+
+### ShipCombatSystem
+**Purpose:** Handles ship-to-ship combat mechanics
+**Components:** `spaceship`, `combat_stats`, `fleet`, `squadron`
+**Priority:** 90
+**Throttle:** Every 20 ticks (~1 second)
+**File:** `systems/ShipCombatSystem.ts`
+
+**Responsibilities:**
+- Multi-phase combat (ranging → engaging → boarding → resolution)
+- Squadron and fleet coordination
+- Coherence-based quantum weapons
+- Boarding actions and capture mechanics
+- Combat result determination
+
+**Status:** ✅ Implemented
+
+---
+
+### TimelineMergerSystem
+**Purpose:** Manages timeline merger ship operations
+**Components:** `spaceship`, `timeline_merger_operation`
+**Priority:** 95
+**Throttle:** Every 100 ticks (~5 seconds)
+**File:** `systems/TimelineMergerSystem.ts`
+
+**Responsibilities:**
+- Analyze probability branches for compatibility
+- Gradual timeline merging process
+- Contamination management during merge
+- Paradox detection and resolution
+- Branch collapse coordination
+
+**Status:** ✅ Implemented
+
+---
+
+### ProbabilityScoutSystem
+**Purpose:** Handles probability scout missions mapping unobserved timelines
+**Components:** `spaceship`, `probability_scout_mission`
+**Priority:** 96
+**Throttle:** Every 100 ticks (~5 seconds)
+**File:** `systems/ProbabilityScoutSystem.ts`
+
+**Responsibilities:**
+- Phase management: scanning → observing → mapping → complete
+- Branch observation without collapse (low contamination)
+- Collapse risk calculation based on observation precision
+- Map generation of alternate timeline differences
+- Solo operation with perfect coherence
+
+**Configuration:**
+- `SCANNING_RATE`: 2 (50 ticks to complete)
+- `OBSERVING_RATE`: 1 (100 ticks per branch)
+- `MAPPING_RATE`: 3 (33 ticks to complete)
+- `BASE_COLLAPSE_RISK`: 0.01 (1%)
+- `CONTAMINATION_PER_BRANCH`: 0.001
+
+**Status:** ✅ Implemented
+
+---
+
+### SvetzRetrievalSystem
+**Purpose:** Handles Svetz retrieval ship cross-timeline item recovery
+**Components:** `spaceship`, `svetz_retrieval_mission`
+**Priority:** 97
+**Throttle:** Every 100 ticks (~5 seconds)
+**File:** `systems/SvetzRetrievalSystem.ts`
+
+**Responsibilities:**
+- Phase management: navigating → searching → retrieving → anchoring → returning → complete
+- Navigate to extinct/alternate timelines
+- Search for and retrieve target items/entities
+- Anchor retrieved objects to current timeline
+- Manage contamination from cross-timeline retrieval
+
+**Configuration:**
+- `NAVIGATION_RATE`: 1.5 (~67 ticks)
+- `SEARCHING_RATE`: 1 (100 ticks)
+- `RETRIEVAL_RATE`: 2 (50 ticks)
+- `ANCHORING_RATE`: 0.5 (200 ticks)
+- `BASE_CONTAMINATION`: 0.05 (5% per item)
+- `BASE_RETRIEVAL_SUCCESS`: 0.7 (70%)
+
+**Named After:** Larry Niven's time-traveling character Svetz
+
+**Status:** ✅ Implemented
+
+---
+
+### InvasionSystem
+**Purpose:** Manages multiverse invasion mechanics
+**Components:** `invasion`, `spaceship`, `fleet`
+**Priority:** 100
+**Throttle:** Every 200 ticks (~10 seconds)
+**File:** `systems/InvasionSystem.ts`
+
+**Responsibilities:**
+- Cross-universe warfare coordination
+- Invasion force deployment
+- Defense mobilization
+- Territory occupation
+- Peace negotiation triggers
+
+**Status:** ✅ Implemented
+
+---
+
+## Civilization & Archaeology
+
+### UpliftDiplomacySystem
+**Purpose:** Manages civilization uplift agreements and ethics
+**Components:** `uplift_agreement`, `civilization_reputation`, `technology_era`
+**Priority:** 88
+**Throttle:** Every 200 ticks (~10 seconds)
+**File:** `systems/UpliftDiplomacySystem.ts`
+
+**Responsibilities:**
+- Uplift agreement negotiation
+- Technology transfer management
+- Ethical reputation tracking
+- Dependency relationship monitoring
+- Uplift success/failure outcomes
+
+**Status:** ✅ Implemented
+
+---
+
+### CollapseSystem
+**Purpose:** Simulates civilization collapse and dark age mechanics
+**Components:** `technology_era`, `knowledge_repository`, `village_governance`
+**Priority:** 89
+**Throttle:** Every 500 ticks (~25 seconds)
+**File:** `systems/CollapseSystem.ts`
+
+**Responsibilities:**
+- Collapse trigger detection (resource depletion, war, plague)
+- Dark age progression
+- Knowledge loss tracking
+- Recovery mechanics
+- Era regression management
+
+**Status:** ✅ Implemented
+
+---
+
+### KnowledgePreservationSystem
+**Purpose:** Manages knowledge repositories during dark ages
+**Components:** `knowledge_repository`, `library`, `university`
+**Priority:** 87
+**Throttle:** Every 300 ticks (~15 seconds)
+**File:** `systems/KnowledgePreservationSystem.ts`
+
+**Responsibilities:**
+- Knowledge storage and retrieval
+- Repository maintenance during collapse
+- Monk/scholar knowledge preservation
+- Technology rediscovery facilitation
+- Cross-civilization knowledge sharing
+
+**Status:** ✅ Implemented
+
+---
+
+### ArchaeologySystem
+**Purpose:** Handles archaeological excavation and discovery
+**Components:** `archaeological_site`, `megastructure`, `technology_unlock`
+**Priority:** 86
+**Throttle:** Every 400 ticks (~20 seconds)
+**File:** `systems/ArchaeologySystem.ts`
+
+**Responsibilities:**
+- Excavation site discovery
+- Ancient technology recovery
+- Artifact analysis
+- Megastructure archaeology (reverse engineering)
+- Lost civilization research
+
+**Status:** ✅ Implemented
+
+---
+
 ## Utility Systems
 
 ### AutoSaveSystem
@@ -1853,7 +2036,9 @@ Systems are registered in `systems/registerAllSystems.ts` in a specific order:
 17. **Automation & Factories** (48-53, early for optimization)
 18. **Governance & Metrics** (555-999)
 19. **Consciousness** (560-565)
-20. **Utility** (1000+)
+20. **Civilization & Archaeology** (86-89)
+21. **Space & Multiverse** (90-100)
+22. **Utility** (1000+)
 
 **Priority determines execution order within each tick. Lower numbers run first.**
 
@@ -1880,6 +2065,15 @@ Many systems don't need to run every tick (50ms). Throttled systems use an updat
 | AncestorTransformationSystem | 500 ticks | ~25 seconds |
 | AfterlifeMemoryFadingSystem | 1000 ticks | ~50 seconds |
 | AutoSaveSystem | 6000 ticks | ~5 minutes |
+| ShipCombatSystem | 20 ticks | ~1 second |
+| TimelineMergerSystem | 100 ticks | ~5 seconds |
+| ProbabilityScoutSystem | 100 ticks | ~5 seconds |
+| SvetzRetrievalSystem | 100 ticks | ~5 seconds |
+| InvasionSystem | 200 ticks | ~10 seconds |
+| UpliftDiplomacySystem | 200 ticks | ~10 seconds |
+| CollapseSystem | 500 ticks | ~25 seconds |
+| KnowledgePreservationSystem | 300 ticks | ~15 seconds |
+| ArchaeologySystem | 400 ticks | ~20 seconds |
 
 ---
 

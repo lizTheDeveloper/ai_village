@@ -642,6 +642,7 @@ export class FarmManagementPanel implements IWindowPanel {
       // Count affected plants if we have position
       // PERFORMANCE: Uses query to get only plant entities (O(n) instead of O(n²))
       if (position && effectRadius > 0) {
+        const effectRadiusSquared = effectRadius * effectRadius; // Pre-compute squared threshold
         const plantEntities = world.query().with('plant').executeEntities();
         for (const plantEntity of plantEntities) {
           const plant = plantEntity.components.get('plant') as PlantComponent | undefined;
@@ -650,8 +651,8 @@ export class FarmManagementPanel implements IWindowPanel {
 
           const dx = plantPos.x - position.x;
           const dy = plantPos.y - position.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance <= effectRadius) {
+          const distanceSquared = dx * dx + dy * dy; // Use squared distance for comparison (avoids sqrt)
+          if (distanceSquared <= effectRadiusSquared) {
             affectedPlants++;
           }
         }

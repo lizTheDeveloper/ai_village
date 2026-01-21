@@ -131,6 +131,13 @@ See [CLAUDE.md - Running the Game](../CLAUDE.md#running-the-game)
 | **[packages/core/src/research/README.md](./packages/core/src/research/README.md)** | Research system |
 | **[docs/EPISTEMIC_LEARNING_SPEC.md](./docs/EPISTEMIC_LEARNING_SPEC.md)** | Knowledge and learning |
 
+### Grand Strategy & Civilization
+
+| Document | Description |
+|----------|-------------|
+| **[GRAND_STRATEGY_GUIDE.md](./GRAND_STRATEGY_GUIDE.md)** | Player guide to political hierarchy, tech eras, ship types |
+| **[openspec/IMPLEMENTATION_ROADMAP.md](../openspec/IMPLEMENTATION_ROADMAP.md)** | Grand strategy implementation roadmap |
+
 ---
 
 ## 🛠️ Developer Tools & Debugging

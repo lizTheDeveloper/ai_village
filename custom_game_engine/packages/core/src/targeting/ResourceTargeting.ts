@@ -254,6 +254,7 @@ export class ResourceTargeting {
 
   /**
    * Calculate distance between two positions.
+   * PERFORMANCE: Returns actual distance - used for display and sorting.
    */
   private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;

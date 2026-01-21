@@ -104,10 +104,13 @@ export class PlantActionHandler implements ActionHandler {
     // Check actor is adjacent to target (distance <= √2 ≈ 1.414)
     const dx = targetPos.x - actorPos.x;
     const dy = targetPos.y - actorPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const MAX_PLANT_DISTANCE = Math.sqrt(2); // Allow diagonal planting
+    // PERFORMANCE: Use squared distance for comparison
+    const MAX_PLANT_DISTANCE_SQUARED = 2; // (√2)^2 = 2
+    const distanceSquared = dx * dx + dy * dy;
 
-    if (distance > MAX_PLANT_DISTANCE) {
+    if (distanceSquared > MAX_PLANT_DISTANCE_SQUARED) {
+      const distance = Math.sqrt(distanceSquared); // Only for error message
+      const MAX_PLANT_DISTANCE = Math.sqrt(2);
       return {
         valid: false,
         reason: `Target tile (${targetPos.x},${targetPos.y}) is too far from actor at (${actorPos.x.toFixed(1)},${actorPos.y.toFixed(1)}). Distance: ${distance.toFixed(2)}, max: ${MAX_PLANT_DISTANCE.toFixed(2)}`,

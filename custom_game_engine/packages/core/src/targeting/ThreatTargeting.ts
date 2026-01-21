@@ -438,6 +438,7 @@ export class ThreatTargeting {
 
   /**
    * Calculate distance between two positions.
+   * PERFORMANCE: Returns actual distance - needed for threat assessment weighting.
    */
   private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = b.x - a.x;
