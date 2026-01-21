@@ -219,7 +219,7 @@ export function updateReputationFromUplift(
       }
       reputation.reputationWithOthers[targetCivId] = Math.min(
         100,
-        reputation.reputationWithOthers[targetCivId] + 30
+        (reputation.reputationWithOthers[targetCivId] ?? 0) + 30
       );
       break;
 
@@ -232,7 +232,7 @@ export function updateReputationFromUplift(
       }
       reputation.reputationWithOthers[targetCivId] = Math.max(
         -100,
-        reputation.reputationWithOthers[targetCivId] - 10
+        (reputation.reputationWithOthers[targetCivId] ?? 0) - 10
       );
       break;
 
@@ -258,7 +258,7 @@ export function updateReputationFromUplift(
       }
       reputation.reputationWithOthers[targetCivId] = Math.max(
         -100,
-        reputation.reputationWithOthers[targetCivId] - 40
+        (reputation.reputationWithOthers[targetCivId] ?? 0) - 40
       );
       break;
 
@@ -272,7 +272,7 @@ export function updateReputationFromUplift(
       }
       reputation.reputationWithOthers[targetCivId] = Math.max(
         -100,
-        reputation.reputationWithOthers[targetCivId] - 5
+        (reputation.reputationWithOthers[targetCivId] ?? 0) - 5
       );
       break;
   }

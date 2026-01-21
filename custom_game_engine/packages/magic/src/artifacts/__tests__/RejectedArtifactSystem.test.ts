@@ -427,6 +427,63 @@ describe('RejectedArtifactSystem', () => {
       const corrupted = system.getAllCorruptedEffects();
       expect(corrupted.length).toBe(2);
     });
+
+    it('should get artifacts by creator', () => {
+      // Create artifacts with different creators
+      const creator1 = 'agent_alice';
+      const creator2 = 'agent_bob';
+
+      system.preserveRejectedEffect(
+        { name: 'Alice Spell 1', operations: [] },
+        { description: 'test' },
+        'Test',
+        'test',
+        undefined,
+        creator1
+      );
+      system.preserveRejectedEffect(
+        { name: 'Alice Spell 2', operations: [] },
+        { description: 'test' },
+        'Test',
+        'test',
+        undefined,
+        creator1
+      );
+      system.preserveRejectedEffect(
+        { name: 'Bob Spell', operations: [] },
+        { description: 'test' },
+        'Test',
+        'test',
+        undefined,
+        creator2
+      );
+
+      const aliceArtifacts = system.getArtifactsByCreator(creator1);
+      const bobArtifacts = system.getArtifactsByCreator(creator2);
+
+      expect(aliceArtifacts.length).toBe(2);
+      expect(bobArtifacts.length).toBe(1);
+
+      // Verify creator IDs are correct
+      const aliceComponent = aliceArtifacts[0].getComponent<RejectedArtifactComponent>('rejected_artifact');
+      const bobComponent = bobArtifacts[0].getComponent<RejectedArtifactComponent>('rejected_artifact');
+
+      expect(aliceComponent?.creatorId).toBe(creator1);
+      expect(bobComponent?.creatorId).toBe(creator2);
+    });
+
+    it('should handle artifacts without creator', () => {
+      // Create artifact without creator
+      system.preserveRejectedEffect(
+        { name: 'No Creator', operations: [] },
+        { description: 'test' },
+        'Test',
+        'test'
+      );
+
+      const artifacts = system.getArtifactsByCreator('some_creator');
+      expect(artifacts.length).toBe(0);
+    });
   });
 
   describe('attemptRecovery', () => {
@@ -580,6 +637,42 @@ describe('RejectedArtifactSystem', () => {
       expect(component?.validationErrors).toEqual(errors);
       expect(component?.corruptionReason).toBe('Multiple validation errors');
       expect(component?.originalData).toEqual(effect);
+    });
+
+    it('should preserve creator ID when creating rejected artifact', () => {
+      const creatorId = 'agent_wizard_123';
+      const effect = { name: 'Test Effect', operations: [] };
+
+      const entity = system.preserveRejectedEffect(
+        effect,
+        { description: 'test' },
+        'Test rejection',
+        'test_service',
+        undefined,
+        creatorId
+      );
+
+      const component = entity.getComponent<RejectedArtifactComponent>('rejected_artifact');
+      expect(component?.creatorId).toBe(creatorId);
+    });
+
+    it('should preserve creator ID when creating corrupted effect', () => {
+      const creatorId = 'agent_mage_456';
+      const effect = { name: 'Corrupted Effect', operations: null };
+      const errors: ValidationIssue[] = [
+        { stage: 'schema', code: 'ERR1', message: 'Error 1', severity: 'error' },
+      ];
+
+      const entity = system.preserveCorruptedEffect(
+        effect,
+        { description: 'test' },
+        errors,
+        'Validation failed',
+        creatorId
+      );
+
+      const component = entity.getComponent<CorruptedEffectComponent>('corrupted_effect');
+      expect(component?.creatorId).toBe(creatorId);
     });
   });
 });

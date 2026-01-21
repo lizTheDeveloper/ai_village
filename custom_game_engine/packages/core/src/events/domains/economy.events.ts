@@ -374,7 +374,7 @@ export interface EconomyEvents {
 
   'economy:lane:blocked': {
     laneId: string;
-    caravanId: string;
+    caravanId?: string;
   };
 
   'economy:lane:caravan_departed': {

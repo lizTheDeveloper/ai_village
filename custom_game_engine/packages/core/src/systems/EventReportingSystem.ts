@@ -24,6 +24,8 @@ import type { RecordingCategory } from '../components/RecordingComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { EquipmentComponent } from '../components/EquipmentComponent.js';
+import { getAllEquippedItems } from '../components/EquipmentComponent.js';
 
 /**
  * Event newsworthiness scoring.
@@ -514,6 +516,75 @@ export class EventReportingSystem extends BaseSystem {
   }
 
   /**
+   * Calculate equipment quality based on reporter's gear.
+   * Returns multiplier (0.5-1.5) based on equipment quality.
+   */
+  private calculateEquipmentQuality(reporterEntity: EntityImpl): number {
+    const equipment = reporterEntity.getComponent<EquipmentComponent>(CT.Equipment);
+
+    // Base quality without any equipment
+    let equipmentQuality = 0.5;
+
+    if (!equipment) {
+      return equipmentQuality;
+    }
+
+    // Get all equipped items
+    const equippedItems = getAllEquippedItems(equipment);
+
+    // Check for recording-related equipment by item ID patterns
+    // Note: Since specific recording equipment items may not be defined yet,
+    // we'll look for general tool/equipment items and use their quality
+    let hasRecordingEquipment = false;
+    let totalQualityBonus = 0;
+    let equipmentCount = 0;
+
+    for (const item of equippedItems) {
+      // Check for potential recording equipment by item ID
+      const itemId = item.id.toLowerCase();
+
+      // Camera or recording device
+      if (itemId.includes('camera') || itemId.includes('recording') ||
+          itemId.includes('video') || itemId.includes('camcorder')) {
+        hasRecordingEquipment = true;
+        // Camera is the most important piece of equipment
+        equipmentQuality += 0.4;
+        equipmentCount++;
+      }
+
+      // Microphone
+      if (itemId.includes('microphone') || itemId.includes('mic') ||
+          itemId.includes('audio')) {
+        hasRecordingEquipment = true;
+        // Microphone provides smaller boost
+        equipmentQuality += 0.2;
+        equipmentCount++;
+      }
+
+      // Lighting equipment
+      if (itemId.includes('light') || itemId.includes('lamp') ||
+          itemId.includes('flash')) {
+        hasRecordingEquipment = true;
+        // Lighting provides minor boost
+        equipmentQuality += 0.1;
+        equipmentCount++;
+      }
+
+      // Generic tool quality bonus (if item has quality trait)
+      if (item.traits?.tool && equipmentCount > 0) {
+        // Tool trait exists - this is professional equipment
+        totalQualityBonus += 0.1;
+      }
+    }
+
+    // Add quality bonus if professional equipment detected
+    equipmentQuality += totalQualityBonus;
+
+    // Cap at reasonable maximum (1.5 = 150% quality for premium gear)
+    return Math.min(1.5, equipmentQuality);
+  }
+
+  /**
    * Start a recording for a reporter at a scene.
    */
   private startRecording(
@@ -527,6 +598,9 @@ export class EventReportingSystem extends BaseSystem {
 
     if (!identity || !position) return;
 
+    // Calculate equipment quality based on reporter's gear
+    const equipmentQuality = this.calculateEquipmentQuality(reporterEntity);
+
     // Create recording entity
     const recordingEntity = world.createEntity();
     const recording = createRecordingComponent(
@@ -539,7 +613,7 @@ export class EventReportingSystem extends BaseSystem {
       {
         associatedStoryId: story.id,
         description: `Coverage of: ${story.headline}`,
-        equipmentQuality: 1.0,  // TODO: Based on equipment
+        equipmentQuality,
       }
     );
 

@@ -123,6 +123,9 @@ export enum ComponentType {
   ResearchState = 'research_state',
   TechnologyUnlock = 'technology_unlock',
   TechnologyEra = 'technology_era',
+  KnowledgeRepository = 'knowledge_repository',  // Grand strategy: knowledge preservation during dark ages
+  UpliftAgreement = 'uplift_agreement',  // Civilization uplift diplomacy agreements
+  CivilizationReputation = 'civilization_reputation',  // Uplift ethical reputation and trust
 
   // Publishing & Knowledge Infrastructure
   Library = 'library',

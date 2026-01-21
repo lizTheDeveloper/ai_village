@@ -18,6 +18,10 @@ import type {
   SoulIdentityComponent,
 } from '@ai-village/core';
 import type { ComponentType } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
+import type { DeityComponent } from '@ai-village/core';
+import type { SpiritualComponent } from '@ai-village/core';
+import type { BeliefComponent, Belief } from '@ai-village/core';
 
 // Use the correct IncarnationRecord type from SoulIdentityComponent
 interface IncarnationRecord {
@@ -437,10 +441,94 @@ Generate the era snapshot now:`;
   /**
    * Get culture context from world
    */
-  private getCultureContext(_world: World): string {
-    // TODO: Implement based on agent cultures, beliefs, etc.
-    // For now, return placeholder
-    return 'Mixed cultures developing shared traditions';
+  private getCultureContext(world: World): string {
+    const culturalInfo: string[] = [];
+
+    // Get all deities and their followers
+    const deities = world.query().with(CT.Deity).executeEntities();
+    if (deities.length > 0) {
+      const deityDescriptions: string[] = [];
+
+      for (const deity of deities.slice(0, 3)) { // Limit to top 3 deities
+        const deityComp = deity.getComponent(CT.Deity) as DeityComponent | undefined;
+        if (!deityComp) continue;
+
+        const name = deityComp.identity?.primaryName || 'unnamed deity';
+        const believerCount = deityComp.believers.size;
+        const domain = deityComp.identity?.domain;
+
+        if (believerCount > 0) {
+          let desc = `${name} (${believerCount} believers`;
+          if (domain) {
+            desc += `, domain: ${domain}`;
+          }
+          desc += ')';
+          deityDescriptions.push(desc);
+        }
+      }
+
+      if (deityDescriptions.length > 0) {
+        culturalInfo.push(`Worshipping: ${deityDescriptions.join(', ')}`);
+      }
+    }
+
+    // Get agents with beliefs
+    const believingAgents = world.query().with(CT.Belief).executeEntities();
+    if (believingAgents.length > 0) {
+      // Sample beliefs to understand cultural patterns
+      const beliefSample: Map<string, number> = new Map();
+
+      for (const agent of believingAgents.slice(0, 10)) { // Sample first 10
+        const beliefComp = agent.getComponent(CT.Belief) as BeliefComponent | undefined;
+        if (!beliefComp) continue;
+
+        const allBeliefs: readonly Belief[] = beliefComp.allBeliefs;
+        for (const belief of allBeliefs) {
+          if (belief.type === 'world' || belief.type === 'social') {
+            const key = belief.description;
+            beliefSample.set(key, (beliefSample.get(key) || 0) + 1);
+          }
+        }
+      }
+
+      // Report most common beliefs
+      const sortedBeliefs = Array.from(beliefSample.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2);
+
+      if (sortedBeliefs.length > 0) {
+        const beliefDescriptions = sortedBeliefs.map(([desc, _count]) => desc);
+        culturalInfo.push(`Common beliefs: ${beliefDescriptions.join('; ')}`);
+      }
+    }
+
+    // Get spiritual agents (faith levels)
+    const spiritualAgents = world.query().with(CT.Spiritual).executeEntities();
+    if (spiritualAgents.length > 0) {
+      let totalFaith = 0;
+      let faithfulCount = 0;
+
+      for (const agent of spiritualAgents) {
+        const spiritual = agent.getComponent(CT.Spiritual) as SpiritualComponent | undefined;
+        if (spiritual && spiritual.faith > 0.3) { // Count only moderately faithful
+          totalFaith += spiritual.faith;
+          faithfulCount++;
+        }
+      }
+
+      if (faithfulCount > 0) {
+        const avgFaith = totalFaith / faithfulCount;
+        const faithLevel = avgFaith > 0.7 ? 'deeply religious' :
+                          avgFaith > 0.5 ? 'moderately faithful' :
+                          'spiritually questioning';
+        culturalInfo.push(`Population is ${faithLevel} (${faithfulCount}/${spiritualAgents.length} faithful)`);
+      }
+    }
+
+    // Return combined cultural context or default
+    return culturalInfo.length > 0
+      ? culturalInfo.join('. ')
+      : 'Mixed cultures developing shared traditions';
   }
 
   /**

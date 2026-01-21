@@ -491,6 +491,31 @@ export interface GovernanceEvents {
     tick: number;
   };
 
+  'empire:civil_war_started': {
+    empireName: string;
+    claimantCount: number;
+    crisisReason: string;
+    tick: number;
+  };
+
+  'empire:claimant_declared': {
+    empireName: string;
+    claimantId: EntityId;
+    claimantName: string;
+    legitimacy: number;
+    supportingNations: string[];
+    tick: number;
+  };
+
+  'empire:nation_picked_side': {
+    empireName: string;
+    nationId: EntityId;
+    nationName: string;
+    claimantId: EntityId;
+    claimantName: string;
+    tick: number;
+  };
+
   // === Diplomatic Events ===
   'empire:alliance_formed': {
     empireId: EntityId;
@@ -880,6 +905,96 @@ export interface GovernanceEvents {
     memberId: EntityId;
     oldSatisfaction: number;
     newSatisfaction: number;
+    tick: number;
+  };
+
+  // === Civilization Uplift Events ===
+  'governance:uplift_offer_available': {
+    advancedCivId: string;
+    primitiveCivId: string;
+    advancedEra: string;
+    primitiveEra: string;
+    eraGap: number;
+    maxEraJump: number;
+    successProbability: number;
+    tick: number;
+  };
+
+  'governance:uplift_offer_accepted': {
+    advancedCivId: string;
+    primitiveCivId: string;
+    eraJump: number;
+    tick: number;
+  };
+
+  'governance:uplift_offer_rejected': {
+    advancedCivId: string;
+    primitiveCivId: string;
+    tick: number;
+  };
+
+  'civilization:uplift_started': {
+    uplifterCivId: string;
+    upliftedCivId: string;
+    eraJump: number;
+    successProbability: number;
+    tick: number;
+  };
+
+  'civilization:uplift_completed': {
+    uplifterCivId: string;
+    upliftedCivId: string;
+    outcome: 'full_success' | 'partial_dependency' | 'cargo_cult' | 'tech_misuse' | 'rejection';
+    eraJump: number;
+    sourceEra: string;
+    targetEra: string;
+    tick: number;
+  };
+
+  'civilization:uplift_failed': {
+    uplifterCivId: string;
+    upliftedCivId: string;
+    outcome: 'full_success' | 'partial_dependency' | 'cargo_cult' | 'tech_misuse' | 'rejection';
+    eraJump: number;
+    tick: number;
+  };
+
+  'civilization:cargo_cult_formed': {
+    uplifterCivId: string;
+    upliftedCivId: string;
+    tick: number;
+  };
+
+  // === Civilization Collapse Events ===
+  'civilization:collapse_triggered': {
+    civilizationId: string;
+    trigger: string;
+    severity: string;
+    erasLost: number;
+    tick: number;
+  };
+
+  'civilization:era_regression': {
+    civilizationId: string;
+    fromEra: string;
+    toEra: string;
+    erasRegressed: number;
+    reason: string;
+    tick: number;
+  };
+
+  'civilization:technology_lost': {
+    civilizationId: string;
+    technologyId: string;
+    reason: string;
+    tick: number;
+  };
+
+  'civilization:dark_age_started': {
+    civilizationId: string;
+    trigger: string;
+    severity: string;
+    estimatedRecoveryTime: number;
     tick: number;
   };
 }

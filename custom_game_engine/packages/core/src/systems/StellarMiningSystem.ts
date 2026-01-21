@@ -42,6 +42,7 @@ import {
 } from '../components/MiningOperationComponent.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 import type { WarehouseComponent } from '../components/WarehouseComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 /** Update interval: every 10 ticks = 0.5 seconds at 20 TPS */
 const UPDATE_INTERVAL = 10;
@@ -215,8 +216,53 @@ export class StellarMiningSystem extends BaseSystem {
         continue;
       }
 
-      // TODO: Check if ship is still at phenomenon location
-      // For now, assume ships stay at location
+      // Check if ship is still at phenomenon location
+      const shipPos = shipEntity.getComponent<PositionComponent>('position');
+
+      if (!shipPos) {
+        // Ship has no position (should not happen in space)
+        shipsToRemove.push(shipId);
+        crewToRemove += ship.crew.member_ids.length;
+        continue;
+      }
+
+      // Get phenomenon entity to retrieve its coordinates
+      const phenomenonEntity = world.getEntity(operation.locationId);
+
+      if (!phenomenonEntity) {
+        // Phenomenon no longer exists
+        shipsToRemove.push(shipId);
+        crewToRemove += ship.crew.member_ids.length;
+        continue;
+      }
+
+      const phenomenonPos = phenomenonEntity.getComponent<PositionComponent>('position');
+
+      if (!phenomenonPos) {
+        // Phenomenon has no position (should not happen)
+        shipsToRemove.push(shipId);
+        crewToRemove += ship.crew.member_ids.length;
+        continue;
+      }
+
+      // Calculate 3D distance between ship and phenomenon
+      // Use squared distance to avoid sqrt (performance optimization per CLAUDE.md)
+      const dx = shipPos.x - phenomenonPos.x;
+      const dy = shipPos.y - phenomenonPos.y;
+      const dz = shipPos.z - phenomenonPos.z;
+      const distanceSquared = dx * dx + dy * dy + dz * dz;
+
+      // Mining distance threshold in AU (must stay close to mine)
+      // Using same threshold as exploration arrival (0.5 AU)
+      const MAX_MINING_DISTANCE = 0.5;
+      const MAX_MINING_DISTANCE_SQUARED = MAX_MINING_DISTANCE * MAX_MINING_DISTANCE;
+
+      if (distanceSquared > MAX_MINING_DISTANCE_SQUARED) {
+        // Ship moved too far from mining site
+        shipsToRemove.push(shipId);
+        crewToRemove += ship.crew.member_ids.length;
+        continue;
+      }
     }
 
     // Remove invalid ships

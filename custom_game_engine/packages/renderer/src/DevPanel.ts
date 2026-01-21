@@ -1,5 +1,5 @@
 /**
- * DevPanel - Developer tools for testing magic and divinity systems
+ * DevPanel - Developer tools for testing game systems
  *
  * Features:
  * - Magic paradigm state manipulation
@@ -11,6 +11,7 @@
  * - Event injection
  * - State inspection
  * - Universe export/import (snapshot save/load)
+ * - Grand Strategy inspection (Empires, Federations, Councils, Trade, Fleets, Megastructures, Multiverse)
  */
 
 import type { World } from '@ai-village/core';
@@ -23,6 +24,14 @@ import {
   type ManaPoolsComponent,
   type SpiritualComponent,
   type DivineAbilityComponent,
+  type EmpireComponent,
+  type FederationGovernanceComponent,
+  type GalacticCouncilComponent,
+  type NavyComponent,
+  type ArmadaComponent,
+  type FleetComponent,
+  type SquadronComponent,
+  type ShipCrewComponent,
   CT,
   getTileBasedBlueprintRegistry,
   parseLayout,
@@ -31,6 +40,7 @@ import {
   type WindowMaterial,
   DeityComponent,
 } from '@ai-village/core';
+import type { MegastructureComponent } from '../../core/src/components/MegastructureComponent.js';
 import type { MagicParadigm } from '@ai-village/magic';
 import {
   CORE_PARADIGM_REGISTRY,
@@ -52,7 +62,7 @@ import type { IWindowPanel } from './types/WindowTypes.js';
 // Types
 // ============================================================================
 
-type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world' | 'introspection';
+type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world' | 'introspection' | 'grand_strategy';
 
 interface ResourceSlider {
   id: string;
@@ -464,14 +474,16 @@ export class DevPanel implements IWindowPanel {
 
     // Sync magic paradigm states from MagicSystemStateManager
     const magicManager = MagicSystemStateManager.getInstance();
-    for (const paradigm of PARADIGMS) {
-      const paradigmState = magicManager.getState(paradigm.id);
-      const localState = this.paradigmStates.get(paradigm.id);
-      if (localState) {
-        localState.enabled = paradigmState !== 'disabled';
-        localState.active = paradigmState === 'active';
-        // Mana tracking would need to be added to MagicSystemStateManager
-        // For now, keep local tracking
+    if (magicManager) {
+      for (const paradigm of PARADIGMS) {
+        const paradigmState = magicManager.getState(paradigm.id);
+        const localState = this.paradigmStates.get(paradigm.id);
+        if (localState) {
+          localState.enabled = paradigmState !== 'disabled';
+          localState.active = paradigmState === 'active';
+          // Mana tracking would need to be added to MagicSystemStateManager
+          // For now, keep local tracking
+        }
       }
     }
 
@@ -504,6 +516,7 @@ export class DevPanel implements IWindowPanel {
     if (!this.world) return;
 
     const magicManager = MagicSystemStateManager.getInstance();
+    if (!magicManager) return;
 
     // Apply magic paradigm state changes
     for (const [paradigmId, localState] of Array.from(this.paradigmStates.entries())) {
@@ -695,6 +708,9 @@ export class DevPanel implements IWindowPanel {
       case 'introspection':
         y = this.renderIntrospectionSection(ctx, width, y);
         break;
+      case 'grand_strategy':
+        y = this.renderGrandStrategySection(ctx, width, y);
+        break;
     }
 
     ctx.restore();
@@ -734,6 +750,7 @@ export class DevPanel implements IWindowPanel {
       { id: 'buildings', label: 'Buildings' },
       { id: 'skills', label: 'Skills' },
       { id: 'state', label: 'State' },
+      { id: 'grand_strategy', label: 'GrandStrat' },
       { id: 'introspection', label: 'Intro' },
     ];
 
@@ -2922,6 +2939,355 @@ export class DevPanel implements IWindowPanel {
     ctx.fillText('✓ Phase 4: Schema Migration - COMPLETE', padding, y);
     y += 15;
     ctx.fillText('✓ DevPanel: All Schemas Visible', padding, y);
+    y += 20;
+
+    return y;
+  }
+
+  private renderGrandStrategySection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    const padding = SIZES.padding;
+    const contentWidth = width - padding * 2;
+
+    // ========================================================================
+    // 1. POLITICAL HIERARCHY
+    // ========================================================================
+    y = this.renderSectionHeader(ctx, width, y, 'POLITICAL HIERARCHY');
+    y += 4;
+
+    // Empires
+    const empires = this.world.query().with(CT.Empire).executeEntities();
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`Empires: ${empires.length}`, padding, y);
+    y += 16;
+
+    if (empires.length > 0) {
+      for (const empire of empires.slice(0, 3)) { // Show first 3
+        const empireComp = empire.getComponent(CT.Empire) as EmpireComponent;
+        if (!empireComp) continue;
+
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '9px monospace';
+        ctx.fillText(`• ${empireComp.empireName}`, padding + 10, y);
+
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '8px monospace';
+        ctx.fillText(`Nations: ${empireComp.territory.nations?.length || 0}`, padding + 150, y);
+        ctx.fillText(`Systems: ${empireComp.territory.totalSystems || 0}`, padding + 230, y);
+        y += 14;
+      }
+      if (empires.length > 3) {
+        ctx.fillStyle = COLORS.textDim;
+        ctx.font = '8px monospace';
+        ctx.fillText(`... and ${empires.length - 3} more`, padding + 10, y);
+        y += 14;
+      }
+    } else {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No empires exist yet', padding + 10, y);
+      y += 14;
+    }
+    y += 4;
+
+    // Federations
+    const federations = this.world.query().with(CT.FederationGovernance).executeEntities();
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`Federations: ${federations.length}`, padding, y);
+    y += 16;
+
+    if (federations.length > 0) {
+      for (const federation of federations.slice(0, 3)) {
+        const fedComp = federation.getComponent(CT.FederationGovernance) as FederationGovernanceComponent;
+        if (!fedComp) continue;
+
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '9px monospace';
+        ctx.fillText(`• ${fedComp.name}`, padding + 10, y);
+
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '8px monospace';
+        ctx.fillText(`Members: ${fedComp.memberEmpireIds?.length || 0}`, padding + 150, y);
+        ctx.fillText(`Type: ${fedComp.governanceType}`, padding + 230, y);
+        y += 14;
+      }
+      if (federations.length > 3) {
+        ctx.fillStyle = COLORS.textDim;
+        ctx.font = '8px monospace';
+        ctx.fillText(`... and ${federations.length - 3} more`, padding + 10, y);
+        y += 14;
+      }
+    } else {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No federations exist yet', padding + 10, y);
+      y += 14;
+    }
+    y += 4;
+
+    // Galactic Council
+    const councils = this.world.query().with(CT.GalacticCouncil).executeEntities();
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`Galactic Councils: ${councils.length}`, padding, y);
+    y += 16;
+
+    if (councils.length > 0) {
+      for (const council of councils.slice(0, 2)) {
+        const councilComp = council.getComponent(CT.GalacticCouncil) as GalacticCouncilComponent;
+        if (!councilComp) continue;
+
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '9px monospace';
+        ctx.fillText(`• Galactic Council`, padding + 10, y);
+
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '8px monospace';
+        ctx.fillText(`Members: ${councilComp.memberFederationIds?.length || 0}`, padding + 150, y);
+        y += 14;
+      }
+    } else {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No galactic councils exist yet', padding + 10, y);
+      y += 14;
+    }
+    y += 8;
+
+    // ========================================================================
+    // 2. TRADE NETWORKS
+    // ========================================================================
+    y = this.renderSectionHeader(ctx, width, y, 'TRADE NETWORKS');
+    y += 4;
+
+    const tradeNetworks = this.world.query().with(CT.TradeNetwork).executeEntities();
+    const tradeCaravans = this.world.query().with(CT.TradeCaravan).executeEntities();
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`Trade Networks: ${tradeNetworks.length}`, padding, y);
+    y += 16;
+
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '9px monospace';
+    ctx.fillText(`Active Caravans: ${tradeCaravans.length}`, padding + 10, y);
+    y += 14;
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '8px monospace';
+    ctx.fillText('Network topology analysis: chokepoints, betweenness centrality', padding + 10, y);
+    y += 14;
+
+    if (tradeNetworks.length === 0 && tradeCaravans.length === 0) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No trade networks established yet', padding + 10, y);
+      y += 14;
+    }
+    y += 8;
+
+    // ========================================================================
+    // 3. MEGASTRUCTURES
+    // ========================================================================
+    y = this.renderSectionHeader(ctx, width, y, 'MEGASTRUCTURES');
+    y += 4;
+
+    const megastructures = this.world.query().with(CT.Megastructure).executeEntities();
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`Megastructures: ${megastructures.length}`, padding, y);
+    y += 16;
+
+    if (megastructures.length > 0) {
+      const byType: Record<string, number> = {};
+      let operationalCount = 0;
+      let underConstructionCount = 0;
+
+      for (const mega of megastructures) {
+        const megaComp = mega.getComponent(CT.Megastructure) as MegastructureComponent;
+        if (!megaComp) continue;
+
+        byType[megaComp.type] = (byType[megaComp.type] || 0) + 1;
+        if (megaComp.operational) {
+          operationalCount++;
+        } else {
+          underConstructionCount++;
+        }
+      }
+
+      ctx.fillStyle = COLORS.success;
+      ctx.font = '9px monospace';
+      ctx.fillText(`Operational: ${operationalCount}`, padding + 10, y);
+
+      ctx.fillStyle = COLORS.warning;
+      ctx.fillText(`Under Construction: ${underConstructionCount}`, padding + 130, y);
+      y += 16;
+
+      // Show breakdown by type
+      ctx.fillStyle = COLORS.textMuted;
+      ctx.font = '8px monospace';
+      ctx.fillText('By Type:', padding + 10, y);
+      y += 14;
+
+      for (const [type, count] of Object.entries(byType).slice(0, 5)) {
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '8px monospace';
+        ctx.fillText(`• ${type}: ${count}`, padding + 20, y);
+        y += 12;
+      }
+      if (Object.keys(byType).length > 5) {
+        ctx.fillStyle = COLORS.textDim;
+        ctx.font = '8px monospace';
+        ctx.fillText(`... and ${Object.keys(byType).length - 5} more types`, padding + 20, y);
+        y += 12;
+      }
+    } else {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No megastructures exist yet', padding + 10, y);
+      y += 14;
+    }
+    y += 8;
+
+    // ========================================================================
+    // 4. FLEET/NAVY HIERARCHY
+    // ========================================================================
+    y = this.renderSectionHeader(ctx, width, y, 'FLEET & NAVY');
+    y += 4;
+
+    const navies = this.world.query().with(CT.Navy).executeEntities();
+    const armadas = this.world.query().with(CT.Armada).executeEntities();
+    const fleets = this.world.query().with(CT.Fleet).executeEntities();
+    const squadrons = this.world.query().with(CT.Squadron).executeEntities();
+    const shipCrew = this.world.query().with(CT.ShipCrew).executeEntities();
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('Ship-Fleet Hierarchy:', padding, y);
+    y += 16;
+
+    const hierarchyLevels = [
+      { label: 'Navies', count: navies.length, color: COLORS.divinity },
+      { label: 'Armadas', count: armadas.length, color: COLORS.magic },
+      { label: 'Fleets', count: fleets.length, color: COLORS.success },
+      { label: 'Squadrons', count: squadrons.length, color: COLORS.text },
+      { label: 'Crew Members', count: shipCrew.length, color: COLORS.textMuted },
+    ];
+
+    for (const level of hierarchyLevels) {
+      ctx.fillStyle = level.color;
+      ctx.font = '9px monospace';
+      ctx.fillText(`${level.label}: ${level.count}`, padding + 10, y);
+      y += 14;
+    }
+
+    if (navies.length > 0) {
+      y += 4;
+      ctx.fillStyle = COLORS.textMuted;
+      ctx.font = '8px monospace';
+      ctx.fillText('Navy Details:', padding + 10, y);
+      y += 14;
+
+      for (const navy of navies.slice(0, 2)) {
+        const navyComp = navy.getComponent(CT.Navy) as NavyComponent;
+        if (!navyComp) continue;
+
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '8px monospace';
+        const navyName = navyComp.name || `Navy`;
+        ctx.fillText(`• ${navyName}`, padding + 20, y);
+
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.fillText(`ID: ${navy.id.slice(0, 8)}`, padding + 150, y);
+        y += 14;
+      }
+    } else {
+      y += 4;
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No navies exist yet', padding + 10, y);
+      y += 14;
+    }
+    y += 8;
+
+    // ========================================================================
+    // 5. MULTIVERSE MECHANICS
+    // ========================================================================
+    y = this.renderSectionHeader(ctx, width, y, 'MULTIVERSE');
+    y += 4;
+
+    // Count passages
+    const passages = this.world.query().with(CT.Passage).executeEntities();
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('Inter-Universe Travel:', padding, y);
+    y += 16;
+
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '9px monospace';
+    ctx.fillText(`Active Passages: ${passages.length}`, padding + 10, y);
+    y += 14;
+
+    // Timeline merger operations
+    const mergerOps = this.world.query().with(CT.TimelineMergerOperation).executeEntities();
+    ctx.fillStyle = mergerOps.length > 0 ? COLORS.warning : COLORS.textMuted;
+    ctx.fillText(`Timeline Merger Operations: ${mergerOps.length}`, padding + 10, y);
+    y += 14;
+
+    // Universe fork metadata
+    const forkMetadata = this.world.query().with(CT.UniverseForkMetadata).executeEntities();
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.fillText(`Universe Forks: ${forkMetadata.length}`, padding + 10, y);
+    y += 14;
+
+    if (passages.length === 0 && mergerOps.length === 0 && forkMetadata.length === 0) {
+      y += 4;
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.fillText('No multiverse activity detected', padding + 10, y);
+      y += 14;
+    }
+    y += 8;
+
+    // ========================================================================
+    // 6. QUICK ACTIONS
+    // ========================================================================
+    y = this.renderSectionHeader(ctx, width, y, 'QUICK ACTIONS');
+    y += 4;
+
+    ctx.fillStyle = COLORS.textDim;
+    ctx.font = '9px monospace';
+    ctx.fillText('Actions coming soon:', padding, y);
+    y += 14;
+
+    const actions = [
+      '• Spawn test Empire',
+      '• Create trade route',
+      '• Build megastructure',
+      '• Launch fleet',
+      '• Trigger invasion plot',
+      '• Create paradox',
+    ];
+
+    ctx.font = '8px monospace';
+    for (const action of actions) {
+      ctx.fillText(action, padding + 10, y);
+      y += 12;
+    }
+    y += 8;
+
+    // Info footer
+    ctx.fillStyle = COLORS.success;
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('✓ Grand Strategy Systems - Phase 1-7 Complete', padding, y);
     y += 20;
 
     return y;

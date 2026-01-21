@@ -39,7 +39,8 @@ import {
   getConversationStyle,
   findSharedInterests,
 } from '@ai-village/core';
-import type { SexualityComponent, ActiveAttraction, CurrentMate } from '@ai-village/reproduction';
+import type { SexualityComponent } from '@ai-village/reproduction';
+import type { ActiveAttraction, CurrentMate } from '@ai-village/reproduction';
 import type { CourtshipComponent } from '@ai-village/reproduction';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
@@ -1534,8 +1535,8 @@ export class StructuredPromptBuilder {
 
         // Determine primary attraction type
         const dimensions = Object.entries(attraction.attractions)
-          .filter(([_, intensity]) => intensity > 0.3)
-          .sort((a, b) => b[1] - a[1]);
+          .filter(([_, intensity]) => (intensity as number) > 0.3)
+          .sort((a, b) => (b[1] as number) - (a[1] as number));
 
         if (dimensions.length === 0) continue;
 

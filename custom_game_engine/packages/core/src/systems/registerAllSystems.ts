@@ -127,6 +127,7 @@ import { NavyBudgetSystem } from './NavyBudgetSystem.js';
 // Megastructures (Phase 5: Grand Strategy)
 import { MegastructureConstructionSystem } from './MegastructureConstructionSystem.js';
 import { MegastructureMaintenanceSystem } from './MegastructureMaintenanceSystem.js';
+import { ArchaeologySystem } from './ArchaeologySystem.js';
 
 // Building & Construction
 import { BuildingSystem } from './BuildingSystem.js';
@@ -338,6 +339,7 @@ import { NationSystem } from './NationSystem.js';  // Nation-level governance
 import { EmpireSystem } from './EmpireSystem.js';  // Empire-level governance
 import { EmpireDiplomacySystem } from './EmpireDiplomacySystem.js';  // Inter-empire diplomatic AI
 import { EmpireWarSystem } from './EmpireWarSystem.js';  // Imperial war resolution
+import { UpliftDiplomacySystem } from './UpliftDiplomacySystem.js';  // Civilization uplift diplomacy
 import { FederationGovernanceSystem } from './FederationGovernanceSystem.js';  // Federation governance
 import { GalacticCouncilSystem } from './GalacticCouncilSystem.js';  // Galactic Council governance
 import { InvasionPlotHandler } from './InvasionPlotHandler.js';  // Phase 4: Multiverse invasion plots
@@ -749,6 +751,12 @@ export function registerAllSystems(
   // Lazy activation: requires 'megastructure' component
   gameLoop.systemRegistry.register(new MegastructureMaintenanceSystem());
 
+  // Archaeology System (priority 235): Excavates ruins and discovers artifacts
+  // Listens for megastructure collapse events to create archaeological sites
+  // Processes excavation progress and artifact reverse engineering
+  // Lazy activation: requires 'archaeological_site' component
+  gameLoop.systemRegistry.register(new ArchaeologySystem());
+
   // ============================================================================
   // VIRTUAL REALITY
   // ============================================================================
@@ -1136,6 +1144,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new FederationGovernanceSystem());  // Federation governance (priority 205)
   gameLoop.systemRegistry.register(new GalacticCouncilSystem());  // Galactic Council governance (priority 210)
   gameLoop.systemRegistry.register(new InvasionPlotHandler());  // Multiverse invasion plot assignment (priority 215)
+  gameLoop.systemRegistry.register(new UpliftDiplomacySystem());  // Civilization uplift diplomacy (priority 220)
   gameLoop.systemRegistry.register(new EmpireWarSystem());  // Empire war resolution (priority 605, combat phase)
   gameLoop.systemRegistry.register(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
 

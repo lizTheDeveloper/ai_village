@@ -390,55 +390,67 @@ export class UpliftDiplomacySystem extends BaseSystem {
 
         // Update uplifter's uplifting list
         (uplifterEntity as EntityImpl).updateComponent(CT.TechnologyEra, (tech) => {
-          const updated = { ...tech };
-          if (!updated.upliftingCivIds.includes(agreement.upliftedCivId)) {
-            updated.upliftingCivIds = [...updated.upliftingCivIds, agreement.upliftedCivId];
+          const technologyEra = tech as TechnologyEraComponent;
+          if (!technologyEra.upliftingCivIds.includes(agreement.upliftedCivId)) {
+            return {
+              ...technologyEra,
+              upliftingCivIds: [...technologyEra.upliftingCivIds, agreement.upliftedCivId],
+            };
           }
-          return updated;
+          return technologyEra;
         });
       }
     }
 
     // Add complications based on outcome
     if (outcome === 'cargo_cult') {
-      agreementEntity.updateComponent(CT.UpliftAgreement, (a) => ({
-        ...a,
-        complications: [
-          ...a.complications,
-          {
-            type: 'cargo_cult' as const,
-            description: 'Uplifted civilization misunderstood technology, forming cargo cult',
-            tick,
-            severity: 0.8,
-          },
-        ],
-      }));
+      agreementEntity.updateComponent(CT.UpliftAgreement, (a) => {
+        const upliftAgreement = a as UpliftAgreementComponent;
+        return {
+          ...upliftAgreement,
+          complications: [
+            ...upliftAgreement.complications,
+            {
+              type: 'cargo_cult' as const,
+              description: 'Uplifted civilization misunderstood technology, forming cargo cult',
+              tick,
+              severity: 0.8,
+            },
+          ],
+        };
+      });
     } else if (outcome === 'tech_misuse') {
-      agreementEntity.updateComponent(CT.UpliftAgreement, (a) => ({
-        ...a,
-        complications: [
-          ...a.complications,
-          {
-            type: 'tech_misuse' as const,
-            description: 'Technology misused, causing weapons proliferation or environmental damage',
-            tick,
-            severity: 0.9,
-          },
-        ],
-      }));
+      agreementEntity.updateComponent(CT.UpliftAgreement, (a) => {
+        const upliftAgreement = a as UpliftAgreementComponent;
+        return {
+          ...upliftAgreement,
+          complications: [
+            ...upliftAgreement.complications,
+            {
+              type: 'tech_misuse' as const,
+              description: 'Technology misused, causing weapons proliferation or environmental damage',
+              tick,
+              severity: 0.9,
+            },
+          ],
+        };
+      });
     } else if (outcome === 'partial_dependency') {
-      agreementEntity.updateComponent(CT.UpliftAgreement, (a) => ({
-        ...a,
-        complications: [
-          ...a.complications,
-          {
-            type: 'dependency_trap' as const,
-            description: 'Uplifted civilization became dependent on uplifter for continued support',
-            tick,
-            severity: 0.6,
-          },
-        ],
-      }));
+      agreementEntity.updateComponent(CT.UpliftAgreement, (a) => {
+        const upliftAgreement = a as UpliftAgreementComponent;
+        return {
+          ...upliftAgreement,
+          complications: [
+            ...upliftAgreement.complications,
+            {
+              type: 'dependency_trap' as const,
+              description: 'Uplifted civilization became dependent on uplifter for continued support',
+              tick,
+              severity: 0.6,
+            },
+          ],
+        };
+      });
     }
 
     // Update uplifter's reputation
@@ -588,8 +600,9 @@ export class UpliftDiplomacySystem extends BaseSystem {
     if (!(uplifterCivId in this.activeUplifts)) {
       this.activeUplifts[uplifterCivId] = [];
     }
-    if (!this.activeUplifts[uplifterCivId].includes(agreementEntityId)) {
-      this.activeUplifts[uplifterCivId].push(agreementEntityId);
+    const agreements = this.activeUplifts[uplifterCivId];
+    if (agreements && !agreements.includes(agreementEntityId)) {
+      agreements.push(agreementEntityId);
     }
   }
 
@@ -597,8 +610,9 @@ export class UpliftDiplomacySystem extends BaseSystem {
    * Remove from active uplifts tracking
    */
   private removeFromActiveUplifts(uplifterCivId: string, agreementEntityId: string): void {
-    if (uplifterCivId in this.activeUplifts) {
-      this.activeUplifts[uplifterCivId] = this.activeUplifts[uplifterCivId].filter(
+    const agreements = this.activeUplifts[uplifterCivId];
+    if (agreements) {
+      this.activeUplifts[uplifterCivId] = agreements.filter(
         (id) => id !== agreementEntityId
       );
     }
@@ -635,7 +649,7 @@ export class UpliftDiplomacySystem extends BaseSystem {
     if (!advancedTech || !primitiveTech) return;
 
     // Create uplift agreement entity
-    const agreementEntity = world.createEntity();
+    const agreementEntity = world.createEntity() as EntityImpl;
     const successProbability = calculateSuccessProbability(eraJump);
 
     const agreement = createUpliftAgreementComponent({
@@ -651,10 +665,13 @@ export class UpliftDiplomacySystem extends BaseSystem {
     agreementEntity.addComponent(agreement);
 
     // Update to in_progress phase
-    agreementEntity.updateComponent(CT.UpliftAgreement, (a) => ({
-      ...a,
-      currentPhase: 'in_progress',
-    }));
+    agreementEntity.updateComponent(CT.UpliftAgreement, (a) => {
+      const upliftAgreement = a as UpliftAgreementComponent;
+      return {
+        ...upliftAgreement,
+        currentPhase: 'in_progress',
+      };
+    });
 
     // Track in active uplifts
     this.addToActiveUplifts(advancedCivId, agreementEntity.id);
@@ -694,10 +711,13 @@ export class UpliftDiplomacySystem extends BaseSystem {
     if (!reputation) return;
 
     // Slight shift toward prime directive (chose non-interference)
-    advancedEntity.updateComponent(CT.CivilizationReputation, (rep) => ({
-      ...rep,
-      primeDirectiveScore: Math.max(-100, rep.primeDirectiveScore - 2),
-    }));
+    (advancedEntity as EntityImpl).updateComponent(CT.CivilizationReputation, (rep) => {
+      const civilizationReputation = rep as CivilizationReputationComponent;
+      return {
+        ...civilizationReputation,
+        primeDirectiveScore: Math.max(-100, civilizationReputation.primeDirectiveScore - 2),
+      };
+    });
   }
 
   /**

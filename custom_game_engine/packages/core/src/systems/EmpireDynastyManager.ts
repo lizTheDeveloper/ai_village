@@ -17,6 +17,7 @@ import type { DynastyComponent, SuccessionPosition } from '../components/Dynasty
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import type { EmpireComponent } from '../components/EmpireComponent.js';
 import { calculateLegitimacy, updateLegitimacyFactors } from '../components/DynastyComponent.js';
 
 /**
@@ -262,6 +263,17 @@ function selectByDivineRight(candidates: HeirCandidate[]): HeirCandidate {
 }
 
 /**
+ * Civil war claimant
+ */
+export interface CivilWarClaimant {
+  agentId: string;
+  agentName: string;
+  legitimacy: number;
+  supportingNations: string[];
+  militaryStrength: number;
+}
+
+/**
  * Handle succession crisis (civil war risk)
  */
 export function handleSuccessionCrisis(
@@ -282,10 +294,210 @@ export function handleSuccessionCrisis(
     },
   });
 
-  // TODO: Create civil war mechanics
-  // - Rival claimants raise armies
-  // - Nations choose sides
-  // - Empire stability drops
+  // Get empire component
+  const empire = empireEntity.getComponent<EmpireComponent>(CT.Empire);
+  if (!empire) {
+    console.error('[EmpireDynastyManager] Empire component not found for civil war');
+    return;
+  }
+
+  // Find rival claimants (all dynasty members with legitimacy > 0.2)
+  const claimants = findRivalClaimants(world, empire.leadership.dynasty?.dynastyId || '', tick);
+
+  if (claimants.length === 0) {
+    console.warn('[EmpireDynastyManager] No rival claimants found for civil war');
+    return;
+  }
+
+  // Drop empire stability significantly
+  const stabilityDrop = 0.3;
+  const newStability = Math.max(0, (empire.stability.imperialLegitimacy / 100) - stabilityDrop);
+
+  // Update empire component with stability drop
+  (empireEntity as EntityImpl).updateComponent<EmpireComponent>(CT.Empire, (current) => ({
+    ...current,
+    stability: {
+      ...current.stability,
+      imperialLegitimacy: newStability * 100,
+    },
+    centralAuthority: Math.max(0, (current.centralAuthority || 0.7) - 0.2),
+  }));
+
+  // Nations pick sides based on loyalty, distance, and claimant legitimacy
+  const nationAllegiances = assignNationAllegiances(world, empire, claimants, tick);
+
+  // Update claimant support based on nation assignments
+  for (const claimant of claimants) {
+    claimant.supportingNations = [];
+    claimant.militaryStrength = 0;
+  }
+
+  for (const [nationId, claimantId] of nationAllegiances.entries()) {
+    const claimant = claimants.find(c => c.agentId === claimantId);
+    if (claimant) {
+      claimant.supportingNations.push(nationId);
+
+      // Each nation adds military strength (simplified)
+      const nationRecord = empire.nationRecords.find(n => n.nationId === nationId);
+      if (nationRecord) {
+        claimant.militaryStrength += nationRecord.militaryContribution;
+      }
+    }
+  }
+
+  // Emit civil war started event
+  world.eventBus.emit({
+    type: 'empire:civil_war_started',
+    source: empireEntity.id,
+    data: {
+      empireName,
+      claimantCount: claimants.length,
+      crisisReason,
+      tick,
+    },
+  });
+
+  // Emit claimant declared events
+  for (const claimant of claimants) {
+    world.eventBus.emit({
+      type: 'empire:claimant_declared',
+      source: empireEntity.id,
+      data: {
+        empireName,
+        claimantId: claimant.agentId,
+        claimantName: claimant.agentName,
+        legitimacy: claimant.legitimacy,
+        supportingNations: claimant.supportingNations,
+        tick,
+      },
+    });
+  }
+}
+
+/**
+ * Find rival claimants for civil war
+ */
+function findRivalClaimants(
+  world: World,
+  dynastyId: string,
+  currentTick: number
+): CivilWarClaimant[] {
+  const claimants: CivilWarClaimant[] = [];
+
+  // Query all dynasty members
+  const dynastyEntities = world.query().with(CT.Dynasty).executeEntities();
+
+  for (const entity of dynastyEntities) {
+    const dynasty = entity.getComponent<DynastyComponent>(CT.Dynasty);
+    if (!dynasty || dynasty.dynastyId !== dynastyId) {
+      continue;
+    }
+
+    // Skip current ruler
+    if (dynasty.isRuler) {
+      continue;
+    }
+
+    // Only include claimants with minimum legitimacy threshold
+    const legitimacy = calculateLegitimacy(dynasty, 'primogeniture');
+    if (legitimacy < 0.2) {
+      continue;
+    }
+
+    // Get agent name
+    const identity = entity.getComponent(CT.Identity);
+    const agentName = (identity as any)?.name ?? 'Unknown Claimant';
+
+    claimants.push({
+      agentId: entity.id,
+      agentName,
+      legitimacy,
+      supportingNations: [],
+      militaryStrength: 0,
+    });
+  }
+
+  return claimants;
+}
+
+/**
+ * Assign nations to claimants based on various factors
+ */
+function assignNationAllegiances(
+  world: World,
+  empire: EmpireComponent,
+  claimants: CivilWarClaimant[],
+  tick: number
+): Map<string, string> {
+  const allegiances = new Map<string, string>();
+
+  if (claimants.length === 0) {
+    return allegiances;
+  }
+
+  // Each nation picks a side based on:
+  // 1. Claimant legitimacy (40%)
+  // 2. Nation loyalty to empire (30% - low loyalty = support rebellion)
+  // 3. Random factor (30% - represents local politics, personalities)
+
+  for (const nationRecord of empire.nationRecords) {
+    const nationId = nationRecord.nationId;
+
+    // Calculate scores for each claimant
+    if (claimants.length === 0) {
+      continue; // No claimants, skip this nation
+    }
+
+    let bestClaimant = claimants[0]!; // Safe: checked length above
+    let bestScore = -Infinity;
+
+    for (const claimant of claimants) {
+      // Legitimacy factor (0-1)
+      const legitimacyScore = claimant.legitimacy;
+
+      // Loyalty factor (low loyalty = more likely to support rebellion)
+      // Core nations more likely to stay loyal to strongest claimant
+      const loyaltyFactor = nationRecord.isCore
+        ? 0.8
+        : 1.0 - (nationRecord.loyaltyToEmpire || 0.5);
+
+      // Random factor (0-1)
+      const randomFactor = Math.random();
+
+      // Weighted score
+      const score =
+        legitimacyScore * 0.4 +
+        loyaltyFactor * 0.3 +
+        randomFactor * 0.3;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestClaimant = claimant;
+      }
+    }
+
+    // Assign nation to claimant
+    allegiances.set(nationId, bestClaimant.agentId);
+
+    // Get nation name for event
+    const nationName = nationRecord.nationName || 'Unknown Nation';
+
+    // Emit nation picked side event
+    world.eventBus.emit({
+      type: 'empire:nation_picked_side',
+      source: empire.empireName,
+      data: {
+        empireName: empire.empireName,
+        nationId,
+        nationName,
+        claimantId: bestClaimant.agentId,
+        claimantName: bestClaimant.agentName,
+        tick,
+      },
+    });
+  }
+
+  return allegiances;
 }
 
 /**

@@ -72,6 +72,9 @@ export interface RejectedArtifactComponent extends Component {
 
   /** Rejection category */
   rejectionCategory: RejectionCategory;
+
+  /** Entity ID of who created/rejected this artifact */
+  creatorId?: string;
 }
 
 /**
@@ -101,6 +104,9 @@ export interface CorruptedEffectComponent extends Component {
 
   /** When it was corrupted */
   corruptedAt: number;
+
+  /** Entity ID of who created this corrupted effect */
+  creatorId?: string;
 }
 
 /**
@@ -160,6 +166,7 @@ export class RejectedArtifactSystem {
    * @param rejectionReason - Thematic rejection message
    * @param rejectedBy - Service that rejected it (e.g., 'blessing_service', 'validation_pipeline')
    * @param scores - Evaluation scores (if available)
+   * @param creatorId - Entity ID of the creator (optional)
    * @returns Entity representing the rejected artifact
    */
   preserveRejectedEffect(
@@ -167,7 +174,8 @@ export class RejectedArtifactSystem {
     request: EffectGenerationRequest,
     rejectionReason: string,
     rejectedBy: string,
-    scores?: EvaluationScores
+    scores?: EvaluationScores,
+    creatorId?: string
   ): Entity {
     // Categorize rejection based on scores
     const { category, realm, danger } = this.categorizeRejection(scores);
@@ -195,6 +203,7 @@ export class RejectedArtifactSystem {
       retrievable,
       recoveryRequirements,
       rejectionCategory: category,
+      creatorId,
     };
 
     this.world.addComponent(entity.id, component);
@@ -210,13 +219,15 @@ export class RejectedArtifactSystem {
    * @param request - Original generation request
    * @param validationErrors - Validation issues encountered
    * @param corruptionReason - Why it's corrupted
+   * @param creatorId - Entity ID of the creator (optional)
    * @returns Entity representing the corrupted effect
    */
   preserveCorruptedEffect(
     effect: any,
     request: EffectGenerationRequest,
     validationErrors: ValidationIssue[],
-    corruptionReason: string
+    corruptionReason: string,
+    creatorId?: string
   ): Entity {
     const entity = this.world.createEntity();
 
@@ -230,6 +241,7 @@ export class RejectedArtifactSystem {
       originalData: effect,
       recoverable: validationErrors.every(e => e.severity !== 'critical'),
       corruptedAt: Date.now(),
+      creatorId,
     };
 
     this.world.addComponent(entity.id, component);
@@ -446,15 +458,16 @@ export class RejectedArtifactSystem {
   }
 
   /**
-   * Get rejected artifacts by creator (if we add creator tracking).
+   * Get rejected artifacts by creator.
    *
    * @param creatorId - Entity ID of creator
    * @returns Rejected artifacts created by this entity
    */
   getArtifactsByCreator(creatorId: string): Entity[] {
-    // TODO: Add creator field to RejectedArtifactComponent
-    // For now, return all artifacts
-    return this.getAllRejectedArtifacts();
+    return this.getAllRejectedArtifacts().filter(entity => {
+      const component = entity.getComponent<RejectedArtifactComponent>('rejected_artifact');
+      return component?.creatorId === creatorId;
+    });
   }
 
   /**

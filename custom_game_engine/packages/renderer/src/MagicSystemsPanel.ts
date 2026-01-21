@@ -135,6 +135,10 @@ export class MagicSystemsPanel implements IWindowPanel {
     this.clickRegions = [];
 
     const stateManager = getMagicSystemState();
+    if (!stateManager) {
+      return;
+    }
+
     const paradigms = stateManager.getAllParadigms();
 
     // Set up text rendering
@@ -187,6 +191,10 @@ export class MagicSystemsPanel implements IWindowPanel {
 
     // Subtitle count
     const stateManager = getMagicSystemState();
+    if (!stateManager) {
+      return y + SIZES.headerHeight;
+    }
+
     const activeCount = stateManager.getActiveParadigms().length;
     const enabledCount = stateManager.getEnabledParadigms().length;
 
@@ -223,7 +231,7 @@ export class MagicSystemsPanel implements IWindowPanel {
     width: number,
     y: number,
     paradigm: MagicParadigm,
-    stateManager: ReturnType<typeof getMagicSystemState>
+    stateManager: NonNullable<ReturnType<typeof getMagicSystemState>>
   ): number {
     const state = stateManager.getState(paradigm.id);
     const runtimeState = stateManager.getRuntimeState(paradigm.id);
@@ -411,6 +419,9 @@ export class MagicSystemsPanel implements IWindowPanel {
 
   private handleClickAction(region: ClickRegion): void {
     const stateManager = getMagicSystemState();
+    if (!stateManager) {
+      return;
+    }
 
     switch (region.action) {
       case 'toggle-expand':

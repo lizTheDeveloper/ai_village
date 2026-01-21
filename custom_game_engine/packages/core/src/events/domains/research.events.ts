@@ -167,6 +167,31 @@ export interface ResearchEvents {
     discoverer: string;
     recipeType: string;
   };
+  /** Technology preserved in repository during collapse */
+  'knowledge:technology_preserved': {
+    civilizationId: string;
+    repositoryId: EntityId;
+    technologyId: string;
+    repositoryType: string;
+    tick: number;
+  };
+  /** Technology rediscovered from repository or reinvented */
+  'knowledge:technology_rediscovered': {
+    civilizationId: string;
+    repositoryId: EntityId;
+    technologyId: string;
+    repositoryType: string;
+    rediscoveryMethod: 'archaeological_discovery' | 'reinvention';
+    tick: number;
+  };
+  /** Knowledge repository degraded due to lack of maintenance */
+  'knowledge:repository_degraded': {
+    repositoryId: EntityId;
+    civilizationId: string;
+    conditionLevel: number;
+    technologiesLost: number;
+    tick: number;
+  };
 }
 export type ResearchEventType = keyof ResearchEvents;
 export type ResearchEventData = ResearchEvents[ResearchEventType];

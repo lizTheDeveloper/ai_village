@@ -2,6 +2,9 @@
  * Core stable components.
  */
 
+// Type guards for safe component type narrowing
+export * from './typeGuards.js';
+
 export * from './PositionComponent.js';
 export { createPositionComponent, type PositionComponent } from './PositionComponent.js';
 export * from './PhysicsComponent.js';
@@ -136,6 +139,8 @@ export { createTechnologyUnlockComponent, unlockBuilding, unlockTechnology, isBu
 export type { TechnologyUnlockComponent, TechnologyEra as BuildingTechnologyEra, BuildingUnlock, TechnologyUnlock } from './TechnologyUnlockComponent.js';
 export { createTechnologyEraComponent, getEraMetadata, getEraIndex, getEraByIndex, getNextEra, getPreviousEra, isTechnologyUnlocked as isTechUnlockedInEra, unlockTechnology as unlockTechInEra, calculateStability, updateCollapseRisk, recordEraTransition, ERA_METADATA } from './TechnologyEraComponent.js';
 export type { TechnologyEraComponent, TechnologyEra, TechBreakthrough, EraTransition, EraMetadata } from './TechnologyEraComponent.js';
+export { createKnowledgeRepositoryComponent, canPreserveKnowledge, getEffectiveCapacity, getEffectiveDiscoveryBonus, preserveTechnology, removeTechnology, calculateDegradationRate, REPOSITORY_TYPE_METADATA } from './KnowledgeRepositoryComponent.js';
+export type { KnowledgeRepositoryComponent, RepositoryType } from './KnowledgeRepositoryComponent.js';
 // Production scaling (Grand Strategy Phase 5)
 export { createProductionCapabilityComponent, calculateProductionMultiplier, calculateItemsPerDay, getTierFromTechLevel, addBottleneckResource, isBottleneckedResource, getEffectiveProductionRate, updateFactoryStats, getEffectiveWorkforce } from './ProductionCapabilityComponent.js';
 export type { ProductionCapabilityComponent, ProductionTier, ResourceBottleneck } from './ProductionCapabilityComponent.js';

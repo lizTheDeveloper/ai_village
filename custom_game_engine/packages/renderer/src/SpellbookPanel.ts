@@ -180,7 +180,15 @@ export class SpellbookPanel implements IWindowPanel {
 
     // Spell count
     const registry = getSpellRegistry();
+    if (!registry) {
+      return y + SIZES.headerHeight;
+    }
+
     const stateManager = getMagicSystemState();
+    if (!stateManager) {
+      return y + SIZES.headerHeight;
+    }
+
     const activeParadigms = stateManager.getActiveParadigms();
     let spellCount = 0;
     for (const paradigm of activeParadigms) {
@@ -271,7 +279,15 @@ export class SpellbookPanel implements IWindowPanel {
 
   private renderSpellList(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     const registry = getSpellRegistry();
+    if (!registry) {
+      return y;
+    }
+
     const stateManager = getMagicSystemState();
+    if (!stateManager) {
+      return y;
+    }
+
     const activeParadigms = stateManager.getActiveParadigms();
 
     const spells: SpellDefinition[] = [];
@@ -365,10 +381,13 @@ export class SpellbookPanel implements IWindowPanel {
     ctx.fillText(`${Math.floor(proficiency)}%`, barX + barWidth + 5, barY);
 
     // Mishap chance
-    const mishapChance = getSpellRegistry().getMishapChance(spell.id);
-    if (mishapChance > 0.05) {
-      ctx.fillStyle = '#FF6666';
-      ctx.fillText(`${Math.floor(mishapChance * 100)}% mishap`, barX + barWidth + 35, barY);
+    const spellRegistry = getSpellRegistry();
+    if (spellRegistry) {
+      const mishapChance = spellRegistry.getMishapChance(spell.id);
+      if (mishapChance > 0.05) {
+        ctx.fillStyle = '#FF6666';
+        ctx.fillText(`${Math.floor(mishapChance * 100)}% mishap`, barX + barWidth + 35, barY);
+      }
     }
 
     // Click region
@@ -386,6 +405,10 @@ export class SpellbookPanel implements IWindowPanel {
 
   private renderDetailPanel(ctx: CanvasRenderingContext2D, width: number, height: number): void {
     const registry = getSpellRegistry();
+    if (!registry) {
+      return;
+    }
+
     const spell = registry.getSpell(this.selectedSpellId!);
     const state = registry.getPlayerState(this.selectedSpellId!);
 
@@ -545,17 +568,22 @@ export class SpellbookPanel implements IWindowPanel {
   }
 
   handleKeyPress(key: string): boolean {
+    const registry = getSpellRegistry();
+    if (!registry) {
+      return false;
+    }
+
     // Hotkey assignment when spell is selected
     if (this.selectedSpellId && key >= '1' && key <= '9') {
       const hotkey = parseInt(key, 10);
-      getSpellRegistry().assignHotkey(this.selectedSpellId, hotkey);
+      registry.assignHotkey(this.selectedSpellId, hotkey);
       return true;
     }
 
     // Quick cast via hotkey
     if (key >= '1' && key <= '9') {
       const hotkey = parseInt(key, 10);
-      const spell = getSpellRegistry().getSpellByHotkey(hotkey);
+      const spell = registry.getSpellByHotkey(hotkey);
       if (spell) {
         this.castSpell(spell.id);
         return true;
@@ -567,6 +595,10 @@ export class SpellbookPanel implements IWindowPanel {
 
   private castSpell(spellId: string): void {
     const registry = getSpellRegistry();
+    if (!registry) {
+      return;
+    }
+
     const spell = registry.getSpell(spellId);
     if (!spell) return;
 

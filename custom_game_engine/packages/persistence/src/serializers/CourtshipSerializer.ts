@@ -5,13 +5,13 @@
 import { BaseComponentSerializer } from '../ComponentSerializerRegistry.js';
 import { CourtshipComponent } from '@ai-village/reproduction';
 import type {
-  CourtshipParadigm,
   CourtshipState,
   CourtshipStyle,
   ActiveCourtship,
   ReceivedCourtship,
   PastCourtship,
 } from '@ai-village/reproduction';
+import type { CourtshipParadigm } from '@ai-village/reproduction';
 
 interface SerializedCourtship {
   state: CourtshipState;
@@ -38,7 +38,7 @@ export class CourtshipSerializer extends BaseComponentSerializer<CourtshipCompon
   protected serializeData(component: CourtshipComponent): SerializedCourtship {
     // Convert Map to array of entries for JSON serialization
     // Handle undefined rejectionCooldown (may be missing on older components)
-    const rejectionCooldown = component.rejectionCooldown
+    const rejectionCooldown: Array<[string, number]> = component.rejectionCooldown
       ? Array.from(component.rejectionCooldown.entries())
       : [];
     return {

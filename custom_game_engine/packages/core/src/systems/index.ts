@@ -65,6 +65,8 @@ export * from './EmpireDiplomacySystem.js';  // Inter-empire diplomatic AI
 export * from './EmpireWarSystem.js';  // Imperial war resolution and peace treaties
 export * from './FederationGovernanceSystem.js';  // Federation governance (multi-empire)
 export * from './GalacticCouncilSystem.js';  // Galactic Council governance (multi-species)
+// Civilization Collapse System
+export * from './CollapseSystem.js';  // Civilization collapse and dark ages
 // City Director System (City-level strategic management)
 export * from './CityDirectorSystem.js';
 export { CityDirectorSystem, DEFAULT_CITY_DIRECTOR_CONFIG } from './CityDirectorSystem.js';

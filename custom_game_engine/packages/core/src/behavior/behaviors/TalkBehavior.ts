@@ -68,7 +68,7 @@ function translateEnglishToAlienSync(
   let alienText = englishText;
 
   // Sort concepts by length (longest first) to handle compound words
-  const sortedConcepts: string[] = Array.from(language.knownWords.keys())
+  const sortedConcepts: string[] = (Array.from(language.knownWords.keys()) as string[])
     .sort((a: string, b: string) => b.length - a.length);
 
   for (const concept of sortedConcepts) {

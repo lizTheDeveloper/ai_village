@@ -110,7 +110,12 @@ export class SkillTreePanel implements IWindowPanel {
       throw new Error('No active paradigm set');
     }
 
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    const registry = MagicSkillTreeRegistry.getInstance();
+    if (!registry) {
+      throw new Error('MagicSkillTreeRegistry not initialized');
+    }
+
+    const tree = registry.getTree(this.uiState.activeParadigmId);
     if (!tree) {
       throw new Error(`Skill tree not found for paradigm: ${this.uiState.activeParadigmId}`);
     }
@@ -158,7 +163,12 @@ export class SkillTreePanel implements IWindowPanel {
     }
 
     // Check if clicking on a node
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId!);
+    const registry = MagicSkillTreeRegistry.getInstance();
+    if (!registry) {
+      return false;
+    }
+
+    const tree = registry.getTree(this.uiState.activeParadigmId!);
     if (!tree) {
       return false;
     }
@@ -320,7 +330,13 @@ export class SkillTreePanel implements IWindowPanel {
       return;
     }
 
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    const registry = MagicSkillTreeRegistry.getInstance();
+    if (!registry) {
+      this.uiState.hoveredNodeId = undefined;
+      return;
+    }
+
+    const tree = registry.getTree(this.uiState.activeParadigmId);
     if (!tree) {
       this.uiState.hoveredNodeId = undefined;
       return;
@@ -516,7 +532,12 @@ export class SkillTreePanel implements IWindowPanel {
       return false;
     }
 
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(activeParadigmId);
+    const registry = MagicSkillTreeRegistry.getInstance();
+    if (!registry) {
+      return false;
+    }
+
+    const tree = registry.getTree(activeParadigmId);
     if (!tree) {
       return false;
     }
@@ -632,7 +653,12 @@ export class SkillTreePanel implements IWindowPanel {
       return;
     }
 
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    const registry = MagicSkillTreeRegistry.getInstance();
+    if (!registry) {
+      return;
+    }
+
+    const tree = registry.getTree(this.uiState.activeParadigmId);
     if (!tree) {
       return;
     }
@@ -717,7 +743,12 @@ export class SkillTreePanel implements IWindowPanel {
       return;
     }
 
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    const registry = MagicSkillTreeRegistry.getInstance();
+    if (!registry) {
+      return;
+    }
+
+    const tree = registry.getTree(this.uiState.activeParadigmId);
     if (!tree) {
       return;
     }
