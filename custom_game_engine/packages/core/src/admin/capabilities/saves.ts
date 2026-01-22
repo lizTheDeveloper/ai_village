@@ -119,7 +119,7 @@ const savesCapability = defineCapability({
 
         try {
           const response = await fetch(
-            `http://localhost:3001/api/universe/${encodeURIComponent(universeId)}/snapshot/${tick}`
+            `http://localhost:3001/api/multiverse/universe/${encodeURIComponent(universeId)}/snapshot/${tick}`
           );
 
           if (!response.ok) {
@@ -221,7 +221,7 @@ const savesCapability = defineCapability({
         };
 
         try {
-          const response = await fetch('http://localhost:3001/api/universe/fork', {
+          const response = await fetch('http://localhost:3001/api/multiverse/universe/fork', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

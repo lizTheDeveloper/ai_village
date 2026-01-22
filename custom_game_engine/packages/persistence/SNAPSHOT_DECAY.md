@@ -139,7 +139,7 @@ Cleanup should be triggered periodically by the client when saving:
 const currentTick = world.tick;
 
 // Trigger cleanup on server
-const response = await fetch(`http://localhost:3001/api/universe/${universeId}/cleanup`, {
+const response = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}/cleanup`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ currentTick })
@@ -151,7 +151,7 @@ console.log(`Cleaned up ${cleanup.decayed} snapshots, freed ${cleanup.bytesFreed
 
 ## Server API
 
-### POST /api/universe/:id/cleanup
+### POST /api/multiverse/universe/:id/cleanup
 
 Remove decayed snapshots.
 

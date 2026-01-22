@@ -174,7 +174,7 @@ export class MultiverseClient {
    * Get universe metadata
    */
   async getUniverse(universeId: string): Promise<UniverseMetadata | null> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}`);
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}`);
 
     if (response.status === 404) {
       return null;
@@ -201,8 +201,8 @@ export class MultiverseClient {
     if (options?.ownerId) params.set('ownerId', options.ownerId);
 
     const url = params.toString()
-      ? `${this.baseUrl}/universes?${params}`
-      : `${this.baseUrl}/universes`;
+      ? `${this.baseUrl}/multiverse/universes?${params}`
+      : `${this.baseUrl}/multiverse/universes`;
 
     const response = await fetch(url);
 

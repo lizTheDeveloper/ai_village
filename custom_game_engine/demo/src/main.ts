@@ -3607,7 +3607,10 @@ async function main() {
   let executorPromptBuilder: ExecutorPromptBuilder | null = null;
 
   if (isLLMAvailable) {
-    llmQueue = new LLMDecisionQueue(llmProvider, 1);
+    // With 1000 req/min per provider (Groq + Cerebras = 2000 total),
+    // and ~1-2 second latency per request, we need high concurrency
+    // to fully utilize bandwidth. 100 concurrent allows ~3000 req/min throughput.
+    llmQueue = new LLMDecisionQueue(llmProvider, 100);
     promptBuilder = new StructuredPromptBuilder();
     talkerPromptBuilder = new TalkerPromptBuilder();
     executorPromptBuilder = new ExecutorPromptBuilder();

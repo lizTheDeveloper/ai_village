@@ -64,6 +64,7 @@ import {
   StructuredPromptBuilder,
   TalkerPromptBuilder,
   ExecutorPromptBuilder,
+  LoadBalancingProvider,
   type LLMProvider,
 } from '@ai-village/llm';
 
@@ -343,28 +344,69 @@ async function setupLLMProvider(): Promise<{
   queue: LLMDecisionQueue | null;
   promptBuilder: StructuredPromptBuilder | null;
 }> {
-  // Check for Groq API key first (preferred for headless)
+  // Collect all available cloud providers for load balancing
+  const cloudProviders: LLMProvider[] = [];
+
+  // Check for Groq API key
   const groqApiKey = process.env.GROQ_API_KEY;
   const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
   if (groqApiKey) {
     try {
-      console.log(`[HeadlessGame] Using Groq API with model: ${groqModel}`);
-      const provider = new OpenAICompatProvider(
+      console.log(`[HeadlessGame] Groq API available with model: ${groqModel}`);
+      const groqProvider = new OpenAICompatProvider(
         groqModel,
         'https://api.groq.com/openai/v1',
         groqApiKey
       );
-      return {
-        provider,
-        queue: new LLMDecisionQueue(provider, 3),
-        promptBuilder: new StructuredPromptBuilder(),
-      };
+      cloudProviders.push(groqProvider);
     } catch (e) {
       console.error('[HeadlessGame] Groq setup failed:', e);
     }
   }
 
+  // Check for Cerebras API key
+  const cerebrasApiKey = process.env.CEREBRAS_API_KEY;
+  const cerebrasModel = process.env.CEREBRAS_MODEL || 'llama-3.3-70b';
+
+  if (cerebrasApiKey) {
+    try {
+      console.log(`[HeadlessGame] Cerebras API available with model: ${cerebrasModel}`);
+      const cerebrasProvider = new OpenAICompatProvider(
+        cerebrasModel,
+        'https://api.cerebras.ai/v1',
+        cerebrasApiKey
+      );
+      cloudProviders.push(cerebrasProvider);
+    } catch (e) {
+      console.error('[HeadlessGame] Cerebras setup failed:', e);
+    }
+  }
+
+  // If we have cloud providers, use load balancing across them
+  if (cloudProviders.length > 0) {
+    let provider: LLMProvider;
+    if (cloudProviders.length === 1) {
+      provider = cloudProviders[0]!;
+      console.log(`[HeadlessGame] Using single cloud provider: ${provider.getModelName()}`);
+    } else {
+      provider = new LoadBalancingProvider(cloudProviders, 'cloud-balanced');
+      console.log(`[HeadlessGame] Using load-balanced cloud providers (${cloudProviders.length} providers)`);
+    }
+
+    // Use higher concurrency to fully utilize provider rate limits
+    // With 1000 req/min per provider, 50 concurrent should be safe
+    const maxConcurrent = cloudProviders.length * 50;
+    console.log(`[HeadlessGame] Max concurrent LLM requests: ${maxConcurrent}`);
+
+    return {
+      provider,
+      queue: new LLMDecisionQueue(provider, maxConcurrent),
+      promptBuilder: new StructuredPromptBuilder(),
+    };
+  }
+
+  // Fallback to local providers
   const isMac = process.platform === 'darwin';
 
   if (isMac) {
@@ -378,7 +420,7 @@ async function setupLLMProvider(): Promise<{
         );
         return {
           provider,
-          queue: new LLMDecisionQueue(provider, 3),
+          queue: new LLMDecisionQueue(provider, 10), // Local can handle more
           promptBuilder: new StructuredPromptBuilder(),
         };
       }
@@ -394,7 +436,7 @@ async function setupLLMProvider(): Promise<{
       const provider = new OllamaProvider('qwen3:1.7b');
       return {
         provider,
-        queue: new LLMDecisionQueue(provider, 3),
+        queue: new LLMDecisionQueue(provider, 10), // Local can handle more
         promptBuilder: new StructuredPromptBuilder(),
       };
     }

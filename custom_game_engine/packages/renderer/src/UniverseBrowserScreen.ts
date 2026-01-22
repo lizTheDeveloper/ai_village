@@ -145,7 +145,7 @@ export class UniverseBrowserScreen {
     this.render();
 
     try {
-      const response = await fetch(`${this.API_BASE}/universes?limit=50`);
+      const response = await fetch(`${this.API_BASE}/multiverse/universes?limit=50`);
       if (!response.ok) throw new Error('Failed to fetch universes');
       const data = await response.json();
       this.serverUniverses = data.universes || [];

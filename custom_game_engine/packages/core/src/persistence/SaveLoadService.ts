@@ -110,7 +110,7 @@ class MultiverseClient {
   }
 
   async getUniverse(universeId: string): Promise<unknown | null> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}`);
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}`);
     if (response.status === 404) return null;
     if (!response.ok) throw new Error('Failed to get universe');
     const data = await response.json();
@@ -119,7 +119,7 @@ class MultiverseClient {
 
   async createUniverse(options: { name: string; isPublic?: boolean; id?: string }): Promise<{ id: string; name: string }> {
     if (!this.playerId) throw new Error('Player ID not set');
-    const response = await fetch(`${this.baseUrl}/universe`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/universe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
