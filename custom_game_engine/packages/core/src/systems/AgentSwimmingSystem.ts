@@ -10,7 +10,6 @@ import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { calculatePressure, calculateLightLevel } from '@ai-village/world';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AgentSwimmingSystem - Depth-based swimming mechanics with oxygen and pressure
@@ -96,6 +95,7 @@ export class AgentSwimmingSystem extends BaseSystem {
     string,
     { x: number; y: number; z: number }
   >();
+
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;

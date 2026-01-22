@@ -180,7 +180,7 @@ export class SleepSystem extends BaseSystem {
       });
 
       // Clear energy recovery mutation when awake
-      clearMutationRate(entity, 'needs.energy', 'sleep_energy_recovery');
+      clearMutationRate(entity, 'needs.energy');
     }
   }
 

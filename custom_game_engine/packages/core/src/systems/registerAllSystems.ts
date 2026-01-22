@@ -657,9 +657,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new MoodSystem());
 
   // SleepSystem - Uses StateMutatorSystem for batched sleep drive and energy recovery
-  const sleepSystem = new SleepSystem();
-  sleepSystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(sleepSystem);
+  gameLoop.systemRegistry.register(new SleepSystem());
 
   gameLoop.systemRegistry.register(new SteeringSystem());
   gameLoop.systemRegistry.register(new AgeTrackingSystem());
@@ -925,9 +923,7 @@ export function registerAllSystems(
   // ============================================================================
   // BODY & REPRODUCTION
   // ============================================================================
-  const bodySystem = new BodySystem();
-  bodySystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(bodySystem);
+  gameLoop.systemRegistry.register(new BodySystem());
   gameLoop.systemRegistry.register(new EquipmentSystem());
   gameLoop.systemRegistry.register(new ReproductionSystem());
   gameLoop.systemRegistry.register(new CourtshipSystem());

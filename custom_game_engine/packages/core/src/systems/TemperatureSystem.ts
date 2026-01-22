@@ -83,20 +83,6 @@ export class TemperatureSystem extends BaseSystem {
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
 
-  // Track cleanup functions for registered deltas
-  private deltaCleanups = new Map<string, () => void>();
-
-  // Reference to StateMutatorSystem (set via setStateMutatorSystem)
-  private stateMutator: StateMutatorSystem | null = null;
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
-
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
     const deltaTime = ctx.deltaTime;
@@ -172,7 +158,7 @@ export class TemperatureSystem extends BaseSystem {
 
       // Update health damage mutation rates once per game minute
       if (shouldUpdateDeltas) {
-        this.updateTemperatureDeltas(entity.id, updatedTemp.state);
+        this.updateTemperatureMutations(entity, updatedTemp.state);
       }
     }
 

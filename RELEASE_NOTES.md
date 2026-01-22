@@ -1,5 +1,164 @@
 # Release Notes
 
+## 2026-01-21 - "TemperatureSystem Migration + SleepSystem/BodySystem Registration Cleanup" - 7 Files (+7 net)
+
+### 🔄 TemperatureSystem.ts FULLY Migrated (-14 lines)
+
+**Completed MutationVectorComponent API migration (reversing Cycle 29 revert).**
+
+#### Removed StateMutatorSystem Integration
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- private deltaCleanups = new Map<string, () => void>();
+- private stateMutator: StateMutatorSystem | null = null;
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+-   this.stateMutator = stateMutator;
+- }
+```
+
+#### Method Renamed
+```typescript
+- this.updateTemperatureDeltas(entity.id, updatedTemp.state);
++ this.updateTemperatureMutations(entity, updatedTemp.state);
+```
+
+**Status:** TemperatureSystem.ts now uses `setMutationRate()`/`clearMutationRate()` directly from MutationVectorComponent. No manual cleanup tracking needed.
+
+**Impact:** Matches migration pattern from BodySystem, NeedsSystem, AnimalSystem, AgentSwimmingSystem.
+
+---
+
+### 🧹 registerAllSystems.ts Registration Cleanup (-6 lines)
+
+**Removed StateMutatorSystem registration calls for SleepSystem and BodySystem.**
+
+#### Changes
+```typescript
+// SleepSystem
+- const sleepSystem = new SleepSystem();
+- sleepSystem.setStateMutatorSystem(stateMutator);
+- gameLoop.systemRegistry.register(sleepSystem);
++ gameLoop.systemRegistry.register(new SleepSystem());
+
+// BodySystem
+- const bodySystem = new BodySystem();
+- bodySystem.setStateMutatorSystem(stateMutator);
+- gameLoop.systemRegistry.register(bodySystem);
++ gameLoop.systemRegistry.register(new BodySystem());
+```
+
+**Impact:** Clean inline registration for migrated systems. No external references needed.
+
+---
+
+### 🧹 AnimalSystem.ts Cleanup (-9 lines)
+
+**Removed no-op setStateMutatorSystem() method and unused import.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- /**
+-  * Set the StateMutatorSystem reference.
+-  * Called by registerAllSystems during initialization.
+-  * Note: This system uses setMutationRate() directly from MutationVectorComponent.
+-  */
+- setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
+-   // No-op: Uses setMutationRate() directly
+- }
+```
+
+#### Comments Updated
+```typescript
+// Before:
+- * PERFORMANCE: Uses StateMutatorSystem with MutationVectorComponent for per-tick updates
+- * @dependencies StateMutatorSystem - Handles per-tick mutations via MutationVectorComponent
+- * @see StateMutatorSystem - handles per-tick mutations
+
+// After:
++ * PERFORMANCE: Uses MutationVectorComponent for per-tick mutations
++ * @dependencies StateMutatorSystem - Applies per-tick mutations via MutationVectorComponent
++ * @see StateMutatorSystem - applies per-tick mutations
+```
+
+**Impact:** Cleaner code, accurate comments reflecting direct MutationVectorComponent usage.
+
+---
+
+### ➕ NeedsSystem.ts Compatibility Method (+9 lines)
+
+**Added no-op setStateMutatorSystem() method back for registration compatibility.**
+
+#### Added
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
++ /**
++  * Set the StateMutatorSystem reference.
++  * Called by registerAllSystems during initialization.
++  * Note: This system uses setMutationRate() directly from MutationVectorComponent.
++  */
++ setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
++   // No-op: Uses setMutationRate() directly
++ }
+```
+
+**Rationale:** Provides compatibility interface even though system uses MutationVectorComponent directly. Prevents registration errors if callers expect this method.
+
+---
+
+### 🧹 SleepSystem.ts API Simplification (-1 line)
+
+**Simplified clearMutationRate() call - source parameter no longer needed.**
+
+#### Change
+```typescript
+// Before:
+- clearMutationRate(entity, 'needs.energy', 'sleep_energy_recovery');
+
+// After:
++ clearMutationRate(entity, 'needs.energy');
+```
+
+**Impact:** MutationVectorComponent API evolved - source parameter optional/removed.
+
+---
+
+### 🧹 AgentSwimmingSystem.ts Import Cleanup (-1 line)
+
+**Removed unused StateMutatorSystem import.**
+
+#### Change
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+```
+
+**Impact:** Clean imports, no unused references.
+
+---
+
+### 📊 Cycle 30 Summary
+
+**Purpose:** Complete TemperatureSystem migration, clean up registration for SleepSystem/BodySystem.
+
+**Systems Migration Status:**
+- ✅ AnimalSystem - Fully migrated (Cycle 26)
+- ✅ NeedsSystem - Fully migrated (Cycle 27)
+- ✅ BodySystem - Fully migrated (Cycle 27)
+- ✅ AgentSwimmingSystem - Fully migrated (Cycle 27)
+- ✅ SleepSystem - Fully migrated (Cycle 25)
+- ✅ TemperatureSystem - Fully migrated (Cycle 30) ← **Just completed**
+
+**All systems now using direct MutationVectorComponent API.**
+
+**Impact:**
+- Simpler code (no manual cleanup tracking)
+- Better performance (component-based mutation metadata)
+- Consistent pattern across all systems
+
+**Migration Complete:** All systems using MutationVectorComponent API have clean registration.
+
+---
+
 ## 2026-01-21 - "Final Registration Cleanup + TemperatureSystem Revert" - 5 Files (-14 net)
 
 ### 🧹 System Registration Final Cleanup (registerAllSystems.ts, -12 lines)

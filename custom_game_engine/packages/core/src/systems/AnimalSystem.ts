@@ -4,19 +4,18 @@ import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalCompo
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
  * Priority: 15 (same as NeedsSystem, runs after AI, before Movement)
  *
- * PERFORMANCE: Uses StateMutatorSystem with MutationVectorComponent for per-tick updates
+ * PERFORMANCE: Uses MutationVectorComponent for per-tick mutations
  * Instead of updating needs/age every tick, this system:
  * 1. Runs once per game minute to update mutation rates based on state (sleeping, eating, etc.)
- * 2. StateMutatorSystem handles the actual per-tick mutations
+ * 2. StateMutatorSystem applies mutations every tick via MutationVectorComponent
  * 3. Event emission and state determination handled here
  *
- * @dependencies StateMutatorSystem - Handles per-tick mutations via MutationVectorComponent
+ * @dependencies StateMutatorSystem - Applies per-tick mutations via MutationVectorComponent
  */
 export class AnimalSystem extends BaseSystem {
   public readonly id: SystemId = CT.Animal;
@@ -28,22 +27,13 @@ export class AnimalSystem extends BaseSystem {
 
   /**
    * Systems that must run before this one.
-   * @see StateMutatorSystem - handles per-tick mutations
+   * @see StateMutatorSystem - applies per-tick mutations
    */
   public readonly dependsOn = ['state_mutator'] as const;
 
   // Performance: Update mutation rates once per game minute (1200 ticks)
   private deltaLastUpdateTick = 0;
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   * Note: This system uses setMutationRate() directly from MutationVectorComponent.
-   */
-  setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
-    // No-op: Uses setMutationRate() directly
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Performance: Only update mutation rates once per game minute
