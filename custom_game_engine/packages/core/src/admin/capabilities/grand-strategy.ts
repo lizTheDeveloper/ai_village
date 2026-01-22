@@ -81,16 +81,42 @@ const grandStrategyCapability = defineCapability({
     defineQuery({
       id: 'list-empires',
       name: 'List Empires',
-      description: 'List all Empire entities in the current universe',
+      description: 'List all Empire entities with stats',
       params: [
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return {
-          message: 'Query empires via game client',
-          endpoint: '/api/live/entities?type=empire',
-          hint: 'Use DevPanel Grand Strategy tab or run: curl http://localhost:8766/dashboard/entities?type=empire',
-        };
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/empires${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch empires', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
+      },
+    }),
+
+    defineQuery({
+      id: 'list-nations',
+      name: 'List Nations',
+      description: 'List all Nation entities',
+      params: [
+        { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
+      ],
+      handler: async (params, gameClient, context) => {
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/nations${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch nations', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
       },
     }),
 
@@ -102,11 +128,16 @@ const grandStrategyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return {
-          message: 'Query federations via game client',
-          endpoint: '/api/live/entities?type=federation_governance',
-          hint: 'Use DevPanel Grand Strategy tab',
-        };
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/federations${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch federations', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
       },
     }),
 
@@ -118,10 +149,16 @@ const grandStrategyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return {
-          message: 'Query galactic councils via game client',
-          endpoint: '/api/live/entities?type=galactic_council',
-        };
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/galactic-councils${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch galactic councils', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
       },
     }),
 
@@ -131,31 +168,63 @@ const grandStrategyCapability = defineCapability({
     defineQuery({
       id: 'list-navies',
       name: 'List Navies',
-      description: 'List all Navy entities',
+      description: 'List all Navy entities with fleet counts',
       params: [
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return {
-          message: 'Query navies via game client',
-          endpoint: '/api/live/entities?type=navy',
-        };
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/navies${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch navies', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
       },
     }),
 
     defineQuery({
       id: 'list-fleets',
       name: 'List Fleets',
-      description: 'List all Fleet entities',
+      description: 'List all Fleet entities with positions',
       params: [
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return {
-          message: 'Query fleets via game client',
-          endpoint: '/api/live/entities?type=fleet',
-          hierarchy: 'Navy → Armada → Fleet → Squadron → Ships',
-        };
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/fleets${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch fleets', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
+      },
+    }),
+
+    defineQuery({
+      id: 'list-squadrons',
+      name: 'List Squadrons',
+      description: 'List all Squadron entities',
+      params: [
+        { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
+      ],
+      handler: async (params, gameClient, context) => {
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/squadrons${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch squadrons', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
       },
     }),
 
@@ -167,11 +236,37 @@ const grandStrategyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return {
-          message: 'Query megastructures via game client',
-          endpoint: '/api/live/entities?type=megastructure',
-          types: ['dyson_swarm', 'orbital_ring', 'wormhole_network', 'stellar_engine'],
-        };
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/megastructures${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch megastructures', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
+      },
+    }),
+
+    defineQuery({
+      id: 'trade-networks',
+      name: 'Trade Networks',
+      description: 'Get trade network statistics (shipping lanes, caravans)',
+      params: [
+        { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
+      ],
+      handler: async (params, gameClient, context) => {
+        try {
+          const session = params.session ? `?session=${params.session}` : '';
+          const response = await fetch(`${context.baseUrl}/api/live/trade-networks${session}`);
+          if (response.ok) {
+            return await response.json();
+          }
+          return { error: 'Failed to fetch trade networks', status: response.status };
+        } catch (err) {
+          return { error: err instanceof Error ? err.message : 'Request failed' };
+        }
       },
     }),
   ],
@@ -354,12 +449,12 @@ await simulator.initialize();
     defineAction({
       id: 'diplomatic-action',
       name: 'Diplomatic Action',
-      description: 'Issue a diplomatic action between two empires (ally, trade, war)',
+      description: 'Issue a diplomatic action between two empires (ally, trade, war, peace)',
       params: [
         { name: 'empireId', type: 'entity-id', required: true, entityType: 'empire', description: 'Source Empire ID' },
         { name: 'targetEmpireId', type: 'entity-id', required: true, entityType: 'empire', description: 'Target Empire ID' },
         {
-          name: 'action',
+          name: 'diplomaticAction',
           type: 'select',
           required: true,
           description: 'Diplomatic action to take',
@@ -368,34 +463,26 @@ await simulator.initialize();
             { value: 'trade_agreement', label: 'Trade Agreement' },
             { value: 'non_aggression', label: 'Non-Aggression Pact' },
             { value: 'declare_war', label: 'Declare War' },
+            { value: 'peace', label: 'Negotiate Peace' },
           ],
         },
       ],
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetch(`${context.baseUrl}/api/grand-strategy/diplomatic-action`, {
+          const response = await fetch(`${context.baseUrl}/api/live/diplomatic-action`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               empireId: params.empireId,
               targetEmpireId: params.targetEmpireId,
-              action: params.action,
+              diplomaticAction: params.diplomaticAction,
             }),
           });
-          if (response.ok) {
-            return await response.json();
-          }
+          return await response.json();
+        } catch (err) {
           return {
             success: false,
-            message: `Diplomatic action: ${params.empireId} → ${params.action} → ${params.targetEmpireId}`,
-            hint: 'Use GrandStrategySimulator.diplomaticAction() for programmatic control',
-            code: `simulator.diplomaticAction('${params.empireId}', '${params.targetEmpireId}', '${params.action}');`,
-          };
-        } catch {
-          return {
-            success: false,
-            message: 'Metrics server not running. Use GrandStrategySimulator directly.',
-            code: `simulator.diplomaticAction('${params.empireId}', '${params.targetEmpireId}', '${params.action}');`,
+            error: err instanceof Error ? err.message : 'Request failed',
           };
         }
       },
@@ -412,7 +499,7 @@ await simulator.initialize();
       ],
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetch(`${context.baseUrl}/api/grand-strategy/move-fleet`, {
+          const response = await fetch(`${context.baseUrl}/api/live/move-fleet`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -421,20 +508,11 @@ await simulator.initialize();
               targetY: params.targetY,
             }),
           });
-          if (response.ok) {
-            return await response.json();
-          }
+          return await response.json();
+        } catch (err) {
           return {
             success: false,
-            message: `Fleet ${params.fleetId} movement order to (${params.targetX}, ${params.targetY})`,
-            hint: 'Use GrandStrategySimulator.moveFleet() for programmatic control',
-            code: `simulator.moveFleet('${params.fleetId}', ${params.targetX}, ${params.targetY});`,
-          };
-        } catch {
-          return {
-            success: false,
-            message: 'Metrics server not running. Use GrandStrategySimulator directly.',
-            code: `simulator.moveFleet('${params.fleetId}', ${params.targetX}, ${params.targetY});`,
+            error: err instanceof Error ? err.message : 'Request failed',
           };
         }
       },
@@ -443,7 +521,7 @@ await simulator.initialize();
     defineAction({
       id: 'assign-megastructure-task',
       name: 'Assign Megastructure Task',
-      description: 'Assign workers to a specific task on a megastructure',
+      description: 'Assign a task to a megastructure',
       params: [
         { name: 'megastructureId', type: 'entity-id', required: true, entityType: 'megastructure', description: 'Megastructure ID' },
         {
@@ -456,12 +534,14 @@ await simulator.initialize();
             { value: 'expansion', label: 'Expansion (increase capacity)' },
             { value: 'research', label: 'Research (generate science)' },
             { value: 'production', label: 'Production (generate resources)' },
+            { value: 'defense', label: 'Defense (protect system)' },
+            { value: 'idle', label: 'Idle (no task)' },
           ],
         },
       ],
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetch(`${context.baseUrl}/api/grand-strategy/megastructure-task`, {
+          const response = await fetch(`${context.baseUrl}/api/live/megastructure-task`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -469,20 +549,11 @@ await simulator.initialize();
               task: params.task,
             }),
           });
-          if (response.ok) {
-            return await response.json();
-          }
+          return await response.json();
+        } catch (err) {
           return {
             success: false,
-            message: `Megastructure ${params.megastructureId} assigned task: ${params.task}`,
-            hint: 'Use GrandStrategySimulator.assignMegastructureTask() for programmatic control',
-            code: `simulator.assignMegastructureTask('${params.megastructureId}', '${params.task}');`,
-          };
-        } catch {
-          return {
-            success: false,
-            message: 'Metrics server not running. Use GrandStrategySimulator directly.',
-            code: `simulator.assignMegastructureTask('${params.megastructureId}', '${params.task}');`,
+            error: err instanceof Error ? err.message : 'Request failed',
           };
         }
       },

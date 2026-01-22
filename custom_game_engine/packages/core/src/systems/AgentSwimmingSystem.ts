@@ -9,7 +9,7 @@ import { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { calculatePressure, calculateLightLevel } from '@ai-village/world';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 
 /**
  * AgentSwimmingSystem - Depth-based swimming mechanics with oxygen and pressure

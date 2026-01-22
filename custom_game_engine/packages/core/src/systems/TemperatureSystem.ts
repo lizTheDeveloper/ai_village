@@ -9,7 +9,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import {
   HEALTH_DAMAGE_RATE,
   WORLD_TEMP_BASE,

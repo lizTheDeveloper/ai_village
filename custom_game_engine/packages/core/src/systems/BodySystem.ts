@@ -26,7 +26,7 @@ import {
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext, type ComponentAccessor } from '../ecs/SystemContext.js';
 
 export class BodySystem extends BaseSystem {

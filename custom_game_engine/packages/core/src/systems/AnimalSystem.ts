@@ -2,7 +2,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 
 /**
