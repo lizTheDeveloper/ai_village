@@ -1,5 +1,68 @@
 # Release Notes
 
+## 2026-01-21 - "Remove Compatibility Methods from AgentSwimmingSystem + TemperatureSystem" - 3 Files (-10 net)
+
+### 🧹 AgentSwimmingSystem.ts Cleanup (-9 lines)
+
+**Removed no-op setStateMutatorSystem() method added in Cycle 32.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- /**
+-  * Set the StateMutatorSystem reference.
+-  * Called by registerAllSystems during initialization.
+-  */
+- setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
+-   // No-op: Uses setMutationRate() directly from MutationVectorComponent
+- }
+```
+
+**Rationale:** System doesn't need compatibility method - no callers in registerAllSystems.
+
+**Impact:** Cleaner code, no unused methods.
+
+---
+
+### 🧹 TemperatureSystem.ts Import Cleanup (-1 line)
+
+**Removed unused StateMutatorSystem import.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+```
+
+**Impact:** Clean imports, no unused references.
+
+---
+
+### 📊 Cycle 33 Summary
+
+**Purpose:** Remove unnecessary compatibility methods.
+
+**Systems With Compatibility Methods (needed by registerAllSystems):**
+- ✅ AnimalSystem (has caller in registerAllSystems)
+- ✅ NeedsSystem (has caller in registerAllSystems)
+- ✅ SleepSystem (has caller in registerAllSystems)
+
+**Systems Without Compatibility Methods (no callers):**
+- BodySystem (no caller, removed in Cycle 27)
+- TemperatureSystem (no caller, never had one)
+- AgentSwimmingSystem (no caller, removed in Cycle 33) ← **Just cleaned**
+
+**Pattern Clarified:**
+Only systems with active callers in registerAllSystems need the no-op compatibility method. Others can be fully clean.
+
+**Impact:**
+- Cleaner code for systems without callers
+- Compatibility methods only where actually needed
+- Removed Cycle 32 additions that weren't necessary
+
+**Files:** 3 changed (+2/-12, -10 net)
+
+---
+
 ## 2026-01-21 - "AgentSwimmingSystem + SleepSystem Compatibility Methods" - 3 Files (+17 net)
 
 ### ➕ AgentSwimmingSystem.ts Compatibility (+8 lines)
