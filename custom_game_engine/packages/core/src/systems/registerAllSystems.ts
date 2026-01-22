@@ -577,9 +577,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(temperatureSystem);
 
   // FireSpreadSystem - Handles fire spreading and burning damage
-  // Uses StateMutatorSystem for batched burning DoT damage
+  // Uses MutationVectorComponent for burning DoT damage
   const fireSpreadSystem = new FireSpreadSystem();
-  fireSpreadSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(fireSpreadSystem);
 
   // ============================================================================
@@ -781,10 +780,8 @@ export function registerAllSystems(
   // RoofRepairSystem - One-time migration to add roofs to existing buildings
   gameLoop.systemRegistry.register(new RoofRepairSystem());
 
-  // BuildingMaintenanceSystem - Uses StateMutatorSystem for batched condition decay
-  const buildingMaintenanceSystem = new BuildingMaintenanceSystem();
-  buildingMaintenanceSystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(buildingMaintenanceSystem);
+  // BuildingMaintenanceSystem - Uses MutationVectorComponent for per-tick condition decay
+  gameLoop.systemRegistry.register(new BuildingMaintenanceSystem());
 
   gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
   // ResourceGatheringSystem - Uses StateMutatorSystem for batched resource regeneration
@@ -812,10 +809,8 @@ export function registerAllSystems(
   registerDisabled(new PowerGridSystem());
   registerDisabled(new DirectConnectionSystem());
   registerDisabled(new BeltSystem());
-  // AssemblyMachineSystem - Uses StateMutatorSystem for batched crafting progress
-  const assemblyMachineSystem = new AssemblyMachineSystem();
-  assemblyMachineSystem.setStateMutatorSystem(stateMutator);
-  registerDisabled(assemblyMachineSystem);
+  // AssemblyMachineSystem - Uses MutationVectorComponent for smooth crafting progress
+  registerDisabled(new AssemblyMachineSystem());
 
   // ============================================================================
   // ECONOMY & TRADE
@@ -1113,9 +1108,8 @@ export function registerAllSystems(
 
   // LAZY ACTIVATION: Afterlife systems - disabled until first death occurs
   // These process souls in the Underworld; enabled by death:first_soul_arrives event
-  // AfterlifeNeedsSystem - Uses StateMutatorSystem for batched spiritual needs decay
+  // AfterlifeNeedsSystem - Uses MutationVectorComponent for spiritual needs decay
   const afterlifeNeedsSystem = new AfterlifeNeedsSystem();
-  afterlifeNeedsSystem.setStateMutatorSystem(stateMutator);
   registerDisabled(afterlifeNeedsSystem);
   registerDisabled(new AncestorTransformationSystem());
   registerDisabled(new ReincarnationSystem());

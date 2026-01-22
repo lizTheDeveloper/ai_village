@@ -1,5 +1,140 @@
 # Release Notes
 
+## 2026-01-21 - "Complete Cycle 42 Migrations - Cleanup Remaining Code" - 4 Files (-39 net)
+
+### 🧹 AssemblyMachineSystem.ts Method Migration (-19 net)
+
+**Completed updateProgressDelta method migration to setMutationRate().**
+
+#### updateProgressDelta Method Migrated
+```typescript
+// Before: Using registerDelta
+- if (!this.stateMutator) {
+-   throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
+- }
+- if (this.deltaCleanups.has(entity.id)) {
+-   this.deltaCleanups.get(entity.id)!();
+- }
+- const progressRatePerMinute = (60 / recipe.craftingTime) * speedMod * efficiencyMod * 100;
+- const cleanup = this.stateMutator.registerDelta({
+-   entityId: entity.id,
+-   componentType: CT.AssemblyMachine,
+-   field: 'progress',
+-   deltaPerMinute: progressRatePerMinute,
+-   min: 0, max: 100, source: 'assembly_machine_progress',
+- });
+- this.deltaCleanups.set(entity.id, cleanup);
+
+// After: Using setMutationRate
++ const progressRatePerSecond = (1 / recipe.craftingTime) * speedMod * efficiencyMod * 100;
++ setMutationRate(entity, 'assembly_machine.progress', progressRatePerSecond, {
++   min: 0, max: 100, source: 'assembly_machine',
++ });
+```
+
+**Impact:** Cleaner code, per-second rates (new API), no manual cleanup tracking.
+
+---
+
+### 🧹 BuildingMaintenanceSystem.ts Method Removal (-21 lines)
+
+**Removed getInterpolatedCondition() method that used StateMutatorSystem.**
+
+#### Removed Method
+```typescript
+- /**
+-  * Get interpolated condition value for UI display
+-  * Provides smooth visual updates between batch updates
+-  */
+- getInterpolatedCondition(world, entityId, currentCondition): number {
+-   if (!this.stateMutator) return currentCondition;
+-   return this.stateMutator.getInterpolatedValue(...);
+- }
+```
+
+**Impact:** Method relied on StateMutatorSystem - removed as part of migration.
+
+---
+
+### 🧹 FireSpreadSystem.ts Cleanup (+2 lines)
+
+**Replaced deltaCleanups with clearMutationRate().**
+
+#### Cleanup Simplified
+```typescript
+// Before:
+- if (this.deltaCleanups.has(entity.id)) {
+-   this.deltaCleanups.get(entity.id)!();
+-   this.deltaCleanups.delete(entity.id);
+- }
+
+// After:
++ // Clear old mutation rate
++ clearMutationRate(entity, 'needs.health');
+```
+
+**Impact:** Simpler cleanup code.
+
+---
+
+### 🧹 registerAllSystems.ts Registration Cleanup (+4/-4, 0 net)
+
+**Removed setStateMutatorSystem() calls and updated comments.**
+
+#### Changes
+```typescript
+// FireSpreadSystem:
+- // Uses StateMutatorSystem for batched burning DoT damage
++ // Uses MutationVectorComponent for burning DoT damage
+  const fireSpreadSystem = new FireSpreadSystem();
+- fireSpreadSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(fireSpreadSystem);
+
+// AfterlifeNeedsSystem:
+- // Uses StateMutatorSystem for batched spiritual needs decay
++ // Uses MutationVectorComponent for spiritual needs decay
+  const afterlifeNeedsSystem = new AfterlifeNeedsSystem();
+- afterlifeNeedsSystem.setStateMutatorSystem(stateMutator);
+  registerDisabled(afterlifeNeedsSystem);
+```
+
+**Impact:** Clean registration for all migrated systems.
+
+---
+
+### 📊 Cycle 43 Summary
+
+**Purpose:** Complete Cycle 42 migrations by cleaning up remaining StateMutatorSystem code.
+
+**Changes:**
+- AssemblyMachineSystem: updateProgressDelta method migrated (-19 lines)
+- BuildingMaintenanceSystem: getInterpolatedCondition removed (-21 lines)
+- FireSpreadSystem: deltaCleanups → clearMutationRate (+2 lines)
+- registerAllSystems: Removed setStateMutatorSystem() calls (0 net)
+
+**All 4 Systems from Cycle 42 Now Fully Clean:**
+- ✅ AfterlifeNeedsSystem (no remaining StateMutatorSystem code)
+- ✅ AssemblyMachineSystem (no remaining StateMutatorSystem code)
+- ✅ BuildingMaintenanceSystem (no remaining StateMutatorSystem code)
+- ✅ FireSpreadSystem (no remaining StateMutatorSystem code)
+
+**Migration Complete for 10 Systems:**
+All migrated systems now:
+- Use setMutationRate()/clearMutationRate() directly
+- No StateMutatorSystem fields, methods, or runtime checks
+- No manual cleanup tracking (deltaCleanups removed)
+- Per-second rates instead of per-minute
+- Cleaner, simpler code
+
+**Impact:**
+- 39 more lines of boilerplate removed
+- Total cleanup across Cycles 42-43: 80 lines removed
+- Consistent API usage across all 10 migrated systems
+
+**Files:** 4 changed (+13/-52, -39 net)
+
+---
+
 ## 2026-01-21 - "Four Systems Migrated to MutationVectorComponent API" - 5 Files (-41 net)
 
 ### 🔄 AfterlifeNeedsSystem.ts FULLY Migrated (-17 net)

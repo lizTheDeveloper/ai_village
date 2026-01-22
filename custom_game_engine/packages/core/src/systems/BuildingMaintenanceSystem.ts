@@ -243,25 +243,4 @@ export class BuildingMaintenanceSystem extends BaseSystem {
     }
   }
 
-  /**
-   * Get interpolated condition value for UI display
-   * Provides smooth visual updates between batch updates
-   */
-  getInterpolatedCondition(
-    world: World,
-    entityId: string,
-    currentCondition: number
-  ): number {
-    if (!this.stateMutator) {
-      return currentCondition; // Fallback to current value if not initialized
-    }
-
-    return this.stateMutator.getInterpolatedValue(
-      entityId,
-      CT.Building,
-      'condition',
-      currentCondition,
-      world.tick
-    );
-  }
 }

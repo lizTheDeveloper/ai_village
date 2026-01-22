@@ -126,8 +126,8 @@ export class AssemblyMachineSystem extends BaseSystem {
   }
 
   /**
-   * Update assembly machine progress delta rate.
-   * Registers delta with StateMutatorSystem for batched updates.
+   * Update assembly machine progress mutation rate.
+   * Uses MutationVectorComponent for smooth per-tick updates.
    */
   private updateProgressDelta(
     entity: EntityImpl,
@@ -135,36 +135,22 @@ export class AssemblyMachineSystem extends BaseSystem {
     power: PowerComponent | undefined,
     recipe: any
   ): void {
-    if (!this.stateMutator) {
-      throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
-    }
-
-    // Clean up old delta
-    if (this.deltaCleanups.has(entity.id)) {
-      this.deltaCleanups.get(entity.id)!();
-    }
-
     // Apply power efficiency to speed
     const efficiencyMod = power?.efficiency ?? 1.0;
     const speedMod = calculateEffectiveSpeed(machine);
 
-    // Calculate progress rate per game minute
+    // Calculate progress rate per second
     // Recipe crafting time is in seconds
     // Progress is 0-100, so we multiply by 100
-    // Rate: (60 seconds per game minute / crafting time) * modifiers * 100
-    const progressRatePerMinute = (60 / recipe.craftingTime) * speedMod * efficiencyMod * 100;
+    // Old API was per minute, new API is per second - divide by 60
+    // Rate: (1 second / crafting time) * modifiers * 100
+    const progressRatePerSecond = (1 / recipe.craftingTime) * speedMod * efficiencyMod * 100;
 
-    const cleanup = this.stateMutator.registerDelta({
-      entityId: entity.id,
-      componentType: CT.AssemblyMachine,
-      field: 'progress',
-      deltaPerMinute: progressRatePerMinute,
+    setMutationRate(entity, 'assembly_machine.progress', progressRatePerSecond, {
       min: 0,
       max: 100,
-      source: 'assembly_machine_progress',
+      source: 'assembly_machine',
     });
-
-    this.deltaCleanups.set(entity.id, cleanup);
   }
 
   /**

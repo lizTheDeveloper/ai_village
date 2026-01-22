@@ -619,10 +619,8 @@ export class FireSpreadSystem extends BaseSystem {
     // Remove existing burning component if present
     if (impl.hasComponent(CT.Burning)) {
       impl.removeComponent(CT.Burning);
-      if (this.deltaCleanups.has(entity.id)) {
-        this.deltaCleanups.get(entity.id)!();
-        this.deltaCleanups.delete(entity.id);
-      }
+      // Clear old mutation rate
+      clearMutationRate(entity, 'needs.health');
     }
 
     // Add new burning component
