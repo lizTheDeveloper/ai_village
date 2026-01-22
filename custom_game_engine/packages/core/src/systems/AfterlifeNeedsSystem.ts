@@ -19,7 +19,6 @@ import type { Entity } from '../ecs/Entity.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import { setMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
-import { ComponentType as CT } from '../types/ComponentType.js';
 
 // Decay/recovery rates per game minute
 const BASE_COHERENCE_DECAY = 0.0001;      // Very slow - takes ~7000 game minutes to fade

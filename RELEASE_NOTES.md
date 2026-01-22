@@ -1,5 +1,37 @@
 # Release Notes
 
+## 2026-01-21 - "AfterlifeNeedsSystem Final Import Cleanup" - 1 File (-1 net)
+
+### 🧹 AfterlifeNeedsSystem.ts Final Import Cleanup (-1 line)
+
+**Removed unused ComponentType import.**
+
+#### Removed
+```typescript
+- import { ComponentType as CT } from '../types/ComponentType.js';
+```
+
+**Rationale:** ComponentType no longer needed after Cycle 42 migration to MutationVectorComponent API.
+
+**Impact:** Clean imports, no unused references.
+
+---
+
+### 📊 Cycle 47 Summary
+
+**Purpose:** Final import cleanup for AfterlifeNeedsSystem.
+
+**Changes:**
+- Removed unused ComponentType import
+
+**Impact:**
+- Fully clean imports for AfterlifeNeedsSystem
+- Completes Cycle 42 migration cleanup
+
+**Files:** 1 changed (+0/-1, -1 net)
+
+---
+
 ## 2026-01-21 - "ResourceGatheringSystem Migration + AfterlifeNeeds Cleanup" - 2 Files (+10 net)
 
 ### 🔄 ResourceGatheringSystem.ts FULLY Migrated (+45/-35, +10 net)
