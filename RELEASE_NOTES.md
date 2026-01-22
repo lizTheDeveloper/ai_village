@@ -1,5 +1,197 @@
 # Release Notes
 
+## 2026-01-22 - "LLM Provider Strategy Fix + Cerebras Rate Limits" - 14 Files (+31 net)
+
+### 🔧 LLM Provider Strategy Change
+
+**headless.ts** - LoadBalancingProvider → FallbackProvider (+19/-7)
+
+**Reason:** Cerebras has 30 RPM limit (not 1000), making load balancing ineffective.
+
+#### Before (Cycle 56 - Incorrect)
+```typescript
+provider = new LoadBalancingProvider(cloudProviders, 'cloud-balanced');
+// Distribute requests equally: Groq + Cerebras
+// Concurrency: 50 per provider (100 total)
+// Problem: Cerebras can't handle 50 concurrent at 30 RPM!
+```
+
+#### After (Cycle 57 - Correct)
+```typescript
+provider = new FallbackProvider(cloudProviders, {
+  retryAfterMs: 60000,        // Retry failed provider after 1 minute
+  maxConsecutiveFailures: 3,   // Disable after 3 consecutive failures
+  logFallbacks: true,
+});
+// Groq primary (1000 RPM), Cerebras fallback (30 RPM)
+// Concurrency: 50 (Groq's optimal)
+```
+
+**Console Output:**
+- Before: `Using load-balanced cloud providers (2 providers)`
+- After: `Using Groq as primary, Cerebras as fallback (2 providers)`
+
+**Rationale:**
+- **Groq:** 1000 RPM = 16.7 RPS (excellent throughput)
+- **Cerebras:** 30 RPM = 0.5 RPS (only useful as fallback)
+- Load balancing requires similar provider capacities
+- 30 RPM too low to meaningfully share load
+- **Fallback strategy:** Maximize Groq utilization, Cerebras as safety net
+
+---
+
+### 📊 Cerebras Rate Limit Corrections
+
+**CooldownCalculator.ts** - Fix Cerebras limits (+6/-3)
+
+**Before (Cycle 56 - Incorrect):**
+```typescript
+cerebras: {
+  requestsPerMinute: 1000, // Wrong! Assumed same as Groq
+  burstSize: 50,
+}
+```
+
+**After (Cycle 57 - Correct):**
+```typescript
+cerebras: {
+  requestsPerMinute: 30, // Cerebras: 30 RPM, 900/hour (33x lower than Groq!)
+  burstSize: 10,          // Reduced from 50
+}
+```
+
+**Source:** Cerebras API documentation confirms 30 RPM limit (not 1000).
+
+---
+
+**metrics-server.ts** - Adjust concurrency (+6/-6)
+
+**Groq configuration:**
+```typescript
+// Before: Too low
+- maxConcurrent: 10
+
+// After: Optimal for 1000 RPM
++ maxConcurrent: 50
+// 1000 RPM = ~17 RPS; with ~1-2s latency need 50 concurrent to saturate
+```
+
+**Cerebras configuration:**
+```typescript
+// Before: Too high for fallback
+- maxConcurrent: 10
+
+// After: Appropriate for 30 RPM
++ maxConcurrent: 5
+// 30 RPM = 0.5 RPS; 5 concurrent is plenty (fallback from Groq)
+```
+
+**Import path fix:**
+```typescript
+- from '../packages/llm/dist/index.js';
++ from '../packages/llm/src/index.js';
+// Use src for dev mode (HMR support)
+```
+
+---
+
+### 🔄 LLM Request Router Enhancements
+
+**LLMRequestRouter.ts** - Round-robin load balancing (+21 lines)
+
+**New fields:**
+```typescript
++ private requestCounter: number = 0;
++ private loadBalanceProviders: string[] = ['groq']; // Groq primary
+```
+
+**Load balancing logic** (when no specific model requested):
+```typescript
+if (!model) {
+  const availableProviders = this.loadBalanceProviders.filter(p =>
+    this.poolManager.hasProvider(p)
+  );
+
+  if (availableProviders.length > 0) {
+    // Round-robin selection
+    const selectedProvider = availableProviders[this.requestCounter % availableProviders.length]!;
+    this.requestCounter++;
+    return { provider: selectedProvider, queueName: selectedProvider };
+  }
+}
+```
+
+**ProviderPoolManager.ts** - Add hasProvider() method (+7 lines)
+```typescript
+hasProvider(providerName: string): boolean {
+  return this.queues.has(providerName);
+}
+```
+
+Used by LLMRequestRouter to check provider availability before load balancing.
+
+---
+
+### 🔧 Additional API Namespace Fixes
+
+**Migrated 4 more endpoints to `/api/multiverse/*` namespace.**
+
+**SaveLoadService.ts** (+1 endpoint)
+```typescript
+- /universe/{id}/snapshot
++ /multiverse/universe/{id}/snapshot
+```
+
+**MultiverseClient.ts** (+2 endpoints)
+```typescript
+- /universe/{id} (DELETE)
++ /multiverse/universe/{id}
+
+- /universe/{id}/snapshot (POST)
++ /multiverse/universe/{id}/snapshot
+```
+
+**UniverseBrowserScreen.ts** (+2 endpoints)
+```typescript
+- /universe/{id}/forks
++ /multiverse/universe/{id}/forks
+
+- /universe/{id} (GET parent metadata)
++ /multiverse/universe/{id}
+```
+
+**SNAPSHOT_DECAY.md** - Documentation update
+```typescript
+- GET /api/universe/:id/decay-preview
++ GET /api/multiverse/universe/:id/decay-preview
+```
+
+**Phase 2 Progress:** 11 endpoints migrated total (Cycles 50, 55, 56, 57)
+
+---
+
+### 📊 Cycle 57 Summary
+
+**Purpose:** Correct LLM provider strategy after discovering Cerebras 30 RPM limit.
+
+**Changes:**
+1. **Provider Strategy:** LoadBalancingProvider → FallbackProvider
+2. **Rate Limits:** Cerebras 1000 RPM → 30 RPM (correct)
+3. **Concurrency:** Groq 50, Cerebras 5 (optimized for actual limits)
+4. **Router:** Round-robin load balancing when no model specified
+5. **API:** 4 more endpoints to `/api/multiverse/*` (11 total Phase 2)
+
+**Impact:**
+- Realistic provider utilization (Groq primary at 1000 RPM, Cerebras fallback at 30 RPM)
+- Correct rate limit tracking and cooldown calculation
+- Continued API namespace consistency
+
+**Files:** 14 changed (+56/-25, **+31 net**)
+
+**Important:** Cycle 56's load balancing approach was based on incorrect assumption that Cerebras had 1000 RPM. Corrected in Cycle 57 to fallback pattern.
+
+---
+
 ## 2026-01-22 - "LLM Load Balancing + API Namespace Migration Complete" - 9 Files (+42 net)
 
 ### 🚀 LLM Load Balancing (Headless Mode)
