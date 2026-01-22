@@ -76,7 +76,7 @@ const skillsProfessionsCapability = defineCapability({
   id: 'skills-professions',
   name: 'Skills & Professions',
   description: 'Bless agents with talents, guide their learning, and shape their life paths',
-  category: 'agent-management',
+  category: 'entities',
 
   tab: {
     icon: '⚒️',

@@ -38,7 +38,7 @@ const researchTechnologyCapability = defineCapability({
   id: 'research-technology',
   name: 'Research & Technology',
   description: 'Manage technological progress, discoveries, and knowledge preservation',
-  category: 'knowledge',
+  category: 'systems',
 
   tab: {
     icon: '🔬',
