@@ -1,5 +1,62 @@
 # Release Notes
 
+## 2026-01-21 - "FireSpreadSystem Import Update for MutationVectorComponent Migration" - 2 Files (0 net)
+
+### 🔄 FireSpreadSystem.ts Import Update (+2/-1, +1 net)
+
+**Started MutationVectorComponent API migration - updated imports.**
+
+#### Changes
+```typescript
+// Before:
+-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+
+// After:
++import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
+```
+
+**Rationale:** FireSpreadSystem beginning migration to MutationVectorComponent API, following the pattern from previously migrated systems:
+- AnimalSystem (Cycle 26)
+- NeedsSystem (Cycle 27)
+- BodySystem (Cycle 27)
+- AgentSwimmingSystem (Cycle 27)
+- SleepSystem (Cycle 25)
+- TemperatureSystem (Cycle 30)
+
+**Impact:**
+- Prepares FireSpreadSystem for direct MutationVectorComponent usage
+- Will enable removal of StateMutatorSystem integration
+- Follows established migration pattern
+
+**Next Steps:**
+- Replace StateMutatorSystem method calls with setMutationRate()/clearMutationRate()
+- Remove deltaCleanups tracking
+- Update registration in registerAllSystems
+
+---
+
+### 📊 Cycle 41 Summary
+
+**Purpose:** Begin FireSpreadSystem migration to MutationVectorComponent API.
+
+**Changes:**
+- Updated imports: StateMutatorSystem → MutationVectorComponent
+- Migration in progress (just started)
+
+**Migration Status:**
+- ✅ **Complete**: AnimalSystem, NeedsSystem, BodySystem, AgentSwimmingSystem, SleepSystem, TemperatureSystem
+- 🔄 **In Progress**: FireSpreadSystem (Cycle 41) ← **Just started**
+
+**Impact:**
+- One more system migrating to the cleaner MutationVectorComponent API
+- Continues the pattern of removing StateMutatorSystem integration
+
+**Note:** Cycles 36-40 had no changes (clean working tree).
+
+**Files:** 2 changed (+3/-3, 0 net)
+
+---
+
 ## 2026-01-21 - "Remove Compatibility Methods from AnimalSystem + SleepSystem" - 3 Files (-18 net)
 
 ### 🧹 AnimalSystem.ts Cleanup (-9 lines)

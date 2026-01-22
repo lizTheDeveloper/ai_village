@@ -24,7 +24,7 @@ import type { EventBus } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 
 /**
  * Degradation configuration

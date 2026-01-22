@@ -8,7 +8,7 @@ import type { BurningComponent } from '../components/BurningComponent.js';
 import { createBurningComponent } from '../components/BurningComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import type { Tile, RoofMaterial, WallMaterial, DoorMaterial } from '@ai-village/world';
 import { getAllNeighbors } from '@ai-village/world';
 
@@ -175,19 +175,8 @@ export class FireSpreadSystem extends BaseSystem {
   // Burning tile tracking
   private burningTiles = new Map<string, BurningTileData>();
 
-  // StateMutatorSystem integration for entity DoT
-  private stateMutator: StateMutatorSystem | null = null;
-  private deltaCleanups = new Map<string, () => void>();
-
   // Weather entity cache
   private weatherEntityId: string | null = null;
-
-  /**
-   * Set the StateMutatorSystem reference (called during system registration)
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
