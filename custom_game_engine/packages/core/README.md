@@ -840,17 +840,10 @@ update(world, entities, deltaTime) {
 
 ### Architecture Changes
 
-**Old API:**
-- External Map storage in StateMutatorSystem
-- `registerDelta({ entityId, componentType, field, deltaPerMinute, ... })` returned cleanup function
-- Systems needed `setStateMutatorSystem()` injection
-- Batched updates once per game minute (1200 ticks)
-- Required manual cleanup via returned functions
-- Interpolation needed for smooth UI
-
-**New API:**
+**Current API (entity-local storage):**
 - Entity-local `MutationVectorComponent` storage
-- `setMutationRate(entity, fieldPath, rate, options)` - no cleanup needed
+- `setMutationRate(entity, fieldPath, rate, options)` - rate is per SECOND
+- `clearMutationRate(entity, fieldPath)` - remove specific mutation
 - Systems import and use directly (no injection)
 - Per-tick updates with direct mutation (smooth by default)
 - Automatic cleanup when entity destroyed
@@ -920,16 +913,18 @@ update(world: World, entities: ReadonlyArray<Entity>) {
 - Examples: `'needs.hunger'`, `'body.health'`, `'body.parts.arm.health'`
 - Use `MUTATION_PATHS` constants for common fields (type-safe)
 
-**Rate conversion:** Old `deltaPerMinute` / 60 = new rate per second
-- Old: `deltaPerMinute: -0.0008` → New: `rate: -0.0008 / 60`
+**Important:** Rate is per SECOND (not per minute)
+- Example: Hunger decays 0.0008 per minute = `rate: -0.0008 / 60` (per second)
 
 #### 3. No System Injection Needed
 
-Just import and use - no `setStateMutatorSystem()` needed:
+Just import and use - no dependency injection needed:
 
 ```typescript
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
+
 export class MySystem implements System {
-  // NO dependency injection needed!
+  // NO dependency injection or cleanup functions needed!
   // Just import and call setMutationRate/clearMutationRate directly
 
   update(world: World, entities: ReadonlyArray<Entity>) {

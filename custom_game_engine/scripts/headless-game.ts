@@ -243,16 +243,14 @@ async function registerAllSystems(
   gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
   gameLoop.actionRegistry.register(new HarvestActionHandler());
 
-  // Plant system - Uses StateMutatorSystem
+  // Plant system - Uses MutationVectorComponent
   const plantSystem = new PlantSystem(gameLoop.world.eventBus);
   plantSystem.setSpeciesLookup(getPlantSpecies);
-  plantSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(plantSystem);
 
-  // Animal systems
+  // Animal systems - Uses MutationVectorComponent
   gameLoop.systemRegistry.register(new AnimalBrainSystem());
   const animalSystem = new AnimalSystem(gameLoop.world.eventBus);
-  animalSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(animalSystem);
   gameLoop.systemRegistry.register(new AnimalProductionSystem(gameLoop.world.eventBus));
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
@@ -276,14 +274,12 @@ async function registerAllSystems(
   gameLoop.systemRegistry.register(new VerificationSystem());
   gameLoop.systemRegistry.register(new CommunicationSystem());
 
-  // NeedsSystem - Uses StateMutatorSystem for batched decay
+  // NeedsSystem - Uses MutationVectorComponent for batched decay
   const needsSystem = new NeedsSystem();
-  needsSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(needsSystem);
 
-  // SleepSystem - Uses StateMutatorSystem for batched sleep updates
+  // SleepSystem - Uses MutationVectorComponent for batched sleep updates
   const sleepSystem = new SleepSystem();
-  sleepSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(sleepSystem);
 
   gameLoop.systemRegistry.register(new TamingSystem());
@@ -319,9 +315,8 @@ async function registerAllSystems(
   gameLoop.systemRegistry.register(researchSystem);
   registerDefaultResearch();
 
-  // Resource gathering - Uses StateMutatorSystem for batched resource updates
+  // Resource gathering - Uses MutationVectorComponent for batched resource updates
   const resourceGatheringSystem = new ResourceGatheringSystem();
-  resourceGatheringSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(resourceGatheringSystem);
 
   // Movement and memory

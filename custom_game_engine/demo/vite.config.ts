@@ -308,6 +308,8 @@ export default defineConfig({
       '@ai-village/renderer': path.resolve(__dirname, '../packages/renderer/src/index.ts'),
       '@ai-village/llm': path.resolve(__dirname, '../packages/llm/src/index.ts'),
       '@ai-village/shared-worker': path.resolve(__dirname, '../packages/shared-worker/src/index.ts'),
+      '@ai-village/agents': path.resolve(__dirname, '../packages/agents/src/index.ts'),
+      '@ai-village/language': path.resolve(__dirname, '../packages/language/src/index.ts'),
       // Stub out Node.js modules for browser
       'fs': path.resolve(__dirname, '../packages/llm/src/browser-stubs/fs.ts'),
       'path': path.resolve(__dirname, '../packages/llm/src/browser-stubs/path.ts'),

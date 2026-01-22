@@ -1,5 +1,341 @@
 # Release Notes
 
+## 2026-01-22 - "🎉 MutationVectorComponent Migration COMPLETE + Data Extraction" - 81 Files (-2349 net)
+
+### 🎊 MILESTONE: MutationVectorComponent Migration Complete
+
+**ALL systems have migrated from StateMutatorSystem.registerDelta() to MutationVectorComponent API.**
+
+**Migration complete for:** AnimalSystem, NeedsSystem, BodySystem, AgentSwimmingSystem, SleepSystem, TemperatureSystem, AfterlifeNeedsSystem, AssemblyMachineSystem, BuildingMaintenanceSystem, FireSpreadSystem, DamageEffectApplier, ResourceGatheringSystem, **PlantSystem** (final).
+
+**Total removed:** ~2300+ lines of boilerplate code including:
+- Manual deltaCleanups tracking maps
+- StateMutatorSystem references and initialization
+- Per-minute rate calculations (converted to per-second)
+- Legacy registerDelta() API and interfaces
+
+---
+
+### 🗑️ StateMutatorSystem.ts - Legacy API Removed (+291/-XXX lines)
+
+**Removed entire legacy `registerDelta()` API and related code.**
+
+#### Removed Interfaces
+```typescript
+- interface StateDelta { entityId, componentType, field, deltaPerMinute, ... }
+- interface RegisteredDelta extends StateDelta { cleanup, id }
+- private legacyDeltas: Map<string, RegisteredDelta[]>
+- private legacyLastUpdate = 0
+- private readonly LEGACY_UPDATE_INTERVAL = 1200
+```
+
+#### Removed Methods
+```typescript
+- registerDelta(delta: StateDelta): () => void {
+-   // Legacy batch processing every 60 seconds
+- }
+```
+
+#### Updated Documentation
+```typescript
+- * LEGACY API (registerDelta):
+- * - Still supported for backward compatibility during migration
+- * - Will be removed in Phase 4 of migration
+
++ * Architecture:
++ * - Mutation rates stored ON the entity in MutationVectorComponent
++ * - Runs every tick (throttleInterval = 0)
++ * - Direct mutation - no getEntity(), no updateComponent()
+```
+
+**Result:** StateMutatorSystem is now a pure per-tick mutation applier with zero legacy code.
+
+---
+
+### 🌿 PlantSystem.ts - Final System Migration (-111 lines)
+
+**Last system migrated to MutationVectorComponent API.**
+
+#### Import Changes
+```typescript
+- import { StateMutatorSystem } from '@ai-village/core';
++ import { setMutationRate, clearMutationRate } from '@ai-village/core';
+```
+
+#### Removed Fields
+```typescript
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<string, {
+-   hydration: () => void;
+-   age: () => void;
+-   dehydrationDamage?: () => void;
+-   malnutritionDamage?: () => void;
+- }>();
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void { ... }
+```
+
+#### Rate Conversion: Per-Minute → Per-Second
+```typescript
+// Hydration decay
+- const hydrationDecayPerMinute = -(hydrationDecayPerDay / (24 * 60));
++ const hydrationDecayPerSecond = -(hydrationDecayPerDay / (24 * 60 * 60));
+
+// Age increment
+- const ageIncreasePerMinute = 1 / 1440; // 1440 game minutes per day
++ const ageIncreasePerSecond = 1 / (24 * 60 * 60); // 86400 game seconds per day
+```
+
+#### Migration Pattern
+```typescript
+// Before: Manual cleanup tracking
+- if (this.deltaCleanups.has(entityId)) {
+-   const cleanups = this.deltaCleanups.get(entityId)!;
+-   cleanups.hydration();
+-   cleanups.age();
+- }
+- const hydrationCleanup = this.stateMutator.registerDelta({
+-   entityId, componentType: CT.Plant, field: 'hydration',
+-   deltaPerMinute: hydrationDecayPerMinute, ...
+- });
+- this.deltaCleanups.set(entityId, { hydration: hydrationCleanup, ... });
+
+// After: Direct mutation rate management
++ setMutationRate(entity, 'plant.hydration', hydrationDecayPerSecond, {
++   min: 0, max: 100, source: 'plant_hydration_decay'
++ });
+```
+
+**Performance:** PlantSystem manages 10k-100k+ entities. Once-per-hour rate updates ensure optimal performance.
+
+---
+
+### 📦 Data Extraction to JSON - Modding Support (7 New Files, -2349 Net Lines)
+
+**Extracted TypeScript inline data to JSON files for modding, hot-reload, and easier editing.**
+
+#### New JSON Files Created
+
+**custom_game_engine/packages/core/data/**
+- `ammunition.json` (10K) - All ammo types extracted from `ammo/index.ts` (-439 lines)
+- `animal-housing.json` (2.0K) - Animal habitat data
+- `animal-products.json` (2.0K) - Harvestable animal products
+- `default-items.json` (18K) - All game items extracted from `defaultItems.ts` (-674 lines)
+- `realms.json` (3.4K) - Realm definitions extracted from `RealmDefinitions.ts` (-127 lines)
+- `uplift-technologies.json` - Tech tree data extracted from `UpliftTechnologyDefinitions.ts` (-341 lines)
+
+**custom_game_engine/packages/world/data/**
+- `aquatic-species.json` - Marine life data extracted from `AquaticSpecies.ts` (-629 lines)
+
+#### Example: RealmDefinitions.ts Data Extraction
+```typescript
+// Before: 127 lines of inline TypeScript objects
+- export const UnderworldRealm: RealmProperties = {
+-   id: 'underworld',
+-   name: 'The Underworld',
+-   category: 'underworld',
+-   // ... 40 more lines
+- };
+
+// After: JSON import + type safety
++ import realmsData from '../../data/realms.json';
++ export const UnderworldRealm: RealmProperties = realmsData.realms.underworld as RealmProperties;
+```
+
+#### Example: defaultItems.ts Data Extraction
+```typescript
+// Before: 674 lines of defineItem() calls
+- export const RESOURCE_ITEMS: ItemDefinition[] = [
+-   defineItem('wood', 'Wood', 'resource', { weight: 5, stackSize: 100, ... }),
+-   defineItem('stone', 'Stone', 'resource', { weight: 10, stackSize: 100, ... }),
+-   // ... 100+ more items
+- ];
+
+// After: JSON import + helper function
++ import defaultItemsData from '../../data/default-items.json';
++ function loadItemsFromJSON(items: any[]): ItemDefinition[] {
++   return items.map((item: any) => defineItem(item.id, item.name, item.category, item));
++ }
++ export const RESOURCE_ITEMS: ItemDefinition[] = loadItemsFromJSON(defaultItemsData.resourceItems);
+```
+
+**Benefits:**
+- **Modding:** JSON files easy to edit without TypeScript knowledge
+- **Hot-reload:** Changes can be applied without full rebuild
+- **Separation:** Config/data separate from code logic
+- **Version control:** Cleaner diffs for data changes
+- **Tools:** JSON can be edited with specialized tools/generators
+
+**Total extracted:** -2349 net lines from TypeScript → JSON
+
+---
+
+### 🛠️ New Admin Capabilities (4 New Modules)
+
+**Added 4 new admin dashboard capabilities using the unified `defineCapability` API.**
+
+#### custom_game_engine/packages/core/src/admin/capabilities/
+
+**1. corruption.ts** - View/Manage Corrupted Entities
+- Implements **Conservation of Game Matter** principle (nothing deleted, only corrupted)
+- Query corrupted entities by reason, realm, danger level
+- Browse proto-realities and rejected realms
+- View entities in Limbo, The Void, Forbidden Library
+- Corruption reasons: validation_failed, malformed_data, reality_breaking, too_overpowered, lore_breaking, too_meta
+- Rejection realms: limbo, void, forbidden_library, rejected_realm, proto_reality, forgotten_realm
+- **Tone:** Unsettling. Corruption is serious. Recovery uncertain.
+
+**2. dreams-sleep.ts** - Peer Into Dreams & Influence Sleep
+- Witness private dreams of sleeping agents
+- Send prophetic visions (guidance, warning, comfort, nightmare)
+- Soothe nightmares and grant restful sleep
+- Connect dreamers in shared visions
+- Analyze sleep patterns and quality
+- Plant subtle ideas that surface in dreams
+- **Tone:** Mystical. Dreams = "realm where memories dance"
+- **Power:** Deeply intimate - access to subconscious
+
+**3. reproduction-family.ts** - Observe Families & Life Cycles
+- View family trees and lineages
+- Track pregnancy status and genetics
+- Browse mating pairs and compatibility
+- Observe parent-child relationships
+- Monitor population demographics
+- **Tone:** Reverent. Family = sacred bonds
+
+**4. research-technology.ts** - Guide Scientific Progress
+- View current research projects
+- Monitor tech tree progress
+- Accelerate or redirect research
+- Unlock technologies
+- View researchers and their contributions
+- Track civilization advancement
+- **Tone:** Progressive. Knowledge = collective achievement
+
+**Pattern:** All use `defineCapability`, `defineQuery`, `defineAction` for consistent admin API.
+
+---
+
+### 🤖 AdminAngelSystem.ts - LLM Queue Integration (+358 lines)
+
+**Integrated shared LLM queue for rate limiting and metrics tracking.**
+
+#### New Interface
+```typescript
++ export interface LLMQueue {
++   requestDecision(agentId: string, prompt: string): Promise<string>;
++ }
+
++ export interface AdminAngelSystemConfig {
++   llmQueue?: LLMQueue;
++ }
+```
+
+#### Constructor
+```typescript
++ constructor(config?: AdminAngelSystemConfig) {
++   super();
++   if (config?.llmQueue) {
++     this.llmQueue = config.llmQueue;
++   }
++ }
+```
+
+#### callLLM Method Enhancement
+```typescript
+- private async callLLM(prompt: string): Promise<string> {
++ private async callLLM(prompt: string, world?: World): Promise<string> {
++   // If we have a shared LLM queue, use it (preferred path)
++   if (this.llmQueue) {
++     const agentId = this.getAdminAngelId(world);
++     const response = await this.llmQueue.requestDecision(agentId, prompt);
++     return response;
++   }
+```
+
+**Benefits:**
+- **Shared rate limiting:** AdminAngelSystem respects global LLM limits
+- **Unified metrics:** All LLM calls tracked in one place
+- **Provider rotation:** Automatic failover to backup providers
+- **Session cooldowns:** Prevents provider exhaustion
+- **Backward compatible:** Falls back to direct calls if no queue provided
+
+---
+
+### 🧪 Test Cleanups (16+ Test Files)
+
+**Removed `setStateMutatorSystem()` calls from all system tests.**
+
+#### Pattern (Applied to 16+ tests)
+```typescript
+// Before: Manual StateMutatorSystem wiring
+- const stateMutator = new StateMutatorSystem();
+- world.gameLoop.systemRegistry.register(stateMutator);
+- animalSystem.setStateMutatorSystem(stateMutator);
+
+// After: Direct system registration (no wiring needed)
++ world.gameLoop.systemRegistry.register(animalSystem);
+```
+
+#### Major Test Files Updated
+- AnimalSystem.test.ts (-6 lines)
+- NeedsSystem.test.ts (-6 lines)
+- AfterlifeNeedsSystem.test.ts (-116 lines - major cleanup)
+- StateMutatorSystem.test.ts (323 lines changed - updated for new API)
+- BodySystem.test.ts (-6 lines)
+- SleepSystem.test.ts (-6 lines)
+- TemperatureSystem.test.ts (-6 lines)
+- PlantSystem.test.ts (-9 lines)
+- ResourceGatheringSystem.test.ts (-6 lines)
+- BuildingMaintenanceSystem.test.ts (-6 lines)
+- FireSpreadSystem.test.ts (-6 lines)
+- AssemblyMachineSystem.test.ts (-6 lines)
+- And 4+ more...
+
+**Result:** All tests now use the new MutationVectorComponent API exclusively.
+
+---
+
+### 📊 Cycle 49 Summary
+
+**Purpose:** Complete MutationVectorComponent migration, remove legacy API, extract data to JSON for modding.
+
+**Major Changes:**
+1. **Migration Complete:** PlantSystem (final system) migrated
+2. **Legacy Removed:** StateMutatorSystem.registerDelta() API completely removed
+3. **Data Extraction:** 7 JSON files created (-2349 net lines)
+4. **Admin Capabilities:** 4 new capability modules (corruption, dreams-sleep, reproduction-family, research-technology)
+5. **LLM Integration:** AdminAngelSystem shared queue support (+358 lines)
+6. **Test Cleanup:** 16+ tests updated to new API
+
+**Impact:**
+- **Code Quality:** ~2300+ lines of boilerplate removed
+- **Maintainability:** No manual cleanup tracking needed
+- **Performance:** Per-tick mutations with zero GC pressure
+- **Modding:** Game data now in JSON (hot-reload, easy editing)
+- **Admin Tools:** 4 new capabilities for game management
+- **Architecture:** Clean, focused StateMutatorSystem without legacy code
+
+**Files:** 81 changed (+1152/-3501, **-2349 net**)
+
+**Systems Migrated (12 total):**
+1. AnimalSystem (Cycle 23)
+2. NeedsSystem (Cycle 24)
+3. BodySystem (Cycle 25)
+4. AgentSwimmingSystem (Cycle 26)
+5. SleepSystem (Cycle 27)
+6. TemperatureSystem (Cycle 30)
+7. AfterlifeNeedsSystem (Cycle 42)
+8. AssemblyMachineSystem (Cycle 42)
+9. BuildingMaintenanceSystem (Cycle 42)
+10. FireSpreadSystem (Cycle 42)
+11. DamageEffectApplier (Cycle 45)
+12. ResourceGatheringSystem (Cycle 46)
+13. **PlantSystem (Cycle 49) ← FINAL**
+
+**🎉 MIGRATION COMPLETE! 🎉**
+
+---
+
 ## 2026-01-21 - "HealingEffectApplier Type Safety Improvement" - 1 File (0 net)
 
 ### ✨ HealingEffectApplier.ts Type Safety (+2/-2, 0 net)

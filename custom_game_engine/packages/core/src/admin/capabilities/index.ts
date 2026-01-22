@@ -24,6 +24,7 @@ import './planets.js';
 import './politics.js';
 import './social.js';
 import './reproduction-family.js';
+import './research-technology.js';
 import './environment.js';
 import './life.js';
 import './navigation.js';
