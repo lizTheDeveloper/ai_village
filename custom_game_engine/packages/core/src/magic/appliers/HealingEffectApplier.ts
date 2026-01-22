@@ -267,8 +267,8 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     // Cleanup function for dispel support
     const cleanupFn = () => {
       // Clear all mutations from this source
-      const mv = target.getComponent('mutation_vector');
-      if (mv && mv.fields) {
+      const mv = target.getComponent<import('../../components/MutationVectorComponent.js').MutationVectorComponent>(CT.MutationVector);
+      if (mv?.fields) {
         for (const [fieldPath, field] of Object.entries(mv.fields)) {
           if (field.source === source || field.source.startsWith(`${source}:`)) {
             clearMutationRate(target, fieldPath);

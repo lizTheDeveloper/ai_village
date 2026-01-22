@@ -1,5 +1,50 @@
 # Release Notes
 
+## 2026-01-21 - "HealingEffectApplier Type Safety Improvement" - 1 File (0 net)
+
+### ✨ HealingEffectApplier.ts Type Safety (+2/-2, 0 net)
+
+**Improved type safety in cleanup function.**
+
+#### Changes
+```typescript
+// Before: String literal and explicit null check
+- const mv = target.getComponent('mutation_vector');
+- if (mv && mv.fields) {
+
+// After: ComponentType constant with generic type + optional chaining
++ const mv = target.getComponent<import('../../components/MutationVectorComponent.js').MutationVectorComponent>(CT.MutationVector);
++ if (mv?.fields) {
+```
+
+**Improvements:**
+- Using ComponentType constant (`CT.MutationVector`) instead of string literal `'mutation_vector'`
+- Generic type parameter for compile-time type safety
+- Optional chaining (`?.`) instead of explicit null check
+
+**Impact:**
+- Better type safety at compile time
+- Cleaner code with optional chaining
+- Consistent with TypeScript best practices
+
+---
+
+### 📊 Cycle 48 Summary
+
+**Purpose:** Improve type safety in HealingEffectApplier cleanup function.
+
+**Changes:**
+- getComponent with proper typing
+- Optional chaining operator
+
+**Impact:**
+- Better type safety
+- More idiomatic TypeScript
+
+**Files:** 1 changed (+2/-2, 0 net)
+
+---
+
 ## 2026-01-21 - "AfterlifeNeedsSystem Final Import Cleanup" - 1 File (-1 net)
 
 ### 🧹 AfterlifeNeedsSystem.ts Final Import Cleanup (-1 line)
