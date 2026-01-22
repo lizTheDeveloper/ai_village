@@ -573,9 +573,8 @@ export function registerAllSystems(
   agentSwimming.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(agentSwimming);
 
-  // TemperatureSystem - Uses StateMutatorSystem for batched temperature damage
+  // TemperatureSystem - Uses MutationVectorComponent for temperature damage
   const temperatureSystem = new TemperatureSystem();
-  temperatureSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(temperatureSystem);
 
   // FireSpreadSystem - Handles fire spreading and burning damage

@@ -171,7 +171,7 @@ async function dashboardRequest(endpoint: string, options: RequestInit = {}) {
 }
 
 async function checkConnection() {
-  const status = await dashboardRequest('/api/live/status');
+  const status = await dashboardRequest('/api/game/status');
   if (!status.connected) {
     throw new Error('No game client connected. Start headless game first.');
   }
@@ -267,7 +267,7 @@ async function getRebellionState() {
 async function verifyOutcome(expectedOutcome: string) {
   console.log(`\nVerifying outcome: ${expectedOutcome}...`);
 
-  const entities = await dashboardRequest('/api/live/entities');
+  const entities = await dashboardRequest('/api/game/entities');
 
   // Check for outcome-specific entities/components
   switch (expectedOutcome) {

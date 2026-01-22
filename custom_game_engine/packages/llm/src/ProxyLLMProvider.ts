@@ -206,7 +206,7 @@ export class ProxyLLMProvider implements LLMProvider {
 
   async isAvailable(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.proxyUrl}/api/live/status`, {
+      const response = await fetch(`${this.proxyUrl}/api/game/status`, {
         method: 'GET',
       });
       return response.ok;

@@ -324,10 +324,10 @@ describe('Metrics Server Integration', () => {
   });
 
   describe('Live Query API', () => {
-    describe('GET /api/live/entities', () => {
+    describe('GET /api/game/entities', () => {
       it('should return array of agent IDs', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/live/entities`);
+          const response = await fetch(`${SERVER_URL}/api/game/entities`);
 
           if (response.ok) {
             const data = await response.json();
@@ -343,7 +343,7 @@ describe('Metrics Server Integration', () => {
 
         try {
           const response = await fetch(
-            `${SERVER_URL}/api/live/entities?session=${sessionId}`
+            `${SERVER_URL}/api/game/entities?session=${sessionId}`
           );
 
           if (response.ok) {
@@ -356,10 +356,10 @@ describe('Metrics Server Integration', () => {
       });
     });
 
-    describe('GET /api/live/entity', () => {
+    describe('GET /api/game/entity', () => {
       it('should require entity ID parameter', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/live/entity`);
+          const response = await fetch(`${SERVER_URL}/api/game/entity`);
 
           // Should return 400 for missing ID
           if (!response.ok) {
@@ -376,7 +376,7 @@ describe('Metrics Server Integration', () => {
       it('should return 404 for non-existent entity', async () => {
         try {
           const response = await fetch(
-            `${SERVER_URL}/api/live/entity?id=nonexistent_agent`
+            `${SERVER_URL}/api/game/entity?id=nonexistent_agent`
           );
 
           if (!response.ok) {
@@ -391,10 +391,10 @@ describe('Metrics Server Integration', () => {
       });
     });
 
-    describe('GET /api/live/magic', () => {
+    describe('GET /api/game/magic', () => {
       it('should return magic system state', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/live/magic`);
+          const response = await fetch(`${SERVER_URL}/api/game/magic`);
 
           if (response.ok) {
             const data = await response.json();
@@ -407,10 +407,10 @@ describe('Metrics Server Integration', () => {
       });
     });
 
-    describe('GET /api/live/divinity', () => {
+    describe('GET /api/game/divinity', () => {
       it('should return divinity system state', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/live/divinity`);
+          const response = await fetch(`${SERVER_URL}/api/game/divinity`);
 
           if (response.ok) {
             const data = await response.json();
@@ -423,10 +423,10 @@ describe('Metrics Server Integration', () => {
       });
     });
 
-    describe('GET /api/live/universe', () => {
+    describe('GET /api/game/universe', () => {
       it('should return universe configuration', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/live/universe`);
+          const response = await fetch(`${SERVER_URL}/api/game/universe`);
 
           if (response.ok) {
             const data = await response.json();
@@ -522,7 +522,7 @@ describe('Metrics Server Integration', () => {
           if (setData.success) {
             // Step 2: Query entity state
             const queryResponse = await fetch(
-              `${SERVER_URL}/api/live/entity?id=${agentId}`
+              `${SERVER_URL}/api/game/entity?id=${agentId}`
             );
 
             if (queryResponse.ok) {
@@ -548,10 +548,10 @@ describe('Metrics Server Integration', () => {
 
       try {
         const response1 = await fetch(
-          `${SERVER_URL}/api/live/entities?session=${session1}`
+          `${SERVER_URL}/api/game/entities?session=${session1}`
         );
         const response2 = await fetch(
-          `${SERVER_URL}/api/live/entities?session=${session2}`
+          `${SERVER_URL}/api/game/entities?session=${session2}`
         );
 
         if (response1.ok && response2.ok) {
@@ -571,7 +571,7 @@ describe('Metrics Server Integration', () => {
   describe('Rate Limiting', () => {
     it('should handle rapid requests without crashing', async () => {
       const requests = Array.from({ length: 10 }, (_, i) =>
-        fetch(`${SERVER_URL}/api/live/entities`)
+        fetch(`${SERVER_URL}/api/game/entities`)
       );
 
       try {
@@ -590,7 +590,7 @@ describe('Metrics Server Integration', () => {
   describe('Content Negotiation', () => {
     it('should return JSON by default', async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/api/live/entities`);
+        const response = await fetch(`${SERVER_URL}/api/game/entities`);
 
         if (response.ok) {
           const contentType = response.headers.get('content-type');
@@ -605,7 +605,7 @@ describe('Metrics Server Integration', () => {
   describe('CORS Headers', () => {
     it('should include CORS headers for browser access', async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/api/live/entities`, {
+        const response = await fetch(`${SERVER_URL}/api/game/entities`, {
           headers: {
             Origin: 'http://localhost:3000',
           },

@@ -436,31 +436,36 @@ export class AgentSwimmingSystem extends BaseSystem {
       });
     }
 
-    // Set drowning damage if oxygen depleted
+    // Calculate total health damage (drowning + pressure)
+    let totalHealthDamage = 0;
+    let damageSource = '';
+
+    // Drowning damage if oxygen depleted
     if (needs.oxygen !== undefined && needs.oxygen <= 0) {
-      // 1% health per second = 0.01 health per second
-      setMutationRate(impl, 'needs.health', -0.01, {
-        min: 0,
-        source: 'swimming_drowning',
-      });
-    } else {
-      // Clear drowning damage if oxygen recovered
-      clearMutationRate(impl, 'needs.health');
+      // 1% health per second = 0.01 health per second (0-1 scale)
+      totalHealthDamage += 0.01;
+      damageSource = 'swimming_drowning';
     }
 
-    // Set pressure damage mutation if needed
+    // Pressure damage
     if (pressureDamageRate > 0) {
       // Convert to health scale 0-1 (health is 0-1 normalized)
       const healthLossPerSecond = pressureDamageRate / 100;
-      setMutationRate(impl, 'needs.health', -healthLossPerSecond, {
-        min: 0,
-        source: `swimming_pressure_${depthZone}`,
-      });
+      totalHealthDamage += healthLossPerSecond;
+      damageSource = damageSource
+        ? `${damageSource}+pressure_${depthZone}`
+        : `swimming_pressure_${depthZone}`;
     }
-    // Note: If both drowning and pressure damage apply, the last setMutationRate
-    // will override. This is fine since drowning only happens at oxygen=0,
-    // which implies shallow water (no pressure damage) or the agent is already
-    // in critical condition.
+
+    // Apply combined health damage or clear if none
+    if (totalHealthDamage > 0) {
+      setMutationRate(impl, 'needs.health', -totalHealthDamage, {
+        min: 0,
+        source: damageSource,
+      });
+    } else {
+      clearMutationRate(impl, 'needs.health');
+    }
   }
 }
 

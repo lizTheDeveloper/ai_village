@@ -1428,7 +1428,7 @@ function handleWebSocketMessage(msg) {
 // Poll game connection status every 5 seconds
 async function checkGameStatus() {
   try {
-    const response = await fetch('/api/live/status');
+    const response = await fetch('/api/game/status');
     const data = await response.json();
 
     const statusDot = document.querySelector('.status-dot');

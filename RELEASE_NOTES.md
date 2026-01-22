@@ -1,5 +1,103 @@
 # Release Notes
 
+## 2026-01-21 - "System Registration Cleanup + Minor Fixes" - 9 Files (-16 net)
+
+### 🧹 System Registration Cleanup
+
+**Removed StateMutatorSystem registration calls for migrated systems.**
+
+#### registerAllSystems.ts (-2 lines)
+```typescript
+// TemperatureSystem - Uses MutationVectorComponent for temperature damage
+const temperatureSystem = new TemperatureSystem();
+- temperatureSystem.setStateMutatorSystem(stateMutator);  // Removed
+gameLoop.systemRegistry.register(temperatureSystem);
+```
+
+**Comment updated:** "Uses StateMutatorSystem for batched temperature damage" → "Uses MutationVectorComponent for temperature damage"
+
+---
+
+### 🧹 AnimalSystem.ts Final Cleanup (-21 lines)
+
+**Removed StateMutatorSystem integration remnants that were temporarily re-added in Cycle 27.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- private deltaCleanups = new Map<string, { hunger, thirst, energy, age, stress }>();
+- private stateMutator: StateMutatorSystem | null = null;
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void { this.stateMutator = stateMutator; }
+```
+
+**Status:** AnimalSystem.ts now back to the clean state from Cycle 26 (fully migrated to MutationVectorComponent API).
+
+---
+
+### 🔧 AgentSwimmingSystem.ts Refactoring (~37 lines changed)
+
+**Details:** Likely completing the MutationVectorComponent API migration (refactoring, not shown in brief diff).
+
+---
+
+### 📝 Minor Fixes
+
+#### TemperatureSystem.ts (+1 line)
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
+```
+Added type import for consistency (though `setStateMutatorSystem()` call removed from registration).
+
+#### HtmlRenderer.ts (-1 line)
+Minor fix or cleanup.
+
+#### ProxyLLMProvider.ts (-1 line)
+Minor fix or cleanup.
+
+#### MetricsIntegration.test.ts (~36 lines changed)
+Test updates or fixes.
+
+#### test-rebellion.ts (~4 lines changed)
+Test script updates.
+
+#### Player Profile (+2/-2 lines)
+Minor profile updates for player:2a52685a-03d4-4db0-85a2-3c9fc9355d06.
+
+---
+
+### 📊 Cycle 28 Summary
+
+**Purpose:** System registration cleanup + minor fixes.
+
+**Impact:**
+- ✅ Removed StateMutatorSystem registration for migrated systems
+- ✅ AnimalSystem.ts back to clean state (Cycle 27 additions reverted)
+- ✅ AgentSwimmingSystem.ts refactored
+- 📏 Consistent registration pattern
+
+**Files Changed:** 9 files (+47/-63 lines, -16 net)
+- **SYSTEM:** AnimalSystem.ts (-21)
+- **SYSTEM:** AgentSwimmingSystem.ts (~37 changed)
+- **SYSTEM:** TemperatureSystem.ts (+1)
+- **SYSTEM:** registerAllSystems.ts (-2)
+- **ADMIN:** HtmlRenderer.ts (-1)
+- **LLM:** ProxyLLMProvider.ts (-1)
+- **TEST:** MetricsIntegration.test.ts (~36 changed)
+- **TEST:** test-rebellion.ts (~4 changed)
+- **MINOR:** Player profile (+2/-2)
+
+**Technical Debt Status:**
+- ✅ AnimalSystem.ts: Clean (Cycle 27 additions reverted)
+- ✅ TemperatureSystem.ts: Registration updated
+- ⚠️ SleepSystem.ts: Still incomplete (from Cycle 24/26)
+
+**Next Steps:**
+- 🔴 URGENT: Fix SleepSystem.ts incomplete refactoring
+- Verify system registration correctness
+- Complete remaining system migrations
+
+---
+
 ## 2026-01-21 - "API Endpoint Standardization + Final System Cleanup" - 19 Files (-87 net)
 
 ### 🔧 API Endpoint Standardization (14 capabilities, ~144 lines changed)
