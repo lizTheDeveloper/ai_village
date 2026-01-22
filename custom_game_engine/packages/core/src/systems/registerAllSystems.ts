@@ -568,9 +568,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(planetaryCurrents);
 
   // AgentSwimmingSystem - Depth-based swimming mechanics (priority 18)
-  // Oxygen consumption and pressure damage - uses StateMutatorSystem for gradual effects
+  // Oxygen consumption and pressure damage - uses MutationVectorComponent for gradual effects
   const agentSwimming = new AgentSwimmingSystem();
-  agentSwimming.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(agentSwimming);
 
   // TemperatureSystem - Uses MutationVectorComponent for temperature damage
@@ -612,9 +611,8 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new AnimalBrainSystem());
 
-  // AnimalSystem - Uses StateMutatorSystem for batched needs/age decay updates
+  // AnimalSystem - Uses StateMutatorSystem with MutationVectorComponent for per-tick mutations
   const animalSystem = new AnimalSystem();
-  animalSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(animalSystem);
 
   gameLoop.systemRegistry.register(new AnimalProductionSystem());
@@ -653,10 +651,8 @@ export function registerAllSystems(
 
   gameLoop.systemRegistry.register(new MovementSystem());
 
-  // NeedsSystem - Uses StateMutatorSystem for batched decay updates
-  const needsSystem = new NeedsSystem();
-  needsSystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(needsSystem);
+  // NeedsSystem - Uses MutationVectorComponent for per-tick state mutations
+  gameLoop.systemRegistry.register(new NeedsSystem());
 
   gameLoop.systemRegistry.register(new MoodSystem());
 

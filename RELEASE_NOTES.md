@@ -1,5 +1,132 @@
 # Release Notes
 
+## 2026-01-21 - "Final Registration Cleanup + TemperatureSystem Revert" - 5 Files (-14 net)
+
+### 🧹 System Registration Final Cleanup (registerAllSystems.ts, -12 lines)
+
+**Removed StateMutatorSystem registration calls and updated comments for all migrated systems.**
+
+#### Removed Registration Calls
+```typescript
+// AgentSwimmingSystem
+- agentSwimming.setStateMutatorSystem(stateMutator);
+- // Comment: "uses StateMutatorSystem for gradual effects"
++ // Comment: "uses MutationVectorComponent for gradual effects"
+
+// AnimalSystem
+- animalSystem.setStateMutatorSystem(stateMutator);
+- // Comment: "Uses StateMutatorSystem for batched needs/age decay updates"
++ // Comment: "Uses StateMutatorSystem with MutationVectorComponent for per-tick mutations"
+
+// NeedsSystem
+- const needsSystem = new NeedsSystem();
+- needsSystem.setStateMutatorSystem(stateMutator);
+- gameLoop.systemRegistry.register(needsSystem);
++ gameLoop.systemRegistry.register(new NeedsSystem()); // Inline construction
+- // Comment: "Uses StateMutatorSystem for batched decay updates"
++ // Comment: "Uses MutationVectorComponent for per-tick state mutations"
+```
+
+**Impact:** Clean registration pattern for migrated systems. No more `setStateMutatorSystem()` calls.
+
+---
+
+### 🧹 BodySystem.ts Final Cleanup (-27 lines)
+
+**Removed remaining StateMutatorSystem integration fields and methods.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- private deltaCleanups = new Map<string, { bloodLoss, bloodRecovery, healthDamage }>();
+- private healingCleanups = new Map<string, { partHealing, injuryHealing }>();
+- private stateMutator: StateMutatorSystem | null = null;
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void { this.stateMutator = stateMutator; }
+```
+
+#### Comment Updated
+```typescript
+// Before:
+- * @see StateMutatorSystem - handles batched blood loss/recovery and health damage
+
+// After:
++ * @see StateMutatorSystem - handles batched mutations for blood loss/recovery and health damage
+```
+
+**Status:** BodySystem.ts fully migrated to MutationVectorComponent API.
+
+---
+
+### 🔄 TemperatureSystem.ts REVERTED (+16 lines)
+
+**⚠️ Reverted to StateMutatorSystem integration (migration undone).**
+
+#### Added Back
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
++ private deltaCleanups = new Map<string, () => void>();
++ private stateMutator: StateMutatorSystem | null = null;
++ setStateMutatorSystem(stateMutator: StateMutatorSystem): void { this.stateMutator = stateMutator; }
+```
+
+#### Method Renamed
+```typescript
+- this.updateTemperatureMutations(entity, updatedTemp.state);
++ this.updateTemperatureDeltas(entity.id, updatedTemp.state);
+```
+
+**Status:** TemperatureSystem.ts reverted to StateMutatorSystem integration. Migration undone.
+
+**Reason:** Unclear - may indicate MutationVectorComponent API migration was causing issues or incomplete implementation.
+
+---
+
+### ✏️ Minor Changes
+
+#### AnimalSystem.ts (+1 line)
+Minor addition or fix.
+
+#### Player Profile (+2/-2 lines)
+Minor profile updates for player:2a52685a-03d4-4db0-85a2-3c9fc9355d06.
+
+---
+
+### 📊 Cycle 29 Summary
+
+**Purpose:** Final registration cleanup + TemperatureSystem revert.
+
+**Impact:**
+- ✅ All migrated systems have clean registration (no `setStateMutatorSystem()` calls)
+- ✅ BodySystem.ts fully migrated and cleaned
+- ⚠️ TemperatureSystem.ts reverted to StateMutatorSystem integration
+- 📏 Updated comments to reflect actual implementation
+
+**Files Changed:** 5 files (+23/-37 lines, -14 net)
+- **SYSTEM:** BodySystem.ts (-27) - Final cleanup
+- **SYSTEM:** TemperatureSystem.ts (+16) - REVERTED to StateMutatorSystem
+- **SYSTEM:** registerAllSystems.ts (-12) - Removed registration calls
+- **SYSTEM:** AnimalSystem.ts (+1) - Minor addition
+- **MINOR:** Player profile (+2/-2)
+
+**Migration Status:**
+- ✅ AnimalSystem.ts: COMPLETE
+- ✅ NeedsSystem.ts: COMPLETE
+- ✅ BodySystem.ts: COMPLETE
+- ✅ AgentSwimmingSystem.ts: COMPLETE
+- ❌ TemperatureSystem.ts: REVERTED (was partially migrated, now back to StateMutatorSystem)
+- ⚠️ SleepSystem.ts: Still incomplete (from Cycle 24/26)
+
+**Technical Debt:**
+- ⚠️ TemperatureSystem.ts reverted - reason unclear
+- ⚠️ SleepSystem.ts still incomplete
+
+**Next Steps:**
+- 🔴 Investigate why TemperatureSystem.ts was reverted
+- 🔴 URGENT: Fix SleepSystem.ts incomplete refactoring
+- Verify migrated systems work correctly
+
+---
+
 ## 2026-01-21 - "System Registration Cleanup + Minor Fixes" - 9 Files (-16 net)
 
 ### 🧹 System Registration Cleanup

@@ -28,7 +28,6 @@ import type { MoodComponent } from '../components/MoodComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext, type ComponentAccessor } from '../ecs/SystemContext.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 export class BodySystem extends BaseSystem {
   public readonly id: SystemId = 'body';
@@ -40,36 +39,12 @@ export class BodySystem extends BaseSystem {
 
   /**
    * Systems that must run before this one.
-   * @see StateMutatorSystem - handles batched blood loss/recovery and health damage
+   * @see StateMutatorSystem - handles batched mutations for blood loss/recovery and health damage
    */
   public readonly dependsOn = ['state_mutator'] as const;
 
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-
-  // Track cleanup functions for registered deltas
-  private deltaCleanups = new Map<string, {
-    bloodLoss?: () => void;
-    bloodRecovery?: () => void;
-    healthDamage?: () => void;
-  }>();
-
-  // Track cleanup functions for healing deltas
-  private healingCleanups = new Map<string, {
-    partHealing: Map<string, () => void>;
-    injuryHealing: Map<string, () => void>;
-  }>();
-
-  // Reference to StateMutatorSystem (set via setStateMutatorSystem)
-  private stateMutator: StateMutatorSystem | null = null;
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
