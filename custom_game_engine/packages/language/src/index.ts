@@ -83,7 +83,7 @@ export { PhonemeAnalyzer } from './PhonemeAnalyzer.js';
 // ==================== TRACERY GRAMMAR ====================
 
 // Tracery grammar builder for word generation
-export { TraceryGrammarBuilder } from './TraceryGrammarBuilder.js';
+export { TraceryGrammarBuilder, generateRandomName } from './TraceryGrammarBuilder.js';
 
 // Language description grammar (generates poetic descriptions)
 export {

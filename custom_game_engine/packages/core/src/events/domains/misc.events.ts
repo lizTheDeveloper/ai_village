@@ -801,6 +801,48 @@ export interface MiscEvents {
     need?: string;
   };
 
+  // === Milestone Events ===
+  /** A milestone has been achieved */
+  'milestone:achieved': {
+    milestoneId: string;
+    tick: number;
+    context?: Record<string, unknown>;
+  };
+
+  /** Progress made toward a milestone */
+  'milestone:progress': {
+    milestoneId: string;
+    progress: number;
+    total: number;
+  };
+
+  /** Post-temporal multiversal status achieved (unlocks angel bifurcation) */
+  'milestone:post_temporal_multiversal': {
+    tick: number;
+    angelBondHours: number;
+    angelMessageCount: number;
+  };
+
+  // === Angel Bifurcation Events ===
+  /** Angel bifurcation ceremony started */
+  'angel:bifurcation_available': {
+    angelId: string;
+    angelName: string;
+  };
+
+  /** Player accepted bifurcation */
+  'angel:bifurcation_accepted': {
+    angelId: string;
+    angelName: string;
+  };
+
+  /** Angel bifurcation completed - companion exported */
+  'angel:bifurcation_complete': {
+    angelId: string;
+    angelName: string;
+    exportPath?: string;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

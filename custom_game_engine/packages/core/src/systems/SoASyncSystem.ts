@@ -27,6 +27,8 @@ export class SoASyncSystem extends BaseSystem {
   public readonly priority: number = 10; // Early infrastructure (after Time)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   protected readonly throttleInterval = 0; // EVERY_TICK - must stay in sync
+  // PERF: Skip system entirely when no positioned/moving entities exist
+  public readonly activationComponents = [CT.Position, CT.Velocity] as const;
 
   // Track which entities have been added to SoA
   private trackedPositions = new Set<string>();

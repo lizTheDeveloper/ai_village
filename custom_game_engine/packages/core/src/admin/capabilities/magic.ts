@@ -106,7 +106,7 @@ const magicCapability = defineCapability({
         { name: 'entityId', type: 'entity-id', required: true, entityType: 'agent', description: 'Magic user entity' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with magic components' };
+        return { message: 'Delegate to /api/game/entity with magic components' };
       },
       renderResult: (data: unknown) => {
         const magic = data as {
@@ -260,7 +260,7 @@ const magicCapability = defineCapability({
         { name: 'deityId', type: 'entity-id', required: true, description: 'Deity entity ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with deity components' };
+        return { message: 'Delegate to /api/game/entity with deity components' };
       },
       renderResult: (data: unknown) => {
         const deity = data as {

@@ -37,8 +37,11 @@ export class AquaticAnimalSpawningSystem extends BaseSystem {
   public readonly priority: number = 91;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  /** Throttle to every 10 seconds (200 ticks at 20 TPS) for periodic spawn checks */
-  protected readonly throttleInterval = 200;
+  // PERF: Method-driven system - spawning is via spawnAquaticAnimalsInChunk(), not per-tick
+  // High throttle ensures onUpdate() is rarely called (it does nothing anyway)
+  protected readonly throttleInterval = 6000; // 5 minutes
+  // PERF: Skip entirely when no animals exist (nothing to spawn into)
+  public readonly activationComponents = ['animal'] as const;
 
   private spawnedChunks: Set<string> = new Set();
 

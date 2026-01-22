@@ -711,8 +711,7 @@ export class PlacementScorer {
     if (!memory) return 0;
 
     let score = 0;
-    const searchRadius = 5;
-    const searchRadiusSq = searchRadius * searchRadius;
+    const searchRadiusSq = 25; // 5 * 5
 
     for (const m of memory.episodicMemories) {
       if (!m.location) continue;
@@ -739,8 +738,7 @@ export class PlacementScorer {
     if (!spatialMem) return 0;
 
     let score = 0;
-    const searchRadius = 8;
-    const searchRadiusSq = searchRadius * searchRadius;
+    const searchRadiusSq = 64; // 8 * 8
 
     // Query memories for this resource type
     const memories = spatialMem.queryResourceLocations(resourceType);

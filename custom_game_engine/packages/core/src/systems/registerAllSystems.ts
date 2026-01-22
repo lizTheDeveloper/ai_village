@@ -246,6 +246,7 @@ import { SacredSiteSystem } from './SacredSiteSystem.js';
 import { AvatarSystem } from './AvatarSystem.js';
 import { AngelSystem } from './AngelSystem.js';
 import { AdminAngelSystem } from './AdminAngelSystem.js';
+import { MilestoneSystem } from './MilestoneSystem.js';
 import { PossessionSystem } from './PossessionSystem.js';
 import { PlayerInputSystem } from './PlayerInputSystem.js';
 
@@ -1009,6 +1010,12 @@ export function registerAllSystems(
   // ============================================================================
   // Keep enabled - the admin angel helps players learn the game via divine chat
   gameLoop.systemRegistry.register(new AdminAngelSystem());
+
+  // ============================================================================
+  // MILESTONE SYSTEM (Player Progression)
+  // ============================================================================
+  // Tracks player achievements and unlocks features like angel bifurcation
+  gameLoop.systemRegistry.register(new MilestoneSystem());
 
   // ============================================================================
   // DIVINITY - ADVANCED THEOLOGY

@@ -30,10 +30,12 @@ interface SpellEffect {
 
 /**
  * Spell cast event data structure
+ * Note: effects is optional because base magic:spell_cast events may not have it
+ * Only building-summoning spells include the effects array
  */
 interface SpellCastData {
-  casterId: string;
-  effects: SpellEffect[];
+  casterId?: string;
+  effects?: SpellEffect[];
   targetPosition?: { x: number; y: number };
 }
 
@@ -41,43 +43,56 @@ export class BuildingSummoningSystem extends BaseSystem {
   public readonly id: SystemId = 'building_summoning' as SystemId;
   public readonly priority: number = 150; // After magic casting, before rendering
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  protected readonly throttleInterval = 0; // Every tick
+  // PERFORMANCE: Event-driven system - no per-tick polling needed
+  protected readonly throttleInterval = 100; // SLOW - only check occasionally as backup
+  // PERF: Skip entirely when no entities can cast spells (need mana)
+  public readonly activationComponents = [CT.Mana] as const;
 
   private blueprintRegistry: BuildingBlueprintRegistry;
+  // PERFORMANCE: Queue events instead of polling history every tick
+  private pendingSummonings: SpellCastData[] = [];
+  private pendingRifts: SpellCastData[] = [];
+  private initialized = false;
 
   constructor() {
     super();
     this.blueprintRegistry = new BuildingBlueprintRegistry();
   }
 
+  public override async onInitialize(world: World): Promise<void> {
+    // Subscribe to spell cast events instead of polling
+    const eventBus = world.getEventBus();
+    eventBus.subscribe('magic:spell_cast', (event) => {
+      const data = event.data as SpellCastData;
+      if (data.effects?.some(eff => eff.type === 'summon_building')) {
+        this.pendingSummonings.push(data);
+      }
+      if (data.effects?.some(eff => eff.type === 'create_dimensional_rift')) {
+        this.pendingRifts.push(data);
+      }
+    });
+    this.initialized = true;
+  }
+
   public override onUpdate(ctx: SystemContext): void {
     const { world } = ctx;
 
-    // Find all spell cast events that summon buildings
-    const eventBus = world.getEventBus();
-    const allEvents = eventBus.getHistory(world.tick - 1);
-
-    const summoningEvents = allEvents.filter(
-      e => e.type === 'magic:spell_cast' &&
-           (e.data as SpellCastData).effects?.some(eff => eff.type === 'summon_building')
-    );
-
-    for (const event of summoningEvents) {
-      this.handleBuildingSummoning(world, event.data as SpellCastData);
+    // Process queued summoning events
+    for (const event of this.pendingSummonings) {
+      this.handleBuildingSummoning(world, event);
     }
+    this.pendingSummonings = [];
 
-    // Also handle rift creation events
-    const riftEvents = allEvents.filter(
-      e => e.type === 'magic:spell_cast' &&
-           (e.data as SpellCastData).effects?.some(eff => eff.type === 'create_dimensional_rift')
-    );
-
-    for (const event of riftEvents) {
-      this.handleRiftCreation(world, event.data as SpellCastData);
+    // Process queued rift events
+    for (const event of this.pendingRifts) {
+      this.handleRiftCreation(world, event);
     }
+    this.pendingRifts = [];
   }
 
   private handleBuildingSummoning(world: World, event: SpellCastData): void {
+    if (!event.casterId || !event.effects) return;
+
     const caster = world.getEntity(event.casterId);
     if (!caster) return;
 
@@ -141,6 +156,8 @@ export class BuildingSummoningSystem extends BaseSystem {
   }
 
   private handleRiftCreation(world: World, event: SpellCastData): void {
+    if (!event.casterId || !event.effects) return;
+
     const caster = world.getEntity(event.casterId);
     if (!caster) return;
 

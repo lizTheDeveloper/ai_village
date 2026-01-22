@@ -95,7 +95,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: 0,
     maxComfortTemp: 35,
 
-    spawnBiomes: ['grassland', 'farmland'],
+    spawnBiomes: ['plains', 'grassland', 'farmland', 'savanna'],
     spawnDensity: 0.3,
   },
 
@@ -133,7 +133,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -10,
     maxComfortTemp: 30,
 
-    spawnBiomes: ['grassland', 'farmland'],
+    spawnBiomes: ['plains', 'grassland', 'farmland', 'savanna'],
     spawnDensity: 0.1,
   },
 
@@ -171,7 +171,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -5,
     maxComfortTemp: 30,
 
-    spawnBiomes: ['grassland', 'hills', 'farmland'],
+    spawnBiomes: ['plains', 'grassland', 'hills', 'farmland', 'savanna'],
     spawnDensity: 0.15,
   },
 
@@ -247,7 +247,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -15,
     maxComfortTemp: 35,
 
-    spawnBiomes: ['forest', 'grassland', 'settlement'],
+    spawnBiomes: ['forest', 'plains', 'grassland', 'settlement', 'woodland'],
     spawnDensity: 0.02,
   },
 
@@ -285,7 +285,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -5,
     maxComfortTemp: 35,
 
-    spawnBiomes: ['forest', 'settlement'],
+    spawnBiomes: ['forest', 'woodland', 'plains'],
     spawnDensity: 0.02,
   },
 
@@ -323,7 +323,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -10,
     maxComfortTemp: 30,
 
-    spawnBiomes: ['grassland', 'forest', 'meadow'],
+    spawnBiomes: ['plains', 'grassland', 'forest', 'woodland', 'savanna'],
     spawnDensity: 0.25,
   },
 
@@ -361,7 +361,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -20,
     maxComfortTemp: 30,
 
-    spawnBiomes: ['forest', 'meadow'],
+    spawnBiomes: ['forest', 'woodland', 'foothills'],
     spawnDensity: 0.1,
   },
 
@@ -399,7 +399,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -5,
     maxComfortTemp: 32,
 
-    spawnBiomes: ['forest', 'farmland'],
+    spawnBiomes: ['forest', 'woodland', 'plains'],
     spawnDensity: 0.08,
   },
 
@@ -437,7 +437,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: -10,
     maxComfortTemp: 35,
 
-    spawnBiomes: ['hills', 'mountains', 'grassland'],
+    spawnBiomes: ['mountains', 'foothills', 'plains', 'grassland'],
     spawnDensity: 0.12,
   },
 
@@ -477,7 +477,7 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     minComfortTemp: 0,
     maxComfortTemp: 500, // FIRE doesn't bother him
 
-    spawnBiomes: ['countryside', 'plains', 'village', 'grassland'], // Where the peasants are
+    spawnBiomes: ['plains', 'savanna', 'grassland'], // Where the peasants are
     spawnDensity: 0.0001, // Legendary - extremely rare
   },
 };

@@ -199,13 +199,15 @@ export class WanderBehavior extends BaseBehavior {
     const home = this.getHomePosition(agent, world) || { x: 0, y: 0 };
     const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
 
-    // Calculate distance from home
+    // Calculate distance from home - use squared distance for comparison
     const dx = position.x - home.x;
     const dy = position.y - home.y;
-    const distanceFromHome = Math.sqrt(dx * dx + dy * dy);
+    const distanceFromHomeSquared = dx * dx + dy * dy;
+    const homeRadiusSquared = homeRadius * homeRadius;
 
     // If outside home radius, bias toward home
-    if (distanceFromHome > homeRadius) {
+    if (distanceFromHomeSquared > homeRadiusSquared) {
+      const distanceFromHome = Math.sqrt(distanceFromHomeSquared); // sqrt only when needed
       const angleToHome = Math.atan2(-dy, -dx);
       // Progressive bias: stronger pull when farther from home
       const bias = Math.min(0.8, (distanceFromHome - homeRadius) / homeRadius);
@@ -374,13 +376,15 @@ function applyHomeBias(
   const home = getHomePosition(agent, ctx) || { x: 0, y: 0 };
   const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
 
-  // Calculate distance from home
+  // Calculate distance from home - use squared distance for comparison
   const dx = position.x - home.x;
   const dy = position.y - home.y;
-  const distanceFromHome = Math.sqrt(dx * dx + dy * dy);
+  const distanceFromHomeSquared = dx * dx + dy * dy;
+  const homeRadiusSquared = homeRadius * homeRadius;
 
   // If outside home radius, bias toward home
-  if (distanceFromHome > homeRadius) {
+  if (distanceFromHomeSquared > homeRadiusSquared) {
+    const distanceFromHome = Math.sqrt(distanceFromHomeSquared); // sqrt only when needed
     const angleToHome = Math.atan2(-dy, -dx);
     // Progressive bias: stronger pull when farther from home
     const bias = Math.min(0.8, (distanceFromHome - homeRadius) / homeRadius);

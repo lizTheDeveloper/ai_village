@@ -297,4 +297,10 @@ export enum ComponentType {
   // Exotic Ship Missions (Grand Strategy Phase 6)
   ProbabilityScoutMission = 'probability_scout_mission', // Scout ship mapping unobserved timelines
   SvetzRetrievalMission = 'svetz_retrieval_mission',     // Retrieval ship fetching items from extinct timelines
+
+  // Player Progression
+  Milestone = 'milestone',                   // Tracks player achievements and unlocks
+
+  // Performance Infrastructure
+  MutationVector = 'mutation_vector',        // Entity-local mutation rates for StateMutatorSystem
 }

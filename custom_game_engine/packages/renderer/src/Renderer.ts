@@ -334,21 +334,22 @@ export class Renderer {
     this.pixelLabEntityRenderer.updateAnimations(performance.now());
 
     // Update phase-shifting animations for 5D buildings
+    // PERF: Only query buildings, not all entities
     const currentTick = world.tick;
-    const allEntities = world.getAllEntities();
-    for (const entity of allEntities) {
+    const buildingEntities = world.query().with('building').executeEntities();
+    for (const entity of buildingEntities) {
       const building = entity.components.get('building') as BuildingComponent | undefined;
-      if (building) {
-        const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType) as BuildingBlueprint | null;
-        if (blueprint?.dimensional?.v_axis) {
-          this.buildingRenderer.updateVPhase(entity.id, currentTick, blueprint.dimensional);
+      if (!building) continue;
 
-          // Update UI if this building is selected
-          if (this.selectedDimensionalBuildingId === entity.id) {
-            const phases = blueprint.dimensional.v_axis.phases;
-            const currentPhase = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentVPhase || 0;
-            this.dimensionalControls.updatePhaseIndicator(currentPhase, phases);
-          }
+      const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType) as BuildingBlueprint | null;
+      if (blueprint?.dimensional?.v_axis) {
+        this.buildingRenderer.updateVPhase(entity.id, currentTick, blueprint.dimensional);
+
+        // Update UI if this building is selected
+        if (this.selectedDimensionalBuildingId === entity.id) {
+          const phases = blueprint.dimensional.v_axis.phases;
+          const currentPhase = this.buildingRenderer.getDimensionalStateForRendering(entity.id)?.currentVPhase || 0;
+          this.dimensionalControls.updatePhaseIndicator(currentPhase, phases);
         }
       }
     }

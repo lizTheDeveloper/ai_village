@@ -797,13 +797,16 @@ export class GatherBehavior extends BaseBehavior {
         // If preferred type specified, only consider that type
         if (preferredType && resourceComp.resourceType !== preferredType) continue;
 
-        // Distance from resource to home (0, 0)
-        const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
+        // Distance from resource to home (0, 0) - use squared distance for comparison
+        const distanceToHomeSquared = resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y;
+        const HOME_RADIUS_SQUARED = HOME_RADIUS * HOME_RADIUS;
 
         // Scoring: prefer resources near home AND near agent
         let score = distanceToAgent;
-        if (distanceToHome > HOME_RADIUS) {
+        if (distanceToHomeSquared > HOME_RADIUS_SQUARED) {
           // Penalize resources far from home (add 2x the excess distance)
+          // Use sqrt only once for scoring calculation
+          const distanceToHome = Math.sqrt(distanceToHomeSquared);
           score += (distanceToHome - HOME_RADIUS) * 2.0;
         }
 
@@ -836,13 +839,16 @@ export class GatherBehavior extends BaseBehavior {
         // If preferred type specified, check if material matches
         if (preferredType && voxelComp.material !== preferredType) continue;
 
-        // Distance from resource to home (0, 0)
-        const distanceToHome = Math.sqrt(voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y);
+        // Distance from resource to home (0, 0) - use squared distance for comparison
+        const distanceToHomeSquared = voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y;
+        const HOME_RADIUS_SQUARED = HOME_RADIUS * HOME_RADIUS;
 
         // Scoring: prefer resources near home AND near agent
         let score = distanceToAgent;
-        if (distanceToHome > HOME_RADIUS) {
+        if (distanceToHomeSquared > HOME_RADIUS_SQUARED) {
           // Penalize resources far from home (add 2x the excess distance)
+          // Use sqrt only once for scoring calculation
+          const distanceToHome = Math.sqrt(distanceToHomeSquared);
           score += (distanceToHome - HOME_RADIUS) * 2.0;
         }
 
@@ -977,13 +983,16 @@ export class GatherBehavior extends BaseBehavior {
         const isEdible = isEdibleSpecies(plantComp.speciesId);
 
         if (hasFruit && isEdible) {
-          // Distance from plant to home (0, 0)
-          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+          // Distance from plant to home (0, 0) - use squared distance for comparison
+          const distanceToHomeSquared = plantPos.x * plantPos.x + plantPos.y * plantPos.y;
+          const HOME_RADIUS_SQUARED = HOME_RADIUS * HOME_RADIUS;
 
           // Scoring: prefer plants near home AND near agent (same as resources)
           let score = distanceToAgent;
-          if (distanceToHome > HOME_RADIUS) {
+          if (distanceToHomeSquared > HOME_RADIUS_SQUARED) {
             // Penalize plants far from home (add 2x the excess distance)
+            // Use sqrt only once for scoring calculation
+            const distanceToHome = Math.sqrt(distanceToHomeSquared);
             score += (distanceToHome - HOME_RADIUS) * 2.0;
           }
 
@@ -1078,13 +1087,16 @@ export class GatherBehavior extends BaseBehavior {
         const isValidStage = validStages.includes(plantComp.stage);
 
         if (hasSeeds && isValidStage) {
-          // Distance from plant to home (0, 0)
-          const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+          // Distance from plant to home (0, 0) - use squared distance for comparison
+          const distanceToHomeSquared = plantPos.x * plantPos.x + plantPos.y * plantPos.y;
+          const HOME_RADIUS_SQUARED = HOME_RADIUS * HOME_RADIUS;
 
           // Scoring: prefer plants near home AND near agent (same as resources)
           let score = distanceToAgent;
-          if (distanceToHome > HOME_RADIUS) {
+          if (distanceToHomeSquared > HOME_RADIUS_SQUARED) {
             // Penalize plants far from home (add 2x the excess distance)
+            // Use sqrt only once for scoring calculation
+            const distanceToHome = Math.sqrt(distanceToHomeSquared);
             score += (distanceToHome - HOME_RADIUS) * 2.0;
           }
 
@@ -1726,9 +1738,12 @@ function findGatherTargetWithContext(
       continue;
     }
 
-    const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
+    // Use squared distance for comparison (modern BehaviorContext version)
+    const distanceToHomeSquared = resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y;
+    const HOME_RADIUS_SQUARED = HOME_RADIUS * HOME_RADIUS;
     let score = distanceToAgent;
-    if (distanceToHome > HOME_RADIUS) {
+    if (distanceToHomeSquared > HOME_RADIUS_SQUARED) {
+      const distanceToHome = Math.sqrt(distanceToHomeSquared);
       score += (distanceToHome - HOME_RADIUS) * 2.0;
     }
 

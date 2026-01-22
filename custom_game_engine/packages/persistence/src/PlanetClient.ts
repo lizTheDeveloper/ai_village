@@ -172,7 +172,7 @@ export class PlanetClient {
     config?: Partial<PlanetConfig>;
     id?: string;
   }): Promise<PlanetMetadata> {
-    const response = await fetch(`${this.baseUrl}/api/planets`, {
+    const response = await fetch(`${this.baseUrl}/api/planet`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

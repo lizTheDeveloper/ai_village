@@ -83,9 +83,11 @@ export class TargetingAPI {
 
     const maxDist = options?.maxDistance ?? Infinity;
     const minDist = options?.minDistance ?? 0;
+    const maxDistSq = maxDist * maxDist;
+    const minDistSq = minDist * minDist;
 
     let nearest: Entity | null = null;
-    let nearestDist = Infinity;
+    let nearestDistSq = Infinity;
 
     // Only search entities visible to this agent
     // VisionComponent tracks seen entities by category
@@ -106,15 +108,17 @@ export class TargetingAPI {
       const targetPos = (visibleEntity as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
       if (!targetPos) continue;
 
-      const dist = this.distance(position, targetPos);
+      const dx = targetPos.x - position.x;
+      const dy = targetPos.y - position.y;
+      const distSq = dx * dx + dy * dy;
 
       // Check distance bounds
-      if (dist < minDist || dist > maxDist) continue;
+      if (distSq < minDistSq || distSq > maxDistSq) continue;
 
       // Track nearest
-      if (dist < nearestDist) {
+      if (distSq < nearestDistSq) {
         nearest = visibleEntity;
-        nearestDist = dist;
+        nearestDistSq = distSq;
       }
     }
 
@@ -300,9 +304,13 @@ export class TargetingAPI {
     if (options.memoryCategory) {
       const remembered = this.getRememberedLocation(entity, options.memoryCategory);
       if (remembered) {
-        // Check if within max distance
-        const dist = this.distance(position, remembered);
-        if (!options.maxDistance || dist <= options.maxDistance) {
+        // Check if within max distance (use squared distance for comparison)
+        const dx = remembered.x - position.x;
+        const dy = remembered.y - position.y;
+        const distSq = dx * dx + dy * dy;
+        const maxDistSq = options.maxDistance ? options.maxDistance * options.maxDistance : Infinity;
+
+        if (distSq <= maxDistSq) {
           return {
             type: 'remembered',
             position: { x: remembered.x, y: remembered.y },

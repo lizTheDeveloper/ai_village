@@ -4487,10 +4487,11 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   // See docs/API_NAMESPACE_MIGRATION.md for the full migration plan
 
   // Route aliasing: NEW namespace → OLD namespace (silent, for new clients)
+  // Note: Only rewrite paths with trailing content, not exact matches that already work
   const namespaceAliases: Array<[string, string]> = [
     ['/api/game/', '/api/live/'],           // Live game queries
-    ['/api/planets', '/api/planet'],         // Planet sharing (note: no trailing slash)
-    ['/api/saves', '/api/save'],             // Save/load/fork (note: no trailing slash)
+    ['/api/planets/', '/api/planet/'],       // Planet subpaths (/:id/*, stats, etc.)
+    ['/api/saves/', '/api/save/'],           // Save/load/fork subpaths
     ['/api/server/', '/api/game-server/'],   // Game server management
   ];
 
@@ -4502,6 +4503,10 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
       break;
     }
   }
+
+  // Special case: exact matches for consistency (e.g., POST /api/planets → /api/planet)
+  // But /api/planets (GET list) already works, so only handle POST for create
+  // This is handled by the existing routes - no additional rewriting needed
 
   // Deprecation warnings: OLD namespace (emit warning, still works)
   const deprecatedPrefixes: Array<[string, string]> = [

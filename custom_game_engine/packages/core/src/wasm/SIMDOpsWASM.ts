@@ -101,10 +101,15 @@ export class SIMDOpsWASM {
       // Create memory (256 pages = 16MB)
       this.memory = new WebAssembly.Memory({ initial: this.memorySize });
 
-      // Instantiate module
+      // Instantiate module with required imports
+      // AssemblyScript compiled modules require an abort function
       this.instance = await WebAssembly.instantiate(this.module, {
         env: {
           memory: this.memory,
+          abort: (message: number, fileName: number, line: number, column: number) => {
+            // Log abort but don't throw to avoid breaking SIMD operations
+            console.error(`[WASM] Abort at line ${line}:${column}`);
+          },
         },
       });
 

@@ -23,7 +23,7 @@ show_status() {
 
   # Check services via port scanning
   local ports=(3000 3001 3002 3010 3011 8766)
-  local names=("Game (default)" "Game (alt 1)" "Game (alt 2)" "Test Screen" "Sprite Wizard" "Admin Console")
+  local names=("Game (default)" "API Server (multiverse)" "Game (alt 2)" "Test Screen" "Sprite Wizard" "Admin Console")
 
   for i in "${!ports[@]}"; do
     local port=${ports[$i]}

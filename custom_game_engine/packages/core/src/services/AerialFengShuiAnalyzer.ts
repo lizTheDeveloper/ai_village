@@ -416,11 +416,11 @@ export class AerialFengShuiAnalyzer {
 
         const dx = b.x - a.x;
         const dy = b.y - a.y;
-        // PERFORMANCE: Use squared distance for comparison
         const distanceSquared = dx * dx + dy * dy;
 
         // Check for narrow gaps that create wind tunnels (2 <= distance <= 8)
         if (distanceSquared >= 4 && distanceSquared <= 64) { // 2^2 and 8^2
+          // Only compute sqrt once for width value needed in logic and display
           const distance = Math.sqrt(distanceSquared);
           const width = distance;
           const avgHeight = (a.height + b.height) / 2;
@@ -478,12 +478,10 @@ export class AerialFengShuiAnalyzer {
 
         const dx = b.x - a.x;
         const dy = b.y - a.y;
-        // PERFORMANCE: Use squared distance for comparison
         const distanceSquared = dx * dx + dy * dy;
 
         // Straight line between tall structures at their level creates Sha Qi (5 <= distance <= 20)
         if (distanceSquared >= 25 && distanceSquared <= 400) { // 5^2 and 20^2
-          const distance = Math.sqrt(distanceSquared);
           // Check if line is mostly straight (not diagonal avoidance)
           const isAligned = Math.abs(dx) < 2 || Math.abs(dy) < 2;
 
@@ -552,7 +550,6 @@ export class AerialFengShuiAnalyzer {
         if (b.id === building.id) return false;
         const dx = b.x - building.x;
         const dy = b.y - building.y;
-        // PERFORMANCE: Use squared distance for comparison
         const distSquared = dx * dx + dy * dy;
         return distSquared < 25; // 5^2
       }).length;

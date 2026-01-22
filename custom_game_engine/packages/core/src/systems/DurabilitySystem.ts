@@ -48,8 +48,11 @@ export class DurabilitySystem extends BaseSystem {
   public readonly id: SystemId = 'durability';
   public readonly priority: number = 56; // After CraftingSystem (55)
   public readonly requiredComponents = [] as const; // Manual processing, not entity-based
-  // Event-driven system: No per-tick work, only responds to applyToolWear() calls
-  protected readonly throttleInterval: number = 0;
+  // PERF: Event-driven system - called via applyToolWear(), no per-tick work
+  // High throttle ensures onUpdate() is rarely called (it does nothing anyway)
+  protected readonly throttleInterval: number = 6000; // 5 minutes
+  // PERF: Skip system entirely when no inventory exists (tools need inventory)
+  public readonly activationComponents = ['inventory'] as const;
 
   private eventBus: EventBus | null = null;
 

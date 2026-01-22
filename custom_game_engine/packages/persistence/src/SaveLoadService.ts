@@ -79,6 +79,7 @@ export class SaveLoadService {
   private serverAvailable: boolean = false;
   private lastServerCheck: number = 0;
   private serverCheckInterval: number = 30000; // Check every 30 seconds
+  private serverSyncPendingPromise: Promise<boolean> | null = null;
 
   constructor() {}
 
@@ -87,6 +88,14 @@ export class SaveLoadService {
    * When enabled, saves are uploaded to the multiverse server.
    */
   async enableServerSync(playerId: string): Promise<boolean> {
+    // Track the pending promise so save() can wait for it
+    this.serverSyncPendingPromise = this._doEnableServerSync(playerId);
+    const result = await this.serverSyncPendingPromise;
+    this.serverSyncPendingPromise = null;
+    return result;
+  }
+
+  private async _doEnableServerSync(playerId: string): Promise<boolean> {
     multiverseClient.setPlayerId(playerId);
 
     // Check server availability
@@ -95,6 +104,7 @@ export class SaveLoadService {
 
     if (this.serverAvailable) {
       this.serverSyncEnabled = true;
+      console.log('[SaveLoad] Server sync ENABLED - saves will be uploaded');
 
       // Register player with server
       try {
@@ -288,10 +298,19 @@ export class SaveLoadService {
     // Save to storage (local)
     await this.storageBackend.save(key, saveFile);
 
+    // Wait for pending server sync initialization before deciding whether to sync
+    // This prevents race condition where save() is called before enableServerSync() completes
+    if (this.serverSyncPendingPromise) {
+      console.log('[SaveLoad] Waiting for server sync initialization before syncing save...');
+      await this.serverSyncPendingPromise;
+    }
+
     // Sync to multiverse server if enabled
     const shouldSync = this.serverSyncEnabled &&
       options.syncToServer !== false &&
       await this.checkServerAvailable();
+
+    console.log(`[SaveLoad] Sync decision: serverSyncEnabled=${this.serverSyncEnabled}, syncToServer=${options.syncToServer !== false}, shouldSync=${shouldSync}`);
 
     if (shouldSync) {
       try {
@@ -320,6 +339,7 @@ export class SaveLoadService {
             canonEvent: options.canonEvent,
           }
         );
+        console.log(`[SaveLoad] Successfully synced save to server as timeline entry (universe: ${serverUniverseId})`);
       } catch (error) {
         // Log but don't fail - local save succeeded
         console.error('[SaveLoad] Failed to sync to server:', error);

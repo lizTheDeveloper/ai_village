@@ -9,6 +9,7 @@
 
 import type { LanguageConfig } from './types.js';
 import type { TraceryGrammar } from './LanguageDescriptionGrammar.js';
+import { UNIVERSAL_PHONEMES } from './PhonemeInventory.js';
 
 /**
  * Builds Tracery grammars from language configurations
@@ -152,4 +153,43 @@ export class TraceryGrammarBuilder {
   private pickRandom<T>(array: T[]): T {
     return array[Math.floor(Math.random() * array.length)]!;
   }
+}
+
+// ============================================================================
+// Standalone Name Generation Utilities
+// ============================================================================
+
+/**
+ * Generate a random name from 2 syllables using universal phonemes
+ *
+ * Uses soft, flowing sounds appropriate for angelic/ethereal names.
+ *
+ * @param syllableCount - Number of syllables (default 2)
+ * @returns A randomly generated name
+ *
+ * @example
+ * ```typescript
+ * const name = generateRandomName(); // "nela", "rivo", "misu"
+ * const longerName = generateRandomName(3); // "nelakon"
+ * ```
+ */
+export function generateRandomName(syllableCount: number = 2): string {
+  // Extract soft consonants (nasals, liquids, fricatives - more pleasant sounds)
+  const softTypes = ['nasal', 'liquid', 'fricative', 'glide'];
+  const softConsonants = UNIVERSAL_PHONEMES.consonants
+    .filter(p => p.type && softTypes.includes(p.type))
+    .map(p => p.sound);
+
+  // All vowels
+  const vowels = UNIVERSAL_PHONEMES.vowels.map(p => p.sound);
+
+  // Build syllables as CV (consonant-vowel) pattern
+  const syllables: string[] = [];
+  for (let i = 0; i < syllableCount; i++) {
+    const consonant = softConsonants[Math.floor(Math.random() * softConsonants.length)]!;
+    const vowel = vowels[Math.floor(Math.random() * vowels.length)]!;
+    syllables.push(consonant + vowel);
+  }
+
+  return syllables.join('');
 }

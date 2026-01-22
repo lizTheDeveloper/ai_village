@@ -81,10 +81,14 @@ export class FleeBehavior extends BaseAnimalBehavior {
       return { complete: true, reason: 'Threat has no position' };
     }
 
-    const distToThreat = this.distance(position, threatPos);
+    // PERFORMANCE: Use squared distance for comparison, actual distance only for event
+    const dx = position.x - threatPos.x;
+    const dy = position.y - threatPos.y;
+    const distToThreatSquared = dx * dx + dy * dy;
+    const SAFE_DISTANCE_SQUARED = SAFE_DISTANCE * SAFE_DISTANCE;
 
     // If we're far enough, stop fleeing
-    if (distToThreat >= SAFE_DISTANCE) {
+    if (distToThreatSquared >= SAFE_DISTANCE_SQUARED) {
       this.stopMovement(entity);
       // Reduce stress gradually
       entity.updateComponent('animal', (current: AnimalComponent) => ({
@@ -112,7 +116,8 @@ export class FleeBehavior extends BaseAnimalBehavior {
       state: 'fleeing' as const,
     }));
 
-    // Emit fleeing event
+    // Emit fleeing event (compute actual distance only for reporting)
+    const distToThreat = Math.sqrt(distToThreatSquared);
     world.eventBus.emit({
       type: 'animal:fleeing',
       source: entity.id,
@@ -174,15 +179,20 @@ export class FleeBehavior extends BaseAnimalBehavior {
     if (animal.wild && animal.trustLevel < 50) {
       const agents = world.query().with('agent').with('position').executeEntities();
 
+      // PERFORMANCE: Pre-compute squared threshold
+      const THREAT_DETECTION_RANGE_SQUARED = THREAT_DETECTION_RANGE * THREAT_DETECTION_RANGE;
+
       for (const agentEntity of agents) {
         const agentPos = (agentEntity as EntityImpl).getComponent<PositionComponent>('position');
         if (!agentPos) continue;
 
-        const dist = this.distance(position, agentPos);
+        const dx = position.x - agentPos.x;
+        const dy = position.y - agentPos.y;
+        const distSquared = dx * dx + dy * dy;
 
-        if (dist <= THREAT_DETECTION_RANGE && dist < nearestDist) {
+        if (distSquared <= THREAT_DETECTION_RANGE_SQUARED && distSquared < nearestDist) {
           nearest = agentEntity;
-          nearestDist = dist;
+          nearestDist = distSquared;
         }
       }
     }
@@ -200,11 +210,14 @@ export class FleeBehavior extends BaseAnimalBehavior {
 
       // Check if this is a predator to our species
       if (this.isPredator(otherAnimalComp, animal)) {
-        const dist = this.distance(position, otherPos);
+        const dx = position.x - otherPos.x;
+        const dy = position.y - otherPos.y;
+        const distSquared = dx * dx + dy * dy;
+        const THREAT_DETECTION_RANGE_SQUARED = THREAT_DETECTION_RANGE * THREAT_DETECTION_RANGE;
 
-        if (dist <= THREAT_DETECTION_RANGE && dist < nearestDist) {
+        if (distSquared <= THREAT_DETECTION_RANGE_SQUARED && distSquared < nearestDist) {
           nearest = otherAnimal;
-          nearestDist = dist;
+          nearestDist = distSquared;
         }
       }
     }

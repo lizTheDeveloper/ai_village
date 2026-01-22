@@ -72,8 +72,11 @@ export class CookingSystem extends BaseSystem {
   public readonly id = 'cooking' as const;
   public readonly priority = 56; // Just after CraftingSystem (55)
   public readonly requiredComponents = [] as const;
-  // Event-driven system - no per-tick work needed
-  protected readonly throttleInterval: number = 0;
+  // PERF: Event-driven system - subscribes to crafting:completed, no per-tick work
+  // High throttle ensures onUpdate() is rarely called (it does nothing anyway)
+  protected readonly throttleInterval: number = 6000; // 5 minutes
+  // PERF: Skip system entirely when no agents with skills exist
+  public readonly activationComponents = ['skills'] as const;
 
   private recipeRegistry: RecipeRegistry | null = null;
 

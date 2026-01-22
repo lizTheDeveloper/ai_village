@@ -75,6 +75,8 @@ export class InvasionPlotHandler extends BaseSystem {
 
   /** Update every 100 ticks = 5 seconds */
   protected readonly throttleInterval = 100;
+  // PERF: Skip entirely when no invasions are active
+  public readonly activationComponents = [CT.Invasion] as const;
 
   /** Track invasions we've already assigned plots for */
   private processedInvasions = new Set<string>();

@@ -812,12 +812,14 @@ function generatePenteract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
         // Rotate coordinates based on phase
         const rx = dx * Math.cos(rotation) - dy * Math.sin(rotation);
         const ry = dx * Math.sin(rotation) + dy * Math.cos(rotation);
-        const dist = Math.sqrt(rx * rx + ry * ry);
+        const distSq = rx * rx + ry * ry;
+        const centerMinus1Sq = (center - 1) * (center - 1);
+        const centerMinus2Sq = (center - 2) * (center - 2);
 
         // Outer boundary
-        if (dist > center - 1) {
+        if (distSq > centerMinus1Sq) {
           row += ' ';
-        } else if (dist > center - 2) {
+        } else if (distSq > centerMinus2Sq) {
           row += TILE_SYMBOLS.WALL;
         } else {
           // Internal structure varies by phase
@@ -825,9 +827,9 @@ function generatePenteract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
           const cellY = Math.floor((ry + center) / 4);
           const phaseOffset = (cellX + cellY + phase) % 3;
 
-          if (phaseOffset === 0 && dist > 3) {
+          if (phaseOffset === 0 && distSq > 9) {
             row += TILE_SYMBOLS.WALL; // Walls shift with phase
-          } else if ((x + y + phase) % 7 === 0 && dist > 2) {
+          } else if ((x + y + phase) % 7 === 0 && distSq > 4) {
             row += TILE_SYMBOLS.PILLAR; // Pillars mark phase boundaries
           } else {
             row += TILE_SYMBOLS.FLOOR;
@@ -932,14 +934,16 @@ function generateHexeract(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
       for (let x = 0; x < size; x++) {
         const dx = x - center;
         const dy = y - center;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distSq = dx * dx + dy * dy;
+        const centerMinus1Sq = (center - 1) * (center - 1);
+        const centerMinus2Sq = (center - 2) * (center - 2);
 
         // Seed random based on position and state for reproducibility
         const cellSeed = ((x * 31 + y * 17 + state * 13) % 100) / 100;
 
-        if (dist > center - 1) {
+        if (distSq > centerMinus1Sq) {
           row += ' ';
-        } else if (dist > center - 2) {
+        } else if (distSq > centerMinus2Sq) {
           // Boundary - solid in low-chaos states, broken in high
           if (cellSeed > chaos * 0.3) {
             row += TILE_SYMBOLS.WALL;
@@ -949,12 +953,13 @@ function generateHexeract(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
         } else {
           // Interior structure depends on probability state
           const pattern = (x * y + state) % 5;
+          const centerHalfSq = (center / 2) * (center / 2);
 
           if (pattern === 0 && cellSeed < chaos) {
             row += TILE_SYMBOLS.VOID; // Void patches in chaotic states
           } else if (pattern === 1 && cellSeed > chaos * 0.5) {
             row += TILE_SYMBOLS.WALL;
-          } else if (pattern === 2 && dist < center / 2 && cellSeed < chaos * 0.8) {
+          } else if (pattern === 2 && distSq < centerHalfSq && cellSeed < chaos * 0.8) {
             row += TILE_SYMBOLS.PILLAR;
           } else {
             row += TILE_SYMBOLS.FLOOR;
@@ -1156,13 +1161,15 @@ function generateUniverseGate(spec: ExoticBuildingSpec): HigherDimensionalBuildi
     for (let x = 0; x < size; x++) {
       const dx = x - center;
       const dy = y - center;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSq = dx * dx + dy * dy;
+      const centerMinus1Sq = (center - 1) * (center - 1);
+      const centerMinus2Sq = (center - 2) * (center - 2);
 
-      if (dist > center - 1) {
+      if (distSq > centerMinus1Sq) {
         row += ' ';
-      } else if (dist > center - 2) {
+      } else if (distSq > centerMinus2Sq) {
         row += TILE_SYMBOLS.WALL;
-      } else if (dist < 3) {
+      } else if (distSq < 9) { // 3^2 = 9
         // Central portal area (marked with void)
         row += TILE_SYMBOLS.VOID;
       } else if ((x + y) % 4 === 0) {
@@ -1250,11 +1257,13 @@ function generateNexus(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
     for (let x = 0; x < size; x++) {
       const dx = x - center;
       const dy = y - center;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSq = dx * dx + dy * dy;
+      const centerMinus1Sq = (center - 1) * (center - 1);
+      const centerMinus2Sq = (center - 2) * (center - 2);
 
-      if (dist > center - 1) {
+      if (distSq > centerMinus1Sq) {
         row += ' ';
-      } else if (dist > center - 2) {
+      } else if (distSq > centerMinus2Sq) {
         row += TILE_SYMBOLS.WALL;
       } else {
         row += TILE_SYMBOLS.FLOOR;
@@ -1630,7 +1639,7 @@ function generateShell(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
       const dx = x - center;
       const dy = y - center;
       const angle = Math.atan2(dy, dx);
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dist = Math.sqrt(dx * dx + dy * dy); // Need actual distance for spiral formula
 
       // Spiral formula
       const spiralR = (angle + Math.PI) / (2 * Math.PI) * center + dist / 3;
@@ -1716,11 +1725,13 @@ function generateBubble(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
     for (let x = 0; x < size; x++) {
       const dx = x - center;
       const dy = y - center;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSq = dx * dx + dy * dy;
+      const radiusSq = radius * radius;
+      const radiusMinus1Sq = (radius - 1) * (radius - 1);
 
-      if (dist > radius) {
+      if (distSq > radiusSq) {
         row += ' ';
-      } else if (dist > radius - 1) {
+      } else if (distSq > radiusMinus1Sq) {
         row += TILE_SYMBOLS.WALL;
       } else {
         row += TILE_SYMBOLS.FLOOR;
@@ -1801,8 +1812,9 @@ function generateWebStructure(spec: ExoticBuildingSpec): VoxelBuildingDefinition
     for (let x = 1; x < size - 1; x++) {
       const dx = x - center;
       const dy = y - center;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < center - 1 && layout[y][x] === ' ') {
+      const distSq = dx * dx + dy * dy;
+      const centerMinus1Sq = (center - 1) * (center - 1);
+      if (distSq < centerMinus1Sq && layout[y][x] === ' ') {
         layout[y][x] = TILE_SYMBOLS.FLOOR;
       }
     }

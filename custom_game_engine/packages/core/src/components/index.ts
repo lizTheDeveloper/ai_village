@@ -1288,3 +1288,36 @@ export {
   type MegastructureLocation,
   type MegastructureConstruction,
 } from './MegastructureComponent.js';
+
+// Milestone System (Player progression tracking)
+export * from './MilestoneComponent.js';
+export {
+  createMilestoneComponent,
+  hasMilestone,
+  awardMilestone,
+  updateMilestoneProgress,
+  getMilestoneProgress,
+  checkPostTemporalStatus,
+  type MilestoneComponent,
+  type MilestoneId,
+  type MilestoneRecord,
+} from './MilestoneComponent.js';
+
+// MutationVector System (Performance - entity-local mutation rates)
+export * from './MutationVectorComponent.js';
+export {
+  createMutationVectorComponent,
+  setMutationRate,
+  addMutationRate,
+  clearMutationRate,
+  clearMutationsBySource,
+  getMutationRate,
+  getMutationField,
+  hasMutations,
+  getMutationFieldPaths,
+  MUTATION_PATHS,
+  type MutationVectorComponent,
+  type MutationField,
+  type MutationRateOptions,
+  type MutationPath,
+} from './MutationVectorComponent.js';

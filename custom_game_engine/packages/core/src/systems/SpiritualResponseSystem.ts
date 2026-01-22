@@ -27,6 +27,8 @@ export class SpiritualResponseSystem extends BaseSystem {
   public readonly id: SystemId = 'spiritual_response';
   public readonly priority: number = 117; // After PrayerSystem (116)
   public readonly requiredComponents = [] as const;
+  // PERF: Skip entirely when no spiritual agents exist
+  public readonly activationComponents = ['spiritual'] as const;
 
   private prayerIdCounter: number = 0;
   private recentPrayers = new Map<string, number>(); // agentId -> last prayer tick
