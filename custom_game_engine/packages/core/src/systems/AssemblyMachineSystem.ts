@@ -8,7 +8,7 @@ import type { AssemblyMachineComponent } from '../components/AssemblyMachineComp
 import type { MachineConnectionComponent, MachineSlot } from '../components/MachineConnectionComponent.js';
 import type { PowerComponent } from '../components/PowerComponent.js';
 import { calculateEffectiveSpeed } from '../components/AssemblyMachineComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import type { FactoryAIComponent } from '../components/FactoryAIComponent.js';
 import { recordProduction, recordConsumption } from '../components/FactoryAIComponent.js';
 
@@ -31,25 +31,13 @@ export class AssemblyMachineSystem extends BaseSystem {
   public readonly activationComponents = [CT.AssemblyMachine] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
-  public readonly dependsOn = ['state_mutator'] as const;
-
-  private stateMutator: StateMutatorSystem | null = null;
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
-  private deltaCleanups = new Map<string, () => void>();
-
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Skip if no entities - empty list is valid edge case
     if (ctx.activeEntities.length === 0) {
       return;
-    }
-
-    if (!this.stateMutator) {
-      throw new Error('[AssemblyMachineSystem] StateMutatorSystem not set');
     }
 
     const currentTick = ctx.tick;
@@ -64,21 +52,15 @@ export class AssemblyMachineSystem extends BaseSystem {
 
       // Skip if not powered
       if (power && !power.isPowered) {
-        // Clean up delta if machine becomes unpowered
-        if (this.deltaCleanups.has(entity.id)) {
-          this.deltaCleanups.get(entity.id)!();
-          this.deltaCleanups.delete(entity.id);
-        }
+        // Clear mutation rate if machine becomes unpowered
+        clearMutationRate(entity, 'assembly_machine.progress');
         continue;
       }
 
       // If no recipe set, agent needs to configure
       if (!machine.currentRecipe) {
-        // Clean up delta if recipe is unset
-        if (this.deltaCleanups.has(entity.id)) {
-          this.deltaCleanups.get(entity.id)!();
-          this.deltaCleanups.delete(entity.id);
-        }
+        // Clear mutation rate if recipe is unset
+        clearMutationRate(entity, 'assembly_machine.progress');
         continue;
       }
 
@@ -108,17 +90,13 @@ export class AssemblyMachineSystem extends BaseSystem {
       // Check if we have ingredients
       const hasIngredients = this.checkIngredients(recipe, connection.inputs);
       if (!hasIngredients) {
-        // Clean up delta if no ingredients
-        if (this.deltaCleanups.has(entity.id)) {
-          this.deltaCleanups.get(entity.id)!();
-          this.deltaCleanups.delete(entity.id);
-        }
+        // Clear mutation rate if no ingredients
+        clearMutationRate(entity, 'assembly_machine.progress');
         continue;
       }
 
-      // Update progress delta rate once per game minute
-      // OR if this entity doesn't have a delta yet (first time processing)
-      if (shouldUpdateDeltas || !this.deltaCleanups.has(entity.id)) {
+      // Update progress mutation rate once per game minute
+      if (shouldUpdateDeltas) {
         this.updateProgressDelta(entity, machine, power, recipe);
       }
 

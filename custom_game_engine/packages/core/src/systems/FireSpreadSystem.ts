@@ -223,8 +223,8 @@ export class FireSpreadSystem extends BaseSystem {
         durationRemaining: newDuration,
       }));
 
-      // Register/update health damage delta
-      this.updateBurningDelta(entity.id, burning.damagePerMinute);
+      // Register/update health damage mutation rate
+      this.updateBurningMutation(entity, burning.damagePerMinute);
 
       // Attempt to spread fire to nearby tiles
       this.spreadFireFromEntity(world, position, burning, weatherData, chunkManager);
@@ -295,11 +295,8 @@ export class FireSpreadSystem extends BaseSystem {
     // Remove burning component
     impl.removeComponent(CT.Burning);
 
-    // Clean up health damage delta
-    if (this.deltaCleanups.has(entity.id)) {
-      this.deltaCleanups.get(entity.id)!();
-      this.deltaCleanups.delete(entity.id);
-    }
+    // Clear health damage mutation rate
+    clearMutationRate(entity, 'needs.health');
 
     // Emit extinguish event
     world.eventBus.emit({
@@ -310,31 +307,18 @@ export class FireSpreadSystem extends BaseSystem {
   }
 
   /**
-   * Update burning DoT delta for an entity.
+   * Update burning damage mutation rate for an entity.
    */
-  private updateBurningDelta(entityId: string, damagePerMinute: number): void {
-    if (!this.stateMutator) {
-      throw new Error('[FireSpreadSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
+  private updateBurningMutation(entity: Entity, damagePerMinute: number): void {
+    // Convert damagePerMinute to rate per second (divide by 60)
+    const ratePerSecond = -damagePerMinute / 60;
 
-    // Clean up old delta if it exists
-    if (this.deltaCleanups.has(entityId)) {
-      this.deltaCleanups.get(entityId)!();
-      this.deltaCleanups.delete(entityId);
-    }
-
-    // Register new delta
-    const cleanup = this.stateMutator.registerDelta({
-      entityId,
-      componentType: CT.Needs,
-      field: 'health',
-      deltaPerMinute: -damagePerMinute,
+    // Set mutation rate on the entity
+    setMutationRate(entity, 'needs.health', ratePerSecond, {
       min: 0,
       max: 100,
       source: 'burning_damage',
     });
-
-    this.deltaCleanups.set(entityId, cleanup);
   }
 
   /**

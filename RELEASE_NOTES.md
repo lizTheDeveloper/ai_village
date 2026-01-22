@@ -1,5 +1,132 @@
 # Release Notes
 
+## 2026-01-21 - "Four Systems Migrated to MutationVectorComponent API" - 5 Files (-41 net)
+
+### 🔄 AfterlifeNeedsSystem.ts FULLY Migrated (-17 net)
+
+**Completed MutationVectorComponent API migration.**
+
+#### Removed StateMutatorSystem Integration
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
++ import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+
+- public readonly dependsOn = ['state_mutator'] as const;
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<...>();
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void { ... }
+
+// Removed runtime check:
+- if (!this.stateMutator) {
+-   throw new Error('[AfterlifeNeedsSystem] StateMutatorSystem not set');
+- }
+```
+
+**Impact:** Now uses setMutationRate()/clearMutationRate() directly. No manual cleanup tracking.
+
+---
+
+### 🔄 AssemblyMachineSystem.ts FULLY Migrated (-9 net)
+
+**Completed MutationVectorComponent API migration.**
+
+#### Removed StateMutatorSystem Integration
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
++ import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
+
+- public readonly dependsOn = ['state_mutator'] as const;
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<string, () => void>();
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void { ... }
+```
+
+**Impact:** Clean migration following established pattern.
+
+---
+
+### 🔄 BuildingMaintenanceSystem.ts FULLY Migrated (-16 net)
+
+**Completed MutationVectorComponent API migration.**
+
+#### Removed StateMutatorSystem Integration
+```typescript
+// Comment updated:
+- * PERFORMANCE: Uses StateMutatorSystem for batched condition decay (60× improvement)
++ * PERFORMANCE: Uses MutationVectorComponent for per-tick condition decay
+
+// Removed fields:
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<string, () => void>();
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void { ... }
+```
+
+**Impact:** Cleaner code, same performance characteristics.
+
+---
+
+### 🔄 FireSpreadSystem.ts Migration CONTINUED (-11 net to +4)
+
+**Completed MutationVectorComponent API migration (started in Cycle 41).**
+
+#### Method Renames and Cleanup Simplification
+```typescript
+// Method renamed:
+- this.updateBurningDelta(entity.id, burning.damagePerMinute);
++ this.updateBurningMutation(entity, burning.damagePerMinute);
+
+// Cleanup simplified:
+- if (this.deltaCleanups.has(entity.id)) {
+-   this.deltaCleanups.get(entity.id)!();
+-   this.deltaCleanups.delete(entity.id);
+- }
++ clearMutationRate(entity, 'needs.health');
+```
+
+**Impact:** Migration complete - matches pattern from other systems.
+
+---
+
+### 📊 Cycle 42 Summary
+
+**Purpose:** Migrate 4 systems to MutationVectorComponent API in one cycle.
+
+**Systems Migrated in Cycle 42:**
+- ✅ AfterlifeNeedsSystem (-17 lines)
+- ✅ AssemblyMachineSystem (-9 lines)
+- ✅ BuildingMaintenanceSystem (-16 lines)
+- ✅ FireSpreadSystem (completed, -11 to +4 lines, started in Cycle 41)
+
+**All Systems Now Using MutationVectorComponent API:**
+- AnimalSystem (Cycle 26)
+- NeedsSystem (Cycle 27)
+- BodySystem (Cycle 27)
+- AgentSwimmingSystem (Cycle 27)
+- SleepSystem (Cycle 25)
+- TemperatureSystem (Cycle 30)
+- **AfterlifeNeedsSystem (Cycle 42)** ← NEW
+- **AssemblyMachineSystem (Cycle 42)** ← NEW
+- **BuildingMaintenanceSystem (Cycle 42)** ← NEW
+- **FireSpreadSystem (Cycle 42)** ← NEW
+
+**Total Systems Migrated**: 10 systems
+
+**Pattern:**
+All migrated systems:
+- Use setMutationRate()/clearMutationRate() directly
+- No manual cleanup tracking (deltaCleanups maps removed)
+- No StateMutatorSystem fields or methods
+- Simpler, cleaner code
+
+**Impact:**
+- 41 lines of boilerplate removed across 4 systems
+- Consistent API usage across all migrated systems
+- Better code maintainability
+
+**Files:** 5 changed (+10/-51, -41 net)
+
+---
+
 ## 2026-01-21 - "FireSpreadSystem Import Update for MutationVectorComponent Migration" - 2 Files (0 net)
 
 ### 🔄 FireSpreadSystem.ts Import Update (+2/-1, +1 net)

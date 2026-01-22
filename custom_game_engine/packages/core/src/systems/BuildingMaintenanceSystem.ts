@@ -3,10 +3,10 @@
  *
  * Part of Phase 41: Autonomous Building System
  *
- * PERFORMANCE: Uses StateMutatorSystem for batched condition decay (60× improvement)
+ * PERFORMANCE: Uses MutationVectorComponent for per-tick condition decay
  * Instead of updating every 200 ticks, this system:
  * 1. Runs once per game hour to update decay rates based on weather/durability
- * 2. StateMutatorSystem handles the actual batched decay
+ * 2. StateMutatorSystem handles the actual per-tick decay via MutationVectorComponent
  * 3. Event emission handled when crossing thresholds
  *
  * Responsibilities:
@@ -80,22 +80,8 @@ export class BuildingMaintenanceSystem extends BaseSystem {
   private currentWeather: string = 'clear';
   private lastRateUpdateTick: number = 0;
 
-  // Reference to StateMutatorSystem (set via setStateMutatorSystem)
-  private stateMutator: StateMutatorSystem | null = null;
-
-  // Track cleanup functions for registered deltas
-  private deltaCleanups = new Map<string, () => void>();
-
   // Track last condition for threshold detection
   private lastConditions = new Map<string, number>();
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   /**
    * Initialize the system
@@ -116,10 +102,6 @@ export class BuildingMaintenanceSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
     const entities = ctx.activeEntities;
-    // Check if StateMutatorSystem has been set
-    if (!this.stateMutator) {
-      throw new Error('[BuildingMaintenanceSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
 
     const currentTick = world.tick ?? 0;
 
@@ -138,12 +120,8 @@ export class BuildingMaintenanceSystem extends BaseSystem {
 
       // Skip incomplete buildings
       if (!building.isComplete) {
-        // Clean up any existing deltas for incomplete buildings
-        if (this.deltaCleanups.has(entity.id)) {
-          const cleanup = this.deltaCleanups.get(entity.id)!;
-          cleanup();
-          this.deltaCleanups.delete(entity.id);
-        }
+        // Clear any mutation rates for incomplete buildings
+        clearMutationRate(entity, 'building.condition');
         continue;
       }
 
@@ -157,25 +135,15 @@ export class BuildingMaintenanceSystem extends BaseSystem {
           weatherMultiplier *
           durabilityModifier;
 
-        // Clean up old delta if it exists
-        if (this.deltaCleanups.has(entity.id)) {
-          const cleanup = this.deltaCleanups.get(entity.id)!;
-          cleanup();
-        }
+        // Convert from per-minute to per-second rate
+        const decayRatePerSecond = decayRatePerMinute / 60;
 
-        // Register new delta with StateMutatorSystem
-        const cleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Building,
-          field: 'condition',
-          deltaPerMinute: decayRatePerMinute,
+        // Set mutation rate using new API
+        setMutationRate(entity, 'building.condition', decayRatePerSecond, {
           min: 0,
           max: 100,
           source: 'building_maintenance',
         });
-
-        // Store cleanup function
-        this.deltaCleanups.set(entity.id, cleanup);
       }
 
       // Always check for threshold crossings (every tick)

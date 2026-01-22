@@ -19,7 +19,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 // Decay/recovery rates per game minute
@@ -37,30 +37,10 @@ export class AfterlifeNeedsSystem extends BaseSystem {
   public readonly activationComponents = ['afterlife'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second
 
-  public readonly dependsOn = ['state_mutator'] as const;
-
-  private stateMutator: StateMutatorSystem | null = null;
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute
-  private deltaCleanups = new Map<
-    string,
-    {
-      coherence?: () => void;
-      tether?: () => void;
-      solitude?: () => void;
-      peace?: () => void;
-    }
-  >();
-
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
-    if (!this.stateMutator) {
-      throw new Error('[AfterlifeNeedsSystem] StateMutatorSystem not set');
-    }
-
     const currentTick = ctx.tick;
     const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
@@ -126,8 +106,8 @@ export class AfterlifeNeedsSystem extends BaseSystem {
   }
 
   /**
-   * Update afterlife need delta rates for a soul entity.
-   * Registers deltas with StateMutatorSystem for batched updates.
+   * Update afterlife need mutation rates for a soul entity.
+   * Sets mutation rates on entity's MutationVectorComponent.
    */
   private updateAfterlifeDeltas(
     entity: Entity,
@@ -135,26 +115,6 @@ export class AfterlifeNeedsSystem extends BaseSystem {
     realmLocation: RealmLocationComponent,
     currentTick: number
   ): void {
-    if (!this.stateMutator) {
-      throw new Error('[AfterlifeNeedsSystem] StateMutatorSystem not set');
-    }
-
-    // Clean up old deltas
-    if (this.deltaCleanups.has(entity.id)) {
-      const cleanups = this.deltaCleanups.get(entity.id)!;
-      cleanups.coherence?.();
-      cleanups.tether?.();
-      cleanups.solitude?.();
-      cleanups.peace?.();
-    }
-
-    const cleanupFuncs: {
-      coherence?: () => void;
-      tether?: () => void;
-      solitude?: () => void;
-      peace?: () => void;
-    } = {};
-
     // Apply time dilation from realm (underworld is 4x slower)
     const timeDilation = realmLocation.timeDilation;
 
@@ -173,17 +133,13 @@ export class AfterlifeNeedsSystem extends BaseSystem {
       coherenceDecayRate *= 0.5;
     }
 
-    // Apply time dilation
-    coherenceDecayRate *= timeDilation;
+    // Apply time dilation and convert from per-minute to per-second
+    coherenceDecayRate *= timeDilation / 60;
 
-    cleanupFuncs.coherence = this.stateMutator.registerDelta({
-      entityId: entity.id,
-      componentType: CT.Afterlife,
-      field: 'coherence',
-      deltaPerMinute: coherenceDecayRate,
+    setMutationRate(entity, MUTATION_PATHS.AFTERLIFE_COHERENCE, coherenceDecayRate, {
       min: 0,
       max: 1,
-      source: 'afterlife_coherence_decay',
+      source: 'afterlife_needs',
     });
 
     // ========================================================================
@@ -202,17 +158,13 @@ export class AfterlifeNeedsSystem extends BaseSystem {
       tetherDecayRate *= 0.25;
     }
 
-    // Apply time dilation
-    tetherDecayRate *= timeDilation;
+    // Apply time dilation and convert from per-minute to per-second
+    tetherDecayRate *= timeDilation / 60;
 
-    cleanupFuncs.tether = this.stateMutator.registerDelta({
-      entityId: entity.id,
-      componentType: CT.Afterlife,
-      field: 'tether',
-      deltaPerMinute: tetherDecayRate,
+    setMutationRate(entity, MUTATION_PATHS.AFTERLIFE_TETHER, tetherDecayRate, {
       min: 0,
       max: 1,
-      source: 'afterlife_tether_decay',
+      source: 'afterlife_needs',
     });
 
     // ========================================================================
@@ -225,17 +177,13 @@ export class AfterlifeNeedsSystem extends BaseSystem {
       solitudeRate *= 0.5;
     }
 
-    // Apply time dilation
-    solitudeRate *= timeDilation;
+    // Apply time dilation and convert from per-minute to per-second
+    solitudeRate *= timeDilation / 60;
 
-    cleanupFuncs.solitude = this.stateMutator.registerDelta({
-      entityId: entity.id,
-      componentType: CT.Afterlife,
-      field: 'solitude',
-      deltaPerMinute: solitudeRate,
+    setMutationRate(entity, MUTATION_PATHS.AFTERLIFE_SOLITUDE, solitudeRate, {
       min: 0,
       max: 1,
-      source: 'afterlife_solitude_increase',
+      source: 'afterlife_needs',
     });
 
     // ========================================================================
@@ -251,19 +199,13 @@ export class AfterlifeNeedsSystem extends BaseSystem {
       peaceRate = -PEACE_GAIN * 0.5;
     }
 
-    // Apply time dilation
-    peaceRate *= timeDilation;
+    // Apply time dilation and convert from per-minute to per-second
+    peaceRate *= timeDilation / 60;
 
-    cleanupFuncs.peace = this.stateMutator.registerDelta({
-      entityId: entity.id,
-      componentType: CT.Afterlife,
-      field: 'peace',
-      deltaPerMinute: peaceRate,
+    setMutationRate(entity, MUTATION_PATHS.AFTERLIFE_PEACE, peaceRate, {
       min: 0,
       max: 1,
-      source: 'afterlife_peace_change',
+      source: 'afterlife_needs',
     });
-
-    this.deltaCleanups.set(entity.id, cleanupFuncs);
   }
 }
