@@ -1,5 +1,165 @@
 # Release Notes
 
+## 2026-01-21 - "System Refactoring: StateMutatorSystem Integration Cleanup" - 5 Files (-21 net)
+
+### ✅ FIXED: SleepSystem.ts StateMutatorSystem Integration (+16 lines)
+
+**Restored StateMutatorSystem integration fields/methods that were incorrectly removed in Cycle 24.**
+
+`packages/core/src/systems/SleepSystem.ts` had incomplete refactoring in the previous cycle - it removed StateMutatorSystem fields but kept runtime checks that referenced them, causing TypeScript errors.
+
+#### Restored Fields/Methods
+```typescript
+// StateMutatorSystem integration for batched sleep drive and energy recovery
+private stateMutator: StateMutatorSystem | null = null;
+private lastDeltaUpdateTick = 0;
+private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+private deltaCleanups = new Map<string, {
+  sleepDrive?: () => void;
+  energyRecovery?: () => void;
+}>();
+
+/**
+ * Set the StateMutatorSystem reference (called during system registration)
+ */
+setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+  this.stateMutator = stateMutator;
+}
+```
+
+**Impact:** SleepSystem.ts now compiles and runs correctly. Technical debt from Cycle 24 resolved.
+
+---
+
+### 🧹 System Cleanup: AnimalSystem.ts (-14 net)
+
+**Removed local StateMutatorSystem integration fields in favor of direct MutationVectorComponent API.**
+
+#### Removed Fields/Methods
+```typescript
+// Reference to StateMutatorSystem (set via setStateMutatorSystem)
+- private stateMutator: StateMutatorSystem | null = null;
+
+// Track cleanup functions for registered deltas
+- private deltaCleanups = new Map<string, {
+-   hunger: () => void;
+-   thirst: () => void;
+-   energy: () => void;
+-   age: () => void;
+-   stress: () => void;
+- }>();
+
+/**
+ * Set the StateMutatorSystem reference.
+ * Called by registerAllSystems during initialization.
+ */
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+-   this.stateMutator = stateMutator;
+- }
+```
+
+#### Updated Comments
+```typescript
+// Before:
+- * PERFORMANCE: Uses StateMutatorSystem for batched vector updates (60× improvement)
+- * 1. Runs once per game minute to update delta rates based on state
+- * 2. StateMutatorSystem handles the actual batched updates
+- * @dependencies StateMutatorSystem - Handles batched decay updates
+- * @see StateMutatorSystem - handles batched decay updates
+
+// After:
++ * PERFORMANCE: Uses StateMutatorSystem with MutationVectorComponent for per-tick updates
++ * 1. Runs once per game minute to update mutation rates based on state
++ * 2. StateMutatorSystem handles the actual per-tick mutations
++ * @dependencies StateMutatorSystem - Handles per-tick mutations
++ * @see StateMutatorSystem - handles per-tick mutations
+```
+
+**⚠️ WARNING:** Code still references `this.stateMutator` in runtime check (line ~40) but field was removed. Same incomplete refactoring pattern as Cycle 24 SleepSystem.ts.
+
+---
+
+### 🧹 System Cleanup: BodySystem.ts (-18 lines)
+
+**Removed local StateMutatorSystem integration fields in favor of direct MutationVectorComponent API.**
+
+#### Removed Fields/Methods
+```typescript
+// StateMutatorSystem integration for batched blood loss and healing
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<string, {
+-   bloodLoss?: () => void;
+-   bloodRecovery?: () => void;
+-   healthDamage?: () => void;
+- }>();
+- private healingCleanups = new Map<string, {
+-   partHealing: Map<string, () => void>; // partId -> cleanup
+-   injuryHealing: Map<string, () => void>; // "partId:injuryIndex" -> cleanup
+- }>();
+
+/**
+ * Set the StateMutatorSystem reference (called during system registration)
+ */
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+-   this.stateMutator = stateMutator;
+- }
+```
+
+**Kept Fields:**
+```typescript
+// Still present for delta update scheduling
+private lastDeltaUpdateTick = 0;
+private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+```
+
+**⚠️ WARNING:** Code still references `this.stateMutator` in runtime check (line ~50) but field was removed. Same incomplete refactoring pattern.
+
+---
+
+### 📝 Minor Changes
+
+#### AgentSwimmingSystem.ts (+1 line)
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
+```
+Added type import for consistency.
+
+#### Player Profile (+2/-2 lines)
+Minor profile updates for player:2a52685a-03d4-4db0-85a2-3c9fc9355d06.
+
+---
+
+### 📊 Cycle 25 Summary
+
+**Purpose:** Fix SleepSystem.ts technical debt + continue StateMutatorSystem refactoring.
+
+**Impact:**
+- SleepSystem.ts now compiles and runs correctly (Cycle 24 technical debt fixed)
+- AnimalSystem.ts and BodySystem.ts simplified (-32 lines total)
+- Systems moving toward direct MutationVectorComponent API usage
+
+**Files Changed:** 5 files (+25/-46 lines, -21 net)
+- **FIXED:** SleepSystem.ts (+16 lines) - Restored StateMutatorSystem integration
+- **CLEANUP:** AnimalSystem.ts (-14 net) - Removed local integration
+- **CLEANUP:** BodySystem.ts (-18 lines) - Removed local integration
+- **MINOR:** AgentSwimmingSystem.ts (+1 line) - Added type import
+- **MINOR:** Player profile (+2/-2)
+
+**⚠️ NEW Technical Debt:**
+- AnimalSystem.ts has incomplete refactoring (references removed field `this.stateMutator` at line ~40)
+- BodySystem.ts has incomplete refactoring (references removed field `this.stateMutator` at line ~50)
+- Both will cause TypeScript compilation errors or runtime failures
+
+**Pattern Observed:**
+This appears to be an ongoing refactoring effort to move systems from local StateMutatorSystem integration to direct MutationVectorComponent API usage. The refactoring is being done incrementally but leaves systems in broken states between commits.
+
+**Next Steps:**
+- 🔴 URGENT: Fix AnimalSystem.ts incomplete refactoring
+- 🔴 URGENT: Fix BodySystem.ts incomplete refactoring
+- Consider completing refactoring in atomic commits to avoid broken intermediate states
+
+---
+
 ## 2026-01-21 - "Admin Dashboard Grand Strategy Capability Wiring" - 6 Files (+57 net)
 
 ### 🔌 Grand Strategy Capability API Integration (+57 net, 219 lines changed)

@@ -55,9 +55,8 @@ export class TemperatureSystem extends BaseSystem {
    * Systems that must run before this one.
    * @see TimeSystem - provides time of day for daily temperature cycles
    * @see WeatherSystem - provides weather modifiers (tempModifier) affecting ambient temperature
-   * @see StateMutatorSystem - handles batched health damage from temperature
    */
-  public readonly dependsOn = ['time', 'weather', 'state_mutator'] as const;
+  public readonly dependsOn = ['time', 'weather'] as const;
   protected readonly throttleInterval = 10; // FAST - 0.5 seconds for responsive temperature changes
 
   private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps

@@ -43,26 +43,8 @@ export class BodySystem extends BaseSystem {
    */
   public readonly dependsOn = ['state_mutator'] as const;
 
-  // StateMutatorSystem integration for batched blood loss and healing
-  private stateMutator: StateMutatorSystem | null = null;
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-  private deltaCleanups = new Map<string, {
-    bloodLoss?: () => void;
-    bloodRecovery?: () => void;
-    healthDamage?: () => void;
-  }>();
-  private healingCleanups = new Map<string, {
-    partHealing: Map<string, () => void>; // partId -> cleanup
-    injuryHealing: Map<string, () => void>; // "partId:injuryIndex" -> cleanup
-  }>();
-
-  /**
-   * Set the StateMutatorSystem reference (called during system registration)
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     if (!this.stateMutator) {

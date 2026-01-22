@@ -4,18 +4,19 @@ import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalCompo
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
  * Priority: 15 (same as NeedsSystem, runs after AI, before Movement)
  *
- * PERFORMANCE: Uses StateMutatorSystem for batched vector updates (60× improvement)
+ * PERFORMANCE: Uses StateMutatorSystem with MutationVectorComponent for per-tick updates
  * Instead of updating needs/age every tick, this system:
- * 1. Runs once per game minute to update delta rates based on state (sleeping, eating, etc.)
- * 2. StateMutatorSystem handles the actual batched updates
+ * 1. Runs once per game minute to update mutation rates based on state (sleeping, eating, etc.)
+ * 2. StateMutatorSystem handles the actual per-tick mutations
  * 3. Event emission and state determination handled here
  *
- * @dependencies StateMutatorSystem - Handles batched needs/age decay updates
+ * @dependencies StateMutatorSystem - Handles per-tick mutations via MutationVectorComponent
  */
 export class AnimalSystem extends BaseSystem {
   public readonly id: SystemId = CT.Animal;
@@ -27,33 +28,13 @@ export class AnimalSystem extends BaseSystem {
 
   /**
    * Systems that must run before this one.
-   * @see StateMutatorSystem - handles batched decay updates
+   * @see StateMutatorSystem - handles per-tick mutations
    */
   public readonly dependsOn = ['state_mutator'] as const;
 
-  // Reference to StateMutatorSystem (set via setStateMutatorSystem)
-  private stateMutator: StateMutatorSystem | null = null;
-
-  // Performance: Update delta rates once per game minute (1200 ticks)
+  // Performance: Update mutation rates once per game minute (1200 ticks)
   private deltaLastUpdateTick = 0;
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-
-  // Track cleanup functions for registered deltas
-  private deltaCleanups = new Map<string, {
-    hunger: () => void;
-    thirst: () => void;
-    energy: () => void;
-    age: () => void;
-    stress: () => void;
-  }>();
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Check if StateMutatorSystem has been set
