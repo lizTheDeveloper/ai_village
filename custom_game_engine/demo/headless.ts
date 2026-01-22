@@ -64,7 +64,7 @@ import {
   StructuredPromptBuilder,
   TalkerPromptBuilder,
   ExecutorPromptBuilder,
-  LoadBalancingProvider,
+  FallbackProvider,
   type LLMProvider,
 } from '@ai-village/llm';
 
@@ -383,20 +383,25 @@ async function setupLLMProvider(): Promise<{
     }
   }
 
-  // If we have cloud providers, use load balancing across them
+  // If we have cloud providers, use Groq as primary with fallback
+  // Groq: 1000 RPM (primary), Cerebras: 30 RPM (fallback only)
   if (cloudProviders.length > 0) {
     let provider: LLMProvider;
     if (cloudProviders.length === 1) {
       provider = cloudProviders[0]!;
       console.log(`[HeadlessGame] Using single cloud provider: ${provider.getModelName()}`);
     } else {
-      provider = new LoadBalancingProvider(cloudProviders, 'cloud-balanced');
-      console.log(`[HeadlessGame] Using load-balanced cloud providers (${cloudProviders.length} providers)`);
+      // Use FallbackProvider: Groq primary (1000 RPM), Cerebras fallback (30 RPM)
+      provider = new FallbackProvider(cloudProviders, {
+        retryAfterMs: 60000,        // Retry failed provider after 1 minute
+        maxConsecutiveFailures: 3,   // Disable after 3 consecutive failures
+        logFallbacks: true,
+      });
+      console.log(`[HeadlessGame] Using Groq as primary, Cerebras as fallback (${cloudProviders.length} providers)`);
     }
 
-    // Use higher concurrency to fully utilize provider rate limits
-    // With 1000 req/min per provider, 50 concurrent should be safe
-    const maxConcurrent = cloudProviders.length * 50;
+    // Groq has 1000 RPM = ~17 RPS; 50 concurrent handles this well
+    const maxConcurrent = 50;
     console.log(`[HeadlessGame] Max concurrent LLM requests: ${maxConcurrent}`);
 
     return {

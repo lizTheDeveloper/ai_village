@@ -219,7 +219,7 @@ export class MultiverseClient {
    * Delete a universe (marks as deleted)
    */
   async deleteUniverse(universeId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}`, {
       method: 'DELETE',
     });
 
@@ -287,7 +287,7 @@ export class MultiverseClient {
       });
     }
 
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}/snapshot`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/snapshot`, {
       method: 'POST',
       headers,
       body,

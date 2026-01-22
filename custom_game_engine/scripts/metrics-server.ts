@@ -141,7 +141,7 @@ import {
   LLMRequestRouter,
   DEFAULT_RATE_LIMITS,
   type LLMRequestPayload,
-} from '../packages/llm/dist/index.js';
+} from '../packages/llm/src/index.js';
 
 // Admin module for unified dashboard
 import { createAdminRouter } from '../packages/core/src/admin/index.js';
@@ -187,7 +187,7 @@ if (groqApiKey || cerebrasApiKey) {
   if (groqProvider) {
     poolConfig.groq = {
       provider: groqProvider,
-      maxConcurrent: 10, // Allow 10 concurrent requests to fully utilize 2000 RPM limit
+      maxConcurrent: 50, // 1000 RPM = ~17 RPS; with ~1-2s latency need 50 concurrent to saturate
       fallbackChain: cerebrasProvider ? ['cerebras'] : [],
     };
     llmProvidersConfigured.push('groq');
@@ -196,7 +196,7 @@ if (groqApiKey || cerebrasApiKey) {
   if (cerebrasProvider) {
     poolConfig.cerebras = {
       provider: cerebrasProvider,
-      maxConcurrent: 10, // Allow 10 concurrent requests to fully utilize 2000 RPM limit
+      maxConcurrent: 5, // 30 RPM = 0.5 RPS; 5 concurrent is plenty (fallback from Groq)
       fallbackChain: groqProvider ? ['groq'] : [],
     };
     llmProvidersConfigured.push('cerebras');

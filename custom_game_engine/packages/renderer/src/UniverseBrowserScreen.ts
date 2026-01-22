@@ -176,7 +176,7 @@ export class UniverseBrowserScreen {
     const enrichPromises = this.serverUniverses.map(async (universe) => {
       // Fetch fork count
       try {
-        const forksResponse = await fetch(`${this.API_BASE}/universe/${universe.id}/forks`);
+        const forksResponse = await fetch(`${this.API_BASE}/multiverse/universe/${universe.id}/forks`);
         if (forksResponse.ok) {
           const forksData = await forksResponse.json();
           universe.forkCount = forksData.forks?.length || 0;
@@ -193,7 +193,7 @@ export class UniverseBrowserScreen {
         } else {
           // Fetch parent metadata
           try {
-            const parentResponse = await fetch(`${this.API_BASE}/universe/${universe.forkOf.universeId}`);
+            const parentResponse = await fetch(`${this.API_BASE}/multiverse/universe/${universe.forkOf.universeId}`);
             if (parentResponse.ok) {
               const parentData = await parentResponse.json();
               universe.forkOf.universeName = parentData.universe?.name;

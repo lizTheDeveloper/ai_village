@@ -33,12 +33,12 @@ export interface ProviderRateLimits {
 
 export const DEFAULT_RATE_LIMITS: ProviderRateLimits = {
   groq: {
-    requestsPerMinute: 1000, // 1000 requests per minute per provider
+    requestsPerMinute: 1000, // Groq: 1K RPM for most models (llama-3.3-70b, qwen3-32b)
     burstSize: 50,
   },
   cerebras: {
-    requestsPerMinute: 1000, // 1000 requests per minute per provider
-    burstSize: 50,
+    requestsPerMinute: 30, // Cerebras: 30 RPM, 900/hour (much lower than Groq!)
+    burstSize: 10,
   },
   openai: {
     requestsPerMinute: 10, // Conservative estimate

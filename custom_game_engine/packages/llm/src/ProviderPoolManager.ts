@@ -201,6 +201,13 @@ export class ProviderPoolManager {
   }
 
   /**
+   * Check if a provider is configured
+   */
+  hasProvider(providerName: string): boolean {
+    return this.queues.has(providerName);
+  }
+
+  /**
    * Get all provider names
    */
   getProviderNames(): string[] {

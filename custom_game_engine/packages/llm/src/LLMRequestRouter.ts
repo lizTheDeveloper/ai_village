@@ -64,6 +64,11 @@ export class LLMRequestRouter {
   private providerMappings: Map<string, ProviderMapping>;
   private defaultModel: string = 'qwen-3-32b';
 
+  // Load balancing: weighted counter for distributing across providers
+  // Groq gets ~97% of requests (1000 RPM), Cerebras ~3% (30 RPM) as fallback
+  private requestCounter: number = 0;
+  private loadBalanceProviders: string[] = ['groq']; // Groq primary; Cerebras only as fallback due to 30 RPM limit
+
   // Cost and metrics tracking
   public costTracker: CostTracker;
   public metricsCollector: QueueMetricsCollector;
@@ -268,6 +273,7 @@ export class LLMRequestRouter {
 
   /**
    * Detect provider from model or custom config
+   * Uses round-robin load balancing when no specific model is requested
    */
   private detectProvider(
     model?: string,
@@ -277,6 +283,21 @@ export class LLMRequestRouter {
     if (customConfig?.baseUrl) {
       const provider = this.detectProviderFromUrl(customConfig.baseUrl);
       return { provider, queueName: provider };
+    }
+
+    // Load balance when no specific model is requested
+    // This distributes load across all available providers
+    if (!model) {
+      const availableProviders = this.loadBalanceProviders.filter(p =>
+        this.poolManager.hasProvider(p)
+      );
+
+      if (availableProviders.length > 0) {
+        // Round-robin selection
+        const selectedProvider = availableProviders[this.requestCounter % availableProviders.length]!;
+        this.requestCounter++;
+        return { provider: selectedProvider, queueName: selectedProvider };
+      }
     }
 
     // Standard model

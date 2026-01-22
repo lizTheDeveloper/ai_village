@@ -145,7 +145,7 @@ class MultiverseClient {
     const tick = parseInt(universeSnapshot.time.universeTick, 10);
     const day = universeSnapshot.time.day;
 
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}/snapshot`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/snapshot`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

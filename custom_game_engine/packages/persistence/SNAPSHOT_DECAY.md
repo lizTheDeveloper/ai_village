@@ -176,7 +176,7 @@ Remove decayed snapshots.
 }
 ```
 
-### GET /api/universe/:id/decay-preview?currentTick=50000
+### GET /api/multiverse/universe/:id/decay-preview?currentTick=50000
 
 Preview which snapshots would be decayed (dry-run).
 
