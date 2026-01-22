@@ -1,5 +1,153 @@
 # Release Notes
 
+## 2026-01-21 - "API Namespace Migration Phase 1 Documentation" - 3 Files (+54 net)
+
+### 📚 API_NAMESPACE_MIGRATION.md Updated (+54 net)
+
+**Documented Phase 1 completion and clarified Phase 2/3 plans.**
+
+#### Status Table Added
+```markdown
+| Phase | Status | Description |
+|-------|--------|-------------|
+| **Phase 1** | ✅ COMPLETE | metrics-server namespace aliasing + client migration |
+| **Phase 2** | ⬜ PENDING | api-server namespace reorganization |
+| **Phase 3** | ⬜ PENDING | Remove deprecated routes |
+```
+
+#### Phase 1 Implementation Details
+**Added documentation of aliasing implementation** (metrics-server.ts, line ~4484):
+```typescript
+const namespaceAliases: Array<[string, string]> = [
+  ['/api/game/', '/api/live/'],           // Live game queries
+  ['/api/planets/', '/api/planet/'],      // Planet subpaths
+  ['/api/saves/', '/api/save/'],          // Save/load/fork
+  ['/api/server/', '/api/game-server/'],  // Server management
+];
+```
+
+**Client Files Migrated (127+ replacements across 25+ files):**
+- Admin capabilities (21 files, 105 replacements): `/api/live/` → `/api/game/`
+- PlanetClient.ts: Uses `/api/planets/`
+- ProxyLLMProvider.ts, HtmlRenderer.ts: Use `/api/game/status`
+- MetricsIntegration.test.ts: 18 replacements
+- test-rebellion.ts: 2 replacements
+
+#### Phase 2 Routes Clarified
+**api-server (Port 3001) - Routes to migrate:**
+
+**Soul Routes:**
+- `POST /api/save-soul` → `POST /api/souls/save`
+- `GET /api/soul-repository/stats` → `GET /api/souls/stats`
+- `POST /api/generate-soul-sprite` → `POST /api/souls/sprite`
+
+**Species Routes:**
+- `POST /api/save-alien-species` → `POST /api/species/save`
+- `GET /api/alien-species` → `GET /api/species`
+- `POST /api/generate-sprite` → `POST /api/species/sprite`
+
+**Universe/Multiverse Routes:**
+- `* /api/universe/*` → `* /api/multiverse/universe/*`
+- `GET /api/universes` → `GET /api/multiverse/universes`
+- `* /api/passage/*` → `* /api/multiverse/passage/*`
+- `GET /api/passages` → `GET /api/multiverse/passages`
+- `* /api/player/*` → `* /api/multiverse/player/*`
+
+#### Restructuring
+- Renamed "Proposed Solution" → "Namespace Design"
+- Added "Architecture" section
+- Added "Migration Status" section
+- Added "Known Behaviors" section
+- Updated testing checklist with Phase 1 completion
+
+**Impact:** Clear documentation of what was done in Phase 1 and what needs to happen in Phase 2/3.
+
+---
+
+### 📝 api-server.ts Header Comment (+29 lines)
+
+**Expanded header with complete API namespace plan.**
+
+#### Added
+```typescript
+/**
+ * Multiverse API Server (Port 3001)
+ *
+ * Persistence and multiverse management server, separate from game runtime (8766).
+ *
+ * API Namespaces:
+ *
+ * /api/multiverse/*  - Universe/multiverse operations
+ *   - /api/universe, /api/universes - Universe CRUD (Phase 2: → /api/multiverse/universe/*)
+ *   - /api/passage, /api/passages   - Inter-universe connections (Phase 2: → /api/multiverse/passage/*)
+ *   - /api/player/*                 - Player registration (Phase 2: → /api/multiverse/player/*)
+ *   - /api/multiverse/stats         - Multiverse statistics (already correct)
+ *
+ * /api/souls/*  - Soul repository (eternal storage)
+ *   - /api/save-soul              - Save soul (Phase 2: → /api/souls/save)
+ *   - /api/soul-repository/stats  - Repository stats (Phase 2: → /api/souls/stats)
+ *   - /api/generate-soul-sprite   - Generate sprite (Phase 2: → /api/souls/sprite)
+ *
+ * /api/species/*  - Alien species database
+ *   - /api/alien-species          - List species (Phase 2: → /api/species)
+ *   - /api/save-alien-species     - Save species (Phase 2: → /api/species/save)
+ *   - /api/generate-sprite        - Generate sprite (Phase 2: → /api/species/sprite)
+ *
+ * See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
+ */
+```
+
+**Before:** Generic "PixelLab proxying, soul repository, snapshots, multiverse" comment.
+
+**Impact:** Developers can see the intended API structure at a glance.
+
+---
+
+### 📝 universe-api.ts Comment (+10 lines)
+
+**Added Phase 2 migration route mappings.**
+
+#### Added
+```typescript
+/**
+ * Current Routes (Phase 2 Migration Pending):
+ *   /api/universe/*   → /api/multiverse/universe/*
+ *   /api/universes    → /api/multiverse/universes
+ *   /api/passage/*    → /api/multiverse/passage/*
+ *   /api/passages     → /api/multiverse/passages
+ *   /api/player/*     → /api/multiverse/player/*
+ *   /api/multiverse/stats (already correct)
+ *
+ * See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
+ */
+```
+
+**Impact:** Developers working on universe-api.ts can see what needs to be migrated.
+
+---
+
+### 📊 Cycle 31 Summary
+
+**Purpose:** Document Phase 1 completion and clarify Phase 2/3 plans.
+
+**Changes:**
+- Updated API_NAMESPACE_MIGRATION.md with implementation details
+- Added route migration tables for Phase 2
+- Expanded api-server.ts header with API namespace plan
+- Added universe-api.ts migration comment
+
+**Impact:**
+- Clear documentation of completed work (Phase 1)
+- Clear roadmap for future work (Phases 2-3)
+- Code comments guide developers to full documentation
+
+**Migration Status:**
+- **Phase 1** ✅ COMPLETE - metrics-server (Port 8766) aliasing + 127+ client replacements
+- **Phase 2** ⬜ PENDING - api-server (Port 3001) reorganization
+- **Phase 3** ⬜ PENDING - Remove deprecated routes
+
+---
+
 ## 2026-01-21 - "TemperatureSystem Migration + SleepSystem/BodySystem Registration Cleanup" - 7 Files (+7 net)
 
 ### 🔄 TemperatureSystem.ts FULLY Migrated (-14 lines)

@@ -1,11 +1,28 @@
 #!/usr/bin/env tsx
 /**
- * Multiverse API Server
- * Runs on port 3001 to handle:
- * - PixelLab API proxying and species persistence
- * - Soul repository (eternal soul storage)
- * - Universe snapshots and timeline management
- * - Cross-player multiverse connections
+ * Multiverse API Server (Port 3001)
+ *
+ * Persistence and multiverse management server, separate from the game runtime server (8766).
+ *
+ * API Namespaces:
+ *
+ * /api/multiverse/*  - Universe/multiverse operations
+ *   - /api/universe, /api/universes - Universe CRUD (Phase 2: → /api/multiverse/universe/*)
+ *   - /api/passage, /api/passages   - Inter-universe connections (Phase 2: → /api/multiverse/passage/*)
+ *   - /api/player/*                 - Player registration (Phase 2: → /api/multiverse/player/*)
+ *   - /api/multiverse/stats         - Multiverse statistics (already correct)
+ *
+ * /api/souls/*  - Soul repository (eternal storage)
+ *   - /api/save-soul              - Save soul (Phase 2: → /api/souls/save)
+ *   - /api/soul-repository/stats  - Repository stats (Phase 2: → /api/souls/stats)
+ *   - /api/generate-soul-sprite   - Generate sprite (Phase 2: → /api/souls/sprite)
+ *
+ * /api/species/*  - Alien species database
+ *   - /api/alien-species          - List species (Phase 2: → /api/species)
+ *   - /api/save-alien-species     - Save species (Phase 2: → /api/species/save)
+ *   - /api/generate-sprite        - Generate sprite (Phase 2: → /api/species/sprite)
+ *
+ * See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
  */
 
 import express from 'express';

@@ -4,6 +4,7 @@ import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalCompo
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
@@ -34,6 +35,14 @@ export class AnimalSystem extends BaseSystem {
   // Performance: Update mutation rates once per game minute (1200 ticks)
   private deltaLastUpdateTick = 0;
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+
+  /**
+   * Set the StateMutatorSystem reference.
+   * Called by registerAllSystems during initialization.
+   */
+  setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
+    // No-op: Uses setMutationRate() directly from MutationVectorComponent
+  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Performance: Only update mutation rates once per game minute

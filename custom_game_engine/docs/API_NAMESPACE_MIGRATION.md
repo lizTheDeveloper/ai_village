@@ -1,6 +1,14 @@
 # API Namespace Migration Plan
 
-## Current State
+## Migration Status
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| **Phase 1** | ✅ COMPLETE | metrics-server namespace aliasing + client migration |
+| **Phase 2** | ⬜ PENDING | api-server namespace reorganization |
+| **Phase 3** | ⬜ PENDING | Remove deprecated routes |
+
+## Architecture
 
 ### Two Servers
 
@@ -9,27 +17,26 @@
 | **8766** | metrics-server.ts | Game runtime, LLM, sprites, planets, admin | ~8500 |
 | **3001** | api-server.ts | Multiverse, souls, universes | ~200 |
 
-### Problem
-Both use `/api/*` namespace with no clear separation. This causes:
+### Original Problem
+Both used `/api/*` namespace with no clear separation. This caused:
 - Confusion about which server handles what
 - Potential routing conflicts if servers are consolidated
 - PlanetClient pointing to wrong port initially returned endpoint docs
 
-## Proposed Solution
+## Namespace Design
 
-### Option A: Keep Two Servers, Distinct Namespaces (Recommended)
+### Port 8766 (metrics-server) - Game Runtime ✅
 
-**Port 8766 (metrics-server) - Game Runtime:**
 ```
-/api/game/*     - Live game queries (was /api/live/*)
+/api/game/*     - Live game queries (NEW, maps to /api/live/*)
 /api/actions/*  - Game actions (unchanged)
 /api/llm/*      - LLM queue (unchanged)
-/api/planets/*  - Planet sharing (was /api/planet*)
+/api/planets/*  - Planet sharing (NEW, maps to /api/planet/*)
 /api/sprites/*  - Sprite generation (unchanged)
 /api/pixellab/* - PixelLab daemon (unchanged)
 /api/headless/* - Headless games (unchanged)
-/api/server/*   - Game server management (was /api/game-server/*)
-/api/saves/*    - Save/load/fork (was /api/save*)
+/api/server/*   - Game server management (NEW, maps to /api/game-server/*)
+/api/saves/*    - Save/load/fork (NEW, maps to /api/save/*)
 /api/canon/*    - Canon events (unchanged)
 /api/microgen/* - Microgen/riddles (unchanged)
 /api/animations/* - Animation queue (unchanged)
@@ -38,95 +45,115 @@ Both use `/api/*` namespace with no clear separation. This causes:
 /metrics/*      - Raw metrics
 ```
 
-**Port 3001 (api-server) - Persistence & Multiverse:**
+### Port 3001 (api-server) - Persistence & Multiverse ⬜
+
+**Current routes (to be migrated):**
 ```
-/api/multiverse/*  - Universe management
-  /api/multiverse/universes     - List universes
-  /api/multiverse/universe/:id  - CRUD operations
-  /api/multiverse/snapshots/*   - Snapshot management
-  /api/multiverse/passages/*    - Inter-universe passages
-  /api/multiverse/players/*     - Player management
-  /api/multiverse/stats         - Multiverse statistics
+/api/universe/*         → /api/multiverse/universe/*
+/api/universes          → /api/multiverse/universes
+/api/passage/*          → /api/multiverse/passage/*
+/api/passages           → /api/multiverse/passages
+/api/player/*           → /api/multiverse/player/*
+/api/multiverse/stats   - Already correct!
 
-/api/souls/*       - Soul repository
-  /api/souls           - List souls
-  /api/souls/:id       - Get soul
-  /api/souls/save      - Save soul
-  /api/souls/stats     - Repository stats
-  /api/souls/sprite    - Generate soul sprite
+/api/save-soul          → /api/souls/save
+/api/soul-repository/*  → /api/souls/*
+/api/generate-soul-sprite → /api/souls/sprite
 
-/api/species/*     - Alien species
-  /api/species         - List species
-  /api/species/save    - Save species
-  /api/species/sprite  - Generate sprite
+/api/save-alien-species → /api/species/save
+/api/alien-species      → /api/species
+/api/generate-sprite    → /api/species/sprite
 ```
 
-## Migration Steps
+## Phase 1: metrics-server ✅ COMPLETE
 
-### Phase 1: Rename with Backwards Compatibility
+### Implementation Details
 
-1. **Add new routes alongside old ones**
-   - `/api/live/*` → also available at `/api/game/*`
-   - `/api/planet*` → also available at `/api/planets/*`
-   - `/api/save*` → also available at `/api/saves/*`
-   - `/api/game-server/*` → also available at `/api/server/*`
+Added namespace aliasing in `scripts/metrics-server.ts` (line ~4484):
 
-2. **Add deprecation warnings to old routes**
-   ```typescript
-   if (pathname.startsWith('/api/live/')) {
-     console.warn('[DEPRECATED] Use /api/game/* instead of /api/live/*');
-   }
-   ```
+```typescript
+// Route aliasing: NEW namespace → OLD namespace (silent, for new clients)
+const namespaceAliases: Array<[string, string]> = [
+  ['/api/game/', '/api/live/'],           // Live game queries
+  ['/api/planets/', '/api/planet/'],       // Planet subpaths (/:id/*, stats, etc.)
+  ['/api/saves/', '/api/save/'],           // Save/load/fork subpaths
+  ['/api/server/', '/api/game-server/'],   // Game server management
+];
 
-3. **Update client code to use new routes**
-   - PlanetClient.ts
-   - saveLoadService
-   - Any other API clients
+for (const [newPrefix, oldPrefix] of namespaceAliases) {
+  if (pathname.startsWith(newPrefix)) {
+    pathname = oldPrefix + pathname.slice(newPrefix.length);
+    break;
+  }
+}
+```
 
-### Phase 2: Update API Server (3001)
+### Client Files Migrated
 
-1. **Reorganize universe routes under /api/multiverse/**
-   - `/api/universe/*` → `/api/multiverse/universe/*`
+**Admin Capabilities (21 files, 105 replacements):**
+- `/api/live/` → `/api/game/` in all files under `packages/core/src/admin/capabilities/`
 
-2. **Reorganize soul routes under /api/souls/**
-   - `/api/save-soul` → `/api/souls/save`
-   - `/api/soul-repository/stats` → `/api/souls/stats`
+**Other Client Files:**
+- `packages/persistence/src/PlanetClient.ts` - Uses `/api/planets/` for queries
+- `packages/llm/src/ProxyLLMProvider.ts` - Uses `/api/game/status`
+- `packages/core/src/admin/HtmlRenderer.ts` - Uses `/api/game/status`
+- `packages/renderer/src/__tests__/MetricsIntegration.test.ts` - 18 replacements
+- `scripts/test-rebellion.ts` - 2 replacements
 
-3. **Reorganize species routes under /api/species/**
-   - `/api/save-alien-species` → `/api/species/save`
-   - `/api/alien-species` → `/api/species`
+**Total: 127+ replacements across 25+ files**
 
-### Phase 3: Remove Deprecated Routes
+### Known Behaviors
 
-After confirming all clients use new routes:
-1. Remove old route handlers
-2. Update documentation
+1. `GET /api/planets` returns planet list (no aliasing needed - exact match works)
+2. `POST /api/planet` creates a planet (handler location, used by PlanetClient)
+3. `GET /api/planets/:id` aliased to `/api/planet/:id` (subpath rewriting)
 
-## Files to Modify
+## Phase 2: api-server ⬜ PENDING
 
-### Server Side
-- `scripts/metrics-server.ts` - Add new route aliases, deprecation warnings
-- `demo/src/api-server.ts` - Reorganize routes under new namespaces
-- `demo/src/universe-api.ts` - Update route definitions
+### Routes to Reorganize
 
-### Client Side
-- `packages/persistence/src/PlanetClient.ts` - Update baseUrl handling
-- `packages/persistence/src/saveLoadService.ts` - Update API paths
-- `demo/src/main.ts` - Update any direct API calls
-- `demo/vite.config.ts` - Update proxy routes
+**Soul Routes:**
+| Old Route | New Route |
+|-----------|-----------|
+| `POST /api/save-soul` | `POST /api/souls/save` |
+| `GET /api/soul-repository/stats` | `GET /api/souls/stats` |
+| `POST /api/generate-soul-sprite` | `POST /api/souls/sprite` |
 
-## Timeline
+**Species Routes:**
+| Old Route | New Route |
+|-----------|-----------|
+| `POST /api/save-alien-species` | `POST /api/species/save` |
+| `GET /api/alien-species` | `GET /api/species` |
+| `POST /api/generate-sprite` | `POST /api/species/sprite` |
 
-1. **Immediate**: Fix current `/api/planets` issue (DONE - added `?? []`)
-2. **Phase 1**: Add new routes with backwards compatibility
-3. **Phase 2**: Update all clients
-4. **Phase 3**: Remove deprecated routes (after 2 weeks)
+**Universe/Multiverse Routes:**
+| Old Route | New Route |
+|-----------|-----------|
+| `* /api/universe/*` | `* /api/multiverse/universe/*` |
+| `GET /api/universes` | `GET /api/multiverse/universes` |
+| `* /api/passage/*` | `* /api/multiverse/passage/*` |
+| `GET /api/passages` | `GET /api/multiverse/passages` |
+| `* /api/player/*` | `* /api/multiverse/player/*` |
+| `GET /api/multiverse/stats` | ✅ Already correct |
+
+### Files to Update
+
+1. `demo/src/api-server.ts` - Add namespace aliasing middleware
+2. `demo/src/universe-api.ts` - Update route definitions (or add aliasing)
+3. Update any clients calling api-server directly
+
+## Phase 3: Remove Deprecated Routes ⬜ PENDING
+
+After 2 weeks of backwards compatibility:
+1. Remove old route aliases in metrics-server
+2. Remove old route handlers in api-server
+3. Update documentation to show only new routes
 
 ## Testing Checklist
 
-- [ ] `/api/planets` returns planet list
-- [ ] `/api/game/status` returns game status
-- [ ] `/api/multiverse/universes` returns universe list
-- [ ] `/api/souls` returns soul list
-- [ ] All deprecated routes still work with warnings
+- [x] `/api/planets` returns planet list (metrics-server)
+- [x] `/api/game/status` returns game status (metrics-server)
+- [x] All admin capability queries work with `/api/game/`
+- [ ] `/api/multiverse/universes` returns universe list (api-server - Phase 2)
+- [ ] `/api/souls/save` saves souls (api-server - Phase 2)
 - [ ] Browser console shows no errors on game load
