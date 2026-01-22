@@ -18,8 +18,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
-import type { TimeComponent } from './TimeSystem.js';
-import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+import { setMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 // Decay/recovery rates per game minute

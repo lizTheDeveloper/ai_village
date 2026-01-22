@@ -1,5 +1,108 @@
 # Release Notes
 
+## 2026-01-21 - "ResourceGatheringSystem Migration + AfterlifeNeeds Cleanup" - 2 Files (+10 net)
+
+### 🔄 ResourceGatheringSystem.ts FULLY Migrated (+45/-35, +10 net)
+
+**Migrated resource regeneration system to MutationVectorComponent API.**
+
+**Performance note**: This system manages 250k+ resource entities. Uses mutation rates updated once per game minute instead of every tick.
+
+#### Import Added
+```typescript
++ import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
+```
+
+#### Removed StateMutatorSystem Integration
+```typescript
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<string, () => void>();
+
+// setStateMutatorSystem changed to no-op:
+- setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+-   this.stateMutator = stateMutator;
+- }
++ setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
++   // No-op: Uses setMutationRate() directly
++ }
+```
+
+#### Regeneration Logic Simplified
+```typescript
+// Before: Using deltaCleanups and updateRegenerationDelta method
+- if (this.deltaCleanups.has(entity.id)) {
+-   this.deltaCleanups.get(entity.id)!();
+-   this.deltaCleanups.delete(entity.id);
+- }
+- this.updateRegenerationDelta(entity, resource);
+
+// After: Direct setMutationRate/clearMutationRate
++ if (resource.regenerationRate <= 0) {
++   clearMutationRate(entity, 'resource.amount');
++   continue;
++ }
++ setMutationRate(entity, 'resource.amount', resource.regenerationRate, {
++   min: 0,
++   max: resource.maxAmount,
++   source: 'resource_regeneration',
++ });
+```
+
+**Changes:**
+- Removed stateMutator field and deltaCleanups map
+- Removed runtime check for stateMutator
+- setStateMutatorSystem → no-op compatibility method
+- Renamed shouldUpdateDeltas → shouldUpdateRates
+- Inlined regeneration logic with setMutationRate()
+- Simplified cleanup: clearMutationRate() instead of deltaCleanups
+- Comments updated: "batched regeneration" → "per-tick state mutations"
+
+**Impact:**
+- Resource regeneration for 250k+ entities now uses new API
+- No manual cleanup tracking
+- Simpler code with direct mutation rate management
+- Per-second rates (no conversion needed)
+
+---
+
+### 🧹 AfterlifeNeedsSystem.ts Import Cleanup (+2/-1, +1 net)
+
+**Removed unused imports from Cycle 42 migration.**
+
+#### Removed
+```typescript
+- import type { TimeComponent } from './TimeSystem.js';
+- import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
++ import { setMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+```
+
+**Impact:** Clean imports - removed unused TimeComponent and clearMutationRate.
+
+---
+
+### 📊 Cycle 46 Summary
+
+**Purpose:** Migrate ResourceGatheringSystem + cleanup AfterlifeNeedsSystem imports.
+
+**Changes:**
+- ResourceGatheringSystem: Fully migrated to MutationVectorComponent API (+10 net)
+- AfterlifeNeedsSystem: Removed unused imports (+1 net)
+
+**Migration Status:**
+- ✅ **Complete (12)**: AnimalSystem, NeedsSystem, BodySystem, AgentSwimmingSystem, SleepSystem, TemperatureSystem, AfterlifeNeedsSystem, AssemblyMachineSystem, BuildingMaintenanceSystem, FireSpreadSystem, DamageEffectApplier, **ResourceGatheringSystem** ← NEW
+- 🔄 **In Progress (1)**: HealingEffectApplier (Cycle 44 import, awaiting migration)
+
+**Total Systems Migrated**: 12 systems
+
+**Impact:**
+- Resource regeneration system (250k+ entities) using new API
+- 10 more lines of cleanup
+- Consistent pattern across all migrated systems
+
+**Files:** 2 changed (+45/-35, +10 net)
+
+---
+
 ## 2026-01-21 - "DamageEffectApplier Damage-Over-Time Migration" - 1 File (-9 net)
 
 ### 🔄 DamageEffectApplier.ts DoT System Migrated (+21/-30, -9 net)
