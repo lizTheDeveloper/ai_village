@@ -27,8 +27,6 @@ import type { EventBus } from '../events/EventBus.js';
 import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
 import { SpellRegistry, type SpellDefinition } from '../magic/SpellRegistry.js';
 import { initializeMagicSystem as initMagicInfrastructure, getTerminalEffectHandler } from '../magic/InitializeMagicSystem.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
-
 // Import all managers
 import { SkillTreeManager } from '../magic/managers/SkillTreeManager.js';
 import { SpellProficiencyManager } from '../magic/managers/SpellProficiencyManager.js';
@@ -57,7 +55,6 @@ export class MagicSystem extends BaseSystem {
 
   // Infrastructure
   private effectExecutor: SpellEffectExecutor | null = null;
-  private stateMutatorSystem: StateMutatorSystem | null = null;
 
   // Managers (Phase 3: extracted from god object)
   private skillTreeManager: SkillTreeManager | null = null;
@@ -87,14 +84,10 @@ export class MagicSystem extends BaseSystem {
         terminalHandler.initialize(eventBus);
       }
 
-      // Get StateMutatorSystem from world for gradual effects
-      this.stateMutatorSystem = world.getSystem('state_mutator') as StateMutatorSystem | null;
+      // Get FireSpreadSystem from world for fire effects
       const fireSpreadSystem = world.getSystem('fire_spread');
 
       // Pass to effect executor
-      if (this.effectExecutor && this.stateMutatorSystem) {
-        this.effectExecutor.setStateMutatorSystem(this.stateMutatorSystem);
-      }
       if (this.effectExecutor && fireSpreadSystem) {
         this.effectExecutor.setFireSpreadSystem(fireSpreadSystem);
       }

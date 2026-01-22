@@ -1,0 +1,584 @@
+{
+  "example_talents": [
+    {
+      "talentId": "color_change_nails",
+      "name": "Chromatic Nails",
+      "description": "Can change the color of their fingernails at will",
+      "tier": "mundane",
+      "effects": [{ "type": "transform", "target": "own fingernails", "effect": "change color" }],
+      "limitations": ["Only affects own nails", "Cannot create patterns"],
+      "usageLimit": "unlimited",
+      "visibility": "subtle",
+      "improvable": false,
+      "quirk": "Great at parties, useless in battle"
+    },
+    {
+      "talentId": "spot_remover",
+      "name": "Spot Removal",
+      "description": "Can remove any stain or spot from any surface",
+      "tier": "minor",
+      "effects": [{ "type": "transform", "target": "stains", "effect": "remove completely" }],
+      "limitations": ["Only works on stains", "Cannot remove tattoos or scars"],
+      "usageLimit": "unlimited",
+      "visibility": "invisible",
+      "improvable": true,
+      "quirk": "Surprisingly useful for crime scene cleanup"
+    },
+    {
+      "talentId": "direction_sense",
+      "name": "Perfect Direction",
+      "description": "Always knows which way is north and can find any place they have been before",
+      "tier": "moderate",
+      "effects": [
+        { "type": "perceive", "target": "directions", "effect": "perfect knowledge of cardinal directions" },
+        { "type": "perceive", "target": "locations", "effect": "can navigate to any visited location" }
+      ],
+      "limitations": ["Cannot find places never visited", "Does not provide maps"],
+      "usageLimit": "unlimited",
+      "visibility": "invisible",
+      "improvable": true
+    },
+    {
+      "talentId": "nightmare_creation",
+      "name": "Nightmare Sculptor",
+      "description": "Can create and control nightmares, pulling them from dreams into reality",
+      "tier": "major",
+      "effects": [
+        { "type": "create", "target": "nightmare creatures", "effect": "manifest nightmares", "range": "medium" },
+        { "type": "control", "target": "dream creatures", "effect": "command nightmares" }
+      ],
+      "limitations": ["Creatures fade in daylight", "Can be overcome by courage"],
+      "usageLimit": "exhausting",
+      "visibility": "spectacular",
+      "improvable": true,
+      "quirk": "Has terrible insomnia themselves"
+    },
+    {
+      "talentId": "transformation",
+      "name": "Universal Transformation",
+      "description": "Can transform any object or creature into any other object or creature",
+      "tier": "magician_class",
+      "effects": [
+        { "type": "transform", "target": "anything", "effect": "transform into anything else", "range": "touch" }
+      ],
+      "limitations": ["Touch required", "Unwilling creatures get a resistance roll"],
+      "usageLimit": "exhausting",
+      "visibility": "spectacular",
+      "improvable": true,
+      "quirk": "Accidentally transformed themselves into a toad once. Got better."
+    }
+  ],
+  "narrative_rules": [
+    {
+      "id": "million_to_one",
+      "name": "Million-to-One Chance",
+      "description": "A million-to-one chance succeeds nine times out of ten",
+      "genre": "any",
+      "trigger": "Odds explicitly stated as \"a million to one\"",
+      "effect": "Attempt automatically succeeds",
+      "strength": "absolute"
+    },
+    {
+      "id": "chosen_one",
+      "name": "The Chosen One",
+      "description": "Prophecied heroes have narrative protection",
+      "genre": "fantasy",
+      "trigger": "Being identified as the chosen one by prophecy",
+      "effect": "Cannot die until prophecy fulfilled (but can suffer greatly)",
+      "strength": "strong"
+    },
+    {
+      "id": "rule_of_three",
+      "name": "Rule of Three",
+      "description": "Things that happen in threes are magically potent",
+      "genre": "any",
+      "trigger": "Third attempt at something, third sibling, third wish",
+      "effect": "Third instance is most powerful/successful",
+      "strength": "strong"
+    },
+    {
+      "id": "dramatic_timing",
+      "name": "Dramatic Timing",
+      "description": "Important events wait for dramatic moments",
+      "genre": "any",
+      "trigger": "Narratively significant moment",
+      "effect": "Rescues, revelations, and arrivals happen at perfect moments",
+      "strength": "suggestion"
+    },
+    {
+      "id": "comedy_physics",
+      "name": "Comedy Physics",
+      "description": "Physical laws bend for comedic effect",
+      "genre": "comedy",
+      "trigger": "Situation would be funnier if physics bent",
+      "effect": "Cartoon-style physics apply temporarily",
+      "strength": "suggestion"
+    },
+    {
+      "id": "horror_rules",
+      "name": "Horror Rules",
+      "description": "Genre conventions of horror apply",
+      "genre": "horror",
+      "trigger": "Investigation of mysterious events",
+      "effect": "Splitting up is dangerous, lights fail at bad times, etc.",
+      "strength": "strong"
+    },
+    {
+      "id": "love_conquers",
+      "name": "True Love",
+      "description": "True love has magical power",
+      "genre": "romance",
+      "trigger": "Act of true love",
+      "effect": "Can break curses, overcome obstacles, achieve the impossible",
+      "strength": "absolute"
+    },
+    {
+      "id": "narrative_causality",
+      "name": "Narrative Causality",
+      "description": "Stories want to be told a certain way",
+      "genre": "any",
+      "trigger": "Events align with classic story structure",
+      "effect": "Reality bends to follow the story beats",
+      "strength": "suggestion"
+    }
+  ],
+  "example_puns": [
+    {
+      "pun": "Spelling Bee",
+      "literal_meaning": "A bee made of letters",
+      "magical_effect": "Forces targets to spell correctly",
+      "setup": "Exists in nature, can be caught and released"
+    },
+    {
+      "pun": "Night Stand",
+      "literal_meaning": "A stand that only exists at night",
+      "magical_effect": "Furniture that appears at sunset, vanishes at dawn",
+      "setup": "Made from night wood"
+    },
+    {
+      "pun": "Eye Scream",
+      "literal_meaning": "Eyes that scream",
+      "magical_effect": "Causes horrifying visions and literal screaming",
+      "setup": "Created by exposing ice cream to horror"
+    },
+    {
+      "pun": "Tree-son",
+      "literal_meaning": "Child of a tree",
+      "magical_effect": "A dryad born from betraying another tree",
+      "setup": "Spoken accusation between trees"
+    },
+    {
+      "pun": "Bread Winner",
+      "literal_meaning": "Bread that wins",
+      "magical_effect": "Eating it guarantees victory in the next contest",
+      "setup": "Baked by a champion baker"
+    }
+  ],
+  "talent": {
+    "id": "talent",
+    "name": "Talent Magic",
+    "description": "Everyone is born with exactly one unique magical talent",
+    "universeIds": ["xanth", "talent_realms"],
+    "lore": "In these realms, magic is personal. Every person is born with exactly one\nmagical talent, never to be repeated. Some talents are grand, some are humble,\nbut each is unique. The hierarchy of talents (mundane, minor, moderate, major,\nMagician-class) determines much of social standing.",
+    "sources": [
+      {
+        "id": "innate_talent",
+        "name": "Innate Talent",
+        "type": "internal",
+        "regeneration": "passive",
+        "regenRate": 0,
+        "storable": false,
+        "transferable": false,
+        "stealable": false,
+        "detectability": "subtle",
+        "description": "The talent you were born with - unique to you alone"
+      }
+    ],
+    "costs": [
+      {
+        "type": "stamina",
+        "canBeTerminal": false,
+        "cumulative": false,
+        "recoverable": true,
+        "recoveryMethod": "rest",
+        "visibility": "obvious"
+      }
+    ],
+    "channels": [
+      { "type": "will", "requirement": "required", "canBeMastered": true, "blockEffect": "prevents_casting" }
+    ],
+    "laws": [
+      {
+        "id": "one_talent",
+        "name": "The One Talent Law",
+        "type": "conservation",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "Each person has exactly one talent. No more, no less. Ever."
+      },
+      {
+        "id": "uniqueness",
+        "name": "Talent Uniqueness",
+        "type": "balance",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "No two people in the universe share the same talent"
+      },
+      {
+        "id": "birth_determined",
+        "name": "Birth Determination",
+        "type": "consent",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "Talents are determined at birth and cannot be chosen or changed"
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "overuse",
+        "consequence": "backlash",
+        "severity": "minor",
+        "probability": 0.1,
+        "mitigatable": true,
+        "description": "Overusing your talent can tire you out"
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "born",
+        "rarity": "common",
+        "voluntary": false,
+        "grantsAccess": ["innate_talent"],
+        "startingProficiency": 30,
+        "description": "Born with a unique magical talent"
+      }
+    ],
+    "availableTechniques": ["create", "destroy", "transform", "perceive", "control", "protect", "enhance"],
+    "availableForms": ["fire", "water", "earth", "air", "body", "mind", "spirit", "plant", "animal", "image", "time", "space"],
+    "powerScaling": "step",
+    "powerCeiling": 100,
+    "allowsGroupCasting": false,
+    "allowsEnchantment": false,
+    "persistsAfterDeath": false,
+    "allowsTeaching": false,
+    "allowsScrolls": false,
+    "foreignMagicPolicy": "incompatible"
+  },
+  "narrative": {
+    "id": "narrative",
+    "name": "Narrative Causality",
+    "description": "Story logic and genre conventions are laws of nature",
+    "universeIds": ["discworld", "story_realms"],
+    "lore": "On the Disc, stories are things. Narrative causality shapes events to\nmatch the stories that want to be told. The million-to-one chance works\nbecause stories say it should. Heroes survive because the story needs them.\nSome rare individuals learn to sense and manipulate these narrative threads.",
+    "sources": [
+      {
+        "id": "narrative_weight",
+        "name": "Narrative Weight",
+        "type": "social",
+        "regeneration": "none",
+        "storable": false,
+        "transferable": true,
+        "stealable": false,
+        "detectability": "undetectable",
+        "description": "The power of being in a story"
+      }
+    ],
+    "costs": [
+      {
+        "type": "karma",
+        "canBeTerminal": false,
+        "cumulative": true,
+        "recoverable": true,
+        "recoveryMethod": "time",
+        "visibility": "hidden"
+      }
+    ],
+    "channels": [
+      { "type": "verbal", "requirement": "optional", "canBeMastered": true, "blockEffect": "no_effect" },
+      { "type": "emotion", "requirement": "enhancing", "canBeMastered": false, "blockEffect": "no_effect" }
+    ],
+    "laws": [
+      {
+        "id": "narrative_imperative",
+        "name": "Narrative Imperative",
+        "type": "narrative",
+        "strictness": "strong",
+        "canBeCircumvented": true,
+        "circumventionCostMultiplier": 3.0,
+        "description": "Stories want to be told certain ways. Fighting the narrative is exhausting."
+      },
+      {
+        "id": "genre_conventions",
+        "name": "Genre Conventions",
+        "type": "narrative",
+        "strictness": "weak",
+        "canBeCircumvented": true,
+        "description": "Different genres have different rules. Know which story you're in."
+      },
+      {
+        "id": "lampshade_principle",
+        "name": "Lampshade Principle",
+        "type": "narrative",
+        "strictness": "weak",
+        "canBeCircumvented": true,
+        "description": "Acknowledging a narrative convention weakens its power"
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "paradox",
+        "consequence": "wild_surge",
+        "severity": "moderate",
+        "probability": 0.3,
+        "mitigatable": true,
+        "description": "Fighting the narrative too hard causes reality glitches"
+      },
+      {
+        "trigger": "attention",
+        "consequence": "attention_gained",
+        "severity": "minor",
+        "probability": 0.2,
+        "mitigatable": true,
+        "description": "Being too narratively significant attracts plot complications"
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "rare",
+        "voluntary": false,
+        "prerequisites": ["narrative_awareness"],
+        "grantsAccess": ["narrative_weight"],
+        "startingProficiency": 10,
+        "description": "Becoming aware of the story you're in"
+      },
+      {
+        "method": "study",
+        "rarity": "uncommon",
+        "voluntary": true,
+        "prerequisites": ["extensive_reading"],
+        "grantsAccess": ["narrative_weight"],
+        "startingProficiency": 20,
+        "description": "Studying enough stories to recognize the patterns"
+      }
+    ],
+    "availableTechniques": ["perceive", "control", "protect"],
+    "availableForms": ["mind", "spirit", "image"],
+    "powerScaling": "threshold",
+    "powerCeiling": null,
+    "allowsGroupCasting": true,
+    "groupCastingMultiplier": 2.0,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true,
+    "foreignMagicPolicy": "transforms"
+  },
+  "pun": {
+    "id": "pun",
+    "name": "Pun Magic",
+    "description": "Words have literal magical power based on their sounds",
+    "universeIds": ["xanth", "pun_realms"],
+    "lore": "In the land of Xanth, puns are not merely wordplay but fundamental forces\nof nature. A \"shoe tree\" grows shoes. A \"door mat\" makes doors very formal.\nThe groaner the pun, the more powerful the magic. Newcomers often groan\nat the omnipresent wordplay, but natives have learned to appreciate - or at\nleast tolerate - the punny nature of their reality.",
+    "sources": [
+      {
+        "id": "punergy",
+        "name": "Punergy",
+        "type": "ambient",
+        "regeneration": "passive",
+        "regenRate": 0.05,
+        "storable": true,
+        "transferable": true,
+        "stealable": false,
+        "detectability": "obvious",
+        "description": "The magical power of wordplay"
+      }
+    ],
+    "costs": [
+      {
+        "type": "sanity",
+        "canBeTerminal": false,
+        "cumulative": false,
+        "recoverable": true,
+        "recoveryMethod": "rest",
+        "visibility": "obvious"
+      }
+    ],
+    "channels": [
+      { "type": "verbal", "requirement": "required", "canBeMastered": false, "blockEffect": "prevents_casting" }
+    ],
+    "laws": [
+      {
+        "id": "literal_truth",
+        "name": "Literal Truth",
+        "type": "true_names",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "Words mean exactly what they sound like they mean"
+      },
+      {
+        "id": "groan_power",
+        "name": "Groan Power",
+        "type": "sacrifice",
+        "strictness": "strong",
+        "canBeCircumvented": false,
+        "description": "The worse the pun, the more powerful the magic"
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "failure",
+        "consequence": "wild_surge",
+        "severity": "minor",
+        "probability": 0.4,
+        "mitigatable": false,
+        "description": "Bad puns create unpredictable effects"
+      },
+      {
+        "trigger": "overuse",
+        "consequence": "mishap",
+        "severity": "minor",
+        "probability": 0.3,
+        "mitigatable": true,
+        "description": "Too many puns cause reality to punish you with worse puns"
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "born",
+        "rarity": "common",
+        "voluntary": false,
+        "grantsAccess": ["punergy"],
+        "startingProficiency": 20,
+        "description": "Born in a pun-based reality"
+      }
+    ],
+    "availableTechniques": ["create", "transform", "perceive"],
+    "availableForms": ["plant", "animal", "body", "image"],
+    "powerScaling": "linear",
+    "powerCeiling": 80,
+    "allowsGroupCasting": true,
+    "groupCastingMultiplier": 1.5,
+    "allowsEnchantment": true,
+    "persistsAfterDeath": true,
+    "allowsTeaching": true,
+    "allowsScrolls": true,
+    "foreignMagicPolicy": "transforms"
+  },
+  "wild": {
+    "id": "wild",
+    "name": "Wild Magic",
+    "description": "Chaotic magic that does unpredictable things",
+    "universeIds": ["chaos_realms", "wild_zones"],
+    "lore": "In places where the fabric of reality is thin, magic runs wild. Spells\ndon't do what they're supposed to. Random effects cascade. Colors taste\nlike sounds. Wild mages learn to ride the chaos rather than control it,\nsurfing the waves of probability and hoping for the best.",
+    "sources": [
+      {
+        "id": "chaos",
+        "name": "Chaotic Essence",
+        "type": "ambient",
+        "regeneration": "passive",
+        "regenRate": 0.1,
+        "storable": false,
+        "transferable": false,
+        "stealable": false,
+        "detectability": "obvious",
+        "description": "The raw stuff of chaos"
+      }
+    ],
+    "costs": [
+      {
+        "type": "luck",
+        "canBeTerminal": false,
+        "cumulative": true,
+        "recoverable": true,
+        "recoveryMethod": "time",
+        "visibility": "hidden"
+      },
+      {
+        "type": "sanity",
+        "canBeTerminal": true,
+        "cumulative": true,
+        "recoverable": true,
+        "recoveryMethod": "rest",
+        "visibility": "subtle"
+      }
+    ],
+    "channels": [
+      { "type": "emotion", "requirement": "enhancing", "canBeMastered": false, "blockEffect": "no_effect" }
+    ],
+    "laws": [
+      {
+        "id": "entropy_rules",
+        "name": "Entropy Rules",
+        "type": "entropy",
+        "strictness": "absolute",
+        "canBeCircumvented": false,
+        "description": "Wild magic always increases chaos"
+      },
+      {
+        "id": "no_control",
+        "name": "Uncontrollable",
+        "type": "paradox",
+        "strictness": "strong",
+        "canBeCircumvented": true,
+        "circumventionCostMultiplier": 5.0,
+        "description": "Attempting precise control invites worse chaos"
+      }
+    ],
+    "risks": [
+      {
+        "trigger": "wild_magic",
+        "consequence": "wild_surge",
+        "severity": "moderate",
+        "probability": 0.8,
+        "mitigatable": false,
+        "description": "Random magical effects occur constantly"
+      },
+      {
+        "trigger": "failure",
+        "consequence": "target_swap",
+        "severity": "minor",
+        "probability": 0.5,
+        "mitigatable": false,
+        "description": "Spells hit random targets"
+      },
+      {
+        "trigger": "critical_failure",
+        "consequence": "mutation",
+        "severity": "severe",
+        "probability": 0.2,
+        "mitigatable": false,
+        "description": "Major failures cause permanent random changes"
+      }
+    ],
+    "acquisitionMethods": [
+      {
+        "method": "awakening",
+        "rarity": "uncommon",
+        "voluntary": false,
+        "grantsAccess": ["chaos"],
+        "startingProficiency": 0,
+        "description": "Exposure to wild magic zones"
+      },
+      {
+        "method": "infection",
+        "rarity": "common",
+        "voluntary": false,
+        "grantsAccess": ["chaos"],
+        "startingProficiency": 10,
+        "description": "Caught wild magic like a disease"
+      }
+    ],
+    "availableTechniques": ["create", "destroy", "transform"],
+    "availableForms": ["fire", "water", "earth", "air", "body", "mind", "spirit", "plant", "animal", "image", "void", "time", "space"],
+    "powerScaling": "exponential",
+    "powerCeiling": null,
+    "allowsGroupCasting": true,
+    "groupCastingMultiplier": 0.5,
+    "allowsEnchantment": false,
+    "persistsAfterDeath": true,
+    "allowsTeaching": false,
+    "allowsScrolls": false,
+    "foreignMagicPolicy": "absorbs"
+  }
+}

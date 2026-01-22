@@ -230,9 +230,8 @@ async function registerAllSystems(
   const stateMutator = new StateMutatorSystem();
   gameLoop.systemRegistry.register(stateMutator);
 
-  // TemperatureSystem - Uses StateMutatorSystem
+  // TemperatureSystem - Uses MutationVectorComponent
   const temperatureSystem = new TemperatureSystem();
-  temperatureSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(temperatureSystem);
 
   const soilSystem = new SoilSystem();

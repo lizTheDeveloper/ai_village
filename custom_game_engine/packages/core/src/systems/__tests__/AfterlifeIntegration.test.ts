@@ -36,7 +36,6 @@ describe('Afterlife System Integration', () => {
 
     // Create and register AfterlifeNeedsSystem
     afterlifeSystem = new AfterlifeNeedsSystem();
-    afterlifeSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AfterlifeNeedsSystem', afterlifeSystem);
   });
 

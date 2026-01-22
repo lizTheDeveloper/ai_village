@@ -11,7 +11,6 @@ import type { MovementComponent } from '../components/MovementComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * NeedsSystem - Manages agent physical needs (hunger, energy, thirst)
@@ -50,15 +49,6 @@ export class NeedsSystem extends BaseSystem {
 
   // Track previous critical state for each entity to detect threshold crossings
   private wasEnergyCritical = new Map<string, boolean>();
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   * Note: This system uses setMutationRate() directly from MutationVectorComponent.
-   */
-  setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
-    // No-op: Uses setMutationRate() directly
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Performance: Only update mutation rates once per game minute

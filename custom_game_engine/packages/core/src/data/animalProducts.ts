@@ -4,6 +4,7 @@
  */
 
 import type { ProductionType, AnimalLifeStage } from '../types/AnimalTypes.js';
+import animalProductsData from '../../data/animal-products.json';
 
 export interface AnimalProduct {
   id: string;
@@ -36,94 +37,7 @@ export interface AnimalProduct {
 /**
  * Animal product definitions
  */
-export const ANIMAL_PRODUCTS: Record<string, AnimalProduct> = {
-  // Eggs
-  chicken_egg: {
-    id: 'chicken_egg',
-    name: 'Chicken Egg',
-    sourceSpecies: ['chicken'],
-    productionType: 'periodic',
-    minLifeStage: 'adult',
-    minHealth: 30,
-    productionInterval: 1, // 1 day
-    minQuantity: 1,
-    maxQuantity: 1,
-    healthFactor: 0.4,
-    bondFactor: 0.1,
-    dietFactor: 0.3,
-    geneticsFactor: 0.2,
-    itemId: 'egg',
-  },
-
-  // Milk
-  cow_milk: {
-    id: 'cow_milk',
-    name: 'Cow Milk',
-    sourceSpecies: ['cow'],
-    productionType: 'continuous',
-    minLifeStage: 'adult',
-    minHealth: 50,
-    minBondLevel: 20, // Need some trust to milk
-    minQuantity: 1,
-    maxQuantity: 3,
-    healthFactor: 0.3,
-    bondFactor: 0.2,
-    dietFactor: 0.3,
-    geneticsFactor: 0.2,
-    itemId: 'milk',
-  },
-
-  // Wool
-  sheep_wool: {
-    id: 'sheep_wool',
-    name: 'Sheep Wool',
-    sourceSpecies: ['sheep'],
-    productionType: 'periodic',
-    minLifeStage: 'juvenile',
-    minHealth: 40,
-    productionInterval: 90, // 90 days (seasonal shearing)
-    minQuantity: 1,
-    maxQuantity: 3,
-    healthFactor: 0.3,
-    bondFactor: 0.1,
-    dietFactor: 0.4,
-    geneticsFactor: 0.2,
-    itemId: 'wool',
-  },
-
-  goat_milk: {
-    id: 'goat_milk',
-    name: 'Goat Milk',
-    sourceSpecies: ['goat'],
-    productionType: 'continuous',
-    minLifeStage: 'adult',
-    minHealth: 50,
-    minBondLevel: 20,
-    minQuantity: 1,
-    maxQuantity: 2,
-    healthFactor: 0.3,
-    bondFactor: 0.2,
-    dietFactor: 0.3,
-    geneticsFactor: 0.2,
-    itemId: 'goat_milk',
-  },
-
-  rabbit_fur: {
-    id: 'rabbit_fur',
-    name: 'Rabbit Fur',
-    sourceSpecies: ['rabbit'],
-    productionType: 'terminal', // Only on death/butchering
-    minLifeStage: 'juvenile',
-    minHealth: 0, // Can harvest even from dead
-    minQuantity: 1,
-    maxQuantity: 1,
-    healthFactor: 0.4,
-    bondFactor: 0.0,
-    dietFactor: 0.3,
-    geneticsFactor: 0.3,
-    itemId: 'rabbit_fur',
-  },
-};
+export const ANIMAL_PRODUCTS = animalProductsData.products as Record<string, AnimalProduct>;
 
 // Aliases for test compatibility - require these to exist
 const chickenEgg = ANIMAL_PRODUCTS.chicken_egg;

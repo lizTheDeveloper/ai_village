@@ -59,7 +59,6 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     const memorySystem = new MemorySystem();
 
     harness.registerSystem('StateMutatorSystem', stateMutator);
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
     harness.registerSystem('MemorySystem', memorySystem);
 

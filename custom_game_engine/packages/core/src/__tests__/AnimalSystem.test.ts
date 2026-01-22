@@ -3,25 +3,19 @@ import { WorldImpl } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { AnimalSystem } from '../systems/AnimalSystem.js';
-import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
 import { ComponentType } from '../types/ComponentType.js';
 describe('Animal System', () => {
   let world: WorldImpl;
   let animalSystem: AnimalSystem;
-  let stateMutator: StateMutatorSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
 
-    // Create and wire up StateMutatorSystem (required dependency)
-    stateMutator = new StateMutatorSystem();
-
     animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
   });
 
   describe('Acceptance Criterion 2: Animal Species Definitions', () => {

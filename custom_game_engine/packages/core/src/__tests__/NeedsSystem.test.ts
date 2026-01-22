@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldImpl } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
-import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { NeedsComponent, type NeedsComponentLegacy } from '../components/NeedsComponent.js';
 import { createAgentComponent } from '../components/AgentComponent.js';
 import { createCircadianComponent } from '../components/CircadianComponent.js';
@@ -13,18 +12,13 @@ import { ComponentType } from '../types/ComponentType.js';
 describe('NeedsSystem', () => {
   let world: WorldImpl;
   let system: NeedsSystem;
-  let stateMutator: StateMutatorSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
 
-    // Create and wire up StateMutatorSystem (required dependency)
-    stateMutator = new StateMutatorSystem();
-
     system = new NeedsSystem();
-    system.setStateMutatorSystem(stateMutator);
   });
 
   describe('initialization', () => {

@@ -114,7 +114,6 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AnimalHousingSystem', housingSystem);
     harness.registerSystem('AnimalSystem', animalSystem);

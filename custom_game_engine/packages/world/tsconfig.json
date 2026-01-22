@@ -4,7 +4,7 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*", "src/**/*.json"],
+  "include": ["src/**/*", "src/**/*.json", "data/**/*.json"],
   "references": [
     { "path": "../core" },
     { "path": "../agents" },

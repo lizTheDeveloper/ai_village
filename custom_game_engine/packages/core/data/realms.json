@@ -1,0 +1,117 @@
+{
+  "realms": {
+    "underworld": {
+      "id": "underworld",
+      "name": "The Underworld",
+      "category": "underworld",
+      "parentUniverseId": "main",
+      "size": "infinite",
+      "topology": "underground_cavern",
+      "timeFlow": "slow",
+      "timeRatio": 0.25,
+      "environment": "eternal_twilight",
+      "stability": 0.99,
+      "accessMethods": ["death", "ritual"],
+      "accessRestrictions": [
+        {
+          "type": "state",
+          "requirement": "dead_or_sponsored",
+          "description": "Only the dead or those with divine sponsorship may enter"
+        }
+      ],
+      "contested": false,
+      "laws": [
+        {
+          "name": "no_return",
+          "effect": "dead_cannot_leave",
+          "enforcement": "automatic",
+          "description": "The dead cannot leave the Underworld without divine intervention or resurrection"
+        },
+        {
+          "name": "memory_fading",
+          "effect": "mortal_memories_fade",
+          "enforcement": "environmental",
+          "description": "Memories of mortal life slowly fade in the Underworld"
+        }
+      ],
+      "selfSustaining": true,
+      "maintenanceCost": 0,
+      "subRealms": []
+    },
+    "celestial": {
+      "id": "celestial",
+      "name": "The Celestial Realm",
+      "category": "celestial",
+      "parentUniverseId": "main",
+      "size": "kingdom",
+      "topology": "floating_islands",
+      "timeFlow": "slow",
+      "timeRatio": 0.1,
+      "environment": "eternal_spring",
+      "stability": 0.98,
+      "accessMethods": ["invitation", "ascension", "pilgrimage"],
+      "accessRestrictions": [
+        {
+          "type": "permission",
+          "requirement": "divine_invitation",
+          "description": "Must be invited by a celestial being"
+        },
+        {
+          "type": "state",
+          "requirement": "pure_of_heart",
+          "description": "Only the virtuous may enter"
+        }
+      ],
+      "contested": false,
+      "laws": [
+        {
+          "name": "no_violence",
+          "effect": "combat_impossible",
+          "enforcement": "automatic",
+          "description": "Violence is impossible in the Celestial Realm"
+        },
+        {
+          "name": "truth_binding",
+          "effect": "lies_impossible",
+          "enforcement": "automatic",
+          "description": "Lies cannot be spoken here"
+        }
+      ],
+      "selfSustaining": true,
+      "maintenanceCost": 0,
+      "subRealms": []
+    },
+    "dream_realm": {
+      "id": "dream_realm",
+      "name": "The Dreaming",
+      "category": "dream",
+      "parentUniverseId": "main",
+      "size": "infinite",
+      "topology": "shifting_landscape",
+      "timeFlow": "subjective",
+      "timeRatio": 1.0,
+      "environment": "ever_changing",
+      "stability": 0.5,
+      "accessMethods": ["dream", "trance"],
+      "accessRestrictions": [],
+      "contested": false,
+      "laws": [
+        {
+          "name": "thought_manifestation",
+          "effect": "thoughts_become_real",
+          "enforcement": "environmental",
+          "description": "Strong thoughts can become temporarily real"
+        },
+        {
+          "name": "dream_logic",
+          "effect": "causality_weakened",
+          "enforcement": "automatic",
+          "description": "Logic and causality work differently here"
+        }
+      ],
+      "selfSustaining": true,
+      "maintenanceCost": 0,
+      "subRealms": []
+    }
+  }
+}

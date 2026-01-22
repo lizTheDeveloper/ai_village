@@ -1,5 +1,17 @@
 # StateMutatorSystem Redesign Specification
 
+## Implementation Status: COMPLETE ✅
+
+**Completed:** January 2026
+
+All phases of this redesign have been implemented:
+- Phase 1: MutationVectorComponent created for entity-local storage
+- Phase 2: StateMutatorSystem refactored to use per-tick direct mutation
+- Phase 3: All 12+ systems migrated to new `setMutationRate()` API
+- Phase 4: Legacy `registerDelta()` API removed
+
+The legacy API (`registerDelta()`, `setStateMutatorSystem()`, cleanup functions) has been fully removed.
+
 ## Problem Statement
 
 The current `StateMutatorSystem` was intended to be a **computation and GC pressure alleviator** but was implemented incorrectly. Instead of reducing allocations and enabling smooth per-tick updates, it:
@@ -29,7 +41,7 @@ The current `StateMutatorSystem` was intended to be a **computation and GC press
 | ResourceGatheringSystem | amount | 1200 ticks | 1 |
 | Magic (HoT/DoT) | health, mana, stamina | N/A (spell-based) | 1-6 |
 
-### Current Architecture (Flawed)
+### Previous Architecture (Replaced)
 
 ```
 ┌─────────────────┐     registerDelta()      ┌─────────────────────────┐
@@ -57,7 +69,7 @@ The current `StateMutatorSystem` was intended to be a **computation and GC press
 - `updateComponent()` creates new object every time = GC pressure
 - External Map requires manual cleanup function tracking
 
-## Intended Architecture
+## New Architecture (Implemented)
 
 The original vision was for **one component per entity** that stores mutation rates, with the system running **every tick** doing simple math:
 
@@ -95,7 +107,7 @@ The original vision was for **one component per entity** that stores mutation ra
 - Derivative support = effects can decay naturally
 - Entity-local storage = no external Map, no cleanup functions
 
-## Proposed Design
+## Implemented Design
 
 ### 1. MutationVectorComponent
 

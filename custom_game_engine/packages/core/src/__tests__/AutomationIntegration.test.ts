@@ -68,9 +68,6 @@ describe('Automation Integration Tests', () => {
     assemblySystem = new AssemblyMachineSystem();
     stateMutatorSystem = new StateMutatorSystem();
 
-    // Wire up StateMutatorSystem dependency
-    assemblySystem.setStateMutatorSystem(stateMutatorSystem);
-
     // Register recipe
     recipeRegistry.registerRecipe(IRON_GEAR_RECIPE);
     craftingSystem.setRecipeRegistry(recipeRegistry);

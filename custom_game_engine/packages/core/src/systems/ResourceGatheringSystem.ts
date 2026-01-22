@@ -6,7 +6,6 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 import type { EventBus } from '../events/EventBus.js';
 
 /**
@@ -46,15 +45,6 @@ export class ResourceGatheringSystem extends BaseSystem {
 
   protected onInitialize(_world: World, eventBus: EventBus): void {
     // Events initialized by BaseSystem
-  }
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   * Note: This system uses setMutationRate() directly from MutationVectorComponent.
-   */
-  setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
-    // No-op: Uses setMutationRate() directly
   }
 
   /** Run every 20 ticks (1 second at 20 TPS) - kept for discrete event checks */

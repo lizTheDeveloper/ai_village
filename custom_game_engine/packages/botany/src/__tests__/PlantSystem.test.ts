@@ -70,11 +70,12 @@ describe('PlantSystem', () => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
 
-    // Create and wire up StateMutatorSystem (required dependency)
+    // Create and register StateMutatorSystem (needed to apply mutations in tests)
     stateMutator = new StateMutatorSystem();
+    world.addSystem(stateMutator);
 
     system = new PlantSystem(eventBus);
-    system.setStateMutatorSystem(stateMutator);
+    world.addSystem(system);
     // Configure species lookup for all tests
     system.setSpeciesLookup(createMockSpeciesLookup());
   });

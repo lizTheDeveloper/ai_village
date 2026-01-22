@@ -29,7 +29,6 @@ describe('ConflictIntegration', () => {
   let skillSystem: SkillSystem;
   let needsSystem: NeedsSystem;
   let memorySystem: MemoryFormationSystem;
-  let stateMutatorSystem: StateMutatorSystem;
   let mockLLM: any;
 
   beforeEach(() => {
@@ -49,9 +48,6 @@ describe('ConflictIntegration', () => {
       }),
     };
 
-    // Initialize StateMutatorSystem first (required by NeedsSystem)
-    stateMutatorSystem = new StateMutatorSystem();
-
     huntingSystem = new HuntingSystem(world.eventBus as EventBusImpl, mockLLM);
     predatorSystem = new PredatorAttackSystem(world.eventBus as EventBusImpl);
     combatSystem = new AgentCombatSystem(mockLLMObject, world.eventBus as EventBusImpl);
@@ -60,9 +56,6 @@ describe('ConflictIntegration', () => {
     skillSystem = new SkillSystem(world.eventBus as EventBusImpl);
     needsSystem = new NeedsSystem(world.eventBus as EventBusImpl);
     memorySystem = new MemoryFormationSystem(world.eventBus as EventBusImpl);
-
-    // Set StateMutatorSystem on NeedsSystem
-    needsSystem.setStateMutatorSystem(stateMutatorSystem);
   });
 
   describe('Full conflict flow', () => {

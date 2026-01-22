@@ -38,13 +38,12 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should handle single agent efficiently', () => {
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -77,13 +76,12 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should scale to 10 agents', () => {
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -118,13 +116,12 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should maintain performance over multiple frames', () => {
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const timeSystem = new TimeSystem();
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('TimeSystem', timeSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
@@ -165,12 +162,11 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should not leak memory over extended run', () => {
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -207,14 +203,13 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should handle mixed entity types efficiently', () => {
-    // Create and wire StateMutatorSystem (required for AnimalSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const plantSystem = new PlantSystem(harness.world.eventBus);
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('PlantSystem', plantSystem);
@@ -317,12 +312,11 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should system updates remain consistent', () => {
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });

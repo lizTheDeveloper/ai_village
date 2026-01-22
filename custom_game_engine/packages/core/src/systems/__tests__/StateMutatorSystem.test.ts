@@ -3,6 +3,7 @@ import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { World } from '../../World.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
+import { setMutationRate, clearMutationRate, createMutationVectorComponent } from '../../components/MutationVectorComponent.js';
 
 describe('StateMutatorSystem', () => {
   let world: World;
@@ -13,113 +14,8 @@ describe('StateMutatorSystem', () => {
     system = new StateMutatorSystem();
   });
 
-  describe('Delta Application Ordering', () => {
-    it('should apply healing (positive deltas) before damage (negative deltas)', () => {
-      // Create entity with 0.1 health (near death)
-      const entity = world.createEntity();
-      entity.addComponent({
-        type: CT.Needs,
-        hunger: 0.5,
-        thirst: 0.5,
-        energy: 0.5,
-        health: 0.1, // Near death
-        maxMana: 100,
-        mana: 50,
-      } as NeedsComponent);
-
-      // Register damage that would kill if applied first
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -0.15, // Would bring health to -0.05 (dead)
-        min: 0,
-        source: 'poison_damage',
-      });
-
-      // Register healing that saves the entity
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.2, // Heals +0.2
-        max: 1.0,
-        source: 'healing_spell',
-      });
-
-      // Force update by advancing ticks
-      world.setTick(1200); // 1 game minute
-      system.update(world, [], 60); // 60 seconds elapsed
-
-      const needs = entity.getComponent(CT.Needs) as NeedsComponent;
-
-      // Expected result if healing applied first:
-      // 0.1 + 0.2 = 0.3 (healing)
-      // 0.3 - 0.15 = 0.15 (then damage)
-      // Entity survives with 0.15 health
-
-      // If damage applied first:
-      // 0.1 - 0.15 = -0.05 → clamped to 0 (dead)
-      // 0 + 0.2 = 0.2 (healing can't bring back from death)
-
-      // Verify entity survived because healing was applied first
-      expect(needs.health).toBeGreaterThan(0);
-      expect(needs.health).toBeCloseTo(0.15, 2);
-    });
-
-    it('should apply multiple healing deltas before damage deltas', () => {
-      const entity = world.createEntity();
-      entity.addComponent({
-        type: CT.Needs,
-        hunger: 0.5,
-        thirst: 0.5,
-        energy: 0.5,
-        health: 0.05, // Very low health
-        maxMana: 100,
-        mana: 50,
-      } as NeedsComponent);
-
-      // Register multiple healing sources
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.1, // First heal
-        max: 1.0,
-        source: 'bandage',
-      });
-
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.15, // Second heal
-        max: 1.0,
-        source: 'potion',
-      });
-
-      // Register damage
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -0.2, // Damage
-        min: 0,
-        source: 'bleed',
-      });
-
-      // Force update
-      world.setTick(1200);
-      system.update(world, [], 60);
-
-      const needs = entity.getComponent(CT.Needs) as NeedsComponent;
-
-      // Expected: 0.05 + 0.1 + 0.15 - 0.2 = 0.1
-      expect(needs.health).toBeGreaterThan(0);
-      expect(needs.health).toBeCloseTo(0.1, 2);
-    });
-
-    it('should handle zero deltas (buffs) separately from healing/damage', () => {
+  describe('Basic Mutation Application', () => {
+    it('should apply positive mutation rate correctly', () => {
       const entity = world.createEntity();
       entity.addComponent({
         type: CT.Needs,
@@ -131,77 +27,20 @@ describe('StateMutatorSystem', () => {
         mana: 50,
       } as NeedsComponent);
 
-      // Register zero delta (buff marker)
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'energy',
-        deltaPerMinute: 0, // Buff marker
-        source: 'buff_marker',
-      });
-
-      // Register healing
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.1,
-        max: 1.0,
-        source: 'regen',
-      });
-
-      // Register damage
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -0.05,
-        min: 0,
-        source: 'poison',
-      });
-
-      world.setTick(1200);
-      system.update(world, [], 60);
-
-      const needs = entity.getComponent(CT.Needs) as NeedsComponent;
-
-      // Healing applied before damage: 0.5 + 0.1 - 0.05 = 0.55
-      expect(needs.health).toBeCloseTo(0.55, 2);
-      // Energy unchanged by zero delta
-      expect(needs.energy).toBe(0.5);
-    });
-  });
-
-  describe('Basic Delta Application', () => {
-    it('should apply positive delta correctly', () => {
-      const entity = world.createEntity();
-      entity.addComponent({
-        type: CT.Needs,
-        hunger: 0.5,
-        thirst: 0.5,
-        energy: 0.5,
-        health: 0.5,
-        maxMana: 100,
-        mana: 50,
-      } as NeedsComponent);
-
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.2,
+      // Set healing mutation (rate is per second)
+      setMutationRate(entity, 'needs.health', 0.2, {
         max: 1.0,
         source: 'test_heal',
       });
 
-      world.setTick(1200);
-      system.update(world, [], 60);
+      // Update system (1 second elapsed)
+      system.update(world, [], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.7, 2);
     });
 
-    it('should apply negative delta correctly', () => {
+    it('should apply negative mutation rate correctly', () => {
       const entity = world.createEntity();
       entity.addComponent({
         type: CT.Needs,
@@ -213,17 +52,14 @@ describe('StateMutatorSystem', () => {
         mana: 50,
       } as NeedsComponent);
 
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -0.2,
+      // Set damage mutation
+      setMutationRate(entity, 'needs.health', -0.2, {
         min: 0,
         source: 'test_damage',
       });
 
-      world.setTick(1200);
-      system.update(world, [], 60);
+      // Update system (1 second elapsed)
+      system.update(world, [], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.3, 2);
@@ -241,17 +77,12 @@ describe('StateMutatorSystem', () => {
         mana: 50,
       } as NeedsComponent);
 
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -0.5,
+      setMutationRate(entity, 'needs.health', -0.5, {
         min: 0,
         source: 'massive_damage',
       });
 
-      world.setTick(1200);
-      system.update(world, [], 60);
+      system.update(world, [], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBe(0); // Clamped to min
@@ -269,25 +100,20 @@ describe('StateMutatorSystem', () => {
         mana: 50,
       } as NeedsComponent);
 
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.5,
+      setMutationRate(entity, 'needs.health', 0.5, {
         max: 1.0,
         source: 'overheal',
       });
 
-      world.setTick(1200);
-      system.update(world, [], 60);
+      system.update(world, [], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBe(1.0); // Clamped to max
     });
   });
 
-  describe('Delta Cleanup', () => {
-    it('should remove delta when cleanup function is called', () => {
+  describe('Derivative (Rate Decay)', () => {
+    it('should apply derivative to slow down healing over time', () => {
       const entity = world.createEntity();
       entity.addComponent({
         type: CT.Needs,
@@ -299,27 +125,30 @@ describe('StateMutatorSystem', () => {
         mana: 50,
       } as NeedsComponent);
 
-      const cleanup = system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -0.1,
-        min: 0,
-        source: 'dispellable_damage',
+      // Healing that decays over time
+      setMutationRate(entity, 'needs.health', 0.2, {
+        derivative: -0.1, // Rate decreases by 0.1 per second
+        max: 1.0,
+        source: 'decaying_heal',
       });
 
-      // Call cleanup (simulating dispel)
-      cleanup();
-
-      // Update should not apply the delta
-      world.setTick(1200);
-      system.update(world, [], 60);
-
+      // First second: rate is 0.2
+      system.update(world, [], 1.0);
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
-      expect(needs.health).toBe(0.5); // Unchanged
-    });
+      expect(needs.health).toBeCloseTo(0.7, 2);
 
-    it('should auto-expire delta based on totalAmount', () => {
+      // Second second: rate is now 0.1 (0.2 - 0.1)
+      system.update(world, [], 1.0);
+      expect(needs.health).toBeCloseTo(0.8, 2);
+
+      // Third second: rate is now 0.0 (0.1 - 0.1)
+      system.update(world, [], 1.0);
+      expect(needs.health).toBeCloseTo(0.8, 2); // No change, rate decayed to 0
+    });
+  });
+
+  describe('Total Amount Expiration', () => {
+    it('should auto-expire mutation after totalAmount is reached', () => {
       const entity = world.createEntity();
       entity.addComponent({
         type: CT.Needs,
@@ -331,30 +160,150 @@ describe('StateMutatorSystem', () => {
         mana: 50,
       } as NeedsComponent);
 
-      // Register delta with total amount limit
-      system.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: +0.1,
-        totalAmount: 0.1, // Only heal 0.1 total
+      // Bandage that heals 0.1 total
+      setMutationRate(entity, 'needs.health', 0.1, {
+        totalAmount: 0.1,
         max: 1.0,
         source: 'bandage',
       });
 
       // First update: applies 0.1
-      world.setTick(1200);
-      system.update(world, [], 60);
-
+      system.update(world, [], 1.0);
       let needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.6, 2);
 
-      // Second update: delta should be expired, no change
-      world.setTick(2400);
-      system.update(world, [], 60);
-
+      // Second update: mutation should be expired, no change
+      system.update(world, [], 1.0);
       needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.6, 2); // No additional healing
+    });
+  });
+
+  describe('Tick Expiration', () => {
+    it('should auto-expire mutation at specified tick', () => {
+      const entity = world.createEntity();
+      entity.addComponent({
+        type: CT.Needs,
+        hunger: 0.5,
+        thirst: 0.5,
+        energy: 0.5,
+        health: 0.5,
+        maxMana: 100,
+        mana: 50,
+      } as NeedsComponent);
+
+      // Mutation that expires at tick 100
+      setMutationRate(entity, 'needs.health', 0.1, {
+        expiresAt: 100,
+        max: 1.0,
+        source: 'timed_buff',
+      });
+
+      // Before expiration (tick 50)
+      world.setTick(50);
+      system.update(world, [], 1.0);
+      let needs = entity.getComponent(CT.Needs) as NeedsComponent;
+      expect(needs.health).toBeCloseTo(0.6, 2);
+
+      // After expiration (tick 100)
+      world.setTick(100);
+      system.update(world, [], 1.0);
+      needs = entity.getComponent(CT.Needs) as NeedsComponent;
+      expect(needs.health).toBeCloseTo(0.6, 2); // Mutation expired, no more healing
+    });
+  });
+
+  describe('Clearing Mutations', () => {
+    it('should remove mutation when clearMutationRate is called', () => {
+      const entity = world.createEntity();
+      entity.addComponent({
+        type: CT.Needs,
+        hunger: 0.5,
+        thirst: 0.5,
+        energy: 0.5,
+        health: 0.5,
+        maxMana: 100,
+        mana: 50,
+      } as NeedsComponent);
+
+      setMutationRate(entity, 'needs.health', -0.1, {
+        min: 0,
+        source: 'dispellable_damage',
+      });
+
+      // Clear the mutation (simulating dispel)
+      clearMutationRate(entity, 'needs.health');
+
+      // Update should not apply the mutation
+      system.update(world, [], 1.0);
+
+      const needs = entity.getComponent(CT.Needs) as NeedsComponent;
+      expect(needs.health).toBe(0.5); // Unchanged
+    });
+  });
+
+  describe('Multiple Mutations Same Field', () => {
+    it('should override previous mutation on same field', () => {
+      const entity = world.createEntity();
+      entity.addComponent({
+        type: CT.Needs,
+        hunger: 0.5,
+        thirst: 0.5,
+        energy: 0.5,
+        health: 0.5,
+        maxMana: 100,
+        mana: 50,
+      } as NeedsComponent);
+
+      // First mutation
+      setMutationRate(entity, 'needs.health', 0.1, {
+        max: 1.0,
+        source: 'heal_1',
+      });
+
+      // Second mutation overrides first
+      setMutationRate(entity, 'needs.health', -0.2, {
+        min: 0,
+        source: 'damage',
+      });
+
+      system.update(world, [], 1.0);
+
+      const needs = entity.getComponent(CT.Needs) as NeedsComponent;
+      // Only damage applies (0.5 - 0.2 = 0.3), healing was overwritten
+      expect(needs.health).toBeCloseTo(0.3, 2);
+    });
+  });
+
+  describe('Negligible Rate Cleanup', () => {
+    it('should auto-remove mutations with negligible rates', () => {
+      const entity = world.createEntity();
+      entity.addComponent({
+        type: CT.Needs,
+        hunger: 0.5,
+        thirst: 0.5,
+        energy: 0.5,
+        health: 0.5,
+        maxMana: 100,
+        mana: 50,
+      } as NeedsComponent);
+      entity.addComponent(createMutationVectorComponent());
+
+      // Set a very small rate (below threshold)
+      setMutationRate(entity, 'needs.health', 0.00001, {
+        max: 1.0,
+        source: 'tiny_heal',
+      });
+
+      // Update - mutation should be auto-removed due to negligible rate
+      system.update(world, [], 1.0);
+
+      // Second update - should not crash, mutation is gone
+      system.update(world, [], 1.0);
+
+      const needs = entity.getComponent(CT.Needs) as NeedsComponent;
+      // Health barely changed
+      expect(needs.health).toBeCloseTo(0.5, 2);
     });
   });
 });

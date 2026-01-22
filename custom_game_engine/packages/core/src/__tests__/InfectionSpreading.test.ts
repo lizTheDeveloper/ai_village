@@ -5,7 +5,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl, type World } from '../ecs/World.js';
 import { BodySystem } from '../systems/BodySystem.js';
-import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { createBodyComponentFromPlan } from '../components/BodyPlanRegistry.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
@@ -13,13 +12,10 @@ import type { BodyComponent } from '../components/BodyComponent.js';
 describe('BodySystem - Infection Spreading', () => {
   let world: World;
   let bodySystem: BodySystem;
-  let stateMutator: StateMutatorSystem;
 
   beforeEach(() => {
     world = new WorldImpl();
-    stateMutator = new StateMutatorSystem();
     bodySystem = new BodySystem();
-    bodySystem.setStateMutatorSystem(stateMutator);
   });
 
   it('should initialize infection severity when infection starts', () => {

@@ -32,7 +32,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -78,7 +77,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -126,7 +124,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -173,7 +170,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -221,7 +217,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -270,7 +265,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -420,7 +414,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });

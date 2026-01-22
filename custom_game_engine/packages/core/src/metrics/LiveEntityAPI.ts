@@ -426,6 +426,7 @@ export class LiveEntityAPI {
 
     try {
       // Dynamic import to break circular dependency: core -> agents -> reproduction -> core
+      // @ts-expect-error - Module resolution handled at runtime
       const { createLLMAgent, createWanderingAgent } = await import('@ai-village/agents');
       const agentId = shouldUseLLM
         ? createLLMAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, undefined, options)

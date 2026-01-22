@@ -23,14 +23,12 @@ describe('Animal Housing - Integration Tests', () => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
 
-    // Create and wire up StateMutatorSystem (required dependency for AnimalSystem and TemperatureSystem)
+    // Create StateMutatorSystem for test usage
     stateMutator = new StateMutatorSystem();
 
     temperatureSystem = new TemperatureSystem();
-    temperatureSystem.setStateMutatorSystem(stateMutator);
 
     animalSystem = new AnimalSystem(eventBus);
-    animalSystem.setStateMutatorSystem(stateMutator);
   });
 
   describe('Temperature System Integration', () => {

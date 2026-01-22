@@ -29,8 +29,6 @@ import type {
 import { calculateScaledValue } from './SpellEffect.js';
 import type { SpellDefinition } from './SpellRegistry.js';
 import { SpellEffectRegistry } from './SpellEffectRegistry.js';
-import type { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
-
 // ============================================================================
 // Effect Applier Interface
 // ============================================================================
@@ -103,9 +101,6 @@ export interface EffectContext {
   /** Active paradigm ID */
   paradigmId?: string;
 
-  /** StateMutatorSystem for gradual effect registration (required for DoT/HoT effects) */
-  stateMutatorSystem: StateMutatorSystem | null;
-
   /** FireSpreadSystem for fire ignition (required for fire damage effects) */
   fireSpreadSystem: any | null; // Using 'any' to avoid circular dependency with FireSpreadSystem
 }
@@ -129,9 +124,6 @@ export class SpellEffectExecutor {
   /** Instance counter for unique effect instance IDs */
   private instanceCounter: number = 0;
 
-  /** StateMutatorSystem for gradual effects */
-  private stateMutatorSystem: StateMutatorSystem | null = null;
-
   /** FireSpreadSystem for fire ignition effects */
   private fireSpreadSystem: any | null = null;
 
@@ -146,17 +138,6 @@ export class SpellEffectExecutor {
 
   static resetInstance(): void {
     SpellEffectExecutor.instance = null;
-  }
-
-  /**
-   * Set the StateMutatorSystem for gradual effect processing.
-   * Must be called during MagicSystem initialization.
-   */
-  setStateMutatorSystem(system: StateMutatorSystem): void {
-    if (this.stateMutatorSystem !== null) {
-      throw new Error('[SpellEffectExecutor] StateMutatorSystem already set');
-    }
-    this.stateMutatorSystem = system;
   }
 
   /**
@@ -268,8 +249,6 @@ export class SpellEffectExecutor {
     const isCrit = this.rollCrit(effect, casterMagic);
 
     // Build context
-    // Note: stateMutatorSystem may be null if not initialized, but the appliers
-    // will fail fast with a clear error if they need it for DoT/HoT effects
     const context: EffectContext = {
       tick,
       spell,
@@ -278,7 +257,6 @@ export class SpellEffectExecutor {
       isCrit,
       powerMultiplier,
       paradigmId: casterMagic.activeParadigmId,
-      stateMutatorSystem: this.stateMutatorSystem,
       fireSpreadSystem: this.fireSpreadSystem,
     };
 
@@ -369,7 +347,6 @@ export class SpellEffectExecutor {
           isCrit: false,
           powerMultiplier: 1.0,
           paradigmId: activeEffect.paradigmId,
-          stateMutatorSystem: null,
           fireSpreadSystem: null,
         };
 

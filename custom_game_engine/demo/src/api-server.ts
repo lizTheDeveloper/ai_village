@@ -4,25 +4,31 @@
  *
  * Persistence and multiverse management server, separate from the game runtime server (8766).
  *
- * API Namespaces:
+ * API Namespaces (Phase 2 Migration Complete):
  *
  * /api/multiverse/*  - Universe/multiverse operations
- *   - /api/universe, /api/universes - Universe CRUD (Phase 2: → /api/multiverse/universe/*)
- *   - /api/passage, /api/passages   - Inter-universe connections (Phase 2: → /api/multiverse/passage/*)
- *   - /api/player/*                 - Player registration (Phase 2: → /api/multiverse/player/*)
- *   - /api/multiverse/stats         - Multiverse statistics (already correct)
+ *   POST   /api/multiverse/universe      - Create universe
+ *   GET    /api/multiverse/universe/:id  - Get universe
+ *   DELETE /api/multiverse/universe/:id  - Delete universe
+ *   GET    /api/multiverse/universes     - List universes
+ *   POST   /api/multiverse/passage       - Create passage
+ *   GET    /api/multiverse/passages      - List passages
+ *   POST   /api/multiverse/player        - Register player
+ *   GET    /api/multiverse/player/:id    - Get player
+ *   GET    /api/multiverse/stats         - Multiverse statistics
  *
  * /api/souls/*  - Soul repository (eternal storage)
- *   - /api/save-soul              - Save soul (Phase 2: → /api/souls/save)
- *   - /api/soul-repository/stats  - Repository stats (Phase 2: → /api/souls/stats)
- *   - /api/generate-soul-sprite   - Generate sprite (Phase 2: → /api/souls/sprite)
+ *   POST /api/souls/save    - Save soul
+ *   GET  /api/souls/stats   - Repository stats
+ *   POST /api/souls/sprite  - Generate soul sprite
  *
  * /api/species/*  - Alien species database
- *   - /api/alien-species          - List species (Phase 2: → /api/species)
- *   - /api/save-alien-species     - Save species (Phase 2: → /api/species/save)
- *   - /api/generate-sprite        - Generate sprite (Phase 2: → /api/species/sprite)
+ *   GET  /api/species        - List species
+ *   POST /api/species/save   - Save species
+ *   POST /api/species/sprite - Generate sprite
  *
- * See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
+ * Old routes still work via aliasing (backwards compatible).
+ * See docs/API_NAMESPACE_MIGRATION.md for details.
  */
 
 import express from 'express';
@@ -49,10 +55,58 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increase limit for base64 images
 
-// Log all requests to /api/ for debugging
+// ============================================================================
+// API NAMESPACE MIGRATION (Phase 2)
+// ============================================================================
+// New namespaces map to existing handlers for backwards compatibility.
+// See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
+
+// Route aliasing: NEW namespace → OLD namespace
+// Note: These paths are relative to the /api mount point (no /api prefix)
+const namespaceAliases: Array<[string, string]> = [
+  // Soul routes
+  ['/souls/save', '/save-soul'],
+  ['/souls/stats', '/soul-repository/stats'],
+  ['/souls/sprite', '/generate-soul-sprite'],
+  // Species routes
+  ['/species/save', '/save-alien-species'],
+  ['/species/sprite', '/generate-sprite'],
+  ['/species', '/alien-species'],  // Must be after more specific routes
+  // Multiverse routes (prefix rewrites)
+  ['/multiverse/universes', '/universes'],
+  ['/multiverse/universe/', '/universe/'],
+  ['/multiverse/universe', '/universe'],  // Exact match for POST
+  ['/multiverse/passages', '/passages'],
+  ['/multiverse/passage/', '/passage/'],
+  ['/multiverse/passage', '/passage'],
+  ['/multiverse/player/', '/player/'],
+  ['/multiverse/player', '/player'],
+  // /multiverse/stats already correct - no rewrite needed
+];
+
 app.use('/api', (req, res, next) => {
+  // Check for namespace aliasing (req.url is relative to /api mount)
+  const originalUrl = req.url;
+  for (const [newPath, oldPath] of namespaceAliases) {
+    // Handle exact matches and query strings
+    if (req.url === newPath || req.url.startsWith(newPath + '?')) {
+      req.url = oldPath + req.url.slice(newPath.length);
+      break;
+    }
+    // Handle prefix matches (for paths with IDs like /multiverse/universe/123)
+    if (newPath.endsWith('/') && req.url.startsWith(newPath)) {
+      req.url = oldPath + req.url.slice(newPath.length);
+      break;
+    }
+  }
+
+  // Log all requests (show rewritten path if applicable)
   const bodySize = req.headers['content-length'] || 'unknown';
-  console.log(`[API] ${req.method} ${req.path} (body: ${bodySize} bytes)`);
+  if (req.url !== originalUrl) {
+    console.log(`[API] ${req.method} /api${originalUrl} → /api${req.url} (body: ${bodySize} bytes)`);
+  } else {
+    console.log(`[API] ${req.method} /api${req.url} (body: ${bodySize} bytes)`);
+  }
   next();
 });
 
@@ -206,8 +260,8 @@ async function startServer() {
 
   app.listen(PORT, () => {
     console.log(`[API Server] Running on port ${PORT}`);
-    console.log(`[API Server] Soul sprite generation available at /api/generate-soul-sprite`);
-    console.log(`[API Server] Multiverse API available at /api/universe, /api/universes, /api/passage, etc.`);
+    console.log(`[API Server] Namespaces: /api/multiverse/*, /api/souls/*, /api/species/*`);
+    console.log(`[API Server] Old routes still work via aliasing (backwards compatible)`);
   });
 }
 

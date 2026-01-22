@@ -8,15 +8,16 @@
  * - Passage management (inter-universe connections)
  * - Player management (registration, universe ownership)
  *
- * Current Routes (Phase 2 Migration Pending):
- *   /api/universe/*   → /api/multiverse/universe/*
- *   /api/universes    → /api/multiverse/universes
- *   /api/passage/*    → /api/multiverse/passage/*
- *   /api/passages     → /api/multiverse/passages
- *   /api/player/*     → /api/multiverse/player/*
- *   /api/multiverse/stats (already correct)
+ * Preferred Routes (via namespace aliasing in api-server.ts):
+ *   /api/multiverse/universe/*   - Universe CRUD
+ *   /api/multiverse/universes    - List universes
+ *   /api/multiverse/passage/*    - Passage CRUD
+ *   /api/multiverse/passages     - List passages
+ *   /api/multiverse/player/*     - Player management
+ *   /api/multiverse/stats        - Multiverse statistics
  *
- * See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
+ * Old routes (/api/universe/*, etc.) still work via aliasing.
+ * See docs/API_NAMESPACE_MIGRATION.md for details.
  */
 
 import type { Request, Response, Router } from 'express';

@@ -26,7 +26,9 @@
     { "path": "./packages/introspection" },
     { "path": "./packages/building-designer" },
     { "path": "./packages/hierarchy-simulator" },
+    { "path": "./packages/deterministic-sprite-generator" },
     { "path": "./packages/core" },
+    { "path": "./packages/language" },
     { "path": "./packages/botany" },
     { "path": "./packages/reproduction" },
     { "path": "./packages/agents" },
@@ -34,9 +36,12 @@
     { "path": "./packages/magic" },
     { "path": "./packages/divinity" },
     { "path": "./packages/metrics" },
+    { "path": "./packages/metrics-dashboard" },
     { "path": "./packages/persistence" },
+    { "path": "./packages/navigation" },
     { "path": "./packages/world" },
     { "path": "./packages/environment" },
+    { "path": "./packages/shared-worker" },
     { "path": "./packages/city-simulator" },
     { "path": "./packages/renderer" }
   ]

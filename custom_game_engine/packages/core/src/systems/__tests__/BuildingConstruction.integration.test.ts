@@ -145,7 +145,6 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const resourceSystem = new ResourceGatheringSystem();
-    resourceSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
     const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
@@ -190,7 +189,6 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const resourceSystem = new ResourceGatheringSystem();
-    resourceSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
     const entities = harness.world.query().with(ComponentType.Resource).executeEntities();
@@ -231,7 +229,6 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const resourceSystem = new ResourceGatheringSystem();
-    resourceSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
     harness.clearEvents();

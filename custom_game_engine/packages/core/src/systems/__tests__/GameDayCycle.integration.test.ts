@@ -51,12 +51,11 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should agent sleep during night hours', () => {
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -86,12 +85,11 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should agent wake during day hours', () => {
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -127,12 +125,11 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should needs decay over time', () => {
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -204,7 +201,7 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should multiple systems integrate over full day', () => {
-    // Create and wire StateMutatorSystem first (required for SleepSystem and NeedsSystem)
+    // Create StateMutatorSystem first (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
@@ -212,11 +209,9 @@ describe('Complete Game Day Cycle Integration', () => {
     harness.registerSystem('TimeSystem', timeSystem);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -279,16 +274,14 @@ describe('Complete Game Day Cycle Integration', () => {
   });
 
   it('should temperature system affect health over time', () => {
-    // Create and wire StateMutatorSystem (required for TemperatureSystem and NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const tempSystem = new TemperatureSystem(harness.world.eventBus);
-    tempSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -319,7 +312,7 @@ describe('Complete Game Day Cycle Integration', () => {
 
   it.skip('should full day cycle emit all expected events', () => {
     // SKIP: TimeSystem doesn't emit world:time:hour events (not implemented)
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
@@ -327,7 +320,6 @@ describe('Complete Game Day Cycle Integration', () => {
     harness.registerSystem('TimeSystem', timeSystem);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });

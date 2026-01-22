@@ -144,6 +144,7 @@ export * from './AvatarSystem.js';
 export * from './PossessionSystem.js';
 export * from './PlayerInputSystem.js';
 // Phase 7: Angels
+export * from './AngelTypes.js';  // Shared types (extracted to break circular deps)
 export * from './AngelSystem.js';
 // Admin Angel (NUX helper in divine chat)
 export * from './AdminAngelSystem.js';

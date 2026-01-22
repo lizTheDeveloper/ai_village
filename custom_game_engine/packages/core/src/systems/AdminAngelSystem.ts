@@ -27,9 +27,29 @@ import {
   popPendingObservation,
 } from '../components/AdminAngelComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
-import { generateRandomName } from '@ai-village/language';
+import { generateRandomName } from '../utils/nameGenerator.js';
 
-// LLM Configuration - Uses environment variables or defaults
+// ============================================================================
+// LLM Queue Interface (matches @ai-village/llm LLMDecisionQueue)
+// ============================================================================
+
+/**
+ * Interface for LLM decision queue - allows loose coupling with @ai-village/llm package.
+ * The actual LLMDecisionQueue from @ai-village/llm implements this interface.
+ */
+export interface LLMQueue {
+  requestDecision(agentId: string, prompt: string): Promise<string>;
+}
+
+/**
+ * Configuration for AdminAngelSystem
+ */
+export interface AdminAngelSystemConfig {
+  /** Optional LLM queue for using the shared LLM infrastructure */
+  llmQueue?: LLMQueue;
+}
+
+// LLM Configuration - Uses environment variables or defaults (fallback when no queue provided)
 const LLM_CONFIG = {
   model: typeof process !== 'undefined' ? (process.env?.LLM_MODEL || 'qwen/qwen3-32b') : 'qwen/qwen3-32b',
   baseUrl: typeof process !== 'undefined' ? (process.env?.LLM_BASE_URL || 'https://api.groq.com/openai/v1') : 'https://api.groq.com/openai/v1',
@@ -126,15 +146,21 @@ game rn:
 ${stateLines.map(l => `- ${l}`).join('\n')}
 
 u can:
-- pause/unpause (say: [pause] or [resume])
-- speed up (say: [speed 2] or [speed 5])
-- open panels (say: [open agent-info] or [open crafting])
-- move camera (say: [look at agent NAME] or [look at x,y])
-- make agents do stuff (say: [agent NAME gather wood])
+- time: [pause], [resume], [speed 2], [speed 5]
+- camera: [look at agent NAME], [look at x,y], [follow AGENT], [zoom in], [zoom out]
+- panels: [open agent-info], [open crafting], [close PANEL]
+- agents: [agent NAME gather wood], [select AGENT], [info AGENT], [spawn agent], [give AGENT ITEM]
+- time travel: [save NAME], [load NAME], [list checkpoints], [rewind]
+- divine powers: [bless AGENT], [heal AGENT], [whisper AGENT msg], [vision AGENT msg]
+- miracles: [miracle rain], [miracle fertility], [miracle bounty], [weather sunny/rain/storm]
+- multiverse: [fork universe], [list universes], [list passages]
 - grand strategy: [list empires], [list fleets], [list megastructures]
-- diplomacy: [diplomatic ally EMPIRE_ID TARGET_ID], [diplomatic war EMPIRE_ID TARGET_ID]
-- fleet orders: [move fleet FLEET_ID X Y]
+- diplomacy: [diplomatic ally EMPIRE TARGET], [diplomatic war EMPIRE TARGET]
+- fleet: [move fleet FLEET_ID X Y]
 - megastructure: [megastructure task MEGA_ID maintenance/research/production]
+- research: [research TECH], [list research]
+- building: [build TYPE at X,Y], [summon building TYPE]
+- utility: [notify MESSAGE], [stats], [help]
 
 ${recentChat ? `recent chat:\n${recentChat}\n` : ''}
 ${playerMessage ? `[they said]: ${playerMessage}` : '[proactive turn - only speak if something interesting happened]'}
@@ -161,13 +187,71 @@ export class AdminAngelSystem extends BaseSystem {
   private angelEntityId: string | null = null;
   private lastProactiveTick: number = 0;
   private pendingRequests = new Set<string>(); // Track in-flight requests
+  private llmQueue: LLMQueue | null = null; // Shared LLM queue (if provided)
+
+  constructor(config?: AdminAngelSystemConfig) {
+    super();
+    if (config?.llmQueue) {
+      this.llmQueue = config.llmQueue;
+      console.log('[AdminAngelSystem] Using shared LLM queue');
+    }
+  }
 
   /**
    * Call the LLM for a casual chat response.
-   * Uses Qwen via Groq API for fast, cheap responses.
+   *
+   * If an LLM queue was provided (via config), uses it for:
+   * - Shared rate limiting with agent LLM calls
+   * - Automatic metrics tracking in the admin dashboard
+   * - Works in headless mode
+   *
+   * Falls back to direct fetch if no queue provided.
    */
-  private async callLLM(prompt: string): Promise<string> {
+  private async callLLM(prompt: string, world?: World): Promise<string> {
+    const startTime = Date.now();
+    const agentId = this.angelEntityId ?? 'admin_angel';
+
+    // If we have a shared LLM queue, use it (preferred path)
+    if (this.llmQueue) {
+      try {
+        const response = await this.llmQueue.requestDecision(agentId, prompt);
+        // Strip thinking tags if present (qwen models use them)
+        return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+      } catch (error) {
+        console.error('[AdminAngelSystem] LLM queue call failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback: Direct API call (browser mode or no queue configured)
+    return this.callLLMDirect(prompt, world, startTime, agentId);
+  }
+
+  /**
+   * Direct LLM API call (fallback when no queue provided)
+   * Used in browser mode or when headless without shared LLM infrastructure.
+   */
+  private async callLLMDirect(
+    prompt: string,
+    world: World | undefined,
+    startTime: number,
+    agentId: string
+  ): Promise<string> {
     const { model, baseUrl, apiKey } = LLM_CONFIG;
+
+    // Emit llm:request event for metrics tracking
+    if (world?.eventBus) {
+      world.eventBus.emit({
+        type: 'llm:request',
+        data: {
+          agentId,
+          promptLength: prompt.length,
+          reason: 'manual',
+          llmType: 'standard',
+        },
+        source: agentId,
+      });
+    }
 
     // Check if we're in browser environment - use proxy
     const isBrowser = typeof window !== 'undefined';
@@ -201,16 +285,62 @@ export class AdminAngelSystem extends BaseSystem {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`LLM API error: ${response.status} - ${errorText.substring(0, 200)}`);
+        const error = new Error(`LLM API error: ${response.status} - ${errorText.substring(0, 200)}`);
+
+        // Emit llm:error event
+        if (world?.eventBus) {
+          world.eventBus.emit({
+            type: 'llm:error',
+            data: {
+              agentId,
+              error: error.message,
+              errorType: 'connection',
+            },
+            source: agentId,
+          });
+        }
+
+        throw error;
       }
 
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content || '';
+      const latencyMs = Date.now() - startTime;
+
+      // Emit llm:decision event for metrics tracking
+      if (world?.eventBus) {
+        world.eventBus.emit({
+          type: 'llm:decision',
+          data: {
+            agentId,
+            decision: 'chat_response',
+            behavior: 'admin_angel_chat',
+            reasoning: content.substring(0, 100),
+            source: 'llm',
+            latencyMs,
+          },
+          source: agentId,
+        });
+      }
 
       // Strip any thinking tags if present (qwen sometimes uses them)
       return content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
     } catch (error) {
       console.error('[AdminAngelSystem] LLM call failed:', error);
+
+      // Emit llm:error if not already emitted
+      if (world?.eventBus && !(error instanceof Error && error.message.includes('LLM API error'))) {
+        world.eventBus.emit({
+          type: 'llm:error',
+          data: {
+            agentId,
+            error: error instanceof Error ? error.message : String(error),
+            errorType: 'connection',
+          },
+          source: agentId,
+        });
+      }
+
       throw error;
     }
   }
@@ -316,8 +446,8 @@ export class AdminAngelSystem extends BaseSystem {
     // Mark as awaiting
     angel.awaitingResponse = true;
 
-    // Call LLM asynchronously
-    this.callLLM(prompt)
+    // Call LLM asynchronously (pass world for metrics tracking)
+    this.callLLM(prompt, ctx.world)
       .then((response) => {
         this.handleAngelResponseDirect(ctx.world, angel, angelEntity, response);
       })
@@ -446,6 +576,7 @@ export class AdminAngelSystem extends BaseSystem {
     };
 
     switch (cmd.type) {
+      // ========== TIME CONTROL ==========
       case 'pause':
         emit('time:request_pause', {});
         break;
@@ -458,6 +589,8 @@ export class AdminAngelSystem extends BaseSystem {
         emit('time:request_speed', { speed });
         break;
       }
+
+      // ========== UI / PANELS ==========
       case 'open': {
         const panel = cmd.args.join('-');
         emit('ui:open_panel', { panelId: panel });
@@ -468,12 +601,28 @@ export class AdminAngelSystem extends BaseSystem {
         emit('ui:close_panel', { panelId: closePanel });
         break;
       }
+
+      // ========== CAMERA ==========
       case 'look':
         if (cmd.args[0] === 'at') {
           const target = cmd.args.slice(1).join(' ');
           emit('camera:focus', { target });
         }
         break;
+      case 'follow': {
+        // [follow AGENT]
+        const followTarget = cmd.args.join(' ');
+        emit('camera:focus', { target: followTarget, follow: true });
+        break;
+      }
+      case 'zoom': {
+        // [zoom in] or [zoom out]
+        const direction = cmd.args[0];
+        emit('admin_angel:zoom', { direction: direction || 'in' });
+        break;
+      }
+
+      // ========== AGENT COMMANDS ==========
       case 'agent': {
         // [agent NAME behavior args...]
         const agentName = cmd.args[0];
@@ -488,9 +637,136 @@ export class AdminAngelSystem extends BaseSystem {
         }
         break;
       }
-      // Grand Strategy Commands
+      case 'select': {
+        // [select AGENT]
+        const selectTarget = cmd.args.join(' ');
+        emit('admin_angel:select_agent', { agentName: selectTarget });
+        break;
+      }
+      case 'info': {
+        // [info AGENT]
+        const infoTarget = cmd.args.join(' ');
+        emit('admin_angel:get_info', { agentName: infoTarget });
+        break;
+      }
+      case 'spawn': {
+        // [spawn agent] or [spawn animal TYPE]
+        const spawnType = cmd.args[0];
+        const spawnSubtype = cmd.args[1];
+        emit('admin_angel:spawn', { type: spawnType, subtype: spawnSubtype });
+        break;
+      }
+      case 'give': {
+        // [give AGENT ITEM]
+        const giveTarget = cmd.args[0];
+        const giveItem = cmd.args.slice(1).join(' ');
+        if (giveTarget && giveItem) {
+          emit('admin_angel:give_item', { agentName: giveTarget, item: giveItem });
+        }
+        break;
+      }
+
+      // ========== TIME TRAVEL / CHECKPOINTS ==========
+      case 'save': {
+        // [save NAME]
+        const saveName = cmd.args.join(' ') || 'quicksave';
+        emit('admin_angel:save_checkpoint', { name: saveName });
+        break;
+      }
+      case 'load': {
+        // [load NAME]
+        const loadName = cmd.args.join(' ');
+        if (loadName) {
+          emit('admin_angel:load_checkpoint', { name: loadName });
+        }
+        break;
+      }
+      case 'rewind': {
+        // [rewind] - go back to last checkpoint
+        emit('admin_angel:rewind', {});
+        break;
+      }
+
+      // ========== DIVINE POWERS ==========
+      case 'bless': {
+        // [bless AGENT]
+        const blessTarget = cmd.args.join(' ');
+        emit('divine_power:bless_individual', {
+          deityId: this.angelEntityId || 'admin_angel',
+          targetId: blessTarget, // Will need to resolve to entity ID
+          blessingType: 'general',
+          cost: 0,
+        });
+        emit('admin_angel:divine_action', { action: 'bless', target: blessTarget });
+        break;
+      }
+      case 'heal': {
+        // [heal AGENT]
+        const healTarget = cmd.args.join(' ');
+        emit('admin_angel:divine_action', { action: 'heal', target: healTarget });
+        break;
+      }
+      case 'whisper': {
+        // [whisper AGENT message...]
+        const whisperTarget = cmd.args[0];
+        const whisperMsg = cmd.args.slice(1).join(' ');
+        if (whisperTarget && whisperMsg) {
+          emit('divine_power:whisper', {
+            deityId: this.angelEntityId || 'admin_angel',
+            targetId: whisperTarget,
+            message: whisperMsg,
+            cost: 0,
+          });
+        }
+        break;
+      }
+      case 'vision': {
+        // [vision AGENT message...]
+        const visionTarget = cmd.args[0];
+        const visionContent = cmd.args.slice(1).join(' ');
+        if (visionTarget && visionContent) {
+          emit('divine_power:clear_vision', {
+            deityId: this.angelEntityId || 'admin_angel',
+            targetId: visionTarget,
+            visionContent,
+            cost: 0,
+          });
+        }
+        break;
+      }
+      case 'miracle': {
+        // [miracle TYPE] - rain, fertility, bounty, etc.
+        const miracleType = cmd.args[0] || 'blessing';
+        emit('deity:miracle', {
+          deityId: this.angelEntityId || 'admin_angel',
+          miracleType,
+          description: `Divine ${miracleType} from the angel`,
+        });
+        break;
+      }
+      case 'weather': {
+        // [weather sunny/rain/storm/snow]
+        const weatherType = cmd.args[0] || 'clear';
+        emit('admin_angel:weather_control', { weather: weatherType });
+        break;
+      }
+
+      // ========== MULTIVERSE ==========
+      case 'fork': {
+        // [fork universe] or [fork from CHECKPOINT]
+        if (cmd.args[0] === 'universe' || cmd.args[0] === 'from') {
+          const fromCheckpoint = cmd.args[0] === 'from' ? cmd.args.slice(1).join(' ') : undefined;
+          emit('universe:fork_requested', {
+            reason: 'admin_angel_request',
+            sourceCheckpoint: fromCheckpoint ? { key: fromCheckpoint, name: fromCheckpoint } : undefined,
+          });
+        }
+        break;
+      }
+
+      // ========== GRAND STRATEGY ==========
       case 'list': {
-        // [list empires], [list fleets], [list megastructures], etc.
+        // [list empires], [list fleets], [list megastructures], [list checkpoints], [list universes], [list passages], [list research]
         const entityType = cmd.args[0];
         emit('admin_angel:list_entities', { entityType });
         break;
@@ -530,6 +806,56 @@ export class AdminAngelSystem extends BaseSystem {
             emit('admin_angel:megastructure_task', { megastructureId: megaId, task });
           }
         }
+        break;
+      }
+
+      // ========== RESEARCH ==========
+      case 'research': {
+        // [research TECH_NAME]
+        const techName = cmd.args.join(' ');
+        if (techName) {
+          emit('admin_angel:start_research', { technology: techName });
+        }
+        break;
+      }
+
+      // ========== BUILDING ==========
+      case 'build': {
+        // [build TYPE at X,Y]
+        const buildArgs = cmd.args.join(' ');
+        const atMatch = buildArgs.match(/(.+)\s+at\s+(\d+)[,\s]+(\d+)/i);
+        if (atMatch) {
+          const buildingType = atMatch[1]!.trim();
+          const x = parseInt(atMatch[2]!, 10);
+          const y = parseInt(atMatch[3]!, 10);
+          emit('admin_angel:place_building', { buildingType, x, y });
+        }
+        break;
+      }
+      case 'summon': {
+        // [summon building TYPE]
+        if (cmd.args[0] === 'building') {
+          const summonType = cmd.args.slice(1).join(' ');
+          emit('admin_angel:summon_building', { buildingType: summonType });
+        }
+        break;
+      }
+
+      // ========== UTILITY ==========
+      case 'notify': {
+        // [notify MESSAGE]
+        const notifyMsg = cmd.args.join(' ');
+        emit('ui:notification', { message: notifyMsg, type: 'info' });
+        break;
+      }
+      case 'stats': {
+        // [stats] - request game statistics
+        emit('admin_angel:request_stats', {});
+        break;
+      }
+      case 'help': {
+        // [help] - list commands (will be handled by returning help text)
+        emit('admin_angel:help_requested', {});
         break;
       }
     }

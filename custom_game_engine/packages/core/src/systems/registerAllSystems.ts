@@ -415,7 +415,7 @@ export interface LLMDependencies {
  */
 export interface PlantSystemsConfig {
   /** PlantSystem class constructor */
-  PlantSystem: new (eventBus: EventBus) => System & { setStateMutatorSystem(s: StateMutatorSystem): void };
+  PlantSystem: new (eventBus: EventBus) => System;
   /** PlantDiscoverySystem class constructor */
   PlantDiscoverySystem: new () => System;
   /** PlantDiseaseSystem class constructor */
@@ -459,7 +459,7 @@ export interface SystemRegistrationConfig extends LLMDependencies {
 export interface SystemRegistrationResult {
   soilSystem: SoilSystem;
   /** PlantSystem instance (from @ai-village/botany or deprecated core version) */
-  plantSystem: System & { setStateMutatorSystem(s: StateMutatorSystem): void };
+  plantSystem: System;
   wildAnimalSpawning: WildAnimalSpawningSystem;
   aquaticAnimalSpawning: AquaticAnimalSpawningSystem;
   governanceDataSystem: GovernanceDataSystem;
@@ -597,9 +597,8 @@ export function registerAllSystems(
   // ============================================================================
   // PLANTS (use @ai-village/botany systems if provided, otherwise deprecated core versions)
   // ============================================================================
-  // PlantSystem - Uses StateMutatorSystem for batched hydration/age/health updates
+  // PlantSystem - Uses MutationVectorComponent for per-tick hydration/age/health updates
   const plantSystem = new PlantSystemClass(eventBus);
-  plantSystem.setStateMutatorSystem(stateMutator);
   gameLoop.systemRegistry.register(plantSystem);
   gameLoop.systemRegistry.register(new PlantDiscoverySystemClass());
   gameLoop.systemRegistry.register(new PlantDiseaseSystemClass(eventBus));
@@ -610,7 +609,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new AnimalBrainSystem());
 
-  // AnimalSystem - Uses StateMutatorSystem with MutationVectorComponent for per-tick mutations
+  // AnimalSystem - Uses MutationVectorComponent for per-tick needs mutations
   const animalSystem = new AnimalSystem();
   gameLoop.systemRegistry.register(animalSystem);
 
@@ -655,7 +654,7 @@ export function registerAllSystems(
 
   gameLoop.systemRegistry.register(new MoodSystem());
 
-  // SleepSystem - Uses StateMutatorSystem for batched sleep drive and energy recovery
+  // SleepSystem - Uses MutationVectorComponent for per-tick sleep drive and energy recovery
   gameLoop.systemRegistry.register(new SleepSystem());
 
   gameLoop.systemRegistry.register(new SteeringSystem());
@@ -784,10 +783,8 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new BuildingMaintenanceSystem());
 
   gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
-  // ResourceGatheringSystem - Uses StateMutatorSystem for batched resource regeneration
-  const resourceGatheringSystem = new ResourceGatheringSystem();
-  resourceGatheringSystem.setStateMutatorSystem(stateMutator);
-  gameLoop.systemRegistry.register(resourceGatheringSystem);
+  // ResourceGatheringSystem - Uses MutationVectorComponent for per-tick resource regeneration
+  gameLoop.systemRegistry.register(new ResourceGatheringSystem());
 
   // Tile-Based Voxel Building (Phase 3-4)
   gameLoop.systemRegistry.register(new TreeFellingSystem());
@@ -995,7 +992,10 @@ export function registerAllSystems(
   // ADMIN ANGEL (NUX Helper)
   // ============================================================================
   // Keep enabled - the admin angel helps players learn the game via divine chat
-  gameLoop.systemRegistry.register(new AdminAngelSystem());
+  // Pass LLM queue for shared LLM infrastructure (metrics, rate limiting, headless support)
+  gameLoop.systemRegistry.register(new AdminAngelSystem({
+    llmQueue: llmQueue,
+  }));
 
   // ============================================================================
   // MILESTONE SYSTEM (Player Progression)

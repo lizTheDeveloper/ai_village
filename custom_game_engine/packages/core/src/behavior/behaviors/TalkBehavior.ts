@@ -31,8 +31,8 @@ import { ComponentType } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
-// Language system imports (optional - gracefully degrades if not available)
-import type { LanguageKnowledgeComponent, LanguageComponent } from '@ai-village/language';
+// Language types (local stubs to avoid circular dependencies with @ai-village/language)
+import type { LanguageKnowledgeComponent, LanguageComponent } from '../../types/LanguageStubs.js';
 
 /** Probability of speaking each tick */
 const SPEAK_CHANCE = 0.3;

@@ -38,10 +38,9 @@ describe('SleepSystem Integration', () => {
 
     world.addEntity(agent);
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
 
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
@@ -83,10 +82,9 @@ describe('SleepSystem Integration', () => {
 
     world.addEntity(agent);
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
 
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
@@ -133,10 +131,9 @@ describe('SleepSystem Integration', () => {
 
     world.addEntity(agent);
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
 
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
@@ -183,10 +180,9 @@ describe('SleepSystem Integration', () => {
 
     world.addEntity(agent);
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
 
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();
@@ -233,10 +229,9 @@ describe('SleepSystem Integration', () => {
 
     world.addEntity(agent);
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
 
     // Only pass entities with circadian component
     const entities = world.query().with(ComponentType.Circadian).executeEntities();

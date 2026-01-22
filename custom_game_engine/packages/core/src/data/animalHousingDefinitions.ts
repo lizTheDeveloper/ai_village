@@ -3,6 +3,8 @@
  * Per construction-system/spec.md Tier 2.5 - Animal Housing
  */
 
+import housingData from '../../data/animal-housing.json';
+
 export interface AnimalHousingDefinition {
   buildingType: string;
   tier: number;
@@ -20,80 +22,7 @@ export interface AnimalHousingDefinition {
  * Animal housing building definitions from spec
  * Per CLAUDE.md: NO SILENT FALLBACKS - all fields are required
  */
-export const ANIMAL_HOUSING_DEFINITIONS: Record<string, AnimalHousingDefinition> = {
-  'chicken-coop': {
-    buildingType: 'chicken-coop',
-    tier: 2.5,
-    size: { width: 2, height: 2 },
-    capacity: 8,
-    allowedSpecies: ['chicken', 'duck', 'turkey'],
-    cost: { wood: 25 },
-    insulation: 0.6,
-    baseTemperature: 5,
-    weatherProtection: 0.8,
-    cleanlinessDecayRate: 5, // 5% per bird per day
-  },
-  kennel: {
-    buildingType: 'kennel',
-    tier: 2.5,
-    size: { width: 2, height: 3 },
-    capacity: 6,
-    allowedSpecies: ['dog', 'wolf'],
-    cost: { wood: 30, stone: 10 },
-    insulation: 0.7,
-    baseTemperature: 6,
-    weatherProtection: 0.85,
-    cleanlinessDecayRate: 5, // 5% per canine per day
-  },
-  stable: {
-    buildingType: 'stable',
-    tier: 2.5,
-    size: { width: 3, height: 4 },
-    capacity: 4,
-    allowedSpecies: ['horse', 'donkey', 'mule'],
-    cost: { wood: 50, stone: 20 },
-    insulation: 0.8,
-    baseTemperature: 8,
-    weatherProtection: 0.9,
-    cleanlinessDecayRate: 5, // 5% per equine per day
-  },
-  apiary: {
-    buildingType: 'apiary',
-    tier: 2.5,
-    size: { width: 2, height: 2 },
-    capacity: 3,
-    allowedSpecies: ['bee_colony'],
-    cost: { wood: 20, glass: 5 },
-    insulation: 0.5,
-    baseTemperature: 4,
-    weatherProtection: 0.75,
-    cleanlinessDecayRate: 2, // 2% per colony per day (bees are cleaner)
-  },
-  aquarium: {
-    buildingType: 'aquarium',
-    tier: 2.5,
-    size: { width: 2, height: 2 },
-    capacity: 10,
-    allowedSpecies: ['fish'],
-    cost: { glass: 30, stone: 10 },
-    insulation: 0.4,
-    baseTemperature: 3,
-    weatherProtection: 1.0, // Fully enclosed
-    cleanlinessDecayRate: 8, // 8% per 10 fish per day (water gets dirty fast)
-  },
-  barn: {
-    buildingType: 'barn',
-    tier: 3,
-    size: { width: 4, height: 5 },
-    capacity: 12,
-    allowedSpecies: ['cow', 'sheep', 'goat', 'pig'],
-    cost: { wood: 80, stone: 40 },
-    insulation: 0.85,
-    baseTemperature: 10,
-    weatherProtection: 0.95,
-    cleanlinessDecayRate: 5, // 5% per large animal per day
-  },
-};
+export const ANIMAL_HOUSING_DEFINITIONS = housingData.housing as Record<string, AnimalHousingDefinition>;
 
 /**
  * Get housing definition by building type

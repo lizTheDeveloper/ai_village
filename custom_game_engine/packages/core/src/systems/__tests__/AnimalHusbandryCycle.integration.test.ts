@@ -35,7 +35,6 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const timeSystem = new TimeSystem();
@@ -101,7 +100,6 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const timeSystem = new TimeSystem();
@@ -161,7 +159,6 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
@@ -209,7 +206,6 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -269,7 +265,6 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const tamingSystem = new TamingSystem(harness.world.eventBus);
@@ -313,7 +308,6 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const animalSystem = new AnimalSystem();
-    animalSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('AnimalSystem', animalSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });

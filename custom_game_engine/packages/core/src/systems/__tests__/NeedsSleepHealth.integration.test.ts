@@ -72,12 +72,11 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // Low energy
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     // Only pass entities with circadian component
@@ -116,12 +115,11 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // 80 hunger
 
-    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     // Only pass entities with 'needs' component to NeedsSystem
@@ -180,12 +178,11 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 0.37,
   })); // Full health, normal body temp
 
-    // Create and wire StateMutatorSystem (required for health damage)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const tempSystem = new TemperatureSystem();
-    tempSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     const entities = Array.from(harness.world.entities.values());
@@ -243,12 +240,11 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   }));
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     // Only pass entities with circadian component
@@ -289,12 +285,11 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // Almost full energy
 
-    // Create and wire StateMutatorSystem (required for SleepSystem)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const sleepSystem = new SleepSystem();
-    sleepSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('SleepSystem', sleepSystem);
 
     // Only pass entities with required components
@@ -347,16 +342,14 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   }));
 
-    // Create and wire StateMutatorSystem (required for batched updates)
+    // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const needsSystem = new NeedsSystem();
-    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const tempSystem = new TemperatureSystem();
-    tempSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     // Filter entities by required components for each system

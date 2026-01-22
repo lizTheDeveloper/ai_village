@@ -1,0 +1,768 @@
+{
+  "resourceItems": [
+    {
+      "id": "wood",
+      "name": "Wood",
+      "category": "resource",
+      "weight": 2.0,
+      "stackSize": 50,
+      "isGatherable": true,
+      "gatherSources": ["tree", "dead_tree"],
+      "requiredTool": "axe",
+      "baseValue": 5,
+      "rarity": "common"
+    },
+    {
+      "id": "stone",
+      "name": "Stone",
+      "category": "resource",
+      "weight": 3.0,
+      "stackSize": 30,
+      "isGatherable": true,
+      "gatherSources": ["rock", "boulder"],
+      "requiredTool": "pickaxe",
+      "baseValue": 4,
+      "rarity": "common"
+    },
+    {
+      "id": "plant_fiber",
+      "name": "Plant Fiber",
+      "category": "resource",
+      "weight": 0.5,
+      "stackSize": 100,
+      "isGatherable": true,
+      "gatherSources": ["grass", "plant", "flax"],
+      "baseValue": 2,
+      "rarity": "common"
+    },
+    {
+      "id": "leaves",
+      "name": "Leaves",
+      "category": "resource",
+      "weight": 0.3,
+      "stackSize": 100,
+      "isGatherable": true,
+      "gatherSources": ["tree", "bush"],
+      "baseValue": 1,
+      "rarity": "common"
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "category": "resource",
+      "weight": 1.0,
+      "stackSize": 10,
+      "isGatherable": true,
+      "gatherSources": ["water_source", "well", "river"],
+      "baseValue": 3,
+      "rarity": "common"
+    },
+    {
+      "id": "food",
+      "name": "Food",
+      "category": "resource",
+      "weight": 0.5,
+      "stackSize": 20,
+      "isEdible": true,
+      "hungerRestored": 20,
+      "quality": 40,
+      "flavors": ["savory"],
+      "isGatherable": true,
+      "baseValue": 8,
+      "rarity": "common"
+    }
+  ],
+  "foodItems": [
+    {
+      "id": "berry",
+      "name": "Berry",
+      "category": "food",
+      "weight": 0.2,
+      "stackSize": 50,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 15,
+          "quality": 40,
+          "flavors": ["sweet", "sour"],
+          "spoilRate": 0.1
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 15,
+      "quality": 40,
+      "flavors": ["sweet", "sour"],
+      "isGatherable": true,
+      "gatherSources": ["berry_bush"],
+      "baseValue": 6,
+      "rarity": "common"
+    },
+    {
+      "id": "wheat",
+      "name": "Wheat",
+      "category": "food",
+      "weight": 0.3,
+      "stackSize": 50,
+      "isEdible": true,
+      "hungerRestored": 10,
+      "quality": 25,
+      "flavors": ["bitter"],
+      "isGatherable": true,
+      "gatherSources": ["wheat_plant"],
+      "baseValue": 5,
+      "rarity": "common"
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "category": "food",
+      "weight": 0.3,
+      "stackSize": 30,
+      "isEdible": true,
+      "hungerRestored": 20,
+      "quality": 55,
+      "flavors": ["sweet"],
+      "isGatherable": true,
+      "gatherSources": ["apple_tree"],
+      "baseValue": 8,
+      "rarity": "common"
+    },
+    {
+      "id": "carrot",
+      "name": "Carrot",
+      "category": "food",
+      "weight": 0.2,
+      "stackSize": 40,
+      "isEdible": true,
+      "hungerRestored": 15,
+      "quality": 45,
+      "flavors": ["sweet"],
+      "isGatherable": true,
+      "gatherSources": ["carrot_plant"],
+      "baseValue": 6,
+      "rarity": "common"
+    },
+    {
+      "id": "raw_meat",
+      "name": "Raw Meat",
+      "category": "food",
+      "weight": 1.0,
+      "stackSize": 20,
+      "isEdible": true,
+      "hungerRestored": 15,
+      "quality": 20,
+      "flavors": ["umami", "bitter"],
+      "isGatherable": false,
+      "baseValue": 12,
+      "rarity": "common"
+    },
+    {
+      "id": "cooked_meat",
+      "name": "Cooked Meat",
+      "category": "food",
+      "weight": 0.8,
+      "stackSize": 20,
+      "isEdible": true,
+      "hungerRestored": 50,
+      "quality": 75,
+      "flavors": ["savory", "umami"],
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "raw_meat", "amount": 1 }],
+      "baseValue": 25,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "bread",
+      "name": "Bread",
+      "category": "food",
+      "weight": 0.5,
+      "stackSize": 20,
+      "isEdible": true,
+      "hungerRestored": 40,
+      "quality": 65,
+      "flavors": ["savory"],
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "wheat", "amount": 3 }],
+      "baseValue": 20,
+      "rarity": "common"
+    },
+    {
+      "id": "fish",
+      "name": "Fish",
+      "category": "food",
+      "weight": 0.5,
+      "stackSize": 20,
+      "isEdible": true,
+      "hungerRestored": 25,
+      "quality": 50,
+      "flavors": ["savory", "umami"],
+      "isGatherable": true,
+      "gatherSources": ["fishing_spot"],
+      "requiredTool": "fishing_rod",
+      "baseValue": 15,
+      "rarity": "common"
+    },
+    {
+      "id": "egg",
+      "name": "Egg",
+      "category": "food",
+      "weight": 0.2,
+      "stackSize": 30,
+      "isEdible": true,
+      "hungerRestored": 10,
+      "quality": 45,
+      "flavors": ["savory"],
+      "isGatherable": false,
+      "baseValue": 7,
+      "rarity": "common"
+    },
+    {
+      "id": "milk",
+      "name": "Milk",
+      "category": "food",
+      "weight": 0.5,
+      "stackSize": 10,
+      "isEdible": true,
+      "hungerRestored": 15,
+      "quality": 50,
+      "flavors": ["sweet"],
+      "isGatherable": false,
+      "baseValue": 10,
+      "rarity": "common"
+    }
+  ],
+  "materialItems": [
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "category": "material",
+      "weight": 4.0,
+      "stackSize": 30,
+      "isGatherable": true,
+      "gatherSources": ["iron_deposit"],
+      "requiredTool": "pickaxe",
+      "baseValue": 15,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "iron_ingot",
+      "name": "Iron Ingot",
+      "category": "material",
+      "weight": 3.0,
+      "stackSize": 30,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "iron_ore", "amount": 2 }],
+      "baseValue": 35,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "coal",
+      "name": "Coal",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 50,
+      "isGatherable": true,
+      "gatherSources": ["coal_deposit"],
+      "requiredTool": "pickaxe",
+      "baseValue": 8,
+      "rarity": "common"
+    },
+    {
+      "id": "gold_ore",
+      "name": "Gold Ore",
+      "category": "material",
+      "weight": 5.0,
+      "stackSize": 20,
+      "isGatherable": true,
+      "gatherSources": ["gold_deposit"],
+      "requiredTool": "pickaxe",
+      "baseValue": 50,
+      "rarity": "rare"
+    },
+    {
+      "id": "copper_ore",
+      "name": "Copper Ore",
+      "category": "material",
+      "weight": 3.5,
+      "stackSize": 30,
+      "isGatherable": true,
+      "gatherSources": ["copper_deposit"],
+      "requiredTool": "pickaxe",
+      "baseValue": 12,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "copper_ingot",
+      "name": "Copper Ingot",
+      "category": "material",
+      "weight": 2.5,
+      "stackSize": 30,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "copper_ore", "amount": 2 }],
+      "baseValue": 28,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "gold_ingot",
+      "name": "Gold Ingot",
+      "category": "material",
+      "weight": 4.0,
+      "stackSize": 20,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "gold_ore", "amount": 3 }],
+      "baseValue": 180,
+      "rarity": "rare"
+    },
+    {
+      "id": "steel_ingot",
+      "name": "Steel Ingot",
+      "category": "material",
+      "weight": 3.5,
+      "stackSize": 25,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "iron_ingot", "amount": 2 },
+        { "itemId": "coal", "amount": 1 }
+      ],
+      "baseValue": 85,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "cloth",
+      "name": "Cloth",
+      "category": "material",
+      "weight": 0.5,
+      "stackSize": 50,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "plant_fiber", "amount": 3 }],
+      "baseValue": 10,
+      "rarity": "common"
+    },
+    {
+      "id": "rope",
+      "name": "Rope",
+      "category": "material",
+      "weight": 0.8,
+      "stackSize": 30,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "plant_fiber", "amount": 5 }],
+      "baseValue": 12,
+      "rarity": "common"
+    },
+    {
+      "id": "plank",
+      "name": "Wooden Plank",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 50,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "wood", "amount": 1 }],
+      "baseValue": 8,
+      "rarity": "common"
+    },
+    {
+      "id": "thatch",
+      "name": "Thatch Bundle",
+      "category": "material",
+      "weight": 0.8,
+      "stackSize": 50,
+      "isGatherable": false,
+      "craftedFrom": [{ "itemId": "plant_fiber", "amount": 5 }],
+      "baseValue": 6,
+      "rarity": "common"
+    }
+  ],
+  "toolItems": [
+    {
+      "id": "axe",
+      "name": "Axe",
+      "category": "tool",
+      "weight": 3.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "stone", "amount": 3 }
+      ],
+      "baseValue": 30,
+      "rarity": "common"
+    },
+    {
+      "id": "pickaxe",
+      "name": "Pickaxe",
+      "category": "tool",
+      "weight": 3.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "stone", "amount": 3 }
+      ],
+      "baseValue": 32,
+      "rarity": "common"
+    },
+    {
+      "id": "hoe",
+      "name": "Hoe",
+      "category": "tool",
+      "weight": 2.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "stone", "amount": 2 }
+      ],
+      "baseValue": 25,
+      "rarity": "common",
+      "traits": {
+        "tool": {
+          "toolType": "hoe",
+          "efficiency": 1.0,
+          "durabilityLoss": 0.2
+        }
+      }
+    },
+    {
+      "id": "fishing_rod",
+      "name": "Fishing Rod",
+      "category": "tool",
+      "weight": 1.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 3 },
+        { "itemId": "fiber", "amount": 2 }
+      ],
+      "baseValue": 28,
+      "rarity": "common"
+    },
+    {
+      "id": "hammer",
+      "name": "Hammer",
+      "category": "tool",
+      "weight": 2.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 1 },
+        { "itemId": "stone", "amount": 2 }
+      ],
+      "baseValue": 22,
+      "rarity": "common"
+    },
+    {
+      "id": "iron_axe",
+      "name": "Iron Axe",
+      "category": "tool",
+      "weight": 3.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "iron_ingot", "amount": 2 }
+      ],
+      "baseValue": 75,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "iron_pickaxe",
+      "name": "Iron Pickaxe",
+      "category": "tool",
+      "weight": 4.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "iron_ingot", "amount": 3 }
+      ],
+      "baseValue": 85,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "iron_hoe",
+      "name": "Iron Hoe",
+      "category": "tool",
+      "weight": 3.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "iron_ingot", "amount": 2 }
+      ],
+      "baseValue": 65,
+      "rarity": "uncommon",
+      "traits": {
+        "tool": {
+          "toolType": "hoe",
+          "efficiency": 1.5,
+          "durabilityLoss": 0.15
+        }
+      }
+    },
+    {
+      "id": "steel_pickaxe",
+      "name": "Steel Pickaxe",
+      "category": "tool",
+      "weight": 4.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "steel_ingot", "amount": 3 }
+      ],
+      "baseValue": 200,
+      "rarity": "rare"
+    },
+    {
+      "id": "steel_axe",
+      "name": "Steel Axe",
+      "category": "tool",
+      "weight": 4.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "steel_ingot", "amount": 2 }
+      ],
+      "baseValue": 180,
+      "rarity": "rare"
+    }
+  ],
+  "weaponItems": [
+    {
+      "id": "copper_dagger",
+      "name": "Copper Dagger",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 1 },
+        { "itemId": "copper_ingot", "amount": 2 }
+      ],
+      "baseValue": 55,
+      "rarity": "common"
+    },
+    {
+      "id": "gold_scepter",
+      "name": "Gold Scepter",
+      "category": "equipment",
+      "weight": 2.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 1 },
+        { "itemId": "gold_ingot", "amount": 3 }
+      ],
+      "baseValue": 600,
+      "rarity": "legendary"
+    }
+  ],
+  "consumableItems": [
+    {
+      "id": "healing_potion",
+      "name": "Healing Potion",
+      "category": "consumable",
+      "weight": 0.3,
+      "stackSize": 10,
+      "isEdible": false,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "berry", "amount": 5 },
+        { "itemId": "water", "amount": 1 }
+      ],
+      "baseValue": 30,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "energy_potion",
+      "name": "Energy Potion",
+      "category": "consumable",
+      "weight": 0.3,
+      "stackSize": 10,
+      "isEdible": false,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wheat", "amount": 3 },
+        { "itemId": "water", "amount": 1 }
+      ],
+      "baseValue": 25,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "fertilizer",
+      "name": "Fertilizer",
+      "category": "consumable",
+      "weight": 1.0,
+      "stackSize": 20,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "fiber", "amount": 5 },
+        { "itemId": "leaves", "amount": 5 }
+      ],
+      "baseValue": 15,
+      "rarity": "common"
+    }
+  ],
+  "clothingItems": [
+    {
+      "id": "simple_clothing",
+      "name": "Simple Clothing",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "cloth", "amount": 3 }
+      ],
+      "baseValue": 20,
+      "rarity": "common"
+    },
+    {
+      "id": "fine_clothing",
+      "name": "Fine Clothing",
+      "category": "equipment",
+      "weight": 1.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "cloth", "amount": 5 },
+        { "itemId": "fiber", "amount": 2 }
+      ],
+      "baseValue": 50,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "leather",
+      "name": "Leather",
+      "category": "material",
+      "weight": 1.5,
+      "stackSize": 30,
+      "isGatherable": false,
+      "baseValue": 18,
+      "rarity": "common"
+    },
+    {
+      "id": "leather_armor",
+      "name": "Leather Armor",
+      "category": "equipment",
+      "weight": 5.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "leather", "amount": 8 },
+        { "itemId": "fiber", "amount": 3 }
+      ],
+      "baseValue": 80,
+      "rarity": "uncommon"
+    }
+  ],
+  "advancedMaterialItems": [
+    {
+      "id": "mithril_ingot",
+      "name": "Mithril Ingot",
+      "category": "material",
+      "weight": 2.0,
+      "stackSize": 20,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "iron_ingot", "amount": 2 },
+        { "itemId": "gold_ingot", "amount": 1 }
+      ],
+      "baseValue": 300,
+      "rarity": "rare"
+    },
+    {
+      "id": "adamantine_ingot",
+      "name": "Adamantine Ingot",
+      "category": "material",
+      "weight": 5.0,
+      "stackSize": 15,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "steel_ingot", "amount": 3 },
+        { "itemId": "coal", "amount": 5 }
+      ],
+      "baseValue": 500,
+      "rarity": "legendary"
+    },
+    {
+      "id": "enchanting_table",
+      "name": "Enchanting Table",
+      "category": "equipment",
+      "weight": 20.0,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "mithril_ingot", "amount": 4 },
+        { "itemId": "wood", "amount": 10 },
+        { "itemId": "gold_ingot", "amount": 2 }
+      ],
+      "baseValue": 800,
+      "rarity": "legendary"
+    }
+  ],
+  "preservedFoodItems": [
+    {
+      "id": "dried_meat",
+      "name": "Dried Meat",
+      "category": "food",
+      "weight": 0.5,
+      "stackSize": 30,
+      "isEdible": true,
+      "hungerRestored": 35,
+      "quality": 55,
+      "flavors": ["savory", "umami"],
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "raw_meat", "amount": 2 }
+      ],
+      "baseValue": 20,
+      "rarity": "common"
+    }
+  ],
+  "farmingToolItems": [
+    {
+      "id": "watering_can",
+      "name": "Watering Can",
+      "category": "tool",
+      "weight": 1.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "iron_ingot", "amount": 2 },
+        { "itemId": "wood", "amount": 1 }
+      ],
+      "baseValue": 40,
+      "rarity": "common",
+      "traits": {
+        "tool": {
+          "toolType": "watering_can",
+          "efficiency": 1.0,
+          "durabilityLoss": 0.1
+        }
+      }
+    },
+    {
+      "id": "stone_hoe",
+      "name": "Stone Hoe",
+      "category": "tool",
+      "weight": 2.5,
+      "stackSize": 1,
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "wood", "amount": 2 },
+        { "itemId": "stone", "amount": 2 }
+      ],
+      "baseValue": 20,
+      "rarity": "common",
+      "traits": {
+        "tool": {
+          "toolType": "hoe",
+          "efficiency": 1.0,
+          "durabilityLoss": 0.2
+        }
+      }
+    }
+  ]
+}

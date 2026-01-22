@@ -13,7 +13,18 @@ import { EntityImpl } from '../ecs/Entity.js';
 import { createBuildingComponent, BuildingType } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
-import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
+
+// Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
+type AgentModule = { createLLMAgent: (world: any, x: number, y: number, speed: number) => string; createWanderingAgent: (world: any, x: number, y: number, speed: number) => string };
+let _agentModule: AgentModule | null = null;
+async function getAgentModule(): Promise<AgentModule> {
+  if (!_agentModule) {
+    // Dynamic import to break circular dependency: core -> agents -> core
+    // @ts-expect-error - Module resolution handled at runtime
+    _agentModule = await import('@ai-village/agents');
+  }
+  return _agentModule!;
+}
 
 /**
  * Available city templates for spawning
@@ -725,13 +736,14 @@ export async function spawnCity(
     const agentX = config.x + Math.cos(angle) * spawnRadius;
     const agentY = config.y + Math.sin(angle) * spawnRadius;
 
-    // Create agent using existing agent creation functions
+    // Create agent using existing agent creation functions (lazy-loaded)
     // Use LLM agents if configured, otherwise use wandering agents (scripted)
+    const agentModule = await getAgentModule();
     let agentId: string;
     if (useLLM) {
-      agentId = createLLMAgent(world, agentX, agentY, 2.0);
+      agentId = agentModule.createLLMAgent(world, agentX, agentY, 2.0);
     } else {
-      agentId = createWanderingAgent(world, agentX, agentY, 2.0);
+      agentId = agentModule.createWanderingAgent(world, agentX, agentY, 2.0);
     }
 
     spawnedAgentIds.push(agentId);

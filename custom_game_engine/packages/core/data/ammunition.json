@@ -1,0 +1,482 @@
+{
+  "arrow_ammo": [
+    {
+      "id": "arrow_wood",
+      "name": "Wooden Arrow",
+      "category": "ammo",
+      "weight": 0.05,
+      "stackSize": 50,
+      "baseMaterial": "wood",
+      "baseValue": 2,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "arrow",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "arrow_iron",
+      "name": "Iron Arrow",
+      "category": "ammo",
+      "weight": 0.08,
+      "stackSize": 50,
+      "baseMaterial": "iron",
+      "baseValue": 5,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "arrow",
+          "damageModifier": 1.3
+        }
+      }
+    },
+    {
+      "id": "arrow_steel",
+      "name": "Steel Arrow",
+      "category": "ammo",
+      "weight": 0.08,
+      "stackSize": 50,
+      "baseMaterial": "steel",
+      "baseValue": 10,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "arrow",
+          "damageModifier": 1.5
+        }
+      }
+    },
+    {
+      "id": "arrow_fire",
+      "name": "Fire Arrow",
+      "category": "ammo",
+      "weight": 0.1,
+      "stackSize": 30,
+      "baseValue": 15,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "arrow",
+          "damageModifier": 1.2,
+          "specialEffect": "burning"
+        }
+      }
+    },
+    {
+      "id": "arrow_explosive",
+      "name": "Explosive Arrow",
+      "category": "ammo",
+      "weight": 0.15,
+      "stackSize": 20,
+      "baseValue": 50,
+      "rarity": "rare",
+      "traits": {
+        "ammo": {
+          "ammoType": "arrow",
+          "damageModifier": 2.0,
+          "specialEffect": "explosive"
+        }
+      }
+    },
+    {
+      "id": "arrow_poison",
+      "name": "Poison Arrow",
+      "category": "ammo",
+      "weight": 0.08,
+      "stackSize": 30,
+      "baseValue": 20,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "arrow",
+          "damageModifier": 1.1,
+          "specialEffect": "poison"
+        }
+      }
+    }
+  ],
+  "bolt_ammo": [
+    {
+      "id": "bolt_iron",
+      "name": "Iron Bolt",
+      "category": "ammo",
+      "weight": 0.1,
+      "stackSize": 40,
+      "baseMaterial": "iron",
+      "baseValue": 8,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "bolt",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "bolt_steel",
+      "name": "Steel Bolt",
+      "category": "ammo",
+      "weight": 0.1,
+      "stackSize": 40,
+      "baseMaterial": "steel",
+      "baseValue": 15,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "bolt",
+          "damageModifier": 1.4
+        }
+      }
+    },
+    {
+      "id": "bolt_armor_piercing",
+      "name": "Armor-Piercing Bolt",
+      "category": "ammo",
+      "weight": 0.12,
+      "stackSize": 30,
+      "baseMaterial": "steel",
+      "baseValue": 30,
+      "rarity": "rare",
+      "traits": {
+        "ammo": {
+          "ammoType": "bolt",
+          "damageModifier": 1.3,
+          "specialEffect": "armor_piercing"
+        }
+      }
+    }
+  ],
+  "sling_ammo": [
+    {
+      "id": "sling_stone",
+      "name": "Sling Stone",
+      "category": "ammo",
+      "weight": 0.1,
+      "stackSize": 100,
+      "baseMaterial": "stone",
+      "baseValue": 1,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "sling_stone",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "sling_bullet_lead",
+      "name": "Lead Sling Bullet",
+      "category": "ammo",
+      "weight": 0.08,
+      "stackSize": 80,
+      "baseMaterial": "lead",
+      "baseValue": 3,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "sling_stone",
+          "damageModifier": 1.5
+        }
+      }
+    }
+  ],
+  "pistol_ammo": [
+    {
+      "id": "bullet_musket",
+      "name": "Musket Ball",
+      "category": "ammo",
+      "weight": 0.02,
+      "stackSize": 50,
+      "baseMaterial": "lead",
+      "baseValue": 5,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_musket",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "bullet_9mm",
+      "name": "9mm Rounds",
+      "category": "ammo",
+      "weight": 0.01,
+      "stackSize": 100,
+      "baseMaterial": "brass",
+      "baseValue": 3,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_pistol",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "bullet_45acp",
+      "name": ".45 ACP Rounds",
+      "category": "ammo",
+      "weight": 0.015,
+      "stackSize": 80,
+      "baseMaterial": "brass",
+      "baseValue": 5,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_pistol",
+          "damageModifier": 1.3
+        }
+      }
+    },
+    {
+      "id": "bullet_357",
+      "name": ".357 Magnum Rounds",
+      "category": "ammo",
+      "weight": 0.02,
+      "stackSize": 60,
+      "baseMaterial": "brass",
+      "baseValue": 8,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_pistol",
+          "damageModifier": 1.5
+        }
+      }
+    }
+  ],
+  "rifle_ammo": [
+    {
+      "id": "bullet_556",
+      "name": "5.56mm Rounds",
+      "category": "ammo",
+      "weight": 0.012,
+      "stackSize": 90,
+      "baseMaterial": "brass",
+      "baseValue": 4,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_rifle",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "bullet_762",
+      "name": "7.62mm Rounds",
+      "category": "ammo",
+      "weight": 0.02,
+      "stackSize": 60,
+      "baseMaterial": "brass",
+      "baseValue": 6,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_rifle",
+          "damageModifier": 1.3
+        }
+      }
+    },
+    {
+      "id": "bullet_50cal",
+      "name": ".50 Cal Rounds",
+      "category": "ammo",
+      "weight": 0.1,
+      "stackSize": 30,
+      "baseMaterial": "brass",
+      "baseValue": 20,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_heavy",
+          "damageModifier": 2.0
+        }
+      }
+    },
+    {
+      "id": "bullet_ap",
+      "name": "Armor-Piercing Rounds",
+      "category": "ammo",
+      "weight": 0.025,
+      "stackSize": 40,
+      "baseMaterial": "tungsten",
+      "baseValue": 15,
+      "rarity": "rare",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_rifle",
+          "damageModifier": 1.2,
+          "specialEffect": "armor_piercing"
+        }
+      }
+    },
+    {
+      "id": "bullet_tracer",
+      "name": "Tracer Rounds",
+      "category": "ammo",
+      "weight": 0.015,
+      "stackSize": 50,
+      "baseMaterial": "brass",
+      "baseValue": 8,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "bullet_rifle",
+          "damageModifier": 0.9,
+          "specialEffect": "burning"
+        }
+      }
+    }
+  ],
+  "shotgun_ammo": [
+    {
+      "id": "shell_buckshot",
+      "name": "Buckshot Shells",
+      "category": "ammo",
+      "weight": 0.03,
+      "stackSize": 40,
+      "baseMaterial": "lead",
+      "baseValue": 8,
+      "rarity": "common",
+      "traits": {
+        "ammo": {
+          "ammoType": "shell_shotgun",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "shell_slug",
+      "name": "Slug Shells",
+      "category": "ammo",
+      "weight": 0.04,
+      "stackSize": 30,
+      "baseMaterial": "lead",
+      "baseValue": 12,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "shell_shotgun",
+          "damageModifier": 1.5,
+          "specialEffect": "armor_piercing"
+        }
+      }
+    },
+    {
+      "id": "shell_dragon",
+      "name": "Dragon's Breath Shells",
+      "category": "ammo",
+      "weight": 0.04,
+      "stackSize": 20,
+      "baseValue": 25,
+      "rarity": "rare",
+      "traits": {
+        "ammo": {
+          "ammoType": "shell_shotgun",
+          "damageModifier": 1.2,
+          "specialEffect": "burning"
+        }
+      }
+    }
+  ],
+  "energy_ammo": [
+    {
+      "id": "energy_cell_small",
+      "name": "Small Energy Cell",
+      "category": "ammo",
+      "weight": 0.2,
+      "stackSize": 20,
+      "baseValue": 25,
+      "rarity": "uncommon",
+      "traits": {
+        "ammo": {
+          "ammoType": "energy_cell",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "energy_cell_large",
+      "name": "Large Energy Cell",
+      "category": "ammo",
+      "weight": 0.5,
+      "stackSize": 10,
+      "baseValue": 60,
+      "rarity": "rare",
+      "traits": {
+        "ammo": {
+          "ammoType": "energy_cell",
+          "damageModifier": 1.2
+        }
+      }
+    },
+    {
+      "id": "energy_cell_overcharged",
+      "name": "Overcharged Energy Cell",
+      "category": "ammo",
+      "weight": 0.3,
+      "stackSize": 8,
+      "baseValue": 100,
+      "rarity": "epic",
+      "traits": {
+        "ammo": {
+          "ammoType": "energy_cell",
+          "damageModifier": 1.5,
+          "specialEffect": "overcharge"
+        }
+      }
+    }
+  ],
+  "plasma_ammo": [
+    {
+      "id": "plasma_canister",
+      "name": "Plasma Canister",
+      "category": "ammo",
+      "weight": 0.5,
+      "stackSize": 10,
+      "baseValue": 50,
+      "rarity": "rare",
+      "traits": {
+        "ammo": {
+          "ammoType": "plasma_fuel",
+          "damageModifier": 1.0
+        }
+      }
+    },
+    {
+      "id": "plasma_canister_refined",
+      "name": "Refined Plasma Canister",
+      "category": "ammo",
+      "weight": 0.6,
+      "stackSize": 8,
+      "baseValue": 100,
+      "rarity": "epic",
+      "traits": {
+        "ammo": {
+          "ammoType": "plasma_fuel",
+          "damageModifier": 1.4
+        }
+      }
+    },
+    {
+      "id": "plasma_canister_unstable",
+      "name": "Unstable Plasma Canister",
+      "category": "ammo",
+      "weight": 0.4,
+      "stackSize": 5,
+      "baseValue": 150,
+      "rarity": "epic",
+      "traits": {
+        "ammo": {
+          "ammoType": "plasma_fuel",
+          "damageModifier": 2.0,
+          "specialEffect": "explosive"
+        }
+      }
+    }
+  ]
+}

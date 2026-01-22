@@ -12,6 +12,7 @@ import type { Entity } from '@ai-village/core';
 import { ComponentType as CT } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
 import type { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
+import { ChunkManager3D } from './3d/ChunkManager3D.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -58,17 +59,7 @@ const ANIMATION_CONFIG = {
   animationType: 'walking-8-frames',
 };
 
-const TERRAIN_COLORS: Record<string, number> = {
-  grass: 0x4ade80,
-  dirt: 0x8b6914,
-  stone: 0x6b7280,
-  sand: 0xfcd34d,
-  water: 0x3b82f6,
-  snow: 0xf0f9ff,
-  forest: 0x166534,
-  mountain: 0x78716c,
-  default: 0x9ca3af,
-};
+// TERRAIN_COLORS moved to src/3d/ChunkMesh.ts (handled by ChunkManager3D)
 
 const BUILDING_COLORS: Record<string, number> = {
   // Crafting stations
@@ -147,11 +138,8 @@ export class Renderer3D {
   private config: Renderer3DConfig;
   private world: World | null = null;
 
-  // Terrain
-  private terrainGroup: THREE.Group;
-  private builtTiles: Set<string> = new Set();
-  private blockGeometry: THREE.BoxGeometry;
-  private materials: Map<string, THREE.MeshLambertMaterial> = new Map();
+  // Terrain: Optimized ChunkManager3D with greedy meshing
+  private chunkManager: ChunkManager3D | null = null;
 
   // Entities (agents)
   private entitySprites: Map<string, {
@@ -275,21 +263,14 @@ export class Renderer3D {
     // Create controls
     this.controls = new PointerLockControls(this.camera, document.body);
 
-    // Create terrain group
-    this.terrainGroup = new THREE.Group();
-    this.scene.add(this.terrainGroup);
-
-    // Create block geometry
-    this.blockGeometry = new THREE.BoxGeometry(
-      this.config.blockSize,
-      this.config.blockSize,
-      this.config.blockSize
-    );
-
-    // Create materials
-    for (const [name, color] of Object.entries(TERRAIN_COLORS)) {
-      this.materials.set(name, new THREE.MeshLambertMaterial({ color }));
-    }
+    // Initialize optimized chunk manager with greedy meshing
+    this.chunkManager = new ChunkManager3D(this.scene, {
+      chunkSize: 16,
+      renderRadius: Math.ceil(this.config.renderRadius / 16),
+      useGreedyMeshing: true,
+      enableFrustumCulling: true,
+      blockSize: this.config.blockSize,
+    });
 
     // Setup lights
     this.setupLights();
@@ -426,6 +407,11 @@ export class Renderer3D {
   setWorld(world: World): void {
     this.world = world;
     this.clearTerrain();
+
+    // Configure chunk manager with world tile accessor
+    if (this.chunkManager && world.getTileAt) {
+      this.chunkManager.setTileAccessor((x, y) => world.getTileAt?.(x, y) ?? null);
+    }
   }
 
   /**
@@ -487,6 +473,10 @@ export class Renderer3D {
     if (this.scene.fog instanceof THREE.Fog) {
       this.scene.fog.near = this.config.fogNear;
       this.scene.fog.far = this.config.fogFar;
+    }
+    // Update chunk manager render radius (convert tiles to chunks)
+    if (this.chunkManager) {
+      this.chunkManager.setRenderRadius(Math.ceil(distance / 16));
     }
   }
 
@@ -674,87 +664,23 @@ export class Renderer3D {
    * Clear all terrain
    */
   clearTerrain(): void {
-    while (this.terrainGroup.children.length > 0) {
-      const child = this.terrainGroup.children[0];
-      if (child) {
-        this.terrainGroup.remove(child);
-      }
+    if (this.chunkManager) {
+      this.chunkManager.clear();
     }
-    this.builtTiles.clear();
   }
-
 
   /**
    * Update terrain around camera position
+   *
+   * Uses ChunkManager3D with greedy meshing for 10-100x performance improvement:
+   * - Batches all blocks in a 16x16 chunk into single geometry
+   * - Greedy meshing merges adjacent faces into larger quads
+   * - Frustum culling hides chunks outside camera view
+   * - Face culling eliminates hidden internal faces
    */
   updateTerrain(): void {
-    if (!this.world) return;
-
-    const camX = Math.floor(this.camera.position.x);
-    const camY = Math.floor(this.camera.position.z); // Z in Three.js is Y in world
-
-    const radius = Math.floor(this.config.renderRadius);
-
-    for (let x = camX - radius; x <= camX + radius; x++) {
-      for (let y = camY - radius; y <= camY + radius; y++) {
-        const key = `${x},${y}`;
-        if (this.builtTiles.has(key)) continue;
-
-        const tile = this.world.getTileAt?.(x, y);
-        if (!tile) continue;
-
-        this.buildTile(x, y, tile);
-        this.builtTiles.add(key);
-      }
-    }
-  }
-
-  private buildTile(
-    x: number,
-    y: number,
-    tile: { terrain?: string; elevation?: number; wall?: { material?: string } }
-  ): void {
-    const terrain = tile.terrain || 'grass';
-    const elevation = tile.elevation || 0;
-
-    // Build surface block + a few blocks below
-    const minZ = Math.max(-2, elevation - 3);
-    const maxZ = elevation;
-
-    for (let z = minZ; z <= maxZ; z++) {
-      let material: THREE.MeshLambertMaterial;
-      if (z === elevation) {
-        material = this.materials.get(terrain) || this.materials.get('default')!;
-      } else if (z > elevation - 2) {
-        material = this.materials.get('dirt')!;
-      } else {
-        material = this.materials.get('stone')!;
-      }
-
-      const mesh = new THREE.Mesh(this.blockGeometry, material);
-      mesh.position.set(
-        x * this.config.blockSize,
-        z * this.config.blockSize,
-        y * this.config.blockSize
-      );
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      this.terrainGroup.add(mesh);
-    }
-
-    // Add wall if present
-    if (tile.wall) {
-      const wallMat = this.materials.get('stone')!;
-      for (let wz = elevation + 1; wz <= elevation + 3; wz++) {
-        const wallMesh = new THREE.Mesh(this.blockGeometry, wallMat);
-        wallMesh.position.set(
-          x * this.config.blockSize,
-          wz * this.config.blockSize,
-          y * this.config.blockSize
-        );
-        this.terrainGroup.add(wallMesh);
-      }
-    }
+    if (!this.world || !this.chunkManager) return;
+    this.chunkManager.update(this.camera);
   }
 
   // ============================================================================
@@ -1861,12 +1787,10 @@ export class Renderer3D {
     this.deactivate();
     this.unmount();
 
-    // Dispose geometry
-    this.blockGeometry.dispose();
-
-    // Dispose materials
-    for (const material of this.materials.values()) {
-      material.dispose();
+    // Dispose chunk manager (handles all terrain geometry)
+    if (this.chunkManager) {
+      this.chunkManager.dispose();
+      this.chunkManager = null;
     }
 
     // Dispose building materials

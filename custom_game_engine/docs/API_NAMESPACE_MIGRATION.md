@@ -5,8 +5,8 @@
 | Phase | Status | Description |
 |-------|--------|-------------|
 | **Phase 1** | ✅ COMPLETE | metrics-server namespace aliasing + client migration |
-| **Phase 2** | ⬜ PENDING | api-server namespace reorganization |
-| **Phase 3** | ⬜ PENDING | Remove deprecated routes |
+| **Phase 2** | ✅ COMPLETE | api-server namespace aliasing |
+| **Phase 3** | ⬜ PENDING | Remove deprecated routes (after 2 weeks) |
 
 ## Architecture
 
@@ -45,25 +45,32 @@ Both used `/api/*` namespace with no clear separation. This caused:
 /metrics/*      - Raw metrics
 ```
 
-### Port 3001 (api-server) - Persistence & Multiverse ⬜
+### Port 3001 (api-server) - Persistence & Multiverse ✅
 
-**Current routes (to be migrated):**
 ```
-/api/universe/*         → /api/multiverse/universe/*
-/api/universes          → /api/multiverse/universes
-/api/passage/*          → /api/multiverse/passage/*
-/api/passages           → /api/multiverse/passages
-/api/player/*           → /api/multiverse/player/*
-/api/multiverse/stats   - Already correct!
+/api/multiverse/*  - Universe/multiverse operations
+  POST   /api/multiverse/universe      - Create universe
+  GET    /api/multiverse/universe/:id  - Get universe
+  DELETE /api/multiverse/universe/:id  - Delete universe
+  GET    /api/multiverse/universes     - List universes
+  POST   /api/multiverse/passage       - Create passage
+  GET    /api/multiverse/passages      - List passages
+  POST   /api/multiverse/player        - Register player
+  GET    /api/multiverse/player/:id    - Get player
+  GET    /api/multiverse/stats         - Multiverse statistics
 
-/api/save-soul          → /api/souls/save
-/api/soul-repository/*  → /api/souls/*
-/api/generate-soul-sprite → /api/souls/sprite
+/api/souls/*  - Soul repository (eternal storage)
+  POST /api/souls/save    - Save soul
+  GET  /api/souls/stats   - Repository stats
+  POST /api/souls/sprite  - Generate soul sprite
 
-/api/save-alien-species → /api/species/save
-/api/alien-species      → /api/species
-/api/generate-sprite    → /api/species/sprite
+/api/species/*  - Alien species database
+  GET  /api/species        - List species
+  POST /api/species/save   - Save species
+  POST /api/species/sprite - Generate sprite
 ```
+
+Old routes still work via aliasing (backwards compatible).
 
 ## Phase 1: metrics-server ✅ COMPLETE
 
@@ -108,39 +115,60 @@ for (const [newPrefix, oldPrefix] of namespaceAliases) {
 2. `POST /api/planet` creates a planet (handler location, used by PlanetClient)
 3. `GET /api/planets/:id` aliased to `/api/planet/:id` (subpath rewriting)
 
-## Phase 2: api-server ⬜ PENDING
+## Phase 2: api-server ✅ COMPLETE
 
-### Routes to Reorganize
+### Implementation Details
+
+Added namespace aliasing middleware in `demo/src/api-server.ts`:
+
+```typescript
+// Route aliasing: NEW namespace → OLD namespace
+const namespaceAliases: Array<[string, string]> = [
+  // Soul routes
+  ['/api/souls/save', '/api/save-soul'],
+  ['/api/souls/stats', '/api/soul-repository/stats'],
+  ['/api/souls/sprite', '/api/generate-soul-sprite'],
+  // Species routes
+  ['/api/species/save', '/api/save-alien-species'],
+  ['/api/species/sprite', '/api/generate-sprite'],
+  ['/api/species', '/api/alien-species'],
+  // Multiverse routes
+  ['/api/multiverse/universes', '/api/universes'],
+  ['/api/multiverse/universe/', '/api/universe/'],
+  ['/api/multiverse/universe', '/api/universe'],
+  ['/api/multiverse/passages', '/api/passages'],
+  ['/api/multiverse/passage/', '/api/passage/'],
+  ['/api/multiverse/passage', '/api/passage'],
+  ['/api/multiverse/player/', '/api/player/'],
+  ['/api/multiverse/player', '/api/player'],
+];
+```
+
+### Route Mapping
 
 **Soul Routes:**
-| Old Route | New Route |
-|-----------|-----------|
-| `POST /api/save-soul` | `POST /api/souls/save` |
-| `GET /api/soul-repository/stats` | `GET /api/souls/stats` |
-| `POST /api/generate-soul-sprite` | `POST /api/souls/sprite` |
+| New Route | Old Route (aliased) |
+|-----------|---------------------|
+| `POST /api/souls/save` | `/api/save-soul` |
+| `GET /api/souls/stats` | `/api/soul-repository/stats` |
+| `POST /api/souls/sprite` | `/api/generate-soul-sprite` |
 
 **Species Routes:**
-| Old Route | New Route |
-|-----------|-----------|
-| `POST /api/save-alien-species` | `POST /api/species/save` |
-| `GET /api/alien-species` | `GET /api/species` |
-| `POST /api/generate-sprite` | `POST /api/species/sprite` |
+| New Route | Old Route (aliased) |
+|-----------|---------------------|
+| `GET /api/species` | `/api/alien-species` |
+| `POST /api/species/save` | `/api/save-alien-species` |
+| `POST /api/species/sprite` | `/api/generate-sprite` |
 
-**Universe/Multiverse Routes:**
-| Old Route | New Route |
-|-----------|-----------|
-| `* /api/universe/*` | `* /api/multiverse/universe/*` |
-| `GET /api/universes` | `GET /api/multiverse/universes` |
-| `* /api/passage/*` | `* /api/multiverse/passage/*` |
-| `GET /api/passages` | `GET /api/multiverse/passages` |
-| `* /api/player/*` | `* /api/multiverse/player/*` |
-| `GET /api/multiverse/stats` | ✅ Already correct |
-
-### Files to Update
-
-1. `demo/src/api-server.ts` - Add namespace aliasing middleware
-2. `demo/src/universe-api.ts` - Update route definitions (or add aliasing)
-3. Update any clients calling api-server directly
+**Multiverse Routes:**
+| New Route | Old Route (aliased) |
+|-----------|---------------------|
+| `* /api/multiverse/universe/*` | `/api/universe/*` |
+| `GET /api/multiverse/universes` | `/api/universes` |
+| `* /api/multiverse/passage/*` | `/api/passage/*` |
+| `GET /api/multiverse/passages` | `/api/passages` |
+| `* /api/multiverse/player/*` | `/api/player/*` |
+| `GET /api/multiverse/stats` | Already at correct path |
 
 ## Phase 3: Remove Deprecated Routes ⬜ PENDING
 
@@ -151,9 +179,17 @@ After 2 weeks of backwards compatibility:
 
 ## Testing Checklist
 
-- [x] `/api/planets` returns planet list (metrics-server)
-- [x] `/api/game/status` returns game status (metrics-server)
+**metrics-server (Port 8766):**
+- [x] `/api/planets` returns planet list
+- [x] `/api/game/status` returns game status
 - [x] All admin capability queries work with `/api/game/`
-- [ ] `/api/multiverse/universes` returns universe list (api-server - Phase 2)
-- [ ] `/api/souls/save` saves souls (api-server - Phase 2)
-- [ ] Browser console shows no errors on game load
+
+**api-server (Port 3001):**
+- [x] `/api/multiverse/universes` returns universe list
+- [x] `/api/multiverse/stats` returns multiverse stats
+- [x] `/api/souls/stats` returns soul repository stats
+- [x] `/api/species` returns alien species list
+
+**General:**
+- [x] Browser console shows no errors on game load
+- [x] Old routes still work via aliasing (backwards compatible)

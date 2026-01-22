@@ -1,0 +1,83 @@
+{
+  "products": {
+    "chicken_egg": {
+      "id": "chicken_egg",
+      "name": "Chicken Egg",
+      "sourceSpecies": ["chicken"],
+      "productionType": "periodic",
+      "minLifeStage": "adult",
+      "minHealth": 30,
+      "productionInterval": 1,
+      "minQuantity": 1,
+      "maxQuantity": 1,
+      "healthFactor": 0.4,
+      "bondFactor": 0.1,
+      "dietFactor": 0.3,
+      "geneticsFactor": 0.2,
+      "itemId": "egg"
+    },
+    "cow_milk": {
+      "id": "cow_milk",
+      "name": "Cow Milk",
+      "sourceSpecies": ["cow"],
+      "productionType": "continuous",
+      "minLifeStage": "adult",
+      "minHealth": 50,
+      "minBondLevel": 20,
+      "minQuantity": 1,
+      "maxQuantity": 3,
+      "healthFactor": 0.3,
+      "bondFactor": 0.2,
+      "dietFactor": 0.3,
+      "geneticsFactor": 0.2,
+      "itemId": "milk"
+    },
+    "sheep_wool": {
+      "id": "sheep_wool",
+      "name": "Sheep Wool",
+      "sourceSpecies": ["sheep"],
+      "productionType": "periodic",
+      "minLifeStage": "juvenile",
+      "minHealth": 40,
+      "productionInterval": 90,
+      "minQuantity": 1,
+      "maxQuantity": 3,
+      "healthFactor": 0.3,
+      "bondFactor": 0.1,
+      "dietFactor": 0.4,
+      "geneticsFactor": 0.2,
+      "itemId": "wool"
+    },
+    "goat_milk": {
+      "id": "goat_milk",
+      "name": "Goat Milk",
+      "sourceSpecies": ["goat"],
+      "productionType": "continuous",
+      "minLifeStage": "adult",
+      "minHealth": 50,
+      "minBondLevel": 20,
+      "minQuantity": 1,
+      "maxQuantity": 2,
+      "healthFactor": 0.3,
+      "bondFactor": 0.2,
+      "dietFactor": 0.3,
+      "geneticsFactor": 0.2,
+      "itemId": "goat_milk"
+    },
+    "rabbit_fur": {
+      "id": "rabbit_fur",
+      "name": "Rabbit Fur",
+      "sourceSpecies": ["rabbit"],
+      "productionType": "terminal",
+      "minLifeStage": "juvenile",
+      "minHealth": 0,
+      "minQuantity": 1,
+      "maxQuantity": 1,
+      "healthFactor": 0.4,
+      "bondFactor": 0.0,
+      "dietFactor": 0.3,
+      "geneticsFactor": 0.3,
+      "itemId": "rabbit_fur"
+    }
+  }
+}

@@ -11,7 +11,7 @@
  */
 
 import type { World } from '../ecs/World.js';
-import type { AngelData, AngelPurpose, AngelRank } from './AngelSystem.js';
+import type { AngelData, AngelPurpose, AngelRank } from './AngelTypes.js';
 import type { Prayer, SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';

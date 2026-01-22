@@ -792,7 +792,7 @@ See [SYSTEMS_CATALOG.md](../../SYSTEMS_CATALOG.md) for complete reference with p
 
 ## Performance Pattern: StateMutatorSystem
 
-**The StateMutatorSystem provides batched vector updates for gradual state changes, achieving 60-1200× performance improvements.**
+**The StateMutatorSystem provides per-tick direct mutation for gradual state changes with zero GC pressure, achieving smooth interpolation and eliminating allocation overhead.**
 
 ### The Problem
 
@@ -802,47 +802,72 @@ Many game systems need to apply small, predictable changes every tick:
 - **PlantSystem**: Plant growth and aging
 - **AnimalSystem**: Hunger/thirst/energy changes
 
-Updating these every tick is expensive and unnecessary for gradual changes.
+Traditional approaches have trade-offs:
+- **Every-tick updates**: Expensive and creates GC pressure from updateComponent() calls
+- **Batched updates**: Causes jumpy UI values between batches
 
-### The Solution: Batched Vector Updates
+### The Solution: Per-Tick Direct Mutation
 
-Instead of updating every tick, systems register **delta rates** (change per game minute) and `StateMutatorSystem` applies them in batches.
+Instead of external storage and batched updates, mutation rates are stored **on the entity** in a `MutationVectorComponent` and applied every tick via **direct field mutation** (no updateComponent() allocations).
 
 ```typescript
-// ❌ OLD: Update every tick (20 TPS)
+// ❌ OLD: Update every tick with allocations
 update(world, entities, deltaTime) {
   for (const agent of agents) {
-    agent.hunger -= 0.0008 * deltaTime;  // Tiny change every tick
+    const needs = agent.getComponent('needs');
+    agent.updateComponent({  // Creates new object!
+      ...needs,
+      hunger: needs.hunger - 0.0008 * deltaTime
+    });
   }
 }
-// 100 agents × 20 updates/sec = 2000 updates/sec
+// 100 agents × 20 updates/sec × 2 allocations = 4000 allocations/sec
 
-// ✅ NEW: Register delta rate (update once per game minute)
+// ✅ NEW: Set mutation rate (entity-local, direct mutation)
+import { setMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+
 update(world, entities, deltaTime) {
-  if (currentTick - lastUpdate >= 1200) { // Once per minute
-    for (const agent of agents) {
-      stateMutator.registerDelta({
-        entityId: agent.id,
-        field: 'hunger',
-        deltaPerMinute: -0.0008,  // Rate per game minute
-        min: 0, max: 1,
-      });
-    }
+  for (const agent of agents) {
+    // Set rate once (per second, not per minute!)
+    setMutationRate(agent, MUTATION_PATHS.NEEDS_HUNGER, -0.0008 / 60, {
+      min: 0, max: 1,
+      source: 'needs_system'
+    });
   }
 }
-// 100 agents × 1 update/60sec = 1.67 updates/sec (60× reduction)
+// StateMutatorSystem applies directly every tick - zero allocations!
 ```
+
+### Architecture Changes
+
+**Old API:**
+- External Map storage in StateMutatorSystem
+- `registerDelta({ entityId, componentType, field, deltaPerMinute, ... })` returned cleanup function
+- Systems needed `setStateMutatorSystem()` injection
+- Batched updates once per game minute (1200 ticks)
+- Required manual cleanup via returned functions
+- Interpolation needed for smooth UI
+
+**New API:**
+- Entity-local `MutationVectorComponent` storage
+- `setMutationRate(entity, fieldPath, rate, options)` - no cleanup needed
+- Systems import and use directly (no injection)
+- Per-tick updates with direct mutation (smooth by default)
+- Automatic cleanup when entity destroyed
+- No interpolation needed (always up-to-date)
 
 ### Performance Impact
 
 **For 100 agents with hunger + energy:**
-- **Before:** 4,000 field updates/sec
-- **After:** 3.33 field updates/sec
-- **Reduction:** 1,200× fewer updates
+- **Before:** 4,000 updateComponent() calls/sec (allocations + GC)
+- **After:** 0 allocations (direct field mutation)
+- **Benefit:** Zero GC pressure, smooth updates
 
-**System overhead:**
-- Needs system: Every tick → Once per minute (60× reduction)
-- StateMutatorSystem: Negligible (batches all deltas once per minute)
+**Key improvements:**
+- No getEntity() lookups (iterates active entities directly)
+- No updateComponent() allocations (mutates fields in place)
+- Smooth per-tick updates (no jumpy values)
+- Entity-local storage (no external Maps to manage)
 
 ### Adopted Systems
 
@@ -859,102 +884,109 @@ update(world, entities, deltaTime) {
 
 ### Usage Guide
 
-#### 1. System Setup
+#### 1. Import the API
 
-Add dependency and reference:
+No system injection needed - just import and use:
 
 ```typescript
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
-
-export class MySystem implements System {
-  public readonly dependsOn = ['state_mutator'] as const;
-  private stateMutator: StateMutatorSystem | null = null;
-  private lastUpdateTick = 0;
-  private readonly UPDATE_INTERVAL = 1200; // 1 game minute
-  private deltaCleanups = new Map<string, () => void>();
-
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
-}
+import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 ```
 
-#### 2. Register Deltas
-
-Update rates periodically (e.g., once per game minute):
+#### 2. Set Mutation Rates
 
 ```typescript
 update(world: World, entities: ReadonlyArray<Entity>) {
-  if (!this.stateMutator) {
-    throw new Error('[MySystem] StateMutatorSystem not set');
-  }
-
-  const shouldUpdateRates = world.tick - this.lastUpdateTick >= this.UPDATE_INTERVAL;
-
   for (const entity of entities) {
-    if (shouldUpdateRates) {
-      // Clean up old delta
-      if (this.deltaCleanups.has(entity.id)) {
-        this.deltaCleanups.get(entity.id)!();
-      }
+    const needs = entity.getComponent<NeedsComponent>(CT.Needs);
+    if (!needs) continue;
 
-      // Register new delta rate
-      const cleanup = this.stateMutator.registerDelta({
-        entityId: entity.id,
-        componentType: CT.MyComponent,
-        field: 'myField',
-        deltaPerMinute: -0.05,  // Decay rate per game minute
-        min: 0,
-        max: 100,
-        source: 'my_system',
-      });
+    // Simple decay (rate is per SECOND)
+    setMutationRate(entity, MUTATION_PATHS.NEEDS_HUNGER, -0.0008 / 60, {
+      min: 0, max: 1,
+      source: 'needs_system'
+    });
 
-      this.deltaCleanups.set(entity.id, cleanup);
-    }
-  }
-
-  if (shouldUpdateRates) {
-    this.lastUpdateTick = world.tick;
+    // Or use custom field paths
+    setMutationRate(entity, 'needs.energy', -0.0003 / 60, {
+      min: 0, max: 1,
+      source: 'needs_energy_decay'
+    });
   }
 }
 ```
 
-#### 3. Wire Up in registerAllSystems
+**Field path format:** `'componentType.field'` or `'componentType.nested.field'`
+- Examples: `'needs.hunger'`, `'body.health'`, `'body.parts.arm.health'`
+- Use `MUTATION_PATHS` constants for common fields (type-safe)
+
+**Rate conversion:** Old `deltaPerMinute` / 60 = new rate per second
+- Old: `deltaPerMinute: -0.0008` → New: `rate: -0.0008 / 60`
+
+#### 3. No System Injection Needed
+
+Just import and use - no `setStateMutatorSystem()` needed:
 
 ```typescript
-// In registerAllSystems.ts
-const stateMutator = new StateMutatorSystem();
-gameLoop.systemRegistry.register(stateMutator);
+export class MySystem implements System {
+  // NO dependency injection needed!
+  // Just import and call setMutationRate/clearMutationRate directly
 
-const mySystem = new MySystem();
-mySystem.setStateMutatorSystem(stateMutator);
-gameLoop.systemRegistry.register(mySystem);
+  update(world: World, entities: ReadonlyArray<Entity>) {
+    for (const entity of entities) {
+      setMutationRate(entity, 'my_component.my_field', -0.01, {
+        min: 0, max: 100,
+        source: 'my_system'
+      });
+    }
+  }
+}
 ```
 
 ### Advanced Features
+
+#### Derivative (Decay/Acceleration)
+
+Rates can have derivatives for natural decay:
+
+```typescript
+// Healing-over-time that slows down
+setMutationRate(entity, MUTATION_PATHS.BODY_HEALTH, 0.5, {
+  derivative: -0.05,  // Rate decreases by 0.05/second
+  min: 0, max: 100,
+  source: 'regeneration'
+});
+// Rate: 0.5 → 0.45 → 0.40 → ... → 0 (natural decay)
+```
 
 #### Expiration (Buffs, Bandages, Potions)
 
 **Time-based expiration:**
 ```typescript
-registerDelta({
-  entityId: agent.id,
-  field: 'speed',
-  deltaPerMinute: 0,  // Instant effect
-  expiresAtTick: world.tick + (1200 * 5),  // 5 game minutes
-  source: 'speed_buff',
+setMutationRate(entity, 'agent.speed', 0, {
+  expiresAt: world.tick + (1200 * 5),  // 5 game minutes
+  source: 'speed_buff'
 });
 ```
 
 **Amount-based expiration:**
 ```typescript
-registerDelta({
-  entityId: agent.id,
-  field: 'hp',
-  deltaPerMinute: +10,
-  totalAmount: 20,  // Expires after 20 hp healed
-  source: 'bandage',
+setMutationRate(entity, MUTATION_PATHS.BODY_HEALTH, 2, {
+  min: 0, max: 100,
+  totalAmount: 20,  // Stop after 20 hp healed
+  source: 'bandage'
 });
+```
+
+#### Clear Mutations
+
+```typescript
+// Clear a specific field
+clearMutationRate(entity, MUTATION_PATHS.NEEDS_HUNGER);
+
+// Clear all mutations from a source
+import { clearMutationsBySource } from '../components/MutationVectorComponent.js';
+clearMutationsBySource(entity, 'poison');
 ```
 
 #### Dynamic Rates
@@ -963,112 +995,97 @@ Update rates when conditions change:
 
 ```typescript
 // Base energy decay
-let energyDecay = -0.0003;  // Idle
+let energyDecay = -0.0003 / 60;  // Idle
 
 // Activity-based modification
 if (agent.behavior === 'gather') {
-  energyDecay = -0.0008;  // Working
+  energyDecay = -0.0008 / 60;  // Working
 } else if (agent.isRunning) {
-  energyDecay = -0.0012;  // Running
+  energyDecay = -0.0012 / 60;  // Running
 }
 
-// Register updated rate
-stateMutator.registerDelta({
-  entityId: agent.id,
-  field: 'energy',
-  deltaPerMinute: energyDecay,
+// Set updated rate (overwrites previous)
+setMutationRate(entity, MUTATION_PATHS.NEEDS_ENERGY, energyDecay, {
   min: 0, max: 1,
-  source: 'needs_energy_decay',
+  source: 'needs_energy_decay'
 });
-```
-
-#### UI Interpolation
-
-Get smooth interpolated values between batch updates:
-
-```typescript
-// In NeedsSystem
-getInterpolatedValue(
-  world: World,
-  entityId: string,
-  field: 'hunger' | 'energy',
-  currentValue: number
-): number {
-  if (!this.stateMutator) return currentValue;
-
-  return this.stateMutator.getInterpolatedValue(
-    entityId,
-    CT.Needs,
-    field,
-    currentValue,
-    world.tick
-  );
-}
-
-// In UI code
-const needsSystem = world.systemRegistry.get('needs') as NeedsSystem;
-const displayHunger = needsSystem.getInterpolatedValue(
-  world,
-  agent.id,
-  'hunger',
-  needs.hunger
-);
-hungerBar.setProgress(displayHunger); // Smooth animation!
 ```
 
 ### When to Use StateMutatorSystem
 
 ✅ **Good candidates:**
-- Slow, predictable changes (needs decay, passive regeneration)
+- Gradual, predictable changes (needs decay, passive regeneration)
 - Effects that accumulate (damage over time, buffs/debuffs)
 - Many entities with similar rates (100+ agents)
-- Non-critical timing (UI updates can be delayed by 1 minute)
+- Smooth UI updates (values change every tick)
 
 ❌ **Bad candidates:**
 - Instant changes (taking damage from attack - apply immediately!)
-- Critical game logic (agent death checks - need immediate response)
+- Critical game logic needing immediate response
 - Irregular patterns (random events - can't predict rate)
-- Few entities (< 10 entities don't benefit from batching)
+- Very few entities (< 10 entities have minimal overhead anyway)
 
-### Cleanup Pattern
+### Migration from Old API
 
-Always clean up deltas when no longer needed:
-
+**Old pattern:**
 ```typescript
-// Pattern 1: Temporary effect
-const cleanup = stateMutator.registerDelta({ ... });
-setTimeout(cleanup, effectDuration);
+// Old: External storage, cleanup functions
+private stateMutator: StateMutatorSystem | null = null;
+private deltaCleanups = new Map<string, () => void>();
 
-// Pattern 2: Condition-based
-let cleanup: (() => void) | null = null;
-
-if (shouldApplyEffect && !cleanup) {
-  cleanup = stateMutator.registerDelta({ ... });
-} else if (!shouldApplyEffect && cleanup) {
-  cleanup();
-  cleanup = null;
+setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+  this.stateMutator = stateMutator;
 }
 
-// Pattern 3: Entity death/removal
-stateMutator.clearEntityDeltas(entityId);
+update(world: World, entities: ReadonlyArray<Entity>) {
+  for (const entity of entities) {
+    if (this.deltaCleanups.has(entity.id)) {
+      this.deltaCleanups.get(entity.id)!();
+    }
+
+    const cleanup = this.stateMutator!.registerDelta({
+      entityId: entity.id,
+      componentType: CT.Needs,
+      field: 'hunger',
+      deltaPerMinute: -0.0008,  // Per minute
+      min: 0, max: 1,
+      source: 'needs'
+    });
+
+    this.deltaCleanups.set(entity.id, cleanup);
+  }
+}
+```
+
+**New pattern:**
+```typescript
+// New: Entity-local, no cleanup needed
+import { setMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+
+update(world: World, entities: ReadonlyArray<Entity>) {
+  for (const entity of entities) {
+    // No cleanup needed - overwrites previous rate
+    setMutationRate(entity, MUTATION_PATHS.NEEDS_HUNGER, -0.0008 / 60, {
+      min: 0, max: 1,
+      source: 'needs'
+    });
+  }
+}
 ```
 
 ### Debug Tools
 
 ```typescript
-const info = stateMutator.getDebugInfo();
-console.log(`Entities with deltas: ${info.entityCount}`);
-console.log(`Total deltas: ${info.deltaCount}`);
-console.log('Deltas by source:', info.deltasBySource);
+import { getMutationFieldPaths, getMutationField } from '../components/MutationVectorComponent.js';
 
-// Output:
-// Entities with deltas: 100
-// Total deltas: 250
-// Deltas by source: Map {
-//   'needs_hunger_decay' => 100,
-//   'needs_energy_decay' => 100,
-//   'building_maintenance' => 50
-// }
+// Get all active mutations for an entity
+const paths = getMutationFieldPaths(entity);
+console.log('Active mutations:', paths);
+
+// Get details for a specific field
+const field = getMutationField(entity, MUTATION_PATHS.NEEDS_HUNGER);
+console.log('Hunger mutation:', field);
+// Output: { rate: -0.0000133, derivative: 0, min: 0, max: 1, source: 'needs_system' }
 ```
 
 ---

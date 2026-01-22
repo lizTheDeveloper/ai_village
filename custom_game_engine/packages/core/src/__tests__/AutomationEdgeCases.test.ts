@@ -61,9 +61,6 @@ describe('Automation Edge Cases', () => {
     beltSystem = new BeltSystem();
     assemblySystem = new AssemblyMachineSystem();
     stateMutatorSystem = new StateMutatorSystem();
-
-    // Wire up StateMutatorSystem dependency
-    assemblySystem.setStateMutatorSystem(stateMutatorSystem);
   });
 
   describe('Power Grid Edge Cases', () => {

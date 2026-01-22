@@ -266,13 +266,12 @@ describe('Mining & Metalworking System Integration Tests', () => {
 
   describe('Ore Deposits Do Not Regenerate', () => {
     it('should NOT regenerate ore deposits at midnight', () => {
-      // Create and wire up StateMutatorSystem (required dependency)
+      // Create StateMutatorSystem for test usage
       const stateMutator = new StateMutatorSystem();
       harness.registerSystem('StateMutatorSystem', stateMutator);
 
       // Create a resource gathering system
       const resourceSystem = new ResourceGatheringSystem(harness.eventBus);
-      resourceSystem.setStateMutatorSystem(stateMutator);
       harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
       // Create an iron deposit with some ore harvested

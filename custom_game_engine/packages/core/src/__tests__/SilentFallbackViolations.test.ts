@@ -3,7 +3,6 @@ import { WorldImpl } from '../ecs/index.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { PlantSystem } from '@ai-village/botany';
 import { MemoryFormationSystem } from '../systems/MemoryFormationSystem.js';
-import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { PlantComponent } from '../components/PlantComponent.js';
 
@@ -29,9 +28,7 @@ describe('Silent Fallback Violations', () => {
   describe('NeedsSystem error handling', () => {
     it('should throw when entity lacks needs component', () => {
       // Arrange
-      const stateMutator = new StateMutatorSystem();
       const needsSystem = new NeedsSystem();
-      needsSystem.setStateMutatorSystem(stateMutator);
 
       // Create entity WITHOUT needs component
       const entity = world.createEntity();
@@ -53,9 +50,7 @@ describe('Silent Fallback Violations', () => {
 
     it('should include entity ID in error message', () => {
       // Arrange
-      const stateMutator = new StateMutatorSystem();
       const needsSystem = new NeedsSystem();
-      needsSystem.setStateMutatorSystem(stateMutator);
 
       const entity = world.createEntity();
       (entity as any).addComponent('agent', { behavior: 'idle' });
@@ -349,9 +344,7 @@ describe('Silent Fallback Violations', () => {
   describe('Error message quality', () => {
     it('NeedsSystem error should explain what to check', () => {
       // Arrange
-      const stateMutator = new StateMutatorSystem();
       const needsSystem = new NeedsSystem();
-      needsSystem.setStateMutatorSystem(stateMutator);
 
       const entity = world.createEntity();
       (entity as any).addComponent('agent', { behavior: 'idle' });
