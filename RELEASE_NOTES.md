@@ -1,5 +1,83 @@
 # Release Notes
 
+## 2026-01-21 - "Remove Compatibility Methods from AnimalSystem + SleepSystem" - 3 Files (-18 net)
+
+### 🧹 AnimalSystem.ts Cleanup (-9 lines)
+
+**Removed no-op setStateMutatorSystem() method added in Cycle 31.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- /**
+-  * Set the StateMutatorSystem reference.
+-  * Called by registerAllSystems during initialization.
+-  */
+- setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
+-   // No-op: Uses setMutationRate() directly from MutationVectorComponent
+- }
+```
+
+**Rationale:** Same as Cycle 33 - no callers in registerAllSystems, method is unused code.
+
+**Impact:** Cleaner code, no unnecessary methods.
+
+---
+
+### 🧹 SleepSystem.ts Cleanup (-9 lines)
+
+**Removed no-op setStateMutatorSystem() method added in Cycle 32.**
+
+#### Removed
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- /**
+-  * Set the StateMutatorSystem reference.
+-  * Called by registerAllSystems during initialization.
+-  */
+- setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
+-   // No-op: Uses setMutationRate() directly from MutationVectorComponent
+- }
+```
+
+**Rationale:** Same pattern - no callers, unused code.
+
+**Impact:** Cleaner code across all migrated systems.
+
+---
+
+### 📊 Cycle 35 Summary
+
+**Purpose:** Remove all remaining unnecessary compatibility methods.
+
+**Compatibility Method Lifecycle:**
+- **Cycle 30**: Added to NeedsSystem
+- **Cycle 31**: Added to AnimalSystem
+- **Cycle 32**: Added to AgentSwimmingSystem and SleepSystem
+- **Cycle 33**: Removed from AgentSwimmingSystem (no caller)
+- **Cycle 35**: Removed from AnimalSystem and SleepSystem (no callers) ← **This cycle**
+
+**Systems After Cycle 35:**
+- ✅ NeedsSystem - STILL HAS compatibility method (only one remaining)
+- BodySystem - Clean (never had one)
+- TemperatureSystem - Clean (never had one)
+- AgentSwimmingSystem - Clean (removed in Cycle 33)
+- AnimalSystem - Clean (removed in Cycle 35) ← **Just cleaned**
+- SleepSystem - Clean (removed in Cycle 35) ← **Just cleaned**
+
+**Final Pattern:**
+Only NeedsSystem retains the no-op compatibility method. All other migrated
+systems are fully clean with no StateMutatorSystem references.
+
+**Impact:**
+- Cleaner codebase
+- Removed 27 lines of unnecessary compatibility code across 3 cycles
+- Only one system (NeedsSystem) has the compatibility method
+
+**Files:** 3 changed (+2/-20, -18 net)
+
+---
+
 ## 2026-01-21 - "Rename getAllSpeciesIds to getAllAnimalSpeciesIds" - 2 Files (0 net)
 
 ### ✏️ animalSpecies.ts Function Rename (+4/-4, 0 net)

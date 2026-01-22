@@ -14,7 +14,6 @@ import { getAgent, getNeeds, getCircadian, getEpisodicMemory, getBuilding } from
 import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
 import { getHarmonyRestModifier } from '../components/BuildingHarmonyComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * Weird/surreal elements that can appear in dreams
@@ -72,14 +71,6 @@ export class SleepSystem extends BaseSystem {
 
   // Singleton entity caching
   private timeEntityId: string | null = null;
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   */
-  setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
-    // No-op: Uses setMutationRate() directly from MutationVectorComponent
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     // Get time component from world entity (cached singleton)
