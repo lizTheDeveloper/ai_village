@@ -518,7 +518,7 @@ async function createSoulsForInitialAgents(
         }
 
         // Send soul to server repository for persistence
-        fetch('http://localhost:3001/api/save-soul', {
+        fetch('http://localhost:3001/api/souls/save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3076,7 +3076,7 @@ function setupDebugAPI(
 
       console.log('[Diagnose] === STEP 5: Check Universe on Server ===');
       try {
-        const univResp = await fetch(`http://localhost:3001/api/universe/${universeId}`);
+        const univResp = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}`);
         console.log('[Diagnose] Universe check status:', univResp.status);
         if (univResp.status === 404) {
           console.log('[Diagnose] Universe does not exist on server');
@@ -3094,7 +3094,7 @@ function setupDebugAPI(
       // Try creating universe if it doesn't exist
       console.log('[Diagnose] Creating test universe...');
       try {
-        const createResp = await fetch('http://localhost:3001/api/universe', {
+        const createResp = await fetch('http://localhost:3001/api/multiverse/universe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3118,7 +3118,7 @@ function setupDebugAPI(
       console.log('[Diagnose] Snapshot size:', JSON.stringify(firstSave).length, 'bytes');
 
       try {
-        const uploadResp = await fetch(`http://localhost:3001/api/universe/${universeId}/snapshot`, {
+        const uploadResp = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}/snapshot`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -38,7 +38,7 @@ import { generateRandomName } from '../utils/nameGenerator.js';
  * The actual LLMDecisionQueue from @ai-village/llm implements this interface.
  */
 export interface LLMQueue {
-  requestDecision(agentId: string, prompt: string): Promise<string>;
+  requestDecision(agentId: string, prompt: string, customConfig?: { tier?: string }): Promise<string>;
 }
 
 /**
@@ -50,8 +50,9 @@ export interface AdminAngelSystemConfig {
 }
 
 // LLM Configuration - Uses environment variables or defaults (fallback when no queue provided)
+// Angels use 'high' tier (120B model) for better intelligence
 const LLM_CONFIG = {
-  model: typeof process !== 'undefined' ? (process.env?.LLM_MODEL || 'qwen/qwen3-32b') : 'qwen/qwen3-32b',
+  model: typeof process !== 'undefined' ? (process.env?.LLM_MODEL || 'openai/gpt-oss-120b') : 'openai/gpt-oss-120b',
   baseUrl: typeof process !== 'undefined' ? (process.env?.LLM_BASE_URL || 'https://api.groq.com/openai/v1') : 'https://api.groq.com/openai/v1',
   apiKey: typeof process !== 'undefined' ? (process.env?.GROQ_API_KEY || process.env?.LLM_API_KEY || '') : '',
 };
@@ -212,9 +213,10 @@ export class AdminAngelSystem extends BaseSystem {
     const agentId = this.angelEntityId ?? 'admin_angel';
 
     // If we have a shared LLM queue, use it (preferred path)
+    // Angels use 'high' intelligence tier for better responses
     if (this.llmQueue) {
       try {
-        const response = await this.llmQueue.requestDecision(agentId, prompt);
+        const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
         // Strip thinking tags if present (qwen models use them)
         return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       } catch (error) {

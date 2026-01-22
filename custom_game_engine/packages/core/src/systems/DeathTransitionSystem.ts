@@ -1,3 +1,61 @@
+/**
+ * @status DISABLED
+ * @reason Test expects old API (world.getComponent, dead component) but system uses new realm-based death flow
+ *
+ * ## What This System Does
+ * Handles the complete death lifecycle for entities:
+ * - Detects death (health <= 0) and transitions souls to afterlife realms
+ * - Routes souls based on deity worship (god's underworld) or default reincarnation
+ * - Supports deity policies: annihilation, reincarnation with memory retention
+ * - Integrates with DeathBargainSystem for hero resurrection challenges
+ * - Drops inventory at death location
+ * - Creates witness memories for nearby agents
+ * - Tracks knowledge loss (unique memories vs shared memories)
+ * - Handles power vacuums when leaders die
+ * - Manages pack mind coherence loss and hive collapse on queen death
+ * - Applies mourning effects to close relationships
+ * - Prevents re-processing deaths via processedDeaths Set
+ *
+ * ## What's Broken/Incomplete
+ * - Test expects `world.getComponent('knowledge_loss')` but system creates singleton entity with `knowledge_loss` component
+ * - Test expects `world.getComponent('power_vacuum')` but system creates singleton entity with `power_vacuum` component
+ * - Test expects `dead` component to trigger death, but system checks `needs.health <= 0`
+ * - Test expects `death:occurred` event, but system emits `agent:died` event
+ * - Test expects old API: `deceased.addComponent('dead', {...})` but system uses needs-based detection
+ * - Test uses old component access patterns (getComponent returns undefined checks missing)
+ * - Missing component definitions: `position_holder`, `pack_member`, `hive_queen`, `hive_worker`
+ * - ComponentType enum missing entries: PowerVacuum, PackCombat, HiveCombat (exist but may need validation)
+ * - System exports in index.ts are commented out (lines 177-178)
+ *
+ * ## TODO to Enable
+ * - [ ] Update test to use needs-based death trigger: `deceased.addComponent('needs', { health: 0, ... })`
+ * - [ ] Update test to query singleton entities: `world.query().with('knowledge_loss').executeEntities()[0]`
+ * - [ ] Update test to expect `agent:died` event instead of `death:occurred`
+ * - [ ] Add missing component types: `position_holder`, `pack_member`, `hive_queen`, `hive_worker` to ComponentType enum
+ * - [ ] Verify ComponentType.PowerVacuum, PackCombat, HiveCombat are properly registered
+ * - [ ] Create component definition files if missing: PositionHolderComponent, PackMemberComponent, HiveQueenComponent, HiveWorkerComponent
+ * - [ ] Update test to handle realm_location component (system auto-creates if missing)
+ * - [ ] Fix test expectations around world-level vs entity-level component storage
+ * - [ ] Uncomment exports in src/systems/index.ts (lines 177-178)
+ * - [ ] Update registerAllSystems.ts if needed (currently registers both systems at lines 1077-1084)
+ * - [ ] Run test: `cd /Users/annhoward/src/ai_village/custom_game_engine/packages/core && npm test -- DeathHandling`
+ *
+ * ## Dependencies
+ * - DeathBargainSystem (optional): Offers hero resurrection challenges
+ * - RealmManager: Manages afterlife realm transitions
+ * - SoulRoutingService: Routes souls based on deity worship
+ * - DeathJudgmentSystem: May run before this system to judge souls
+ * - Components: needs, realm_location, agent, identity, position, inventory, episodic_memory, genetic, goals, social_memory, relationship, mood
+ *
+ * ## Architecture Notes
+ * - Priority 110: Runs after NeedsSystem (10) and CombatSystem (~100)
+ * - Throttled: 100 ticks (5 seconds) to reduce overhead
+ * - Activation: Only runs when 'needs' components exist (efficient)
+ * - Singleton pattern: Caches knowledge_loss entity ID to avoid repeated queries
+ * - Fire-and-forget: DeathBargainSystem.offerDeathBargain is async but not awaited
+ * - Event-driven: Emits agent:died, soul:annihilated, soul:reincarnation_queued, death:notification, pack:member_died, hive:collapse
+ */
+
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import type { World, WorldMutator } from '../ecs/World.js';

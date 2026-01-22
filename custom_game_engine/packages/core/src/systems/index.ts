@@ -101,8 +101,7 @@ export * from './InterestsSystem.js';
 export * from './RelationshipConversationSystem.js';
 // export * from './FriendshipSystem.js'; // TODO: Enable after testing
 // Deep Conversation System - Phase 7.1
-// TODO: Fix incomplete implementations before enabling
-// export * from './InterestEvolutionSystem.js';
+export * from './InterestEvolutionSystem.js';
 // Cooking System
 export * from './CookingSystem.js';
 // Skills System
@@ -114,8 +113,7 @@ export * from './DurabilitySystem.js';
 // Body Parts System - extensible for multiple species
 export * from './BodySystem.js';
 // Phase 36: Equipment System - body-based equipment for all species
-// TODO: Fix EquipmentSystem errors before re-enabling
-// export * from './EquipmentSystem.js';
+export * from './EquipmentSystem.js';
 // Species and Genetics
 export * from './ReproductionSystem.js';
 // Courtship System - agent courtship and mating
@@ -174,7 +172,7 @@ export * from './RealmManager.js';
 export * from './PortalSystem.js';
 export * from './RealmTimeSystem.js';
 export * from './DeathJudgmentSystem.js';
-// export * from './DeathBargainSystem.js'; // Temporarily disabled - incomplete implementation
+export * from './DeathBargainSystem.js';
 // export * from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
 export * from './AfterlifeMemoryFadingSystem.js';
 export * from './WisdomGoddessSystem.js';

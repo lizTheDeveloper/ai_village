@@ -281,15 +281,15 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0', // Listen on all network interfaces for VM deployment
     proxy: {
-      '/api/generate-sprite': {
+      '/api/species': {
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
-      '/api/save-alien-species': {
+      '/api/souls': {
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
-      '/api/alien-species': {
+      '/api/multiverse': {
         target: 'http://localhost:3001',
         changeOrigin: true,
       },

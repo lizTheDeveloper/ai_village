@@ -5,8 +5,8 @@
 | Phase | Status | Description |
 |-------|--------|-------------|
 | **Phase 1** | ✅ COMPLETE | metrics-server namespace aliasing + client migration |
-| **Phase 2** | ✅ COMPLETE | api-server namespace aliasing |
-| **Phase 3** | ⬜ PENDING | Remove deprecated routes (after 2 weeks) |
+| **Phase 2** | ✅ COMPLETE | api-server namespace aliasing (superseded by Phase 3) |
+| **Phase 3** | ✅ COMPLETE | Remove deprecated routes, rename handlers to new paths |
 
 ## Architecture
 
@@ -70,7 +70,7 @@ Both used `/api/*` namespace with no clear separation. This caused:
   POST /api/species/sprite - Generate sprite
 ```
 
-Old routes still work via aliasing (backwards compatible).
+All handlers use these canonical paths directly (no aliasing).
 
 ## Phase 1: metrics-server ✅ COMPLETE
 
@@ -115,67 +115,72 @@ for (const [newPrefix, oldPrefix] of namespaceAliases) {
 2. `POST /api/planet` creates a planet (handler location, used by PlanetClient)
 3. `GET /api/planets/:id` aliased to `/api/planet/:id` (subpath rewriting)
 
-## Phase 2: api-server ✅ COMPLETE
+## Phase 2: api-server ✅ COMPLETE (superseded by Phase 3)
+
+Phase 2 added namespace aliasing middleware. Since we're not live, this was immediately
+superseded by Phase 3 which removed the aliasing and renamed handlers directly.
+
+## Phase 3: api-server Direct Rename ✅ COMPLETE
 
 ### Implementation Details
 
-Added namespace aliasing middleware in `demo/src/api-server.ts`:
+Removed aliasing middleware entirely. Renamed all handlers in `demo/src/api-server.ts`
+to use new canonical paths directly:
 
 ```typescript
-// Route aliasing: NEW namespace → OLD namespace
-const namespaceAliases: Array<[string, string]> = [
-  // Soul routes
-  ['/api/souls/save', '/api/save-soul'],
-  ['/api/souls/stats', '/api/soul-repository/stats'],
-  ['/api/souls/sprite', '/api/generate-soul-sprite'],
-  // Species routes
-  ['/api/species/save', '/api/save-alien-species'],
-  ['/api/species/sprite', '/api/generate-sprite'],
-  ['/api/species', '/api/alien-species'],
-  // Multiverse routes
-  ['/api/multiverse/universes', '/api/universes'],
-  ['/api/multiverse/universe/', '/api/universe/'],
-  ['/api/multiverse/universe', '/api/universe'],
-  ['/api/multiverse/passages', '/api/passages'],
-  ['/api/multiverse/passage/', '/api/passage/'],
-  ['/api/multiverse/passage', '/api/passage'],
-  ['/api/multiverse/player/', '/api/player/'],
-  ['/api/multiverse/player', '/api/player'],
-];
+// Soul routes - direct handlers at new paths
+app.post('/api/souls/save', async (req, res) => { ... });
+app.get('/api/souls/stats', (req, res) => { ... });
+app.post('/api/souls/sprite', async (req, res) => { ... });
+
+// Species routes - direct handlers at new paths
+app.post('/api/species/sprite', generateSprite);
+app.post('/api/species/save', saveAlienSpecies);
+app.get('/api/species', getAllAlienSpecies);
+
+// Universe/Multiverse routes - router mounted at /api/multiverse
+const universeRouter = createUniverseApiRouter();
+app.use('/api/multiverse', universeRouter);
 ```
 
-### Route Mapping
+### Client Files Updated (all old routes removed)
 
-**Soul Routes:**
-| New Route | Old Route (aliased) |
-|-----------|---------------------|
-| `POST /api/souls/save` | `/api/save-soul` |
-| `GET /api/souls/stats` | `/api/soul-repository/stats` |
-| `POST /api/souls/sprite` | `/api/generate-soul-sprite` |
+| File | Changes |
+|------|---------|
+| `demo/src/main.ts` | 4 route updates |
+| `packages/core/src/admin/capabilities/saves.ts` | 3 route updates |
+| `packages/persistence/src/MultiverseClient.ts` | 20 endpoint updates |
+| `packages/core/src/persistence/SaveLoadService.ts` | 4 route updates |
+| `packages/renderer/src/UniverseBrowserScreen.ts` | 6 route updates |
+| `packages/persistence/SNAPSHOT_DECAY.md` | 3 doc updates |
+| `demo/vite.config.ts` | Proxy routes updated to `/api/species`, `/api/souls`, `/api/multiverse` |
 
-**Species Routes:**
-| New Route | Old Route (aliased) |
-|-----------|---------------------|
-| `GET /api/species` | `/api/alien-species` |
-| `POST /api/species/save` | `/api/save-alien-species` |
-| `POST /api/species/sprite` | `/api/generate-sprite` |
+### Old → New Route Mapping (for reference)
 
-**Multiverse Routes:**
-| New Route | Old Route (aliased) |
-|-----------|---------------------|
-| `* /api/multiverse/universe/*` | `/api/universe/*` |
-| `GET /api/multiverse/universes` | `/api/universes` |
-| `* /api/multiverse/passage/*` | `/api/passage/*` |
-| `GET /api/multiverse/passages` | `/api/passages` |
-| `* /api/multiverse/player/*` | `/api/player/*` |
-| `GET /api/multiverse/stats` | Already at correct path |
+| Old Route | New Route |
+|-----------|-----------|
+| `/api/save-soul` | `/api/souls/save` |
+| `/api/soul-repository/stats` | `/api/souls/stats` |
+| `/api/generate-soul-sprite` | `/api/souls/sprite` |
+| `/api/alien-species` | `/api/species` |
+| `/api/save-alien-species` | `/api/species/save` |
+| `/api/generate-sprite` | `/api/species/sprite` |
+| `/api/universe` | `/api/multiverse/universe` |
+| `/api/universes` | `/api/multiverse/universes` |
+| `/api/passage` | `/api/multiverse/passage` |
+| `/api/passages` | `/api/multiverse/passages` |
+| `/api/player` | `/api/multiverse/player` |
 
-## Phase 3: Remove Deprecated Routes ⬜ PENDING
+### metrics-server Phase 3 (pending)
 
-After 2 weeks of backwards compatibility:
-1. Remove old route aliases in metrics-server
-2. Remove old route handlers in api-server
-3. Update documentation to show only new routes
+The metrics-server (port 8766) still uses namespace aliasing from Phase 1:
+- `/api/game/` → `/api/live/`
+- `/api/planets/` → `/api/planet/`
+- `/api/saves/` → `/api/save/`
+- `/api/server/` → `/api/game-server/`
+
+This can be cleaned up by renaming the actual handlers in `scripts/metrics-server.ts`
+when ready (larger change, ~8500 line file).
 
 ## Testing Checklist
 
@@ -192,4 +197,4 @@ After 2 weeks of backwards compatibility:
 
 **General:**
 - [x] Browser console shows no errors on game load
-- [x] Old routes still work via aliasing (backwards compatible)
+- [x] All clients use new canonical routes directly (no aliasing needed for api-server)

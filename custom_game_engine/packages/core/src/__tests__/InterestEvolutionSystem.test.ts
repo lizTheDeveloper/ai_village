@@ -195,7 +195,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
       world.eventBus.emit({
-        type: 'skill:increased',
+        type: 'skill:level_up',
         source: agent.id,
         data: {
           agentId: agent.id,
@@ -225,7 +225,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       });
 
       world.eventBus.emit({
-        type: 'skill:increased',
+        type: 'skill:level_up',
         source: agent.id,
         data: {
           agentId: agent.id,
@@ -253,7 +253,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       });
 
       world.eventBus.emit({
-        type: 'skill:increased',
+        type: 'skill:level_up',
         source: agent.id,
         data: {
           agentId: agent.id,
@@ -285,7 +285,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       // Emit 30 skill increase events to reach 0.5 + (0.01 * 30) = 0.8
       for (let i = 0; i < 30; i++) {
         world.eventBus.emit({
-          type: 'skill:increased',
+          type: 'skill:level_up',
           source: agent.id,
           data: {
             agentId: agent.id,
@@ -305,7 +305,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
       world.eventBus.emit({
-        type: 'skill:increased',
+        type: 'skill:level_up',
         source: agent.id,
         data: {
           agentId: agent.id,
@@ -826,7 +826,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
 
     it('should handle events with missing entities', () => {
       world.eventBus.emit({
-        type: 'skill:increased',
+        type: 'skill:level_up',
         source: 'non-existent-agent',
         data: {
           agentId: 'non-existent-agent',

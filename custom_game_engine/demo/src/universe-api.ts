@@ -8,16 +8,13 @@
  * - Passage management (inter-universe connections)
  * - Player management (registration, universe ownership)
  *
- * Preferred Routes (via namespace aliasing in api-server.ts):
+ * Routes (mounted at /api/multiverse):
  *   /api/multiverse/universe/*   - Universe CRUD
  *   /api/multiverse/universes    - List universes
  *   /api/multiverse/passage/*    - Passage CRUD
  *   /api/multiverse/passages     - List passages
  *   /api/multiverse/player/*     - Player management
  *   /api/multiverse/stats        - Multiverse statistics
- *
- * Old routes (/api/universe/*, etc.) still work via aliasing.
- * See docs/API_NAMESPACE_MIGRATION.md for details.
  */
 
 import type { Request, Response, Router } from 'express';
@@ -46,7 +43,7 @@ export function createUniverseApiRouter(): Router {
   // ============================================================
 
   /**
-   * POST /api/universe
+   * POST /api/multiverse/universe
    * Create a new universe
    */
   router.post('/universe', async (req: Request, res: Response) => {
@@ -88,7 +85,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id
+   * GET /api/multiverse/universe/:id
    * Get universe metadata
    */
   router.get('/universe/:id', async (req: Request, res: Response) => {
@@ -108,7 +105,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * DELETE /api/universe/:id
+   * DELETE /api/multiverse/universe/:id
    * Delete a universe (marks as deleted, preserves data)
    */
   router.delete('/universe/:id', async (req: Request, res: Response) => {
@@ -133,7 +130,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universes
+   * GET /api/multiverse/universes
    * List all universes (optionally filtered)
    */
   router.get('/universes', async (req: Request, res: Response) => {
@@ -157,7 +154,7 @@ export function createUniverseApiRouter(): Router {
   // ============================================================
 
   /**
-   * POST /api/universe/:id/snapshot
+   * POST /api/multiverse/universe/:id/snapshot
    * Upload a snapshot (supports compressed uploads)
    */
   router.post('/universe/:id/snapshot', async (req: Request, res: Response) => {
@@ -215,7 +212,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id/snapshot/:tick
+   * GET /api/multiverse/universe/:id/snapshot/:tick
    * Get a snapshot at a specific tick
    */
   router.get('/universe/:id/snapshot/:tick', async (req: Request, res: Response) => {
@@ -235,7 +232,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id/snapshot/latest
+   * GET /api/multiverse/universe/:id/snapshot/latest
    * Get the latest snapshot
    */
   router.get('/universe/:id/snapshot/latest', async (req: Request, res: Response) => {
@@ -258,7 +255,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id/snapshots
+   * GET /api/multiverse/universe/:id/snapshots
    * List all snapshots for a universe
    */
   router.get('/universe/:id/snapshots', async (req: Request, res: Response) => {
@@ -282,7 +279,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id/timeline
+   * GET /api/multiverse/universe/:id/timeline
    * Get timeline with canonical events
    */
   router.get('/universe/:id/timeline', async (req: Request, res: Response) => {
@@ -314,7 +311,7 @@ export function createUniverseApiRouter(): Router {
   // ============================================================
 
   /**
-   * POST /api/universe/:id/cleanup
+   * POST /api/multiverse/universe/:id/cleanup
    * Evaluate and remove decayed snapshots
    */
   router.post('/universe/:id/cleanup', async (req: Request, res: Response) => {
@@ -347,7 +344,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id/decay-preview
+   * GET /api/multiverse/universe/:id/decay-preview
    * Preview which snapshots would be decayed (without actually removing them)
    */
   router.get('/universe/:id/decay-preview', async (req: Request, res: Response) => {
@@ -392,7 +389,7 @@ export function createUniverseApiRouter(): Router {
   // ============================================================
 
   /**
-   * POST /api/universe/:id/fork
+   * POST /api/multiverse/universe/:id/fork
    * Fork a universe at a specific snapshot
    */
   router.post('/universe/:id/fork', async (req: Request, res: Response) => {
@@ -431,7 +428,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/universe/:id/forks
+   * GET /api/multiverse/universe/:id/forks
    * List all forks of a universe
    */
   router.get('/universe/:id/forks', async (req: Request, res: Response) => {
@@ -455,7 +452,7 @@ export function createUniverseApiRouter(): Router {
   // ============================================================
 
   /**
-   * POST /api/passage
+   * POST /api/multiverse/passage
    * Create a passage between universes
    */
   router.post('/passage', async (req: Request, res: Response) => {
@@ -509,7 +506,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/passage/:id
+   * GET /api/multiverse/passage/:id
    * Get passage details
    */
   router.get('/passage/:id', async (req: Request, res: Response) => {
@@ -529,7 +526,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * DELETE /api/passage/:id
+   * DELETE /api/multiverse/passage/:id
    * Delete a passage (marks inactive)
    */
   router.delete('/passage/:id', async (req: Request, res: Response) => {
@@ -549,7 +546,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/passages
+   * GET /api/multiverse/passages
    * List all passages (optionally filtered by universe)
    */
   router.get('/passages', async (req: Request, res: Response) => {
@@ -572,7 +569,7 @@ export function createUniverseApiRouter(): Router {
   // ============================================================
 
   /**
-   * POST /api/player
+   * POST /api/multiverse/player
    * Register a player
    */
   router.post('/player', async (req: Request, res: Response) => {
@@ -604,7 +601,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/player/:id
+   * GET /api/multiverse/player/:id
    * Get player profile
    */
   router.get('/player/:id', async (req: Request, res: Response) => {
@@ -624,7 +621,7 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/player/:id/universes
+   * GET /api/multiverse/player/:id/universes
    * Get player's universes
    */
   router.get('/player/:id/universes', async (req: Request, res: Response) => {

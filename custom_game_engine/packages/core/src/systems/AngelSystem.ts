@@ -34,7 +34,7 @@ import { setupAngelMessaging } from './AngelPhoneSystem.js';
  * LLM Provider interface (matches AngelAIDecisionProcessor requirements)
  */
 interface LLMProvider {
-  generate(prompt: string): Promise<string>;
+  generate(prompt: string, options?: { tier?: string }): Promise<string>;
 }
 
 // ============================================================================

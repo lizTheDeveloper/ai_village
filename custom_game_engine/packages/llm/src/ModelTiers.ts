@@ -7,10 +7,11 @@
  * Tiers:
  * - "simple": Local models (fast, low intelligence)
  * - "default": 20-32B parameter models (balanced)
- * - "high": 100B+ parameter models (highest intelligence)
+ * - "high": 100B+ parameter models (high intelligence)
+ * - "agi": Frontier models - Anthropic Sonnet/Opus, OpenAI GPT-5.2 (highest intelligence)
  */
 
-export type IntelligenceTier = 'simple' | 'default' | 'high';
+export type IntelligenceTier = 'simple' | 'default' | 'high' | 'agi';
 
 export interface ModelConfig {
   id: string;              // Model ID as used in API
@@ -135,6 +136,7 @@ export const DEFAULT_MODELS: Record<IntelligenceTier, string> = {
   simple: 'qwen3:4b',
   default: 'qwen/qwen3-32b',
   high: 'openai/gpt-oss-120b',
+  agi: 'claude-3-5-sonnet-20241022', // Not configured - requires Anthropic API key
 };
 
 /**

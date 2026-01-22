@@ -26,6 +26,7 @@ import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LL
 export interface ProxyLLMRequest extends LLMRequest {
   agentId?: string;
   model?: string;
+  tier?: string;  // Intelligence tier: 'simple', 'default', 'high', 'agi'
 }
 
 export class ProxyLLMProvider implements LLMProvider {
@@ -123,6 +124,7 @@ export class ProxyLLMProvider implements LLMProvider {
             agentId: proxyRequest.agentId || 'unknown',
             prompt: request.prompt,
             model: proxyRequest.model,
+            tier: proxyRequest.tier,
             maxTokens: request.maxTokens,
             temperature: request.temperature,
           }),

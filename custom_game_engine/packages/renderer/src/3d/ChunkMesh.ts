@@ -56,7 +56,7 @@ export class ChunkMesh {
   readonly chunkZ: number;
 
   /** Configuration */
-  private config: ChunkMeshConfig;
+  readonly config: ChunkMeshConfig;
 
   /** The Three.js mesh */
   private mesh: THREE.Mesh | null = null;

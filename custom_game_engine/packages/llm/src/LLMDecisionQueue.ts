@@ -11,6 +11,7 @@ export interface CustomLLMConfig {
   model?: string;
   apiKey?: string;
   customHeaders?: Record<string, string>;
+  tier?: string;  // Intelligence tier: 'simple', 'default', 'high', 'agi'
 }
 
 interface DecisionRequest {
@@ -115,21 +116,27 @@ export class LLMDecisionQueue {
       const minTokens = estimatedPromptTokens * 3;
       const maxTokens = Math.min(8192, Math.max(minTokens, this.configuredMaxTokens));
 
-      const llmRequest: LLMRequest = {
+      const llmRequest: LLMRequest & { tier?: string; agentId?: string } = {
         prompt: request.prompt,
         temperature: 0.7,
         maxTokens, // Thinking models need room for reasoning + tool call
         // Let OllamaProvider handle stop sequences
       };
 
-      // Use custom provider if custom config is provided
+      // Pass tier through for ProxyLLMProvider routing
+      if (request.customConfig?.tier) {
+        llmRequest.tier = request.customConfig.tier;
+      }
+      llmRequest.agentId = request.agentId;
+
+      // Use custom provider if custom config is provided (with baseUrl/apiKey)
       let provider = this.provider;
-      if (request.customConfig) {
+      if (request.customConfig?.baseUrl) {
         const config = request.customConfig;
         // Create custom provider on-the-fly
         provider = new OpenAICompatProvider(
           config.model || 'default-model',
-          config.baseUrl || 'http://localhost:8080/v1',
+          config.baseUrl,
           config.apiKey || ''
         );
 

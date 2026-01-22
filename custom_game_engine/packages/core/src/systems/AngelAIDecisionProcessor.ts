@@ -24,7 +24,7 @@ import { answerPrayer as answerPrayerOnAgent } from '../components/SpiritualComp
  * LLM Provider interface (simplified to avoid cross-package import issues)
  */
 interface LLMProvider {
-  generate(prompt: string): Promise<string>;
+  generate(prompt: string, options?: { tier?: string }): Promise<string>;
 }
 
 /**
@@ -261,8 +261,8 @@ export class AngelAIDecisionProcessor {
         needs
       );
 
-      // Call LLM
-      const responseText = await this.llmProvider.generate(prompt);
+      // Call LLM with 'high' intelligence tier for angel responses
+      const responseText = await this.llmProvider.generate(prompt, { tier: 'high' });
 
       // Parse response
       const response = this.parseAngelResponse(responseText);

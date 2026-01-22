@@ -10,6 +10,7 @@
 
 import * as THREE from 'three';
 import { ChunkMesh, type ChunkMeshConfig } from './ChunkMesh.js';
+import { OcclusionCuller } from './OcclusionCuller.js';
 
 /** Chunk manager configuration */
 export interface ChunkManager3DConfig {
@@ -57,6 +58,12 @@ export class ChunkManager3D {
   private frustum = new THREE.Frustum();
   private projScreenMatrix = new THREE.Matrix4();
 
+  /** Occlusion culler for cave culling */
+  private occlusionCuller: OcclusionCuller;
+
+  /** Whether occlusion culling is enabled */
+  private occlusionEnabled = true;
+
   /** Current camera chunk position */
   private cameraChunkX = 0;
   private cameraChunkZ = 0;
@@ -84,6 +91,9 @@ export class ChunkManager3D {
     this.material = new THREE.MeshLambertMaterial({
       vertexColors: true,
     });
+
+    // Create occlusion culler
+    this.occlusionCuller = new OcclusionCuller();
   }
 
   /**
@@ -119,13 +129,11 @@ export class ChunkManager3D {
     // Load/unload chunks around camera
     this.updateChunksAroundCamera();
 
-    // Rebuild dirty chunks
+    // Rebuild dirty chunks (also updates occlusion data)
     this.rebuildDirtyChunks();
 
-    // Perform frustum culling
-    if (this.config.enableFrustumCulling) {
-      this.performFrustumCulling();
-    }
+    // Perform combined culling: frustum + occlusion
+    this.performCulling();
 
     // Update statistics
     this.updateStats();
@@ -228,20 +236,45 @@ export class ChunkManager3D {
     this.chunks.forEach((entry) => {
       if (entry.chunk.isDirty()) {
         entry.chunk.rebuild();
+
+        // Update occlusion data when chunk changes
+        if (this.occlusionEnabled) {
+          this.occlusionCuller.analyzeChunk(entry.chunk);
+        }
+
         this.stats.rebuildCount++;
       }
     });
   }
 
   /**
-   * Perform frustum culling on all chunks
+   * Perform combined culling (frustum + occlusion)
    */
-  private performFrustumCulling(): void {
+  private performCulling(): void {
     this.stats.cullCount = 0;
     this.stats.visibleChunks = 0;
 
-    this.chunks.forEach((entry) => {
-      const isVisible = this.frustum.intersectsBox(entry.chunk.boundingBox);
+    // Get occlusion-visible chunks
+    let occlusionVisible: Set<string> | null = null;
+    if (this.occlusionEnabled) {
+      occlusionVisible = this.occlusionCuller.computeVisibleChunks(
+        this.cameraChunkX,
+        this.cameraChunkZ,
+        this.config.renderRadius
+      );
+    }
+
+    this.chunks.forEach((entry, key) => {
+      // Frustum check
+      const inFrustum = this.config.enableFrustumCulling
+        ? this.frustum.intersectsBox(entry.chunk.boundingBox)
+        : true;
+
+      // Occlusion check
+      const notOccluded =
+        !this.occlusionEnabled || !occlusionVisible || occlusionVisible.has(key);
+
+      const isVisible = inFrustum && notOccluded;
       entry.chunk.setVisible(isVisible);
 
       if (isVisible) {
@@ -285,6 +318,13 @@ export class ChunkManager3D {
    */
   getRenderRadius(): number {
     return this.config.renderRadius;
+  }
+
+  /**
+   * Enable/disable occlusion culling
+   */
+  setOcclusionCulling(enabled: boolean): void {
+    this.occlusionEnabled = enabled;
   }
 
   /**

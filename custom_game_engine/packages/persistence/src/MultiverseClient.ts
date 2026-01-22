@@ -372,8 +372,8 @@ export class MultiverseClient {
    */
   async getTimeline(universeId: string, canonicalOnly?: boolean): Promise<TimelineIndex | SnapshotEntry[]> {
     const url = canonicalOnly
-      ? `${this.baseUrl}/universe/${universeId}/timeline?canonicalOnly=true`
-      : `${this.baseUrl}/universe/${universeId}/timeline`;
+      ? `${this.baseUrl}/multiverse/universe/${universeId}/timeline?canonicalOnly=true`
+      : `${this.baseUrl}/multiverse/universe/${universeId}/timeline`;
 
     const response = await fetch(url);
 
@@ -402,7 +402,7 @@ export class MultiverseClient {
       throw new Error('Player ID not set. Call setPlayerId() first.');
     }
 
-    const response = await fetch(`${this.baseUrl}/universe/${sourceUniverseId}/fork`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${sourceUniverseId}/fork`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -425,7 +425,7 @@ export class MultiverseClient {
    * List all forks of a universe
    */
   async listForks(universeId: string): Promise<UniverseMetadata[]> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}/forks`);
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/forks`);
 
     if (!response.ok) {
       const error = await response.json();
@@ -452,7 +452,7 @@ export class MultiverseClient {
       throw new Error('Player ID not set. Call setPlayerId() first.');
     }
 
-    const response = await fetch(`${this.baseUrl}/passage`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/passage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -476,7 +476,7 @@ export class MultiverseClient {
    * Get passage details
    */
   async getPassage(passageId: string): Promise<PassageConnection | null> {
-    const response = await fetch(`${this.baseUrl}/passage/${passageId}`);
+    const response = await fetch(`${this.baseUrl}/multiverse/passage/${passageId}`);
 
     if (response.status === 404) {
       return null;
@@ -496,8 +496,8 @@ export class MultiverseClient {
    */
   async listPassages(universeId?: string): Promise<PassageConnection[]> {
     const url = universeId
-      ? `${this.baseUrl}/passages?universeId=${universeId}`
-      : `${this.baseUrl}/passages`;
+      ? `${this.baseUrl}/multiverse/passages?universeId=${universeId}`
+      : `${this.baseUrl}/multiverse/passages`;
 
     const response = await fetch(url);
 
@@ -514,7 +514,7 @@ export class MultiverseClient {
    * Delete a passage (marks inactive)
    */
   async deletePassage(passageId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/passage/${passageId}`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/passage/${passageId}`, {
       method: 'DELETE',
     });
 
@@ -536,7 +536,7 @@ export class MultiverseClient {
       throw new Error('Player ID not set. Call setPlayerId() first.');
     }
 
-    const response = await fetch(`${this.baseUrl}/player`, {
+    const response = await fetch(`${this.baseUrl}/multiverse/player`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -558,7 +558,7 @@ export class MultiverseClient {
    * Get player profile
    */
   async getPlayer(playerId: string): Promise<PlayerProfile | null> {
-    const response = await fetch(`${this.baseUrl}/player/${playerId}`);
+    const response = await fetch(`${this.baseUrl}/multiverse/player/${playerId}`);
 
     if (response.status === 404) {
       return null;
@@ -578,8 +578,8 @@ export class MultiverseClient {
    */
   async getPlayerUniverses(playerId: string, includeMetadata?: boolean): Promise<string[] | UniverseMetadata[]> {
     const url = includeMetadata
-      ? `${this.baseUrl}/player/${playerId}/universes?includeMetadata=true`
-      : `${this.baseUrl}/player/${playerId}/universes`;
+      ? `${this.baseUrl}/multiverse/player/${playerId}/universes?includeMetadata=true`
+      : `${this.baseUrl}/multiverse/player/${playerId}/universes`;
 
     const response = await fetch(url);
 

@@ -165,7 +165,7 @@ packages/renderer/assets/sprites/
 
 The API server (port 3001) provides:
 
-- **POST /api/generate-sprite** - Proxy to PixelLab API
+- **POST /api/species/sprite** - Proxy to PixelLab API
   ```json
   {
     "description": "sprite prompt with direction",
@@ -174,7 +174,7 @@ The API server (port 3001) provides:
   }
   ```
 
-- **POST /api/save-alien-species** - Save species with variants
+- **POST /api/species/save** - Save species with variants
   ```json
   {
     "species": { /* species data */ },
@@ -182,7 +182,7 @@ The API server (port 3001) provides:
   }
   ```
 
-- **GET /api/alien-species** - Get all species from registry
+- **GET /api/species** - Get all species from registry
 
 ## Generation Time
 

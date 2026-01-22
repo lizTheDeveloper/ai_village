@@ -1,4 +1,55 @@
 /**
+ * @status DISABLED (export only)
+ * @reason Commented out in src/systems/index.ts (line 118) but actually functional
+ *
+ * ## What This System Does
+ * EquipmentSystem manages dynamic body-based equipment for all species (humanoids, angels,
+ * aliens, insectoids, etc.). It validates equipment against body parts, tracks weight for
+ * flying creatures, calculates defense/resistance stats, handles durability degradation,
+ * and detects armor set bonuses.
+ *
+ * Key features:
+ * - Dynamic equipment slots based on BodyComponent.parts (not fixed humanoid slots)
+ * - Weight-based flight restrictions (angels can't fly if overloaded)
+ * - Armor validation by body part type and function
+ * - Weekly durability degradation (quality-adjusted)
+ * - Cached defense stats for performance
+ * - Set bonuses (3+ pieces of same material/class)
+ *
+ * ## What's Broken/Incomplete
+ * **NOTHING IS BROKEN!** The system is fully functional:
+ * - ✅ All 19 tests pass (src/systems/__tests__/EquipmentSystem.test.ts)
+ * - ✅ Properly imported and registered in registerAllSystems.ts (line 275, 919)
+ * - ✅ EquipmentComponent exported in src/components/index.ts (line 58)
+ * - ✅ ComponentType.Equipment defined in src/types/ComponentType.ts (line 27)
+ * - ✅ No TypeScript compilation errors
+ * - ✅ Integrates with ItemRegistry, ItemInstanceRegistry, BodyComponent
+ * - ✅ Uses SystemContext (BaseSystem) with proper throttling
+ * - ✅ Event-driven weekly degradation via time:new_week
+ *
+ * The system was disabled in index.ts on 2026-01-01 (commit ae46318a2) with TODO comment
+ * "Fix EquipmentSystem errors before re-enabling", but no actual errors exist.
+ *
+ * ## TODO to Enable
+ * - [x] Verify tests pass (DONE - 19/19 passing)
+ * - [x] Verify compilation works (DONE - no errors)
+ * - [x] Verify system is registered (DONE - registerAllSystems.ts line 919)
+ * - [ ] Uncomment export in src/systems/index.ts line 118:
+ *       Change `// export * from './EquipmentSystem.js';`
+ *       to `export * from './EquipmentSystem.js';`
+ * - [ ] Remove TODO comment on line 117
+ * - [ ] Test in running game to verify integration with BodySystem
+ * - [ ] Verify agents can equip items via EquipmentComponent
+ * - [ ] Consider adding UI panel for equipment management
+ *
+ * ## Integration Notes
+ * - **EquipmentComponent vs EquipmentSlotsComponent**: This system uses EquipmentComponent
+ *   (dynamic body-based slots). EquipmentSlotsComponent is an older fixed-slot design
+ *   currently used by GatherBehavior for tool wear. Consider migrating to unified system.
+ * - **BodyComponent dependency**: Requires BodySystem to be active
+ * - **ItemInstanceRegistry**: Uses global registry for durability tracking
+ * - **Time events**: Subscribes to time:new_week for degradation
+ *
  * EquipmentSystem - Manages dynamic body-based equipment
  *
  * Handles:

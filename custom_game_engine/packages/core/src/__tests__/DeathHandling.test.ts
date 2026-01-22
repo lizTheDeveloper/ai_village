@@ -33,16 +33,32 @@ describe('DeathHandling', () => {
 
     // Create deceased agent
     deceased = world.createEntity();
-    deceased.addComponent('position', { x: 10, y: 10, z: 0 });
-    deceased.addComponent('agent', { name: 'Deceased' });
+    deceased.addComponent('position', { type: 'position', version: 1, x: 10, y: 10, z: 0 });
+    deceased.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
+    deceased.addComponent('identity', { type: 'identity', version: 1, name: 'Deceased' });
+    deceased.addComponent('needs', {
+      type: 'needs',
+      version: 1,
+      health: 100,
+      hunger: 100,
+      energy: 100,
+      temperature: 37,
+      lastUpdate: 0
+    });
     deceased.addComponent('inventory', {
+      type: 'inventory',
       items: [
         { type: 'sword', quantity: 1 },
         { type: 'gold', quantity: 50 },
       ],
     });
-    deceased.addComponent('relationship', { relationships: {} });
+    deceased.addComponent('relationship', {
+      type: 'relationship',
+      version: 1,
+      relationships: new Map()
+    });
     deceased.addComponent('episodic_memory', {
+      type: 'episodic_memory',
       memories: [
         { id: 'unique1', shared: false, content: 'secret location' },
         { id: 'shared1', shared: true, content: 'village festival' },
@@ -51,61 +67,73 @@ describe('DeathHandling', () => {
 
     // Create friend
     friend = world.createEntity();
-    friend.addComponent('position', { x: 20, y: 20, z: 0 });
-    friend.addComponent('agent', { name: 'Friend' });
+    friend.addComponent('position', { type: 'position', version: 1, x: 20, y: 20, z: 0 });
+    friend.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
+    friend.addComponent('identity', { type: 'identity', version: 1, name: 'Friend' });
     friend.addComponent('relationship', {
-      relationships: {
-        [deceased.id]: { opinion: 80, trust: 90, closeness: 'close' },
-      },
+      type: 'relationship',
+      version: 1,
+      relationships: new Map([[deceased.id, { affinity: 80, trust: 90, familiarity: 80 }]]),
     });
 
     // Create witness
     witness = world.createEntity();
-    witness.addComponent('position', { x: 12, y: 12, z: 0 });
-    witness.addComponent('agent', { name: 'Witness' });
-    witness.addComponent('episodic_memory', { memories: [] });
+    witness.addComponent('position', { type: 'position', version: 1, x: 12, y: 12, z: 0 });
+    witness.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
+    witness.addComponent('identity', { type: 'identity', version: 1, name: 'Witness' });
+    witness.addComponent('episodic_memory', {
+      type: 'episodic_memory',
+      memories: []
+    });
   });
 
   describe('REQ-CON-009: Death is Permanent', () => {
     it('should mark agent as dead, not delete', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
       // Entity should still exist
       expect(world.getEntity(deceased.id)).toBeDefined();
-      // But should be marked dead
-      expect(deceased.hasComponent('dead')).toBe(true);
+      // Check if realm_location was marked with dead transformation
+      const realmLocation = deceased.getComponent('realm_location');
+      expect(realmLocation?.transformations).toContain('dead');
     });
 
     it('should drop inventory at death location', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
-      // Check for dropped items at location
-      const droppedItems = world.getEntitiesAt(10, 10, 0);
-      const items = droppedItems.filter((e) => e.hasComponent('item'));
+      // Check for dropped items using query
+      const allEntities = world.query().with('item').executeEntities();
+      const droppedAtLocation = allEntities.filter((e) => {
+        const pos = e.getComponent('position');
+        return pos && pos.x === 10 && pos.y === 10;
+      });
 
-      expect(items.length).toBeGreaterThan(0);
-      expect(items.some((i) => i.getComponent('item').type === 'sword')).toBe(true);
-      expect(items.some((i) => i.getComponent('item').type === 'gold')).toBe(true);
+      expect(droppedAtLocation.length).toBeGreaterThan(0);
+      expect(droppedAtLocation.some((i) => i.getComponent('item').itemType === 'sword')).toBe(true);
+      expect(droppedAtLocation.some((i) => i.getComponent('item').itemType === 'gold')).toBe(true);
     });
 
     it('should notify all agents with relationship', () => {
       const notificationHandler = vi.fn();
       eventBus.on('death:notification', notificationHandler);
 
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
@@ -118,10 +146,11 @@ describe('DeathHandling', () => {
     });
 
     it('should apply mourning to close relations', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
@@ -134,17 +163,19 @@ describe('DeathHandling', () => {
 
     it('should not apply mourning to distant relations', () => {
       const acquaintance = world.createEntity();
-      acquaintance.addComponent('agent', { name: 'Acquaintance' });
+      acquaintance.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
+      acquaintance.addComponent('identity', { type: 'identity', version: 1, name: 'Acquaintance' });
       acquaintance.addComponent('relationship', {
-        relationships: {
-          [deceased.id]: { opinion: 30, trust: 20, closeness: 'distant' },
-        },
+        type: 'relationship',
+        version: 1,
+        relationships: new Map([[deceased.id, { affinity: 30, trust: 20, familiarity: 20 }]]),
       });
 
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
@@ -156,14 +187,18 @@ describe('DeathHandling', () => {
     });
 
     it('should mark unique memories as lost', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
-      const knowledgeLoss = world.getComponent('knowledge_loss');
+      // Query for knowledge_loss singleton entity
+      const knowledgeLossEntities = world.query().with('knowledge_loss').executeEntities();
+      expect(knowledgeLossEntities.length).toBeGreaterThan(0);
+      const knowledgeLoss = knowledgeLossEntities[0].getComponent('knowledge_loss');
 
       expect(knowledgeLoss.lostMemories).toContainEqual(
         expect.objectContaining({ id: 'unique1', content: 'secret location' })
@@ -171,14 +206,18 @@ describe('DeathHandling', () => {
     });
 
     it('should not mark shared memories as lost', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      // Trigger death by setting health to 0
+      deceased.updateComponent('needs', (needs: any) => ({
+        ...needs,
+        health: 0
+      }));
 
       system.update(world, 1);
 
-      const knowledgeLoss = world.getComponent('knowledge_loss');
+      // Query for knowledge_loss singleton entity
+      const knowledgeLossEntities = world.query().with('knowledge_loss').executeEntities();
+      expect(knowledgeLossEntities.length).toBeGreaterThan(0);
+      const knowledgeLoss = knowledgeLossEntities[0].getComponent('knowledge_loss');
 
       const sharedLost = knowledgeLoss.lostMemories.some((m: any) => m.id === 'shared1');
       expect(sharedLost).toBe(false);

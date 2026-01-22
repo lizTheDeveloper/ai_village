@@ -4,7 +4,7 @@
  *
  * Persistence and multiverse management server, separate from the game runtime server (8766).
  *
- * API Namespaces (Phase 2 Migration Complete):
+ * API Namespaces:
  *
  * /api/multiverse/*  - Universe/multiverse operations
  *   POST   /api/multiverse/universe      - Create universe
@@ -26,9 +26,6 @@
  *   GET  /api/species        - List species
  *   POST /api/species/save   - Save species
  *   POST /api/species/sprite - Generate sprite
- *
- * Old routes still work via aliasing (backwards compatible).
- * See docs/API_NAMESPACE_MIGRATION.md for details.
  */
 
 import express from 'express';
@@ -55,58 +52,10 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increase limit for base64 images
 
-// ============================================================================
-// API NAMESPACE MIGRATION (Phase 2)
-// ============================================================================
-// New namespaces map to existing handlers for backwards compatibility.
-// See docs/API_NAMESPACE_MIGRATION.md for the full migration plan.
-
-// Route aliasing: NEW namespace → OLD namespace
-// Note: These paths are relative to the /api mount point (no /api prefix)
-const namespaceAliases: Array<[string, string]> = [
-  // Soul routes
-  ['/souls/save', '/save-soul'],
-  ['/souls/stats', '/soul-repository/stats'],
-  ['/souls/sprite', '/generate-soul-sprite'],
-  // Species routes
-  ['/species/save', '/save-alien-species'],
-  ['/species/sprite', '/generate-sprite'],
-  ['/species', '/alien-species'],  // Must be after more specific routes
-  // Multiverse routes (prefix rewrites)
-  ['/multiverse/universes', '/universes'],
-  ['/multiverse/universe/', '/universe/'],
-  ['/multiverse/universe', '/universe'],  // Exact match for POST
-  ['/multiverse/passages', '/passages'],
-  ['/multiverse/passage/', '/passage/'],
-  ['/multiverse/passage', '/passage'],
-  ['/multiverse/player/', '/player/'],
-  ['/multiverse/player', '/player'],
-  // /multiverse/stats already correct - no rewrite needed
-];
-
+// Log all requests to /api/ for debugging
 app.use('/api', (req, res, next) => {
-  // Check for namespace aliasing (req.url is relative to /api mount)
-  const originalUrl = req.url;
-  for (const [newPath, oldPath] of namespaceAliases) {
-    // Handle exact matches and query strings
-    if (req.url === newPath || req.url.startsWith(newPath + '?')) {
-      req.url = oldPath + req.url.slice(newPath.length);
-      break;
-    }
-    // Handle prefix matches (for paths with IDs like /multiverse/universe/123)
-    if (newPath.endsWith('/') && req.url.startsWith(newPath)) {
-      req.url = oldPath + req.url.slice(newPath.length);
-      break;
-    }
-  }
-
-  // Log all requests (show rewritten path if applicable)
   const bodySize = req.headers['content-length'] || 'unknown';
-  if (req.url !== originalUrl) {
-    console.log(`[API] ${req.method} /api${originalUrl} → /api${req.url} (body: ${bodySize} bytes)`);
-  } else {
-    console.log(`[API] ${req.method} /api${req.url} (body: ${bodySize} bytes)`);
-  }
+  console.log(`[API] ${req.method} ${req.path} (body: ${bodySize} bytes)`);
   next();
 });
 
@@ -127,7 +76,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 const soulRepository = new SoulRepositorySystem();
 
 // Soul repository endpoint
-app.post('/api/save-soul', async (req, res) => {
+app.post('/api/souls/save', async (req, res) => {
   try {
     const soulData = req.body;
     console.log(`[API] Receiving soul: ${soulData.name} (${soulData.archetype})`);
@@ -160,7 +109,7 @@ app.post('/api/save-soul', async (req, res) => {
 });
 
 // Get repository stats
-app.get('/api/soul-repository/stats', (req, res) => {
+app.get('/api/souls/stats', (req, res) => {
   try {
     const stats = soulRepository.getStats();
     res.json(stats);
@@ -171,7 +120,7 @@ app.get('/api/soul-repository/stats', (req, res) => {
 });
 
 // Soul sprite generation endpoint
-app.post('/api/generate-soul-sprite', async (req, res) => {
+app.post('/api/souls/sprite', async (req, res) => {
   try {
     const { soulId, name, description, reincarnationCount, species } = req.body;
 
@@ -245,13 +194,13 @@ app.post('/api/generate-soul-sprite', async (req, res) => {
 });
 
 // API routes
-app.post('/api/generate-sprite', generateSprite);
-app.post('/api/save-alien-species', saveAlienSpecies);
-app.get('/api/alien-species', getAllAlienSpecies);
+app.post('/api/species/sprite', generateSprite);
+app.post('/api/species/save', saveAlienSpecies);
+app.get('/api/species', getAllAlienSpecies);
 
 // Universe/Multiverse API routes
 const universeRouter = createUniverseApiRouter();
-app.use('/api', universeRouter);
+app.use('/api/multiverse', universeRouter);
 
 // Start server
 async function startServer() {
@@ -261,7 +210,6 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`[API Server] Running on port ${PORT}`);
     console.log(`[API Server] Namespaces: /api/multiverse/*, /api/souls/*, /api/species/*`);
-    console.log(`[API Server] Old routes still work via aliasing (backwards compatible)`);
   });
 }
 

@@ -1,6 +1,93 @@
 /**
- * InterestEvolutionSystem
+ * @status DISABLED
+ * @reason Event type mismatch and undefined event types - see "What's Broken/Incomplete" below
  *
+ * ## What This System Does
+ *
+ * InterestEvolutionSystem is part of the Deep Conversation System (Phase 7.1) that makes agent interests
+ * dynamic and responsive to their lived experiences. It implements four key mechanisms:
+ *
+ * 1. **Interest Decay**: Interests fade over time when not discussed or practiced (week-based decay with
+ *    different rates by source: innate=0%, skill=2%/week, experience=5%/week, childhood=8%/week)
+ *
+ * 2. **Skill-Based Strengthening**: Practicing skills strengthens related interests (e.g., farming skill
+ *    increases farming interest by 0.01 per level)
+ *
+ * 3. **Experience-Based Emergence**: Major life events create new interests or strengthen existing ones
+ *    (e.g., witnessing death creates mortality interest at 0.6 intensity)
+ *
+ * 4. **Mentorship Transfer**: High-quality conversations (quality >= 0.6) allow interest transfer between
+ *    agents, with age-based receptivity (child=0.8, teen=0.6, adult=0.3, elder=0.1)
+ *
+ * The system emits 'interest:mutated' events when interests cross significance thresholds (0.2 change,
+ * 0.3 emergence, 0.1 loss) to track cultural evolution and mentor-student relationships.
+ *
+ * ## What's Broken/Incomplete
+ *
+ * 1. **Event Type Mismatch**: System listens for 'skill:level_up' but test emits 'skill:increased'.
+ *    The actual event type defined in misc.events.ts is 'skill:level_up', so tests are wrong.
+ *    Handler method handleSkillGrowth expects 'skill:level_up' event data shape.
+ *
+ * 2. **Conversation Event Data Mismatch**: System expects conversation:ended to have `topics` field
+ *    (line 359) but social.events.ts defines it as optional `topics?: string[]` (line 42), and tests
+ *    use `topicsDiscussed: string[]` (line 513). Need to verify which field name is actually emitted
+ *    by the ConversationSystem.
+ *
+ * 3. **Missing Event Type Definitions**: Three experience trigger events are not defined in EventMap:
+ *    - 'trauma:experienced' (referenced line 207, exists in misc.events.ts line 100+)
+ *    - 'discovery:created' (referenced line 208, may exist in research.events.ts)
+ *    - 'profession:work_completed' (referenced line 209, exists in work.events.ts line 17)
+ *    These events exist but may not be in the aggregated EventMap type.
+ *
+ * 4. **Event Data Field Mismatches in Triggers**:
+ *    - agent:born condition checks 'parentIds' array (line 92) but event may have 'parentId' singular
+ *    - prayer:answered checks event.source (line 103) but may need different field
+ *
+ * 5. **Compilation Issues**: The TypeScript compilation failed with numerous unrelated errors in
+ *    dependencies (@types/serviceworker, chokidar), but these are project-wide config issues, not
+ *    specific to this system. Using `npx tsc --noEmit` shows these are blocking all compilation.
+ *
+ * ## TODO to Enable
+ *
+ * - [ ] **Fix conversation event field name**: Verify ConversationSystem emits 'topics' or 'topicsDiscussed'
+ *       in conversation:ended event data. Update line 359 and 362 to match actual field name. Check
+ *       src/systems/CommunicationSystem.ts for actual emission.
+ *
+ * - [ ] **Fix test event type**: Update InterestEvolutionSystem.test.ts to emit 'skill:level_up' instead
+ *       of 'skill:increased' (lines 198, 228, 258, 288, 307, 829). The system is correct, tests are wrong.
+ *
+ * - [ ] **Verify agent:born event structure**: Check actual agent:born event in reproduction system to
+ *       confirm if it uses 'parentId' (singular) or 'parentIds' (plural). Update condition at line 92.
+ *
+ * - [ ] **Verify event type registration**: Ensure trauma:experienced, discovery:created, and
+ *       profession:work_completed are properly exported in EventMap.ts aggregation (they exist in domain
+ *       files but may not be aggregated).
+ *
+ * - [ ] **Review prayer:answered event**: Check PrayerAnsweringSystem to see what fields are in the event
+ *       data, update condition at line 102-104 if needed.
+ *
+ * - [ ] **Run tests after fixes**: `cd custom_game_engine && npm test InterestEvolutionSystem` to verify
+ *       all 18 test cases pass.
+ *
+ * - [ ] **Uncomment in src/systems/index.ts**: Remove comment on line 105 to re-export the system.
+ *
+ * - [ ] **Register in registerAllSystems.ts**: Add InterestEvolutionSystem to the system registration
+ *       array if not already present.
+ *
+ * - [ ] **Test in-game**: Start game with `./start.sh`, verify no console errors, and monitor
+ *       interest:mutated events in metrics dashboard to confirm interests evolve naturally.
+ *
+ * ## Architecture Notes
+ *
+ * - **Priority**: 18 (runs after FriendshipSystem at 17)
+ * - **Throttle**: Monthly check for decay (30 * 24 * 1200 ticks = 1 month at 20 TPS)
+ * - **Components**: Requires CT.Agent and CT.Interests
+ * - **Events Consumed**: 8 types (agent:death, deity:miracle, building:completed, agent:born,
+ *   prayer:answered, trauma:experienced, discovery:created, profession:work_completed, skill:level_up,
+ *   conversation:ended)
+ * - **Events Emitted**: interest:mutated (5 mutation types: emerged, strengthened, weakened, lost, transferred)
+ *
+ * **Original Description**:
  * Deep Conversation System - Phase 7.1: Interest Evolution
  *
  * Makes interests dynamic and responsive to life:
