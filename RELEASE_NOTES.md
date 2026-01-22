@@ -1,5 +1,57 @@
 # Release Notes
 
+## 2026-01-21 - "Rename getAllSpeciesIds to getAllAnimalSpeciesIds" - 2 Files (0 net)
+
+### ✏️ animalSpecies.ts Function Rename (+4/-4, 0 net)
+
+**Renamed function for clarity - specifies it returns ANIMAL species.**
+
+#### Changes
+```typescript
+// Before:
+/**
+ * Get all available species IDs
+ */
+-export function getAllSpeciesIds(): string[] {
+  return Object.keys(ANIMAL_SPECIES);
+}
+
+// After:
+/**
+ * Get all available animal species IDs
+ */
++export function getAllAnimalSpeciesIds(): string[] {
+  return Object.keys(ANIMAL_SPECIES);
+}
+```
+
+**Rationale:** Function name now clarifies it returns ANIMAL species IDs specifically, not all species types (which could include plants, fungi, bacteria, etc.).
+
+**Impact:**
+- More descriptive function name
+- Prevents confusion about what "species" means
+- Prepares for potential future `getAllPlantSpeciesIds()`, `getAllFungalSpeciesIds()`, etc.
+
+**Breaking Change:** Callers need to update to new function name.
+
+---
+
+### 📊 Cycle 34 Summary
+
+**Purpose:** Improve function naming clarity.
+
+**Changes:**
+- Function renamed: `getAllSpeciesIds()` → `getAllAnimalSpeciesIds()`
+- Comment updated to match
+
+**Impact:**
+- Clearer API semantics
+- Better code organization for multi-domain species system
+
+**Files:** 2 changed (+4/-4, 0 net)
+
+---
+
 ## 2026-01-21 - "Remove Compatibility Methods from AgentSwimmingSystem + TemperatureSystem" - 3 Files (-10 net)
 
 ### 🧹 AgentSwimmingSystem.ts Cleanup (-9 lines)

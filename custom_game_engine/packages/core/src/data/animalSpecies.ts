@@ -96,9 +96,9 @@ export function getSpawnableSpecies(biome: string): AnimalSpecies[] {
 }
 
 /**
- * Get all available species IDs
+ * Get all available animal species IDs
  */
-export function getAllSpeciesIds(): string[] {
+export function getAllAnimalSpeciesIds(): string[] {
   return Object.keys(ANIMAL_SPECIES);
 }
 
