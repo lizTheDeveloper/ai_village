@@ -98,7 +98,7 @@ const combatCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/combats' };
+        return { message: 'Delegate to /api/game/combats' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -147,7 +147,7 @@ const combatCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with combat_stats component' };
+        return { message: 'Delegate to /api/game/entity with combat_stats component' };
       },
       renderResult: (data: unknown) => {
         const stats = data as {

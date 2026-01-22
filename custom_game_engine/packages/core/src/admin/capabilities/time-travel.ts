@@ -55,7 +55,7 @@ const timeTravelCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/player/abilities/time-travel' };
+        return { message: 'Delegate to /api/game/player/abilities/time-travel' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -97,7 +97,7 @@ const timeTravelCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/timelines' };
+        return { message: 'Delegate to /api/game/timelines' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -149,7 +149,7 @@ const timeTravelCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/timelines/divergence-points' };
+        return { message: 'Delegate to /api/game/timelines/divergence-points' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -190,7 +190,7 @@ const timeTravelCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/timelines/compare' };
+        return { message: 'Delegate to /api/game/timelines/compare' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -235,7 +235,7 @@ const timeTravelCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/timelines/rewind-preview' };
+        return { message: 'Delegate to /api/game/timelines/rewind-preview' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

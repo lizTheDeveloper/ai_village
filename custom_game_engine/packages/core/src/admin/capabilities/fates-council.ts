@@ -116,7 +116,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetchFromMetricsServer('/api/live/fates-status');
+          const response = await fetchFromMetricsServer('/api/game/fates-status');
           return response;
         } catch (error) {
           return {
@@ -167,7 +167,7 @@ const fatesCouncilCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const limit = params.limit || 5;
-          const response = await fetchFromMetricsServer(`/api/live/fates-history?limit=${limit}`);
+          const response = await fetchFromMetricsServer(`/api/game/fates-history?limit=${limit}`);
           return response;
         } catch (error) {
           return {
@@ -221,7 +221,7 @@ const fatesCouncilCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const limit = params.limit || 10;
-          const response = await fetchFromMetricsServer(`/api/live/fates-events?limit=${limit}`);
+          const response = await fetchFromMetricsServer(`/api/game/fates-events?limit=${limit}`);
           return response;
         } catch (error) {
           return {
@@ -272,7 +272,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetchFromMetricsServer('/api/live/fates-epic-eligible');
+          const response = await fetchFromMetricsServer('/api/game/fates-epic-eligible');
           return response;
         } catch (error) {
           return {
@@ -325,7 +325,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await postToMetricsServer('/api/live/fates-enable', {});
+          const response = await postToMetricsServer('/api/game/fates-enable', {});
           return response;
         } catch (error) {
           return {
@@ -360,7 +360,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await postToMetricsServer('/api/live/fates-trigger', {
+          const response = await postToMetricsServer('/api/game/fates-trigger', {
             forceLLM: params.forceLLM || false,
             mockEvents: params.mockEvents || false,
           });
@@ -386,7 +386,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await postToMetricsServer('/api/live/fates-grant-wisdom', {
+          const response = await postToMetricsServer('/api/game/fates-grant-wisdom', {
             entityId: params.entityId,
             wisdom: params.wisdom,
           });
@@ -427,7 +427,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await postToMetricsServer('/api/live/fates-mock-event', {
+          const response = await postToMetricsServer('/api/game/fates-mock-event', {
             eventType: params.eventType,
             entityId: params.entityId || undefined,
           });
@@ -450,7 +450,7 @@ const fatesCouncilCapability = defineCapability({
       requiresGame: true,
       handler: async (params, gameClient, context) => {
         try {
-          const response = await postToMetricsServer('/api/live/fates-clear-cooldown', {});
+          const response = await postToMetricsServer('/api/game/fates-clear-cooldown', {});
           return response;
         } catch (error) {
           return {

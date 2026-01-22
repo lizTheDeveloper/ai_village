@@ -71,7 +71,7 @@ const environmentCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/weather' };
+        return { message: 'Delegate to /api/game/weather' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -101,7 +101,7 @@ const environmentCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/time' };
+        return { message: 'Delegate to /api/game/time' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -135,7 +135,7 @@ const environmentCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/temperature' };
+        return { message: 'Delegate to /api/game/temperature' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -164,7 +164,7 @@ const environmentCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/environment/stats' };
+        return { message: 'Delegate to /api/game/environment/stats' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

@@ -75,7 +75,7 @@ const socialCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with relationship component' };
+        return { message: 'Delegate to /api/game/entity with relationship component' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -119,7 +119,7 @@ const socialCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/relationship' };
+        return { message: 'Delegate to /api/game/relationship' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -161,7 +161,7 @@ const socialCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, description: 'Maximum results' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/families' };
+        return { message: 'Delegate to /api/game/families' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -202,7 +202,7 @@ const socialCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/family-tree' };
+        return { message: 'Delegate to /api/game/entity/family-tree' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -255,7 +255,7 @@ const socialCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/social-network' };
+        return { message: 'Delegate to /api/game/entity/social-network' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -290,7 +290,7 @@ const socialCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with reputation component' };
+        return { message: 'Delegate to /api/game/entity with reputation component' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

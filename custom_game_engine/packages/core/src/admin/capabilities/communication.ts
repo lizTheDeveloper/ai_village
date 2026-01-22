@@ -52,7 +52,7 @@ const communicationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/conversations' };
+        return { message: 'Delegate to /api/game/conversations' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -98,7 +98,7 @@ const communicationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/conversation/history' };
+        return { message: 'Delegate to /api/game/conversation/history' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -137,7 +137,7 @@ const communicationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/chat-history' };
+        return { message: 'Delegate to /api/game/entity/chat-history' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -174,7 +174,7 @@ const communicationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/announcements' };
+        return { message: 'Delegate to /api/game/announcements' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -212,7 +212,7 @@ const communicationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/conversations/nearby' };
+        return { message: 'Delegate to /api/game/conversations/nearby' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

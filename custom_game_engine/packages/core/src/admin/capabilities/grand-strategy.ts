@@ -88,7 +88,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/empires${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/empires${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -109,7 +109,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/nations${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/nations${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -130,7 +130,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/federations${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/federations${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -151,7 +151,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/galactic-councils${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/galactic-councils${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -175,7 +175,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/navies${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/navies${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -196,7 +196,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/fleets${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/fleets${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -217,7 +217,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/squadrons${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/squadrons${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -238,7 +238,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/megastructures${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/megastructures${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -259,7 +259,7 @@ const grandStrategyCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         try {
           const session = params.session ? `?session=${params.session}` : '';
-          const response = await fetch(`${context.baseUrl}/api/live/trade-networks${session}`);
+          const response = await fetch(`${context.baseUrl}/api/game/trade-networks${session}`);
           if (response.ok) {
             return await response.json();
           }
@@ -469,7 +469,7 @@ await simulator.initialize();
       ],
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetch(`${context.baseUrl}/api/live/diplomatic-action`, {
+          const response = await fetch(`${context.baseUrl}/api/game/diplomatic-action`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -499,7 +499,7 @@ await simulator.initialize();
       ],
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetch(`${context.baseUrl}/api/live/move-fleet`, {
+          const response = await fetch(`${context.baseUrl}/api/game/move-fleet`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -541,7 +541,7 @@ await simulator.initialize();
       ],
       handler: async (params, gameClient, context) => {
         try {
-          const response = await fetch(`${context.baseUrl}/api/live/megastructure-task`, {
+          const response = await fetch(`${context.baseUrl}/api/game/megastructure-task`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

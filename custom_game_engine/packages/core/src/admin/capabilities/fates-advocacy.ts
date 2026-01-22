@@ -71,7 +71,7 @@ const fatesAdvocacyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/player/fates-access' };
+        return { message: 'Delegate to /api/game/player/fates-access' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -109,7 +109,7 @@ const fatesAdvocacyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/fates/petitions/pending' };
+        return { message: 'Delegate to /api/game/fates/petitions/pending' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -151,7 +151,7 @@ const fatesAdvocacyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/fates/petitions/history' };
+        return { message: 'Delegate to /api/game/fates/petitions/history' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -205,7 +205,7 @@ const fatesAdvocacyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/fates/values' };
+        return { message: 'Delegate to /api/game/fates/values' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -252,7 +252,7 @@ const fatesAdvocacyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/fates/whispers' };
+        return { message: 'Delegate to /api/game/fates/whispers' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

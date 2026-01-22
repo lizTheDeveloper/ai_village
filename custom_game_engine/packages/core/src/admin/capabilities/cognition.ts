@@ -73,7 +73,7 @@ const cognitionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with brain/perception components' };
+        return { message: 'Delegate to /api/game/entity with brain/perception components' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -130,7 +130,7 @@ const cognitionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/memories' };
+        return { message: 'Delegate to /api/game/entity/memories' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -181,7 +181,7 @@ const cognitionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/beliefs' };
+        return { message: 'Delegate to /api/game/entity/beliefs' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -230,7 +230,7 @@ const cognitionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/goals' };
+        return { message: 'Delegate to /api/game/entity/goals' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -278,7 +278,7 @@ const cognitionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/decisions' };
+        return { message: 'Delegate to /api/game/entity/decisions' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -321,7 +321,7 @@ const cognitionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/knowledge' };
+        return { message: 'Delegate to /api/game/entity/knowledge' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

@@ -73,7 +73,7 @@ const politicsCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/governance for governance entities' };
+        return { message: 'Delegate to /api/game/governance for governance entities' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -118,7 +118,7 @@ const politicsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with governance components' };
+        return { message: 'Delegate to /api/game/entity with governance components' };
       },
       renderResult: (data: unknown) => {
         const gov = data as {
@@ -195,7 +195,7 @@ const politicsCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/elections' };
+        return { message: 'Delegate to /api/game/elections' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -245,7 +245,7 @@ const politicsCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/proposals' };
+        return { message: 'Delegate to /api/game/proposals' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -288,7 +288,7 @@ const politicsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/factions' };
+        return { message: 'Delegate to /api/game/entity/factions' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

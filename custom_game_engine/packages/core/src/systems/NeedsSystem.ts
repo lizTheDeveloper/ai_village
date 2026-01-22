@@ -224,26 +224,4 @@ export class NeedsSystem extends BaseSystem {
       this.lastDeltaUpdateTick = currentTick;
     }
   }
-
-  /**
-   * Get interpolated value for UI display
-   * Provides smooth visual updates between batch updates
-   */
-  getInterpolatedValue(
-    entityId: string,
-    field: 'hunger' | 'energy',
-    currentValue: number
-  ): number {
-    if (!this.stateMutator) {
-      return currentValue; // Fallback to current value if not initialized
-    }
-
-    return this.stateMutator.getInterpolatedValue(
-      entityId,
-      CT.Needs,
-      field,
-      currentValue,
-      this.world.tick
-    );
-  }
 }

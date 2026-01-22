@@ -74,7 +74,7 @@ const afterlifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entities?dead=true' };
+        return { message: 'Delegate to /api/game/entities?dead=true' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -120,7 +120,7 @@ const afterlifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with afterlife component' };
+        return { message: 'Delegate to /api/game/entity with afterlife component' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -174,7 +174,7 @@ const afterlifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/afterlife/stats' };
+        return { message: 'Delegate to /api/game/afterlife/stats' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -220,7 +220,7 @@ const afterlifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/death-bargains' };
+        return { message: 'Delegate to /api/game/death-bargains' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -258,7 +258,7 @@ const afterlifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/reincarnation-queue' };
+        return { message: 'Delegate to /api/game/reincarnation-queue' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

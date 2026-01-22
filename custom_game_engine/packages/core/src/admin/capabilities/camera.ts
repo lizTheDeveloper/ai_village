@@ -53,7 +53,7 @@ const cameraCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/camera' };
+        return { message: 'Delegate to /api/game/camera' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -92,7 +92,7 @@ const cameraCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/camera/visible' };
+        return { message: 'Delegate to /api/game/camera/visible' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -144,7 +144,7 @@ const cameraCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/world/bounds' };
+        return { message: 'Delegate to /api/game/world/bounds' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -174,7 +174,7 @@ const cameraCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/poi' };
+        return { message: 'Delegate to /api/game/poi' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

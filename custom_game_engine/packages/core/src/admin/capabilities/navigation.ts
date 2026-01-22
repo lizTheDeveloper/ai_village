@@ -48,7 +48,7 @@ const navigationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with movement components' };
+        return { message: 'Delegate to /api/game/entity with movement components' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -94,7 +94,7 @@ const navigationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/agents?moving=true' };
+        return { message: 'Delegate to /api/game/agents?moving=true' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -136,7 +136,7 @@ const navigationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/pathfinding/stats' };
+        return { message: 'Delegate to /api/game/pathfinding/stats' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -166,7 +166,7 @@ const navigationCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/destinations/summary' };
+        return { message: 'Delegate to /api/game/destinations/summary' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

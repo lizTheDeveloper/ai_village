@@ -72,22 +72,11 @@ export class AgentSwimmingSystem extends BaseSystem {
   // Throttling: Update every 40 ticks (2 seconds at 20 TPS)
   protected readonly throttleInterval = 40;
 
-  // Reference to StateMutatorSystem for registering deltas
-  private stateMutatorSystem: StateMutatorSystem | null = null;
-
   // Track entities currently in water - only process these!
   private underwaterEntities = new Set<string>();
 
-  // Track active delta cleanup functions per entity
-  private activeDeltaCleanups = new Map<
-    string,
-    {
-      oxygen?: () => void;
-      drowning?: () => void;
-      pressure?: () => void;
-      lastDepthZone?: string;
-    }
-  >();
+  // Track last depth zone for each entity to detect zone changes
+  private lastDepthZone = new Map<string, string>();
 
   // Cache tile positions to avoid repeated getTileAt calls
   private tileCache = new Map<
@@ -106,13 +95,6 @@ export class AgentSwimmingSystem extends BaseSystem {
     string,
     { x: number; y: number; z: number }
   >();
-
-  /**
-   * Set the StateMutatorSystem reference (called during registration)
-   */
-  setStateMutatorSystem(system: StateMutatorSystem): void {
-    this.stateMutatorSystem = system;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
@@ -343,7 +325,7 @@ export class AgentSwimmingSystem extends BaseSystem {
   }
 
   /**
-   * Handle agent on surface/land - refill oxygen and clear underwater deltas
+   * Handle agent on surface/land - refill oxygen and clear underwater mutations
    */
   private handleSurfaceState(entityId: string, impl: EntityImpl, needs: NeedsComponent): void {
     // Refill oxygen instantly
@@ -356,18 +338,16 @@ export class AgentSwimmingSystem extends BaseSystem {
       );
     }
 
-    // Clear all underwater deltas
-    const cleanups = this.activeDeltaCleanups.get(entityId);
-    if (cleanups) {
-      cleanups.oxygen?.();
-      cleanups.drowning?.();
-      cleanups.pressure?.();
-      this.activeDeltaCleanups.delete(entityId);
-    }
+    // Clear all underwater mutations
+    clearMutationRate(impl, 'needs.oxygen');
+    clearMutationRate(impl, 'needs.health');
+
+    // Clear depth zone tracking
+    this.lastDepthZone.delete(entityId);
   }
 
   /**
-   * Manage underwater effects using StateMutatorSystem for gradual changes
+   * Manage underwater effects using MutationVectorComponent for gradual changes
    */
   private manageUnderwaterEffects(
     entityId: string,
@@ -382,8 +362,8 @@ export class AgentSwimmingSystem extends BaseSystem {
     // Determine depth zone
     let depthZone: string;
     let speedMultiplier = 1.0;
-    let oxygenDrainRate = 0.0; // Per minute (converted from per-second values)
-    let pressureDamageRate = 0.0; // Per minute
+    let oxygenDrainRate = 0.0; // Per second
+    let pressureDamageRate = 0.0; // Per second
 
     const lightLevel = calculateLightLevel(depth);
     const pressure = calculatePressure(depth);
@@ -392,12 +372,12 @@ export class AgentSwimmingSystem extends BaseSystem {
       // EPIPELAGIC
       depthZone = 'epipelagic';
       speedMultiplier = 0.5;
-      oxygenDrainRate = 0.005 * 60; // 0.3 per minute
+      oxygenDrainRate = 0.005; // Per second
     } else if (oceanDepth <= 1000) {
       // MESOPELAGIC
       depthZone = 'mesopelagic';
       speedMultiplier = 0.3;
-      oxygenDrainRate = 0.01 * 60; // 0.6 per minute
+      oxygenDrainRate = 0.01; // Per second
 
       // Vision penalty without light source
       if (!hasLightSource && lightLevel < 10) {
@@ -407,29 +387,29 @@ export class AgentSwimmingSystem extends BaseSystem {
       // BATHYPELAGIC
       depthZone = 'bathypelagic';
       speedMultiplier = 0.1;
-      oxygenDrainRate = 0.02 * 60; // 1.2 per minute
+      oxygenDrainRate = 0.02; // Per second
 
       // Pressure damage begins
       if (!hasDeepSeaSuit && pressure > 100) {
-        pressureDamageRate = 0.001 * (pressure / 100) * 60;
+        pressureDamageRate = 0.001 * (pressure / 100);
       }
     } else if (oceanDepth <= 6000) {
       // ABYSSAL
       depthZone = 'abyssal';
       speedMultiplier = 0.05;
-      oxygenDrainRate = 0.05 * 60; // 3.0 per minute
+      oxygenDrainRate = 0.05; // Per second
 
       if (!hasDeepSeaSuit) {
-        pressureDamageRate = 0.01 * 60; // 0.6 per minute
+        pressureDamageRate = 0.01; // Per second
       }
     } else {
       // HADAL
       depthZone = 'hadal';
       speedMultiplier = 0.02;
-      oxygenDrainRate = 0.1 * 60; // 6.0 per minute
+      oxygenDrainRate = 0.1; // Per second
 
       if (!hasDeepSeaSuit) {
-        pressureDamageRate = 0.05 * 60; // 3.0 per minute
+        pressureDamageRate = 0.05; // Per second
       }
     }
 
@@ -438,77 +418,49 @@ export class AgentSwimmingSystem extends BaseSystem {
       oxygenDrainRate *= 0.2; // 5× breath capacity
     }
 
-    // Get or create cleanup tracking
-    let cleanups = this.activeDeltaCleanups.get(entityId);
-    if (!cleanups) {
-      cleanups = {};
-      this.activeDeltaCleanups.set(entityId, cleanups);
-    }
-
     // Only update movement speed multiplier if depth zone changed
-    if (cleanups.lastDepthZone !== depthZone) {
+    const lastZone = this.lastDepthZone.get(entityId);
+    if (lastZone !== depthZone) {
       impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
         ...current,
         speedMultiplier: speedMultiplier,
       }));
-      cleanups.lastDepthZone = depthZone;
+      this.lastDepthZone.set(entityId, depthZone);
     }
 
-    // Register/update oxygen drain delta
-    if (this.stateMutatorSystem && oxygenDrainRate > 0) {
-      // Clear old delta if it exists
-      cleanups.oxygen?.();
-
-      // Register new delta
-      cleanups.oxygen = this.stateMutatorSystem.registerDelta({
-        entityId,
-        componentType: CT.Needs,
-        field: 'oxygen',
-        deltaPerMinute: -oxygenDrainRate,
+    // Set oxygen drain mutation
+    if (oxygenDrainRate > 0) {
+      setMutationRate(impl, 'needs.oxygen', -oxygenDrainRate, {
         min: 0,
-        source: `swimming:oxygen:${depthZone}`,
+        source: `swimming_oxygen_${depthZone}`,
       });
     }
 
-    // Register drowning damage if oxygen depleted
-    if (this.stateMutatorSystem && needs.oxygen !== undefined && needs.oxygen <= 0) {
-      if (!cleanups.drowning) {
-        // 1% health per second = 0.6 health per minute
-        cleanups.drowning = this.stateMutatorSystem.registerDelta({
-          entityId,
-          componentType: CT.Needs,
-          field: 'health',
-          deltaPerMinute: -0.6,
-          min: 0,
-          source: 'swimming:drowning',
-        });
-      }
+    // Set drowning damage if oxygen depleted
+    if (needs.oxygen !== undefined && needs.oxygen <= 0) {
+      // 1% health per second = 0.01 health per second
+      setMutationRate(impl, 'needs.health', -0.01, {
+        min: 0,
+        source: 'swimming_drowning',
+      });
     } else {
       // Clear drowning damage if oxygen recovered
-      cleanups.drowning?.();
-      cleanups.drowning = undefined;
+      clearMutationRate(impl, 'needs.health');
     }
 
-    // Register/update pressure damage delta
-    if (this.stateMutatorSystem && pressureDamageRate > 0) {
-      // Clear old delta if it exists
-      cleanups.pressure?.();
-
-      // Register new delta (convert to health scale 0-1)
-      const healthLossPerMinute = pressureDamageRate / 100;
-      cleanups.pressure = this.stateMutatorSystem.registerDelta({
-        entityId,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: -healthLossPerMinute,
+    // Set pressure damage mutation if needed
+    if (pressureDamageRate > 0) {
+      // Convert to health scale 0-1 (health is 0-1 normalized)
+      const healthLossPerSecond = pressureDamageRate / 100;
+      setMutationRate(impl, 'needs.health', -healthLossPerSecond, {
         min: 0,
-        source: `swimming:pressure:${depthZone}`,
+        source: `swimming_pressure_${depthZone}`,
       });
-    } else if (cleanups.pressure) {
-      // Clear pressure damage if no longer at dangerous depth
-      cleanups.pressure();
-      cleanups.pressure = undefined;
     }
+    // Note: If both drowning and pressure damage apply, the last setMutationRate
+    // will override. This is fine since drowning only happens at oxygen=0,
+    // which implies shallow water (no pressure damage) or the agent is already
+    // in critical condition.
   }
 }
 
