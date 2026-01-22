@@ -1,5 +1,228 @@
 # Release Notes
 
+## 2026-01-22 - "Documentation Refinement + Legacy Cleanup + Rendering Specs" - 7 Files (-132 net)
+
+### 📚 Documentation Refinement
+
+**core/README.md** - Removed "Migration from Old API" Section (-18 net)
+
+Migration is complete (Cycle 49). Simplified documentation to show only current API.
+
+**Changes:**
+- Removed "Old pattern" code block (30+ lines of legacy examples)
+- Section retitled: "Migration from Old API" → "Example: Gradual State Changes"
+- Updated to "Current best practice" (single pattern, no comparison)
+- Added `clearMutationRate()` usage example
+- Emphasized rate is per SECOND
+- Updated source name: `'needs'` → `'needs_system'` (more specific)
+- Removed `'state_mutator'` from `dependsOn` examples
+- Removed `setStateMutatorSystem()` from dependency injection examples
+
+**Result:** Clean, focused documentation without legacy distractions.
+
+---
+
+### 🗑️ Legacy Code Cleanup
+
+**Deleted 3 .disabled files (-1063 lines total)**
+
+#### JealousySystem.ts.disabled (-285 lines)
+- Experimental social system tracking jealousy between agents
+- Never activated in production
+- Replaced by EmotionalTriggerSystem
+
+#### VeilOfForgettingSystem.ts.disabled (-419 lines)
+- Experimental memory forgetting mechanics
+- Never fully integrated with MemorySystem
+- Memory decay now handled by MemoryConsolidationSystem
+
+#### base-crops.ts.disabled (-359 lines)
+- Legacy plant species definitions
+- Superseded by `data/plant-species.json` (extracted in earlier cycle)
+- Kept as .disabled "just in case" but no longer needed
+
+**Rationale:** Code unused for 6+ months, proper replacement systems exist.
+
+---
+
+### 🛠️ Capability Registration
+
+**admin/capabilities/index.ts** - Register buildings-construction (+1)
+```typescript
++ import './buildings-construction.js';
+```
+Ensures buildings-construction capability loads in admin dashboard.
+Capability was created in Cycle 49 but not registered until now.
+
+---
+
+### 🎨 New Rendering Optimization Specs
+
+**openspec/specs/OCCLUSION_CULLING.md** (517 lines, new file)
+
+**Inspiration**: Minecraft cave culling (Tomcc's algorithm)
+
+#### Problem
+Current rendering only uses frustum culling:
+- Renders chunks BEHIND solid walls/terrain
+- Underground caves: All chunks rendered even if blocked by mountain
+- Interior rooms: Exterior chunks still rendered
+
+#### Tomcc's Cave Culling Algorithm
+From Minecraft developer Tomcc:
+
+> "The idea is to trace visibility through chunk boundaries. A chunk face is visible from another if you can draw a line between them without hitting solid blocks."
+
+**Algorithm**:
+1. Precompute which chunk faces can "see through" to other faces (transparency check)
+2. Starting from camera chunk, flood-fill visibility through passable faces
+3. Hide chunks unreachable via visibility graph
+
+**Implementation**:
+```typescript
+interface ChunkFace {
+  canSeeThrough: boolean; // Any non-solid blocks on this face?
+  neighbors: Set<ChunkFace>; // Adjacent chunk faces
+}
+
+function cullChunks(cameraChunk: Chunk): Set<Chunk> {
+  const visible = new Set<Chunk>();
+  const queue = [cameraChunk];
+  const visited = new Set<Chunk>();
+
+  while (queue.length) {
+    const chunk = queue.shift()!;
+    if (visited.has(chunk)) continue;
+    visited.add(chunk);
+    visible.add(chunk);
+
+    for (const face of chunk.faces) {
+      if (face.canSeeThrough) {
+        queue.push(...face.neighbors.map(f => f.chunk));
+      }
+    }
+  }
+
+  return visible;
+}
+```
+
+**Benefits**:
+- Skip 60-80% of underground chunks (Minecraft data)
+- Massive performance improvement for cave/interior scenes
+- No GPU occlusion queries needed (simpler implementation)
+- Works well with existing frustum culling
+
+**Implementation Phases**:
+1. Compute chunk face visibility (preprocess during mesh build)
+2. Build adjacency graph (chunk boundaries)
+3. Flood-fill from camera chunk each frame
+4. Integrate with existing ChunkManager3D
+
+**Status**: Draft specification, not implemented yet.
+
+---
+
+**openspec/specs/WORKER_THREAD_MESHING.md** (433 lines, new file)
+
+**Inspiration**: Minecraft Sodium mod, modern game engines
+
+#### Problem
+Chunk meshing runs on main thread:
+- `ChunkMesh.rebuild()` blocks during geometry generation
+- Greedy meshing is CPU-intensive (nested loops over voxels)
+- Large chunks cause frame drops during rebuild
+- Multiple chunks rebuilding = stutter
+
+#### Current Architecture
+```
+Main Thread:
+  ChunkManager3D.update()
+    → ChunkMesh.rebuild()
+      → GreedyMesher.mesh()      // CPU intensive! BLOCKS!
+      → createGeometry()          // Fast
+      → uploadToGPU()             // Must be main thread (WebGL)
+```
+
+#### Target Architecture
+```
+Main Thread:                    Worker Pool (4-8 workers):
+  ChunkManager3D.update()
+    → requestMeshBuild(chunk)  →  Worker 1: GreedyMesher.mesh()
+    → requestMeshBuild(chunk)  →  Worker 2: GreedyMesher.mesh()
+    ...
+    ← receiveMeshData(chunk)   ←  Worker 1: done (serialized mesh data)
+      → createGeometry()          // Main thread
+      → uploadToGPU()             // Main thread (WebGL context)
+```
+
+#### Design Philosophy
+1. **Keep GPU operations on main thread**: WebGL context is not shareable across threads
+2. **Move CPU work to workers**: Mesh generation, collision, pathfinding
+3. **Async-friendly API**: Don't block waiting for workers (use callbacks/promises)
+4. **Graceful degradation**: Fall back to main thread if workers unavailable
+
+#### Implementation Phases
+
+**Phase 1**: Shared Worker Infrastructure
+- Use existing `packages/shared-worker/` package
+- Create `MeshWorker.ts` for greedy meshing
+- Message passing via structured clone
+
+**Phase 2**: Job Queue System
+- MeshJobQueue distributes work to available workers
+- Priority-based scheduling (visible chunks first)
+- Deduplication (don't rebuild same chunk twice)
+
+**Phase 3**: Async API
+- `ChunkMesh.rebuildAsync(callback)` instead of blocking `rebuild()`
+- Callback receives mesh data when ready
+- Non-blocking update loop
+
+**Phase 4**: Worker Pool Management
+- 4-8 workers based on CPU cores
+- Load balancing across workers
+- Worker lifecycle management
+
+**Phase 5**: Shared Memory Optimization (Advanced)
+- Use SharedArrayBuffer to reduce copy overhead
+- Zero-copy voxel data transfer
+- Atomic operations for synchronization
+
+**Benefits**:
+- Smooth 60 FPS even during chunk rebuilds
+- Concurrent meshing (4-8 chunks at once)
+- Main thread free for game logic and rendering
+- Scalable to multi-core CPUs
+
+**Fallback**: If workers unavailable (older browsers), runs on main thread.
+
+**Status**: Draft specification, not implemented yet.
+
+---
+
+### 📊 Cycle 51 Summary
+
+**Purpose:** Clean up post-migration documentation, remove legacy code, add rendering optimization specs.
+
+**Changes:**
+- **Documentation**: core/README.md simplified (-18 net) - removed "old vs new" comparison
+- **Cleanup**: 3 .disabled files deleted (-1063 lines) - unused experimental systems/data
+- **Registration**: buildings-construction capability imported (+1)
+- **Specs**: 2 rendering optimization specs (950 lines total)
+  - OCCLUSION_CULLING.md (517 lines) - Minecraft-inspired cave culling
+  - WORKER_THREAD_MESHING.md (433 lines) - Off-thread chunk meshing (Sodium mod inspired)
+
+**Impact:**
+- Documentation focuses on current API exclusively
+- Codebase cleaned of 6-month-old unused code
+- Comprehensive specs for future 3D renderer optimizations
+- Admin dashboard capability properly registered
+
+**Files:** 7 changed (+983/-1115, **-132 net**)
+
+---
+
 ## 2026-01-22 - "Documentation & Config Update + Deterministic Lockstep Spec" - 10 Files (+326 net)
 
 ### 📚 Documentation Updates Post-Migration
