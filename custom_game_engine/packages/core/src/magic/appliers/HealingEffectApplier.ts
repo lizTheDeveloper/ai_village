@@ -21,6 +21,7 @@ import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
 import { createHealingEffect } from '../SpellEffect.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { setMutationRate, clearMutationRate } from '../../components/MutationVectorComponent.js';
 
 // ============================================================================
 // Helper Interfaces
@@ -150,7 +151,7 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
 
   /**
    * Apply heal over time using StateMutatorSystem.
-   * Registers a delta that gradually increases health/mana/stamina over the effect duration.
+   * Registers a mutation rate that gradually increases health/mana/stamina over the effect duration.
    */
   private applyHealOverTime(
     effect: HealingEffect,
@@ -160,148 +161,120 @@ class HealingEffectApplier implements EffectApplier<HealingEffect> {
     baseHealing: number,
     context: EffectContext
   ): EffectApplicationResult {
-    // StateMutatorSystem is required for HoT effects - fail fast if not available
-    if (!context.stateMutatorSystem) {
-      return {
-        success: false,
-        effectId: effect.id,
-        targetId: target.id,
-        appliedValues: {},
-        resisted: false,
-        error: '[HealingEffectApplier] StateMutatorSystem not initialized. Cannot apply heal-over-time effects.',
-        appliedAt: context.tick,
-        casterId: caster.id,
-        spellId: context.spell.id,
-      };
-    }
-
-    // Calculate healing per minute from total healing and duration
+    // Calculate duration and rate
     const durationInTicks = effect.duration!;
-    const durationInMinutes = durationInTicks / 1200; // 1200 ticks per game minute at 20 TPS
-    const healingPerMinute = totalHealing / durationInMinutes;
+    const durationInSeconds = durationInTicks / 20; // 20 TPS
+    const healingPerSecond = totalHealing / durationInSeconds;
 
     const appliedValues: Record<string, number> = {
       totalHealing,
-      healingPerMinute,
+      healingPerSecond,
       durationInTicks,
     };
 
-    const cleanupFunctions: Array<() => void> = [];
+    const source = `magic:${context.spell.id}:${effect.id}`;
 
-    // Register delta(s) based on resource type
+    // Register mutation rate(s) based on resource type
     switch (effect.resourceType) {
       case 'health': {
         // Convert healing (0-100 scale) to health gain (0-1 scale)
-        const healthGainPerMinute = healingPerMinute / 100;
-        const cleanupFn = context.stateMutatorSystem.registerDelta({
-          entityId: target.id,
-          componentType: CT.Needs,
-          field: 'health',
-          deltaPerMinute: healthGainPerMinute,
+        const healthGainPerSecond = healingPerSecond / 100;
+        setMutationRate(target, 'needs.health', healthGainPerSecond, {
+          min: 0,
           max: 1.0, // Health is 0-1 scale
-          source: `magic:${context.spell.id}:${effect.id}`,
-          expiresAtTick: context.tick + durationInTicks,
+          source,
+          expiresAt: context.tick + durationInTicks,
+          totalAmount: totalHealing / 100, // Total amount in 0-1 scale
         });
-        cleanupFunctions.push(cleanupFn);
-        appliedValues.healthPerMinute = healthGainPerMinute;
+        appliedValues.healthPerSecond = healthGainPerSecond;
         break;
       }
 
       case 'mana': {
         const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
         const maxMana = needs?.maxMana ?? 100;
-        const manaGainPerMinute = healingPerMinute / maxMana; // Normalize to 0-1
-        const cleanupFn = context.stateMutatorSystem.registerDelta({
-          entityId: target.id,
-          componentType: CT.Needs,
-          field: 'mana',
-          deltaPerMinute: manaGainPerMinute,
+        const manaGainPerSecond = healingPerSecond / maxMana; // Normalize to 0-1
+        setMutationRate(target, 'needs.mana', manaGainPerSecond, {
+          min: 0,
           max: 1.0,
-          source: `magic:${context.spell.id}:${effect.id}`,
-          expiresAtTick: context.tick + durationInTicks,
+          source,
+          expiresAt: context.tick + durationInTicks,
+          totalAmount: totalHealing / maxMana, // Total amount in 0-1 scale
         });
-        cleanupFunctions.push(cleanupFn);
-        appliedValues.manaPerMinute = manaGainPerMinute;
+        appliedValues.manaPerSecond = manaGainPerSecond;
         break;
       }
 
       case 'stamina': {
         const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
         const maxStamina = needs?.maxStamina ?? 100;
-        const staminaGainPerMinute = healingPerMinute / maxStamina; // Normalize to 0-1
-        const cleanupFn = context.stateMutatorSystem.registerDelta({
-          entityId: target.id,
-          componentType: CT.Needs,
-          field: 'stamina',
-          deltaPerMinute: staminaGainPerMinute,
+        const staminaGainPerSecond = healingPerSecond / maxStamina; // Normalize to 0-1
+        setMutationRate(target, 'needs.stamina', staminaGainPerSecond, {
+          min: 0,
           max: 1.0,
-          source: `magic:${context.spell.id}:${effect.id}`,
-          expiresAtTick: context.tick + durationInTicks,
+          source,
+          expiresAt: context.tick + durationInTicks,
+          totalAmount: totalHealing / maxStamina, // Total amount in 0-1 scale
         });
-        cleanupFunctions.push(cleanupFn);
-        appliedValues.staminaPerMinute = staminaGainPerMinute;
+        appliedValues.staminaPerSecond = staminaGainPerSecond;
         break;
       }
 
       case 'all': {
         // Split healing across all resources
-        const splitHealing = healingPerMinute / 3;
+        const splitHealing = healingPerSecond / 3;
         const needs = target.components.get('needs') as ExtendedNeedsComponent | undefined;
 
         // Health
-        const healthGainPerMinute = splitHealing / 100;
-        cleanupFunctions.push(
-          context.stateMutatorSystem.registerDelta({
-            entityId: target.id,
-            componentType: CT.Needs,
-            field: 'health',
-            deltaPerMinute: healthGainPerMinute,
-            max: 1.0,
-            source: `magic:${context.spell.id}:${effect.id}:health`,
-            expiresAtTick: context.tick + durationInTicks,
-          })
-        );
+        const healthGainPerSecond = splitHealing / 100;
+        setMutationRate(target, 'needs.health', healthGainPerSecond, {
+          min: 0,
+          max: 1.0,
+          source: `${source}:health`,
+          expiresAt: context.tick + durationInTicks,
+          totalAmount: (totalHealing / 3) / 100,
+        });
 
         // Mana
         const maxMana = needs?.maxMana ?? 100;
-        const manaGainPerMinute = splitHealing / maxMana;
-        cleanupFunctions.push(
-          context.stateMutatorSystem.registerDelta({
-            entityId: target.id,
-            componentType: CT.Needs,
-            field: 'mana',
-            deltaPerMinute: manaGainPerMinute,
-            max: 1.0,
-            source: `magic:${context.spell.id}:${effect.id}:mana`,
-            expiresAtTick: context.tick + durationInTicks,
-          })
-        );
+        const manaGainPerSecond = splitHealing / maxMana;
+        setMutationRate(target, 'needs.mana', manaGainPerSecond, {
+          min: 0,
+          max: 1.0,
+          source: `${source}:mana`,
+          expiresAt: context.tick + durationInTicks,
+          totalAmount: (totalHealing / 3) / maxMana,
+        });
 
         // Stamina
         const maxStamina = needs?.maxStamina ?? 100;
-        const staminaGainPerMinute = splitHealing / maxStamina;
-        cleanupFunctions.push(
-          context.stateMutatorSystem.registerDelta({
-            entityId: target.id,
-            componentType: CT.Needs,
-            field: 'stamina',
-            deltaPerMinute: staminaGainPerMinute,
-            max: 1.0,
-            source: `magic:${context.spell.id}:${effect.id}:stamina`,
-            expiresAtTick: context.tick + durationInTicks,
-          })
-        );
+        const staminaGainPerSecond = splitHealing / maxStamina;
+        setMutationRate(target, 'needs.stamina', staminaGainPerSecond, {
+          min: 0,
+          max: 1.0,
+          source: `${source}:stamina`,
+          expiresAt: context.tick + durationInTicks,
+          totalAmount: (totalHealing / 3) / maxStamina,
+        });
 
-        appliedValues.healthPerMinute = healthGainPerMinute;
-        appliedValues.manaPerMinute = manaGainPerMinute;
-        appliedValues.staminaPerMinute = staminaGainPerMinute;
+        appliedValues.healthPerSecond = healthGainPerSecond;
+        appliedValues.manaPerSecond = manaGainPerSecond;
+        appliedValues.staminaPerSecond = staminaGainPerSecond;
         break;
       }
     }
 
-    // Create combined cleanup function
+    // Cleanup function for dispel support
     const cleanupFn = () => {
-      cleanupFunctions.forEach(fn => fn());
+      // Clear all mutations from this source
+      const mv = target.getComponent('mutation_vector');
+      if (mv && mv.fields) {
+        for (const [fieldPath, field] of Object.entries(mv.fields)) {
+          if (field.source === source || field.source.startsWith(`${source}:`)) {
+            clearMutationRate(target, fieldPath);
+          }
+        }
+      }
     };
 
     return {

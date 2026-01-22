@@ -1,5 +1,50 @@
 # Release Notes
 
+## 2026-01-21 - "HealingEffectApplier Import Update for Migration" - 1 File (+1 net)
+
+### 🔄 HealingEffectApplier.ts Import Addition (+1 line)
+
+**Started MutationVectorComponent API migration - added import.**
+
+#### Changes
+```typescript
++ import { setMutationRate, clearMutationRate } from '../../components/MutationVectorComponent.js';
+```
+
+**Rationale:** HealingEffectApplier beginning migration to MutationVectorComponent API, following the same pattern as FireSpreadSystem (Cycle 41) and the 10 previously migrated systems.
+
+**Impact:**
+- Prepares HealingEffectApplier for direct MutationVectorComponent usage
+- Will enable removal of any StateMutatorSystem integration (if present)
+- Follows established migration pattern
+
+**Next Steps:**
+- Replace any StateMutatorSystem method calls with setMutationRate()/clearMutationRate()
+- Remove any deltaCleanups tracking (if present)
+- Update any registration code (if applicable)
+
+---
+
+### 📊 Cycle 44 Summary
+
+**Purpose:** Begin HealingEffectApplier migration to MutationVectorComponent API.
+
+**Changes:**
+- Added MutationVectorComponent import
+- Migration in progress (just started)
+
+**Migration Status:**
+- ✅ **Complete (10)**: AnimalSystem, NeedsSystem, BodySystem, AgentSwimmingSystem, SleepSystem, TemperatureSystem, AfterlifeNeedsSystem, AssemblyMachineSystem, BuildingMaintenanceSystem, FireSpreadSystem
+- 🔄 **In Progress (1)**: HealingEffectApplier (Cycle 44) ← **Just started**
+
+**Impact:**
+- Continues the codebase-wide migration to MutationVectorComponent API
+- Another system moving to the cleaner, simpler API
+
+**Files:** 1 changed (+1/-0, +1 net)
+
+---
+
 ## 2026-01-21 - "Complete Cycle 42 Migrations - Cleanup Remaining Code" - 4 Files (-39 net)
 
 ### 🧹 AssemblyMachineSystem.ts Method Migration (-19 net)
