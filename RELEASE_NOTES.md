@@ -1,5 +1,92 @@
 # Release Notes
 
+## 2026-01-21 - "DamageEffectApplier Damage-Over-Time Migration" - 1 File (-9 net)
+
+### 🔄 DamageEffectApplier.ts DoT System Migrated (+21/-30, -9 net)
+
+**Migrated damage-over-time magic system to MutationVectorComponent API.**
+
+#### Import Added
+```typescript
++ import { setMutationRate, clearMutationRate } from '../../components/MutationVectorComponent.js';
+```
+
+#### applyDamageOverTime Method Migrated
+```typescript
+// Before: Using StateMutatorSystem.registerDelta
+- if (!context.stateMutatorSystem) {
+-   return { success: false, error: 'StateMutatorSystem not initialized' };
+- }
+- const durationInMinutes = durationInTicks / 1200;
+- const damagePerMinute = finalDamage / durationInMinutes;
+- const healthLossPerMinute = damagePerMinute / 100;
+- const cleanupFn = context.stateMutatorSystem.registerDelta({
+-   entityId: target.id,
+-   componentType: CT.Needs,
+-   field: 'health',
+-   deltaPerMinute: -healthLossPerMinute,
+-   min: 0,
+-   source: `magic:${context.spell.id}:${effect.id}`,
+-   expiresAtTick: context.tick + durationInTicks,
+- });
+
+// After: Using setMutationRate
++ const durationInSeconds = durationInTicks / 20;
++ const damagePerSecond = finalDamage / durationInSeconds;
++ const healthLossPerSecond = damagePerSecond / 100;
++ const source = `magic:${context.spell.id}:${effect.id}`;
++ setMutationRate(target, 'needs.health', -healthLossPerSecond, {
++   min: 0,
++   max: 1.0,
++   source,
++   expiresAt: context.tick + durationInTicks,
++   totalAmount: finalDamage / 100,
++ });
++ const cleanupFn = () => clearMutationRate(target, 'needs.health');
+```
+
+**Changes:**
+- Removed StateMutatorSystem runtime check (was failing fast if not available)
+- Per-minute rates → per-second rates
+- registerDelta → setMutationRate
+- Cleanup function uses clearMutationRate
+- API field changes: expiresAtTick → expiresAt, added totalAmount
+- Return values updated: damagePerMinute → damagePerSecond
+
+**Impact:**
+- Magic damage-over-time now uses MutationVectorComponent API
+- Simpler code without runtime checks
+- Consistent with other migrated systems
+- Per-second rates align with new API
+
+---
+
+### 📊 Cycle 45 Summary
+
+**Purpose:** Migrate magic damage-over-time system to MutationVectorComponent API.
+
+**Changes:**
+- DamageEffectApplier.ts: applyDamageOverTime method fully migrated (-9 lines)
+- Removed StateMutatorSystem dependency
+- Per-second rate calculations
+- Cleaner cleanup function
+
+**Migration Status:**
+- ✅ **Complete (10)**: AnimalSystem, NeedsSystem, BodySystem, AgentSwimmingSystem, SleepSystem, TemperatureSystem, AfterlifeNeedsSystem, AssemblyMachineSystem, BuildingMaintenanceSystem, FireSpreadSystem
+- ✅ **Complete (1 new)**: DamageEffectApplier (Cycle 45) ← **Just completed**
+- 🔄 **In Progress (1)**: HealingEffectApplier (Cycle 44 import, awaiting migration)
+
+**Total Systems Migrated**: 11 systems
+
+**Impact:**
+- Magic system damage-over-time now using new API
+- 9 lines of boilerplate removed
+- Consistent pattern across all migrated code
+
+**Files:** 1 changed (+21/-30, -9 net)
+
+---
+
 ## 2026-01-21 - "HealingEffectApplier Import Update for Migration" - 1 File (+1 net)
 
 ### 🔄 HealingEffectApplier.ts Import Addition (+1 line)
