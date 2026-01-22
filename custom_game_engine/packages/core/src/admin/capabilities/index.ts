@@ -20,6 +20,7 @@ import './grand-strategy.js';
 import './combat.js';
 import './magic.js';
 import './economy.js';
+import './buildings-construction.js';
 import './planets.js';
 import './politics.js';
 import './social.js';

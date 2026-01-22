@@ -1020,50 +1020,25 @@ setMutationRate(entity, MUTATION_PATHS.NEEDS_ENERGY, energyDecay, {
 - Irregular patterns (random events - can't predict rate)
 - Very few entities (< 10 entities have minimal overhead anyway)
 
-### Migration from Old API
+### Example: Gradual State Changes
 
-**Old pattern:**
+**Current best practice (entity-local mutations):**
 ```typescript
-// Old: External storage, cleanup functions
-private stateMutator: StateMutatorSystem | null = null;
-private deltaCleanups = new Map<string, () => void>();
-
-setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-  this.stateMutator = stateMutator;
-}
+// Current API: Entity-local, no cleanup needed
+import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 
 update(world: World, entities: ReadonlyArray<Entity>) {
   for (const entity of entities) {
-    if (this.deltaCleanups.has(entity.id)) {
-      this.deltaCleanups.get(entity.id)!();
-    }
-
-    const cleanup = this.stateMutator!.registerDelta({
-      entityId: entity.id,
-      componentType: CT.Needs,
-      field: 'hunger',
-      deltaPerMinute: -0.0008,  // Per minute
-      min: 0, max: 1,
-      source: 'needs'
-    });
-
-    this.deltaCleanups.set(entity.id, cleanup);
-  }
-}
-```
-
-**New pattern:**
-```typescript
-// New: Entity-local, no cleanup needed
-import { setMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
-
-update(world: World, entities: ReadonlyArray<Entity>) {
-  for (const entity of entities) {
-    // No cleanup needed - overwrites previous rate
+    // Set rate (per SECOND) - overwrites previous rate
     setMutationRate(entity, MUTATION_PATHS.NEEDS_HUNGER, -0.0008 / 60, {
       min: 0, max: 1,
-      source: 'needs'
+      source: 'needs_system'
     });
+
+    // Clear rate when no longer needed
+    if (someCondition) {
+      clearMutationRate(entity, MUTATION_PATHS.NEEDS_HUNGER);
+    }
   }
 }
 ```
@@ -1279,11 +1254,10 @@ export class MySystem implements System {
 
 ```typescript
 export class DependentSystem implements System {
-  readonly dependsOn = ['time', 'weather', 'state_mutator'] as const;
+  readonly dependsOn = ['time', 'weather'] as const;
 
   private timeSystem: TimeSystem | null = null;
   private weatherSystem: WeatherSystem | null = null;
-  private stateMutator: StateMutatorSystem | null = null;
 
   // Called by registerAllSystems during initialization
   setTimeSystem(timeSystem: TimeSystem): void {
@@ -1294,16 +1268,16 @@ export class DependentSystem implements System {
     this.weatherSystem = weatherSystem;
   }
 
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
-
   update(world: World, entities: ReadonlyArray<Entity>): void {
-    if (!this.timeSystem || !this.weatherSystem || !this.stateMutator) {
+    if (!this.timeSystem || !this.weatherSystem) {
       throw new Error('[DependentSystem] Dependencies not set');
     }
 
-    // Use systems
+    // Use systems directly
+    const currentTime = this.timeSystem.getCurrentTime();
+
+    // For mutations, just import and use (no dependency needed)
+    setMutationRate(entity, 'some.field', rate, { min: 0, max: 1 });
   }
 }
 ```
@@ -1605,17 +1579,23 @@ eventBus.on('*', (event) => {
 ### StateMutatorSystem not updating
 
 **Check:**
-1. System has `dependsOn = ['state_mutator']`?
-2. `setStateMutatorSystem()` called in `registerAllSystems.ts`?
-3. Delta registered correctly? (entityId, componentType, field, deltaPerMinute)
-4. Delta cleanup on entity death?
+1. Entity has `MutationVectorComponent`?
+2. Mutation rate set correctly? (`setMutationRate(entity, fieldPath, rate, options)`)
+3. Rate is per SECOND (not per minute)?
+4. Field path correct? (e.g., `'needs.hunger'` not `'hunger'`)
+5. Min/max bounds preventing updates?
 
 **Debug:**
 ```typescript
 // In browser console
-const stateMutator = window.game.gameLoop.systemRegistry.get('state_mutator');
-const info = stateMutator.getDebugInfo();
-console.log('StateMutator:', info);
+import { getMutationFieldPaths, getMutationField } from '../components/MutationVectorComponent.js';
+
+const entity = world.getEntity(entityId);
+const paths = getMutationFieldPaths(entity);
+console.log('Active mutations:', paths);
+
+const field = getMutationField(entity, 'needs.hunger');
+console.log('Hunger mutation:', field);
 ```
 
 ### Performance issues (low TPS)
@@ -1736,7 +1716,7 @@ packages/core/__tests__/
 - Use SimulationScheduler (`filterActiveEntities()`) to reduce entity processing
 - No `console.log` in systems (only `console.error` for actual errors)
 - Clean up event listeners in `cleanup()`
-- Clean up StateMutator deltas on entity death
+- Use `setMutationRate()` for gradual changes (rate is per SECOND, auto-cleanup on entity death)
 
 **Event-driven architecture:**
 - Systems emit events, other systems listen
