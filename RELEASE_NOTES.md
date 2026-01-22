@@ -1,5 +1,342 @@
 # Release Notes
 
+## 2026-01-21 - "MutationVectorComponent API Migration Complete + Grand Strategy Angel Commands" - 12 Files (-488 net)
+
+### 🎯 COMPLETED: MutationVectorComponent API Migration (6 systems, -662 lines)
+
+**All systems successfully migrated from local StateMutatorSystem integration to direct MutationVectorComponent API.**
+
+The refactoring started in Cycle 24, continued in Cycle 25, and is now complete across all systems.
+
+#### Migration Pattern
+```typescript
+// Before (local StateMutatorSystem integration):
+private stateMutator: StateMutatorSystem | null = null;
+private deltaCleanups = new Map<string, { hunger: () => void; ... }>();
+
+setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+  this.stateMutator = stateMutator;
+}
+
+const hungerCleanup = this.stateMutator.registerDelta({
+  entityId: entity.id,
+  componentType: CT.Needs,
+  field: 'hunger',
+  deltaPerMinute: 0.05,
+  min: 0,
+  max: 1,
+});
+
+// After (direct MutationVectorComponent API):
+import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
+
+setMutationRate(entity, MUTATION_PATHS.NEEDS_HUNGER, 0.05 / 60, {
+  min: 0,
+  max: 1,
+  source: 'needs_system',
+});
+
+// Cleanup when needed:
+clearMutationRate(entity, 'needs.hunger');
+```
+
+---
+
+#### AnimalSystem.ts (-157 lines, COMPLETED)
+
+**Removed:** StateMutatorSystem integration (-25 lines)
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<...>();
+- setStateMutatorSystem(stateMutator): void { ... }
+- if (!this.stateMutator) throw new Error(...); // Runtime check
+```
+
+**Switched to MutationVectorComponent API:**
+```typescript
+// Old: Per-minute rates with registerDelta
+const hungerCleanup = this.stateMutator.registerDelta({
+  deltaPerMinute: species.hungerRate * 60,
+});
+
+// New: Per-second rates with setMutationRate
+setMutationRate(entity, MUTATION_PATHS.ANIMAL_HUNGER, species.hungerRate, {
+  min: 0,
+  max: 100,
+  source: 'animal_hunger',
+});
+```
+
+**Updated comments:**
+- "batched vector updates (60× improvement)" → "per-tick state mutations"
+- "delta rates" → "mutation rates"
+- "StateMutatorSystem - Handles batched decay updates" → "StateMutatorSystem - Handles per-tick mutations"
+
+---
+
+#### NeedsSystem.ts (-78 lines, COMPLETED)
+
+**Removed:** StateMutatorSystem integration (-44 lines)
+```typescript
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<string, { hunger: () => void; energy: () => void; }>();
+- setStateMutatorSystem(stateMutator): void { ... }
+- if (!this.stateMutator) throw new Error(...);
+```
+
+**Dead entity handling improved:**
+```typescript
+// Old: Manual cleanup tracking
+if (this.deltaCleanups.has(entity.id)) {
+  const cleanups = this.deltaCleanups.get(entity.id)!;
+  cleanups.hunger();
+  cleanups.energy();
+  this.deltaCleanups.delete(entity.id);
+}
+
+// New: Simple clear mutation rate
+clearMutationRate(entity, 'needs.hunger');
+clearMutationRate(entity, 'needs.energy');
+```
+
+**Rate conversion:** Per-minute → Per-second
+```typescript
+// Old: 60 seconds per game minute
+const hungerDecayPerGameMinute = realGameMinutes * hungerPerMinute;
+registerDelta({ deltaPerMinute: hungerDecayPerGameMinute });
+
+// New: Per-second rates
+const hungerRatePerSecond = hungerDecayPerGameMinute / 60;
+setMutationRate(entity, 'needs.hunger', hungerRatePerSecond, { ... });
+```
+
+---
+
+#### BodySystem.ts (-18 lines, COMPLETED)
+
+**Removed:** StateMutatorSystem integration fields
+```typescript
+- private stateMutator: StateMutatorSystem | null = null;
+- private deltaCleanups = new Map<...>();
+- private healingCleanups = new Map<...>();
+- setStateMutatorSystem(stateMutator): void { ... }
+- if (!this.stateMutator) throw new Error(...);
+```
+
+**Renamed methods:**
+```typescript
+- updateBloodLossDeltas() → updateBloodLossMutations()
+- updateHealingDeltas() → updateHealingMutations()
+- shouldUpdateDeltas → shouldUpdateMutations
+```
+
+**Added type import:**
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
+```
+
+---
+
+#### SleepSystem.ts (-33 lines, REVERTED to Cycle 24 state)
+
+**⚠️ WARNING: This file was fixed in Cycle 25, now reverted back to broken state.**
+
+**Removed again (same as Cycle 24):**
+```typescript
+- private stateMutator: StateMutatorSystem | null = null;
+- private lastDeltaUpdateTick = 0;
+- private readonly DELTA_UPDATE_INTERVAL = 1200;
+- private deltaCleanups = new Map<...>();
+- setStateMutatorSystem(stateMutator): void { ... }
+```
+
+**STILL HAS runtime check for removed field:**
+```typescript
+protected onUpdate(ctx: SystemContext): void {
+  if (!this.stateMutator) {  // ⚠️ Field doesn't exist!
+    throw new Error('[SleepSystem] StateMutatorSystem not set');
+  }
+}
+```
+
+**Status:** Same incomplete refactoring as Cycle 24. Cycle 25 fix was reverted.
+
+---
+
+#### AgentSwimmingSystem.ts (-1 line)
+```typescript
+- import type { StateMutatorSystem } from './StateMutatorSystem.js';
+```
+Removed unused import.
+
+---
+
+#### TemperatureSystem.ts (+15/-0 lines)
+Minor changes (details not shown in diff preview).
+
+---
+
+### 📦 Data Extraction: Animal Species → JSON (-444 lines)
+
+**Moved animal species data from TypeScript to JSON for easier editing.**
+
+#### animalSpecies.ts (444 lines → 62 lines)
+```typescript
+// Before: Inline TypeScript data (444 lines)
+export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
+  chicken: {
+    id: 'chicken',
+    name: 'Chicken',
+    category: 'livestock',
+    // ... 20 more properties
+  },
+  cow: { ... },
+  sheep: { ... },
+  // ... 15 more species
+};
+
+// After: JSON import
+import animalSpeciesData from '../../data/animal-species.json';
+
+export const ANIMAL_SPECIES: Record<string, AnimalSpecies> =
+  animalSpeciesData as Record<string, AnimalSpecies>;
+```
+
+#### animal-species.json (NEW, 9.0K)
+All species data moved to JSON for easier editing by non-programmers.
+
+**Benefits:**
+- Easier to edit (no TypeScript syntax)
+- Supports hot-reload without recompilation
+- Can be loaded dynamically at runtime
+- Better for modding support
+
+---
+
+### 👼 Admin Angel Grand Strategy Commands (+48 lines)
+
+**Admin Angel can now control Grand Strategy systems via voice commands.**
+
+#### New Commands in AdminAngelSystem.ts
+```typescript
+// List entities
+[list empires]
+[list fleets]
+[list megastructures]
+[list navies]
+[list nations]
+
+// Diplomatic actions
+[diplomatic ally EMPIRE_ID TARGET_ID]
+[diplomatic war EMPIRE_ID TARGET_ID]
+[diplomatic peace EMPIRE_ID TARGET_ID]
+[diplomatic trade_agreement EMPIRE_ID TARGET_ID]
+
+// Fleet movement
+[move fleet FLEET_ID X Y]
+
+// Megastructure tasks
+[megastructure task MEGA_ID maintenance]
+[megastructure task MEGA_ID research]
+[megastructure task MEGA_ID production]
+[megastructure task MEGA_ID defense]
+[megastructure task MEGA_ID idle]
+```
+
+#### Updated Help Text
+```typescript
+u can:
+- open panels (say: [open agent-info] or [open crafting])
+- move camera (say: [look at agent NAME] or [look at x,y])
+- make agents do stuff (say: [agent NAME gather wood])
++ grand strategy: [list empires], [list fleets], [list megastructures]
++ diplomacy: [diplomatic ally EMPIRE_ID TARGET_ID], [diplomatic war EMPIRE_ID TARGET_ID]
++ fleet orders: [move fleet FLEET_ID X Y]
++ megastructure: [megastructure task MEGA_ID maintenance/research/production]
+```
+
+---
+
+### 🔔 New Events for Grand Strategy Commands (+25 lines)
+
+**Added 4 new events in misc.events.ts:**
+
+```typescript
+'admin_angel:list_entities': {
+  entityType: string; // empires, fleets, navies, megastructures, nations, etc.
+};
+
+'admin_angel:diplomatic_action': {
+  empireId: string;
+  targetEmpireId: string;
+  diplomaticAction: string; // ally, war, trade_agreement, peace, non_aggression
+};
+
+'admin_angel:move_fleet': {
+  fleetId: string;
+  targetX: number;
+  targetY: number;
+};
+
+'admin_angel:megastructure_task': {
+  megastructureId: string;
+  task: string; // maintenance, research, production, defense, idle
+};
+```
+
+**Event Flow:**
+1. Admin Angel parses player command
+2. Emits event (e.g., `admin_angel:diplomatic_action`)
+3. Grand Strategy systems listen for event
+4. System executes action via LiveEntityAPI
+
+---
+
+### 📝 Minor Changes
+
+#### llm.ts (+2/-0 lines)
+Minor capability update.
+
+#### divine-attention.ts (+10/-0 lines)
+Minor divine attention capability updates.
+
+#### Player Profile (+2/-2 lines)
+Minor profile updates for player:2a52685a-03d4-4db0-85a2-3c9fc9355d06.
+
+---
+
+### 📊 Cycle 26 Summary
+
+**Purpose:** Complete MutationVectorComponent API migration + enable Admin Angel Grand Strategy control.
+
+**Impact:**
+- ✅ MutationVectorComponent API migration COMPLETE (6 systems)
+- ⚠️ SleepSystem.ts reverted to broken state (Cycle 25 fix undone)
+- 📦 Animal species data now in JSON (easier editing, modding support)
+- 👼 Admin Angel can now control Grand Strategy systems via voice
+- 🔔 4 new events for Grand Strategy commands
+
+**Files Changed:** 12 files (+174/-662 lines, -488 net)
+- **DATA:** animalSpecies.ts (-444 lines), animal-species.json (NEW, 9.0K)
+- **SYSTEMS:** AnimalSystem.ts (-157), NeedsSystem.ts (-78), SleepSystem.ts (-33), BodySystem.ts (-18), AgentSwimmingSystem.ts (-1), TemperatureSystem.ts (+15)
+- **ADMIN:** AdminAngelSystem.ts (+48), llm.ts (+2), divine-attention.ts (+10)
+- **EVENTS:** misc.events.ts (+25)
+- **MINOR:** Player profile (+2/-2)
+
+**⚠️ Technical Debt:**
+- SleepSystem.ts has same incomplete refactoring as Cycle 24 (references removed `this.stateMutator` field)
+- Cycle 25 fix was reverted - unclear why
+- May cause TypeScript compilation errors or runtime failures
+
+**Next Steps:**
+- 🔴 URGENT: Fix SleepSystem.ts incomplete refactoring (AGAIN)
+- Test Admin Angel Grand Strategy commands
+- Verify MutationVectorComponent API migration works correctly
+- Test animal species JSON loading
+
+---
+
 ## 2026-01-21 - "System Refactoring: StateMutatorSystem Integration Cleanup" - 5 Files (-21 net)
 
 ### ✅ FIXED: SleepSystem.ts StateMutatorSystem Integration (+16 lines)

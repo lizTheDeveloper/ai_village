@@ -183,7 +183,7 @@ const llmCapability = defineCapability({
         { name: 'temperature', type: 'number', required: false, default: 0.7, description: 'Temperature (0-2)' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/set-llm' };
+        return { success: true, message: 'Delegate to /api/game/set-llm' };
       },
     }),
 

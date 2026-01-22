@@ -70,32 +70,10 @@ export class SleepSystem extends BaseSystem {
    */
   public readonly dependsOn = ['state_mutator'] as const;
 
-  // StateMutatorSystem integration for batched sleep drive and energy recovery
-  private stateMutator: StateMutatorSystem | null = null;
-  private lastDeltaUpdateTick = 0;
-  private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-  private deltaCleanups = new Map<string, {
-    sleepDrive?: () => void;
-    energyRecovery?: () => void;
-  }>();
-
   // Singleton entity caching
   private timeEntityId: string | null = null;
 
-  /**
-   * Set the StateMutatorSystem reference (called during system registration)
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
-
   protected onUpdate(ctx: SystemContext): void {
-    if (!this.stateMutator) {
-      throw new Error('[SleepSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
-
-    const shouldUpdateDeltas = ctx.tick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
-
     // Get time component from world entity (cached singleton)
     if (!this.timeEntityId) {
       const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
@@ -129,89 +107,56 @@ export class SleepSystem extends BaseSystem {
 
       if (!circadian || !needs) continue;
 
-      // Update sleep drive and energy recovery delta rates once per game minute
-      if (shouldUpdateDeltas) {
-        this.updateSleepDeltas(entity, circadian, needs, timeOfDay);
-      }
+      // Update mutation rates for sleep drive and energy recovery
+      this.updateSleepMutations(entity, circadian, needs, timeOfDay);
 
       // Process sleep (discrete events: dreams, wake checks)
       if (circadian.isSleeping) {
         this.processSleep(entity, circadian, needs, hoursElapsed, ctx.world);
       }
     }
-
-    // Mark delta rates as updated
-    if (shouldUpdateDeltas) {
-      this.lastDeltaUpdateTick = ctx.tick;
-    }
   }
 
   // ==========================================================================
-  // Delta Registration (Sleep Drive & Energy Recovery)
+  // Mutation Rate Management (Sleep Drive & Energy Recovery)
   // ==========================================================================
 
   /**
-   * Update sleep drive and energy recovery delta rates.
-   * Called once per game minute to register/update delta rates with StateMutatorSystem.
+   * Update sleep drive and energy recovery mutation rates.
+   * Uses the new setMutationRate API to register rates with StateMutatorSystem.
    */
-  private updateSleepDeltas(
+  private updateSleepMutations(
     entity: Entity,
     circadian: CircadianComponent,
     needs: NeedsComponent,
     timeOfDay: number
   ): void {
-    if (!this.stateMutator) {
-      throw new Error('[SleepSystem] StateMutatorSystem not set');
-    }
-
-    // Clean up old deltas
-    if (this.deltaCleanups.has(entity.id)) {
-      const cleanups = this.deltaCleanups.get(entity.id)!;
-      cleanups.sleepDrive?.();
-      cleanups.energyRecovery?.();
-    }
-
-    const cleanupFuncs: {
-      sleepDrive?: () => void;
-      energyRecovery?: () => void;
-    } = {};
-
-    // Register sleep drive delta (accumulation or depletion)
+    // Set mutation rates based on sleep state
     if (circadian.isSleeping) {
       // Sleeping: deplete sleep drive
-      // Rate: -17/hour = -17/60 = -0.283 per game minute
-      // DIVIDE by 60, not multiply!
-      const sleepDriveRatePerMinute = -17 / 60;
+      // Rate: -17/hour = -17/3600 = -0.00472 per second
+      const sleepDriveRatePerSecond = -17 / 3600;
 
-      cleanupFuncs.sleepDrive = this.stateMutator.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Circadian,
-        field: 'sleepDrive',
-        deltaPerMinute: sleepDriveRatePerMinute,
+      setMutationRate(entity, 'circadian.sleepDrive', sleepDriveRatePerSecond, {
         min: 0,
         max: 100,
         source: 'sleep_drive_depletion',
       });
 
-      // Register energy recovery delta (only when sleeping)
+      // Register energy recovery (only when sleeping)
       const sleepQuality = circadian.sleepQuality || 0.5;
       // Base recovery: 0.1 per game hour (10% energy per hour)
-      // Convert to per-game-minute: 0.1 / 60 = 0.00167 per game minute
-      // DIVIDE by 60, not multiply!
-      const energyRecoveryPerMinute = 0.1 * sleepQuality / 60;
+      // Convert to per-second: 0.1 / 3600 = 0.0000278 per second
+      const energyRecoveryPerSecond = 0.1 * sleepQuality / 3600;
 
-      cleanupFuncs.energyRecovery = this.stateMutator.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Needs,
-        field: 'energy',
-        deltaPerMinute: energyRecoveryPerMinute,
+      setMutationRate(entity, 'needs.energy', energyRecoveryPerSecond, {
         min: 0,
         max: 1.0,
         source: 'sleep_energy_recovery',
       });
     } else {
       // Awake: accumulate sleep drive
-      // Base rate: 5.5/hour = 5.5/60 = 0.0917 per game minute
+      // Base rate: 5.5/hour
       let ratePerHour = 5.5;
 
       // Faster accumulation at night (biological circadian pressure)
@@ -226,23 +171,18 @@ export class SleepSystem extends BaseSystem {
         ratePerHour *= 1.25; // 6.875/hour base, 8.25/hour at night
       }
 
-      // Convert to per-game-minute (60 game minutes = 1 game hour)
-      // DIVIDE by 60, not multiply!
-      const sleepDriveRatePerMinute = ratePerHour / 60;
+      // Convert to per-second (3600 seconds = 1 game hour)
+      const sleepDriveRatePerSecond = ratePerHour / 3600;
 
-      cleanupFuncs.sleepDrive = this.stateMutator.registerDelta({
-        entityId: entity.id,
-        componentType: CT.Circadian,
-        field: 'sleepDrive',
-        deltaPerMinute: sleepDriveRatePerMinute,
+      setMutationRate(entity, 'circadian.sleepDrive', sleepDriveRatePerSecond, {
         min: 0,
         max: 100,
         source: 'sleep_drive_accumulation',
       });
-    }
 
-    // Store cleanup functions
-    this.deltaCleanups.set(entity.id, cleanupFuncs);
+      // Clear energy recovery mutation when awake
+      clearMutationRate(entity, 'needs.energy', 'sleep_energy_recovery');
+    }
   }
 
   // ==========================================================================

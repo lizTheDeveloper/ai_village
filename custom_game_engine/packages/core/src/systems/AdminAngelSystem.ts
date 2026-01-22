@@ -131,6 +131,10 @@ u can:
 - open panels (say: [open agent-info] or [open crafting])
 - move camera (say: [look at agent NAME] or [look at x,y])
 - make agents do stuff (say: [agent NAME gather wood])
+- grand strategy: [list empires], [list fleets], [list megastructures]
+- diplomacy: [diplomatic ally EMPIRE_ID TARGET_ID], [diplomatic war EMPIRE_ID TARGET_ID]
+- fleet orders: [move fleet FLEET_ID X Y]
+- megastructure: [megastructure task MEGA_ID maintenance/research/production]
 
 ${recentChat ? `recent chat:\n${recentChat}\n` : ''}
 ${playerMessage ? `[they said]: ${playerMessage}` : '[proactive turn - only speak if something interesting happened]'}
@@ -481,6 +485,50 @@ export class AdminAngelSystem extends BaseSystem {
             behavior,
             args: behaviorArgs,
           });
+        }
+        break;
+      }
+      // Grand Strategy Commands
+      case 'list': {
+        // [list empires], [list fleets], [list megastructures], etc.
+        const entityType = cmd.args[0];
+        emit('admin_angel:list_entities', { entityType });
+        break;
+      }
+      case 'diplomatic': {
+        // [diplomatic ally EMPIRE_ID TARGET_ID] or [diplomatic war EMPIRE_ID TARGET_ID]
+        const action = cmd.args[0]; // ally, war, trade_agreement, peace
+        const empireId = cmd.args[1];
+        const targetId = cmd.args[2];
+        if (action && empireId && targetId) {
+          emit('admin_angel:diplomatic_action', {
+            empireId,
+            targetEmpireId: targetId,
+            diplomaticAction: action,
+          });
+        }
+        break;
+      }
+      case 'move': {
+        // [move fleet FLEET_ID X Y]
+        if (cmd.args[0] === 'fleet') {
+          const fleetId = cmd.args[1];
+          const x = parseFloat(cmd.args[2] || '0');
+          const y = parseFloat(cmd.args[3] || '0');
+          if (fleetId) {
+            emit('admin_angel:move_fleet', { fleetId, targetX: x, targetY: y });
+          }
+        }
+        break;
+      }
+      case 'megastructure': {
+        // [megastructure task MEGA_ID maintenance/research/production]
+        if (cmd.args[0] === 'task') {
+          const megaId = cmd.args[1];
+          const task = cmd.args[2];
+          if (megaId && task) {
+            emit('admin_angel:megastructure_task', { megastructureId: megaId, task });
+          }
         }
         break;
       }

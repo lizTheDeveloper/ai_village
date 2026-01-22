@@ -65,7 +65,7 @@ const companionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/companion' };
+        return { message: 'Delegate to /api/game/companion' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -123,7 +123,7 @@ const companionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/companion/memories' };
+        return { message: 'Delegate to /api/game/companion/memories' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -171,7 +171,7 @@ const companionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/companion/advice' };
+        return { message: 'Delegate to /api/game/companion/advice' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -207,7 +207,7 @@ const companionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/companion/milestones' };
+        return { message: 'Delegate to /api/game/companion/milestones' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

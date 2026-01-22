@@ -49,7 +49,7 @@ const agentsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID (default: active)' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entities' };
+        return { message: 'Delegate to /api/game/entities' };
       },
       renderResult: (data: unknown) => {
         const agents = (data as { agents?: Array<{ name: string; id: string; x: number; y: number }> })?.agents || [];
@@ -67,7 +67,7 @@ const agentsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity' };
+        return { message: 'Delegate to /api/game/entity' };
       },
     }),
 
@@ -80,7 +80,7 @@ const agentsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/prompt' };
+        return { message: 'Delegate to /api/game/prompt' };
       },
     }),
   ],

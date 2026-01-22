@@ -66,7 +66,7 @@ const divineAttentionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/angel/self-awareness' };
+        return { message: 'Delegate to /api/game/angel/self-awareness' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -115,7 +115,7 @@ const divineAttentionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/simulation/attention-map' };
+        return { message: 'Delegate to /api/game/simulation/attention-map' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -166,7 +166,7 @@ const divineAttentionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/llm/agent-providers' };
+        return { message: 'Delegate to /api/game/llm/agent-providers' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -225,7 +225,7 @@ const divineAttentionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity/attention' };
+        return { message: 'Delegate to /api/game/entity/attention' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -260,7 +260,7 @@ const divineAttentionCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/meta/reality-nature' };
+        return { message: 'Delegate to /api/game/meta/reality-nature' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

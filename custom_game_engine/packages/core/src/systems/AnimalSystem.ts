@@ -4,7 +4,6 @@ import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalCompo
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
@@ -37,12 +36,7 @@ export class AnimalSystem extends BaseSystem {
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
 
   protected onUpdate(ctx: SystemContext): void {
-    // Check if StateMutatorSystem has been set
-    if (!this.stateMutator) {
-      throw new Error('[AnimalSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
-
-    // Performance: Only update delta rates once per game minute
+    // Performance: Only update mutation rates once per game minute
     const currentTick = ctx.tick;
     const shouldUpdateRates = currentTick - this.deltaLastUpdateTick >= this.UPDATE_INTERVAL;
 
@@ -68,131 +62,90 @@ export class AnimalSystem extends BaseSystem {
       // Get species data
       const species = getAnimalSpecies(animal.speciesId);
 
-      // Update delta rates based on current state (once per game minute)
+      // Update mutation rates based on current state (once per game minute)
       if (shouldUpdateRates) {
-        // Calculate rates per GAME minute (not real-time)
-        // Species rates are per second, so convert: ratePerSecond * 60 seconds = ratePerMinute
-        const hungerIncreasePerMinute = species.hungerRate * 60;
-        const thirstIncreasePerMinute = species.thirstRate * 60;
+        // Calculate rates per SECOND (new API uses per-second rates)
+        // Species rates are per second, so use them directly
+        const hungerIncreasePerSecond = species.hungerRate;
+        const thirstIncreasePerSecond = species.thirstRate;
 
         // Energy: sleeping recovers 2x faster, awake drains normally
         // When eating/drinking, energy still drains (but slower than working/fleeing)
-        let energyChangePerMinute: number;
+        let energyChangePerSecond: number;
         if (animal.state === 'sleeping') {
-          energyChangePerMinute = species.energyRate * 60 * 2; // Recover 2x faster
+          energyChangePerSecond = species.energyRate * 2; // Recover 2x faster
         } else if (animal.state === 'eating' || animal.state === 'drinking') {
-          energyChangePerMinute = -species.energyRate * 60 * 0.5; // Drain 50% slower when resting/eating
+          energyChangePerSecond = -species.energyRate * 0.5; // Drain 50% slower when resting/eating
         } else if (animal.state === 'fleeing') {
-          energyChangePerMinute = -species.energyRate * 60 * 1.5; // Drain 50% faster when fleeing
+          energyChangePerSecond = -species.energyRate * 1.5; // Drain 50% faster when fleeing
         } else {
-          energyChangePerMinute = -species.energyRate * 60; // Normal drain
+          energyChangePerSecond = -species.energyRate; // Normal drain
         }
 
-        // Age: Convert from seconds to days, then to per-minute rate
-        // 1 game minute = 60 game seconds = 60/86400 game days
-        const ageIncreasePerMinute = 60 / 86400; // ~0.000694 days per game minute
+        // Age: Convert from seconds to days, then to per-second rate
+        // 1 game second = 1/86400 game days
+        const ageIncreasePerSecond = 1 / 86400; // ~0.0000116 days per game second
 
-        // Stress: Decays over time (0.5 per second = 30 per minute)
-        const stressDecayPerMinute = -30;
+        // Stress: Decays over time (0.5 per second)
+        const stressDecayPerSecond = -0.5;
 
-        // Clean up old deltas if they exist
-        if (this.deltaCleanups.has(entity.id)) {
-          const cleanups = this.deltaCleanups.get(entity.id)!;
-          cleanups.hunger();
-          cleanups.thirst();
-          cleanups.energy();
-          cleanups.age();
-          cleanups.stress();
-        }
-
-        // Register new deltas with StateMutatorSystem
-        const hungerCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Animal,
-          field: 'hunger',
-          deltaPerMinute: hungerIncreasePerMinute,
+        // Set mutation rates using new API (no cleanup needed)
+        setMutationRate(entity, MUTATION_PATHS.ANIMAL_HUNGER, hungerIncreasePerSecond, {
           min: 0,
           max: 100,
           source: 'animal_hunger',
         });
 
-        const thirstCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Animal,
-          field: 'thirst',
-          deltaPerMinute: thirstIncreasePerMinute,
+        setMutationRate(entity, MUTATION_PATHS.ANIMAL_THIRST, thirstIncreasePerSecond, {
           min: 0,
           max: 100,
           source: 'animal_thirst',
         });
 
-        const energyCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Animal,
-          field: 'energy',
-          deltaPerMinute: energyChangePerMinute,
+        setMutationRate(entity, MUTATION_PATHS.ANIMAL_ENERGY, energyChangePerSecond, {
           min: 0,
           max: 100,
           source: 'animal_energy',
         });
 
-        const ageCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Animal,
-          field: 'age',
-          deltaPerMinute: ageIncreasePerMinute,
+        setMutationRate(entity, MUTATION_PATHS.ANIMAL_AGE, ageIncreasePerSecond, {
           min: 0,
           source: 'animal_age',
         });
 
-        const stressCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Animal,
-          field: 'stress',
-          deltaPerMinute: stressDecayPerMinute,
+        setMutationRate(entity, MUTATION_PATHS.ANIMAL_STRESS, stressDecayPerSecond, {
           min: 0,
           max: 100,
           source: 'animal_stress',
         });
-
-        // Store cleanup functions
-        this.deltaCleanups.set(entity.id, {
-          hunger: hungerCleanup,
-          thirst: thirstCleanup,
-          energy: energyCleanup,
-          age: ageCleanup,
-          stress: stressCleanup,
-        });
       }
 
       // Always check for critical states and apply instant effects (every tick)
-      // Note: Starvation/dehydration damage is now handled via delta registration below
+      // Note: Starvation/dehydration damage is now handled via mutation rates below
 
-      // Register health damage deltas if in critical state
+      // Set health damage mutation rates if in critical state
       // These are checked every minute, so damage accumulates appropriately
       if (shouldUpdateRates) {
-        // Starvation damage: 0.5 health per second = 30 per minute
+        // Starvation damage: 0.5 health per second
         if (animal.hunger > 90) {
-          this.stateMutator.registerDelta({
-            entityId: entity.id,
-            componentType: CT.Animal,
-            field: 'health',
-            deltaPerMinute: -30, // 0.5 * 60
+          setMutationRate(entity, 'animal.health', -0.5, {
             min: 0,
             source: 'animal_starvation',
           });
+        } else {
+          // Clear starvation damage if hunger drops below threshold
+          clearMutationRate(entity, 'animal.health');
         }
 
-        // Dehydration damage: 0.6 health per second = 36 per minute
+        // Dehydration damage: 0.6 health per second
         if (animal.thirst > 90) {
-          this.stateMutator.registerDelta({
-            entityId: entity.id,
-            componentType: CT.Animal,
-            field: 'health',
-            deltaPerMinute: -36, // 0.6 * 60
+          setMutationRate(entity, 'animal.health', -0.6, {
             min: 0,
             source: 'animal_dehydration',
           });
+        } else if (animal.hunger <= 90) {
+          // Only clear if both hunger and thirst are below threshold
+          clearMutationRate(entity, 'animal.health');
         }
       }
 
@@ -235,10 +188,10 @@ export class AnimalSystem extends BaseSystem {
           },
         });
 
-        // State changed - need to update energy delta rates on next update
+        // State changed - need to update energy mutation rates on next update
         // (e.g., sleeping recovers 2x faster, fleeing drains 1.5x faster)
-        // Force rate update by setting deltaLastUpdateTick to trigger update
-        if (shouldUpdateRates) {
+        // Force rate update by resetting deltaLastUpdateTick to trigger update
+        if (!shouldUpdateRates) {
           this.deltaLastUpdateTick = 0; // Force update next tick
         }
       }
@@ -258,16 +211,8 @@ export class AnimalSystem extends BaseSystem {
           },
         });
 
-        // Clean up deltas for dead animals
-        if (this.deltaCleanups.has(entity.id)) {
-          const cleanups = this.deltaCleanups.get(entity.id)!;
-          cleanups.hunger();
-          cleanups.thirst();
-          cleanups.energy();
-          cleanups.age();
-          cleanups.stress();
-          this.deltaCleanups.delete(entity.id);
-        }
+        // Note: Mutation rates are entity-local, so they're automatically cleaned up
+        // when the entity is removed. No manual cleanup needed.
 
         // Note: Actual entity removal should be handled by a death handler system
       }
@@ -362,27 +307,5 @@ export class AnimalSystem extends BaseSystem {
     mood -= animal.stress * 0.3; // Stress reduces mood
 
     return Math.max(0, Math.min(100, mood));
-  }
-
-  /**
-   * Get interpolated value for UI display
-   * Provides smooth visual updates between batch updates
-   */
-  getInterpolatedValue(
-    entityId: string,
-    field: 'hunger' | 'thirst' | 'energy' | 'age' | 'stress' | 'health',
-    currentValue: number
-  ): number {
-    if (!this.stateMutator) {
-      return currentValue; // Fallback to current value if not initialized
-    }
-
-    return this.stateMutator.getInterpolatedValue(
-      entityId,
-      CT.Animal,
-      field,
-      currentValue,
-      this.world.tick
-    );
   }
 }

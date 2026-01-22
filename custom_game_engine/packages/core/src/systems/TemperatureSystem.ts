@@ -78,18 +78,9 @@ export class TemperatureSystem extends BaseSystem {
   private tileInsulationCacheLastUpdate: number = 0;
   private readonly TILE_CACHE_DURATION = 50; // Refresh every 50 ticks (walls don't change often)
 
-  // StateMutatorSystem integration for batched health damage
-  private stateMutator: StateMutatorSystem | null = null;
+  // Track when to update mutation rates (once per game minute)
   private lastDeltaUpdateTick = 0;
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-  private deltaCleanups = new Map<string, () => void>();
-
-  /**
-   * Set the StateMutatorSystem reference (called during system registration)
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
 
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
@@ -164,9 +155,9 @@ export class TemperatureSystem extends BaseSystem {
       // Check for state transitions and emit events
       this.checkTemperatureEvents(world, entity, updatedTemp);
 
-      // Update health damage deltas once per game minute
+      // Update health damage mutation rates once per game minute
       if (shouldUpdateDeltas) {
-        this.updateTemperatureDeltas(entity.id, updatedTemp.state);
+        this.updateTemperatureMutations(entity, updatedTemp.state);
       }
     }
 
@@ -461,41 +452,27 @@ export class TemperatureSystem extends BaseSystem {
   }
 
   /**
-   * Update temperature-based health damage deltas.
-   * Called once per game minute to register/update delta rates with StateMutatorSystem.
+   * Update temperature-based health damage mutation rates.
+   * Called once per game minute to register/update mutation rates.
    */
-  private updateTemperatureDeltas(
-    entityId: string,
+  private updateTemperatureMutations(
+    entity: Entity,
     temperatureState: TemperatureComponent['state']
   ): void {
-    if (!this.stateMutator) {
-      throw new Error('[TemperatureSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
+    // Clear existing temperature damage mutation if it exists
+    clearMutationRate(entity, 'needs.health');
 
-    // Clean up old delta if it exists
-    if (this.deltaCleanups.has(entityId)) {
-      this.deltaCleanups.get(entityId)!();
-      this.deltaCleanups.delete(entityId);
-    }
-
-    // Only register delta if in dangerous temperature
+    // Only register mutation if in dangerous temperature
     if (temperatureState === 'dangerously_cold' || temperatureState === 'dangerously_hot') {
-      // Convert HEALTH_DAMAGE_RATE (per second) to per game minute
-      // Game time: 1 real second = ~1.2 game minutes (at 20 TPS with 600s day length)
-      // So HEALTH_DAMAGE_RATE per real second = HEALTH_DAMAGE_RATE * 60 per game minute
-      const healthDamagePerMinute = -(this.HEALTH_DAMAGE_RATE * 60);
+      // HEALTH_DAMAGE_RATE is already per second, so use it directly
+      // Negative because it's damage
+      const healthDamagePerSecond = -this.HEALTH_DAMAGE_RATE;
 
-      const cleanup = this.stateMutator.registerDelta({
-        entityId,
-        componentType: CT.Needs,
-        field: 'health',
-        deltaPerMinute: healthDamagePerMinute,
+      setMutationRate(entity, 'needs.health', healthDamagePerSecond, {
         min: 0,
         max: 100,
         source: `temperature_damage_${temperatureState}`,
       });
-
-      this.deltaCleanups.set(entityId, cleanup);
     }
   }
 

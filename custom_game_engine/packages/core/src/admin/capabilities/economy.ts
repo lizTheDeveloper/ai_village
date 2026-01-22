@@ -99,7 +99,7 @@ const economyCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, default: 50, description: 'Max results' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/resources' };
+        return { message: 'Delegate to /api/game/resources' };
       },
       renderResult: (data: unknown) => {
         const resources = (data as { resources?: Array<{ id: string; type: string; amount: number; maxAmount: number; x: number; y: number }> })?.resources || [];
@@ -124,7 +124,7 @@ const economyCapability = defineCapability({
       description: 'Get aggregate resource statistics for the world',
       params: [],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/resource-stats' };
+        return { message: 'Delegate to /api/game/resource-stats' };
       },
       renderResult: (data: unknown) => {
         const stats = data as {
@@ -159,7 +159,7 @@ const economyCapability = defineCapability({
         { name: 'entityId', type: 'entity-id', required: true, description: 'Entity with inventory' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with inventory component' };
+        return { message: 'Delegate to /api/game/entity with inventory component' };
       },
       renderResult: (data: unknown) => {
         const inventory = data as {
@@ -194,7 +194,7 @@ const economyCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, default: 20, description: 'Max results' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/search-items' };
+        return { message: 'Delegate to /api/game/search-items' };
       },
       renderResult: (data: unknown) => {
         const results = (data as { results?: Array<{ entityId: string; entityName: string; itemId: string; itemName: string; amount: number }> })?.results || [];
@@ -225,7 +225,7 @@ const economyCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, default: 50, description: 'Max results' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/buildings' };
+        return { message: 'Delegate to /api/game/buildings' };
       },
       renderResult: (data: unknown) => {
         const buildings = (data as { buildings?: Array<{ id: string; type: string; name: string; workers: number; x: number; y: number }> })?.buildings || [];
@@ -252,7 +252,7 @@ const economyCapability = defineCapability({
         { name: 'buildingId', type: 'entity-id', required: true, description: 'Building entity ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entity with building component' };
+        return { message: 'Delegate to /api/game/entity with building component' };
       },
       renderResult: (data: unknown) => {
         const building = data as {
@@ -307,7 +307,7 @@ const economyCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, default: 50, description: 'Max results' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/professions' };
+        return { message: 'Delegate to /api/game/professions' };
       },
       renderResult: (data: unknown) => {
         const workers = (data as { workers?: Array<{ id: string; name: string; profession: string; workProgress: number }> })?.workers || [];
@@ -332,7 +332,7 @@ const economyCapability = defineCapability({
       description: 'Get city-wide economic overview from CityDirector',
       params: [],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/city-economy' };
+        return { message: 'Delegate to /api/game/city-economy' };
       },
       renderResult: (data: unknown) => {
         const economy = data as {

@@ -79,7 +79,7 @@ const lifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entities?type=animal' };
+        return { message: 'Delegate to /api/game/entities?type=animal' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -126,7 +126,7 @@ const lifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/entities?type=plant' };
+        return { message: 'Delegate to /api/game/entities?type=plant' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -167,7 +167,7 @@ const lifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/population/stats' };
+        return { message: 'Delegate to /api/game/population/stats' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -203,7 +203,7 @@ const lifeCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/reproduction/stats' };
+        return { message: 'Delegate to /api/game/reproduction/stats' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

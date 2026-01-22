@@ -795,6 +795,31 @@ export interface MiscEvents {
     args: string[];
   };
 
+  /** Admin angel list grand strategy entities */
+  'admin_angel:list_entities': {
+    entityType: string; // empires, fleets, navies, megastructures, etc.
+  };
+
+  /** Admin angel diplomatic action */
+  'admin_angel:diplomatic_action': {
+    empireId: string;
+    targetEmpireId: string;
+    diplomaticAction: string; // ally, war, trade_agreement, peace, non_aggression
+  };
+
+  /** Admin angel move fleet command */
+  'admin_angel:move_fleet': {
+    fleetId: string;
+    targetX: number;
+    targetY: number;
+  };
+
+  /** Admin angel megastructure task assignment */
+  'admin_angel:megastructure_task': {
+    megastructureId: string;
+    task: string; // maintenance, research, production, defense, idle
+  };
+
   'agent:needs_critical': {
     agentId?: EntityId;
     agentName?: string;

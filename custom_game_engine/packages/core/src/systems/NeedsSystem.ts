@@ -11,20 +11,19 @@ import type { MovementComponent } from '../components/MovementComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * NeedsSystem - Manages agent physical needs (hunger, energy, thirst)
  *
- * PERFORMANCE: Uses StateMutatorSystem for batched vector updates (60× improvement)
+ * PERFORMANCE: Uses MutationVectorComponent for per-tick state mutations (no GC pressure)
  * Instead of updating needs every tick, this system:
- * 1. Runs once per game minute to update delta rates based on activity
- * 2. StateMutatorSystem handles the actual batched decay
+ * 1. Runs once per game minute to update mutation rates based on activity
+ * 2. StateMutatorSystem handles the actual per-tick mutation application
  * 3. Event emission and starvation tracking handled here
  *
  * Dependencies:
  * @see TimeSystem (priority 3) - Provides game time for calculating needs decay rates
- * @see StateMutatorSystem (priority 5) - Batched vector updates for hunger/energy decay
+ * @see StateMutatorSystem (priority 5) - Applies mutation vectors every tick
  */
 export class NeedsSystem extends BaseSystem {
   public readonly id: SystemId = 'needs';
@@ -37,43 +36,24 @@ export class NeedsSystem extends BaseSystem {
   /**
    * Systems that must run before this one.
    * @see TimeSystem - provides game time for converting real-time to game minutes for needs decay
-   * @see StateMutatorSystem - handles batched decay updates
+   * @see StateMutatorSystem - handles per-tick mutation application
    */
   public readonly dependsOn = ['time', 'state_mutator'] as const;
 
   // Performance: Cache time entity to avoid querying every tick
   private timeEntityId: string | null = null;
 
-  // Performance: Update delta rates once per game minute (1200 ticks)
+  // Performance: Update mutation rates once per game minute (1200 ticks)
   private lastDeltaUpdateTick = 0;
   private readonly UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
-
-  // Track cleanup functions for registered deltas
-  private deltaCleanups = new Map<string, { hunger: () => void; energy: () => void }>();
 
   // Track previous critical state for each entity to detect threshold crossings
   private wasEnergyCritical = new Map<string, boolean>();
 
-  // Reference to StateMutatorSystem (set via setStateMutatorSystem)
-  private stateMutator: StateMutatorSystem | null = null;
-
-  /**
-   * Set the StateMutatorSystem reference.
-   * Called by registerAllSystems during initialization.
-   */
-  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
-    this.stateMutator = stateMutator;
-  }
-
   protected onUpdate(ctx: SystemContext): void {
-    // Performance: Only update delta rates once per game minute
+    // Performance: Only update mutation rates once per game minute
     const currentTick = ctx.tick;
     const shouldUpdateRates = currentTick - this.lastDeltaUpdateTick >= this.UPDATE_INTERVAL;
-
-    // Check if StateMutatorSystem has been set
-    if (!this.stateMutator) {
-      throw new Error('[NeedsSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
 
     for (const entity of ctx.activeEntities) {
       const impl = entity as EntityImpl;
@@ -83,17 +63,13 @@ export class NeedsSystem extends BaseSystem {
       // Dead entities don't have physical needs - skip decay entirely
       const realmLocation = comps.optional<RealmLocationComponent>('realm_location');
       if (realmLocation?.transformations.includes('dead')) {
-        // Clean up any existing deltas for dead entities
-        if (this.deltaCleanups.has(entity.id)) {
-          const cleanups = this.deltaCleanups.get(entity.id)!;
-          cleanups.hunger();
-          cleanups.energy();
-          this.deltaCleanups.delete(entity.id);
-        }
+        // Clear any existing mutation rates for dead entities
+        clearMutationRate(entity, 'needs.hunger');
+        clearMutationRate(entity, 'needs.energy');
         continue;
       }
 
-      // Update delta rates based on current activity (once per game minute)
+      // Update mutation rates based on current activity (once per game minute)
       if (shouldUpdateRates) {
         // Check if agent is sleeping
         const circadian = comps.optional<CircadianComponent>(CT.Circadian);
@@ -138,38 +114,21 @@ export class NeedsSystem extends BaseSystem {
           energyDecayPerGameMinute = 0; // No energy decay while sleeping
         }
 
-        // Clean up old deltas if they exist
-        if (this.deltaCleanups.has(entity.id)) {
-          const cleanups = this.deltaCleanups.get(entity.id)!;
-          cleanups.hunger();
-          cleanups.energy();
-        }
+        // Convert from per-minute rates to per-second rates (new API requirement)
+        const hungerRatePerSecond = hungerDecayPerGameMinute / 60;
+        const energyRatePerSecond = energyDecayPerGameMinute / 60;
 
-        // Register new deltas with StateMutatorSystem
-        const hungerCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Needs,
-          field: 'hunger',
-          deltaPerMinute: hungerDecayPerGameMinute,
+        // Set mutation rates using new API
+        setMutationRate(entity, 'needs.hunger', hungerRatePerSecond, {
           min: 0,
           max: 1,
-          source: 'needs_hunger_decay',
+          source: 'needs_system',
         });
 
-        const energyCleanup = this.stateMutator.registerDelta({
-          entityId: entity.id,
-          componentType: CT.Needs,
-          field: 'energy',
-          deltaPerMinute: energyDecayPerGameMinute,
+        setMutationRate(entity, 'needs.energy', energyRatePerSecond, {
           min: 0,
           max: 1,
-          source: 'needs_energy_decay',
-        });
-
-        // Store cleanup functions
-        this.deltaCleanups.set(entity.id, {
-          hunger: hungerCleanup,
-          energy: energyCleanup,
+          source: 'needs_system',
         });
       }
 

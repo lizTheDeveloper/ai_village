@@ -67,7 +67,7 @@ const backgroundRealmsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universes/background' };
+        return { message: 'Delegate to /api/game/universes/background' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -128,7 +128,7 @@ const backgroundRealmsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universes/peek' };
+        return { message: 'Delegate to /api/game/universes/peek' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -192,7 +192,7 @@ const backgroundRealmsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universes/find-entity' };
+        return { message: 'Delegate to /api/game/universes/find-entity' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -250,7 +250,7 @@ const backgroundRealmsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universes/compare' };
+        return { message: 'Delegate to /api/game/universes/compare' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -317,7 +317,7 @@ const backgroundRealmsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universes/activity-feed' };
+        return { message: 'Delegate to /api/game/universes/activity-feed' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -357,7 +357,7 @@ const backgroundRealmsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/universes/what-if' };
+        return { message: 'Delegate to /api/game/universes/what-if' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

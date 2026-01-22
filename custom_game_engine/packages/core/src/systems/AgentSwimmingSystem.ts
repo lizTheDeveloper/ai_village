@@ -10,7 +10,6 @@ import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { calculatePressure, calculateLightLevel } from '@ai-village/world';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * AgentSwimmingSystem - Depth-based swimming mechanics with oxygen and pressure
@@ -46,8 +45,8 @@ import type { StateMutatorSystem } from './StateMutatorSystem.js';
  * - Position tracking - skips agents that haven't moved to a new tile
  * - Single-pass processing - combines water detection + underwater processing in one loop
  * - Caches tile lookups - only rechecks when entity moves to different tile
- * - Uses StateMutatorSystem for gradual oxygen drain and pressure damage
- *   (Applied once per game minute, not every tick)
+ * - Uses MutationVectorComponent for gradual oxygen drain and pressure damage
+ *   (Applied smoothly every tick via StateMutatorSystem)
  * - Only sets movement speed multiplier when depth zone changes
  *
  * Performance: Typically processes ~0-5 underwater entities instead of 4000+ total entities

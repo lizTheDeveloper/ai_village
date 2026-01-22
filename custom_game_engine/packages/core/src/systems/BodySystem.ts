@@ -28,6 +28,7 @@ import type { MoodComponent } from '../components/MoodComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext, type ComponentAccessor } from '../ecs/SystemContext.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 export class BodySystem extends BaseSystem {
   public readonly id: SystemId = 'body';
@@ -47,22 +48,18 @@ export class BodySystem extends BaseSystem {
   private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
 
   protected onUpdate(ctx: SystemContext): void {
-    if (!this.stateMutator) {
-      throw new Error('[BodySystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
-    }
-
     const currentTick = ctx.tick;
-    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+    const shouldUpdateMutations = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
     for (const entity of ctx.activeEntities) {
       const comps = ctx.components(entity);
       const body = comps.optional<BodyComponent>(CT.Body);
       if (!body) continue;
 
-      // Update blood loss/recovery and healing delta rates once per game minute
-      if (shouldUpdateDeltas) {
-        this.updateBloodLossDeltas(entity, body);
-        this.updateHealingDeltas(entity, body, comps);
+      // Update blood loss/recovery and healing mutation rates once per game minute
+      if (shouldUpdateMutations) {
+        this.updateBloodLossMutations(entity, body);
+        this.updateHealingMutations(entity, body, comps);
       }
 
       // 1. Natural healing over time (handles injury removal when fully healed)
@@ -87,8 +84,8 @@ export class BodySystem extends BaseSystem {
       this.processModifications(entity, body, ctx.tick, ctx.world);
     }
 
-    // Mark delta rates as updated
-    if (shouldUpdateDeltas) {
+    // Mark mutation rates as updated
+    if (shouldUpdateMutations) {
       this.lastDeltaUpdateTick = currentTick;
     }
   }
