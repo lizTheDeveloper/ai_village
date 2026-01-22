@@ -60,7 +60,7 @@ const savesCapability = defineCapability({
 
         try {
           // Fetch timeline from multiverse server via orchestration API
-          const response = await fetch(`http://localhost:3001/api/universe/${encodeURIComponent(universeId)}/timeline`);
+          const response = await fetch(`http://localhost:3001/api/multiverse/universe/${encodeURIComponent(universeId)}/timeline`);
 
           if (!response.ok) {
             if (response.status === 404) {

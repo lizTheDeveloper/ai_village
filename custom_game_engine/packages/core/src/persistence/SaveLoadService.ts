@@ -102,7 +102,7 @@ class MultiverseClient {
 
   async registerPlayer(displayName?: string): Promise<void> {
     if (!this.playerId) throw new Error('Player ID not set');
-    await fetch(`${this.baseUrl}/player`, {
+    await fetch(`${this.baseUrl}/multiverse/player`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: this.playerId, displayName: displayName ?? this.playerId }),
