@@ -1,5 +1,79 @@
 # Release Notes
 
+## 2026-01-21 - "AgentSwimmingSystem + SleepSystem Compatibility Methods" - 3 Files (+17 net)
+
+### ➕ AgentSwimmingSystem.ts Compatibility (+8 lines)
+
+**Added no-op setStateMutatorSystem() method for registration compatibility.**
+
+#### Added
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
++ /**
++  * Set the StateMutatorSystem reference.
++  * Called by registerAllSystems during initialization.
++  */
++ setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
++   // No-op: Uses setMutationRate() directly from MutationVectorComponent
++ }
+```
+
+**Rationale:** Matches pattern from AnimalSystem (Cycle 31) and NeedsSystem (Cycle 30). Provides standard interface even though system uses MutationVectorComponent directly.
+
+**Impact:** Prevents registration errors, establishes consistent API across all migrated systems.
+
+---
+
+### ➕ SleepSystem.ts Compatibility (+9 lines)
+
+**Added no-op setStateMutatorSystem() method for registration compatibility.**
+
+#### Added
+```typescript
++ import type { StateMutatorSystem } from './StateMutatorSystem.js';
++ /**
++  * Set the StateMutatorSystem reference.
++  * Called by registerAllSystems during initialization.
++  */
++ setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
++   // No-op: Uses setMutationRate() directly from MutationVectorComponent
++ }
+```
+
+**Rationale:** Same as AgentSwimmingSystem - establishes consistent compatibility interface.
+
+**Impact:** All migrated systems now have the same pattern.
+
+---
+
+### 📊 Cycle 32 Summary
+
+**Purpose:** Add compatibility methods to remaining migrated systems.
+
+**All Migrated Systems Now Have Consistent Interface:**
+- ✅ AnimalSystem (Cycle 31)
+- ✅ NeedsSystem (Cycle 30)
+- ✅ AgentSwimmingSystem (Cycle 32) ← **Just added**
+- ✅ SleepSystem (Cycle 32) ← **Just added**
+- BodySystem (fully migrated, no compatibility method needed)
+- TemperatureSystem (fully migrated, no compatibility method needed)
+
+**Pattern:**
+```typescript
+setStateMutatorSystem(_stateMutator: StateMutatorSystem): void {
+  // No-op: Uses setMutationRate() directly from MutationVectorComponent
+}
+```
+
+**Impact:**
+- Consistent API across all systems
+- No registration errors from missing methods
+- Clear documentation via comment that system uses direct API
+
+**Files:** 3 changed (+19/-2, +17 net)
+
+---
+
 ## 2026-01-21 - "API Namespace Migration Phase 1 Documentation" - 3 Files (+54 net)
 
 ### 📚 API_NAMESPACE_MIGRATION.md Updated (+54 net)
