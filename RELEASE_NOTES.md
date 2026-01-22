@@ -1,5 +1,164 @@
 # Release Notes
 
+## 2026-01-22 - "Documentation & Config Update + Deterministic Lockstep Spec" - 10 Files (+326 net)
+
+### 📚 Documentation Updates Post-Migration
+
+**Follow-up to Cycle 49 migration completion.**
+
+#### core/README.md - StateMutatorSystem Docs Updated (0 net, restructured)
+
+**Removed "Old API vs New API" structure, updated to show completed migration state.**
+
+**Changes:**
+- Removed "Old API" section (registerDelta, external Map storage)
+- Restructured as "Current API (entity-local storage)"
+- Clarified rate is **per SECOND** (not per minute)
+- Emphasized no dependency injection needed
+- Example: "Hunger decays 0.0008 per minute = `rate: -0.0008 / 60`"
+
+**Result:** Documentation accurately reflects completed architecture.
+
+---
+
+### 🔧 Registration & Config Updates
+
+**headless-game.ts** - Removed setStateMutatorSystem() Calls (0 net)
+- `plantSystem.setStateMutatorSystem(stateMutator);` removed
+- `animalSystem.setStateMutatorSystem(stateMutator);` removed
+- `needsSystem.setStateMutatorSystem(stateMutator);` removed
+- `sleepSystem.setStateMutatorSystem(stateMutator);` removed
+- Updated comments: "Uses StateMutatorSystem" → "Uses MutationVectorComponent"
+
+**admin/capabilities/index.ts** - Register research-technology (+1)
+```typescript
++ import './research-technology.js';
+```
+
+**vite.config.ts** - Add Package Aliases (+2)
+```typescript
++ '@ai-village/agents': path.resolve(__dirname, '../packages/agents/src/index.ts'),
++ '@ai-village/language': path.resolve(__dirname, '../packages/language/src/index.ts'),
+```
+Enables proper module resolution for agents and language packages.
+
+---
+
+### 📋 New Specification: Deterministic Lockstep
+
+**openspec/specs/DETERMINISTIC_LOCKSTEP.md** (281 lines, new file)
+
+**Inspiration**: Factorio's deterministic engine using fixed-point math.
+
+#### Problem Statement
+
+Floating-point arithmetic causes platform-dependent rounding:
+- Different results on different CPUs/browsers
+- Cannot replay simulations deterministically
+- Cannot sync multiplayer via lockstep (would desync)
+- Save/load may produce different trajectories
+
+#### Proposed Solution: 16.16 Fixed-Point Arithmetic
+
+**Format**: 32-bit integer representing fixed-point number
+- 16 bits integer part: -32768 to 32767
+- 16 bits fractional part: precision of 1/65536 (~0.000015)
+
+**Example Implementation**:
+```typescript
+class Fixed {
+  private static readonly SHIFT = 16;
+  private static readonly SCALE = 1 << 16; // 65536
+  readonly raw: number; // Stored as integer
+
+  static fromFloat(f: number): Fixed {
+    return new Fixed(Math.round(f * Fixed.SCALE));
+  }
+
+  add(other: Fixed): Fixed {
+    return new Fixed(this.raw + other.raw);
+  }
+
+  mul(other: Fixed): Fixed {
+    const result = (BigInt(this.raw) * BigInt(other.raw)) >> BigInt(Fixed.SHIFT);
+    return new Fixed(Number(result));
+  }
+}
+```
+
+#### Benefits
+
+1. **Lockstep Multiplayer**: Sync only player inputs, not world state (massive bandwidth savings)
+2. **Deterministic Replays**: Record inputs, replay produces identical simulation (byte-for-byte)
+3. **Save Compression**: Store only inputs since last checkpoint (vs. entire world state)
+4. **Reproducible Testing**: Deterministic test cases, reproducible bugs
+5. **Time Travel**: Jump to any point by replaying from checkpoint + inputs
+
+#### Architecture: Separate Determinism from Presentation
+
+**Game Logic** (deterministic):
+- Fixed-point arithmetic for all calculations
+- Integer positions, velocities, healths
+- Seeded deterministic RNG
+
+**Rendering** (visual-only):
+- Float interpolation between ticks
+- Smooth animations, camera movements
+- Visual effects, particles
+
+#### Implementation Phases
+
+1. **Fixed-point math library** (`FixedPoint.ts`)
+2. **Deterministic RNG** (seeded, reproducible)
+3. **Component migration** (Position, Velocity, Needs, Body)
+4. **Input recording/replay system**
+5. **Lockstep networking** (optional)
+
+**Status**: Draft specification, not implemented yet.
+
+**Factorio Reference**:
+- Uses fixed-point for ALL game logic
+- Replays are byte-identical across platforms
+- Multiplayer syncs only inputs (30-100 KB/s instead of MB/s)
+- Save files store input history for time travel
+
+---
+
+### 🧹 Maintenance
+
+**PID File Cleanup** (-2 files):
+- `.pixellab-daemon.pid` deleted (daemon shutdown)
+- `.sprite-wizard.pid` deleted (daemon shutdown)
+
+**Player Profile Update**:
+- `player:bb32e616-c89e-415e-af2e-bed045cd0574/profile.json`
+- Updated `createdAt`, `lastSeen` timestamps
+
+---
+
+### 📊 Cycle 50 Summary
+
+**Purpose:** Update documentation to reflect completed migration, add deterministic lockstep spec.
+
+**Changes:**
+- **Documentation**: core/README.md updated to show completed state (0 net)
+- **Registration**: headless-game.ts removed setStateMutatorSystem() calls (0 net)
+- **Config**: vite.config.ts added package aliases (+2), capabilities registered (+1)
+- **Specification**: DETERMINISTIC_LOCKSTEP.md (281 lines) - fixed-point math for determinism
+- **Maintenance**: PID cleanup, player timestamps, release notes
+
+**Impact:**
+- Documentation accurate for completed migration
+- Registration code matches new API patterns
+- Spec document for future deterministic simulation (Factorio-inspired)
+- Proper module resolution for new packages
+
+**Files:** 10 changed (+960/-28, **+932 net** including spec file)
+
+**Note**: Also created `EVENT_DRIVEN_ENTITIES.md` spec (appears in commit)
+
+---
+
 ## 2026-01-22 - "🎉 MutationVectorComponent Migration COMPLETE + Data Extraction" - 81 Files (-2349 net)
 
 ### 🎊 MILESTONE: MutationVectorComponent Migration Complete
