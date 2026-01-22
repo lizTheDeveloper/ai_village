@@ -74,10 +74,12 @@ const researchTechnologyCapability = defineCapability({
         output += `Researched: ${result.researchedCount || 0} / ${result.technologies.length}\n`;
         output += `Available for Research: ${result.availableCount || 0}\n\n`;
 
-        const byDomain: Record<string, typeof result.technologies> = {};
+        const byDomain: Record<string, Array<{ name: string; domain: string; researched: boolean; prerequisites: string[] }>> = {};
         for (const tech of result.technologies) {
-          if (!byDomain[tech.domain]) byDomain[tech.domain] = [];
-          byDomain[tech.domain].push(tech);
+          if (!byDomain[tech.domain]) {
+            byDomain[tech.domain] = [];
+          }
+          byDomain[tech.domain]!.push(tech);
         }
 
         for (const [domain, techs] of Object.entries(byDomain)) {
