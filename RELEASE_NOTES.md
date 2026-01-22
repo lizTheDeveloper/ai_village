@@ -1,5 +1,35 @@
 # Release Notes
 
+## 2026-01-22 - "Fix skills-professions Capability Category" - 1 File (0 net)
+
+### 🔧 Capability Categorization Fix
+
+**skills-professions.ts** - Updated category (+1/-1, 0 net)
+
+Changed:
+```typescript
+- category: 'agent-management',
++ category: 'entities',
+```
+
+**Rationale:** Aligns with other agent-focused capabilities that use `'entities'` category (e.g., corruption, dreams-sleep, reproduction-family). Ensures consistent categorization in admin dashboard.
+
+**Impact:** Skills & Professions capability now appears in correct category tab.
+
+---
+
+### 📊 Cycle 52 Summary
+
+**Purpose:** Fix admin capability categorization.
+
+**Change:** skills-professions category: `'agent-management'` → `'entities'`
+
+**Impact:** Consistent admin dashboard organization.
+
+**Files:** 1 changed (+1/-1, 0 net)
+
+---
+
 ## 2026-01-22 - "Documentation Refinement + Legacy Cleanup + Rendering Specs" - 7 Files (-132 net)
 
 ### 📚 Documentation Refinement
