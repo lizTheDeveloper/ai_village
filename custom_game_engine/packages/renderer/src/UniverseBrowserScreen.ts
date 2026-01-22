@@ -213,7 +213,7 @@ export class UniverseBrowserScreen {
     this.render();
 
     try {
-      const response = await fetch(`${this.API_BASE}/universe/${universeId}/snapshots`);
+      const response = await fetch(`${this.API_BASE}/multiverse/universe/${universeId}/snapshots`);
       if (!response.ok) throw new Error('Failed to fetch snapshots');
       const data = await response.json();
       this.serverSnapshots = data.snapshots || [];
@@ -518,7 +518,7 @@ export class UniverseBrowserScreen {
       if (this.universeSnapshotsCache.has(universe.id)) return;
 
       try {
-        const response = await fetch(`${this.API_BASE}/universe/${universe.id}/snapshots`);
+        const response = await fetch(`${this.API_BASE}/multiverse/universe/${universe.id}/snapshots`);
         if (response.ok) {
           const data = await response.json();
           this.universeSnapshotsCache.set(universe.id, data.snapshots || []);
@@ -1010,7 +1010,7 @@ export class UniverseBrowserScreen {
 
     try {
       // Create fork via API
-      const response = await fetch(`${this.API_BASE}/universe/${universe.id}/fork`, {
+      const response = await fetch(`${this.API_BASE}/multiverse/universe/${universe.id}/fork`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

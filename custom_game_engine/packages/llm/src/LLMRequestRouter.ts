@@ -26,12 +26,19 @@ import type { LLMRequest, LLMResponse } from './LLMProvider.js';
 import type { CustomLLMConfig } from './LLMDecisionQueue.js';
 import { CostTracker } from './CostTracker.js';
 import { QueueMetricsCollector } from './QueueMetricsCollector.js';
+import {
+  MODEL_CONFIGS,
+  getModelsForTier,
+  inferTierFromModel,
+  type IntelligenceTier,
+} from './ModelTiers.js';
 
 export interface LLMRequestPayload {
   sessionId: string;
   agentId: string;
   prompt: string;
   model?: string;
+  tier?: IntelligenceTier;  // Request by tier: 'simple', 'default', 'high'
   maxTokens?: number;
   temperature?: number;
   customConfig?: CustomLLMConfig;
@@ -153,7 +160,7 @@ export class LLMRequestRouter {
    * @returns LLM response with cooldown information
    */
   async routeRequest(payload: LLMRequestPayload): Promise<LLMResponseWithCooldown> {
-    const { sessionId, agentId, prompt, model, maxTokens, temperature, customConfig } = payload;
+    const { sessionId, agentId, prompt, model, tier, maxTokens, temperature, customConfig } = payload;
     const requestStartTime = Date.now();
 
     // Register/update session
@@ -162,8 +169,8 @@ export class LLMRequestRouter {
     }
     this.sessionManager.heartbeat(sessionId);
 
-    // Detect provider and API key
-    const { provider, queueName } = this.detectProvider(model, customConfig);
+    // Detect provider and API key - supports tier-based routing
+    const { provider, queueName, selectedModel } = this.detectProvider(model, tier, customConfig);
     const apiKeyHash = customConfig?.apiKey ? this.hashApiKey(customConfig.apiKey) : undefined;
 
     // Check cooldown
@@ -236,7 +243,7 @@ export class LLMRequestRouter {
           sessionId,
           agentId,
           provider,
-          model: model || this.defaultModel,
+          model: selectedModel,
           inputTokens: llmResponse.inputTokens || 0,
           outputTokens: llmResponse.outputTokens || 0,
           costUSD: llmResponse.costUSD || 0,
@@ -258,7 +265,7 @@ export class LLMRequestRouter {
     return {
       ...llmResponse,
       provider,
-      model: model || this.defaultModel,
+      model: selectedModel,
       cooldown: {
         nextAllowedAt,
         waitMs: cooldownMs,
@@ -272,45 +279,95 @@ export class LLMRequestRouter {
   }
 
   /**
-   * Detect provider from model or custom config
-   * Uses round-robin load balancing when no specific model is requested
+   * Detect provider from model, tier, or custom config
+   * Supports tier-based routing for intelligent model selection
+   *
+   * Priority:
+   * 1. Custom config with baseUrl
+   * 2. Explicit model requested
+   * 3. Tier-based selection (round-robin across models in tier)
+   * 4. Default to 'default' tier
    */
   private detectProvider(
     model?: string,
+    tier?: IntelligenceTier,
     customConfig?: CustomLLMConfig
-  ): { provider: string; queueName: string } {
+  ): { provider: string; queueName: string; selectedModel: string } {
     // Custom config with baseUrl
     if (customConfig?.baseUrl) {
       const provider = this.detectProviderFromUrl(customConfig.baseUrl);
-      return { provider, queueName: provider };
+      return { provider, queueName: provider, selectedModel: model || this.defaultModel };
     }
 
-    // Load balance when no specific model is requested
-    // This distributes load across all available providers
-    if (!model) {
-      const availableProviders = this.loadBalanceProviders.filter(p =>
-        this.poolManager.hasProvider(p)
-      );
+    // If explicit model requested, use it directly
+    if (model) {
+      const queueName = model.replace(/\//g, '_');
+      const modelConfig = MODEL_CONFIGS.find(m => m.id === model);
 
-      if (availableProviders.length > 0) {
-        // Round-robin selection
-        const selectedProvider = availableProviders[this.requestCounter % availableProviders.length]!;
-        this.requestCounter++;
-        return { provider: selectedProvider, queueName: selectedProvider };
+      if (modelConfig && this.poolManager.hasProvider(queueName)) {
+        return {
+          provider: modelConfig.provider,
+          queueName,
+          selectedModel: model,
+        };
       }
+
+      // Fallback to provider-based routing for unknown models
+      const mapping = this.providerMappings.get(model);
+      if (mapping) {
+        return { provider: mapping.provider, queueName: mapping.queue, selectedModel: model };
+      }
+
+      const provider = this.inferProviderFromModel(model);
+      return { provider, queueName: provider, selectedModel: model };
     }
 
-    // Standard model
-    const modelName = model || this.defaultModel;
-    const mapping = this.providerMappings.get(modelName);
+    // Tier-based routing: select best available model for requested tier
+    const requestedTier = tier || 'default';
+    const tierModels = getModelsForTier(requestedTier)
+      .filter(m => m.provider !== 'ollama') // Skip local models in server
+      .sort((a, b) => b.rpm - a.rpm); // Prefer higher RPM models
 
-    if (mapping) {
-      return { provider: mapping.provider, queueName: mapping.queue };
+    // Find available models for this tier
+    const availableModels = tierModels.filter(m => {
+      const queueName = m.id.replace(/\//g, '_');
+      return this.poolManager.hasProvider(queueName);
+    });
+
+    if (availableModels.length > 0) {
+      // Round-robin across available models in tier
+      const selectedModel = availableModels[this.requestCounter % availableModels.length]!;
+      this.requestCounter++;
+
+      const queueName = selectedModel.id.replace(/\//g, '_');
+      return {
+        provider: selectedModel.provider,
+        queueName,
+        selectedModel: selectedModel.id,
+      };
     }
 
-    // Infer from model name
-    const provider = this.inferProviderFromModel(modelName);
-    return { provider, queueName: provider };
+    // No models available for tier, fall back to any available model
+    const anyModel = MODEL_CONFIGS
+      .filter(m => m.provider !== 'ollama')
+      .find(m => this.poolManager.hasProvider(m.id.replace(/\//g, '_')));
+
+    if (anyModel) {
+      const queueName = anyModel.id.replace(/\//g, '_');
+      return {
+        provider: anyModel.provider,
+        queueName,
+        selectedModel: anyModel.id,
+      };
+    }
+
+    // Ultimate fallback to old provider-based routing
+    const fallbackProvider = this.loadBalanceProviders.find(p => this.poolManager.hasProvider(p));
+    return {
+      provider: fallbackProvider || 'groq',
+      queueName: fallbackProvider || 'groq',
+      selectedModel: this.defaultModel,
+    };
   }
 
   /**

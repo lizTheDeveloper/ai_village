@@ -140,7 +140,9 @@ import {
   CooldownCalculator,
   LLMRequestRouter,
   DEFAULT_RATE_LIMITS,
+  MODEL_CONFIGS,
   type LLMRequestPayload,
+  type IntelligenceTier,
 } from '../packages/llm/src/index.js';
 
 // Admin module for unified dashboard
@@ -153,65 +155,107 @@ const gunzip = promisify(zlib.gunzip);
 // LLM QUEUE AND RATE LIMITING INFRASTRUCTURE
 // ============================================================================
 
-// Create LLM providers from environment
+// API keys from environment
 const groqApiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
-const groqModel = process.env.GROQ_MODEL || process.env.VITE_GROQ_MODEL || 'qwen/qwen3-32b';
 const cerebrasApiKey = process.env.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY;
-const cerebrasModel = process.env.CEREBRAS_MODEL || process.env.VITE_CEREBRAS_MODEL || 'qwen-3-32b';
 
 const llmProvidersConfigured: string[] = [];
+const llmModelsConfigured: { model: string; provider: string; tier: IntelligenceTier; rpm: number }[] = [];
 
 let llmRouter: LLMRequestRouter | null = null;
 
 if (groqApiKey || cerebrasApiKey) {
-  // Create provider instances
-  const groqProvider = groqApiKey
-    ? new OpenAICompatProvider(
-        groqModel,
-        'https://api.groq.com/openai/v1',
-        groqApiKey
-      )
-    : null;
-
-  const cerebrasProvider = cerebrasApiKey
-    ? new OpenAICompatProvider(
-        cerebrasModel,
-        'https://api.cerebras.ai/v1',
-        cerebrasApiKey
-      )
-    : null;
-
-  // Build provider pool configuration
+  // Build provider pool configuration - one queue per MODEL to maximize bandwidth
+  // Rate limits are per-model, so using multiple models = more total capacity
   const poolConfig: any = {};
 
-  if (groqProvider) {
-    poolConfig.groq = {
-      provider: groqProvider,
-      maxConcurrent: 50, // 1000 RPM = ~17 RPS; with ~1-2s latency need 50 concurrent to saturate
-      fallbackChain: cerebrasProvider ? ['cerebras'] : [],
+  // Provider base URLs
+  const providerUrls: Record<string, string> = {
+    groq: 'https://api.groq.com/openai/v1',
+    cerebras: 'https://api.cerebras.ai/v1',
+  };
+
+  // Provider API keys
+  const providerKeys: Record<string, string | undefined> = {
+    groq: groqApiKey,
+    cerebras: cerebrasApiKey,
+  };
+
+  // Create a queue for each configured model
+  for (const modelConfig of MODEL_CONFIGS) {
+    const apiKey = providerKeys[modelConfig.provider];
+    const baseUrl = providerUrls[modelConfig.provider];
+
+    // Skip if provider not configured or no API key
+    if (!apiKey || !baseUrl) continue;
+
+    // Skip local models (ollama) in server mode
+    if (modelConfig.provider === 'ollama') continue;
+
+    // Create provider for this model
+    const provider = new OpenAICompatProvider(modelConfig.id, baseUrl, apiKey);
+
+    // Calculate concurrent slots based on RPM
+    // RPM / 60 = RPS, * 3 seconds latency buffer = concurrent slots
+    const maxConcurrent = Math.max(3, Math.ceil((modelConfig.rpm / 60) * 3));
+
+    // Queue name uses model ID (normalized)
+    const queueName = modelConfig.id.replace(/\//g, '_');
+
+    // Build fallback chain: same tier models on other providers
+    const fallbackChain: string[] = MODEL_CONFIGS
+      .filter(m =>
+        m.tier === modelConfig.tier &&
+        m.id !== modelConfig.id &&
+        providerKeys[m.provider] &&
+        m.provider !== 'ollama'
+      )
+      .map(m => m.id.replace(/\//g, '_'));
+
+    poolConfig[queueName] = {
+      provider,
+      maxConcurrent,
+      fallbackChain,
     };
-    llmProvidersConfigured.push('groq');
+
+    llmModelsConfigured.push({
+      model: modelConfig.id,
+      provider: modelConfig.provider,
+      tier: modelConfig.tier,
+      rpm: modelConfig.rpm,
+    });
+
+    if (!llmProvidersConfigured.includes(modelConfig.provider)) {
+      llmProvidersConfigured.push(modelConfig.provider);
+    }
   }
 
-  if (cerebrasProvider) {
-    poolConfig.cerebras = {
-      provider: cerebrasProvider,
-      maxConcurrent: 5, // 30 RPM = 0.5 RPS; 5 concurrent is plenty (fallback from Groq)
-      fallbackChain: groqProvider ? ['groq'] : [],
-    };
-    llmProvidersConfigured.push('cerebras');
+  if (Object.keys(poolConfig).length > 0) {
+    // Create queue infrastructure
+    const poolManager = new ProviderPoolManager(poolConfig);
+    const sessionManager = new GameSessionManager();
+    const cooldownCalculator = new CooldownCalculator(sessionManager, DEFAULT_RATE_LIMITS);
+
+    // Create router
+    llmRouter = new LLMRequestRouter(poolManager, sessionManager, cooldownCalculator);
+
+    // Calculate total capacity
+    const totalRPM = llmModelsConfigured.reduce((sum, m) => sum + m.rpm, 0);
+    const defaultRPM = llmModelsConfigured.filter(m => m.tier === 'default').reduce((sum, m) => sum + m.rpm, 0);
+    const highRPM = llmModelsConfigured.filter(m => m.tier === 'high').reduce((sum, m) => sum + m.rpm, 0);
+
+    console.log(`[LLM Queue] Initialized with providers: ${llmProvidersConfigured.join(', ')}`);
+    console.log(`[LLM Queue] Models configured: ${llmModelsConfigured.length}`);
+    console.log(`[LLM Queue] Total capacity: ${totalRPM} RPM (default: ${defaultRPM}, high: ${highRPM})`);
+    console.log('[LLM Queue] Multi-game fair-share rate limiting active');
+
+    // Log each model
+    for (const m of llmModelsConfigured) {
+      console.log(`  - ${m.model} (${m.provider}, ${m.tier}): ${m.rpm} RPM`);
+    }
+  } else {
+    console.warn('[LLM Queue] No models configured despite having API keys');
   }
-
-  // Create queue infrastructure
-  const poolManager = new ProviderPoolManager(poolConfig);
-  const sessionManager = new GameSessionManager();
-  const cooldownCalculator = new CooldownCalculator(sessionManager, DEFAULT_RATE_LIMITS);
-
-  // Create router
-  llmRouter = new LLMRequestRouter(poolManager, sessionManager, cooldownCalculator);
-
-  console.log(`[LLM Queue] Initialized with providers: ${llmProvidersConfigured.join(', ')}`);
-  console.log('[LLM Queue] Multi-game fair-share rate limiting active');
 } else {
   console.warn('[LLM Queue] No LLM providers configured. Set GROQ_API_KEY or CEREBRAS_API_KEY environment variables.');
 }

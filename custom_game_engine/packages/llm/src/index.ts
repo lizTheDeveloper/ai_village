@@ -189,6 +189,7 @@ export * from './Semaphore';
 export * from './RateLimiter';
 export * from './CooldownCalculator';
 export * from './CostTracker';
+export * from './ModelTiers';
 
 // ============================================================================
 // Performance & Caching

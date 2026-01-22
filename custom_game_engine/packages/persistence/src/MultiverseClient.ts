@@ -316,7 +316,7 @@ export class MultiverseClient {
    * Download a snapshot from the server
    */
   async downloadSnapshot(universeId: string, tick: number): Promise<SaveFile | null> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}/snapshot/${tick}`);
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/snapshot/${tick}`);
 
     if (response.status === 404) {
       return null;
@@ -338,7 +338,7 @@ export class MultiverseClient {
     snapshot: SaveFile;
     entry: SnapshotEntry;
   } | null> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}/snapshot/latest`);
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/snapshot/latest`);
 
     if (response.status === 404) {
       return null;
@@ -356,7 +356,7 @@ export class MultiverseClient {
    * List all snapshots for a universe
    */
   async listSnapshots(universeId: string): Promise<SnapshotEntry[]> {
-    const response = await fetch(`${this.baseUrl}/universe/${universeId}/snapshots`);
+    const response = await fetch(`${this.baseUrl}/multiverse/universe/${universeId}/snapshots`);
 
     if (!response.ok) {
       const error = await response.json();
