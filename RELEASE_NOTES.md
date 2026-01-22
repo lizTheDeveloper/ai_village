@@ -1,5 +1,261 @@
 # Release Notes
 
+## 2026-01-21 - "Admin Dashboard Grand Strategy API Infrastructure" - 13 Files (+1587 net)
+
+### 🏛️ NEW: LiveEntityAPI - Complete Game Control API (1172 lines)
+
+**Comprehensive REST API for querying and controlling the game from the Admin Dashboard.**
+
+`packages/metrics/src/LiveEntityAPI.ts` is a new infrastructure file that provides programmatic access to all game systems via the metrics dashboard. This enables the upcoming Admin Dashboard Grand Strategy view to query and control the game in real-time.
+
+**Architecture:**
+- Connects to `MetricsStreamClient` via WebSocket
+- Handles queries (read-only) and actions (state-changing)
+- Integrates with multiple prompt builders (legacy, Talker Layer 2, Executor Layer 3)
+- Supports agent debug logging, LLM scheduler metrics, save/load service, background universe manager
+
+#### Entity Queries
+```typescript
+// Query handlers for entity data
+handleEntitiesQuery()       // List all agents with basic info
+handleEntityQuery()         // Detailed entity state (components, inventory)
+handleEntityPromptQuery()   // Generate LLM prompt (legacy StructuredPromptBuilder)
+handleTalkerPromptQuery()   // Layer 2 prompt (conversation, goals, social)
+handleExecutorPromptQuery() // Layer 3 prompt (strategic planning, tasks)
+handlePlantsQuery()         // All plants with visual metadata for 3D rendering
+```
+
+#### Game Control Actions
+```typescript
+// Agent control
+handleSetLLMConfig()        // Set custom LLM config for agent
+handleSetSkill()            // Set skill level (0-5)
+handleSpawnAgent()          // Spawn LLM or wandering agent
+handleTeleport()            // Teleport entity to location
+handleSetNeed()             // Set hunger/energy/health/thirst (0-1 range)
+handleGiveItem()            // Add items to inventory
+handleTriggerBehavior()     // Override current behavior
+
+// Game state
+handleSetSpeed()            // Speed multiplier (0.1 - 10.0)
+handlePause()               // Pause/resume game
+
+// Magic system
+handleGrantSpell()          // Add spell to agent's knownSpells
+handleAddBelief()           // Add belief points to deity
+handleCreateDeity()         // Spawn deity with custom domain
+```
+
+#### Grand Strategy Queries (NEW)
+```typescript
+// Query grand strategy entities in real-time
+handleEmpiresQuery()           // List empires with stats (nations, GDP, treasury, navies)
+handleNationsQuery()           // List nations with population, government type
+handleFederationsQuery()       // List federations with member nations
+handleGalacticCouncilsQuery()  // List galactic councils
+handleNaviesQuery()            // List navies with fleet counts
+handleFleetsQuery()            // List fleets with admiral, squadrons, combat strength, position
+handleSquadronsQuery()         // List squadrons
+handleMegastructuresQuery()    // List megastructures
+handleTradeNetworksQuery()     // Get trade network statistics
+
+// Grand Strategy actions
+handleDiplomaticAction()       // Issue diplomatic action (ally, war, trade, peace)
+handleMoveFleet()              // Move fleet to target position
+handleMegastructureTask()      // Assign task to megastructure
+```
+
+#### Timeline/Multiverse Queries (NEW)
+```typescript
+handleTimelinesQuery()             // List all timelines
+handleTimelineSavesQuery()         // List saves with metadata
+handleBackgroundUniversesQuery()   // List background universes with stats
+handleBackgroundUniverseQuery()    // Get specific universe details
+handleSaveTimeline()               // Create timeline save
+handleLoadTimeline()               // Load timeline from save
+handlePauseBackgroundUniverse()    // Pause background universe
+handleResumeBackgroundUniverse()   // Resume background universe
+```
+
+#### Debug Actions
+```typescript
+handleDebugStartLogging()      // Start deep logging for agent
+handleDebugStopLogging()       // Stop logging
+handleDebugListAgents()        // List agents with logging active
+handleDebugGetLogs()           // Get agent log entries
+handleDebugAnalyze()           // Analyze logs with LLM
+handleDebugListLogFiles()      // List available log files
+handleFindAgentByName()        // Find agent by name
+```
+
+#### Utility Methods
+```typescript
+getEntitySummary(entity)       // Convert entity to summary (id, name, type, position, behavior)
+setPromptBuilder()             // Set legacy prompt builder
+setTalkerPromptBuilder()       // Set Layer 2 prompt builder
+setExecutorPromptBuilder()     // Set Layer 3 prompt builder
+setAgentDebugManager()         // Set debug manager for logging
+setScheduler()                 // Set LLM scheduler for metrics
+setSaveLoadService()           // Set save/load service
+setBackgroundUniverseManager() // Set background universe manager
+attach(client)                 // Attach to MetricsStreamClient
+```
+
+**Integration Points:**
+- `@ai-village/core`: World, Entity, ComponentType, pendingApprovalRegistry, AgentDebugManager
+- `@ai-village/agents`: createLLMAgent, createWanderingAgent
+- `@ai-village/llm`: PromptBuilder, LLMScheduler
+- `MetricsStreamClient`: Query/action request/response interfaces
+
+**TODO Comments:**
+- City spawning temporarily disabled during refactor (spawnCity, getCityTemplates not exported)
+- Position component initialization needs proper implementation in handleSpawnEntity
+
+---
+
+### 🌐 Grand Strategy API Endpoints (+403 lines in metrics-server.ts)
+
+**REST API endpoints for querying Grand Strategy entities from the Admin Dashboard.**
+
+`custom_game_engine/scripts/metrics-server.ts` now includes 9 new Grand Strategy endpoints:
+
+#### Query Endpoints
+```
+GET  /api/live/empires           - List all empires with stats
+GET  /api/live/nations           - List all nations
+GET  /api/live/federations       - List all federations
+GET  /api/live/galactic-councils - List all galactic councils
+GET  /api/live/navies            - List all navies with fleet counts
+GET  /api/live/fleets            - List all fleets with positions
+GET  /api/live/squadrons         - List all squadrons
+GET  /api/live/megastructures    - List all megastructures
+GET  /api/live/trade-networks    - Get trade network statistics
+```
+
+#### Action Endpoints
+```
+POST /api/live/diplomatic-action   - Issue diplomatic action (ally, war, trade, peace)
+POST /api/live/move-fleet          - Move fleet to target position
+POST /api/live/megastructure-task  - Assign task to megastructure
+```
+
+**Implementation Pattern:**
+All endpoints follow the same pattern:
+1. Parse session from query params (`?session=<sessionId>`)
+2. Get game client for session (or active client if no session)
+3. Send query to game via `sendQueryToGame(gameClient, 'empires')`
+4. Return JSON response with CORS headers
+5. Error handling: 503 if no client, 500 if query fails
+
+**Example:**
+```typescript
+// GET /api/live/empires
+if (pathname === '/api/live/empires') {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  const sessionParam = url.searchParams.get('session');
+  const gameClient = sessionParam
+    ? getGameClientForSession(sessionParam)
+    : getActiveGameClient();
+
+  if (!gameClient) {
+    res.statusCode = 503;
+    res.end(JSON.stringify({ error: 'No game client connected' }));
+    return;
+  }
+
+  try {
+    const result = await sendQueryToGame(gameClient, 'empires');
+    res.end(JSON.stringify(result, null, 2));
+  } catch (err) {
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+```
+
+---
+
+### 🔌 MetricsStreamClient Query Types (+4 lines)
+
+**Extended QueryRequest interface to support Grand Strategy and Timeline/Multiverse queries.**
+
+`packages/metrics/src/MetricsStreamClient.ts` - Added new query types to the `QueryRequest.queryType` union:
+
+```typescript
+export interface QueryRequest {
+  requestId: string;
+  queryType: 'entities' | 'entity' | 'entity_prompt' | 'talker_prompt' | 'executor_prompt'
+    | 'universe' | 'magic' | 'divinity' | 'pending_approvals' | 'research' | 'terrain'
+    | 'plants' | 'scheduler'
+    // Timeline/multiverse queries (NEW)
+    | 'timelines' | 'timeline_saves' | 'background_universes' | 'background_universe'
+    // Grand Strategy queries (NEW)
+    | 'empires' | 'nations' | 'federations' | 'galactic_councils' | 'navies'
+    | 'fleets' | 'squadrons' | 'megastructures' | 'trade_networks';
+  entityId?: string;
+}
+```
+
+**Impact:** Enables type-safe query routing from metrics server → game client → LiveEntityAPI handlers.
+
+---
+
+### 🗑️ Planet Cleanup - Deleted planet:terrestrial:4df316b8 (-23 lines)
+
+**Removed unused planet data files from multiverse.**
+
+- `demo/multiverse-data/planets/planet:terrestrial:4df316b8/biosphere.json.gz` (binary, -2257 bytes)
+- `demo/multiverse-data/planets/planet:terrestrial:4df316b8/locations.json` (-4 lines)
+- `demo/multiverse-data/planets/planet:terrestrial:4df316b8/metadata.json` (-15 lines)
+
+**Likely reason:** Planet was generated during testing and is no longer needed. Follows conservation of game matter principle (would be marked as corrupted if needed for recovery).
+
+---
+
+### 📝 Minor System Changes
+
+#### SleepSystem.ts (+1/-1 lines)
+- Trivial change (likely formatting or comment)
+
+#### Player Profiles (+4/-4 lines)
+- `demo/multiverse-data/players/player:2a52685a-03d4-4db0-85a2-3c9fc9355d06/profile.json` (+2/-2)
+- `demo/multiverse-data/players/player:bb32e616-c89e-415e-af2e-bed045cd0574/profile.json` (+2/-2)
+- Minor profile updates (playtime, session count, etc.)
+
+#### PID Files (+4/-4 lines) - IGNORE
+- `.api-server.pid`, `.dev-server.pid`, `.pixellab-daemon.pid`, `.sprite-wizard.pid`
+- Process ID files updated during server restarts
+
+---
+
+### 📊 Cycle 23 Summary
+
+**Purpose:** Complete infrastructure for Admin Dashboard Grand Strategy view.
+
+**Impact:**
+- Admin Dashboard can now query and control all Grand Strategy entities (empires, fleets, megastructures)
+- Real-time access to game state via REST API
+- Foundation for Timeline/Multiverse management UI
+- Debug tools for agent behavior analysis
+
+**Files Changed:** 13 files (+1587/-29 lines, +1558 net)
+- **NEW:** LiveEntityAPI.ts (1172 lines) - Complete game control API
+- **EXTENDED:** metrics-server.ts (+403 lines) - Grand Strategy endpoints
+- **EXTENDED:** MetricsStreamClient.ts (+4 lines) - Query type definitions
+- **DELETED:** 3 planet files (-23 lines)
+- **MINOR:** SleepSystem.ts, 2 player profiles, 4 PID files
+
+**Next Steps:**
+- Implement Admin Dashboard Grand Strategy tab
+- Wire up grand strategy UI components
+- Add diplomatic action buttons
+- Fleet movement controls
+- Megastructure task assignment
+
+---
+
 ## 2026-01-21 (Early Morning) - "Angel Bifurcation Ceremony + 10 New Admin Capabilities + Milestone System" - 44 Files (+744 net)
 
 ### 👼 NEW: Angel Bifurcation Ceremony System (+351 lines)

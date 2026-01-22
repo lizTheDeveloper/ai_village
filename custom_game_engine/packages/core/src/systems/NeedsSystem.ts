@@ -10,7 +10,7 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 
 /**
  * NeedsSystem - Manages agent physical needs (hunger, energy, thirst)

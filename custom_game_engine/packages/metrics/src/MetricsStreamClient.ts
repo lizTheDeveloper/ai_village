@@ -12,7 +12,11 @@ import type { StoredMetric } from './MetricsStorage.js';
  */
 export interface QueryRequest {
   requestId: string;
-  queryType: 'entities' | 'entity' | 'entity_prompt' | 'talker_prompt' | 'executor_prompt' | 'universe' | 'magic' | 'divinity' | 'pending_approvals' | 'research' | 'terrain' | 'plants' | 'scheduler';
+  queryType: 'entities' | 'entity' | 'entity_prompt' | 'talker_prompt' | 'executor_prompt' | 'universe' | 'magic' | 'divinity' | 'pending_approvals' | 'research' | 'terrain' | 'plants' | 'scheduler'
+    // Timeline/multiverse queries
+    | 'timelines' | 'timeline_saves' | 'background_universes' | 'background_universe'
+    // Grand Strategy queries
+    | 'empires' | 'nations' | 'federations' | 'galactic_councils' | 'navies' | 'fleets' | 'squadrons' | 'megastructures' | 'trade_networks';
   entityId?: string;
 }
 

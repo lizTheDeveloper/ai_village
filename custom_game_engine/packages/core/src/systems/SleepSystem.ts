@@ -13,7 +13,7 @@ import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getAgent, getNeeds, getCircadian, getEpisodicMemory, getBuilding } from '../utils/componentHelpers.js';
 import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
 import { getHarmonyRestModifier } from '../components/BuildingHarmonyComponent.js';
-import type { StateMutatorSystem } from './StateMutatorSystem.js';
+import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 
 /**
  * Weird/surreal elements that can appear in dreams

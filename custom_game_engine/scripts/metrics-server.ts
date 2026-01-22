@@ -79,6 +79,20 @@
  *   GET  /api/game/scheduler   - Get LLM scheduler metrics (layer selection, cooldowns, success/failure)
  *   GET  /api/game/conversation?id=<id> - Get conversation history for an agent
  *
+ * Grand Strategy API - /api/game/* (queries grand strategy entities in real-time):
+ *   GET  /api/game/empires           - List all empires with stats
+ *   GET  /api/game/nations           - List all nations
+ *   GET  /api/game/federations       - List all federations
+ *   GET  /api/game/galactic-councils - List all galactic councils
+ *   GET  /api/game/navies            - List all navies with fleet counts
+ *   GET  /api/game/fleets            - List all fleets with positions
+ *   GET  /api/game/squadrons         - List all squadrons
+ *   GET  /api/game/megastructures    - List all megastructures
+ *   GET  /api/game/trade-networks    - Get trade network statistics
+ *   POST /api/game/diplomatic-action - Issue diplomatic action (ally, war, trade, peace)
+ *   POST /api/game/move-fleet        - Move fleet to target position
+ *   POST /api/game/megastructure-task - Assign task to megastructure
+ *
  * LLM Queue API - /api/llm/* (server-side LLM with queuing and multi-game fair-share rate limiting):
  *   POST /api/llm/generate     - Generate LLM response (queued, rate-limited, fallback support)
  *   POST /api/llm/heartbeat    - Heartbeat to keep game session active (for cooldown tracking)
@@ -5527,6 +5541,395 @@ Available agents:
       res.statusCode = 500;
       res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
     }
+    return;
+  }
+
+  // === Grand Strategy API Endpoints ===
+  // These query grand strategy entities (empires, fleets, etc.) in real-time
+
+  // GET /api/live/empires - List all empires
+  if (pathname === '/api/live/empires') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'empires');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/nations - List all nations
+  if (pathname === '/api/live/nations') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'nations');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/federations - List all federations
+  if (pathname === '/api/live/federations') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'federations');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/galactic-councils - List all galactic councils
+  if (pathname === '/api/live/galactic-councils') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'galactic_councils');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/navies - List all navies
+  if (pathname === '/api/live/navies') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'navies');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/fleets - List all fleets
+  if (pathname === '/api/live/fleets') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'fleets');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/squadrons - List all squadrons
+  if (pathname === '/api/live/squadrons') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'squadrons');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/megastructures - List all megastructures
+  if (pathname === '/api/live/megastructures') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'megastructures');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // GET /api/live/trade-networks - Get trade network statistics
+  if (pathname === '/api/live/trade-networks') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'trade_networks');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // === Grand Strategy Action Endpoints ===
+
+  // POST /api/live/diplomatic-action - Issue diplomatic action between empires
+  if (pathname === '/api/live/diplomatic-action' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    // Read POST body
+    const body = await new Promise<string>((resolve) => {
+      let data = '';
+      req.on('data', (chunk: Buffer) => { data += chunk.toString(); });
+      req.on('end', () => resolve(data));
+    });
+
+    try {
+      const params = JSON.parse(body);
+      const result = await sendActionToGame(gameClient, 'diplomatic-action', params);
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid request' }));
+    }
+    return;
+  }
+
+  // POST /api/live/move-fleet - Move a fleet to a target position
+  if (pathname === '/api/live/move-fleet' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    // Read POST body
+    const body = await new Promise<string>((resolve) => {
+      let data = '';
+      req.on('data', (chunk: Buffer) => { data += chunk.toString(); });
+      req.on('end', () => resolve(data));
+    });
+
+    try {
+      const params = JSON.parse(body);
+      const result = await sendActionToGame(gameClient, 'move-fleet', params);
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid request' }));
+    }
+    return;
+  }
+
+  // POST /api/live/megastructure-task - Assign task to a megastructure
+  if (pathname === '/api/live/megastructure-task' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    // Read POST body
+    const body = await new Promise<string>((resolve) => {
+      let data = '';
+      req.on('data', (chunk: Buffer) => { data += chunk.toString(); });
+      req.on('end', () => resolve(data));
+    });
+
+    try {
+      const params = JSON.parse(body);
+      const result = await sendActionToGame(gameClient, 'megastructure-task', params);
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid request' }));
+    }
+    return;
+  }
+
+  // CORS preflight for grand strategy actions
+  if ((pathname === '/api/live/diplomatic-action' ||
+       pathname === '/api/live/move-fleet' ||
+       pathname === '/api/live/megastructure-task') && req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.statusCode = 204;
+    res.end();
     return;
   }
 
