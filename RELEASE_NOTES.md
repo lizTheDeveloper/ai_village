@@ -1,5 +1,49 @@
 # Release Notes
 
+## 2026-01-23 - "Complete World Migration in LLM Tests" - 3 Files (+20, -1)
+
+### 🔧 World Type Unification: LLM Package Completion
+
+**Continuation of Cycle 62/64 migration** - One llm test file missed in initial WorldImpl → World migration.
+
+**File Changed:**
+- `packages/llm/src/__tests__/GoalPromptIntegration.test.ts` (line 3)
+
+**Change:**
+```typescript
+// Before:
+import { WorldImpl, type World } from '../../../core/src/ecs/World';
+
+// After:
+import { World, type World } from '../../../core/src/ecs/World';
+```
+
+**Note:** Import statement now has `World` twice (class + type from same location). Redundant but harmless - TypeScript resolves correctly.
+
+**Migration Status Across Packages:**
+- ✅ **Cycle 62:** Core package (111 test files + 3 benchmarks)
+- ✅ **Cycle 64:** Botany package (2 test files)
+- ✅ **Cycle 74:** LLM package (1 test file)
+- **Total:** 116 files migrated
+
+**Context:** Part of Step 1 of PLAN-circular-deps.md (5-step type cleanup plan from Cycle 60)
+
+**Impact:** World type unification continues progressing across all packages. No functional changes. Backward compatibility maintained via WorldImpl alias.
+
+---
+
+### 🌍 New Planet Data
+
+**1 new planet directory:** `planet:magical:2080024e`
+
+**Files:**
+- `metadata.json` - Planet configuration (magical type, biosphere, chunks)
+- `locations.json` - Saved locations (empty)
+
+**Purpose:** Planet reuse testing data for UniverseConfigScreen
+
+---
+
 ## 2026-01-23 - "Complete World Migration in Botany Tests" - 5 Files (+240, -2)
 
 ### 🔧 World Type Unification: Botany Package Completion
