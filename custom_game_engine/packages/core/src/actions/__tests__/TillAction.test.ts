@@ -3,7 +3,7 @@ import { parseAction, isValidAction } from '../AgentAction.js';
 import type { AgentAction } from '../AgentAction.js';
 import { SoilSystem } from '../../systems/SoilSystem.js';
 import type { Tile, BiomeType } from '../../systems/SoilSystem.js';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import type { World } from '../../ecs/World.js';
 
@@ -22,7 +22,7 @@ describe('Tilling Action', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     soilSystem = new SoilSystem();
   });
 

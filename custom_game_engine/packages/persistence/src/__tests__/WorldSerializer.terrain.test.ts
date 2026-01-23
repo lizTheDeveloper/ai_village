@@ -10,14 +10,14 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldSerializer } from '../WorldSerializer.js';
-import { WorldImpl } from '@ai-village/core';
+import { World } from '@ai-village/core';
 import { EventBusImpl } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import { ChunkManager } from '@ai-village/world';
 import type { UniverseSnapshot } from '../types.js';
 
 // Helper: Create test world with ChunkManager
-function createTestWorld(): WorldImpl {
+function createTestWorld(): World {
   const eventBus = new EventBusImpl();
   const chunkManager = new ChunkManager(2); // loadRadius = 2
   const world = new WorldImpl(eventBus, chunkManager);

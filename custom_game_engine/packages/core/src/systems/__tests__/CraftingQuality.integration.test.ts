@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { CraftingSystem } from '../../crafting/CraftingSystem.js';
@@ -10,7 +10,7 @@ import type { Recipe } from '../../crafting/Recipe.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 describe('CraftingSystem Quality Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let craftingSystem: CraftingSystem;
   let agent: EntityImpl;
@@ -18,7 +18,7 @@ describe('CraftingSystem Quality Integration', () => {
   beforeEach(() => {
     // Create real world with EventBus
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create real crafting system
     craftingSystem = new CraftingSystem();

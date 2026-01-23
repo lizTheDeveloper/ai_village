@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import {
@@ -19,14 +19,14 @@ import {
  */
 
 describe('SpatialMemory Filtering Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let agent: EntityImpl;
   let memoryComponent: SpatialMemoryComponent;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create an agent with spatial memory
     agent = new EntityImpl(createEntityId(), 0);

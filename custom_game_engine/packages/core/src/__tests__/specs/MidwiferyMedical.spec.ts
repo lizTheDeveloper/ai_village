@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 
 /**
@@ -20,10 +20,10 @@ import type { Entity } from '../../ecs/Entity';
  */
 
 describe('Midwifery & Medical System', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   // ============================================================================

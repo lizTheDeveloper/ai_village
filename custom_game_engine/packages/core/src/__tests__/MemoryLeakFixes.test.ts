@@ -21,7 +21,7 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
   let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     eventBus = new EventBusImpl();
     metricsCollector = new MetricsCollector(world);
   });
@@ -162,7 +162,7 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
 
   describe('Criterion 3: Event History Pruned', () => {
     it('should prune events older than 5000 ticks when GameLoop runs 1000+ ticks', () => {
-      const world = new WorldImpl();
+      const world = new World();
       const gameLoop = new GameLoop(world, eventBus);
 
       // Emit events at various ticks
@@ -191,7 +191,7 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
     });
 
     it('should call pruneHistory() every 1000 ticks', () => {
-      const world = new WorldImpl();
+      const world = new World();
       const gameLoop = new GameLoop(world, eventBus);
 
       const pruneHistorySpy = vi.spyOn(eventBus, 'pruneHistory');
@@ -205,7 +205,7 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
     });
 
     it('should not accumulate unbounded event history during long sessions', () => {
-      const world = new WorldImpl();
+      const world = new World();
       const gameLoop = new GameLoop(world, eventBus);
 
       // Simulate a very long session with many events
@@ -289,7 +289,7 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
 
   describe('Integration: Memory Growth Stress Test', () => {
     it('should not grow memory unbounded during 10,000+ tick session', () => {
-      const world = new WorldImpl();
+      const world = new World();
       const gameLoop = new GameLoop(world, eventBus);
 
       // Simulate intensive gameplay
@@ -325,7 +325,7 @@ describe.skip('Memory Leak Fixes (PENDING IMPLEMENTATION)', () => {
     it('should maintain stable memory after multiple start/stop cycles', () => {
       // Simulate multiple game sessions
       for (let session = 0; session < 5; session++) {
-        const world = new WorldImpl();
+        const world = new World();
         const gameLoop = new GameLoop(world, eventBus);
 
         // Play for a while

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SoilSystem } from '../SoilSystem.js';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 
@@ -16,7 +16,7 @@ describe('SoilSystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    new WorldImpl(eventBus);
+    new World(eventBus);
     soilSystem = new SoilSystem();
   });
 
@@ -38,7 +38,7 @@ describe('SoilSystem', () => {
 
   describe('Moisture Decay', () => {
     it('should decrease moisture by base decay per day', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 50,
@@ -61,7 +61,7 @@ describe('SoilSystem', () => {
     });
 
     it('should modify decay based on temperature (hot = +50%)', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 50,
@@ -84,7 +84,7 @@ describe('SoilSystem', () => {
     });
 
     it('should modify decay based on temperature (cold = -50%)', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 50,
@@ -107,7 +107,7 @@ describe('SoilSystem', () => {
     });
 
     it('should modify decay based on season (summer = +25%)', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       // Set the world to summer season (index 1)
       // Season cycle: spring (0), summer (1), autumn (2), winter (3)
       // Days: 0-27 = spring, 28-55 = summer, 56-83 = autumn, 84-111 = winter
@@ -139,7 +139,7 @@ describe('SoilSystem', () => {
     });
 
     it('should modify decay based on season (winter = -50%)', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       // Set the world to winter season (index 3)
       // Days: 84-111 = winter
       // Day 84 = 84 * 28,800 = 2,419,200 ticks
@@ -169,7 +169,7 @@ describe('SoilSystem', () => {
     });
 
     it('should not decay moisture below 0', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 5,
@@ -194,7 +194,7 @@ describe('SoilSystem', () => {
 
   describe('Soil Depletion Tracking', () => {
     it('should track fertility level', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 50,
@@ -219,7 +219,7 @@ describe('SoilSystem', () => {
     });
 
     it('should track plantability counter (0-3)', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 50,
@@ -252,7 +252,7 @@ describe('SoilSystem', () => {
     });
 
     it('should require re-tilling when plantability reaches 0', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 50,
@@ -430,7 +430,7 @@ describe('SoilSystem', () => {
 
   describe('Rain Moisture Updates', () => {
     it('should increase moisture on all outdoor tiles when it rains', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile = {
         terrain: 'dirt',
         moisture: 30,
@@ -458,7 +458,7 @@ describe('SoilSystem', () => {
     });
 
     it('should scale moisture increase by rain intensity', () => {
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const tile1 = {
         terrain: 'dirt',
         moisture: 30,

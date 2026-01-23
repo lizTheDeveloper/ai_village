@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:3676ac71",
+  "name": "Titan IX",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155308117",
+  "createdAt": 1769155308127,
+  "lastAccessedAt": 1769155308127,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155308117",
+    "type": "magical"
+  }
+}

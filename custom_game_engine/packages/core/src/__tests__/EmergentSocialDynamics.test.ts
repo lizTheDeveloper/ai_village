@@ -7,7 +7,7 @@
  */
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { RelationshipConversationSystem } from '../systems/RelationshipConversationSystem.js';
@@ -18,13 +18,13 @@ import { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Phase 6: Emergent Social Dynamics', () => {
-  let world: WorldImpl;
+  let world: World;
   let agent1: EntityImpl;
   let agent2: EntityImpl;
 
   beforeEach(async () => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create two test agents
     agent1 = world.createEntity() as EntityImpl;

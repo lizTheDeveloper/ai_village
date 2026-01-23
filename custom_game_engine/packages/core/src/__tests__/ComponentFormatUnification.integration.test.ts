@@ -14,18 +14,18 @@ import { ComponentType } from '../types/ComponentType.js';
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { NeedsComponent, isHungry, isTired } from '../components/NeedsComponent.js';
 import { PersonalityComponent } from '../components/PersonalityComponent.js';
 
 describe('Component Format Unification - Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let entity: EntityImpl;
 
   beforeEach(() => {
     // Create a minimal world for testing
-    world = new WorldImpl({
+    world = new World({
       gameTime: { tick: 0, hour: 6, dayOfYear: 1, season: 'spring' as const, year: 1 },
       eventBus: {
         on: () => () => {},
@@ -248,7 +248,7 @@ describe('Component Format Unification - Integration Tests', () => {
       entity2.addComponent(new NeedsComponent());
       // entity3 has no needs
 
-      // Note: WorldImpl doesn't have getEntities() - this test verifies system integration
+      // Note: World doesn't have getEntities() - this test verifies system integration
       // In actual implementation, systems would query entities differently
       const entities = [entity1, entity2, entity3];
       const entitiesWithNeeds = entities.filter(e =>

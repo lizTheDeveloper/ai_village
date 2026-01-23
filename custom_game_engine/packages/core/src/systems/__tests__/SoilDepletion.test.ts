@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SoilSystem } from '../SoilSystem.js';
 
@@ -16,12 +16,12 @@ import { SoilSystem } from '../SoilSystem.js';
  *   - If counter reaches 0, require re-tilling
  */
 describe('Soil Depletion', () => {
-  let _world: WorldImpl;
+  let _world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    _world = new WorldImpl(eventBus);
+    _world = new World(eventBus);
   });
 
   describe('Harvest Depletion', () => {

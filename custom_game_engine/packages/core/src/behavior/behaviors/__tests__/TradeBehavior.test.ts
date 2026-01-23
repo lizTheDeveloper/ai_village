@@ -4,7 +4,7 @@ import { ComponentType } from '../../../types/ComponentType.js';
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../../ecs/World.js';
+import { World } from '../../../ecs/World.js';
 import { EntityImpl } from '../../../ecs/Entity.js';
 import { EventBusImpl } from '../../../events/EventBus.js';
 import { TradeBehavior } from '../TradeBehavior.js';
@@ -15,14 +15,14 @@ import type { InventoryComponent } from '../../../components/InventoryComponent.
 import type { CurrencyComponent } from '../../../components/CurrencyComponent.js';
 
 describe('TradeBehavior', () => {
-  let world: WorldImpl;
+  let world: World;
   let agent: EntityImpl;
   let shop: EntityImpl;
   let behavior: TradeBehavior;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     behavior = new TradeBehavior();
 
     // Create agent entity

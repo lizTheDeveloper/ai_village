@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { PlantSystem } from '@ai-village/botany';
 import { PlantComponent } from '../../components/PlantComponent.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
@@ -21,7 +21,7 @@ import { ComponentType } from '../../types/ComponentType.js';
  * 4. Event handlers can safely access seed.genetics and seed.generation
  */
 describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
-  let world: WorldImpl;
+  let world: World;
   let plantSystem: PlantSystem;
   let eventBus: EventBusImpl;
 
@@ -73,7 +73,7 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     plantSystem = new PlantSystem(eventBus);
 
     plantSystem.setSpeciesLookup((id: string) => {

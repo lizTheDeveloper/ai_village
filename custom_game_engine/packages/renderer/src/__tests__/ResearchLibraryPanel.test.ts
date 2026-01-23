@@ -50,14 +50,14 @@ vi.mock('@ai-village/world', () => ({
 
 describe('ResearchLibraryPanel', () => {
   let panel: ResearchLibraryPanel;
-  let world: WorldImpl;
+  let world: World;
   let worldEntity: EntityImpl;
   let researchState: ResearchStateComponent;
 
   beforeEach(() => {
     // Create world
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create world entity with research state
     worldEntity = new EntityImpl(createEntityId(), 0);
@@ -147,7 +147,7 @@ describe('ResearchLibraryPanel', () => {
 
     it('should show empty state when no papers discovered', () => {
       // Create new world with empty research state
-      const emptyWorld = new WorldImpl(new EventBusImpl());
+      const emptyWorld = new World(new EventBusImpl());
       const emptyWorldEntity = new EntityImpl(createEntityId(), 0);
       const emptyResearchState = createResearchStateComponent();
 

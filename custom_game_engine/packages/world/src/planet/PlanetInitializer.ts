@@ -24,6 +24,9 @@ export interface PlanetInitializationOptions {
   /** Pre-existing biosphere data from server cache (skip LLM generation) */
   existingBiosphere?: any;
 
+  /** Max species to generate in the biosphere. Limits LLM calls. Default: 8 */
+  maxSpecies?: number;
+
   /** Whether to queue sprite generation (default: true) */
   queueSprites?: boolean;
 
@@ -46,6 +49,7 @@ export async function initializePlanet(
     godCraftedSpawner,
     generateBiosphere = true,
     existingBiosphere,
+    maxSpecies = 8,
     queueSprites = true,
     spriteQueuePath,
     onProgress,
@@ -111,7 +115,7 @@ export async function initializePlanet(
     reportProgress(`🌿 Beginning biosphere generation...`);
 
     try {
-      const biosphereGenerator = new BiosphereGenerator(llmProvider, config, onProgress);
+      const biosphereGenerator = new BiosphereGenerator(llmProvider, config, onProgress, { maxSpecies });
       const biosphere = await biosphereGenerator.generateBiosphere();
 
       planet.setBiosphere(biosphere);

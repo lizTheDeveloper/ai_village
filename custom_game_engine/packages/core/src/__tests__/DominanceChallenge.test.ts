@@ -36,7 +36,7 @@ describe('DominanceChallengeSystem', () => {
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new DominanceChallengeSystem();
     system.initialize(world, eventBus);
 

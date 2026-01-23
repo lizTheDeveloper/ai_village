@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ContextActionRegistry } from '../context-menu/ContextActionRegistry';
 import { MenuContext } from '../context-menu/MenuContext';
-import { WorldImpl, EventBusImpl } from '@ai-village/core';
+import { World, EventBusImpl } from '@ai-village/core';
 
 describe('ContextActionRegistry', () => {
   let registry: ContextActionRegistry;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     eventBus = new EventBusImpl();
     registry = new ContextActionRegistry(world, eventBus);
   });

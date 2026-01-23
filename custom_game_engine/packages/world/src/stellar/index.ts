@@ -2,7 +2,6 @@
  * Stellar Phenomena exports
  */
 
-export * from './StellarPhenomena.js';
 export type {
   StellarPhenomenon,
   ResourceSpawn,

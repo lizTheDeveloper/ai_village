@@ -126,24 +126,7 @@ class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> {
     _world: World,
     _context: EffectContext
   ): void {
-    // Protection effects are typically passive and don't tick
-    // However, we could implement shield regeneration or decay here if needed
-
-    // Example: Shield decay over time
-    // const decayRate = 1; // HP per tick
-    // if (activeEffect.appliedValues.shieldRemaining > 0) {
-    //   activeEffect.appliedValues.shieldRemaining = Math.max(
-    //     0,
-    //     activeEffect.appliedValues.shieldRemaining - decayRate
-    //   );
-    // }
-
-    // Example: Shield refresh every N ticks
-    // const refreshInterval = 100; // ticks
-    // const ticksSinceApplied = context.tick - activeEffect.appliedAt;
-    // if (ticksSinceApplied > 0 && ticksSinceApplied % refreshInterval === 0) {
-    //   activeEffect.appliedValues.shieldRemaining = activeEffect.appliedValues.shieldMax;
-    // }
+    // Protection effects are passive - no per-tick logic needed
   }
 
   remove(

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { HuntingSystem } from '../HuntingSystem.js';
@@ -17,7 +17,7 @@ describe('HuntingSystem Integration', () => {
   it('should complete a successful hunt with skilled hunter and passive prey', () => {
     // Create world with real EventBus
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Mock LLM provider
     const mockLLM = vi.fn().mockResolvedValue({
@@ -111,7 +111,7 @@ describe('HuntingSystem Integration', () => {
 
   it('should track hunt through multiple states (tracking -> stalking -> kill/escape)', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = vi.fn().mockResolvedValue({
       narrative: 'The hunt concluded.',
@@ -199,7 +199,7 @@ describe('HuntingSystem Integration', () => {
 
   it('should generate resources on successful hunt', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = vi.fn().mockResolvedValue({
       narrative: 'The hunter brought down the prey and harvested resources.',
@@ -295,7 +295,7 @@ describe('HuntingSystem Integration', () => {
 
   it('should emit hunt events through EventBus', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = vi.fn().mockResolvedValue({
       narrative: 'The hunt was tracked.',
@@ -398,7 +398,7 @@ describe('HuntingSystem Integration', () => {
 
   it('should apply injury to hunter when dangerous prey counterattacks', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = vi.fn().mockResolvedValue({
       narrative: 'The bear fought back fiercely, injuring the hunter.',

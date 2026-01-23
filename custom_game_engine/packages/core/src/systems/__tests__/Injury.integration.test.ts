@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { InjurySystem } from '../InjurySystem.js';
@@ -17,7 +17,7 @@ import { NeedsComponent } from '../../components/NeedsComponent.js';
 describe('InjurySystem Integration', () => {
   it('should apply skill penalties based on injury location', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create agent with arm laceration
     const agent = new EntityImpl(createEntityId(), 0);
@@ -68,7 +68,7 @@ describe('InjurySystem Integration', () => {
 
   it('should apply movement penalties for leg injuries', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({
@@ -114,7 +114,7 @@ describe('InjurySystem Integration', () => {
 
   it('should modify needs based on injuries', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({
@@ -170,7 +170,7 @@ describe('InjurySystem Integration', () => {
 
   it('should prevent memory formation with head injuries', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({
@@ -212,7 +212,7 @@ describe('InjurySystem Integration', () => {
 
   it('should heal injuries over time', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({
@@ -270,7 +270,7 @@ describe('InjurySystem Integration', () => {
 
   it('should require treatment for major/critical injuries', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({
@@ -321,7 +321,7 @@ describe('InjurySystem Integration', () => {
 
   it('should handle multiple injuries with cumulative effects', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({
@@ -397,7 +397,7 @@ describe('InjurySystem Integration', () => {
 
   it('should throw error for invalid injury data', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent({

@@ -20,7 +20,7 @@ import { ComponentType } from '../../types/ComponentType.js';
  * - Inventory integration (ingredient consumption, product creation)
  */
 describe('CraftingSystem', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let system: CraftingSystem;
   let recipeRegistry: RecipeRegistry;
@@ -49,7 +49,7 @@ describe('CraftingSystem', () => {
     ItemInstanceRegistry.reset();
 
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new CraftingSystem();
     recipeRegistry = new RecipeRegistry();
     recipeRegistry.registerRecipe(testRecipe);

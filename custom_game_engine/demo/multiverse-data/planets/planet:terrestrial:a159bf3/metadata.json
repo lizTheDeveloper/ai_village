@@ -1,0 +1,15 @@
+{
+  "id": "planet:terrestrial:a159bf3",
+  "name": "Triton",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1769154801932",
+  "createdAt": 1769154801935,
+  "lastAccessedAt": 1769154801935,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769154801932",
+    "type": "terrestrial"
+  }
+}

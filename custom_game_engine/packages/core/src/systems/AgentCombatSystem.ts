@@ -19,6 +19,7 @@ import {
   COMBAT_DURATION_LETHAL,
 } from '../constants/index.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 interface PositionComponent {
   type: 'position';
@@ -47,13 +48,6 @@ interface ReputationComponent {
   violence: number;
 }
 
-// interface LegalStatusComponent {
-//   type: 'legal_status';
-//   version: number;
-//   crime: string;
-//   wanted: boolean;
-// }
-
 interface LawsComponent {
   type: 'laws';
   version: number;
@@ -68,10 +62,6 @@ interface EnvironmentComponent {
   terrain?: string;
   weather?: string;
   timeOfDay?: string;
-}
-
-interface LLMProvider {
-  generateNarrative(prompt: any): Promise<{ narrative: string; memorable_details?: string[] }>;
 }
 
 /**

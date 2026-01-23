@@ -28,14 +28,14 @@ import { BuildingType } from '../../types/BuildingType.js';
  */
 
 describe('Agent Building Orchestration - Phase 7', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let buildingSystem: BuildingSystem;
   let aiSystem: AgentBrainSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     buildingSystem = new BuildingSystem();
     buildingSystem.initialize(world, eventBus);
 

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:3f7c0499",
+  "name": "Umbriel Secundus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155894876",
+  "createdAt": 1769155894957,
+  "lastAccessedAt": 1769155894957,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155894876",
+    "type": "magical"
+  }
+}

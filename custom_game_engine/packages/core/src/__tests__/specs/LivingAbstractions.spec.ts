@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 
 /**
@@ -15,10 +15,10 @@ import type { Entity } from '../../ecs/Entity';
  * See: architecture/LITERARY_SURREALISM_SPEC.md Section 3
  */
 describe('Living Abstractions System', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   describe('Tangible Emotions', () => {

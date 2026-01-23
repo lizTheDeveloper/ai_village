@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { GovernanceDataSystem } from '../GovernanceDataSystem.js';
@@ -18,7 +18,7 @@ import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 describe('GovernanceDataSystem Integration', () => {
   let eventBus: EventBusImpl;
-  let world: WorldImpl;
+  let world: World;
   let system: GovernanceDataSystem;
 
   // Use tick value that passes throttle check (system has throttleInterval = 100)
@@ -26,7 +26,7 @@ describe('GovernanceDataSystem Integration', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     world.setTick(TEST_TICK); // Set world tick to pass throttle
     system = new GovernanceDataSystem();
     system.initialize(world, eventBus);

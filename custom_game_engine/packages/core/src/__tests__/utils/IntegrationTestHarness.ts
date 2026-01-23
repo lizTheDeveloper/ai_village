@@ -1,4 +1,4 @@
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
@@ -27,7 +27,7 @@ export interface TestConfig {
  * Integration test harness providing utilities for multi-system tests
  */
 export class IntegrationTestHarness {
-  public world: WorldImpl;
+  public world: World;
   public eventBus: EventBusImpl;
   private timeEntity: EntityImpl | null = null;
   private systems: Map<string, System> = new Map();
@@ -35,7 +35,7 @@ export class IntegrationTestHarness {
 
   constructor() {
     this.eventBus = new EventBusImpl();
-    this.world = new WorldImpl(this.eventBus);
+    this.world = new World(this.eventBus);
 
     // Capture all emitted events for assertions
     const originalEmit = this.eventBus.emit.bind(this.eventBus);

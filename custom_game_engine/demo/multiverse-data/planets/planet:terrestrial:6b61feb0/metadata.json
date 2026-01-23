@@ -1,0 +1,15 @@
+{
+  "id": "planet:terrestrial:6b61feb0",
+  "name": "Epsilon Oberon",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1769152152040",
+  "createdAt": 1769152152070,
+  "lastAccessedAt": 1769152152070,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769152152040",
+    "type": "terrestrial"
+  }
+}

@@ -20,6 +20,7 @@
  */
 
 import type { ProfessionRole } from '../components/ProfessionComponent.js';
+import type { LLMDecisionQueue } from '../types/LLMTypes.js';
 
 /**
  * Context for personality generation.
@@ -50,29 +51,22 @@ export interface GeneratedPersonality {
 }
 
 /**
- * LLM queue interface (matches your existing LLMDecisionQueue).
- */
-export interface LLMQueue {
-  requestDecision(agentId: string, prompt: string): Promise<string>;
-}
-
-/**
  * ProfessionPersonalityGenerator - Generates personality content for professions.
  */
 export class ProfessionPersonalityGenerator {
-  private llmQueue: LLMQueue | null = null;
+  private llmQueue: LLMDecisionQueue | null = null;
 
   /** Cache of generated personalities (optional - for reuse) */
   private personalityCache: Map<string, GeneratedPersonality> = new Map();
 
-  constructor(llmQueue?: LLMQueue) {
+  constructor(llmQueue?: LLMDecisionQueue) {
     this.llmQueue = llmQueue ?? null;
   }
 
   /**
    * Set LLM queue (for late initialization).
    */
-  setLLMQueue(llmQueue: LLMQueue): void {
+  setLLMQueue(llmQueue: LLMDecisionQueue): void {
     this.llmQueue = llmQueue;
   }
 

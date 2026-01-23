@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { UniversitySystem } from '../UniversitySystem.js';
@@ -19,14 +19,14 @@ import { BuildingType } from '../../types/BuildingType.js';
 
 describe('University Research Integration', () => {
   let eventBus: EventBusImpl;
-  let world: WorldImpl;
+  let world: World;
   let universitySystem: UniversitySystem;
   let buildingSystem: BuildingSystem;
   let techSystem: TechnologyUnlockSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     universitySystem = new UniversitySystem(eventBus);
     buildingSystem = new BuildingSystem();
     techSystem = new TechnologyUnlockSystem(eventBus);

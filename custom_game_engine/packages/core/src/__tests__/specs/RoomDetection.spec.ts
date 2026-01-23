@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 
 /**
  * Room Detection System Specifications
@@ -11,10 +11,10 @@ import { WorldImpl } from '../../ecs/World';
  * See: VOXEL_BUILDING_SYSTEM_PLAN.md Section 5
  */
 describe('Room Detection System', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   describe('Flood-Fill Room Detection', () => {
@@ -523,7 +523,7 @@ describe('Room Detection System', () => {
   });
 
   // Helper method
-  private createRoom(world: WorldImpl, originX: number, originY: number, materialId: string): any {
+  private createRoom(world: World, originX: number, originY: number, materialId: string): any {
     for (let x = 0; x < 3; x++) {
       world.placeWallTile(originX + x, originY, { materialId, health: 100, progress: 100, constructedAt: 0, orientation: 'north' });
       world.placeWallTile(originX + x, originY + 2, { materialId, health: 100, progress: 100, constructedAt: 0, orientation: 'north' });

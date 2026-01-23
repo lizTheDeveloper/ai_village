@@ -17,7 +17,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { GameLoop } from '../../loop/GameLoop.js';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SystemRegistry } from '../../ecs/SystemRegistry.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
@@ -458,7 +458,7 @@ describe('System Performance Tests', () => {
 /**
  * Create test entities with various components
  */
-function createTestEntities(world: WorldImpl, count: number): void {
+function createTestEntities(world: World, count: number): void {
   for (let i = 0; i < count; i++) {
     const entity = world.createEntity();
 
@@ -484,7 +484,7 @@ function createTestEntities(world: WorldImpl, count: number): void {
 /**
  * Create governor entities for testing governance
  */
-function createGovernorEntities(world: WorldImpl, count: number): void {
+function createGovernorEntities(world: World, count: number): void {
   for (let i = 0; i < count; i++) {
     const entity = world.createEntity();
     entity.addComponent({
@@ -505,7 +505,7 @@ function createGovernorEntities(world: WorldImpl, count: number): void {
 /**
  * Create trade network entities
  */
-function createTradeNetworkEntities(world: WorldImpl, nodeCount: number): void {
+function createTradeNetworkEntities(world: World, nodeCount: number): void {
   const network = world.createEntity();
   network.addComponent({
     type: CT.TradeNetwork,
@@ -530,7 +530,7 @@ function createTradeNetworkEntities(world: WorldImpl, nodeCount: number): void {
 /**
  * Create explorer entities
  */
-function createExplorerEntities(world: WorldImpl, count: number): void {
+function createExplorerEntities(world: World, count: number): void {
   for (let i = 0; i < count; i++) {
     const entity = world.createEntity();
     entity.addComponent({
@@ -550,7 +550,7 @@ function createExplorerEntities(world: WorldImpl, count: number): void {
 /**
  * Create timeline entities for paradox detection
  */
-function createTimelineEntities(world: WorldImpl, count: number): void {
+function createTimelineEntities(world: World, count: number): void {
   for (let i = 0; i < count; i++) {
     const entity = world.createEntity();
     entity.addComponent({
@@ -565,7 +565,7 @@ function createTimelineEntities(world: WorldImpl, count: number): void {
 /**
  * Create warehouse entities
  */
-function createWarehouseEntities(world: WorldImpl, count: number): void {
+function createWarehouseEntities(world: World, count: number): void {
   for (let i = 0; i < count; i++) {
     const entity = world.createEntity();
     entity.addComponent({

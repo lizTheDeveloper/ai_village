@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { CraftingSystem } from '../crafting/CraftingSystem.js';
@@ -23,7 +23,7 @@ import { createBeltComponent, addItemsToBelt } from '../components/BeltComponent
 import type { Recipe } from '../crafting/Recipe.js';
 
 describe('Automation Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let craftingSystem: CraftingSystem;
   let recipeRegistry: RecipeRegistry;
   let itemRegistry: ItemInstanceRegistry;
@@ -56,7 +56,7 @@ describe('Automation Integration Tests', () => {
   beforeEach(() => {
     // Create world and systems
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     craftingSystem = new CraftingSystem();
     recipeRegistry = new RecipeRegistry();

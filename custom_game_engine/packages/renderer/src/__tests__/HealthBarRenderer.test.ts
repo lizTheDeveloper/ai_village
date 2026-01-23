@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, type World } from '@ai-village/core/ecs/World';
+import { World, type World } from '@ai-village/core/ecs/World';
 import type { Entity } from '@ai-village/core/ecs/Entity';
 import { NeedsComponent } from '@ai-village/core/components/NeedsComponent';
 import { HealthBarRenderer } from '../HealthBarRenderer.js';
@@ -43,7 +43,7 @@ describe('HealthBarRenderer', () => {
   let renderer: HealthBarRenderer;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;

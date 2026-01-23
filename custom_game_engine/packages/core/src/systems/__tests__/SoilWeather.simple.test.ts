@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SoilSystem } from '../SoilSystem.js';
 import type { SystemContext } from '../../ecs/SystemContext.js';
@@ -9,13 +9,13 @@ import type { SystemContext } from '../../ecs/SystemContext.js';
  * without requiring full test infrastructure
  */
 describe('SoilSystem Weather Integration (Simple)', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let soilSystem: SoilSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     soilSystem = new SoilSystem();
   });
 

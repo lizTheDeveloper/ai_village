@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:330972d8",
+  "name": "Alpha Triton",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155100840",
+  "createdAt": 1769155100852,
+  "lastAccessedAt": 1769155100852,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155100840",
+    "type": "magical"
+  }
+}

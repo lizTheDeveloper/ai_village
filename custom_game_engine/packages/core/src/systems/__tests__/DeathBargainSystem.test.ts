@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeathBargainSystem } from '../DeathBargainSystem';
 import { EntityImpl } from '../../ecs/Entity';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import { EventBusImpl } from '../../events/EventBus';
 import { ComponentType } from '../../types/ComponentType';
 import { MYTHIC_RIDDLES } from '../../components/DeathBargainComponent';
@@ -16,7 +16,7 @@ describe('DeathBargainSystem', () => {
 
   beforeEach(() => {
     system = new DeathBargainSystem();
-    world = new WorldImpl(new EventBusImpl());
+    world = new World(new EventBusImpl());
 
     // Mock LLM provider
     mockLLM = {

@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { BodySystem } from '../systems/BodySystem.js';
 import {
@@ -44,7 +44,7 @@ import type { EffectContext } from '../magic/SpellEffectExecutor.js';
 import type { Entity } from '../ecs/Entity.js';
 
 describe('Magic + Body Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let bodySystem: BodySystem;
   let eventBus: EventBusImpl;
   let healingApplier: BodyHealingEffectApplier;
@@ -52,7 +52,7 @@ describe('Magic + Body Integration Tests', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     bodySystem = new BodySystem();
     healingApplier = new BodyHealingEffectApplier();
     transformApplier = new BodyTransformEffectApplier();

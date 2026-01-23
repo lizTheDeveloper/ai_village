@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { PowerGridSystem } from '../PowerGridSystem.js';
@@ -17,7 +17,7 @@ describe('PowerGridSystem Integration', () => {
   it('should power consumer when generator produces sufficient power', () => {
     // Create world with EventBus
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create generator with 100 kW output
     const generator = new EntityImpl(createEntityId(), 0);
@@ -44,7 +44,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should NOT power consumer when generator produces insufficient power', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Generator with only 50 kW
     const generator = new EntityImpl(createEntityId(), 0);
@@ -71,7 +71,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should distribute power across multiple consumers correctly', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Generator with 100 kW
     const generator = new EntityImpl(createEntityId(), 0);
@@ -104,7 +104,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should handle power network isolation correctly', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Generator at (0, 0)
     const generator = new EntityImpl(createEntityId(), 0);
@@ -130,7 +130,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should connect generator to consumer via power pole', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Generator at (0, 0)
     const generator = new EntityImpl(createEntityId(), 0);
@@ -174,7 +174,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should separate networks by power type', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Electrical generator
     const electricalGen = new EntityImpl(createEntityId(), 0);
@@ -200,7 +200,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should update power state over multiple ticks', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Generator with 100 kW
     const generator = new EntityImpl(createEntityId(), 0);
@@ -236,7 +236,7 @@ describe('PowerGridSystem Integration', () => {
 
   it('should handle zero consumption consumer gracefully', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const generator = new EntityImpl(createEntityId(), 0);
     generator.addComponent({ type: 'position', version: 1, x: 50, y: 50 });

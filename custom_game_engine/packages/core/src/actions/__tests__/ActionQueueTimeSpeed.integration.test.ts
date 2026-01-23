@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId, type Entity } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { ActionQueue } from '../ActionQueue.js';
@@ -17,7 +17,7 @@ import { createTimeComponent, type TimeComponent } from '../../systems/TimeSyste
  */
 
 describe('ActionQueue Time Speed Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let actionRegistry: ActionRegistry;
   let actionQueue: ActionQueue;
@@ -33,7 +33,7 @@ describe('ActionQueue Time Speed Integration', () => {
   beforeEach(() => {
     // Create real world with EventBus
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create time entity with time component
     timeEntity = new EntityImpl(createEntityId(), 0);

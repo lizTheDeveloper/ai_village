@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CityManager } from '../CityManager.js';
-import { WorldImpl } from '../../ecs/WorldImpl.js';
+import { World } from '../../ecs/WorldImpl.js';
 import { EventBusImpl } from '../../events/EventBusImpl.js';
 
 describe('CityManager', () => {
   let cityManager: CityManager;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('CityManager', () => {
     });
 
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Initialize event subscriptions
     cityManager.initialize(eventBus);

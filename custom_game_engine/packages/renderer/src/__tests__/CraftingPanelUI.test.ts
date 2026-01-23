@@ -3,18 +3,18 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CraftingPanelUI } from '../CraftingPanelUI';
-import { WorldImpl, EventBusImpl } from '@ai-village/core';
+import { World, EventBusImpl } from '@ai-village/core';
 
 describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
   let panel: CraftingPanelUI;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;

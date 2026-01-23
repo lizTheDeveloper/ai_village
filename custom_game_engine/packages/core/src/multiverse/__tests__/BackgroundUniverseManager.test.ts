@@ -10,19 +10,19 @@ import { PlanetFactionAI } from '../PlanetFactionAI.js';
 import { MultiverseCoordinator } from '../MultiverseCoordinator.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { EventBusImpl } from '../../events/EventBus.js';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import type { CulturalTraits } from '../BackgroundUniverseTypes.js';
 
 describe('BackgroundUniverseManager', () => {
   let manager: BackgroundUniverseManager;
   let coordinator: MultiverseCoordinator;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let events: SystemEventManager;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     events = new SystemEventManager(eventBus, 'test_system');
     coordinator = new MultiverseCoordinator();
     manager = new BackgroundUniverseManager(coordinator, world, events);

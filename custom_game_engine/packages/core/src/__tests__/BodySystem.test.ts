@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { BodySystem } from '../systems/BodySystem.js';
 import {
@@ -28,13 +28,13 @@ import {
 } from '../components/BodyComponent.js';
 
 describe('BodySystem - Multi-Species Support', () => {
-  let world: WorldImpl;
+  let world: World;
   let bodySystem: BodySystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     bodySystem = new BodySystem();
   });
 

@@ -4,7 +4,7 @@
  */
 
 import { describe, bench } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { CraftingSystem } from '../crafting/CraftingSystem.js';
@@ -35,7 +35,7 @@ const IRON_GEAR_RECIPE: Recipe = {
 
 function setupWorld() {
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
   const craftingSystem = new CraftingSystem();
   const recipeRegistry = new RecipeRegistry();
   const itemRegistry = ItemInstanceRegistry.getInstance();

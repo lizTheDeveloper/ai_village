@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { MemoryFormationSystem } from '../MemoryFormationSystem.js';
@@ -20,7 +20,7 @@ import { ComponentType } from '../../types/ComponentType.js';
 
 describe('Episodic Memory Integration', () => {
   let eventBus: EventBusImpl;
-  let world: WorldImpl;
+  let world: World;
   let agent: EntityImpl;
   let memoryFormationSystem: MemoryFormationSystem;
   let memoryConsolidationSystem: MemoryConsolidationSystem;
@@ -28,7 +28,7 @@ describe('Episodic Memory Integration', () => {
   beforeEach(() => {
     // Create real world with EventBus
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create agent with episodic memory component
     agent = new EntityImpl(createEntityId(), 0);

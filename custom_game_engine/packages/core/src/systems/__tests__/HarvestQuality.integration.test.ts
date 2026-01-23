@@ -10,7 +10,7 @@ import type { Action } from '../../actions/Action.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 describe('Harvest Quality Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let harvestHandler: HarvestActionHandler;
   let agent: Entity;
   let plant: Entity;
@@ -44,7 +44,7 @@ describe('Harvest Quality Integration', () => {
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     harvestHandler = new HarvestActionHandler();
 
     // Create agent with farming skill

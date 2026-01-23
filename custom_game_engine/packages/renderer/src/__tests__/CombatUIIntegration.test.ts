@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { WorldImpl } from '@ai-village/core/ecs/World';
+import { World } from '@ai-village/core/ecs/World';
 import type { World } from '@ai-village/core/ecs/World';
 import { EventBusImpl } from '@ai-village/core/events/EventBus';
 import type { EventBus } from '@ai-village/core/events/EventBus';
@@ -24,7 +24,7 @@ describe('Combat UI System Integration', () => {
   let stanceControls: StanceControls;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     eventBus = new EventBusImpl();
     canvas = document.createElement('canvas');
     canvas.width = 800;

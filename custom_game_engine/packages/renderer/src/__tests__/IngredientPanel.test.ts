@@ -18,13 +18,13 @@ import { IngredientPanel } from '../IngredientPanel.js';
  */
 
 describe('IngredientPanel - Fake Implementation Cleanup', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   const testRecipeIds: string[] = [];
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
   });
 
   afterEach(() => {

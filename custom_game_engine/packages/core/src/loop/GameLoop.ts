@@ -3,7 +3,7 @@ import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
 import type { IActionQueue } from '../actions/ActionQueue.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EventBusImpl } from '../events/EventBus.js';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { SystemRegistry } from '../ecs/SystemRegistry.js';
 import { ActionRegistry } from '../actions/ActionRegistry.js';
 import { ActionQueue } from '../actions/ActionQueue.js';
@@ -23,7 +23,7 @@ export class GameLoop {
   readonly msPerTick = MS_PER_TICK;
 
   private _state: GameLoopState = 'stopped';
-  private _world: WorldImpl;
+  private _world: World;
   private _systemRegistry: SystemRegistry;
   private _actionRegistry: ActionRegistry;
   private _actionQueue: ActionQueue;
@@ -54,7 +54,7 @@ export class GameLoop {
   constructor() {
     this.eventBus = new EventBusImpl();
     this._systemRegistry = new SystemRegistry();
-    this._world = new WorldImpl(this.eventBus, undefined, this._systemRegistry);
+    this._world = new World(this.eventBus, undefined, this._systemRegistry);
     this._componentRegistry = new ComponentRegistry();
     this._actionRegistry = new ActionRegistry();
     this._actionQueue = new ActionQueue(

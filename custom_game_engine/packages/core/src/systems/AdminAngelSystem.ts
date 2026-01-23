@@ -30,23 +30,17 @@ import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { generateRandomName } from '../utils/nameGenerator.js';
 
 // ============================================================================
-// LLM Queue Interface (matches @ai-village/llm LLMDecisionQueue)
+// LLM Queue Interface (imported from canonical source)
 // ============================================================================
 
-/**
- * Interface for LLM decision queue - allows loose coupling with @ai-village/llm package.
- * The actual LLMDecisionQueue from @ai-village/llm implements this interface.
- */
-export interface LLMQueue {
-  requestDecision(agentId: string, prompt: string, customConfig?: Record<string, unknown>): Promise<string>;
-}
+import type { LLMDecisionQueue, CustomLLMConfig } from '../types/LLMTypes.js';
 
 /**
  * Configuration for AdminAngelSystem
  */
 export interface AdminAngelSystemConfig {
   /** Optional LLM queue for using the shared LLM infrastructure */
-  llmQueue?: LLMQueue;
+  llmQueue?: LLMDecisionQueue;
 }
 
 // LLM Configuration - Uses environment variables or defaults (fallback when no queue provided)
@@ -193,7 +187,7 @@ export class AdminAngelSystem extends BaseSystem {
   private angelEntityId: string | null = null;
   private lastProactiveTick: number = 0;
   private pendingRequests = new Set<string>(); // Track in-flight requests
-  private llmQueue: LLMQueue | null = null; // Shared LLM queue (if provided)
+  private llmQueue: LLMDecisionQueue | null = null; // Shared LLM queue (if provided)
 
   constructor(config?: AdminAngelSystemConfig) {
     super();

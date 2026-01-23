@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SoilSystem, type Tile, type BiomeType } from '../SoilSystem.js';
 import { parseAction, isValidAction } from '../../actions/AgentAction.js';
@@ -14,13 +14,13 @@ import { parseAction, isValidAction } from '../../actions/AgentAction.js';
  * agents/autonomous-dev/work-orders/tilling-action/work-order.md
  */
 describe('Tilling Action', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let soilSystem: SoilSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     soilSystem = new SoilSystem();
   });
 

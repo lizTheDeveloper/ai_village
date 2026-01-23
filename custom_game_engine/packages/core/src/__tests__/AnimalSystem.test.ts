@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { AnimalSystem } from '../systems/AnimalSystem.js';
@@ -7,13 +7,13 @@ import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
 import { ComponentType } from '../types/ComponentType.js';
 describe('Animal System', () => {
-  let world: WorldImpl;
+  let world: World;
   let animalSystem: AnimalSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     animalSystem = new AnimalSystem();
   });

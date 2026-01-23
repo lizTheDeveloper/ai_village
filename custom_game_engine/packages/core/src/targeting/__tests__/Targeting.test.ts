@@ -7,7 +7,7 @@ import { BuildingType } from '../../types/BuildingType.js';
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { VisionComponent } from '../../components/VisionComponent.js';
@@ -21,10 +21,10 @@ import { AgentTargeting, findNearestAgent, findConversationPartner } from '../Ag
 import { ThreatTargeting, assessThreats, findNearestThreat } from '../ThreatTargeting.js';
 
 describe('Targeting Module', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   /**

@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 
 import { ComponentType } from '../types/ComponentType.js';
 describe('Animal Component and Entity', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
   });
 
   describe('Acceptance Criterion 1: Animal Component and Entity', () => {

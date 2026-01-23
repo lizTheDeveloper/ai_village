@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { createBuildingComponent, type BuildingComponent } from '../components/BuildingComponent.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
@@ -7,12 +7,12 @@ import { AnimalComponent } from '../components/AnimalComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { BuildingType } from '../types/BuildingType.js';
 describe('Animal Housing - Cleanliness System', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
   });
 
   describe('Acceptance Criterion 5: Cleanliness Tracking', () => {

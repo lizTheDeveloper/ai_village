@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { createVoxelResourceComponent } from '../components/VoxelResourceComponent.js';
@@ -20,11 +20,11 @@ import type { ConstructionTask } from '../systems/TileConstructionSystem.js';
  * 5. Tile construction and placement
  */
 describe('Voxel Building System - End-to-End Integration', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Register test blueprints for integration testing
     const registry = getTileBasedBlueprintRegistry();

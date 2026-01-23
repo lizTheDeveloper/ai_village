@@ -7,7 +7,7 @@ import { ComponentType } from '../../types/ComponentType.js';
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createVisionComponent } from '../../components/VisionComponent.js';
@@ -18,12 +18,12 @@ import { MeetingDetector, isMeetingCall } from '../MeetingDetector.js';
 
 describe('VisionProcessor', () => {
   let visionProcessor: VisionProcessor;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     visionProcessor = new VisionProcessor();
   });
 
@@ -201,12 +201,12 @@ describe('VisionProcessor', () => {
 
 describe('HearingProcessor', () => {
   let hearingProcessor: HearingProcessor;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     hearingProcessor = new HearingProcessor(50); // 50 tile hearing range
   });
 
@@ -341,12 +341,12 @@ describe('HearingProcessor', () => {
 
 describe('MeetingDetector', () => {
   let meetingDetector: MeetingDetector;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     meetingDetector = new MeetingDetector();
   });
 

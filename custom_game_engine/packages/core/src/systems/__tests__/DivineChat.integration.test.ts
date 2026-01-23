@@ -12,19 +12,19 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { ChatRoomSystem, type ChatRoomComponent, DIVINE_CHAT_CONFIG } from '../../communication/index.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { createTagsComponent } from '../../components/TagsComponent.js';
 
 describe('Chat Room System - Integration (Divine Chat)', () => {
-  let world: WorldImpl;
+  let world: World;
   let chatSystem: ChatRoomSystem;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     chatSystem = new ChatRoomSystem();
   });
 

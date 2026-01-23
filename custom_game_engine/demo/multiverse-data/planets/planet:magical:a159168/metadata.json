@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:a159168",
+  "name": "Alpha Terra",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769154801690",
+  "createdAt": 1769154801700,
+  "lastAccessedAt": 1769154801700,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769154801690",
+    "type": "magical"
+  }
+}

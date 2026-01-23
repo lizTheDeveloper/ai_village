@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { RealityAnchorSystem } from '../RealityAnchorSystem.js';
@@ -19,7 +19,7 @@ describe('RealityAnchorSystem Integration', () => {
   it('should charge Reality Anchor when sufficient power is available', () => {
     // Create world with EventBus
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create Reality Anchor in charging state
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -64,7 +64,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should NOT charge Reality Anchor when insufficient power', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Reality Anchor needs 5 GW
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -109,7 +109,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should maintain active field when sufficient power (50 GW)', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Reality Anchor with active field
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -150,7 +150,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should collapse field when power fails during active state', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Reality Anchor with active field
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -179,7 +179,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should emit reality_anchor:power_loss event when power fails', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Setup event listener
     const eventSpy = vi.fn();
@@ -215,7 +215,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should emit reality_anchor:field_collapse when field collapses', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const eventSpy = vi.fn();
     eventBus.on('reality_anchor:field_collapse', eventSpy);
@@ -251,7 +251,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should handle mid-battle power loss correctly', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Reality Anchor with god inside
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -302,7 +302,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should handle Reality Anchor without power network gracefully', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Reality Anchor with no nearby generator
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -342,7 +342,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should handle Reality Anchor without PowerComponent gracefully', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Reality Anchor without PowerComponent
     const anchor = new EntityImpl(createEntityId(), 0);
@@ -366,7 +366,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should emit charging_interrupted event when power lost mid-charge', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const eventSpy = vi.fn();
     eventBus.on('reality_anchor:charging_interrupted', eventSpy);
@@ -400,7 +400,7 @@ describe('RealityAnchorSystem Integration', () => {
 
   it('should handle partial power scenarios correctly', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const eventSpy = vi.fn();
     eventBus.on('reality_anchor:power_insufficient', eventSpy);

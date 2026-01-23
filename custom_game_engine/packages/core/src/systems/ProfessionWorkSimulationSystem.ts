@@ -281,28 +281,6 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
         },
       });
     }
-
-    // Special handling for media professions
-    this.handleMediaOutput(world, profession, output);
-  }
-
-  /**
-   * Handle media profession outputs (integrate with TV/Radio systems).
-   */
-  private handleMediaOutput(
-    world: World,
-    profession: ProfessionComponent,
-    output: ProfessionOutput
-  ): void {
-    // TODO: Integration points for existing systems:
-    // - newspaper_reporter → Could emit 'news_article_published' event
-    // - tv_actor → Could update TVProductionSystem progress
-    // - radio_dj → Could trigger RadioBroadcastingSystem show
-    //
-    // For now, just cache outputs in CityDirector (done in aggregation)
-    void world; // Suppress unused warning
-    void profession;
-    void output;
   }
 
   /**

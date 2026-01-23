@@ -33,7 +33,7 @@ import type { WindowManager } from '../../../WindowManager.js';
  * Canvas rendering tests are covered in SkillTreePanel.test.ts
  */
 describe('SkillTreePanel Backend Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let skillTreeManager: SkillTreeManager;
   let spellLearningManager: SpellLearningManager;
@@ -44,7 +44,7 @@ describe('SkillTreePanel Backend Integration', () => {
   beforeEach(() => {
     // Create real backend systems
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     MagicSkillTreeRegistry.resetInstance();
     registry = MagicSkillTreeRegistry.getInstance();

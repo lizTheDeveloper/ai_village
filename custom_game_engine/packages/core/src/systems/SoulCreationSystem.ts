@@ -109,7 +109,7 @@ export class SoulCreationSystem extends BaseSystem {
    * @param count Number of ancient souls to create (default: 3)
    */
   createAncientSouls(world: World, count: number = 3): void {
-    console.log(`[SoulCreationSystem] Creating ${count} ancient souls in the afterlife for reincarnation testing...`);
+    console.warn(`[SoulCreationSystem] Creating ${count} ancient souls in the afterlife for reincarnation testing...`);
 
     for (let i = 0; i < count; i++) {
       const ancientSoul = new EntityImpl(createEntityId(), world.tick);
@@ -192,11 +192,9 @@ export class SoulCreationSystem extends BaseSystem {
 
       // Add to world
       world.addEntity(ancientSoul);
-
-      console.log(`[SoulCreationSystem]   Created ancient soul: ${randomName} (${lives} lives, ${(wisdom * 100).toFixed(0)}% wisdom)`);
     }
 
-    console.log(`[SoulCreationSystem] ✅ ${count} ancient souls ready for reincarnation!`);
+    console.warn(`[SoulCreationSystem] ✅ ${count} ancient souls ready for reincarnation!`);
   }
 
   /**
@@ -204,7 +202,7 @@ export class SoulCreationSystem extends BaseSystem {
    * Returns the entity ID of the created soul
    */
   private createSoulFromRepository(world: World, soulRecord: any): string {
-    console.log(`[SoulCreationSystem] 🔄 Reusing existing soul: ${soulRecord.name} (archetype: ${soulRecord.archetype})`);
+    console.warn(`[SoulCreationSystem] 🔄 Reusing existing soul: ${soulRecord.name} (archetype: ${soulRecord.archetype})`);
 
     const soulEntity = new EntityImpl(createEntityId(), world.tick);
 
@@ -286,7 +284,7 @@ export class SoulCreationSystem extends BaseSystem {
     if (!this.soulRepositorySystem) {
       console.warn('[SoulCreationSystem] SoulRepositorySystem not found - soul reuse disabled');
     } else {
-      console.log('[SoulCreationSystem] Connected to soul repository with', this.soulRepositorySystem.getStats().totalSouls, 'souls');
+      console.warn('[SoulCreationSystem] Connected to soul repository with', this.soulRepositorySystem.getStats().totalSouls, 'souls');
       // Connect the soul name generator to the repository for global uniqueness checking
       soulNameGenerator.setSoulRepository(this.soulRepositorySystem);
     }
@@ -393,7 +391,6 @@ export class SoulCreationSystem extends BaseSystem {
             const angle = Math.random() * Math.PI * 2;
             const worldX = pos.x + Math.cos(angle) * offset;
             const worldY = pos.y + Math.sin(angle) * offset;
-            console.log(`[SoulCreationSystem] Spawning soul near parent at (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) -> (${worldX.toFixed(1)}, ${worldY.toFixed(1)}), offset: ${offset.toFixed(1)} tiles`);
             return {
               chunkX: Math.floor(worldX / CHUNK_SIZE),
               chunkY: Math.floor(worldY / CHUNK_SIZE),
@@ -404,7 +401,6 @@ export class SoulCreationSystem extends BaseSystem {
         }
       }
       // If no parent found with position, fall through to Priority 3
-      console.log(`[SoulCreationSystem] Parent souls provided but none have valid positions, using spawn point`);
     }
 
     // Priority 3: World spawn point
@@ -434,7 +430,7 @@ export class SoulCreationSystem extends BaseSystem {
           const soulRecord = this.soulRepositorySystem.getRandomSoul();
 
           if (soulRecord) {
-            console.log(`[SoulCreationSystem] 🌟 Reforging soul from repository: ${soulRecord.name} (new body, new destiny)`);
+            console.warn(`[SoulCreationSystem] 🌟 Reforging soul from repository: ${soulRecord.name} (new body, new destiny)`);
 
             // Mark this as a reforging - the Three Fates will decide the new destiny
             request.context.isReforging = true;
@@ -460,7 +456,7 @@ export class SoulCreationSystem extends BaseSystem {
         const soulWisdom = soulToReincarnate.getComponent<SoulWisdomComponent>('soul_wisdom');
         const soulIdentity = soulToReincarnate.getComponent<SoulIdentityComponent>('soul_identity');
 
-        console.log(`[SoulCreationSystem] 🔄 REINCARNATING SOUL: ${soulIdentity?.soulName || 'Unknown'}, lives: ${soulWisdom?.reincarnationCount ?? 1}, wisdom: ${soulWisdom?.wisdomLevel ?? 0.5}`);
+        console.warn(`[SoulCreationSystem] 🔄 REINCARNATING SOUL: ${soulIdentity?.soulName || 'Unknown'}, lives: ${soulWisdom?.reincarnationCount ?? 1}, wisdom: ${soulWisdom?.wisdomLevel ?? 0.5}`);
 
         // Update context to mark this as a reincarnation
         request.context.isReforging = true;
@@ -472,9 +468,6 @@ export class SoulCreationSystem extends BaseSystem {
         // DO NOT delete the soul entity - it persists forever across all incarnations
         // The soul will transition from afterlife to incarnated state when the new body is created
         // Soul entity contains accumulated memories, wisdom, and relationships from all lifetimes
-        console.log(`[SoulCreationSystem] Soul ${soulIdentity?.soulName || 'Unknown'} will be incarnated into new body (soul entity preserved)`);
-      } else {
-        console.log(`[SoulCreationSystem] No eligible souls found for reincarnation - creating new soul`);
       }
     }
 
@@ -498,9 +491,6 @@ export class SoulCreationSystem extends BaseSystem {
         3, // 7x7 chunk grid (radius 3 from center = 49 chunks)
         'HIGH', // High priority - soul creation blocks gameplay
         'soul_creation'
-      );
-      console.log(
-        `[SoulCreationSystem] Queued 7x7 chunk grid around spawn (${spawnLocation.chunkX}, ${spawnLocation.chunkY}) for background generation`
       );
     }
 
@@ -780,7 +770,7 @@ export class SoulCreationSystem extends BaseSystem {
         console.error(`[SoulCreationSystem] Reincarnated soul ${context.reincarnatedSoulId} not found! Creating new soul.`);
         soulEntity = new EntityImpl(createEntityId(), world.tick);
       } else {
-        console.log(`[SoulCreationSystem] Updating existing soul entity ${context.reincarnatedSoulId} with new destiny`);
+        console.warn(`[SoulCreationSystem] Updating existing soul entity ${context.reincarnatedSoulId} with new destiny`);
         soulEntity = existingSoul as EntityImpl;
       }
     } else {
@@ -800,7 +790,6 @@ export class SoulCreationSystem extends BaseSystem {
         soulName = existingIdentity.soulName;
         soulCulture = existingIdentity.soulOriginCulture;
         soulOriginSpecies = existingIdentity.soulOriginSpecies;
-        console.log(`[SoulCreationSystem] Preserving soul name: ${soulName} (${soulCulture})`);
       } else {
         // Fallback if component not found (shouldn't happen)
         const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
@@ -906,8 +895,6 @@ export class SoulCreationSystem extends BaseSystem {
     // Only add creation event for new souls (reincarnated souls keep their original creation event)
     if (!context.reincarnatedSoulId) {
       soulEntity.addComponent(creationEvent);
-    } else {
-      console.log(`[SoulCreationSystem] Soul ${soulName} is being reforged - preserving original creation event`);
     }
 
     // Realm Location - update or add
@@ -920,9 +907,9 @@ export class SoulCreationSystem extends BaseSystem {
     // Add to world ONLY if this is a new soul (reincarnated souls are already in the world)
     if (!context.reincarnatedSoulId) {
       world.addEntity(soulEntity);
-      console.log(`[SoulCreationSystem] Added new soul ${soulName} to world`);
+      console.warn(`[SoulCreationSystem] Added new soul ${soulName} to world`);
     } else {
-      console.log(`[SoulCreationSystem] Updated existing soul ${soulName} with new destiny from ceremony`);
+      console.warn(`[SoulCreationSystem] Updated existing soul ${soulName} with new destiny from ceremony`);
     }
 
     return soulEntity.id;

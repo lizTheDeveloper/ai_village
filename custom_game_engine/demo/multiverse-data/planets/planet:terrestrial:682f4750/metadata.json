@@ -1,0 +1,15 @@
+{
+  "id": "planet:terrestrial:682f4750",
+  "name": "Quantum Mundo",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1769152315203",
+  "createdAt": 1769152315205,
+  "lastAccessedAt": 1769152315205,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769152315203",
+    "type": "terrestrial"
+  }
+}

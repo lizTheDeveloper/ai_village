@@ -11,7 +11,7 @@
  */
 
 import { bench, describe } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
@@ -28,9 +28,9 @@ import { SimulationScheduler } from '../ecs/SimulationScheduler.js';
 function createWorldWithEntities(
   entityCount: number,
   components: Array<{ type: string; data: any }>
-): { world: WorldImpl; entities: Entity[] } {
+): { world: World; entities: Entity[] } {
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
   const entities: Entity[] = [];
 
   for (let i = 0; i < entityCount; i++) {
@@ -48,7 +48,7 @@ function createWorldWithEntities(
  * Helper: Create entities spread across a grid
  */
 function createGridEntities(
-  world: WorldImpl,
+  world: World,
   count: number,
   gridSize: number
 ): Entity[] {
@@ -169,7 +169,7 @@ describe('NeedsSystem Performance', () => {
 describe('DoorSystem Performance', () => {
   bench('100 agents near doors', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const entities = createGridEntities(world, 100, 100);
 
     // Add doors to world (mock implementation)
@@ -218,7 +218,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
   // Verification test - ensure filtering actually works
   bench('Verify scheduler actually filters entities', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create 1 agent at (50, 50)
     const agent = world.createEntity();
@@ -276,7 +276,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
 
   bench('WITHOUT scheduler - processes all 4000 entities (slow)', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create 1 agent entity (center of map)
     const agent = world.createEntity();
@@ -328,7 +328,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
 
   bench('WITH scheduler - processes ~120 entities (fast, 97% reduction)', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create 1 agent entity (center of map)
     const agent = world.createEntity();
@@ -386,7 +386,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
 
   bench('AnimalSystem WITH scheduler - only visible animals', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create 1 agent entity (center of map)
     const agent = world.createEntity();
@@ -448,7 +448,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
 
   bench('Scheduler filtering overhead - 4000 entities', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Create 1 agent
     const agent = world.createEntity();
@@ -495,7 +495,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
   // REALISTIC COMPARISON: Simulate actual system work (component updates)
   bench('Realistic: WITHOUT scheduler - update all 4000 entities', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = world.createEntity();
     world.addComponent(agent.id, {
@@ -538,7 +538,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
 
   bench('Realistic: WITH scheduler - update only ~280 active entities', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const agent = world.createEntity();
     world.addComponent(agent.id, {
@@ -602,7 +602,7 @@ describe('SimulationScheduler Performance - Dwarf Fortress Optimization', () => 
 describe('Query Performance', () => {
   bench('Query 1000 entities with single component', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     createGridEntities(world, 1000, 100);
 
     world.query().with(CT.Position).executeEntities();
@@ -610,7 +610,7 @@ describe('Query Performance', () => {
 
   bench('Query 1000 entities with two components', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     createGridEntities(world, 1000, 100);
 
     world.query().with(CT.Position).with(CT.Agent).executeEntities();
@@ -618,7 +618,7 @@ describe('Query Performance', () => {
 
   bench('Repeated queries (anti-pattern)', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const entities = createGridEntities(world, 100, 100);
 
     // This is an anti-pattern - should cache the query
@@ -629,7 +629,7 @@ describe('Query Performance', () => {
 
   bench('Cached query (best practice)', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const entities = createGridEntities(world, 100, 100);
 
     // Cache the query result
@@ -691,7 +691,7 @@ describe('Distance Calculation Performance', () => {
 
 describe('Array Operations Performance', () => {
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
   createGridEntities(world, 1000, 100);
 
   bench('Array.from(map.values()) (slow)', () => {

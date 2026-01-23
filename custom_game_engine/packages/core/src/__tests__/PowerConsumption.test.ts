@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { PowerGridSystem } from '../systems/PowerGridSystem.js';
 import { createPowerProducer, createPowerConsumer } from '../components/PowerComponent.js';
@@ -9,12 +9,12 @@ import type { PowerComponent } from '../components/PowerComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 
 describe('Power Consumption System', () => {
-  let world: WorldImpl;
+  let world: World;
   let powerGridSystem: PowerGridSystem;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     powerGridSystem = new PowerGridSystem();
   });
 

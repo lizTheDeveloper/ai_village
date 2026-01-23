@@ -153,32 +153,28 @@ export class MovementSystem extends BaseSystem {
       const steeringActive = steering && steering.behavior && steering.behavior !== 'none';
 
       if (steeringActive && velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
-        impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
-          ...current,
-          velocityX: velocity.vx ?? current.velocityX,
-          velocityY: velocity.vy ?? current.velocityY,
-        }));
-        // Re-get movement after update
-        const updatedMovement = impl.getComponent<MovementComponent>(CT.Movement)!;
-        Object.assign(movement, updatedMovement);
+        impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
+          current.velocityX = velocity.vx ?? current.velocityX;
+          current.velocityY = velocity.vy ?? current.velocityY;
+          return current;
+        });
       }
 
       // Skip if sleeping - agents cannot move while asleep
       if (circadian && circadian.isSleeping) {
         // Force velocity to 0 while sleeping
         if (movement.velocityX !== 0 || movement.velocityY !== 0) {
-          impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
-            ...current,
-            velocityX: 0,
-            velocityY: 0,
-          }));
-          // Also sync to VelocityComponent
+          impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
+            current.velocityX = 0;
+            current.velocityY = 0;
+            return current;
+          });
           if (velocity) {
-            impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => ({
-              ...current,
-              vx: 0,
-              vy: 0,
-            }));
+            impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => {
+              current.vx = 0;
+              current.vy = 0;
+              return current;
+            });
           }
         }
         continue;
@@ -286,31 +282,30 @@ export class MovementSystem extends BaseSystem {
       const spatialMemory = impl.getComponent<SpatialMemoryComponent>(CT.SpatialMemory);
       if (spatialMemory) {
         recordChunkVisit(spatialMemory, newChunkX, newChunkY, world.tick);
-        impl.updateComponent<SpatialMemoryComponent>(CT.SpatialMemory, (current) => current);
       }
     }
 
-    impl.updateComponent<PositionComponent>(CT.Position, (current) => ({
-      ...current,
-      x: clampedX,
-      y: clampedY,
-      chunkX: newChunkX,
-      chunkY: newChunkY,
-    }));
+    impl.updateComponent<PositionComponent>(CT.Position, (current) => {
+      current.x = clampedX;
+      current.y = clampedY;
+      current.chunkX = newChunkX;
+      current.chunkY = newChunkY;
+      return current;
+    });
   }
 
   private stopEntity(impl: EntityImpl, velocity: VelocityComponent | undefined): void {
-    impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
-      ...current,
-      velocityX: 0,
-      velocityY: 0,
-    }));
+    impl.updateComponent<MovementComponent>(CT.Movement, (current) => {
+      current.velocityX = 0;
+      current.velocityY = 0;
+      return current;
+    });
     if (velocity) {
-      impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => ({
-        ...current,
-        vx: 0,
-        vy: 0,
-      }));
+      impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => {
+        current.vx = 0;
+        current.vy = 0;
+        return current;
+      });
     }
   }
 

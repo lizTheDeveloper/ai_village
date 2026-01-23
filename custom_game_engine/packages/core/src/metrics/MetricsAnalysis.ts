@@ -106,55 +106,20 @@ export class MetricsAnalysis {
   generateInsights(): Insight[] {
     const insights: Insight[] = [];
 
-    // Check for population stall
-    try {
-      const populationStall = this.detectPopulationStall();
-      if (populationStall) {
-        insights.push(populationStall);
-      }
-    } catch (e) {
-      // Ignore errors for missing data
-    }
+    const populationStall = this.detectPopulationStall();
+    if (populationStall) insights.push(populationStall);
 
-    // Check for resource shortage
-    try {
-      const resourceShortage = this.detectResourceShortage();
-      if (resourceShortage) {
-        insights.push(resourceShortage);
-      }
-    } catch (e) {
-      // Ignore errors for missing data
-    }
+    const resourceShortage = this.detectResourceShortage();
+    if (resourceShortage) insights.push(resourceShortage);
 
-    // Check for intelligence decline
-    try {
-      const intelligenceDecline = this.detectIntelligenceDecline();
-      if (intelligenceDecline) {
-        insights.push(intelligenceDecline);
-      }
-    } catch (e) {
-      // Ignore errors for missing data
-    }
+    const intelligenceDecline = this.detectIntelligenceDecline();
+    if (intelligenceDecline) insights.push(intelligenceDecline);
 
-    // Check for survival rate improvement
-    try {
-      const survivalImprovement = this.detectSurvivalImprovement();
-      if (survivalImprovement) {
-        insights.push(survivalImprovement);
-      }
-    } catch (e) {
-      // Ignore errors for missing data
-    }
+    const survivalImprovement = this.detectSurvivalImprovement();
+    if (survivalImprovement) insights.push(survivalImprovement);
 
-    // Check for primary cause of death
-    try {
-      const deathCause = this.detectPrimaryDeathCause();
-      if (deathCause) {
-        insights.push(deathCause);
-      }
-    } catch (e) {
-      // Ignore errors for missing data
-    }
+    const deathCause = this.detectPrimaryDeathCause();
+    if (deathCause) insights.push(deathCause);
 
     return insights;
   }
@@ -196,7 +161,8 @@ export class MetricsAnalysis {
    * Detect resource shortage
    */
   private detectResourceShortage(): Insight | null {
-    const economicMetrics = this.collector.getMetric('economic_metrics');
+    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+    if (!economicMetrics?.resourcesGathered) return null;
 
     for (const [resourceType, gathered] of Object.entries(economicMetrics.resourcesGathered)) {
       const consumed = economicMetrics.resourcesConsumed[resourceType];
@@ -288,7 +254,8 @@ export class MetricsAnalysis {
    * Detect primary cause of death
    */
   private detectPrimaryDeathCause(): Insight | null {
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as any;
+    if (!lifecycleMetrics) return null;
     const causes = new Map<string, number>();
     let totalDeaths = 0;
 

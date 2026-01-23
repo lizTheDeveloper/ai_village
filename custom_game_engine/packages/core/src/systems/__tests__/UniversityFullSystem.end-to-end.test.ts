@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { filterEventsByType } from '../../events/EventFilters.js';
@@ -36,7 +36,7 @@ describe('University Research System - Full E2E', () => {
     // SETUP: Create world with all necessary systems
     // ========================================================================
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const buildingSystem = new BuildingSystem();
     const techSystem = new TechnologyUnlockSystem(eventBus);

@@ -14,7 +14,7 @@
  * while ensuring only the worker runs the actual simulation.
  */
 
-import { WorldImpl, ActionQueue, SystemRegistry, EventBus } from '@ai-village/core';
+import { World, ActionQueue, SystemRegistry, EventBus } from '@ai-village/core';
 import { UniverseClient } from './universe-client.js';
 import { PathInterpolationSystem } from './PathInterpolationSystem.js';
 import type { UniverseState, SerializedWorld } from './types.js';

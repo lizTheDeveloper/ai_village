@@ -14,14 +14,14 @@ import { createCurrencyComponent, type CurrencyComponent } from '../../component
 import { createPositionComponent } from '../../components/PositionComponent';
 
 describe.skip('Quality Economy Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let tradingSystem: TradingSystem;
   let agent: Entity;
   let shop: Entity;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     tradingSystem = new TradingSystem();
 
     // Create agent with inventory and currency

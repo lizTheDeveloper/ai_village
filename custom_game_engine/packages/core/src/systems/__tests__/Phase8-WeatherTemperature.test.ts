@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import { EventBusImpl } from '../../events/EventBus';
 import { EntityImpl, createEntityId } from '../../ecs/Entity';
 import { TemperatureSystem } from '../TemperatureSystem';
@@ -22,14 +22,14 @@ import { BuildingType } from '../../types/BuildingType.js';
  * according to the Phase 8 acceptance criteria.
  */
 describe('Phase 8: Weather & Temperature Systems', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let temperatureSystem: TemperatureSystem;
   let weatherSystem: WeatherSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     temperatureSystem = new TemperatureSystem();
     weatherSystem = new WeatherSystem();
   });

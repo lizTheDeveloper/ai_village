@@ -11,7 +11,8 @@ import type { GameLoop } from '../loop/GameLoop.js';
 import type { System } from '../ecs/System.js';
 import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
 import type { EventBus } from '../events/EventBus.js';
-import type { LLMDecisionQueue, PromptBuilder } from '../decision/LLMDecisionProcessor.js';
+import type { LLMDecisionQueue } from '../types/LLMTypes.js';
+import type { PromptBuilder } from '../decision/LLMDecisionProcessor.js';
 import type { ScheduledDecisionProcessor } from '../decision/ScheduledDecisionProcessor.js';
 import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
 

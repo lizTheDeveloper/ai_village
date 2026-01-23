@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { GoalGenerationSystem } from '../GoalGenerationSystem.js';
@@ -37,13 +37,13 @@ function flushAll(eventBus: EventBusImpl): void {
 }
 
 describe('GoalGenerationSystem Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let goalGenerationSystem: GoalGenerationSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     goalGenerationSystem = new GoalGenerationSystem(eventBus);
     goalGenerationSystem.initialize(world, eventBus);
   });
@@ -145,7 +145,7 @@ describe('GoalGenerationSystem Integration', () => {
     for (let trial = 0; trial < 50; trial++) {
       // Create fresh world for each trial to avoid interference
       const trialEventBus = new EventBusImpl();
-      const trialWorld = new WorldImpl(trialEventBus);
+      const trialWorld = new World(trialEventBus);
       const trialSystem = new GoalGenerationSystem(trialEventBus);
       trialSystem.initialize(trialWorld, trialEventBus);
 
@@ -459,7 +459,7 @@ describe('GoalGenerationSystem Integration', () => {
     // Run 50 trials
     for (let trial = 0; trial < 50; trial++) {
       const testEventBus = new EventBusImpl();
-      const testWorld = new WorldImpl(testEventBus);
+      const testWorld = new World(testEventBus);
       const testSystem = new GoalGenerationSystem(testEventBus);
       testSystem.initialize(testWorld, testEventBus);
 

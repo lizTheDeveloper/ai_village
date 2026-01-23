@@ -183,9 +183,7 @@ const FORMAT_GUIDELINES: Record<string, string> = {
 // SCRIPT GENERATOR
 // ============================================================================
 
-export interface LLMProvider {
-  generate(systemPrompt: string, userPrompt: string): Promise<string>;
-}
+import type { LLMProvider } from '../../types/LLMTypes.js';
 
 export class ScriptGenerator {
   private llmProvider: LLMProvider | null = null;

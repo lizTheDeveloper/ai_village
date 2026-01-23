@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { BuildingSystem } from '../BuildingSystem.js';
@@ -35,11 +35,11 @@ import { BuildingType } from '../../types/BuildingType.js';
 
 describe('Performance Optimizations Integration', () => {
   let eventBus: EventBusImpl;
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
   });
 
   describe('Acceptance Criterion 1: No Duplicate Queries', () => {

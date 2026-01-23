@@ -17,26 +17,7 @@ import type { World } from '../ecs/World.js';
 import type { Checkpoint } from './AutoSaveSystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
-
-// LLM Provider interface (to avoid cross-package import)
-interface LLMRequest {
-  prompt: string;
-  temperature?: number;
-  maxTokens?: number;
-  stopSequences?: string[];
-}
-
-interface LLMResponse {
-  text: string;
-  stopReason?: string;
-  tokensUsed?: number;
-}
-
-interface LLMProvider {
-  generate(request: LLMRequest): Promise<LLMResponse>;
-  getModelName(): string;
-  isAvailable(): Promise<boolean>;
-}
+import type { LLMProvider, LLMRequest, LLMResponse } from '../types/LLMTypes.js';
 
 export class CheckpointNamingService {
   private llmProvider: LLMProvider | null = null;

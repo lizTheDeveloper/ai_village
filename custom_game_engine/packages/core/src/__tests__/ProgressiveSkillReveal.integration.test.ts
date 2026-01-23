@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { SkillSystem } from '../systems/SkillSystem.js';
@@ -33,13 +33,13 @@ import { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 
 describe('ProgressiveSkillReveal Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let skillSystem: SkillSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     skillSystem = new SkillSystem();
     skillSystem.initialize(world, eventBus);
   });

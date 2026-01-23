@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 
 /**
@@ -31,10 +31,10 @@ interface RealityEditRequest {
  * See: architecture/LITERARY_SURREALISM_SPEC.md Section 7
  */
 describe('Reality Editing System', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   describe('Editorial Magic', () => {

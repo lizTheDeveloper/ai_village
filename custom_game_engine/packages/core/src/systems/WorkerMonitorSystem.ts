@@ -151,17 +151,6 @@ export class WorkerMonitorSystem extends BaseSystem {
       }
     }
 
-    // Add other worker pools here as they're created
-    // Example:
-    // const pathfindingPool = (ctx.world as any).pathfindingWorkerPool;
-    // if (pathfindingPool && typeof pathfindingPool.getStats === 'function') {
-    //   const pathStats = pathfindingPool.getStats();
-    //   stats.push({
-    //     name: 'Pathfinding',
-    //     stats: pathStats,
-    //   });
-    // }
-
     return stats;
   }
 }

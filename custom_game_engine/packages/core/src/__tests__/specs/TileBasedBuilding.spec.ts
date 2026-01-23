@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 
 /**
@@ -11,10 +11,10 @@ import type { Entity } from '../../ecs/Entity';
  * See: VOXEL_BUILDING_SYSTEM_PLAN.md
  */
 describe('Tile-Based Building System', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   describe('Tile Structure', () => {

@@ -12,14 +12,14 @@ import type { ResourceComponent } from '../../components/ResourceComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 describe('Resource Gathering System', () => {
-  let world: WorldImpl;
+  let world: World;
   let agent: EntityImpl;
   let tree: EntityImpl;
   let rock: EntityImpl;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create agent with inventory
     agent = new EntityImpl(createEntityId(), world.tick);

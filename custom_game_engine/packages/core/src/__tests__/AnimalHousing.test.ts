@@ -1,16 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { createBuildingComponent, type BuildingComponent } from '../components/BuildingComponent.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 
 describe('Animal Housing - Core Functionality', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
   });
 
   describe('Acceptance Criterion 1: Building Type Definitions', () => {

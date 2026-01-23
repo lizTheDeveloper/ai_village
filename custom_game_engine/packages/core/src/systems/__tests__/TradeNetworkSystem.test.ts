@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import type { World } from '../../ecs/World.js';
 import { TradeNetworkSystem } from '../TradeNetworkSystem.js';
 import { EntityImpl } from '../../ecs/Entity.js';
@@ -26,7 +26,7 @@ describe('TradeNetworkSystem', () => {
   let system: TradeNetworkSystem;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     system = new TradeNetworkSystem();
     system.initialize(world, world.eventBus);
   });

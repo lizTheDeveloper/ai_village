@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../../ecs/World.js';
+import { World } from '../../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../../ecs/Entity.js';
 import { EventBusImpl } from '../../../events/EventBus.js';
 import { SkillTreeManager } from '../SkillTreeManager.js';
@@ -23,7 +23,7 @@ import type { MagicComponent } from '../../../components/MagicComponent.js';
 import { ComponentType as CT } from '../../../types/ComponentType.js';
 
 describe('SkillTreeManager Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let skillTreeManager: SkillTreeManager;
   let spellLearningManager: SpellLearningManager;
@@ -32,7 +32,7 @@ describe('SkillTreeManager Integration', () => {
   beforeEach(() => {
     // Create real world and event bus
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Reset registry for clean test state
     MagicSkillTreeRegistry.resetInstance();

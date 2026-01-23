@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { NeedsComponent, type NeedsComponentLegacy } from '../components/NeedsComponent.js';
@@ -10,13 +10,13 @@ import { createTemperatureComponent } from '../components/TemperatureComponent.j
 
 import { ComponentType } from '../types/ComponentType.js';
 describe('NeedsSystem', () => {
-  let world: WorldImpl;
+  let world: World;
   let system: NeedsSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     system = new NeedsSystem();
   });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SleepSystem } from '../SleepSystem.js';
@@ -20,7 +20,7 @@ describe('SleepSystem Integration', () => {
   it('agent should seek sleep after ~18 hours awake', () => {
     // Create world with time entity
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(6, 48, 1)); // 6 AM, 48s/day, 1x speed
     world.addEntity(timeEntity);
@@ -65,7 +65,7 @@ describe('SleepSystem Integration', () => {
 
   it('agent should accumulate sleep drive faster when tired', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(6, 48, 1));
     world.addEntity(timeEntity);
@@ -109,7 +109,7 @@ describe('SleepSystem Integration', () => {
 
   it('agent should deplete sleep drive after 6 hours of sleep', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(22, 48, 1)); // 10 PM (night)
     world.addEntity(timeEntity);
@@ -158,7 +158,7 @@ describe('SleepSystem Integration', () => {
 
   it('agent should recover energy while sleeping', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(22, 48, 1));
     world.addEntity(timeEntity);
@@ -208,7 +208,7 @@ describe('SleepSystem Integration', () => {
 
   it('agent should NOT accumulate sleep drive while sleeping', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const timeEntity = new EntityImpl(createEntityId(), 0);
     timeEntity.addComponent(createTimeComponent(22, 48, 1));
     world.addEntity(timeEntity);

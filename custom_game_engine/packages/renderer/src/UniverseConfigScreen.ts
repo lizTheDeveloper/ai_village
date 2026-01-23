@@ -39,6 +39,15 @@ export interface UniverseConfig {
   seed?: number;
 }
 
+export interface ExistingPlanetInfo {
+  id: string;
+  name: string;
+  type: string;
+  hasBiosphere: boolean;
+  chunkCount?: number;
+  createdAt?: number;
+}
+
 export interface UniverseConfigScreenOptions {
   /** Skip planet selection step (planet will be selected via UniversePlanetsScreen) */
   skipPlanetStep?: boolean;
@@ -46,6 +55,8 @@ export interface UniverseConfigScreenOptions {
   preselectedPlanetType?: string;
   /** Pre-selected planet ID (if using existing planet from registry) */
   preselectedPlanetId?: string;
+  /** Previously generated planets available for reuse */
+  existingPlanets?: ExistingPlanetInfo[];
 }
 
 export interface ScenarioPreset {
@@ -305,8 +316,59 @@ export class UniverseConfigScreen {
 
     const subtitle = document.createElement('p');
     subtitle.textContent = 'Choose the type of world where your story begins';
-    subtitle.style.cssText = 'margin: 0 0 40px 0; font-size: 14px; text-align: center; color: #aaa;';
+    subtitle.style.cssText = 'margin: 0 0 20px 0; font-size: 14px; text-align: center; color: #aaa;';
     this.container.appendChild(subtitle);
+
+    // Show existing planets if available
+    const existingPlanets = this.options.existingPlanets;
+    if (existingPlanets && existingPlanets.length > 0) {
+      const existingSection = document.createElement('div');
+      existingSection.style.cssText = 'max-width: 1200px; width: 100%; margin-bottom: 30px;';
+
+      const existingLabel = document.createElement('div');
+      existingLabel.style.cssText = 'color: #4CAF50; font-size: 12px; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px;';
+      existingLabel.textContent = 'YOUR PLANETS (skip biosphere generation)';
+      existingSection.appendChild(existingLabel);
+
+      const existingGrid = document.createElement('div');
+      existingGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 20px;';
+
+      for (const planet of existingPlanets) {
+        const isSelected = this.selectedPlanetId === planet.id;
+        const planetTypeInfo = UniverseConfigScreen.PLANET_TYPES[planet.type] || { name: planet.type, icon: '🪐' };
+        const card = document.createElement('div');
+        card.style.cssText = `background: ${isSelected ? 'rgba(76, 175, 80, 0.2)' : 'rgba(30, 50, 30, 0.5)'}; border: 2px solid ${isSelected ? '#4CAF50' : '#2a4a2a'}; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s;`;
+        card.onclick = () => {
+          this.selectedPlanetId = planet.id;
+          this.selectedPlanetType = planet.type;
+          this.render();
+        };
+        const statusIcon = planet.hasBiosphere ? '✓' : '...';
+        const statusColor = planet.hasBiosphere ? '#4CAF50' : '#ff9800';
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 22px;">${planetTypeInfo.icon}</span>
+            <div>
+              <div style="color: ${isSelected ? '#4CAF50' : '#ddd'}; font-size: 14px; font-weight: bold;">${planet.name}</div>
+              <div style="color: #888; font-size: 11px;">${planetTypeInfo.name} <span style="color: ${statusColor};">${statusIcon} ${planet.hasBiosphere ? 'ready' : 'no biosphere'}</span></div>
+            </div>
+          </div>
+        `;
+        if (isSelected) {
+          card.innerHTML += '<div style="position: absolute; top: 8px; right: 8px; color: #4CAF50; font-size: 18px;">✓</div>';
+          card.style.position = 'relative';
+        }
+        existingGrid.appendChild(card);
+      }
+      existingSection.appendChild(existingGrid);
+      this.container.appendChild(existingSection);
+
+      // Divider
+      const divider = document.createElement('div');
+      divider.style.cssText = 'max-width: 1200px; width: 100%; border-top: 1px solid #3a3a5a; margin-bottom: 20px; position: relative;';
+      divider.innerHTML = '<span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1a1a2e; padding: 0 15px; color: #666; font-size: 12px;">OR CREATE NEW</span>';
+      this.container.appendChild(divider);
+    }
 
     const grid = document.createElement('div');
     grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; width: 100%;';
@@ -317,6 +379,7 @@ export class UniverseConfigScreen {
       card.style.cssText = `background: ${isSelected ? 'linear-gradient(135deg, #4a3a2a 0%, #3a2a1a 100%)' : 'rgba(30, 30, 50, 0.8)'}; border: 2px solid ${isSelected ? '#ff9800' : '#3a3a5a'}; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s; position: relative;`;
       card.onclick = () => {
         this.selectedPlanetType = planetId === 'random' ? this.getRandomPlanetType() : planetId;
+        this.selectedPlanetId = undefined; // Clear existing planet selection
         if (planetId === 'random') {
           // For random, immediately proceed to next step
           this.currentStep = 'scenario';

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SimulationScheduler, SimulationMode } from '../SimulationScheduler.js';
-import { WorldImpl } from '../World.js';
+import { World } from '../World.js';
 import { EntityImpl, createEntityId } from '../Entity.js';
 import type { World } from '../World.js';
 import type { Entity } from '../Entity.js';
@@ -15,7 +15,7 @@ describe('SimulationScheduler - Essential Entity Tracking', () => {
   let scheduler: SimulationScheduler;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     scheduler = new SimulationScheduler();
   });
 

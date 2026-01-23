@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SoilSystem, FERTILIZERS } from '../SoilSystem.js';
 
@@ -16,12 +16,12 @@ import { SoilSystem, FERTILIZERS } from '../SoilSystem.js';
  *   - Set fertilized flag with duration
  */
 describe('Fertilizer Application', () => {
-  let _world: WorldImpl;
+  let _world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    _world = new WorldImpl(eventBus);
+    _world = new World(eventBus);
   });
 
   describe('Compost Application', () => {

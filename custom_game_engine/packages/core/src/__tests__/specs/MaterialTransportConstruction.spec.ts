@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World';
+import { World } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 import type { ConstructionTask } from '../../systems/TileConstructionSystem.js';
 
@@ -21,10 +21,10 @@ import type { ConstructionTask } from '../../systems/TileConstructionSystem.js';
  * See: VOXEL_BUILDING_SYSTEM_PLAN.md Section 4
  */
 describe('Material Transport and Construction System', () => {
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
   });
 
   describe('Construction Task Creation', () => {

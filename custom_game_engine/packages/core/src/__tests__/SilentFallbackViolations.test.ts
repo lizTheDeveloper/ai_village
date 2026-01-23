@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { PlantSystem } from '@ai-village/botany';
 import { MemoryFormationSystem } from '../systems/MemoryFormationSystem.js';
@@ -17,12 +17,12 @@ import { PlantComponent } from '../components/PlantComponent.js';
  */
 
 describe('Silent Fallback Violations', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
   });
 
   describe('NeedsSystem error handling', () => {

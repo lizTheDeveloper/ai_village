@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SoilSystem } from '../SoilSystem.js';
 
@@ -15,12 +15,12 @@ import { SoilSystem } from '../SoilSystem.js';
  *   - Emit moisture change event
  */
 describe('Watering Action', () => {
-  let _world: WorldImpl;
+  let _world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    _world = new WorldImpl(eventBus);
+    _world = new World(eventBus);
   });
 
   describe('Manual Watering', () => {

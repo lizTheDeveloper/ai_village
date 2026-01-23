@@ -8,7 +8,7 @@
  */
 
 import type { World } from '../ecs/World.js';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { worldSerializer } from './WorldSerializer.js';
 
@@ -332,7 +332,7 @@ export class SaveStateManager {
    */
   async restoreWorld(saveState: SaveState): Promise<World> {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     await worldSerializer.deserializeWorld(saveState.snapshot, world);
     return world;
   }

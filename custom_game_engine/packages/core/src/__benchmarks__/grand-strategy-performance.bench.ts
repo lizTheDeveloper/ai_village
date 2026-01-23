@@ -12,7 +12,7 @@
  */
 
 import { bench, describe } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
@@ -95,12 +95,12 @@ function createRandomGraph(nodeCount: number, edgeCount: number): Graph {
  * Create a world with shipping lanes and caravans
  */
 function createShippingWorld(laneCount: number, caravansPerLane: number): {
-  world: WorldImpl;
+  world: World;
   laneEntities: Entity[];
   caravanEntities: Entity[];
 } {
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
   const laneEntities: Entity[] = [];
   const caravanEntities: Entity[] = [];
 
@@ -157,11 +157,11 @@ function createShippingWorld(laneCount: number, caravansPerLane: number): {
  * Create a world with many entities for scale testing
  */
 function createScaleWorld(entityCount: number): {
-  world: WorldImpl;
+  world: World;
   entities: Entity[];
 } {
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
   const entities: Entity[] = [];
 
   for (let i = 0; i < entityCount; i++) {
@@ -433,9 +433,9 @@ describe('Grand Strategy: Governance Hierarchy Operations', () => {
    * Create a governance hierarchy:
    * 1 Empire -> 5 Nations -> 25 Provinces -> 125 Cities -> 625 Villages
    */
-  function createGovernanceWorld(): { world: WorldImpl; entities: Entity[] } {
+  function createGovernanceWorld(): { world: World; entities: Entity[] } {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     const entities: Entity[] = [];
 
     // Create Empire

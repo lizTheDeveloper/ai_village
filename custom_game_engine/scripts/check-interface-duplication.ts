@@ -104,6 +104,11 @@ function findInterfaceDefinitions(interfaceName: string): Array<{ file: string; 
 function isExcluded(filePath: string): boolean {
   const normalized = filePath.replace(/\\/g, '/');
 
+  // Exclude this script itself
+  if (normalized.includes('check-interface-duplication.ts')) {
+    return true;
+  }
+
   for (const pattern of EXCLUDE_PATTERNS) {
     if (pattern.startsWith('*')) {
       // Wildcard pattern

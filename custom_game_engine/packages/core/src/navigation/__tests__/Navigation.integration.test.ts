@@ -11,7 +11,7 @@ import { ComponentType } from '../../types/ComponentType.js';
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent, type PositionComponent } from '../../components/PositionComponent.js';
@@ -54,7 +54,7 @@ import { followGradientBehavior } from '../../behaviors/FollowGradientBehavior.j
  * Helper to create a test entity with required components
  */
 function createTestAgent(
-  world: WorldImpl,
+  world: World,
   position: { x: number; y: number },
   behavior: string = 'idle',
   behaviorState: Record<string, any> = {}
@@ -100,7 +100,7 @@ function createTestAgent(
  * Helper to create a resource entity
  */
 function createTestResource(
-  world: WorldImpl,
+  world: World,
   position: { x: number; y: number },
   resourceType: string = 'berry',
   amount: number = 100
@@ -127,7 +127,7 @@ function createTestResource(
 /**
  * Simulate agent update (execute behavior)
  */
-function updateAgent(entity: EntityImpl, world: WorldImpl): void {
+function updateAgent(entity: EntityImpl, world: World): void {
   const agent = entity.getComponent(ComponentType.Agent);
   if (!agent) return;
 
@@ -164,12 +164,12 @@ function applyMovement(entity: EntityImpl, deltaTime: number = 1 / 20): void {
 }
 
 describe('Navigation Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     resetMapKnowledge();
   });
 

@@ -19,13 +19,13 @@ import type { SvetzRetrievalMissionComponent } from '../../components/SvetzRetri
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 describe('SvetzRetrievalSystem', () => {
-  let world: WorldImpl;
+  let world: World;
   let system: SvetzRetrievalSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new SvetzRetrievalSystem();
   });
 

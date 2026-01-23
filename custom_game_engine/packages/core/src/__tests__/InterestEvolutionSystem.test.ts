@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import type { World } from '../ecs/World.js';
@@ -19,20 +19,20 @@ import { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 // Helper to advance world time
-function advanceTime(world: WorldImpl, ticks: number): void {
+function advanceTime(world: World, ticks: number): void {
   for (let i = 0; i < ticks; i++) {
     world.advanceTick();
   }
 }
 
 describe('InterestEvolutionSystem - Phase 7.1', () => {
-  let world: WorldImpl;
+  let world: World;
   let system: InterestEvolutionSystem;
   let agent: EntityImpl;
 
   beforeEach(async () => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new InterestEvolutionSystem();
     await system.initialize(world, eventBus);
 

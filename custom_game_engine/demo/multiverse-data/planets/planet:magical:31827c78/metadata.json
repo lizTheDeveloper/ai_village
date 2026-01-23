@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:31827c78",
+  "name": "Nova Nereid",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155038668",
+  "createdAt": 1769155038674,
+  "lastAccessedAt": 1769155038674,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155038668",
+    "type": "magical"
+  }
+}

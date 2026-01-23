@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { AgentCombatSystem } from '../AgentCombatSystem.js';
@@ -17,7 +17,7 @@ describe('AgentCombatSystem Integration', () => {
   it('should resolve agent vs agent combat with skill-based outcome', () => {
     // Create world with real EventBus
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     // Mock LLM provider for narrative generation
     const mockLLM = {
@@ -116,7 +116,7 @@ describe('AgentCombatSystem Integration', () => {
 
   it('should apply injuries when combat causes damage', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({
@@ -221,7 +221,7 @@ describe('AgentCombatSystem Integration', () => {
 
   it('should emit combat events through EventBus', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({
@@ -313,7 +313,7 @@ describe('AgentCombatSystem Integration', () => {
 
   it('should update relationships after combat', () => {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
 
     const mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({

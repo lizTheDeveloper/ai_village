@@ -14,7 +14,7 @@ describe('BodySystem - Infection Spreading', () => {
   let bodySystem: BodySystem;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     bodySystem = new BodySystem();
   });
 

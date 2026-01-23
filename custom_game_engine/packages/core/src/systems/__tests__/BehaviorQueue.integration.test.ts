@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { AgentBrainSystem } from '../AgentBrainSystem.js';
@@ -23,14 +23,14 @@ import { createTemperatureComponent } from '../../components/TemperatureComponen
  */
 
 describe('Behavior Queue System Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let aiSystem: AgentBrainSystem;
   let agent: EntityImpl;
 
   beforeEach(() => {
     // Create real world with EventBus
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create AI system
     aiSystem = new AgentBrainSystem();

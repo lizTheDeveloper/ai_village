@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { OpenAICompatProvider } from '@ai-village/llm';
@@ -50,12 +50,12 @@ import {
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 describe('Belief Attribution System - E2E Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let llmProvider: OpenAICompatProvider;
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Set up Groq with Qwen 32B
     llmProvider = new OpenAICompatProvider(

@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
@@ -26,7 +26,7 @@ registerBodyHealingEffectApplier();
 registerBodyTransformEffectApplier();
 
 describe('Divinity + Body Parts Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let divineBodySystem: DivineBodyModification;
   let deity: EntityImpl;
   let deityComp: DeityComponent;
@@ -35,7 +35,7 @@ describe('Divinity + Body Parts Integration', () => {
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create divine body modification system
     divineBodySystem = new DivineBodyModification({

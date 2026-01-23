@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5a575e0c",
+  "name": "Nova Rhea",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769157659414",
+  "createdAt": 1769157659589,
+  "lastAccessedAt": 1769157659589,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769157659414",
+    "type": "magical"
+  }
+}

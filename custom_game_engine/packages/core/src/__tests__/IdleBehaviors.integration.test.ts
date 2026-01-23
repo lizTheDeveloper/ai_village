@@ -17,7 +17,7 @@ describe('Idle Behaviors Integration', () => {
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     idleBehaviorSystem = new IdleBehaviorSystem();
     reflectionSystem = new ReflectionSystem(eventBus);
   });

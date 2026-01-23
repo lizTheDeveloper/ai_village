@@ -4,7 +4,7 @@ import { EventBus } from '../../events/EventBus.js';
 
 function createTestWorld(): World {
   const eventBus = new EventBus();
-  return new WorldImpl(eventBus);
+  return new World(eventBus);
 }
 
 describe('QueryCache Integration', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import {
   createInventoryComponent,
   addToInventory,
@@ -10,11 +10,11 @@ import {
 import type { InventoryComponent, InventorySlot } from '../../components/InventoryComponent';
 
 describe('Quality-Based Stacking Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let inventory: InventoryComponent;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     inventory = createInventoryComponent(24, 1000); // 24 slots, 1000 weight capacity
   });
 

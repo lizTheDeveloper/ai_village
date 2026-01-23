@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { SoilSystem } from '../SoilSystem.js';
 import { WeatherSystem } from '../WeatherSystem.js';
@@ -35,7 +35,7 @@ import { TemperatureSystem } from '../TemperatureSystem.js';
  * - Indoor tiles don't receive rain
  */
 describe('Phase 9: Soil + Weather Integration', () => {
-  let _world: WorldImpl;
+  let _world: World;
   let eventBus: EventBusImpl;
   let soilSystem: SoilSystem;
   let weatherSystem: WeatherSystem;
@@ -43,7 +43,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    _world = new WorldImpl(eventBus);
+    _world = new World(eventBus);
     soilSystem = new SoilSystem();
     weatherSystem = new WeatherSystem();
     temperatureSystem = new TemperatureSystem();
@@ -101,7 +101,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
     it('should increase evaporation in summer (+25%)', () => {
       // Summer: 1.25x decay multiplier
       // Setup: Create world with summer season
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
         type: 'time',
@@ -141,7 +141,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
 
     it('should decrease evaporation in winter (-50%)', () => {
       // Winter: 0.5x decay multiplier
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
         type: 'time',
@@ -179,7 +179,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
 
     it('should apply normal evaporation in spring', () => {
       // Spring: 1.0x decay multiplier
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
         type: 'time',
@@ -217,7 +217,7 @@ describe('Phase 9: Soil + Weather Integration', () => {
 
     it('should apply normal evaporation in fall', () => {
       // Fall: 1.0x decay multiplier
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const timeEntity = world.createEntity();
       timeEntity.addComponent({
         type: 'time',

@@ -8,7 +8,7 @@ import { createVisionComponent } from '../../components/VisionComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
-function createTestAgent(world: WorldImpl, name: string, x: number, y: number): EntityImpl {
+function createTestAgent(world: World, name: string, x: number, y: number): EntityImpl {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
   (entity as any).addComponent(createIdentityComponent(name));
@@ -22,13 +22,13 @@ function createTestAgent(world: WorldImpl, name: string, x: number, y: number): 
 }
 
 describe('Hearing System', () => {
-  let world: WorldImpl;
+  let world: World;
   let hearingProcessor: HearingProcessor;
 
   beforeEach(() => {
     // Create WorldImpl with minimal dependencies
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create HearingProcessor for direct testing
     hearingProcessor = new HearingProcessor();

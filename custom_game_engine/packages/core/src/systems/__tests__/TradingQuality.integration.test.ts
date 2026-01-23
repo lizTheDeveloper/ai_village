@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { TradingSystem } from '../TradingSystem.js';
@@ -15,7 +15,7 @@ import { createPositionComponent } from '../../components/PositionComponent.js';
 import { getQualityPriceMultiplier } from '../../items/ItemQuality.js';
 
 describe('TradingSystem Quality Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let tradingSystem: TradingSystem;
   let agent: EntityImpl;
@@ -24,7 +24,7 @@ describe('TradingSystem Quality Integration', () => {
   beforeEach(() => {
     // Create real world with EventBus
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     // Set world tick to daytime (10 AM = tick 12000)
     (world as any)._tick = 12000;
 

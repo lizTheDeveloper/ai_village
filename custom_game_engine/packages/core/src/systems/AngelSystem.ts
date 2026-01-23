@@ -29,13 +29,7 @@ import {
   type AngelResourceComponent,
 } from '../components/AngelResourceComponent.js';
 import { setupAngelMessaging } from './AngelPhoneSystem.js';
-
-/**
- * LLM Provider interface (matches AngelAIDecisionProcessor requirements)
- */
-interface LLMProvider {
-  generate(prompt: string, options?: { tier?: string }): Promise<string>;
-}
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 // ============================================================================
 // Angel Types (re-exported from AngelTypes.ts to maintain backward compatibility)

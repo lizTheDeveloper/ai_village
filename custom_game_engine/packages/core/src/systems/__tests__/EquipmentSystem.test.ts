@@ -6,7 +6,7 @@ import type { BodyComponent, SizeCategory } from '../../components/BodyComponent
 import { itemRegistry } from '../../items/ItemRegistry.js';
 import { defineItem } from '../../items/ItemDefinition.js';
 import type { ArmorTrait } from '../../items/traits/ArmorTrait.js';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl } from '../../ecs/Entity.js';
 
 /**
@@ -38,7 +38,7 @@ function createTestBodyComponent(size: SizeCategory = 'medium'): BodyComponent {
 
 describe('EquipmentSystem', () => {
   let system: EquipmentSystem;
-  let world: WorldImpl;
+  let world: World;
 
   beforeEach(() => {
     // Reset registry
@@ -46,7 +46,7 @@ describe('EquipmentSystem', () => {
 
     // Create system and world
     system = new EquipmentSystem();
-    world = new WorldImpl();
+    world = new World();
 
     // Register test armor items
     itemRegistry.register(

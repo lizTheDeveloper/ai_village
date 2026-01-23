@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { ReflectionSystem } from '../ReflectionSystem.js';
@@ -15,13 +15,13 @@ import { ReflectionComponent } from '../../components/ReflectionComponent.js';
  */
 
 describe('ReflectionSystem Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let reflectionSystem: ReflectionSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     reflectionSystem = new ReflectionSystem(eventBus);
   });
 

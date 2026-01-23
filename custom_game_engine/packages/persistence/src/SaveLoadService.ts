@@ -384,7 +384,7 @@ export class SaveLoadService {
       }
 
       // Clear existing world
-      // Type assertion: WorldImpl has _entities as an internal property
+      // Type assertion: World has _entities as an internal property
       interface WorldImplInternal {
         _entities: Map<string, unknown>;
       }
@@ -575,7 +575,7 @@ export class SaveLoadService {
       }
 
       // Load the snapshot into the world
-      // Type assertion: WorldImpl has _entities as an internal property
+      // Type assertion: World has _entities as an internal property
       interface WorldImplInternal {
         _entities: Map<string, unknown>;
       }

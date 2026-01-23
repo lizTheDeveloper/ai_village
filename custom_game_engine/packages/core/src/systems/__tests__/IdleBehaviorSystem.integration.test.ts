@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { IdleBehaviorSystem } from '../IdleBehaviorSystem.js';
@@ -20,13 +20,13 @@ import { ComponentType } from '../../types/ComponentType.js';
  */
 
 describe('IdleBehaviorSystem Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let idleBehaviorSystem: IdleBehaviorSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     idleBehaviorSystem = new IdleBehaviorSystem();
   });
 

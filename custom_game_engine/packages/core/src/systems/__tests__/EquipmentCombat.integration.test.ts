@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { WorldImpl } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { AgentCombatSystem } from '../AgentCombatSystem.js';
@@ -50,7 +50,7 @@ function createTestBodyComponent(size: SizeCategory = 'medium'): BodyComponent {
  */
 
 describe('Equipment + Combat Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let combatSystem: AgentCombatSystem;
   let equipmentSystem: EquipmentSystem;
@@ -304,7 +304,7 @@ describe('Equipment + Combat Integration', () => {
 
     // Create world and systems
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({

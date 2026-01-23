@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:388c58d5",
+  "name": "Ariel Secundus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155474177",
+  "createdAt": 1769155474201,
+  "lastAccessedAt": 1769155474201,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155474177",
+    "type": "magical"
+  }
+}

@@ -19,13 +19,7 @@ import type { IdentityComponent } from '../components/IdentityComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { answerPrayer as answerPrayerOnAgent } from '../components/SpiritualComponent.js';
-
-/**
- * LLM Provider interface (simplified to avoid cross-package import issues)
- */
-interface LLMProvider {
-  generate(prompt: string, options?: { tier?: string }): Promise<string>;
-}
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 /**
  * Angel response from LLM

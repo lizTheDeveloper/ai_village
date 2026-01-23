@@ -35,7 +35,7 @@ describe('Fake Implementations Cleanup', () => {
 
     beforeEach(() => {
       eventBus = new EventBusImpl();
-      world = new WorldImpl(eventBus);
+      world = new World(eventBus);
       plantSystem = new PlantSystem(eventBus);
     });
 
@@ -197,7 +197,7 @@ describe('Fake Implementations Cleanup', () => {
 
     beforeEach(() => {
       eventBus = new EventBusImpl();
-      world = new WorldImpl(eventBus);
+      world = new World(eventBus);
     });
 
     it('should track real builderId when building completes (not "system")', () => {
@@ -265,7 +265,7 @@ describe('Fake Implementations Cleanup', () => {
 
     beforeEach(() => {
       eventBus = new EventBusImpl();
-      world = new WorldImpl(eventBus);
+      world = new World(eventBus);
     });
 
     it('should handle product_ready event when emitted', () => {
@@ -347,7 +347,7 @@ describe('Fake Implementations Cleanup', () => {
 
     beforeEach(() => {
       eventBus = new EventBusImpl();
-      world = new WorldImpl(eventBus);
+      world = new World(eventBus);
     });
 
     it('should emit agent:idle when agent has no behavior and no urgent needs', () => {
@@ -434,7 +434,7 @@ describe('Fake Implementations Cleanup', () => {
       // This is marked as lower priority in the spec
 
       const eventBus = new EventBusImpl();
-      const world = new WorldImpl(eventBus);
+      const world = new World(eventBus);
       const handler = new HarvestActionHandler();
 
       const firstHarvestEvents: any[] = [];
@@ -517,7 +517,7 @@ describe('Fake Implementations Cleanup', () => {
 
     beforeEach(() => {
       eventBus = new EventBusImpl();
-      world = new WorldImpl(eventBus);
+      world = new World(eventBus);
     });
 
     it('should emit and handle product_ready -> trigger collection behavior', () => {

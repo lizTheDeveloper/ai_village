@@ -8,7 +8,7 @@
  */
 
 import type { World } from '@ai-village/core';
-import { WorldImpl } from '@ai-village/core';
+import { World } from '@ai-village/core';
 import { EventBusImpl } from '@ai-village/core';
 import { worldSerializer } from './WorldSerializer.js';
 

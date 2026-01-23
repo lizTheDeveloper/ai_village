@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { BuildingSystem } from '../systems/BuildingSystem.js';
 import { createBuildingComponent, type BuildingComponent } from '../components/BuildingComponent.js';
@@ -11,7 +11,7 @@ import { BuildingType } from '../types/BuildingType.js';
 /**
  * Helper to create a storage building with resources for tests
  */
-function createStorageWithResources(world: WorldImpl, resources: Record<string, number>): void {
+function createStorageWithResources(world: World, resources: Record<string, number>): void {
   const storage = world.createEntity();
   const building = createBuildingComponent(BuildingType.StorageChest, 1, 100); // Complete building
   (building as any).isComplete = true;
@@ -33,13 +33,13 @@ function createStorageWithResources(world: WorldImpl, resources: Record<string, 
 }
 
 describe('BuildingSystem', () => {
-  let world: WorldImpl;
+  let world: World;
   let system: BuildingSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new BuildingSystem();
     system.initialize(world, eventBus);
   });

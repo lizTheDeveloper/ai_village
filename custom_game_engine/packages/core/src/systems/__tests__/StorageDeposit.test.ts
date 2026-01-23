@@ -18,14 +18,14 @@ import type { ResourceComponent } from '../../components/ResourceComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 describe('Storage Deposit System', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let aiSystem: AgentBrainSystem;
   let movementSystem: MovementSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     aiSystem = new AgentBrainSystem();
     movementSystem = new MovementSystem();
 

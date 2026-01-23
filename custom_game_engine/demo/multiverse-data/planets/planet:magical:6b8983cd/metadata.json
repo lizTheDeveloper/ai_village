@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6b8983cd",
+  "name": "Umbriel Minor",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769152128217",
+  "createdAt": 1769152128240,
+  "lastAccessedAt": 1769152128240,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769152128217",
+    "type": "magical"
+  }
+}

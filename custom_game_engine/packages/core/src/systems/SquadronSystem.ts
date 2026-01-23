@@ -298,15 +298,8 @@ export class SquadronSystem extends BaseSystem {
    * This method currently does passive tracking - the actual modifiers
    * are applied by combat/navigation systems via getFormationModifiers()
    */
-  private applyFormationEffects(squadron: SquadronComponent): void {
-    // Formation bonuses are now handled via FORMATION_MODIFIERS constant
-    // Combat systems use getFormationModifiers() to read these values
-    // Navigation systems can use getFormationSpeedModifier() for β-space travel
-    // This method is kept for future passive effects (e.g., fuel consumption)
-
-    // Example future use: Fuel consumption based on formation
-    // const modifiers = getFormationModifiers(squadron.formation);
-    // fuelConsumptionRate *= (1 - modifiers.speedBonus); // Faster = more fuel
+  private applyFormationEffects(_squadron: SquadronComponent): void {
+    // Formation bonuses handled via FORMATION_MODIFIERS constant read by combat/navigation systems
   }
 }
 

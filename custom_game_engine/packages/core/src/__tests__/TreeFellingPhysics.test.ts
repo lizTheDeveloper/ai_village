@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { createVoxelResourceComponent, createTreeVoxelResource } from '../components/VoxelResourceComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
@@ -21,12 +21,12 @@ import { reduceStabilityFromHarvest, getMaterialHardness } from '../systems/Tree
  * 6. Material hardness affects stability loss
  */
 describe('Tree Felling Physics - Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBus;
   let treeFellingSystem: TreeFellingSystem;
 
   beforeEach(() => {
-    world = new WorldImpl();
+    world = new World();
     eventBus = new EventBusImpl();
     treeFellingSystem = new TreeFellingSystem(eventBus);
   });

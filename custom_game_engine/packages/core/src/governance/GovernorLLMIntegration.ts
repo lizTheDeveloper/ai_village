@@ -44,8 +44,6 @@ export async function initializeGovernorLLM(world: World): Promise<void> {
     const provider = new OpenAICompatProvider(model, baseUrl, apiKey);
     llmDecisionQueue = new LLMDecisionQueue(provider, 2);
     governorPromptBuilder = new GovernorPromptBuilder();
-
-    console.log('[GovernorLLM] Initialized with model:', model);
   } catch (error) {
     console.error('[GovernorLLM] Failed to initialize:', error);
     console.warn('[GovernorLLM] Governor decisions will use fallback logic only');
@@ -362,29 +360,17 @@ export function executeDirectiveInterpretation(
   switch (interpretation.action) {
     case 'implement':
       // Update governor's governance component with new priority
-      console.log(
-        `[GovernorLLM] ${governor.id} implementing directive: ${directive.directive}`
-      );
-      console.log(`[GovernorLLM] Implementation plan: ${interpretation.implementation_plan}`);
-
       // Update the appropriate governance component with the new directive/priority
       updateGovernanceComponentWithDirective(governor, directive, interpretation, world);
       break;
 
     case 'delegate':
       // Find lower-tier entities and delegate to them
-      console.log(
-        `[GovernorLLM] ${governor.id} delegating directive to ${interpretation.delegation_target}`
-      );
       // TODO: Find entities at target tier and create new delegation chain
       break;
 
     case 'negotiate':
       // Initiate negotiation with higher tier
-      console.log(
-        `[GovernorLLM] ${governor.id} requesting negotiation on directive`
-      );
-      console.log(`[GovernorLLM] Negotiation points:`, interpretation.negotiation_points);
       // TODO: Create negotiation request event
       break;
 
@@ -464,9 +450,6 @@ export function addCrisisToGovernorQueue(
       // Add crisis to queue if the component has a crisis array
       if (Array.isArray(governance.activeCrises)) {
         governance.activeCrises.push(crisis);
-        console.log(
-          `[GovernorLLM] Added crisis ${crisis.id} to ${governor.id}'s queue (${governance.activeCrises.length} total)`
-        );
         return;
       }
     }
@@ -521,9 +504,6 @@ function updateGovernanceComponentWithDirective(
     // Update component with directive - different components may have different structures
     if (Array.isArray(governance.activeDirectives)) {
       governance.activeDirectives.push(directiveRecord);
-      console.log(
-        `[GovernorLLM] Added directive ${directiveRecord.id} to ${governor.id}'s active directives`
-      );
     } else if (governance.currentPriorities && typeof governance.currentPriorities === 'object') {
       // For components using priority-based structure
       governance.currentPriorities[directive.directive] = {
@@ -532,9 +512,6 @@ function updateGovernanceComponentWithDirective(
         plan: interpretation.implementation_plan,
         addedTick: world.tick,
       };
-      console.log(
-        `[GovernorLLM] Added priority "${directive.directive}" to ${governor.id}'s governance`
-      );
     } else {
       // Generic fallback: add to a pendingActions array if exists
       if (Array.isArray(governance.pendingActions)) {

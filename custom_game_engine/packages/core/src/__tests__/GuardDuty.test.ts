@@ -25,7 +25,7 @@ describe('GuardDutySystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new GuardDutySystem(eventBus);
 
     // Create guard

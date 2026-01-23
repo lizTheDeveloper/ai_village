@@ -186,8 +186,6 @@ export class FatesCouncilSystem extends BaseSystem {
   protected onInitialize(): void {
     // Subscribe to exotic events
     this.subscribeToExoticEvents();
-
-    console.log('[FatesCouncilSystem] The Three Fates begin their watch over the narrative tapestry');
   }
 
   protected onUpdate(ctx: SystemContext): void {
@@ -234,18 +232,15 @@ export class FatesCouncilSystem extends BaseSystem {
    * Conduct the Fates' evening council
    */
   private conductFatesCouncil(world: World, tick: number, dayNumber: number): void {
-    console.log(`[FatesCouncilSystem] Evening falls. The Three Fates convene... (Day ${dayNumber})`);
-
     // Gather narrative context
     const context = this.gatherNarrativeContext(world, dayNumber);
 
     // Skip council if nothing interesting is happening
     if (context.potentialHooks.length === 0 && context.worldTension < 0.3) {
-      console.log('[FatesCouncilSystem] The tapestry is peaceful. The Fates observe in silence.');
       return;
     }
 
-    console.log(`[FatesCouncilSystem] ${context.allThreads.length} threads examined, ${context.potentialHooks.length} story hooks found`);
+    console.warn(`[FatesCouncilSystem] Council starting - Day ${dayNumber}, ${context.allThreads.length} threads, ${context.potentialHooks.length} hooks`);
 
     // Start the council
     this.activeCouncil = {
@@ -257,9 +252,6 @@ export class FatesCouncilSystem extends BaseSystem {
       dayNumber,
       completed: false,
     };
-
-    // Emit event that council has begun (using generic pattern for custom event)
-    console.log(`[FatesCouncilSystem] Council starting - ${context.allThreads.length} threads, ${context.potentialHooks.length} hooks`);
   }
 
   /**
@@ -692,8 +684,6 @@ export class FatesCouncilSystem extends BaseSystem {
       return;
     }
 
-    // Log that this Fate is thinking
-    console.log(`[FatesCouncilSystem] ${this.getFateName(council.currentSpeaker)} is thinking...`);
 
     // Generate prompt for current speaker
     const prompt = this.generateFatePromptForCouncil(
@@ -762,9 +752,6 @@ export class FatesCouncilSystem extends BaseSystem {
 
     council.transcript.push(exchange);
 
-    // Log the Fate's speech
-    console.log(`[FatesCouncilSystem] ${this.getFateName(council.currentSpeaker)}: ${response}`);
-
     // Advance to next speaker
     council.turnCount++;
 
@@ -797,8 +784,6 @@ export class FatesCouncilSystem extends BaseSystem {
     // Mark as completed
     council.completed = true;
 
-    console.log(`[FatesCouncilSystem] The Fates have concluded their council.`);
-
     // Parse decisions from conversation
     const decision = await this.parseFatesDecisions(world, council);
 
@@ -806,7 +791,7 @@ export class FatesCouncilSystem extends BaseSystem {
     this.executeFatesDecisions(decision, world, council.tick);
 
     // Log completion
-    console.log(`[FatesCouncilSystem] Council complete: ${decision.summary}`);
+    console.warn(`[FatesCouncilSystem] Council complete: ${decision.summary}`);
 
     // Clear active council
     this.activeCouncil = undefined;
@@ -867,7 +852,7 @@ export class FatesCouncilSystem extends BaseSystem {
    * Execute the Fates' decisions (assign plots, weave connections)
    */
   private executeFatesDecisions(decision: FatesDecision, world: World, tick: number): void {
-    console.log(`[FatesCouncilSystem] The Fates have spoken. Executing ${decision.plotAssignments.length} plot assignments...`);
+    console.warn(`[FatesCouncilSystem] Executing ${decision.plotAssignments.length} plot assignments...`);
 
     for (const assignment of decision.plotAssignments) {
       this.assignPlotToEntity(
@@ -882,7 +867,7 @@ export class FatesCouncilSystem extends BaseSystem {
 
     // TODO: Execute narrative connections
 
-    console.log(`[FatesCouncilSystem] Council Summary: ${decision.summary}`);
+    console.warn(`[FatesCouncilSystem] Council Summary: ${decision.summary}`);
   }
 
   /**
@@ -937,8 +922,7 @@ export class FatesCouncilSystem extends BaseSystem {
     // Update the component in the world
     (world as any).addComponent(entityId, updatedPlotLines);
 
-    console.log(`[FatesCouncilSystem] ✨ The Fates weave: ${plotTemplateId} → ${soulId}`);
-    console.log(`[FatesCouncilSystem]    Reasoning: ${reasoning}`);
+    console.warn(`[FatesCouncilSystem] Plot woven: ${plotTemplateId} → ${soulId} (${reasoning})`);
   }
 
   /**
@@ -1170,8 +1154,6 @@ export class FatesCouncilSystem extends BaseSystem {
 
     this.lastEpicScanTick = tick;
 
-    console.log('[FatesCouncilSystem] The Fates scan for souls ready for ascension...');
-
     // Query souls with required components
     const souls = world.query()
       .with(CT.SoulIdentity)
@@ -1198,7 +1180,6 @@ export class FatesCouncilSystem extends BaseSystem {
       const templateId = this.selectEpicTemplate(soul, soulIdentity, plotLines, world);
 
       if (!templateId) {
-        console.log(`[FatesCouncilSystem] Soul ${soulIdentity.true_name} eligible but no matching epic template`);
         continue;
       }
 
@@ -1206,7 +1187,7 @@ export class FatesCouncilSystem extends BaseSystem {
       const thread = soul.getComponent(CT.SilverThread);
       const personalTick = (thread as any)?.head?.personal_tick || tick;
 
-      console.log(`[FatesCouncilSystem] ✨ EPIC ASCENSION: ${soulIdentity.true_name} → ${templateId} (wisdom: ${soulIdentity.wisdom_level})`);
+      console.warn(`[FatesCouncilSystem] EPIC ASCENSION: ${soulIdentity.true_name} → ${templateId} (wisdom: ${soulIdentity.wisdom_level})`);
 
       this.assignPlotToEntity(
         soul.id,
@@ -1221,7 +1202,7 @@ export class FatesCouncilSystem extends BaseSystem {
     }
 
     if (eligibleCount > 0) {
-      console.log(`[FatesCouncilSystem] Epic scan complete: ${eligibleCount} eligible, ${assignedCount} assigned`);
+      console.warn(`[FatesCouncilSystem] Epic scan complete: ${eligibleCount} eligible, ${assignedCount} assigned`);
     }
   }
 
@@ -1331,8 +1312,6 @@ export class FatesCouncilSystem extends BaseSystem {
     }
 
     // Default: If no clear affinity but eligible, pick based on strongest tendency
-    console.log(`[FatesCouncilSystem] No clear epic affinity for ${soulIdentity.true_name}, selecting default based on lessons`);
-
     // Count affinity scores
     const scores = {
       nature: (hasNatureAffinity ? 2 : 0) + (hasNatureSkills ? 1 : 0),
@@ -1419,6 +1398,5 @@ export class FatesCouncilSystem extends BaseSystem {
 
   protected onCleanup(): void {
     this.recentExoticEvents = [];
-    console.log('[FatesCouncilSystem] The Fates withdraw their gaze');
   }
 }

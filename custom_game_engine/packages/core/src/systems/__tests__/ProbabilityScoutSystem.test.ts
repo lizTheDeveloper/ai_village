@@ -18,13 +18,13 @@ import type { ProbabilityScoutMissionComponent } from '../../components/Probabil
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 describe('ProbabilityScoutSystem', () => {
-  let world: WorldImpl;
+  let world: World;
   let system: ProbabilityScoutSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new ProbabilityScoutSystem();
   });
 

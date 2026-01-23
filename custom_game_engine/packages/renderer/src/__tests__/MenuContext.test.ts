@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MenuContext } from '../context-menu/MenuContext';
-import { WorldImpl as World } from '@ai-village/core';
+import { World as World } from '@ai-village/core';
 import { Camera } from '../Camera';
 
 // TODO: Not implemented - tests skipped

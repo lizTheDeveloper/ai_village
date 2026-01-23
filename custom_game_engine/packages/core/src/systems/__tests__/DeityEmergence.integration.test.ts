@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl as World } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 import { DeityEmergenceSystem } from '../DeityEmergenceSystem.js';
 import { AIGodBehaviorSystem } from '../AIGodBehaviorSystem.js';
 import { DeityComponent } from '../../components/DeityComponent.js';

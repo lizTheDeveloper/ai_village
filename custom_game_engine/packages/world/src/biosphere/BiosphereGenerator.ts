@@ -25,17 +25,24 @@ type ArtStyle = 'nes' | 'snes' | 'ps1' | 'gba' | 'gameboy' | 'neogeo' |
 
 export type ProgressCallback = (message: string) => void;
 
+export interface BiosphereGeneratorOptions {
+  /** Max total species to generate. Limits LLM calls to 2*maxSpecies. Default: unlimited. */
+  maxSpecies?: number;
+}
+
 export class BiosphereGenerator {
   private nicheIdentifier: EcologicalNicheIdentifier;
   private alienGenerator: AlienSpeciesGenerator;
   private planet: PlanetConfig;
   private progressCallback?: ProgressCallback;
+  private maxSpecies: number;
 
-  constructor(llmProvider: LLMProvider, planet: PlanetConfig, progressCallback?: ProgressCallback) {
+  constructor(llmProvider: LLMProvider, planet: PlanetConfig, progressCallback?: ProgressCallback, options?: BiosphereGeneratorOptions) {
     this.nicheIdentifier = new EcologicalNicheIdentifier();
     this.alienGenerator = new AlienSpeciesGenerator(llmProvider);
     this.planet = planet;
     this.progressCallback = progressCallback;
+    this.maxSpecies = options?.maxSpecies ?? Infinity;
   }
 
   private reportProgress(message: string): void {
@@ -58,12 +65,21 @@ export class BiosphereGenerator {
     const niches = this.nicheIdentifier.identifyNiches(this.planet);
     this.reportProgress(`✨ ${niches.length} unique habitats discovered`);
 
-    // Phase 2: Generate species for each niche
+    // Phase 2: Generate species for each niche (respecting maxSpecies cap)
     this.reportProgress('🧬 Evolving creatures...');
     const species: GeneratedAlienSpecies[] = [];
 
-    for (const niche of niches) {
-      const nicheSpecies = await this.generateSpeciesForNiche(niche);
+    // Prioritize niches: producers first, then herbivores, then carnivores, then others
+    const nichePriority: Record<string, number> = { producer: 0, herbivore: 1, omnivore: 2, carnivore: 3, decomposer: 4, parasite: 5 };
+    const sortedNiches = [...niches].sort((a, b) => (nichePriority[a.category] ?? 99) - (nichePriority[b.category] ?? 99));
+
+    for (const niche of sortedNiches) {
+      if (species.length >= this.maxSpecies) {
+        this.reportProgress(`🛑 Species cap reached (${this.maxSpecies}), stopping generation`);
+        break;
+      }
+      const remaining = this.maxSpecies - species.length;
+      const nicheSpecies = await this.generateSpeciesForNiche(niche, remaining);
       species.push(...nicheSpecies);
     }
 
@@ -120,9 +136,9 @@ export class BiosphereGenerator {
   /**
    * Generate species for a specific niche
    */
-  private async generateSpeciesForNiche(niche: EcologicalNiche): Promise<GeneratedAlienSpecies[]> {
+  private async generateSpeciesForNiche(niche: EcologicalNiche, maxCount: number = Infinity): Promise<GeneratedAlienSpecies[]> {
     const species: GeneratedAlienSpecies[] = [];
-    const count = niche.expectedSpeciesCount;
+    const count = Math.min(niche.expectedSpeciesCount, maxCount);
 
     for (let i = 0; i < count; i++) {
       const constraints = this.fitNicheConstraints(niche, i);

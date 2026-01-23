@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { createBuildingComponent, type BuildingComponent } from '../components/BuildingComponent.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
@@ -13,7 +13,7 @@ import type { WeatherComponent } from '../components/WeatherComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { BuildingType } from '../types/BuildingType.js';
 describe('Animal Housing - Integration Tests', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let temperatureSystem: TemperatureSystem;
   let animalSystem: AnimalSystem;
@@ -21,7 +21,7 @@ describe('Animal Housing - Integration Tests', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create StateMutatorSystem for test usage
     stateMutator = new StateMutatorSystem();

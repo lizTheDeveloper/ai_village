@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { RealityAnchorSystem } from '../systems/RealityAnchorSystem.js';
 import { PowerGridSystem } from '../systems/PowerGridSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
@@ -11,14 +11,14 @@ import type { PowerComponent } from '../components/PowerComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 
 describe('Reality Anchor Power Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let realityAnchorSystem: RealityAnchorSystem;
   let powerGridSystem: PowerGridSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     realityAnchorSystem = new RealityAnchorSystem();
     powerGridSystem = new PowerGridSystem();
     realityAnchorSystem.initialize(world, eventBus);

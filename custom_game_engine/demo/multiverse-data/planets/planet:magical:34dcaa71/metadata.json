@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:34dcaa71",
+  "name": "Titan VII",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155225298",
+  "createdAt": 1769155225333,
+  "lastAccessedAt": 1769155225333,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155225298",
+    "type": "magical"
+  }
+}

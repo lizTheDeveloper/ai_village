@@ -43,7 +43,7 @@ function createMockBlueprint(id: string, options: Partial<BuildingBlueprint> = {
 }
 
 describe('RecipeListSection - Research Unlock Filtering', () => {
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let recipeListSection: RecipeListSection;
   let researchState: ResearchStateComponent;
@@ -82,7 +82,7 @@ describe('RecipeListSection - Research Unlock Filtering', () => {
 
     // Setup world and services
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     researchState = createResearchStateComponent();
     unlockService = new UnlockQueryService(researchState, researchRegistry);
 

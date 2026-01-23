@@ -33,7 +33,7 @@ describe('DeathHandling', () => {
 
   beforeEach(async () => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     system = new DeathTransitionSystem();
     await system.initialize(world, eventBus);
   });

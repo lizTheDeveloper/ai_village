@@ -225,15 +225,7 @@ export class SpeciesCreationSystem extends BaseSystem {
    * Spawn initial population
    */
   private spawnInitialPopulation(_world: World, _species: CreatedSpecies): void {
-    // In full implementation, would spawn actual entities
-    // For now, just track the creation
-
-    // Example of what would happen:
-    // for (let i = 0; i < species.initialPopulation; i++) {
-    //   const entity = world.createEntity();
-    //   // Add animal component with species.name as species
-    //   // Add position, behavior, etc.
-    // }
+    // Stub: entity spawning not yet implemented
   }
 
   /**

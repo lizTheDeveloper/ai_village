@@ -1,0 +1,15 @@
+{
+  "id": "planet:terrestrial:8d2c5f4",
+  "name": "Epsilon Titan",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1769154784333",
+  "createdAt": 1769154784350,
+  "lastAccessedAt": 1769154784350,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769154784333",
+    "type": "terrestrial"
+  }
+}

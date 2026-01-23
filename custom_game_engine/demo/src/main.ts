@@ -3802,6 +3802,15 @@ async function main() {
       universeConfigScreen.show((config) => {
         universeConfig = config;  // Store full config for scenario access
         resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+      }, {
+        existingPlanets: existingPlanets.map(p => ({
+          id: p.id,
+          name: p.name,
+          type: p.type,
+          hasBiosphere: p.hasBiosphere,
+          chunkCount: p.chunkCount,
+          createdAt: p.createdAt,
+        })),
       });
     });
   } else if (browserResult && browserResult.action === 'load_local' && browserResult.saveKey) {
@@ -4592,10 +4601,11 @@ async function main() {
     }
 
     if (planetServerAvailable && existingPlanets.length > 0) {
-      // Look for a planet with the same type that has a biosphere
-      const matchingPlanet = existingPlanets.find(
-        p => p.type === homeworldConfig.type && p.hasBiosphere
-      );
+      // If user explicitly selected an existing planet, use it directly
+      // Otherwise, try to match by type
+      const matchingPlanet = universeConfig?.planetId
+        ? existingPlanets.find(p => p.id === universeConfig!.planetId)
+        : existingPlanets.find(p => p.type === homeworldConfig.type && p.hasBiosphere);
 
       if (matchingPlanet) {
         console.log(`[WorldInit] Found existing planet: ${matchingPlanet.name} (${matchingPlanet.id})`);
@@ -5036,6 +5046,9 @@ async function main() {
 
   // Game loop already started before soul creation
 
+  // Start render loop immediately - don't block on soul creation
+  renderLoop();
+
   // Wait for soul creation to complete before hiding loading screen and taking snapshot
   if (!loadedCheckpoint && soulCreationPromise) {
     await soulCreationPromise;
@@ -5090,8 +5103,6 @@ async function main() {
       console.error('[InitialSave] Failed to create initial snapshot:', error);
     }
   }
-
-  renderLoop();
 
   // Set up periodic auto-saves every 5 minutes (real time)
   // Note: AutoSaveSystem also saves daily at midnight (game time) with canon events

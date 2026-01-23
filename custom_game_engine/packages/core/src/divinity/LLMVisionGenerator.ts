@@ -24,13 +24,7 @@ import type {
   VisionPurpose,
   VisionClarity,
 } from './VisionDeliverySystem.js';
-
-/**
- * LLM Provider interface (simplified to avoid cross-package import issues)
- */
-interface LLMProvider {
-  generate(prompt: string): Promise<string>;
-}
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 /**
  * Vision generation request

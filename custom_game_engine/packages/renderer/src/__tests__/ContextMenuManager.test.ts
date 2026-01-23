@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { ContextMenuManager } from '../ContextMenuManager';
-import { WorldImpl, EventBusImpl } from '@ai-village/core';
+import { World, EventBusImpl } from '@ai-village/core';
 import { Camera } from '../Camera';
 import { MenuContext } from '../context-menu/MenuContext';
 
 describe('ContextMenuManager', () => {
   let manager: ContextMenuManager;
-  let world: WorldImpl;
+  let world: World;
   let eventBus: EventBusImpl;
   let camera: Camera;
   let canvas: HTMLCanvasElement;
@@ -22,7 +22,7 @@ describe('ContextMenuManager', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    world = new WorldImpl();
+    world = new World();
     eventBus = new EventBusImpl();
     canvas = document.createElement('canvas');
     canvas.width = 800;

@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { WorldImpl } from '../ecs/index.js';
+import { World } from '../ecs/index.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { WildAnimalSpawningSystem } from '../systems/WildAnimalSpawningSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
 
 import { ComponentType } from '../types/ComponentType.js';
 describe('Wild Animal Spawning System', () => {
-  let world: WorldImpl;
+  let world: World;
   let spawningSystem: WildAnimalSpawningSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     spawningSystem = new WildAnimalSpawningSystem();
 

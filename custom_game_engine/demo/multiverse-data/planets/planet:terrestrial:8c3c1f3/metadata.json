@@ -1,0 +1,15 @@
+{
+  "id": "planet:terrestrial:8c3c1f3",
+  "name": "Umbriel",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1769154772232",
+  "createdAt": 1769154772297,
+  "lastAccessedAt": 1769154772297,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769154772232",
+    "type": "terrestrial"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:3b9306d4",
+  "name": "Epsilon Nereid",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769155603701",
+  "createdAt": 1769155603710,
+  "lastAccessedAt": 1769155603710,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769155603701",
+    "type": "magical"
+  }
+}
