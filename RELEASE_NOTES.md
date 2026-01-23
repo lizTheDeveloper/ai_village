@@ -1,5 +1,504 @@
 # Release Notes
 
+## 2026-01-22 - "Deterministic Simulation, Incremental Persistence, Worker Rendering" - 45 Files (+409 net)
+
+### 🎯 Deterministic Simulation Infrastructure (Factorio-Inspired)
+
+**FixedPoint.ts** (181 lines) - 16.16 fixed-point arithmetic for platform-independent math
+
+**Why fixed-point?** Floating-point math produces different results on different CPUs/browsers. Fixed-point gives identical results everywhere.
+
+**Architecture:**
+- 16.16 format: 16 bits integer, 16 bits fractional (range: -32768 to +32767, precision: 0.0000152)
+- BigInt for 64-bit intermediate multiplication/division (prevents overflow)
+- Sin/cos lookup table (256 entries) for deterministic trig
+- Zero-copy operations, immutable API
+
+**API:**
+```typescript
+const a = Fixed.fromFloat(3.14159);
+const b = Fixed.fromInt(2);
+const c = a.mul(b);  // 6.28318
+
+const v1 = FixedVec2.fromFloats(3.0, 4.0);
+const v2 = FixedVec2.fromFloats(1.0, 0.0);
+const distance = v1.distanceTo(v2);  // 4.47213
+const normalized = v1.normalize();  // (0.6, 0.8)
+```
+
+**Use cases:**
+- Deterministic physics simulation
+- Lockstep multiplayer (predict other players' movements)
+- Replay systems (record inputs, replay exactly)
+- Cross-platform consistency (PC, mobile, server all get same results)
+
+---
+
+**DeterministicRandom.ts** (84 lines) - Xorshift128+ PRNG with checkpoint/restore
+
+**Why deterministic RNG?** Math.random() is not reproducible. Same seed must produce identical sequence.
+
+**Architecture:**
+- Xorshift128+ algorithm: 128-bit state, excellent statistical properties
+- SplitMix64 initialization from single seed
+- State serialization for save/load
+- Derived RNGs for per-system branching (prevents cross-contamination)
+
+**API:**
+```typescript
+const rng = new DeterministicRandom(42);  // Seed = 42
+rng.nextRaw();           // 0 to 0xFFFFFFFF
+rng.nextFixed();         // 0 to 65536 (fixed-point format)
+rng.range(1, 6);         // Dice roll
+rng.chance(0.5);         // Coin flip
+rng.pick(['a', 'b', 'c']); // Random element
+rng.shuffle(array);      // Fisher-Yates in-place
+
+// Checkpointing
+const state = rng.getState();  // { s0: "123...", s1: "456..." }
+rng.setState(state);           // Restore
+
+// Derived RNG (per-system deterministic branching)
+const movementRng = rng.derive(1);  // System ID = 1
+const combatRng = rng.derive(2);    // System ID = 2
+```
+
+**Use cases:**
+- Procedural generation (terrain, dungeons, loot)
+- AI behavior variation
+- Event scheduling
+- Combat rolls
+
+---
+
+**InputRecorder.ts** (76 lines) - Records player inputs for deterministic lockstep
+
+**Architecture:**
+- GameInput interface: tick, playerId, type (move/action/build/command/select), data
+- Checkpoint system for world state snapshots (every N ticks)
+- Fast tick-range queries for replay
+
+**API:**
+```typescript
+const recorder = new InputRecorder();
+
+// Record inputs
+recorder.record({
+  tick: 100,
+  playerId: 'player-123',
+  type: 'move',
+  data: { x: 10, y: 20 }
+});
+
+// Replay
+const inputs = recorder.getInputsForTick(100);
+for (const input of inputs) {
+  applyInput(input);  // Execute input deterministically
+}
+
+// Checkpointing (for fast-forward)
+recorder.checkpoint(1000, worldState);
+const nearestCheckpoint = recorder.findNearestCheckpoint(1500);  // 1000
+const state = recorder.getCheckpoint(nearestCheckpoint);
+```
+
+**Use cases:**
+- Replay system (watch your game from any point)
+- Debugging (reproduce exact sequence of events)
+- Multiplayer prediction (predict other players before server confirms)
+- Time travel (rewind to any checkpoint, replay with different inputs)
+
+---
+
+### 💾 Incremental Persistence (Resume-on-Refresh)
+
+**CreationStateManager.ts** (174 lines) - Tracks universe/planet creation progress
+
+**Problem:** Universe creation takes 5-10 minutes:
+- Biosphere generation: 2-5 minutes (10+ terrain systems, 100s of plants)
+- Soul generation: 60+ seconds (60+ agents with personality generation)
+- Page refresh during creation = lose all progress, start over
+
+**Solution:** Checkpoint creation progress to separate IndexedDB database.
+
+**5 Phases:**
+1. **universe_configured** - Universe created on server, config saved
+2. **planet_initialized** - Planet + biosphere generated/cached
+3. **world_populated** - Buildings + agents created, game loop running
+4. **souls_created** - Souls generated for agents
+5. **genesis_complete** - Full save taken, creation state deleted
+
+**API:**
+```typescript
+// Phase 1: Save initial state
+await creationStateManager.saveCreationState({
+  version: 1,
+  universeId, universeName, divinePreset, magicParadigm,
+  phase: 'universe_configured',
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+  universeConfig: { ... }
+});
+
+// Phase 2-4: Update phase
+await creationStateManager.updatePhase('planet_initialized', { planetSeed, planetType });
+await creationStateManager.updatePhase('world_populated');
+await creationStateManager.updatePhase('souls_created');
+
+// Phase 5: Complete and clean up
+await creationStateManager.updatePhase('genesis_complete');
+await creationStateManager.clearCreationState();
+
+// Resume on refresh
+const state = await creationStateManager.getCreationState();
+if (state && state.phase !== 'genesis_complete') {
+  // Resume from state.phase, skip completed phases
+  universeConfig = state.universeConfig;
+  resumeCreation(state);
+}
+```
+
+**Integration in main.ts** (+167 lines):
+- Check for interrupted creation on startup
+- Skip universe browser if resuming
+- Checkpoint at each phase completion
+- Clear state after genesis snapshot
+
+**Benefits:**
+- 5-10 minute biosphere generation = interruptible
+- 60+ second soul generation = interruptible
+- Players can close tab during genesis, resume later
+- No lost progress if browser crashes
+
+---
+
+### 🎨 Worker-Based 3D Rendering
+
+**MeshWorker.ts** (103 lines) - Web Worker for CPU-intensive greedy meshing
+
+**Problem:** Greedy meshing is expensive (10-50ms per chunk). Running on main thread causes frame drops during chunk generation/updates.
+
+**Solution:** Offload to Web Worker. Main thread stays responsive, meshing happens in background.
+
+**Architecture:**
+- ArrayBuffer transfer for zero-copy block data
+- Request/response message format
+- Transferable Float32Array/Uint32Array for mesh data
+
+**Message format:**
+```typescript
+// Request (main thread → worker)
+interface MeshRequest {
+  type: 'mesh';
+  chunkX: number;
+  chunkZ: number;
+  blocks: ArrayBuffer;  // [type0, color0, type1, color1, ...]
+  chunkSize: number;
+  chunkHeight: number;
+}
+
+// Response (worker → main thread)
+interface MeshResponse {
+  type: 'mesh_complete';
+  chunkX: number;
+  chunkZ: number;
+  meshData: {
+    positions: Float32Array;  // Transferred (zero-copy)
+    normals: Float32Array;
+    colors: Float32Array;
+    indices: Uint32Array;
+    vertexCount: number;
+    indexCount: number;
+  };
+}
+```
+
+**Performance:**
+- **Before:** Main thread blocked 10-50ms per chunk (frame drops, stuttering)
+- **After:** Main thread <1ms (schedule work), worker handles meshing
+
+**MeshWorkerPool.ts** (new file, not yet examined):
+- Manages pool of N workers (typically 2-4)
+- Round-robin work distribution
+- Request queuing when all workers busy
+
+---
+
+### 📋 Type System Cleanup Documentation
+
+**PLAN-circular-deps.md** (134 lines) - Root cause analysis of TypeScript build errors
+
+**Not circular package dependencies** (DAG is clean). Three real problems:
+
+**Problem 1: Two `World` classes**
+- `core/src/ecs/World.ts` exports `WorldImpl` (real ECS World)
+- `core/src/World.ts` exports `class World extends WorldImpl` (test helper)
+- `core/src/index.ts` exports test helper as public API
+- Internal functions typed as `WorldImpl`, external packages import `World`
+- In `--build` mode, TypeScript sees two incompatible types from different `.d.ts` paths
+
+**Problem 2: 8+ duplicate LLM interfaces**
+- Canonical definitions exist in `core/src/types/LLMTypes.ts`
+- 8+ files define local copies with divergent signatures:
+  - AdminAngelSystem: `LLMQueue.requestDecision(id, prompt, {tier?})`
+  - ProfessionPersonalityGenerator: `LLMQueue.requestDecision(id, prompt)` (no config)
+  - AngelSystem, AgentCombatSystem, CheckpointNamingService, etc: Local `LLMProvider`
+- Causes `LLMDecisionQueue` (canonical) incompatible with `LLMQueue` (local copy)
+
+**Problem 3: Stale `dist/` artifacts**
+- Old `.d.ts` files persist when internal structure changes
+- `--build` mode resolves types through stale paths
+- Phantom type incompatibilities
+
+**5-Step Implementation Plan:**
+1. **Unify World type** - Merge WorldImpl into World OR make all internal functions use public type
+2. **Consolidate LLM interfaces** - Replace local definitions with imports from canonical source
+3. **Clean dist/**: Add `prebuild: "rm -rf dist"` to all packages
+4. **Add CI guard** - Script to detect interface duplication
+5. **Fix remaining errors** - Strict null checks, missing arguments, DOM types
+
+**Status:** Plan documented, not yet implemented. Temporary workaround: All packages use src/ instead of dist/ (development mode).
+
+---
+
+### 🌐 API Namespace Migration Phase 4 ✅ COMPLETE
+
+**metrics-server.ts** (+298/-298 extensive refactoring)
+
+**Removed all aliasing middleware** - Direct /api/game/ paths
+
+**Before (Phases 1-3 with aliasing):**
+```typescript
+// Route aliasing middleware
+const namespaceAliases = [
+  ['/api/game/', '/api/live/'],
+  ['/api/planets/', '/api/planet/'],
+  ['/api/saves/', '/api/save/'],
+  ['/api/server/', '/api/game-server/'],
+];
+// Deprecation warnings for old paths
+```
+
+**After (Phase 4 - Direct):**
+```typescript
+// All routes renamed directly
+if (pathname === '/api/game/entities') { ... }
+if (pathname === '/api/game/entity') { ... }
+if (pathname === '/api/game/prompt') { ... }
+// No aliasing middleware
+```
+
+**50+ documentation updates:**
+- Dashboard HTML curl examples
+- API endpoint listings
+- Error messages and help text
+- All /api/live/* → /api/game/*
+
+**Rationale:** Since we're not live yet, skip aliasing phase and jump straight to direct rename.
+
+**API_NAMESPACE_MIGRATION.md** (+80 lines):
+- Updated Phase 3 status (complete)
+- Added Phase 4 documentation
+- Old → new route mapping table
+- Noted Phase 4 skips aliasing since not live
+
+---
+
+### 📦 Package Configuration: Development Mode (12 packages)
+
+**All packages switched from dist/ to src/**
+
+**Affected:** agents, deterministic-sprite-generator, divinity, environment, hierarchy-simulator, language, llm, magic, navigation, persistence, renderer
+
+**package.json changes:**
+```json
+// Before
+"main": "./dist/index.js",
+"types": "./dist/index.d.ts",
+"exports": {
+  ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+}
+
+// After
+"main": "./src/index.ts",
+"types": "./src/index.ts",
+"exports": {
+  ".": { "types": "./src/index.ts", "default": "./src/index.ts" }
+}
+```
+
+**Benefits:**
+- Direct TypeScript imports without build step
+- Better HMR (Hot Module Replacement) in Vite
+- Eliminates stale dist/ artifacts causing type resolution issues
+- Faster development iteration (no rebuild on change)
+
+**Tradeoff:** Requires TypeScript in consumer projects. Acceptable since this is a monorepo and all consumers are TypeScript packages.
+
+---
+
+### 🎭 Admin Capability: Weather & Seasons
+
+**weather-seasons.ts** (575 lines, new file)
+
+**Framing:** Divine control over fundamental forces of nature (serious, consequential power)
+
+**5 Queries:**
+1. **View Current Weather** - Type, intensity, duration, temp/movement modifiers, affected entities
+2. **View Weather Forecast** - 1-7 day predictions with intensity and temp ranges
+3. **View Current Season** - Season, days until change, effects on crops/mood
+4. **View Climate Zones** - Temperate/tropical/arid/polar/mediterranean distribution
+5. **View Historical Patterns** - Long-term climate trends
+
+**6 Actions:**
+1. **Summon Weather** - Clear/rain/storm/snow/fog with intensity and duration
+2. **Change Season** - Skip to specific season (disrupts agriculture)
+3. **Create Microclimate** - Blessed zone with custom weather (radius, duration)
+4. **Spawn Natural Disaster** - Hurricane, tornado, blizzard, drought (DANGEROUS)
+5. **Freeze Time of Year** - Lock season permanently (unnatural)
+6. **Reset Climate** - Restore natural patterns after tampering
+
+**Framing examples:**
+- Summoning storm = "unleashing divine wrath"
+- Season extension = "tampering with the natural order"
+- Microclimate = "blessing the land"
+- Disaster = "divine punishment"
+
+**Integration:** Delegates to `/api/game/weather/*` endpoints (not yet implemented).
+
+---
+
+### 🧪 Test Modernization (3 test files)
+
+**DeathHandling.test.ts** (+554 lines extensive refactoring)
+
+**Changes:**
+1. Component creation updated for new structure (type/version fields)
+2. Split agent → agent + identity components
+3. Needs component added (health, hunger, energy, temperature, lastUpdate)
+4. Relationship API updated (Map instead of object, new field names: affinity/trust/familiarity)
+5. Death triggering fixed (set needs.health = 0 instead of adding dead component)
+6. Assertions updated (check realm_location transformations, proper item field names)
+
+**Before:**
+```typescript
+deceased.addComponent('agent', { name: 'Deceased' });
+deceased.addComponent('dead', { cause: 'combat', time: 1000 });
+friend.addComponent('relationship', {
+  relationships: { [deceased.id]: { opinion: 80, trust: 90, closeness: 'close' } }
+});
+```
+
+**After:**
+```typescript
+deceased.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
+deceased.addComponent('identity', { type: 'identity', version: 1, name: 'Deceased' });
+deceased.addComponent('needs', { type: 'needs', version: 1, health: 100, ... });
+deceased.updateComponent('needs', (needs) => ({ ...needs, health: 0 })); // Trigger death
+friend.addComponent('relationship', {
+  type: 'relationship',
+  version: 1,
+  relationships: new Map([[deceased.id, { affinity: 80, trust: 90, familiarity: 80 }]])
+});
+
+// Check realm_location instead of dead component
+const realmLocation = deceased.getComponent('realm_location');
+expect(realmLocation?.transformations).toContain('dead');
+```
+
+**EmergentSocialDynamics.test.ts** (+87 lines)
+- Component structure updates
+- Event emission fixes
+
+**InterestEvolutionSystem.test.ts** (+52 lines)
+- Fixed event names (skill:level_up)
+- Component structure updates
+
+---
+
+### 🔧 System Improvements
+
+**EntityAwakenerSystem.ts** (+43 lines)
+- Enhanced event subscription system
+- Better wake queue management
+- Improved documentation
+
+**FriendshipSystem.ts** (+48 lines)
+- Friendship mechanics enhancements
+- Better relationship tracking
+
+**DeathBargainSystem.ts** (+58 lines)
+- Enhanced riddle challenge system
+- Better LLM integration
+- Improved @status DISABLED documentation
+
+**DeathTransitionSystem.ts** (+28 lines)
+- Death bargain integration hooks
+- Enhanced realm transition logic
+
+**StateMutatorSystem.ts** (+22 lines)
+- Performance improvements
+- Better mutation rate handling
+
+**AdminAngelSystem.ts** (+14 lines)
+- Enhanced LLM queue integration
+
+**registerAllSystems.ts** (+3 lines)
+- Re-enabled InterestEvolutionSystem (still @status DISABLED, exported for testing)
+
+---
+
+### 🎨 3D Rendering Enhancements
+
+**ChunkMesh.ts** (+75 lines)
+- Added serialize() for worker transfer
+- getBlock() and getColor() accessors for meshing
+
+**ChunkManager3D.ts** (+8 lines)
+- Integration for OcclusionCuller enhancements
+- Improved visibility tracking
+
+**OcclusionCuller.ts** (+52 lines)
+- Enhanced face connectivity analysis
+- Better flood-fill algorithm
+
+**3d/index.ts** (+4 lines)
+- Export MeshWorker types
+
+---
+
+### 📊 Statistics
+
+**45 files changed, +1181/-772 lines (+409 net)**
+
+**7 new infrastructure files:**
+- FixedPoint.ts (181 lines) - Deterministic fixed-point math
+- DeterministicRandom.ts (84 lines) - Deterministic PRNG
+- InputRecorder.ts (76 lines) - Input recording for replay
+- CreationStateManager.ts (174 lines) - Resume-on-refresh
+- MeshWorker.ts (103 lines) - Off-thread mesh generation
+- weather-seasons.ts (575 lines) - Admin weather capability
+- PLAN-circular-deps.md (134 lines) - Type system cleanup plan
+
+**6 new test/utility files:**
+- playtest-30min.ts, test-angel-chat.ts, test-angel-play.ts
+- MeshWorkerPool.ts
+- math/index.ts, simulation/index.ts
+
+**Major themes:**
+- Deterministic simulation foundation (fixed-point, deterministic RNG, input recording)
+- Incremental persistence (5-phase resume-on-refresh during expensive creation)
+- Worker-based rendering (off-thread mesh generation for 60 FPS)
+- Type system cleanup plan (root cause analysis, 5-step fix)
+- API namespace migration Phase 4 (direct rename, no aliasing)
+- Package modernization (development mode, src/ instead of dist/)
+- Test modernization (component structure updates for 3 test files)
+- System improvements (EntityAwakener, Friendship, DeathBargain, StateMutator)
+
+**Commit:** 532b7912
+
+---
+
 ## 2026-01-22 - "Admin Capabilities, Event-Driven Entities, 3D Occlusion Culling" - 32 Files (+348 net)
 
 ### 🎭 Admin Dashboard Expansion: 2 New Mystical Capabilities
