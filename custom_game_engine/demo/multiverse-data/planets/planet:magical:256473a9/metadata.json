@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:256473a9",
+  "name": "Umbriel VIII",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769158666115",
+  "createdAt": 1769158666213,
+  "lastAccessedAt": 1769158666213,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769158666115",
+    "type": "magical"
+  }
+}

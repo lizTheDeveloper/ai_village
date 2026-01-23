@@ -74,7 +74,7 @@ describe('PlantSeedProduction Integration', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     plantSystem = new PlantSystem(eventBus);
 
     // Set species lookup

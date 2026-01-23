@@ -68,7 +68,7 @@ describe('PlantSystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
 
     // Create and register StateMutatorSystem (needed to apply mutations in tests)
     stateMutator = new StateMutatorSystem();
