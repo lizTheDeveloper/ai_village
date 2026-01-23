@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { StructuredPromptBuilder } from '../StructuredPromptBuilder';
-import { WorldImpl, type World } from '../../../core/src/ecs/World';
+import { World, type World } from '../../../core/src/ecs/World';
 import { EventBusImpl } from '../../../core/src/events/EventBus';
 import { GoalsComponent } from '../../../core/src/components/GoalsComponent';
 import { PersonalityComponent } from '../../../core/src/components/PersonalityComponent';
