@@ -98,5 +98,6 @@ self.onmessage = (e: MessageEvent<MeshRequest>) => {
     meshData.colors.buffer,
     meshData.indices.buffer,
   ];
-  (self as unknown as Worker).postMessage(response, transferables);
+  // postMessage is a global in worker scope
+  postMessage(response, { transfer: transferables });
 };
