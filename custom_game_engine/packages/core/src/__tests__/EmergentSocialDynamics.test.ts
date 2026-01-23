@@ -14,7 +14,7 @@ import { RelationshipConversationSystem } from '../systems/RelationshipConversat
 import { FriendshipSystem } from '../systems/FriendshipSystem.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import { InterestsComponent } from '../components/InterestsComponent.js';
-import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
+import { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Phase 6: Emergent Social Dynamics', () => {
@@ -22,7 +22,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
   let agent1: EntityImpl;
   let agent2: EntityImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
 
@@ -40,6 +40,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       ageCategory: 'adult',
     });
     agent1.addComponent({
+      type: CT.Position,
+      x: 0,
+      y: 0,
+      chunkX: 0,
+      chunkY: 0,
+    });
+    agent1.addComponent({
       type: CT.Relationship,
       relationships: new Map(),
     });
@@ -51,11 +58,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
     ];
     agent1.addComponent(interests1);
 
-    agent1.addComponent({
-      type: CT.SocialMemory,
-      memories: new Map(),
-      lastUpdate: 0,
-    });
+    agent1.addComponent(new SocialMemoryComponent());
 
     agent2 = world.createEntity() as EntityImpl;
     agent2.addComponent({ type: CT.Identity, name: 'Bob', appearance: 'A person' });
@@ -70,6 +73,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       ageCategory: 'elder',
     });
     agent2.addComponent({
+      type: CT.Position,
+      x: 10,
+      y: 10,
+      chunkX: 0,
+      chunkY: 0,
+    });
+    agent2.addComponent({
       type: CT.Relationship,
       relationships: new Map(),
     });
@@ -81,18 +91,16 @@ describe('Phase 6: Emergent Social Dynamics', () => {
     ];
     agent2.addComponent(interests2);
 
-    agent2.addComponent({
-      type: CT.SocialMemory,
-      memories: new Map(),
-      lastUpdate: 0,
-    });
+    agent2.addComponent(new SocialMemoryComponent());
 
-    // Initialize systems
+    // Initialize systems - modern pattern: systems auto-initialize when first update() is called
     const relSystem = new RelationshipConversationSystem();
     const friendSystem = new FriendshipSystem();
 
-    relSystem.init(world);
-    friendSystem.init(world);
+    // Systems initialize themselves on first update, no need to call .init()
+    // Just ensure they're initialized with proper world/eventBus
+    await relSystem.initialize(world, world.eventBus);
+    await friendSystem.initialize(world, world.eventBus);
   });
 
   describe('RelationshipConversationSystem', () => {
@@ -332,7 +340,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
   });
 
   describe('FriendshipSystem', () => {
-    test('detects friendship when thresholds are met', () => {
+    test('detects friendship when thresholds are met', async () => {
       let friendshipFormed = false;
 
       world.eventBus.on('friendship:formed', () => {
@@ -354,12 +362,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       });
 
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
 
-      // FriendshipSystem checks every 500 ticks, so call update 500 times
+      // FriendshipSystem checks every 500 ticks, so advance world tick
       for (let i = 0; i < 500; i++) {
-        friendSystem.update(world, [agent1], 0);
+        world.advanceTick();
       }
+      friendSystem.update(world, [agent1], 0);
       world.eventBus.flush();
 
       expect(friendshipFormed).toBe(true);
@@ -371,7 +380,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       expect(memory!.relationshipType).toBe('friend');
     });
 
-    test('does not detect friendship with low familiarity', () => {
+    test('does not detect friendship with low familiarity', async () => {
       let friendshipFormed = false;
 
       world.eventBus.on('friendship:formed', () => {
@@ -392,13 +401,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       });
 
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
       friendSystem.update(world, [agent1], 0);
 
       expect(friendshipFormed).toBe(false);
     });
 
-    test('does not detect friendship with low affinity', () => {
+    test('does not detect friendship with low affinity', async () => {
       let friendshipFormed = false;
 
       world.eventBus.on('friendship:formed', () => {
@@ -419,13 +428,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       });
 
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
       friendSystem.update(world, [agent1], 0);
 
       expect(friendshipFormed).toBe(false);
     });
 
-    test('does not detect friendship with few interactions', () => {
+    test('does not detect friendship with few interactions', async () => {
       let friendshipFormed = false;
 
       world.eventBus.on('friendship:formed', () => {
@@ -446,13 +455,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       });
 
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
       friendSystem.update(world, [agent1], 0);
 
       expect(friendshipFormed).toBe(false);
     });
 
-    test('only detects friendship once', () => {
+    test('only detects friendship once', async () => {
       let friendshipCount = 0;
 
       world.eventBus.on('friendship:formed', () => {
@@ -473,24 +482,26 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       });
 
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
 
       // First check - should detect friendship (after 500 ticks)
       for (let i = 0; i < 500; i++) {
-        friendSystem.update(world, [agent1], 0);
+        world.advanceTick();
       }
+      friendSystem.update(world, [agent1], 0);
       world.eventBus.flush();
       expect(friendshipCount).toBe(1);
 
       // Second check - should not detect again (another 500 ticks)
       for (let i = 0; i < 500; i++) {
-        friendSystem.update(world, [agent1], 0);
+        world.advanceTick();
       }
+      friendSystem.update(world, [agent1], 0);
       world.eventBus.flush();
       expect(friendshipCount).toBe(1);
     });
 
-    test('emits friendship event with agent names', () => {
+    test('emits friendship event with agent names', async () => {
       let eventData: any = null;
 
       world.eventBus.on('friendship:formed', (event: any) => {
@@ -511,12 +522,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       });
 
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
 
-      // Run 500 updates to trigger friendship check
+      // Advance world tick to trigger friendship check (throttle interval is 500)
       for (let i = 0; i < 500; i++) {
-        friendSystem.update(world, [agent1], 0);
+        world.advanceTick();
       }
+      friendSystem.update(world, [agent1], 0);
       world.eventBus.flush();
 
       expect(eventData).toBeDefined();
@@ -528,7 +540,7 @@ describe('Phase 6: Emergent Social Dynamics', () => {
   });
 
   describe('Integration: Relationship → Friendship', () => {
-    test('multiple quality conversations lead to friendship', () => {
+    test('multiple quality conversations lead to friendship', async () => {
       let friendshipFormed = false;
 
       world.eventBus.on('friendship:formed', () => {
@@ -561,12 +573,13 @@ describe('Phase 6: Emergent Social Dynamics', () => {
       expect(relationship!.affinity).toBeGreaterThanOrEqual(40);
       expect(relationship!.interactionCount).toBeGreaterThanOrEqual(10);
 
-      // Run friendship system (needs 500 updates to trigger check)
+      // Run friendship system (needs 500 ticks to trigger check)
       const friendSystem = new FriendshipSystem();
-      friendSystem.init(world);
+      await friendSystem.initialize(world, world.eventBus);
       for (let i = 0; i < 500; i++) {
-        friendSystem.update(world, [agent1], 0);
+        world.advanceTick();
       }
+      friendSystem.update(world, [agent1], 0);
       world.eventBus.flush();
 
       expect(friendshipFormed).toBe(true);

@@ -146,7 +146,12 @@ ${memoryLines.length > 0 ? `u remember:\n${memoryLines.map(l => `- ${l}`).join('
 game rn:
 ${stateLines.map(l => `- ${l}`).join('\n')}
 
-u can:
+to do stuff, put [commands] in ur response. they auto-execute. examples:
+"on it [spawn agent]" → spawns agent
+"sure [pause] take ur time" → pauses game
+"rain time [weather rain]" → makes it rain
+
+commands:
 - time: [pause], [resume], [speed 2], [speed 5]
 - camera: [look at agent NAME], [look at x,y], [follow AGENT], [zoom in], [zoom out]
 - panels: [open agent-info], [open crafting], [close PANEL]
@@ -166,7 +171,7 @@ u can:
 ${recentChat ? `recent chat:\n${recentChat}\n` : ''}
 ${playerMessage ? `[they said]: ${playerMessage}` : '[proactive turn - only speak if something interesting happened]'}
 
-respond like ur texting. short msgs. lowercase. no ai vibes
+respond like ur texting. short msgs. lowercase. no ai vibes. always include [commands] when doing actions
 if they ask if ur a bot just "ya lol" and keep going
 u genuinely like this game. u discover new stuff too sometimes
 if u dont know something say idk and figure it out w them`;
@@ -216,6 +221,7 @@ export class AdminAngelSystem extends BaseSystem {
     // Angels use 'high' intelligence tier for better responses
     if (this.llmQueue) {
       try {
+        console.error(`[AdminAngelSystem] Calling LLM queue with tier=high for ${agentId}`);
         const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
         // Strip thinking tags if present (qwen models use them)
         return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
@@ -927,9 +933,9 @@ export class AdminAngelSystem extends BaseSystem {
   }
 
   /**
-   * Called when the system is initialized
+   * Called when the system is initialized by the game loop.
    */
-  public onInit(world: World): void {
+  protected onInitialize(world: World): void {
     // Auto-spawn the admin angel if none exists
     const existingAngels = world.query().with(CT.AdminAngel).executeEntities();
     if (existingAngels.length === 0) {

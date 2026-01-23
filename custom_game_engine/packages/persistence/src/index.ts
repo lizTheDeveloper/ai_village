@@ -69,6 +69,22 @@ export {
 } from './LocalSavesMigration.js';
 export type { MigrationProgress, MigrationOptions } from './LocalSavesMigration.js';
 
+// Creation state tracking (resume-on-refresh)
+export {
+  CreationStateManager,
+  creationStateManager,
+} from './CreationStateManager.js';
+export type {
+  CreationState,
+  CreationPhase,
+} from './CreationStateManager.js';
+
+// Multiverse client (universe persistence)
+export {
+  MultiverseClient,
+  multiverseClient,
+} from './MultiverseClient.js';
+
 // Planet sharing client (persistent world / multiplayer)
 export {
   PlanetClient,

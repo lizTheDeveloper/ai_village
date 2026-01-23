@@ -100,15 +100,15 @@ export class EntityAwakenerSystem implements System {
 
     // Wake entities and remove from queue
     for (const entityId of toWake) {
-      this.wakeEntity(world, entityId, 'scheduled');
+      this.wakeEntityInternal(world, entityId, 'scheduled');
       this.wakeQueue.delete(entityId);
     }
   }
 
   /**
-   * Wake an entity and mark it active this tick.
+   * Wake an entity and mark it active this tick (internal version).
    */
-  private wakeEntity(world: World, entityId: string, reason: 'scheduled' | 'event'): void {
+  private wakeEntityInternal(world: World, entityId: string, reason: 'scheduled' | 'event'): void {
     const entity = world.getEntity(entityId);
     if (!entity) return;
 
@@ -148,15 +148,28 @@ export class EntityAwakenerSystem implements System {
   }
 
   /**
+   * Unsubscribe entity from event.
+   */
+  unsubscribeFromEvent(entityId: string, eventType: string): void {
+    const subscribers = this.eventSubscriptions.get(eventType);
+    if (subscribers) {
+      subscribers.delete(entityId);
+      if (subscribers.size === 0) {
+        this.eventSubscriptions.delete(eventType);
+      }
+    }
+  }
+
+  /**
    * Wake entities subscribed to an event.
    * Call this when emitting events that should wake sleeping entities.
    */
   wakeOnEvent(world: World, eventType: string): void {
     const subscribers = this.eventSubscriptions.get(eventType);
     if (subscribers) {
-      for (const entityId of subscribers) {
-        this.wakeEntity(world, entityId, 'event');
-      }
+      subscribers.forEach(entityId => {
+        this.wakeEntityInternal(world, entityId, 'event');
+      });
     }
   }
 
@@ -191,11 +204,35 @@ export class EntityAwakenerSystem implements System {
   }
 
   /**
+   * Force wake an entity (public version of private wakeEntity).
+   * Marks entity as active and updates sleep state.
+   */
+  wakeEntity(world: World, entityId: string): void {
+    const entity = world.getEntity(entityId);
+    if (!entity) return;
+
+    const sleep = entity.getComponent<SleepComponent>('sleep');
+    if (sleep) {
+      sleep.accumulated_delta = world.tick - sleep.last_processed_tick;
+      sleep.state = 'active';
+    }
+
+    this.activeThisTick.add(entityId);
+  }
+
+  /**
    * Check if entity is active this tick.
    * Systems should check this before processing entities with sleep components.
    */
   isActive(entityId: string): boolean {
     return this.activeThisTick.has(entityId);
+  }
+
+  /**
+   * Get the number of active entities this tick.
+   */
+  getActiveCount(): number {
+    return this.activeThisTick.size;
   }
 
   cleanup(): void {

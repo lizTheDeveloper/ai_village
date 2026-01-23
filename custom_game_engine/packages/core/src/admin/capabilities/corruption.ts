@@ -78,7 +78,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/corruption/list-corrupted' };
+        return { message: 'Delegate to /api/game/corruption/list-corrupted' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -144,7 +144,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/corruption/list-rejected' };
+        return { message: 'Delegate to /api/game/corruption/list-rejected' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -203,7 +203,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/corruption/list-proto-realities' };
+        return { message: 'Delegate to /api/game/corruption/list-proto-realities' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -267,7 +267,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/corruption/details' };
+        return { message: 'Delegate to /api/game/corruption/details' };
       },
     }),
 
@@ -290,7 +290,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/corruption/find-recoverable' };
+        return { message: 'Delegate to /api/game/corruption/find-recoverable' };
       },
     }),
 
@@ -320,7 +320,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/corruption/check-spread' };
+        return { message: 'Delegate to /api/game/corruption/check-spread' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -384,7 +384,7 @@ const corruptionCapability = defineCapability({
             message: 'Recovery aborted - risk not accepted. Corruption recovery is uncertain.'
           };
         }
-        return { success: true, message: 'Delegate to /api/live/corruption/attempt-recovery' };
+        return { success: true, message: 'Delegate to /api/game/corruption/attempt-recovery' };
       },
     }),
 
@@ -407,7 +407,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/corruption/quarantine' };
+        return { success: true, message: 'Delegate to /api/game/corruption/quarantine' };
       },
     }),
 
@@ -438,7 +438,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/corruption/purify' };
+        return { success: true, message: 'Delegate to /api/game/corruption/purify' };
       },
     }),
 
@@ -463,7 +463,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/corruption/consign-to-void' };
+        return { success: true, message: 'Delegate to /api/game/corruption/consign-to-void' };
       },
     }),
 
@@ -491,7 +491,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/corruption/stabilize-proto-reality' };
+        return { success: true, message: 'Delegate to /api/game/corruption/stabilize-proto-reality' };
       },
     }),
 
@@ -515,7 +515,7 @@ const corruptionCapability = defineCapability({
         },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/corruption/merge-fragments' };
+        return { success: true, message: 'Delegate to /api/game/corruption/merge-fragments' };
       },
     }),
   ],

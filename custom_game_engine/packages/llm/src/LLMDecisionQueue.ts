@@ -29,6 +29,7 @@ interface DecisionRequest {
  */
 export class LLMDecisionQueue {
   private provider: LLMProvider;
+  private tierProviders: Map<string, LLMProvider> = new Map();
   private queue: DecisionRequest[] = [];
   private processing = false;
   private maxConcurrent: number;
@@ -39,6 +40,14 @@ export class LLMDecisionQueue {
   constructor(provider: LLMProvider, maxConcurrent: number = 2) {
     this.provider = provider;
     this.maxConcurrent = maxConcurrent;
+  }
+
+  /**
+   * Register a provider for a specific intelligence tier.
+   * When a request specifies this tier, it will use this provider instead of the default.
+   */
+  setTierProvider(tier: string, provider: LLMProvider): void {
+    this.tierProviders.set(tier, provider);
   }
 
   /**
@@ -109,6 +118,7 @@ export class LLMDecisionQueue {
    * Process a single request.
    */
   private async processRequest(request: DecisionRequest): Promise<void> {
+    console.error(`[LLMDecisionQueue] processRequest called for ${request.agentId}, tier=${request.customConfig?.tier || 'none'}, tierProviders=${this.tierProviders.size}`);
     try {
       // Calculate max tokens: at least 3x estimated prompt tokens, but respect configured max
       // Cap at 8192 to stay within model limits (Groq limits to 32768, but we don't need that much)
@@ -129,7 +139,7 @@ export class LLMDecisionQueue {
       }
       llmRequest.agentId = request.agentId;
 
-      // Use custom provider if custom config is provided (with baseUrl/apiKey)
+      // Select provider: custom baseUrl > tier-specific > default
       let provider = this.provider;
       if (request.customConfig?.baseUrl) {
         const config = request.customConfig;
@@ -142,10 +152,16 @@ export class LLMDecisionQueue {
 
         // Apply custom headers if provided
         if (config.customHeaders) {
-          // Type assertion: OpenAICompatProvider has public customHeaders property
-          // This is safe because we just created an OpenAICompatProvider instance above
           (provider as OpenAICompatProvider).customHeaders = config.customHeaders;
         }
+      } else if (request.customConfig?.tier && this.tierProviders.has(request.customConfig.tier)) {
+        // Use tier-specific provider for model routing
+        provider = this.tierProviders.get(request.customConfig.tier)!;
+      }
+
+      // Log model routing for tier requests
+      if (request.customConfig?.tier) {
+        console.error(`[LLMDecisionQueue] Agent ${request.agentId} tier="${request.customConfig.tier}" → model: ${provider.getModelName()}`);
       }
 
       const response = await provider.generate(llmRequest);

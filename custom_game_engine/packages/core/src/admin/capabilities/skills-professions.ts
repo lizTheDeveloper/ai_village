@@ -93,7 +93,7 @@ const skillsProfessionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/agent/skills' };
+        return { message: 'Delegate to /api/game/agent/skills' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -162,7 +162,7 @@ const skillsProfessionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/skills/masters' };
+        return { message: 'Delegate to /api/game/skills/masters' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -209,7 +209,7 @@ const skillsProfessionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/professions/distribution' };
+        return { message: 'Delegate to /api/game/professions/distribution' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -262,7 +262,7 @@ const skillsProfessionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/agent/skill-progress' };
+        return { message: 'Delegate to /api/game/agent/skill-progress' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -322,7 +322,7 @@ const skillsProfessionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/skills/apprentices' };
+        return { message: 'Delegate to /api/game/skills/apprentices' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -380,7 +380,7 @@ const skillsProfessionsCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/professions/advancement-paths' };
+        return { message: 'Delegate to /api/game/professions/advancement-paths' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

@@ -107,7 +107,7 @@ const memoriesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/memories/view' };
+        return { message: 'Delegate to /api/game/memories/view' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -171,7 +171,7 @@ const memoriesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/memories/traumatic' };
+        return { message: 'Delegate to /api/game/memories/traumatic' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -223,7 +223,7 @@ const memoriesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/memories/cherished' };
+        return { message: 'Delegate to /api/game/memories/cherished' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -277,7 +277,7 @@ const memoriesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/memories/shared' };
+        return { message: 'Delegate to /api/game/memories/shared' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -335,7 +335,7 @@ const memoriesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/memories/fading' };
+        return { message: 'Delegate to /api/game/memories/fading' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -392,7 +392,7 @@ const memoriesCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/memories/associations' };
+        return { message: 'Delegate to /api/game/memories/associations' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

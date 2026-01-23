@@ -404,9 +404,23 @@ async function setupLLMProvider(): Promise<{
     const maxConcurrent = 50;
     console.log(`[HeadlessGame] Max concurrent LLM requests: ${maxConcurrent}`);
 
+    const queue = new LLMDecisionQueue(provider, maxConcurrent);
+
+    // Register tier-specific providers for model routing
+    // Angels and other high-tier requests use the 120B model
+    if (groqApiKey) {
+      const highTierProvider = new OpenAICompatProvider(
+        'openai/gpt-oss-120b',
+        'https://api.groq.com/openai/v1',
+        groqApiKey
+      );
+      queue.setTierProvider('high', highTierProvider);
+      console.log('[HeadlessGame] High tier: openai/gpt-oss-120b on Groq');
+    }
+
     return {
       provider,
-      queue: new LLMDecisionQueue(provider, maxConcurrent),
+      queue,
       promptBuilder: new StructuredPromptBuilder(),
     };
   }
@@ -525,6 +539,60 @@ async function main() {
 
   console.log('[HeadlessGame] Game running. Press Ctrl+C to stop.');
   console.log(`[HeadlessGame] Dashboard: curl "http://localhost:8766/dashboard?session=${sessionId}"`);
+
+  // ========== Divine Chat Interface ==========
+  // Listen for angel responses and print them
+  baseGameLoop.world.eventBus.on('chat:send_message', (event) => {
+    const data = event.data as { roomId: string; senderName: string; message: string; senderId: string };
+    if (data.roomId === 'divine_chat') {
+      console.log(`\n[Angel ${data.senderName}]: ${data.message}`);
+      // Re-display prompt hint
+      process.stdout.write('> ');
+    }
+  });
+
+  // Set up readline for player input
+  const readline = await import('readline');
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: '> ',
+  });
+
+  console.log('\n[HeadlessGame] Divine Chat ready. Type messages to talk to the angel.');
+  console.log('[HeadlessGame] Type "quit" to exit.\n');
+  rl.prompt();
+
+  rl.on('line', (line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      rl.prompt();
+      return;
+    }
+    if (trimmed === 'quit' || trimmed === 'exit') {
+      shutdown();
+      return;
+    }
+
+    // Emit as player message to divine_chat
+    baseGameLoop.world.eventBus.emit({
+      type: 'chat:message_sent',
+      data: {
+        roomId: 'divine_chat',
+        senderId: 'player',
+        senderName: 'Player',
+        content: trimmed,
+      },
+      source: 'player',
+    });
+
+    console.log(`[You]: ${trimmed}`);
+    rl.prompt();
+  });
+
+  rl.on('close', () => {
+    shutdown();
+  });
 }
 
 main().catch((error) => {

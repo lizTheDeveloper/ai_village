@@ -88,7 +88,7 @@ const resourcesInventoryCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/resources/village-stockpiles' };
+        return { message: 'Delegate to /api/game/resources/village-stockpiles' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -142,7 +142,7 @@ const resourcesInventoryCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/agent/inventory' };
+        return { message: 'Delegate to /api/game/agent/inventory' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -194,7 +194,7 @@ const resourcesInventoryCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/resources/find-rare' };
+        return { message: 'Delegate to /api/game/resources/find-rare' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -244,7 +244,7 @@ const resourcesInventoryCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/resources/flow-analysis' };
+        return { message: 'Delegate to /api/game/resources/flow-analysis' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -295,7 +295,7 @@ const resourcesInventoryCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/resources/find-shortages' };
+        return { message: 'Delegate to /api/game/resources/find-shortages' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -356,7 +356,7 @@ const resourcesInventoryCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/item/history' };
+        return { message: 'Delegate to /api/game/item/history' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

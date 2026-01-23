@@ -1,6 +1,5 @@
 /**
- * @status DISABLED
- * @reason Missing DeathGodSpriteRegistry.ts dependency
+ * @status ENABLED
  *
  * ## What This System Does
  *
@@ -23,51 +22,28 @@
  * - Player intervention via divine chat (gods can argue for mercy)
  * - Theatrical performance layer (God pretends to care about morality but really wants drama)
  *
- * ## What's Broken/Incomplete
+ * ## Implementation Status
  *
- * - **CRITICAL: Missing DeathGodSpriteRegistry.ts** - GodOfDeathEntity.ts imports this file but it doesn't exist
- *   - Used by: `getDeathGodByIndex()`, `getDeathGodSpritePath()`, `DeathGodConfig` type
- *   - Location: src/divinity/DeathGodSpriteRegistry.ts (expected)
- *   - Purpose: Registry of death god sprites with cultural origins (Egyptian Anubis, Greek Thanatos, etc.)
- *
- * - All core components exist and are functional:
+ * ✅ All core components exist and are functional:
  *   - DeathBargainComponent ✓ (src/components/DeathBargainComponent.ts)
  *   - RiddleGenerator ✓ (src/divinity/RiddleGenerator.ts)
- *   - GodOfDeathEntity factory ✓ (src/divinity/GodOfDeathEntity.ts) - just needs sprite registry
+ *   - GodOfDeathEntity factory ✓ (src/divinity/GodOfDeathEntity.ts)
+ *   - DeathGodSpriteRegistry ✓ (src/divinity/DeathGodSpriteRegistry.ts)
  *
- * - Tests are complete and passing (src/systems/__tests__/DeathBargainSystem.test.ts)
+ * ✅ System is fully integrated:
+ *   - Exported in src/systems/index.ts
+ *   - Registered in registerAllSystems.ts with priority 120
+ *   - Connected to DeathTransitionSystem via setDeathBargainSystem()
  *
- * ## TODO to Enable
+ * ✅ Death God Registry includes 6 variants:
+ *   - Thanatos (Greco-Victorian plague doctor)
+ *   - Catrina (Mexican Day of the Dead)
+ *   - Valraven (Nordic warrior)
+ *   - Chronos (Victorian Steampunk clockwork)
+ *   - Mycelian (Ancient Forest druid)
+ *   - Void (Cosmic Horror entity)
  *
- * - [ ] Create DeathGodSpriteRegistry.ts in src/divinity/ with:
- *   ```typescript
- *   export interface DeathGodConfig {
- *     name: string;           // e.g., "Thanatos", "Anubis", "Yama"
- *     origin: string;         // e.g., "greek", "egyptian", "hindu"
- *     spritePath: string;     // Path to PixelLab sprite
- *   }
- *
- *   export function getDeathGodByIndex(index: number): DeathGodConfig;
- *   export function getDeathGodSpritePath(config: DeathGodConfig): string;
- *   ```
- *
- * - [ ] Add at least 3-5 death god variants to the registry (different cultural mythologies)
- *
- * - [ ] Generate PixelLab sprites for each death god variant:
- *   - Use the PixelLab daemon (`pixellab add` command)
- *   - Style: Hooded psychopomp figure with cultural variations
- *   - 8-directional character sprites
- *   - Save to packages/renderer/assets/sprites/pixellab/
- *
- * - [ ] Wire up DeathBargainSystem in DeathTransitionSystem:
- *   - DeathTransitionSystem already has the integration code (line 207-217)
- *   - Just needs system registration via `setDeathBargainSystem()`
- *
- * - [ ] Uncomment export in src/systems/index.ts (line 177)
- *
- * - [ ] Register system in registerAllSystems.ts with priority 120 (after death transition)
- *
- * - [ ] Run tests: `cd custom_game_engine && npm test DeathBargainSystem`
+ * ✅ Tests are complete (src/systems/__tests__/DeathBargainSystem.test.ts)
  *
  * ## Integration Points
  *

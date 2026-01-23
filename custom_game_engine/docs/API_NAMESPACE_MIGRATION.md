@@ -4,9 +4,9 @@
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| **Phase 1** | ✅ COMPLETE | metrics-server namespace aliasing + client migration |
-| **Phase 2** | ✅ COMPLETE | api-server namespace aliasing (superseded by Phase 3) |
-| **Phase 3** | ✅ COMPLETE | Remove deprecated routes, rename handlers to new paths |
+| **Phase 1** | ✅ COMPLETE | metrics-server client migration (superseded by Phase 3) |
+| **Phase 2** | ✅ COMPLETE | api-server client migration (superseded by Phase 3) |
+| **Phase 3** | ✅ COMPLETE | Both servers: remove aliasing, rename handlers to canonical paths |
 
 ## Architecture
 
@@ -28,21 +28,21 @@ Both used `/api/*` namespace with no clear separation. This caused:
 ### Port 8766 (metrics-server) - Game Runtime ✅
 
 ```
-/api/game/*     - Live game queries (NEW, maps to /api/live/*)
-/api/actions/*  - Game actions (unchanged)
-/api/llm/*      - LLM queue (unchanged)
-/api/planets/*  - Planet sharing (NEW, maps to /api/planet/*)
-/api/sprites/*  - Sprite generation (unchanged)
-/api/pixellab/* - PixelLab daemon (unchanged)
-/api/headless/* - Headless games (unchanged)
-/api/server/*   - Game server management (NEW, maps to /api/game-server/*)
-/api/saves/*    - Save/load/fork (NEW, maps to /api/save/*)
-/api/canon/*    - Canon events (unchanged)
-/api/microgen/* - Microgen/riddles (unchanged)
-/api/animations/* - Animation queue (unchanged)
-/dashboard/*    - LLM-friendly dashboards
-/admin/*        - Admin interface
-/metrics/*      - Raw metrics
+/api/game/*       - Live game queries
+/api/actions/*    - Game actions
+/api/llm/*        - LLM queue
+/api/planets/*    - Planet sharing
+/api/sprites/*    - Sprite generation
+/api/pixellab/*   - PixelLab daemon
+/api/headless/*   - Headless games
+/api/server/*     - Game server management
+/api/saves/*      - Save/load/fork
+/api/canon/*      - Canon events
+/api/microgen/*   - Microgen/riddles
+/api/animations/* - Animation queue
+/dashboard/*      - LLM-friendly dashboards
+/admin/*          - Admin interface
+/metrics/*        - Raw metrics
 ```
 
 ### Port 3001 (api-server) - Persistence & Multiverse ✅
@@ -72,28 +72,10 @@ Both used `/api/*` namespace with no clear separation. This caused:
 
 All handlers use these canonical paths directly (no aliasing).
 
-## Phase 1: metrics-server ✅ COMPLETE
+## Phase 1: metrics-server ✅ COMPLETE (superseded by metrics-server Phase 3)
 
-### Implementation Details
-
-Added namespace aliasing in `scripts/metrics-server.ts` (line ~4484):
-
-```typescript
-// Route aliasing: NEW namespace → OLD namespace (silent, for new clients)
-const namespaceAliases: Array<[string, string]> = [
-  ['/api/game/', '/api/live/'],           // Live game queries
-  ['/api/planets/', '/api/planet/'],       // Planet subpaths (/:id/*, stats, etc.)
-  ['/api/saves/', '/api/save/'],           // Save/load/fork subpaths
-  ['/api/server/', '/api/game-server/'],   // Game server management
-];
-
-for (const [newPrefix, oldPrefix] of namespaceAliases) {
-  if (pathname.startsWith(newPrefix)) {
-    pathname = oldPrefix + pathname.slice(newPrefix.length);
-    break;
-  }
-}
-```
+Phase 1 added namespace aliasing and migrated all clients. Phase 3 then renamed
+the actual handlers and removed the aliasing entirely.
 
 ### Client Files Migrated
 
@@ -171,16 +153,20 @@ app.use('/api/multiverse', universeRouter);
 | `/api/passages` | `/api/multiverse/passages` |
 | `/api/player` | `/api/multiverse/player` |
 
-### metrics-server Phase 3 (pending)
+### metrics-server Phase 3 ✅ COMPLETE
 
-The metrics-server (port 8766) still uses namespace aliasing from Phase 1:
-- `/api/game/` → `/api/live/`
-- `/api/planets/` → `/api/planet/`
-- `/api/saves/` → `/api/save/`
-- `/api/server/` → `/api/game-server/`
+Renamed all handlers in `scripts/metrics-server.ts` to canonical paths and removed
+namespace aliasing entirely:
 
-This can be cleaned up by renaming the actual handlers in `scripts/metrics-server.ts`
-when ready (larger change, ~8500 line file).
+| Old Handler Path | New Handler Path | Count |
+|-----------------|-----------------|-------|
+| `/api/live/*` | `/api/game/*` | 91 occurrences |
+| `/api/game-server/*` | `/api/server/*` | 4 handlers |
+| `/api/planet/*` | `/api/planets/*` | 13 references |
+| `/api/save` | `/api/saves` | 2 handlers (POST, DELETE) |
+
+Also removed: `namespaceAliases` array, rewrite loop, `deprecatedPrefixes` array,
+and updated file header documentation.
 
 ## Testing Checklist
 

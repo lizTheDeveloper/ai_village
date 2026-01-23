@@ -30,11 +30,11 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
   let system: InterestEvolutionSystem;
   let agent: EntityImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
     system = new InterestEvolutionSystem();
-    system.init(world);
+    await system.initialize(world, eventBus);
 
     // Create test agent
     agent = world.createEntity() as EntityImpl;
@@ -199,7 +199,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         source: agent.id,
         data: {
           agentId: agent.id,
-          skill: 'farming',
+          skillId: 'farming',
           oldLevel: 1,
           newLevel: 2,
         },
@@ -229,7 +229,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         source: agent.id,
         data: {
           agentId: agent.id,
-          skill: 'farming',
+          skillId: 'farming',
           oldLevel: 5,
           newLevel: 6,
         },
@@ -257,7 +257,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         source: agent.id,
         data: {
           agentId: agent.id,
-          skill: 'farming',
+          skillId: 'farming',
           oldLevel: 10,
           newLevel: 11,
         },
@@ -289,7 +289,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           source: agent.id,
           data: {
             agentId: agent.id,
-            skill: 'farming',
+            skillId: 'farming',
             oldLevel: i,
             newLevel: i + 1,
           },
@@ -309,7 +309,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         source: agent.id,
         data: {
           agentId: agent.id,
-          skill: 'unknown_skill',
+          skillId: 'unknown_skill',
           oldLevel: 1,
           newLevel: 2,
         },
@@ -402,8 +402,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         type: 'agent:born',
         source: agent.id,
         data: {
-          parentId: agent.id,
-          childId: 'child-id',
+          agentId: 'child-id',
+          parentIds: [agent.id],
         },
       });
       world.eventBus.flush();
@@ -510,8 +510,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: student.id,
           agent2: teacher.id,
-          topicsDiscussed: ['philosophy'],
-          overallQuality: 0.7,
+          topics: ['philosophy'],
+          quality: 0.7,
         },
       });
       world.eventBus.flush();
@@ -544,8 +544,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: student.id,
           agent2: teacher.id,
-          topicsDiscussed: ['philosophy'],
-          overallQuality: 0.5, // Below 0.6 threshold
+          topics: ['philosophy'],
+          quality: 0.5, // Below 0.6 threshold
         },
       });
       world.eventBus.flush();
@@ -577,8 +577,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: student.id,
           agent2: teacher.id,
-          topicsDiscussed: ['philosophy'],
-          overallQuality: 0.7,
+          topics: ['philosophy'],
+          quality: 0.7,
         },
       });
       world.eventBus.flush();
@@ -627,8 +627,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: child.id,
           agent2: teacher.id,
-          topicsDiscussed: ['philosophy'],
-          overallQuality: 0.7,
+          topics: ['philosophy'],
+          quality: 0.7,
         },
       });
       world.eventBus.flush();
@@ -662,8 +662,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: elder.id,
           agent2: teacher.id,
-          topicsDiscussed: ['philosophy'],
-          overallQuality: 0.7,
+          topics: ['philosophy'],
+          quality: 0.7,
         },
       });
       world.eventBus.flush();
@@ -707,8 +707,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: teacher.id,
           agent2: student.id,
-          topicsDiscussed: ['philosophy', 'farming'],
-          overallQuality: 0.7,
+          topics: ['philosophy', 'farming'],
+          quality: 0.7,
         },
       });
       world.eventBus.flush();
@@ -755,8 +755,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: student.id,
           agent2: teacher.id,
-          topicsDiscussed: ['philosophy'],
-          overallQuality: 0.7,
+          topics: ['philosophy'],
+          quality: 0.7,
         },
       });
       world.eventBus.flush();
@@ -814,8 +814,8 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         data: {
           agent1: agent.id,
           agent2: agent2.id,
-          topicsDiscussed: [],
-          overallQuality: 0.8,
+          topics: [],
+          quality: 0.8,
         },
       });
 
@@ -830,7 +830,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         source: 'non-existent-agent',
         data: {
           agentId: 'non-existent-agent',
-          skill: 'farming',
+          skillId: 'farming',
           oldLevel: 1,
           newLevel: 2,
         },

@@ -17,8 +17,6 @@
  * - Interior buildings: ~50% culled (exterior chunks hidden)
  */
 
-import type { ChunkMesh } from './ChunkMesh.js';
-
 /** Face types for chunk boundaries */
 type Face = '+X' | '-X' | '+Y' | '-Y' | '+Z' | '-Z';
 const ALL_FACES: Face[] = ['+X', '-X', '+Y', '-Y', '+Z', '-Z'];
@@ -43,19 +41,31 @@ export class OcclusionCuller {
   /**
    * Analyze chunk to determine face connectivity
    * Called when chunk mesh is built
+   *
+   * @param chunkX - Chunk X coordinate
+   * @param chunkZ - Chunk Z coordinate
+   * @param getBlock - Function to get block type at local coordinates (returns 0 for air)
+   * @param chunkSize - Chunk size in blocks
+   * @param chunkHeight - Chunk height in blocks
    */
-  analyzeChunk(chunk: ChunkMesh): ChunkOcclusionData {
-    const key = `${chunk.chunkX},${chunk.chunkZ}`;
+  analyzeChunk(
+    chunkX: number,
+    chunkZ: number,
+    getBlock: (x: number, y: number, z: number) => number,
+    chunkSize: number,
+    chunkHeight: number
+  ): ChunkOcclusionData {
+    const key = `${chunkX},${chunkZ}`;
 
     // Count solid vs air blocks
     let solidCount = 0;
     let airCount = 0;
 
-    for (let x = 0; x < chunk.config.chunkSize; x++) {
-      for (let z = 0; z < chunk.config.chunkSize; z++) {
-        for (let y = 0; y < chunk.config.chunkHeight; y++) {
-          const block = chunk.getBlock(x, y - 10, z); // Convert to world Y
-          if (block && block.type !== 0) {
+    for (let x = 0; x < chunkSize; x++) {
+      for (let z = 0; z < chunkSize; z++) {
+        for (let y = 0; y < chunkHeight; y++) {
+          const blockType = getBlock(x, y, z);
+          if (blockType !== 0) {
             solidCount++;
           } else {
             airCount++;
@@ -84,7 +94,7 @@ export class OcclusionCuller {
     } else {
       // Need detailed analysis - flood fill from each face
       ALL_FACES.forEach((from) => {
-        const visible = this.floodFillFromFace(chunk, from);
+        const visible = this.floodFillFromFace(getBlock, from, chunkSize, chunkHeight);
         faceConnections.set(from, visible);
       });
     }
@@ -103,10 +113,13 @@ export class OcclusionCuller {
   /**
    * Flood fill from one face to find which other faces are reachable
    */
-  private floodFillFromFace(chunk: ChunkMesh, startFace: Face): Set<Face> {
+  private floodFillFromFace(
+    getBlock: (x: number, y: number, z: number) => number,
+    startFace: Face,
+    size: number,
+    height: number
+  ): Set<Face> {
     const reachable = new Set<Face>();
-    const size = chunk.config.chunkSize;
-    const height = chunk.config.chunkHeight;
 
     // Get starting positions on face
     const startPositions = this.getFacePositions(startFace, size, height);
@@ -116,14 +129,14 @@ export class OcclusionCuller {
     const queue: [number, number, number][] = [];
 
     for (const [x, y, z] of startPositions) {
-      const block = chunk.getBlock(x, y - 10, z); // Convert to world Y
-      if (!block || block.type === 0) {
+      const blockType = getBlock(x, y, z);
+      if (blockType === 0) {
         queue.push([x, y, z]);
         visited.add(`${x},${y},${z}`);
       }
     }
 
-    const directions = [
+    const directions: Array<[number, number, number]> = [
       [1, 0, 0],
       [-1, 0, 0],
       [0, 1, 0],
@@ -145,7 +158,8 @@ export class OcclusionCuller {
       if (z === 0) reachable.add('-Z');
       if (z === size - 1) reachable.add('+Z');
 
-      for (const [dx, dy, dz] of directions) {
+      for (const dir of directions) {
+        const [dx, dy, dz] = dir;
         const nx = x + dx;
         const ny = y + dy;
         const nz = z + dz;
@@ -155,8 +169,8 @@ export class OcclusionCuller {
         if (nx < 0 || nx >= size || nz < 0 || nz >= size) continue;
         if (ny < 0 || ny >= height) continue;
 
-        const block = chunk.getBlock(nx, ny - 10, nz); // Convert to world Y
-        if (!block || block.type === 0) {
+        const blockType = getBlock(nx, ny, nz);
+        if (blockType === 0) {
           visited.add(key);
           queue.push([nx, ny, nz]);
         }

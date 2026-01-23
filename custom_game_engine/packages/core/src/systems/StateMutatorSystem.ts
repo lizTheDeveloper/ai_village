@@ -78,6 +78,18 @@ export class StateMutatorSystem extends BaseSystem {
       const fieldEntries = Object.entries(mv.fields) as [string, MutationField][];
 
       for (const [fieldPath, field] of fieldEntries) {
+        // Check tick expiration before applying (don't apply on expiration tick)
+        if (field.expiresAt !== undefined && tick >= field.expiresAt) {
+          expiredFields.push(fieldPath);
+          continue;
+        }
+
+        // Check if rate has decayed to negligible
+        if (Math.abs(field.rate) < 0.0001 && field.derivative === 0) {
+          expiredFields.push(fieldPath);
+          continue;
+        }
+
         // Apply rate to target field
         const delta = field.rate * dt;
         this.applyDelta(entity, fieldPath, delta, field);
@@ -93,16 +105,6 @@ export class StateMutatorSystem extends BaseSystem {
           if (field.appliedAmount >= field.totalAmount) {
             expiredFields.push(fieldPath);
           }
-        }
-
-        // Check tick expiration
-        if (field.expiresAt !== undefined && tick >= field.expiresAt) {
-          expiredFields.push(fieldPath);
-        }
-
-        // Check if rate has decayed to negligible
-        if (Math.abs(field.rate) < 0.0001 && field.derivative === 0) {
-          expiredFields.push(fieldPath);
         }
       }
 

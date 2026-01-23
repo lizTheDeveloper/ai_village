@@ -2,6 +2,9 @@
  * Core game systems.
  */
 
+// Entity Awakener - event-driven entity activation (priority 5)
+export * from './EntityAwakenerSystem.js';
+
 // Agent AI - modular system
 export * from './AgentBrainSystem.js';
 export * from './MovementSystem.js';
@@ -99,7 +102,7 @@ export * from './MoodSystem.js';
 export * from './InterestsSystem.js';
 // Phase 6: Emergent Social Dynamics - RE-ENABLED
 export * from './RelationshipConversationSystem.js';
-// export * from './FriendshipSystem.js'; // TODO: Enable after testing
+export * from './FriendshipSystem.js';
 // Deep Conversation System - Phase 7.1
 export * from './InterestEvolutionSystem.js';
 // Cooking System
@@ -173,7 +176,7 @@ export * from './PortalSystem.js';
 export * from './RealmTimeSystem.js';
 export * from './DeathJudgmentSystem.js';
 export * from './DeathBargainSystem.js';
-// export * from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
+export * from './DeathTransitionSystem.js';
 export * from './AfterlifeMemoryFadingSystem.js';
 export * from './WisdomGoddessSystem.js';
 export * from './ReincarnationSystem.js';

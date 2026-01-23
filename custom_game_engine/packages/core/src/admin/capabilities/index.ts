@@ -42,3 +42,5 @@ import './corruption.js';
 import './dreams-sleep.js';
 import './memories.js';
 import './resources-inventory.js';
+import './skills-professions.js';
+import './weather-seasons.js';

@@ -18,6 +18,10 @@
     "build": "tsc",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "@ai-village/core": "*",
+    "@ai-village/reproduction": "*"
+  },
   "devDependencies": {
     "typescript": "^5.3.3"
   }

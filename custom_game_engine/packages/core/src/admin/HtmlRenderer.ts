@@ -1465,7 +1465,7 @@ let gameServerRunning = false;
 
 async function checkGameServerStatus() {
   try {
-    const response = await fetch('/api/game-server/status');
+    const response = await fetch('/api/server/status');
     const data = await response.json();
 
     gameServerRunning = data.running;
@@ -1504,7 +1504,7 @@ async function toggleGameServer() {
 
     if (gameServerRunning) {
       // Stop server
-      const response = await fetch('/api/game-server/stop', { method: 'POST' });
+      const response = await fetch('/api/server/stop', { method: 'POST' });
       const data = await response.json();
 
       if (data.success) {
@@ -1514,7 +1514,7 @@ async function toggleGameServer() {
       }
     } else {
       // Start server
-      const response = await fetch('/api/game-server/start', { method: 'POST' });
+      const response = await fetch('/api/server/start', { method: 'POST' });
       const data = await response.json();
 
       if (data.success) {

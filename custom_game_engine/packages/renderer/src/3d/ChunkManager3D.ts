@@ -239,7 +239,13 @@ export class ChunkManager3D {
 
         // Update occlusion data when chunk changes
         if (this.occlusionEnabled) {
-          this.occlusionCuller.analyzeChunk(entry.chunk);
+          this.occlusionCuller.analyzeChunk(
+            entry.chunk.chunkX,
+            entry.chunk.chunkZ,
+            (x, y, z) => entry.chunk.getBlock(x, y, z)?.type ?? 0,
+            this.config.chunkSize,
+            64
+          );
         }
 
         this.stats.rebuildCount++;

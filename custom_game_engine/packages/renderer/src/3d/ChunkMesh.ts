@@ -345,6 +345,81 @@ export class ChunkMesh {
   }
 
   /**
+   * Get block data for worker serialization
+   */
+  getBlockData(): {
+    chunkSize: number;
+    chunkHeight: number;
+    data: Array<{ type: number; color: number }>;
+  } {
+    const data: Array<{ type: number; color: number }> = [];
+
+    // Flatten blocks array: iterate in x, z, y order to match worker expectations
+    for (let y = 0; y < this.config.chunkHeight; y++) {
+      for (let z = 0; z < this.config.chunkSize; z++) {
+        for (let x = 0; x < this.config.chunkSize; x++) {
+          const block = this.blocks[x]?.[z]?.[y];
+          data.push({
+            type: block?.type ?? 0,
+            color: block?.color ?? 0x9ca3af,
+          });
+        }
+      }
+    }
+
+    return {
+      chunkSize: this.config.chunkSize,
+      chunkHeight: this.config.chunkHeight,
+      data,
+    };
+  }
+
+  /**
+   * Apply mesh data from worker
+   */
+  applyMeshData(meshData: MeshData): void {
+    // Dispose old geometry
+    if (this.geometry) {
+      this.geometry.dispose();
+    }
+
+    // Create new geometry from worker data
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(meshData.positions, 3));
+    this.geometry.setAttribute('normal', new THREE.BufferAttribute(meshData.normals, 3));
+    this.geometry.setAttribute('color', new THREE.BufferAttribute(meshData.colors, 3));
+    this.geometry.setIndex(new THREE.BufferAttribute(meshData.indices, 1));
+
+    this.geometry.computeBoundingBox();
+    this.geometry.computeBoundingSphere();
+
+    // Update mesh
+    if (!this.mesh) {
+      this.mesh = new THREE.Mesh(this.geometry, this.material);
+      this.mesh.position.set(
+        this.chunkX * this.config.chunkSize * this.config.blockSize,
+        0,
+        this.chunkZ * this.config.chunkSize * this.config.blockSize
+      );
+      this.mesh.castShadow = true;
+      this.mesh.receiveShadow = true;
+    } else {
+      this.mesh.geometry = this.geometry;
+    }
+
+    // Update stats
+    this.stats.vertexCount = meshData.vertexCount;
+    this.stats.indexCount = meshData.indexCount;
+  }
+
+  /**
+   * Clear dirty flag without rebuilding (for async flow)
+   */
+  clearDirty(): void {
+    this.dirty = false;
+  }
+
+  /**
    * Dispose of all resources
    */
   dispose(): void {

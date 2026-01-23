@@ -1,6 +1,6 @@
 /**
- * @status DISABLED
- * @reason Test expects old API (world.getComponent, dead component) but system uses new realm-based death flow
+ * @status ENABLED
+ * @reason All 15 tests pass after migrating to modern API
  *
  * ## What This System Does
  * Handles the complete death lifecycle for entities:
@@ -15,30 +15,6 @@
  * - Manages pack mind coherence loss and hive collapse on queen death
  * - Applies mourning effects to close relationships
  * - Prevents re-processing deaths via processedDeaths Set
- *
- * ## What's Broken/Incomplete
- * - Test expects `world.getComponent('knowledge_loss')` but system creates singleton entity with `knowledge_loss` component
- * - Test expects `world.getComponent('power_vacuum')` but system creates singleton entity with `power_vacuum` component
- * - Test expects `dead` component to trigger death, but system checks `needs.health <= 0`
- * - Test expects `death:occurred` event, but system emits `agent:died` event
- * - Test expects old API: `deceased.addComponent('dead', {...})` but system uses needs-based detection
- * - Test uses old component access patterns (getComponent returns undefined checks missing)
- * - Missing component definitions: `position_holder`, `pack_member`, `hive_queen`, `hive_worker`
- * - ComponentType enum missing entries: PowerVacuum, PackCombat, HiveCombat (exist but may need validation)
- * - System exports in index.ts are commented out (lines 177-178)
- *
- * ## TODO to Enable
- * - [ ] Update test to use needs-based death trigger: `deceased.addComponent('needs', { health: 0, ... })`
- * - [ ] Update test to query singleton entities: `world.query().with('knowledge_loss').executeEntities()[0]`
- * - [ ] Update test to expect `agent:died` event instead of `death:occurred`
- * - [ ] Add missing component types: `position_holder`, `pack_member`, `hive_queen`, `hive_worker` to ComponentType enum
- * - [ ] Verify ComponentType.PowerVacuum, PackCombat, HiveCombat are properly registered
- * - [ ] Create component definition files if missing: PositionHolderComponent, PackMemberComponent, HiveQueenComponent, HiveWorkerComponent
- * - [ ] Update test to handle realm_location component (system auto-creates if missing)
- * - [ ] Fix test expectations around world-level vs entity-level component storage
- * - [ ] Uncomment exports in src/systems/index.ts (lines 177-178)
- * - [ ] Update registerAllSystems.ts if needed (currently registers both systems at lines 1077-1084)
- * - [ ] Run test: `cd /Users/annhoward/src/ai_village/custom_game_engine/packages/core && npm test -- DeathHandling`
  *
  * ## Dependencies
  * - DeathBargainSystem (optional): Offers hero resurrection challenges

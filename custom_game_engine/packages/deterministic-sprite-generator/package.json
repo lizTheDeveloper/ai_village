@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Deterministic modular pixel art sprite generator - no ML, pure algorithms",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -18,8 +18,8 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
     }
   }
 }

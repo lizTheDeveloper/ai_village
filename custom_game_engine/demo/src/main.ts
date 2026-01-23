@@ -69,7 +69,7 @@ import {
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
-import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, type PlanetMetadata } from '@ai-village/persistence';
+import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, type PlanetMetadata, type CreationState } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
 import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
@@ -3692,10 +3692,45 @@ async function main() {
     console.log('[Demo] Starting fresh game...');
     existingSaves = [];
   }
+
+  // Check for in-progress creation that was interrupted (resume-on-refresh)
+  let creationResumeState: CreationState | null = null;
+  if (!forceNewGame) {
+    try {
+      creationResumeState = await creationStateManager.getCreationState();
+      if (creationResumeState && creationResumeState.phase !== 'genesis_complete') {
+        console.log(`[Demo] Found interrupted creation at phase: ${creationResumeState.phase}`);
+        // Check if genesis snapshot already exists for this universe
+        const hasGenesis = existingSaves.some(s =>
+          s.name?.includes('Genesis') && s.name?.includes(creationResumeState!.universeName)
+        );
+        if (hasGenesis) {
+          // Genesis exists, no need to resume - just clean up
+          await creationStateManager.clearCreationState();
+          creationResumeState = null;
+          console.log('[Demo] Genesis snapshot found, clearing stale creation state');
+        }
+      } else {
+        creationResumeState = null;
+      }
+    } catch (error) {
+      console.warn('[Demo] Failed to check creation state:', error);
+      creationResumeState = null;
+    }
+  }
+
   let loadedCheckpoint = false;
   let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };
   let universeConfigScreen: UniverseConfigScreen | null = null;
   let universeConfig: UniverseConfig | null = null;  // Store full config for scenario access
+
+  // If resuming from interrupted creation, skip the config screen
+  if (creationResumeState) {
+    console.log(`[Demo] Resuming creation from phase: ${creationResumeState.phase}`);
+    universeSelection = { type: 'new', magicParadigm: creationResumeState.magicParadigm };
+    universeConfig = creationResumeState.universeConfig as any;
+    loadedCheckpoint = false;
+  }
 
   // Create god-crafted discovery system first (needed by TerrainGenerator)
   const godCraftedDiscoverySystem = new GodCraftedDiscoverySystem({
@@ -3747,15 +3782,19 @@ async function main() {
   // - Create a new universe (leads to UniverseConfigScreen)
   // - Load a local save
   // - Browse and load from the multiverse server
-  const browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
-    const browserScreen = new UniverseBrowserScreen();
-    browserScreen.show((result) => {
-      browserScreen.hide();
-      resolve(result);
+  // Skip if resuming from interrupted creation
+  let browserResult: UniverseBrowserResult | null = null;
+  if (!creationResumeState) {
+    browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
+      const browserScreen = new UniverseBrowserScreen();
+      browserScreen.show((result) => {
+        browserScreen.hide();
+        resolve(result);
+      });
     });
-  });
+  }
 
-  if (browserResult.action === 'create_new') {
+  if (browserResult && browserResult.action === 'create_new') {
     // Show universe configuration screen for new universe
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       universeConfigScreen = new UniverseConfigScreen();
@@ -3764,7 +3803,7 @@ async function main() {
         resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
       });
     });
-  } else if (browserResult.action === 'load_local' && browserResult.saveKey) {
+  } else if (browserResult && browserResult.action === 'load_local' && browserResult.saveKey) {
     // Load a local save
     const result = await saveLoadService.load(browserResult.saveKey, gameLoop.world);
     if (result.success) {
@@ -3781,7 +3820,7 @@ async function main() {
         });
       });
     }
-  } else if (browserResult.action === 'load_server' && browserResult.universeId) {
+  } else if (browserResult && browserResult.action === 'load_server' && browserResult.universeId) {
     // Load from multiverse server
     // TODO: Implement server snapshot loading
     // For now, fetch the snapshot and apply it to the world
@@ -3821,8 +3860,8 @@ async function main() {
         });
       });
     }
-  } else {
-    // Fallback - shouldn't happen but just in case
+  } else if (!creationResumeState) {
+    // Fallback - shouldn't happen but just in case (only if not resuming)
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((config) => {
@@ -4095,6 +4134,46 @@ async function main() {
   // Store universe name on the world for save/checkpoint naming
   (gameLoop.world as any)._universeName = universeName;
   console.log(`[Main] Universe name: "${universeName}"`);
+
+  // === INCREMENTAL PERSISTENCE: Phase 1 - Universe Configured ===
+  // Save creation state immediately so we can resume if page is refreshed
+  if (!loadedCheckpoint) {
+    try {
+      // Create universe on multiverse server
+      if (multiverseClient.getPlayerId()) {
+        try {
+          await multiverseClient.createUniverse({
+            id: gameLoop.universeId,
+            name: universeName,
+            config: { timeScale: 1, magicLevel: selectedMagicPreset },
+          });
+          console.log('[CreationState] Universe registered on server');
+        } catch (error) {
+          // Non-fatal: server may not be available
+          console.warn('[CreationState] Failed to register universe on server:', error);
+        }
+      }
+
+      // Save creation state to IndexedDB
+      await creationStateManager.saveCreationState({
+        version: 1,
+        universeId: gameLoop.universeId,
+        universeName,
+        divinePreset,
+        planetSeed: '', // Will be updated when planet config is generated
+        planetType: '',
+        magicParadigm: selectedMagicPreset,
+        playerId: playerId,
+        phase: 'universe_configured',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        universeConfig: universeConfig as any || {},
+      });
+      console.log('[CreationState] Phase 1: universe_configured saved');
+    } catch (error) {
+      console.warn('[CreationState] Failed to save creation state:', error);
+    }
+  }
 
   // Create notification system
   const notificationEl = document.createElement('div');
@@ -4496,6 +4575,19 @@ async function main() {
       });
     }
 
+    // === INCREMENTAL PERSISTENCE: Update creation state with planet config ===
+    if (!loadedCheckpoint) {
+      try {
+        await creationStateManager.updatePhase('universe_configured', {
+          planetSeed: homeworldConfig.seed,
+          planetType: homeworldConfig.type,
+          serverPlanetId: serverPlanetId || undefined,
+        });
+      } catch (error) {
+        console.warn('[CreationState] Failed to update planet config:', error);
+      }
+    }
+
     // Check for existing planet with matching type on the server (shared planet mode)
     let existingPlanetBiosphere: any = null;
     let serverPlanetId: string | null = null;
@@ -4545,6 +4637,23 @@ async function main() {
           console.warn('[WorldInit] Failed to create ServerBackedChunkManager:', error);
           useSharedPlanet = false;
         }
+      }
+    }
+
+    // Create planet on server BEFORE biosphere generation (so it persists even if gen is interrupted)
+    if (planetServerAvailable && !serverPlanetId) {
+      try {
+        const newPlanet = await planetClient.createPlanet({
+          name: homeworldConfig.name || 'Homeworld',
+          type: homeworldConfig.type as any,
+          seed: homeworldConfig.seed,
+          config: { seed: homeworldConfig.seed, type: homeworldConfig.type },
+        });
+        serverPlanetId = newPlanet.id;
+        selectedPlanet = newPlanet;
+        console.log(`[WorldInit] Created planet on server early: ${serverPlanetId}`);
+      } catch (error) {
+        console.warn('[WorldInit] Failed to create planet on server early:', error);
       }
     }
 
@@ -4610,9 +4719,31 @@ async function main() {
       console.warn('[WorldInit] Continuing without biosphere generation');
     }
 
+    // === INCREMENTAL PERSISTENCE: Phase 2 - Planet Initialized ===
+    if (!loadedCheckpoint) {
+      try {
+        await creationStateManager.updatePhase('planet_initialized', {
+          serverPlanetId: serverPlanetId || undefined,
+        });
+        console.log('[CreationState] Phase 2: planet_initialized saved');
+      } catch (error) {
+        console.warn('[CreationState] Failed to update creation state:', error);
+      }
+    }
+
     // Create initial entities
     createInitialBuildings(gameLoop.world);
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
+
+    // === INCREMENTAL PERSISTENCE: Phase 3 - World Populated ===
+    if (!loadedCheckpoint) {
+      try {
+        await creationStateManager.updatePhase('world_populated');
+        console.log('[CreationState] Phase 3: world_populated saved');
+      } catch (error) {
+        console.warn('[CreationState] Failed to update creation state:', error);
+      }
+    }
 
     // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
     // (skip in SharedWorker mode - worker is already running)
@@ -4890,6 +5021,14 @@ async function main() {
   if (!loadedCheckpoint && soulCreationPromise) {
     await soulCreationPromise;
 
+    // === INCREMENTAL PERSISTENCE: Phase 4 - Souls Created ===
+    try {
+      await creationStateManager.updatePhase('souls_created');
+      console.log('[CreationState] Phase 4: souls_created saved');
+    } catch (error) {
+      console.warn('[CreationState] Failed to update creation state:', error);
+    }
+
     // Hide the universe config screen now that all souls are created
     if (universeConfigScreen) {
       universeConfigScreen.hide();
@@ -4906,6 +5045,10 @@ async function main() {
         type: 'canonical',  // Mark as canonical so it's never decayed
       });
       console.log(`[InitialSave] Created genesis snapshot: ${initialSaveName}`);
+
+      // === INCREMENTAL PERSISTENCE: Phase 5 - Genesis Complete ===
+      await creationStateManager.clearCreationState();
+      console.log('[CreationState] Creation state cleared (genesis complete)');
     } catch (error) {
       console.error('[InitialSave] Failed to create initial snapshot:', error);
     }

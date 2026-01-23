@@ -214,7 +214,9 @@ export type { SkillsComponent } from './SkillsComponent.js';
 export * from './GoalsComponent.js';
 export { createGoalsComponent, formatGoalsForPrompt, formatGoalsSectionForPrompt, type GoalsComponent } from './GoalsComponent.js';
 // Equipment system (forward-compatibility)
-export * from './EquipmentSlotsComponent.js';
+// NOTE: EquipmentSlotsComponent export commented out to avoid conflicts with EquipmentComponent
+// Files using EquipmentSlotsComponent should import it directly from './EquipmentSlotsComponent.js'
+// export * from './EquipmentSlotsComponent.js';
 // Magic system (forward-compatibility - Phase 30)
 export * from './MagicComponent.js';
 

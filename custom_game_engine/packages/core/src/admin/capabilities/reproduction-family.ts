@@ -69,7 +69,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/family-tree' };
+        return { message: 'Delegate to /api/game/family-tree' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -162,7 +162,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/agent-relationships' };
+        return { message: 'Delegate to /api/game/agent-relationships' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -226,7 +226,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/find-couples' };
+        return { message: 'Delegate to /api/game/find-couples' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -274,7 +274,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/pregnancy-status' };
+        return { message: 'Delegate to /api/game/pregnancy-status' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -329,7 +329,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/find-orphans' };
+        return { message: 'Delegate to /api/game/find-orphans' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -378,7 +378,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/lineage-traits' };
+        return { message: 'Delegate to /api/game/lineage-traits' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -438,7 +438,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/bless-fertility' };
+        return { success: true, message: 'Delegate to /api/game/actions/bless-fertility' };
       },
     }),
 
@@ -454,7 +454,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/bless-union' };
+        return { success: true, message: 'Delegate to /api/game/actions/bless-union' };
       },
     }),
 
@@ -470,7 +470,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/reveal-parentage' };
+        return { success: true, message: 'Delegate to /api/game/actions/reveal-parentage' };
       },
     }),
 
@@ -494,7 +494,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/curse-infertility' };
+        return { success: true, message: 'Delegate to /api/game/actions/curse-infertility' };
       },
     }),
 
@@ -510,7 +510,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/arrange-meeting' };
+        return { success: true, message: 'Delegate to /api/game/actions/arrange-meeting' };
       },
     }),
 
@@ -526,7 +526,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/strengthen-family-bond' };
+        return { success: true, message: 'Delegate to /api/game/actions/strengthen-family-bond' };
       },
     }),
 
@@ -541,7 +541,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/ensure-safe-birth' };
+        return { success: true, message: 'Delegate to /api/game/actions/ensure-safe-birth' };
       },
     }),
 
@@ -561,7 +561,7 @@ const reproductionFamilyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/live/actions/matchmake' };
+        return { success: true, message: 'Delegate to /api/game/actions/matchmake' };
       },
     }),
   ],

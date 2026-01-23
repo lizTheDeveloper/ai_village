@@ -55,7 +55,7 @@ const researchTechnologyCapability = defineCapability({
         { name: 'domain', type: 'select', required: false, options: TECH_DOMAIN_OPTIONS, description: 'Filter by tech domain' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/research/tech-tree' };
+        return { message: 'Delegate to /api/game/research/tech-tree' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -104,7 +104,7 @@ const researchTechnologyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/research/current' };
+        return { message: 'Delegate to /api/game/research/current' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -148,7 +148,7 @@ const researchTechnologyCapability = defineCapability({
         { name: 'limit', type: 'number', required: false, default: 20, description: 'Max discoveries to return' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/research/history' };
+        return { message: 'Delegate to /api/game/research/history' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -189,7 +189,7 @@ const researchTechnologyCapability = defineCapability({
         { name: 'minSkillLevel', type: 'number', required: false, default: 2, description: 'Minimum skill level to include' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/research/potential' };
+        return { message: 'Delegate to /api/game/research/potential' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -236,7 +236,7 @@ const researchTechnologyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/research/lost-knowledge' };
+        return { message: 'Delegate to /api/game/research/lost-knowledge' };
       },
       renderResult: (data: unknown) => {
         const result = data as {
@@ -282,7 +282,7 @@ const researchTechnologyCapability = defineCapability({
         { name: 'session', type: 'session-id', required: false, description: 'Session ID' },
       ],
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/live/research/hotspots' };
+        return { message: 'Delegate to /api/game/research/hotspots' };
       },
       renderResult: (data: unknown) => {
         const result = data as {

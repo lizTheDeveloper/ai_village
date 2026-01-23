@@ -65,7 +65,7 @@ export const SleepComponentSchema: ComponentSchema<SleepComponent> = {
   fields: [
     { name: 'state', type: 'string', required: true },
     { name: 'wake_tick', type: 'number', required: false },
-    { name: 'wake_events', type: 'array', required: false },
+    { name: 'wake_events', type: 'stringArray', required: false },
     { name: 'last_processed_tick', type: 'number', required: true },
     { name: 'accumulated_delta', type: 'number', required: true },
   ],

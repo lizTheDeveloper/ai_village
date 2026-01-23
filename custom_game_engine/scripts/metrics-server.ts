@@ -6,13 +6,11 @@
  *
  * Usage: npx tsx scripts/metrics-server.ts
  *
- * NAMESPACE MIGRATION (see docs/API_NAMESPACE_MIGRATION.md):
- *   Preferred namespaces (use these for new code):
- *     /api/game/*    → Live game queries (was /api/live/*)
- *     /api/planets/* → Planet sharing (was /api/planet*)
- *     /api/saves/*   → Save/load/fork (was /api/save*)
- *     /api/server/*  → Game server mgmt (was /api/game-server/*)
- *   Old namespaces still work but emit deprecation warnings.
+ * API Namespaces:
+ *     /api/game/*    - Live game queries
+ *     /api/planets/* - Planet sharing
+ *     /api/saves/*   - Save/load/fork
+ *     /api/server/*  - Game server management
  *
  * HTTP Endpoints:
  *   GET /                    - Session browser (start here)
@@ -3158,11 +3156,11 @@ AI VILLAGE DASHBOARD | ${sessionStatus}
 ---------------------------------------------------------------------------
   Use the Live Query API to get real-time game state information:
 
-  Universe:  curl http://localhost:${HTTP_PORT}/api/live/universe
-  Magic:     curl http://localhost:${HTTP_PORT}/api/live/magic
-  Divinity:  curl http://localhost:${HTTP_PORT}/api/live/divinity
-  Entities:  curl http://localhost:${HTTP_PORT}/api/live/entities
-  Entity:    curl "http://localhost:${HTTP_PORT}/api/live/entity?id=<entityId>"
+  Universe:  curl http://localhost:${HTTP_PORT}/api/game/universe
+  Magic:     curl http://localhost:${HTTP_PORT}/api/game/magic
+  Divinity:  curl http://localhost:${HTTP_PORT}/api/game/divinity
+  Entities:  curl http://localhost:${HTTP_PORT}/api/game/entities
+  Entity:    curl "http://localhost:${HTTP_PORT}/api/game/entity?id=<entityId>"
 
   The Live Query system queries the running game in real-time via WebSocket.
   Queries are sent to the game client and responses are returned immediately.
@@ -3235,11 +3233,11 @@ Generated: ${formatTimestamp(now)}
 ---------------------------------------------------------------------------
   Real-time game state queries (WebSocket to running game):
 
-  curl http://localhost:${HTTP_PORT}/api/live/universe    # Universe config
-  curl http://localhost:${HTTP_PORT}/api/live/magic       # Magic users & stats
-  curl http://localhost:${HTTP_PORT}/api/live/divinity    # Gods & belief
-  curl http://localhost:${HTTP_PORT}/api/live/entities    # All entities
-  curl "http://localhost:${HTTP_PORT}/api/live/entity?id=<ID>"  # Specific entity
+  curl http://localhost:${HTTP_PORT}/api/game/universe    # Universe config
+  curl http://localhost:${HTTP_PORT}/api/game/magic       # Magic users & stats
+  curl http://localhost:${HTTP_PORT}/api/game/divinity    # Gods & belief
+  curl http://localhost:${HTTP_PORT}/api/game/entities    # All entities
+  curl "http://localhost:${HTTP_PORT}/api/game/entity?id=<ID>"  # Specific entity
 
 `;
 
@@ -3380,10 +3378,10 @@ This is a menu of agents in this session. Use curl to view detailed info.
   output += `\n`;
   output += `## Live Query API (real-time)\n`;
   output += `---------------------------------------------------------------------------\n`;
-  output += `Universe:   curl http://localhost:${HTTP_PORT}/api/live/universe\n`;
-  output += `Magic:      curl http://localhost:${HTTP_PORT}/api/live/magic\n`;
-  output += `Divinity:   curl http://localhost:${HTTP_PORT}/api/live/divinity\n`;
-  output += `Entities:   curl http://localhost:${HTTP_PORT}/api/live/entities\n`;
+  output += `Universe:   curl http://localhost:${HTTP_PORT}/api/game/universe\n`;
+  output += `Magic:      curl http://localhost:${HTTP_PORT}/api/game/magic\n`;
+  output += `Divinity:   curl http://localhost:${HTTP_PORT}/api/game/divinity\n`;
+  output += `Entities:   curl http://localhost:${HTTP_PORT}/api/game/entities\n`;
 
   return output;
 }
@@ -3819,7 +3817,7 @@ Generated: ${formatTimestamp(now)}
     output += `
   ---------------------------------------------------------------------------
   To see full prompt, scroll to LLM PROMPT section below.
-  For real-time prompt: curl "http://localhost:${HTTP_PORT}/api/live/prompt?id=${agentId}"
+  For real-time prompt: curl "http://localhost:${HTTP_PORT}/api/game/prompt?id=${agentId}"
 `;
   }
 
@@ -4044,11 +4042,11 @@ ${lastLLMContext}
 ================================================================================
 LIVE QUERY - Get real-time entity state
 ================================================================================
-  Full entity:     curl "http://localhost:${HTTP_PORT}/api/live/entity?id=${agentId}"
-  All entities:    curl http://localhost:${HTTP_PORT}/api/live/entities
-  Magic systems:   curl http://localhost:${HTTP_PORT}/api/live/magic
-  Divinity:        curl http://localhost:${HTTP_PORT}/api/live/divinity
-  Universe:        curl http://localhost:${HTTP_PORT}/api/live/universe
+  Full entity:     curl "http://localhost:${HTTP_PORT}/api/game/entity?id=${agentId}"
+  All entities:    curl http://localhost:${HTTP_PORT}/api/game/entities
+  Magic systems:   curl http://localhost:${HTTP_PORT}/api/game/magic
+  Divinity:        curl http://localhost:${HTTP_PORT}/api/game/divinity
+  Universe:        curl http://localhost:${HTTP_PORT}/api/game/universe
 
   The Live Query API queries the running game in real-time to get current
   component state (Magic, Spiritual, Skills, Inventory, etc.) for this agent.
@@ -4124,10 +4122,10 @@ Generated: ${formatTimestamp(now)}
   output += `\n`;
   output += `## Live Query API (real-time game state)\n`;
   output += `---------------------------------------------------------------------------\n`;
-  output += `Universe:   curl http://localhost:${HTTP_PORT}/api/live/universe\n`;
-  output += `Magic:      curl http://localhost:${HTTP_PORT}/api/live/magic\n`;
-  output += `Divinity:   curl http://localhost:${HTTP_PORT}/api/live/divinity\n`;
-  output += `Entities:   curl http://localhost:${HTTP_PORT}/api/live/entities\n`;
+  output += `Universe:   curl http://localhost:${HTTP_PORT}/api/game/universe\n`;
+  output += `Magic:      curl http://localhost:${HTTP_PORT}/api/game/magic\n`;
+  output += `Divinity:   curl http://localhost:${HTTP_PORT}/api/game/divinity\n`;
+  output += `Entities:   curl http://localhost:${HTTP_PORT}/api/game/entities\n`;
 
   return output;
 }
@@ -4258,7 +4256,7 @@ Success Rate:
 ================================================================================
 
 API Endpoints:
-- Raw data:  curl http://localhost:${HTTP_PORT}/api/live/scheduler?session=${sessionId || 'latest'}
+- Raw data:  curl http://localhost:${HTTP_PORT}/api/game/scheduler?session=${sessionId || 'latest'}
 - Dashboard: curl http://localhost:${HTTP_PORT}/dashboard/scheduler?session=${sessionId || 'latest'}
 
 ================================================================================
@@ -4538,48 +4536,6 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   const url = new URL(req.url || '/', `http://localhost:${HTTP_PORT}`);
   let pathname = url.pathname;
   const sessionParam = url.searchParams.get('session');
-
-  // === API NAMESPACE MIGRATION ===
-  // Phase 1: Add new route aliases with backwards compatibility
-  // New namespaces map to existing handlers; old namespaces emit deprecation warnings
-  // See docs/API_NAMESPACE_MIGRATION.md for the full migration plan
-
-  // Route aliasing: NEW namespace → OLD namespace (silent, for new clients)
-  // Note: Only rewrite paths with trailing content, not exact matches that already work
-  const namespaceAliases: Array<[string, string]> = [
-    ['/api/game/', '/api/live/'],           // Live game queries
-    ['/api/planets/', '/api/planet/'],       // Planet subpaths (/:id/*, stats, etc.)
-    ['/api/saves/', '/api/save/'],           // Save/load/fork subpaths
-    ['/api/server/', '/api/game-server/'],   // Game server management
-  ];
-
-  let wasRewritten = false;
-  for (const [newPrefix, oldPrefix] of namespaceAliases) {
-    if (pathname.startsWith(newPrefix)) {
-      pathname = oldPrefix + pathname.slice(newPrefix.length);
-      wasRewritten = true;
-      break;
-    }
-  }
-
-  // Special case: exact matches for consistency (e.g., POST /api/planets → /api/planet)
-  // But /api/planets (GET list) already works, so only handle POST for create
-  // This is handled by the existing routes - no additional rewriting needed
-
-  // Deprecation warnings: OLD namespace (emit warning, still works)
-  const deprecatedPrefixes: Array<[string, string]> = [
-    ['/api/live/', '/api/game/'],
-    ['/api/game-server/', '/api/server/'],
-  ];
-
-  if (!wasRewritten) {
-    for (const [oldPrefix, newPrefix] of deprecatedPrefixes) {
-      if (pathname.startsWith(oldPrefix)) {
-        console.warn(`[DEPRECATED] Use ${newPrefix}* instead of ${oldPrefix}* - see docs/API_NAMESPACE_MIGRATION.md`);
-        break;
-      }
-    }
-  }
 
   // === UNIFIED ADMIN DASHBOARD ===
   // Routes /admin/* to the capability-based admin interface
@@ -5122,7 +5078,7 @@ Available agents:
   // === Live Entity API Endpoints ===
   // These query the running game in real-time via WebSocket
 
-  if (pathname === '/api/live/entities') {
+  if (pathname === '/api/game/entities') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5151,7 +5107,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/entity') {
+  if (pathname === '/api/game/entity') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5187,7 +5143,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/prompt') {
+  if (pathname === '/api/game/prompt') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5224,7 +5180,7 @@ Available agents:
   }
 
   // Talker prompt (Layer 2: conversation, goals, social)
-  if (pathname === '/api/live/prompt/talker') {
+  if (pathname === '/api/game/prompt/talker') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5260,7 +5216,7 @@ Available agents:
   }
 
   // Executor prompt (Layer 3: strategic planning, tasks)
-  if (pathname === '/api/live/prompt/executor') {
+  if (pathname === '/api/game/prompt/executor') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5295,7 +5251,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/status') {
+  if (pathname === '/api/game/status') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5340,7 +5296,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/universe') {
+  if (pathname === '/api/game/universe') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5369,7 +5325,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/magic') {
+  if (pathname === '/api/game/magic') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5398,7 +5354,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/divinity') {
+  if (pathname === '/api/game/divinity') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5427,7 +5383,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/research') {
+  if (pathname === '/api/game/research') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5456,7 +5412,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/plants') {
+  if (pathname === '/api/game/plants') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5485,7 +5441,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/terrain') {
+  if (pathname === '/api/game/terrain') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5521,8 +5477,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/scheduler - Get LLM scheduler metrics
-  if (pathname === '/api/live/scheduler') {
+  // GET /api/game/scheduler - Get LLM scheduler metrics
+  if (pathname === '/api/game/scheduler') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5551,8 +5507,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/conversation - Get conversation history for an agent
-  if (pathname === '/api/live/conversation') {
+  // GET /api/game/conversation - Get conversation history for an agent
+  if (pathname === '/api/game/conversation') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5591,8 +5547,8 @@ Available agents:
   // === Grand Strategy API Endpoints ===
   // These query grand strategy entities (empires, fleets, etc.) in real-time
 
-  // GET /api/live/empires - List all empires
-  if (pathname === '/api/live/empires') {
+  // GET /api/game/empires - List all empires
+  if (pathname === '/api/game/empires') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5620,8 +5576,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/nations - List all nations
-  if (pathname === '/api/live/nations') {
+  // GET /api/game/nations - List all nations
+  if (pathname === '/api/game/nations') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5649,8 +5605,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/federations - List all federations
-  if (pathname === '/api/live/federations') {
+  // GET /api/game/federations - List all federations
+  if (pathname === '/api/game/federations') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5678,8 +5634,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/galactic-councils - List all galactic councils
-  if (pathname === '/api/live/galactic-councils') {
+  // GET /api/game/galactic-councils - List all galactic councils
+  if (pathname === '/api/game/galactic-councils') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5707,8 +5663,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/navies - List all navies
-  if (pathname === '/api/live/navies') {
+  // GET /api/game/navies - List all navies
+  if (pathname === '/api/game/navies') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5736,8 +5692,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/fleets - List all fleets
-  if (pathname === '/api/live/fleets') {
+  // GET /api/game/fleets - List all fleets
+  if (pathname === '/api/game/fleets') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5765,8 +5721,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/squadrons - List all squadrons
-  if (pathname === '/api/live/squadrons') {
+  // GET /api/game/squadrons - List all squadrons
+  if (pathname === '/api/game/squadrons') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5794,8 +5750,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/megastructures - List all megastructures
-  if (pathname === '/api/live/megastructures') {
+  // GET /api/game/megastructures - List all megastructures
+  if (pathname === '/api/game/megastructures') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5823,8 +5779,8 @@ Available agents:
     return;
   }
 
-  // GET /api/live/trade-networks - Get trade network statistics
-  if (pathname === '/api/live/trade-networks') {
+  // GET /api/game/trade-networks - Get trade network statistics
+  if (pathname === '/api/game/trade-networks') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5854,8 +5810,8 @@ Available agents:
 
   // === Grand Strategy Action Endpoints ===
 
-  // POST /api/live/diplomatic-action - Issue diplomatic action between empires
-  if (pathname === '/api/live/diplomatic-action' && req.method === 'POST') {
+  // POST /api/game/diplomatic-action - Issue diplomatic action between empires
+  if (pathname === '/api/game/diplomatic-action' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5891,8 +5847,8 @@ Available agents:
     return;
   }
 
-  // POST /api/live/move-fleet - Move a fleet to a target position
-  if (pathname === '/api/live/move-fleet' && req.method === 'POST') {
+  // POST /api/game/move-fleet - Move a fleet to a target position
+  if (pathname === '/api/game/move-fleet' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5928,8 +5884,8 @@ Available agents:
     return;
   }
 
-  // POST /api/live/megastructure-task - Assign task to a megastructure
-  if (pathname === '/api/live/megastructure-task' && req.method === 'POST') {
+  // POST /api/game/megastructure-task - Assign task to a megastructure
+  if (pathname === '/api/game/megastructure-task' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -5966,9 +5922,9 @@ Available agents:
   }
 
   // CORS preflight for grand strategy actions
-  if ((pathname === '/api/live/diplomatic-action' ||
-       pathname === '/api/live/move-fleet' ||
-       pathname === '/api/live/megastructure-task') && req.method === 'OPTIONS') {
+  if ((pathname === '/api/game/diplomatic-action' ||
+       pathname === '/api/game/move-fleet' ||
+       pathname === '/api/game/megastructure-task') && req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -6078,7 +6034,7 @@ Available agents:
 
   // === Pending Approvals API ===
 
-  if (pathname === '/api/live/pending-approvals') {
+  if (pathname === '/api/game/pending-approvals') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6099,7 +6055,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/approve-creation' && req.method === 'POST') {
+  if (pathname === '/api/game/approve-creation' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6127,7 +6083,7 @@ Available agents:
     return;
   }
 
-  if (pathname === '/api/live/reject-creation' && req.method === 'POST') {
+  if (pathname === '/api/game/reject-creation' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6156,7 +6112,7 @@ Available agents:
   }
 
   // Agent Debug Logging API - Deep logging for debugging agent behavior
-  if (pathname === '/api/live/debug-agent') {
+  if (pathname === '/api/game/debug-agent') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6220,7 +6176,7 @@ Available agents:
   }
 
   // Get agent logs
-  if (pathname === '/api/live/debug-agent/logs') {
+  if (pathname === '/api/game/debug-agent/logs') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6246,7 +6202,7 @@ Available agents:
   }
 
   // Analyze agent behavior
-  if (pathname === '/api/live/debug-agent/analyze') {
+  if (pathname === '/api/game/debug-agent/analyze') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6271,7 +6227,7 @@ Available agents:
   }
 
   // List all log files
-  if (pathname === '/api/live/debug-agent/log-files') {
+  if (pathname === '/api/game/debug-agent/log-files') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6288,7 +6244,7 @@ Available agents:
   }
 
   // Find agent by name
-  if (pathname === '/api/live/agents/find-by-name') {
+  if (pathname === '/api/game/agents/find-by-name') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6662,10 +6618,10 @@ MAGIC/DIVINITY ACTIONS
 QUERY ACTIONS (for getting IDs and state)
 ================================================================================
 
-  Get entities:  curl http://localhost:${HTTP_PORT}/api/live/entities
-  Get entity:    curl "http://localhost:${HTTP_PORT}/api/live/entity?id=<entityId>"
-  Get magic:     curl http://localhost:${HTTP_PORT}/api/live/magic
-  Get divinity:  curl http://localhost:${HTTP_PORT}/api/live/divinity
+  Get entities:  curl http://localhost:${HTTP_PORT}/api/game/entities
+  Get entity:    curl "http://localhost:${HTTP_PORT}/api/game/entity?id=<entityId>"
+  Get magic:     curl http://localhost:${HTTP_PORT}/api/game/magic
+  Get divinity:  curl http://localhost:${HTTP_PORT}/api/game/divinity
 
 ================================================================================
 NOTES
@@ -6961,8 +6917,8 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     });
   }
 
-  // GET /api/game-server/status - Check if game server is running
-  if (pathname === '/api/game-server/status' && req.method === 'GET') {
+  // GET /api/server/status - Check if game server is running
+  if (pathname === '/api/server/status' && req.method === 'GET') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -6975,8 +6931,8 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     return;
   }
 
-  // POST /api/game-server/start - Start the game server
-  if (pathname === '/api/game-server/start' && req.method === 'POST') {
+  // POST /api/server/start - Start the game server
+  if (pathname === '/api/server/start' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -7024,8 +6980,8 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     return;
   }
 
-  // POST /api/game-server/stop - Stop the game server
-  if (pathname === '/api/game-server/stop' && req.method === 'POST') {
+  // POST /api/server/stop - Stop the game server
+  if (pathname === '/api/server/stop' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -7075,7 +7031,7 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
   }
 
   // Handle CORS preflight for game server API
-  if (pathname.startsWith('/api/game-server/') && req.method === 'OPTIONS') {
+  if (pathname.startsWith('/api/server/') && req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7409,7 +7365,7 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
   }
 
   // Save current game state
-  if (pathname === '/api/save' && req.method === 'POST') {
+  if (pathname === '/api/saves' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -7525,7 +7481,7 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
   }
 
   // Delete a save
-  if (pathname === '/api/save' && req.method === 'DELETE') {
+  if (pathname === '/api/saves' && req.method === 'DELETE') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -7622,7 +7578,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   // and multiplayer via cross-profile world sharing.
 
   // CORS preflight for planet endpoints
-  if (req.method === 'OPTIONS' && pathname.startsWith('/api/planet')) {
+  if (req.method === 'OPTIONS' && pathname.startsWith('/api/planets')) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'content-type, Content-Type');
@@ -7663,7 +7619,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // Create a new planet
-  if (pathname === '/api/planet' && req.method === 'POST') {
+  if (pathname === '/api/planets' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -7712,7 +7668,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', ''));
 
     try {
       const planet = await planetStorage.getPlanetMetadata(planetId);
@@ -7734,7 +7690,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', ''));
 
     try {
       await planetStorage.deletePlanet(planetId);
@@ -7751,7 +7707,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/access', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/access', ''));
 
     try {
       await planetStorage.recordPlanetAccess(planetId);
@@ -7768,7 +7724,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/biosphere', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/biosphere', ''));
 
     try {
       const biosphere = await planetStorage.getBiosphere(planetId);
@@ -7790,7 +7746,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/biosphere', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/biosphere', ''));
 
     let body = '';
     req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
@@ -7820,7 +7776,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/chunks', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/chunks', ''));
 
     try {
       const chunks = await planetStorage.listChunks(planetId);
@@ -7837,7 +7793,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/chunks/batch', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/chunks/batch', ''));
 
     let body = '';
     req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
@@ -7880,7 +7836,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // Parse: /api/planet/{planetId}/chunk/{x},{y}
+    // Parse: /api/planets/{planetId}/chunk/{x},{y}
     const match = pathname.match(/^\/api\/planet\/([^\/]+)\/chunk\/(-?\d+),(-?\d+)$/);
     if (!match) {
       res.statusCode = 400;
@@ -7912,7 +7868,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // Parse: /api/planet/{planetId}/chunk/{x},{y}
+    // Parse: /api/planets/{planetId}/chunk/{x},{y}
     const match = pathname.match(/^\/api\/planet\/([^\/]+)\/chunk\/(-?\d+),(-?\d+)$/);
     if (!match) {
       res.statusCode = 400;
@@ -7965,7 +7921,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/locations', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/locations', ''));
 
     try {
       const locations = await planetStorage.getNamedLocations(planetId);
@@ -7982,7 +7938,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const planetId = decodeURIComponent(pathname.replace('/api/planet/', '').replace('/location', ''));
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/location', ''));
 
     let body = '';
     req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
@@ -8009,7 +7965,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // Planet API help
-  if (pathname === '/api/planet' || pathname === '/api/planet/') {
+  if (pathname === '/api/planets' || pathname === '/api/planets/') {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -8048,43 +8004,43 @@ ENDPOINTS:
      - config (object, optional): Additional configuration parameters
 
 4. GET PLANET METADATA
-   curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123
+   curl http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123
 
 5. DELETE PLANET (marks as deleted, preserved per conservation rules)
-   curl -X DELETE http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123
+   curl -X DELETE http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123
 
 6. RECORD PLANET ACCESS (increments saveCount)
-   curl -X POST http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/access
+   curl -X POST http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/access
 
 7. GET BIOSPHERE
-   curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/biosphere
+   curl http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/biosphere
 
 8. SAVE BIOSPHERE
-   curl -X PUT http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/biosphere \\
+   curl -X PUT http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/biosphere \\
      -H "Content-Type: application/json" \\
      -d '{"species": [...], "foodWeb": [...], "generatedAt": 1234567890}'
 
 9. LIST ALL CHUNKS
-   curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunks
+   curl http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/chunks
 
 10. GET SPECIFIC CHUNK
-    curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunk/5,10
+    curl http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/chunk/5,10
 
 11. SAVE/UPDATE CHUNK
-    curl -X PUT http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunk/5,10 \\
+    curl -X PUT http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/chunk/5,10 \\
       -H "Content-Type: application/json" \\
       -d '{"x": 5, "y": 10, "tiles": [...], "compression": "rle", "modifiedAt": 1234567890}'
 
 12. BATCH GET CHUNKS
-    curl -X POST http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/chunks/batch \\
+    curl -X POST http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/chunks/batch \\
       -H "Content-Type: application/json" \\
       -d '{"coords": [{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 0, "y": 1}]}'
 
 13. GET NAMED LOCATIONS
-    curl http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/locations
+    curl http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/locations
 
 14. ADD NAMED LOCATION
-    curl -X POST http://localhost:${HTTP_PORT}/api/planet/planet:magical:abc123/location \\
+    curl -X POST http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/location \\
       -H "Content-Type: application/json" \\
       -d '{"chunkX": 5, "chunkY": 10, "name": "Valley of Dawn", "namedBy": "player:abc"}'
 
@@ -8816,14 +8772,14 @@ ENDPOINTS:
           '/metrics/summary?session=<id> - Summary stats',
         ],
         live_api: [
-          '/api/live/status - Check if game is connected',
-          '/api/live/entities - List all agents (live)',
-          '/api/live/entity?id=<entityId> - Get entity state (live)',
-          '/api/live/prompt?id=<entityId> - Get LLM prompt (live)',
-          '/api/live/universe - Get universe configuration (dimensions, laws, etc.)',
-          '/api/live/magic - Get magic system info (enabled paradigms, etc.)',
-          '/api/live/divinity - Get divinity info (gods, belief, pantheons, etc.)',
-          '/api/live/research - Get research info (discovered papers, in-progress, completed)',
+          '/api/game/status - Check if game is connected',
+          '/api/game/entities - List all agents (live)',
+          '/api/game/entity?id=<entityId> - Get entity state (live)',
+          '/api/game/prompt?id=<entityId> - Get LLM prompt (live)',
+          '/api/game/universe - Get universe configuration (dimensions, laws, etc.)',
+          '/api/game/magic - Get magic system info (enabled paradigms, etc.)',
+          '/api/game/divinity - Get divinity info (gods, belief, pantheons, etc.)',
+          '/api/game/research - Get research info (discovered papers, in-progress, completed)',
         ],
         actions_api: [
           '/api/actions - List all available dev actions (LLM dev tools)',

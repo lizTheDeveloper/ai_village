@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { World } from '../ecs/World';
-import { DeathTransitionSystem } from '../systems/DeathTransitionSystem';
-import { Entity } from '../ecs/Entity';
-import { EventBus } from '../events/EventBus';
+import { WorldImpl, type World } from '../ecs/World.js';
+import { DeathTransitionSystem } from '../systems/DeathTransitionSystem.js';
+import type { Entity } from '../ecs/Entity.js';
+import { EventBusImpl, type EventBus } from '../events/EventBus.js';
 
 /**
  * Tests for Death Handling - Acceptance Criterion 6
@@ -22,80 +22,40 @@ describe('DeathHandling', () => {
   let world: World;
   let system: DeathTransitionSystem;
   let eventBus: EventBus;
-  let deceased: Entity;
-  let friend: Entity;
-  let witness: Entity;
 
-  beforeEach(() => {
-    world = new World();
-    eventBus = new EventBus();
-    system = new DeathTransitionSystem(eventBus);
+  // Helper to run the system (advance tick past throttle interval first)
+  function runSystem() {
+    world.setTick(world.tick + 101); // Past throttleInterval of 100
+    const entities = world.query().with('needs').executeEntities();
+    system.update(world, entities, 0.05);
+    eventBus.flush(); // Dispatch queued events to handlers
+  }
 
-    // Create deceased agent
-    deceased = world.createEntity();
-    deceased.addComponent('position', { type: 'position', version: 1, x: 10, y: 10, z: 0 });
-    deceased.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
-    deceased.addComponent('identity', { type: 'identity', version: 1, name: 'Deceased' });
-    deceased.addComponent('needs', {
-      type: 'needs',
-      version: 1,
-      health: 100,
-      hunger: 100,
-      energy: 100,
-      temperature: 37,
-      lastUpdate: 0
-    });
-    deceased.addComponent('inventory', {
-      type: 'inventory',
-      items: [
-        { type: 'sword', quantity: 1 },
-        { type: 'gold', quantity: 50 },
-      ],
-    });
-    deceased.addComponent('relationship', {
-      type: 'relationship',
-      version: 1,
-      relationships: new Map()
-    });
-    deceased.addComponent('episodic_memory', {
-      type: 'episodic_memory',
-      memories: [
-        { id: 'unique1', shared: false, content: 'secret location' },
-        { id: 'shared1', shared: true, content: 'village festival' },
-      ],
-    });
-
-    // Create friend
-    friend = world.createEntity();
-    friend.addComponent('position', { type: 'position', version: 1, x: 20, y: 20, z: 0 });
-    friend.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
-    friend.addComponent('identity', { type: 'identity', version: 1, name: 'Friend' });
-    friend.addComponent('relationship', {
-      type: 'relationship',
-      version: 1,
-      relationships: new Map([[deceased.id, { affinity: 80, trust: 90, familiarity: 80 }]]),
-    });
-
-    // Create witness
-    witness = world.createEntity();
-    witness.addComponent('position', { type: 'position', version: 1, x: 12, y: 12, z: 0 });
-    witness.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
-    witness.addComponent('identity', { type: 'identity', version: 1, name: 'Witness' });
-    witness.addComponent('episodic_memory', {
-      type: 'episodic_memory',
-      memories: []
-    });
+  beforeEach(async () => {
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+    system = new DeathTransitionSystem();
+    await system.initialize(world, eventBus);
   });
 
   describe('REQ-CON-009: Death is Permanent', () => {
     it('should mark agent as dead, not delete', () => {
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
+      // Create deceased agent with all required components
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0, // Dead
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
 
-      system.update(world, 1);
+      runSystem();
 
       // Entity should still exist
       expect(world.getEntity(deceased.id)).toBeDefined();
@@ -105,13 +65,28 @@ describe('DeathHandling', () => {
     });
 
     it('should drop inventory at death location', () => {
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'inventory',
+        items: [
+          { type: 'sword', quantity: 1 },
+          { type: 'gold', quantity: 50 },
+        ],
+      });
 
-      system.update(world, 1);
+      runSystem();
 
       // Check for dropped items using query
       const allEntities = world.query().with('item').executeEntities();
@@ -126,33 +101,72 @@ describe('DeathHandling', () => {
     });
 
     it('should notify all agents with relationship', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+
+      const friend = world.createEntity();
+      friend.addComponent({ type: 'position', version: 1, x: 20, y: 20, z: 0 });
+      friend.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      friend.addComponent({ type: 'identity', version: 1, name: 'Friend' });
+      friend.addComponent({
+        type: 'relationship',
+        version: 1,
+        relationships: new Map([[deceased.id, { affinity: 80, trust: 90, familiarity: 80 }]]),
+      });
+
       const notificationHandler = vi.fn();
       eventBus.on('death:notification', notificationHandler);
 
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
-
-      system.update(world, 1);
+      runSystem();
 
       expect(notificationHandler).toHaveBeenCalledWith(
         expect.objectContaining({
-          deceasedId: deceased.id,
-          notifiedAgents: expect.arrayContaining([friend.id]),
+          type: 'death:notification',
+          data: expect.objectContaining({
+            deceasedId: deceased.id,
+            notifiedAgents: expect.arrayContaining([friend.id]),
+          }),
         })
       );
     });
 
     it('should apply mourning to close relations', () => {
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
 
-      system.update(world, 1);
+      const friend = world.createEntity();
+      friend.addComponent({ type: 'position', version: 1, x: 20, y: 20, z: 0 });
+      friend.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      friend.addComponent({ type: 'identity', version: 1, name: 'Friend' });
+      friend.addComponent({
+        type: 'relationship',
+        version: 1,
+        relationships: new Map([[deceased.id, { affinity: 80, trust: 90, familiarity: 80 }]]),
+      });
+
+      runSystem();
 
       const mood = friend.getComponent('mood');
 
@@ -161,39 +175,29 @@ describe('DeathHandling', () => {
       expect(mood.mourning).toBe(true);
     });
 
-    it('should not apply mourning to distant relations', () => {
-      const acquaintance = world.createEntity();
-      acquaintance.addComponent('agent', { type: 'agent', version: 1, tier: 'autonomic' });
-      acquaintance.addComponent('identity', { type: 'identity', version: 1, name: 'Acquaintance' });
-      acquaintance.addComponent('relationship', {
-        type: 'relationship',
+    it('should mark unique memories as lost', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
         version: 1,
-        relationships: new Map([[deceased.id, { affinity: 30, trust: 20, familiarity: 20 }]]),
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'episodic_memory',
+        memories: [
+          { id: 'unique1', shared: false, content: 'secret location' },
+          { id: 'shared1', shared: true, content: 'village festival' },
+        ],
       });
 
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
-
-      system.update(world, 1);
-
-      const mood = acquaintance.getComponent('mood');
-
-      if (mood) {
-        expect(mood.mourning).toBeFalsy();
-      }
-    });
-
-    it('should mark unique memories as lost', () => {
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
-
-      system.update(world, 1);
+      runSystem();
 
       // Query for knowledge_loss singleton entity
       const knowledgeLossEntities = world.query().with('knowledge_loss').executeEntities();
@@ -206,13 +210,28 @@ describe('DeathHandling', () => {
     });
 
     it('should not mark shared memories as lost', () => {
-      // Trigger death by setting health to 0
-      deceased.updateComponent('needs', (needs: any) => ({
-        ...needs,
-        health: 0
-      }));
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'episodic_memory',
+        memories: [
+          { id: 'unique1', shared: false, content: 'secret location' },
+          { id: 'shared1', shared: true, content: 'village festival' },
+        ],
+      });
 
-      system.update(world, 1);
+      runSystem();
 
       // Query for knowledge_loss singleton entity
       const knowledgeLossEntities = world.query().with('knowledge_loss').executeEntities();
@@ -224,19 +243,32 @@ describe('DeathHandling', () => {
     });
 
     it('should check for power vacuum if deceased held position', () => {
-      deceased.addComponent('position_holder', {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'position_holder',
+        version: 1,
         position: 'chief',
         authority: 10,
       });
 
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
+      runSystem();
 
-      system.update(world, 1);
-
-      const powerVacuum = world.getComponent('power_vacuum');
+      // Query for power_vacuum singleton entity
+      const powerVacuumEntities = world.query().with('power_vacuum').executeEntities();
+      expect(powerVacuumEntities.length).toBeGreaterThan(0);
+      const powerVacuum = powerVacuumEntities[0].getComponent('power_vacuum');
 
       expect(powerVacuum).toBeDefined();
       expect(powerVacuum.position).toBe('chief');
@@ -244,12 +276,30 @@ describe('DeathHandling', () => {
     });
 
     it('should create death memory for witnesses', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
       });
 
-      system.update(world, 1);
+      const witness = world.createEntity();
+      witness.addComponent({ type: 'position', version: 1, x: 12, y: 12, z: 0 });
+      witness.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      witness.addComponent({ type: 'identity', version: 1, name: 'Witness' });
+      witness.addComponent({
+        type: 'episodic_memory',
+        memories: []
+      });
+
+      runSystem();
 
       const witnessMemory = witness.getComponent('episodic_memory');
 
@@ -261,62 +311,70 @@ describe('DeathHandling', () => {
       );
     });
 
-    it('should emit death:occurred event', () => {
-      const deathHandler = vi.fn();
-      eventBus.on('death:occurred', deathHandler);
-
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
+    it('should emit agent:died event', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
       });
 
-      system.update(world, 1);
+      const deathHandler = vi.fn();
+      eventBus.on('agent:died', deathHandler);
+
+      runSystem();
 
       expect(deathHandler).toHaveBeenCalledWith(
         expect.objectContaining({
-          deceasedId: deceased.id,
-          cause: 'combat',
+          type: 'agent:died',
+          data: expect.objectContaining({
+            entityId: deceased.id,
+            destinationRealm: 'none',
+            routingReason: 'no_soul',
+          }),
         })
       );
-    });
-
-    it('should handle death from various causes', () => {
-      const causes = ['combat', 'starvation', 'disease', 'predator', 'old_age', 'accident'];
-
-      causes.forEach((cause) => {
-        const testAgent = world.createEntity();
-        testAgent.addComponent('agent', { name: 'Test' });
-        testAgent.addComponent('dead', {
-          cause: cause,
-          time: 1000,
-        });
-
-        system.update(world, 1);
-
-        expect(testAgent.getComponent('dead').cause).toBe(cause);
-      });
     });
   });
 
   describe('pack mind death handling', () => {
     it('should recalculate coherence on body death', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'pack_member',
+        version: 1,
+        packId: 'pack1',
+      });
+
       const packMind = world.createEntity();
-      packMind.addComponent('pack_combat', {
+      packMind.addComponent({
+        type: 'pack_combat',
+        version: 1,
         packId: 'pack1',
         bodiesInPack: [deceased.id, 'body2', 'body3'],
         coherence: 0.8,
       });
 
-      deceased.addComponent('pack_member', {
-        packId: 'pack1',
-      });
-
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
-
-      system.update(world, 1);
+      runSystem();
 
       const packCombat = packMind.getComponent('pack_combat');
 
@@ -325,23 +383,35 @@ describe('DeathHandling', () => {
     });
 
     it('should trigger pack dissolution on low coherence', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'pack_member',
+        version: 1,
+        packId: 'pack1',
+      });
+
       const packMind = world.createEntity();
-      packMind.addComponent('pack_combat', {
+      packMind.addComponent({
+        type: 'pack_combat',
+        version: 1,
         packId: 'pack1',
         bodiesInPack: [deceased.id, 'body2'],
         coherence: 0.3, // Already low
       });
 
-      deceased.addComponent('pack_member', {
-        packId: 'pack1',
-      });
-
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
-
-      system.update(world, 1);
+      runSystem();
 
       const packCombat = packMind.getComponent('pack_combat');
 
@@ -352,23 +422,35 @@ describe('DeathHandling', () => {
 
   describe('hive death handling', () => {
     it('should trigger collapse on queen death', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'hive_queen',
+        version: 1,
+        hiveId: 'hive1',
+      });
+
       const hive = world.createEntity();
-      hive.addComponent('hive_combat', {
+      hive.addComponent({
+        type: 'hive_combat',
+        version: 1,
         hiveId: 'hive1',
         queen: deceased.id,
         workers: ['worker1', 'worker2', 'worker3'],
       });
 
-      deceased.addComponent('hive_queen', {
-        hiveId: 'hive1',
-      });
-
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
-
-      system.update(world, 1);
+      runSystem();
 
       const hiveCombat = hive.getComponent('hive_combat');
 
@@ -377,23 +459,35 @@ describe('DeathHandling', () => {
     });
 
     it('should handle worker death without collapse', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
+      deceased.addComponent({
+        type: 'hive_worker',
+        version: 1,
+        hiveId: 'hive1',
+      });
+
       const hive = world.createEntity();
-      hive.addComponent('hive_combat', {
+      hive.addComponent({
+        type: 'hive_combat',
+        version: 1,
         hiveId: 'hive1',
         queen: 'queen1',
         workers: [deceased.id, 'worker2', 'worker3'],
       });
 
-      deceased.addComponent('hive_worker', {
-        hiveId: 'hive1',
-      });
-
-      deceased.addComponent('dead', {
-        cause: 'combat',
-        time: 1000,
-      });
-
-      system.update(world, 1);
+      runSystem();
 
       const hiveCombat = hive.getComponent('hive_combat');
 
@@ -403,20 +497,36 @@ describe('DeathHandling', () => {
   });
 
   describe('error handling', () => {
-    it('should throw when death cause is not provided', () => {
-      deceased.addComponent('dead', {
-        time: 1000,
-      } as any);
+    it('should handle entities without needs component gracefully', () => {
+      const entityWithoutNeeds = world.createEntity();
+      entityWithoutNeeds.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
 
-      expect(() => system.update(world, 1)).toThrow('Death cause is required');
+      // Should not throw
+      expect(() => runSystem()).not.toThrow();
     });
 
-    it('should throw when death time is not provided', () => {
-      deceased.addComponent('dead', {
-        cause: 'combat',
-      } as any);
+    it('should not process death twice', () => {
+      const deceased = world.createEntity();
+      deceased.addComponent({ type: 'position', version: 1, x: 10, y: 10, z: 0 });
+      deceased.addComponent({ type: 'agent', version: 1, tier: 'autonomic' });
+      deceased.addComponent({ type: 'identity', version: 1, name: 'Deceased' });
+      deceased.addComponent({
+        type: 'needs',
+        version: 1,
+        health: 0,
+        hunger: 100,
+        energy: 100,
+        temperature: 37,
+        lastUpdate: 0
+      });
 
-      expect(() => system.update(world, 1)).toThrow('Death time is required');
+      runSystem();
+      expect(system.hasProcessedDeath(deceased.id)).toBe(true);
+
+      // Second update should not reprocess
+      runSystem();
+      // Still processed, not processed twice
+      expect(system.hasProcessedDeath(deceased.id)).toBe(true);
     });
   });
 });

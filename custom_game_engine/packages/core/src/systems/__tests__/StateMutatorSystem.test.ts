@@ -12,6 +12,8 @@ describe('StateMutatorSystem', () => {
   beforeEach(() => {
     world = new World();
     system = new StateMutatorSystem();
+    // Initialize events (BaseSystem requires this for SystemContext)
+    system['events'] = { cleanup: () => {}, emit: () => {} } as any;
   });
 
   describe('Basic Mutation Application', () => {
@@ -34,7 +36,7 @@ describe('StateMutatorSystem', () => {
       });
 
       // Update system (1 second elapsed)
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.7, 2);
@@ -59,7 +61,7 @@ describe('StateMutatorSystem', () => {
       });
 
       // Update system (1 second elapsed)
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.3, 2);
@@ -82,7 +84,7 @@ describe('StateMutatorSystem', () => {
         source: 'massive_damage',
       });
 
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBe(0); // Clamped to min
@@ -105,7 +107,7 @@ describe('StateMutatorSystem', () => {
         source: 'overheal',
       });
 
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBe(1.0); // Clamped to max
@@ -133,16 +135,16 @@ describe('StateMutatorSystem', () => {
       });
 
       // First second: rate is 0.2
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.7, 2);
 
       // Second second: rate is now 0.1 (0.2 - 0.1)
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       expect(needs.health).toBeCloseTo(0.8, 2);
 
       // Third second: rate is now 0.0 (0.1 - 0.1)
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       expect(needs.health).toBeCloseTo(0.8, 2); // No change, rate decayed to 0
     });
   });
@@ -168,12 +170,12 @@ describe('StateMutatorSystem', () => {
       });
 
       // First update: applies 0.1
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       let needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.6, 2);
 
       // Second update: mutation should be expired, no change
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.6, 2); // No additional healing
     });
@@ -201,13 +203,13 @@ describe('StateMutatorSystem', () => {
 
       // Before expiration (tick 50)
       world.setTick(50);
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       let needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.6, 2);
 
       // After expiration (tick 100)
       world.setTick(100);
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
       needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBeCloseTo(0.6, 2); // Mutation expired, no more healing
     });
@@ -235,7 +237,7 @@ describe('StateMutatorSystem', () => {
       clearMutationRate(entity, 'needs.health');
 
       // Update should not apply the mutation
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       expect(needs.health).toBe(0.5); // Unchanged
@@ -267,7 +269,7 @@ describe('StateMutatorSystem', () => {
         source: 'damage',
       });
 
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       // Only damage applies (0.5 - 0.2 = 0.3), healing was overwritten
@@ -296,10 +298,10 @@ describe('StateMutatorSystem', () => {
       });
 
       // Update - mutation should be auto-removed due to negligible rate
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       // Second update - should not crash, mutation is gone
-      system.update(world, [], 1.0);
+      system.update(world, [entity], 1.0);
 
       const needs = entity.getComponent(CT.Needs) as NeedsComponent;
       // Health barely changed

@@ -176,7 +176,7 @@ const planetsCapability = defineCapability({
       handler: async (params, _gameClient, _context) => {
         try {
           const planetId = params.planetId as string;
-          const result = await fetchFromMetricsServer(`/api/planet/${encodeURIComponent(planetId)}`);
+          const result = await fetchFromMetricsServer(`/api/planets/${encodeURIComponent(planetId)}`);
           return result;
         } catch (error) {
           return { error: `Failed to fetch planet: ${error}` };
@@ -254,7 +254,7 @@ const planetsCapability = defineCapability({
       handler: async (params, _gameClient, _context) => {
         try {
           const planetId = params.planetId as string;
-          const result = await fetchFromMetricsServer(`/api/planet/${encodeURIComponent(planetId)}/chunks`);
+          const result = await fetchFromMetricsServer(`/api/planets/${encodeURIComponent(planetId)}/chunks`);
           return result;
         } catch (error) {
           return { error: `Failed to fetch chunks: ${error}` };
@@ -331,7 +331,7 @@ const planetsCapability = defineCapability({
       handler: async (params, _gameClient, _context) => {
         try {
           const planetId = params.planetId as string;
-          const result = await fetchFromMetricsServer(`/api/planet/${encodeURIComponent(planetId)}/locations`);
+          const result = await fetchFromMetricsServer(`/api/planets/${encodeURIComponent(planetId)}/locations`);
           return result;
         } catch (error) {
           return { error: `Failed to fetch locations: ${error}` };
@@ -408,7 +408,7 @@ const planetsCapability = defineCapability({
         const planetId = params.planetId as string;
 
         try {
-          await fetchFromMetricsServer(`/api/planet/${encodeURIComponent(planetId)}`, {
+          await fetchFromMetricsServer(`/api/planets/${encodeURIComponent(planetId)}`, {
             method: 'DELETE',
           });
           return { success: true, message: `Planet ${planetId} marked as deleted` };
