@@ -1,5 +1,386 @@
 # Release Notes
 
+## 2026-01-22 - "Entity Persistence Streaming, Type Cleanup (Steps 3-4), Test Helpers" - 51 Files (+722 net)
+
+### 💾 Entity Persistence Streaming
+
+**EntityPersistenceStream.ts** (220 lines) - Batched entity persistence to server
+
+**Problem:** Universe creation generates 60+ agents over 5-10 minutes. If page refreshes mid-creation, all progress lost.
+
+**Solution:** Stream entities to server as created, batch saves every 5 seconds.
+
+**Architecture:**
+```typescript
+export class EntityPersistenceStream {
+  private dirtyEntityIds: Set<string>;           // Entities needing save
+  private flushTimer: ReturnType<typeof setInterval>;  // 5-second timer
+  private options: { flushInterval: 5000, maxBatchSize: 50 };
+
+  attach(world: World, planetId: string): void {
+    // Subscribe to entity:created events
+    world.eventBus.subscribe('entity:created', (event) => {
+      this.dirtyEntityIds.add(event.data.entityId);
+    });
+
+    // Flush every 5 seconds
+    setInterval(() => this.flush(), 5000);
+  }
+
+  async flush(): Promise<void> {
+    // Serialize entities (handles Maps, Sets, Dates)
+    const entities = Array.from(this.dirtyEntityIds).map(id => {
+      const entity = world.getEntity(id);
+      return { id, components: serialize(entity.components), createdAt };
+    });
+
+    // Send batch to server
+    await this.client.saveEntities(planetId, entities);
+    this.dirtyEntityIds.clear();
+  }
+}
+```
+
+**Features:**
+- Listens for entity:created events, queues for batch save
+- Flushes every 5 seconds (configurable)
+- Forces flush at 50 entities to prevent memory buildup
+- Non-fatal errors: re-queues entities for next flush
+- Serializes Maps → objects, Sets → arrays, Dates → timestamps
+- Optional chunk persistence after generation
+
+**API endpoints added (3 files):**
+
+**PlanetClient.ts** (+74 lines):
+```typescript
+async saveEntities(planetId: string, entities: EntitySnapshot[]): Promise<void>
+async getEntities(planetId: string): Promise<EntitySnapshot[]>
+async clearEntities(planetId: string): Promise<void>
+```
+
+**planet-storage.ts** (+79 lines) - Server-side storage:
+- Stores as compressed JSON (entities.json.gz per planet)
+- Merges new entities with existing (overwrites by ID)
+- Decompresses on read, compresses on write
+
+**metrics-server.ts** (+80 lines) - HTTP API:
+```bash
+GET    /api/planets/:id/entities   # Get all entities
+PUT    /api/planets/:id/entities   # Save batch
+DELETE /api/planets/:id/entities   # Clear all
+```
+
+**Use case:** Incremental persistence during universe creation:
+1. EntityPersistenceStream.attach(world, planetId) during creation
+2. Stream entities to server as created (every 5s batches)
+3. CreationStateManager tracks phase (universe_configured → world_populated → souls_created)
+4. Genesis snapshot taken at end
+5. EntityPersistenceStream.clearEntities() after genesis (server-side entity data no longer needed)
+
+**Integration status:** Ready to enable in main.ts (currently commented)
+
+---
+
+### 🔧 Type System Cleanup: Steps 3-4 ✅ COMPLETE
+
+**Implementing PLAN-circular-deps.md (from Cycle 60)**
+
+#### Step 3: Clean dist/ Before Build (24 packages)
+
+**Problem:** Stale .d.ts files in dist/ cause phantom type incompatibilities in --build mode
+
+**Solution:** Added prebuild script to all packages
+```json
+{
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc"
+  }
+}
+```
+
+**Affected packages (24 total):**
+- Core infrastructure: core, world, persistence, renderer
+- Gameplay: agents, botany, building-designer, city-simulator, environment, navigation, reproduction
+- Advanced: deterministic-sprite-generator, divinity, hierarchy-simulator, introspection, language, llm, magic
+- Infrastructure: metrics, metrics-dashboard, shared-worker
+
+**Result:** Every build starts with clean slate, eliminates stale artifacts
+
+---
+
+#### Step 4: CI Guard Against Interface Duplication
+
+**check-interface-duplication.ts** (216 lines, executable) - Prevents interface duplication
+
+**Problem:** 8+ files define local LLMProvider/LLMRequest/LLMResponse copies with diverging signatures (documented in PLAN-circular-deps.md Problem 2)
+
+**Solution:** CI guard that enforces canonical locations
+
+**Canonical locations:**
+```typescript
+const CANONICAL_INTERFACES = [
+  { name: 'LLMProvider', canonicalFile: 'packages/core/src/types/LLMTypes.ts' },
+  { name: 'LLMRequest', canonicalFile: 'packages/core/src/types/LLMTypes.ts' },
+  { name: 'LLMResponse', canonicalFile: 'packages/core/src/types/LLMTypes.ts' },
+  { name: 'LLMDecisionQueue', canonicalFile: 'packages/core/src/types/LLMTypes.ts' },
+  { name: 'LLMScheduler', canonicalFile: 'packages/core/src/types/LLMTypes.ts' },
+];
+```
+
+**Usage:**
+```bash
+# Run manually
+npx tsx scripts/check-interface-duplication.ts
+
+# Or add to package.json:
+"scripts": {
+  "check:interfaces": "tsx scripts/check-interface-duplication.ts",
+  "pretest": "npm run check:interfaces"
+}
+```
+
+**Output example:**
+```
+🔍 Scanning codebase for duplicate interface definitions...
+
+❌ Found 3 duplicate interface definitions:
+
+📦 Interface: LLMProvider
+   Canonical: packages/core/src/types/LLMTypes.ts
+   Duplicates:
+     - packages/core/src/systems/AdminAngelSystem.ts:42
+     - packages/core/src/systems/AngelSystem.ts:18
+     - packages/divinity/src/LLMVisionGenerator.ts:7
+
+💡 Fix: Remove duplicate definitions and import from canonical location instead.
+Example:
+  // Remove: interface LLMProvider { ... }
+  // Add:    import type { LLMProvider } from '@ai-village/core';
+
+❌ CI Check Failed: Duplicate interfaces detected
+```
+
+**Exit codes:**
+- 0 = No duplicates found (CI passes)
+- 1 = Duplicates detected (CI fails)
+
+**Excludes:** node_modules, dist, *.test.ts, __tests__, *.md, *.js, *.d.ts
+
+**Next step:** Add to CI pipeline (npm run pretest or GitHub Actions)
+
+---
+
+### 🧪 World Class Unification: Test Helper Registry (+311 lines)
+
+**Step toward Problem 1 resolution (PLAN-circular-deps.md)**
+
+**Problem:** Two World classes exist:
+- `core/src/ecs/World.ts` exports `WorldImpl` (real ECS World)
+- `core/src/World.ts` exports `class World extends WorldImpl` (test helper)
+- This causes type incompatibility in --build mode
+
+**Progress:** Added component registry to WorldImpl (preparing for merge)
+
+**World.ts enhancements:**
+```typescript
+// Component factory type
+type ComponentFactory = (data?: Record<string, unknown>) => Component;
+
+// Registry mapping strings to factory functions
+const componentRegistry: Record<string, ComponentFactory> = {
+  'agent': (data = {}) => ({
+    type: 'agent', version: 1,
+    behavior: data.behavior || 'wander',
+    behaviorState: data.behaviorState || {},
+    useLLM: data.useLLM || false,
+    ...data,
+  }),
+  'position': (data = {}) => createPositionComponent(data.x || 0, data.y || 0),
+  'velocity': (data = {}) => ({ type: 'velocity', version: 1, vx: 0, vy: 0 }),
+  'resource': (data = {}) => ({ type: 'resource', version: 1, resourceType, amount, ... }),
+  'building': (data = {}) => ({ type: 'building', version: 1, buildingType, ... }),
+  'collision': (data = {}) => ({ type: 'collision', version: 1, radius: 1.0 }),
+  'trust_network': (data = {}) => new TrustNetworkComponent(data),
+  'social_gradient': () => new SocialGradientComponent(),
+  'spatial_memory': (data = {}) => new SpatialMemoryComponent(data),
+  'belief': () => new BeliefComponent(),
+  'episodic_memory': (data = {}) => new EpisodicMemoryComponent(data),
+  'dominance_rank': (data = {}) => createDominanceRankComponent(data),
+  'combat_stats': (data = {}) => createCombatStatsComponent(data),
+  'conflict': (data = {}) => createConflictComponent(data),
+  'guard_duty': (data = {}) => createGuardDutyComponent(data),
+  'injury': (data = {}) => createInjuryComponent(data),
+  'inventory': (data = {}) => ({ type: 'inventory', version: 1, items: [], ...data }),
+  'relationship': (data = {}) => ({ type: 'relationship', version: 1, relationships: {}, ...data }),
+  'needs': (data = {}) => new NeedsComponent(data),
+  // ... 30+ component factories total
+};
+```
+
+**Backwards compatibility aliases:**
+```typescript
+// PascalCase → lowercase_with_underscores
+'Velocity': (data) => componentRegistry['velocity'](data),
+'Steering': (data) => componentRegistry['steering'](data),
+'ExplorationState': (data) => componentRegistry['exploration_state'](data),
+```
+
+**Benefits:**
+- Simplifies test setup (single source of truth for component creation)
+- Eliminates duplication across test files
+- Prepares for full World class unification (merge WorldImpl into World)
+- Supports both class-based and ad-hoc components (exploration_state preserves Sets from tests)
+
+**Next step:** Merge all test helper methods from World.ts into WorldImpl, delete World.ts wrapper (Step 1 of plan)
+
+---
+
+### 📚 Worker Thread Meshing Documentation (Complete)
+
+**2 comprehensive implementation reports documenting Cycle 60's worker meshing work:**
+
+**IMPLEMENTATION_REPORT.md** (258 lines) - Full implementation details
+- All files created/modified (MeshWorker, MeshWorkerPool, ChunkMesh methods, exports)
+- Build verification (renderer package builds successfully)
+- Usage examples with code snippets
+- Performance benefits (before/after comparison)
+- Technical details (data serialization, transferable objects, worker pool management)
+- Integration status table
+
+**WORKER_THREAD_MESHING_STATUS.md** (329 lines) - Status tracking doc
+- Component-by-component status (all ✅ complete)
+- Implementation overview for each component
+- Data flow diagram (main thread ↔ worker thread communication)
+- Performance characteristics (5-15ms meshing, <1ms queue time, no frame drops)
+- Build verification steps
+- Next steps (optional enhancements)
+
+**Key highlights from docs:**
+- MeshWorker: 103 lines, runs GreedyMesher in background thread
+- MeshWorkerPool: 186 lines (created in Cycle 60), manages 4-worker pool
+- ChunkMesh: +3 methods (getBlockData, applyMeshData, clearDirty)
+- Zero-copy transfer via transferable ArrayBuffers
+- No frame drops during chunk generation (was 60ms stutter before)
+
+---
+
+### 🎮 Universe Configuration UX: Auto-Generated Names (+81 lines)
+
+**UniverseConfigScreen.ts enhancements**
+
+**Auto-generate evocative universe names:**
+```typescript
+private static UNIVERSE_PREFIXES = [
+  'Ae', 'Val', 'Cel', 'Eld', 'Ara', 'Nym', 'Ith', 'Zeph', 'Mor', 'Syl',
+  'Thal', 'Ven', 'Kyr', 'Orn', 'Pha', 'Elu', 'Ast', 'Vor', 'Kal', 'Lum',
+];
+private static UNIVERSE_MIDDLES = [
+  'ther', 'an', 'est', 'or', 'un', 'ar', 'el', 'en', 'os', 'al',
+  'ion', 'eth', 'and', 'ur', 'ax', 'em', 'on', 'is', 'ad', 'ir',
+];
+private static UNIVERSE_ENDINGS = [
+  'ia', 'os', 'is', 'um', 'a', 'on', 'heim', 'thas', 'ael', 'ion',
+  'ys', 'oth', 'nar', 'ium', 'ea', 'or', 'ith', 'ara', 'eon', 'us',
+];
+
+generateUniverseName(): string {
+  const prefix = pick(UNIVERSE_PREFIXES);
+  const middle = pick(UNIVERSE_MIDDLES);
+  const ending = pick(UNIVERSE_ENDINGS);
+
+  // Vary structure: "Aetheria", "Celheim", "Valan"
+  const pattern = random(0, 2);
+  return pattern === 0 ? `${prefix}${middle}${ending}` :
+         pattern === 1 ? `${prefix}${ending}` :
+                        `${prefix}${middle}`;
+}
+```
+
+**Examples:**
+- "Aetheria of the Eternal Dawn"
+- "Celheim where Stars Die"
+- "Valan of the Burning Path"
+- "Thalion where Hope Blooms"
+
+**UX flow change:**
+- **Before:** Scenario → Naming → Soul Ceremonies (3 screens)
+- **After:** Scenario → Soul Ceremonies (2 screens, name auto-generated)
+
+**Rationale:** Naming step becomes friction point. Most players iterate through prompts trying to find "the perfect name". Auto-generation removes this friction while preserving evocative names.
+
+**Button text updates:** "Back to Homeworld" → "Back to Planet" (more accurate framing)
+
+**Naming step still accessible:** User can manually edit auto-generated name if desired
+
+---
+
+### 📊 Type Cleanup Plan Progress
+
+**PLAN-circular-deps.md** (created Cycle 60) - 5-step plan to fix TypeScript build errors
+
+**Status after Cycle 61:**
+- ✅ **Step 3: Clean dist/** - prebuild script added to 24 packages
+- ✅ **Step 4: CI guard** - check-interface-duplication.ts created
+- 🚧 **Step 1: Unify World type** - IN PROGRESS (test helper registry added, merge pending)
+- ⬜ **Step 2: Consolidate LLM interfaces** - PENDING (8+ duplicates documented, need removal)
+- ⬜ **Step 5: Fix remaining errors** - PENDING (strict null checks, missing arguments)
+
+**Next cycle priorities:**
+1. Run check-interface-duplication.ts to identify all LLM interface duplicates
+2. Remove duplicates, replace with imports from canonical location (Step 2)
+3. Merge World test helper methods into WorldImpl (Step 1)
+4. Delete core/src/World.ts wrapper (Step 1 completion)
+
+---
+
+### 🧪 Test & Verification Scripts
+
+**playtest-autonomous-30min.ts** (221 lines) - 30-minute autonomous playtest
+- Runs headless simulation for 30 minutes
+- Monitors TPS, agent count, errors
+- Logs statistics every minute
+- Verifies no crashes, performance stable
+
+**verify-resource-gathering.ts** (134 lines) - Resource gathering verification
+- Tests resource gathering behaviors
+- Verifies agents find and collect resources
+- Checks inventory updates correctly
+
+---
+
+### 📊 Statistics
+
+**51 files changed, +810/-88 lines (+722 net)**
+
+**6 new files:**
+- EntityPersistenceStream.ts (220 lines) - Batched entity persistence
+- check-interface-duplication.ts (216 lines) - CI guard for interface duplication
+- IMPLEMENTATION_REPORT.md (258 lines) - Worker meshing implementation report
+- WORKER_THREAD_MESHING_STATUS.md (329 lines) - Worker meshing status doc
+- playtest-autonomous-30min.ts (221 lines) - Autonomous playtest
+- verify-resource-gathering.ts (134 lines) - Resource verification
+
+**3 deleted files (stale planet data):**
+- planet:terrestrial:50b9221f/biosphere.json.gz, locations.json, metadata.json
+
+**Major enhancements:**
+- Type system cleanup: Steps 3-4 complete (prebuild script, CI guard)
+- Entity persistence streaming: Full API implementation (client, server, HTTP endpoints)
+- World class unification: Test helper registry added (+311 lines)
+- Worker meshing: Complete documentation (587 lines of implementation reports)
+- Universe configuration: Auto-generated names, skip naming step
+- Package modernization: All 24 packages now clean dist/ before build
+
+**Type Cleanup Plan Timeline:**
+- **Cycle 60**: Plan created (PLAN-circular-deps.md) - Root cause analysis, 5-step plan
+- **Cycle 61**: Steps 3-4 implemented ✅ (40% complete)
+- **Next cycles**: Steps 1-2, 5 (World unification, LLM interface consolidation, remaining errors)
+
+**Commit:** 437ad4ca
+
+---
+
 ## 2026-01-22 - "Deterministic Simulation, Incremental Persistence, Worker Rendering" - 45 Files (+409 net)
 
 ### 🎯 Deterministic Simulation Infrastructure (Factorio-Inspired)
