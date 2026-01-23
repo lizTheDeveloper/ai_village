@@ -258,13 +258,13 @@ function createInitialBuildings(world: World) {
   campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 100));
   campfire.addComponent(createPositionComponent(-3, -3));
   campfire.addComponent(createRenderableComponent('campfire', 'objects'));
-  (worldMutator as any)._addEntity(campfire);
+  world.addEntity(campfire);
 
   const tent = new EntityImpl(createEntityId(), world.tick);
   tent.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
   tent.addComponent(createPositionComponent(3, -3));
   tent.addComponent(createRenderableComponent('tent', 'objects'));
-  (worldMutator as any)._addEntity(tent);
+  world.addEntity(tent);
 
   const storage = new EntityImpl(createEntityId(), world.tick);
   storage.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
@@ -273,7 +273,7 @@ function createInitialBuildings(world: World) {
   const inv = createInventoryComponent(20, 500);
   inv.slots[0] = { itemId: 'wood', quantity: 50 };
   storage.addComponent(inv);
-  (worldMutator as any)._addEntity(storage);
+  world.addEntity(storage);
 }
 
 function createInitialAgents(world: World, count: number = 5) {
@@ -316,14 +316,16 @@ function createInitialPlants(world: World) {
     plantEntity.addComponent(plantComponent);
     plantEntity.addComponent(createPositionComponent(x, y));
     plantEntity.addComponent(createRenderableComponent(species.id, 'terrain'));
-    (worldMutator as any)._addEntity(plantEntity);
+    // CRITICAL: Use addEntity() instead of _addEntity() to update spatial chunk index
+    // Without this, findNearestResources() returns empty arrays and NPCs can't find food/resources
+    world.addEntity(plantEntity);
   }
 }
 
 function createInitialAnimals(world: World, spawning: WildAnimalSpawningSystem) {
   const animals = [
     { species: 'chicken', position: { x: 3, y: 2 } },
-    { species: 'sheep_white', position: { x: -4, y: 3 } },
+    { species: 'sheep', position: { x: -4, y: 3 } },
     { species: 'rabbit', position: { x: 5, y: -2 } },
   ];
   for (const a of animals) {

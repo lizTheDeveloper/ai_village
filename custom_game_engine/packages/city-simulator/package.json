@@ -5,6 +5,7 @@
   "description": "Standalone NPC city director simulator for testing city management in isolation",
   "scripts": {
     "dev": "vite --port 3032 --host",
+    "prebuild": "rm -rf dist",
     "build": "tsc && vite build",
     "preview": "vite preview --port 3032"
   },

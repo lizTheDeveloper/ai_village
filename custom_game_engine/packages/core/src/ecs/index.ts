@@ -23,8 +23,8 @@ export {
   type EntityWithDistance,
 } from './SystemContext.js';
 
-// Re-export types explicitly (export * doesn't re-export types)
-// Note: BiomeType is also exported from SoilSystem.ts - avoid duplicate exports
-export type { World, WorldMutator, ITile, TerrainType, IPlanet } from './World.js';
+// Re-export World class and types explicitly
+export { World } from './World.js';
+export type { WorldMutator, ITile, TerrainType, IPlanet } from './World.js';
 export type { Entity } from './Entity.js';
 export type { Component } from './Component.js';

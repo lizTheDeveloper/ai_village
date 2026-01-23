@@ -36,6 +36,8 @@ export class LLMDecisionQueue {
   private activeRequests = 0;
   private decisions: Map<string, string> = new Map();
   private configuredMaxTokens: number = 4096; // Reasonable default for agent decisions
+  private lastErrorLogTime: number = 0;
+  private errorCount: number = 0;
 
   constructor(provider: LLMProvider, maxConcurrent: number = 2) {
     this.provider = provider;
@@ -118,7 +120,6 @@ export class LLMDecisionQueue {
    * Process a single request.
    */
   private async processRequest(request: DecisionRequest): Promise<void> {
-    console.error(`[LLMDecisionQueue] processRequest called for ${request.agentId}, tier=${request.customConfig?.tier || 'none'}, tierProviders=${this.tierProviders.size}`);
     try {
       // Calculate max tokens: at least 3x estimated prompt tokens, but respect configured max
       // Cap at 8192 to stay within model limits (Groq limits to 32768, but we don't need that much)
@@ -159,9 +160,9 @@ export class LLMDecisionQueue {
         provider = this.tierProviders.get(request.customConfig.tier)!;
       }
 
-      // Log model routing for tier requests
+      // Log model routing for tier requests (debug only)
       if (request.customConfig?.tier) {
-        console.error(`[LLMDecisionQueue] Agent ${request.agentId} tier="${request.customConfig.tier}" → model: ${provider.getModelName()}`);
+        // Tier routing: agent → provider selection is handled silently
       }
 
       const response = await provider.generate(llmRequest);
@@ -200,7 +201,15 @@ export class LLMDecisionQueue {
       this.decisions.set(request.agentId, response.text);
       request.resolve(response.text);
     } catch (error) {
-      console.error(`[LLMDecisionQueue] Decision error for agent ${request.agentId}:`, error);
+      this.errorCount++;
+      const now = Date.now();
+      // Rate-limit error logging to once per 30 seconds
+      if (now - this.lastErrorLogTime > 30000) {
+        const countMsg = this.errorCount > 1 ? ` (${this.errorCount} errors since last log)` : '';
+        console.warn(`[LLMDecisionQueue] Decision error for agent ${request.agentId}${countMsg}:`, (error as Error).message || error);
+        this.lastErrorLogTime = now;
+        this.errorCount = 0;
+      }
       request.reject(error as Error);
     }
   }

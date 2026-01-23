@@ -79,6 +79,15 @@ export type {
   CreationPhase,
 } from './CreationStateManager.js';
 
+// Entity persistence streaming
+export {
+  EntityPersistenceStream,
+} from './EntityPersistenceStream.js';
+export type {
+  EntitySnapshot,
+  EntityPersistenceStreamOptions,
+} from './EntityPersistenceStream.js';
+
 // Multiverse client (universe persistence)
 export {
   MultiverseClient,

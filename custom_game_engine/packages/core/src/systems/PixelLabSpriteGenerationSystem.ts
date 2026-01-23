@@ -254,13 +254,24 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
       throw new Error('PIXELLAB_API_KEY not found in environment');
     }
 
+    // Map parameters to PixelLab API format
+    const requestBody = {
+      description: params.prompt, // Map prompt to description
+      image_size: {
+        width: params.width,
+        height: params.height,
+      },
+      steps: params.steps,
+      guidance_scale: params.guidance_scale,
+    };
+
     const response = await fetch('https://api.pixellab.ai/v1/generate-image-pixflux', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(params),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -288,10 +299,15 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
     const imageBuffer = fs.readFileSync(params.reference_image_path);
     const base64Image = imageBuffer.toString('base64');
 
-    // Remove the path from params and add the base64 image
-    const { reference_image_path, ...apiParams } = params;
+    // Map parameters to PixelLab API format with reference image
     const requestBody = {
-      ...apiParams,
+      description: params.prompt, // Map prompt to description
+      image_size: {
+        width: params.width,
+        height: params.height,
+      },
+      steps: params.steps,
+      guidance_scale: params.guidance_scale,
       init_image: base64Image, // Correct parameter name for Pixflux API
       init_image_strength: 75, // Lower value = more freedom to turn while maintaining style (1-999, default 300)
     };

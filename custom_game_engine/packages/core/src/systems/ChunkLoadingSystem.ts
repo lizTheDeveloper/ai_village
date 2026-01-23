@@ -122,6 +122,12 @@ export class ChunkLoadingSystem extends BaseSystem {
           // Fallback: Generate immediately if no background generator
           // This ensures terrain always appears, even without BackgroundChunkGenerator
           this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
+          // Emit event so persistence systems can mark chunk dirty
+          world.eventBus.emit({
+            type: 'chunk_background_generated',
+            source: 'ChunkLoadingSystem',
+            data: { chunkX: chunk.x, chunkY: chunk.y, priority: 'IMMEDIATE', requestedBy: 'camera_scroll_fallback', tick: currentTick },
+          });
         }
       }
     }
@@ -188,6 +194,11 @@ export class ChunkLoadingSystem extends BaseSystem {
               this.queuedChunksCache.add(chunkKey);
             } else {
               this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
+              ctx.world.eventBus.emit({
+                type: 'chunk_background_generated',
+                source: 'ChunkLoadingSystem',
+                data: { chunkX: cx, chunkY: cy, priority: 'IMMEDIATE', requestedBy: 'headless_agent_fallback', tick: ctx.tick },
+              });
             }
           } else {
             // Chunk doesn't exist - create and queue
@@ -208,6 +219,11 @@ export class ChunkLoadingSystem extends BaseSystem {
                 this.queuedChunksCache.add(chunkKey);
               } else {
                 this.terrainGenerator.generateChunk(chunk, ctx.world as WorldMutator);
+                ctx.world.eventBus.emit({
+                  type: 'chunk_background_generated',
+                  source: 'ChunkLoadingSystem',
+                  data: { chunkX: cx, chunkY: cy, priority: 'IMMEDIATE', requestedBy: 'headless_agent_fallback', tick: ctx.tick },
+                });
               }
             }
           }

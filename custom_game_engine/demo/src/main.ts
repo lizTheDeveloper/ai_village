@@ -69,7 +69,7 @@ import {
   // Chunk spatial query injection functions
   // Injection functions removed - use world.spatialQuery instead
 } from '@ai-village/core';
-import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, type PlanetMetadata, type CreationState } from '@ai-village/persistence';
+import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
 import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
@@ -3658,16 +3658,16 @@ async function main() {
   let selectedPlanet: PlanetMetadata | null = null;
   let useSharedPlanet = false;
 
-  // Try to enable server sync (non-blocking - game works without server)
-  saveLoadService.enableServerSync(playerId).then(enabled => {
-    if (enabled) {
-      console.log('[Demo] Multiverse server sync enabled - saves will be uploaded to server');
-    } else {
-      console.log('[Demo] Multiverse server not available - saves are local only');
-    }
-  }).catch(error => {
-    console.warn('[Demo] Failed to enable server sync:', error);
-  });
+  // Skip server sync in Vite dev mode (ports 3000-3002 are all Vite, not the API server)
+  // The API server on port 3001 would trigger a browser-native 404 error when not running
+  const isViteDevMode = ['3000', '3001', '3002'].includes(window.location.port);
+  if (!isViteDevMode) {
+    saveLoadService.enableServerSync(playerId).then(enabled => {
+      if (enabled) {
+        console.log('[Demo] Multiverse server sync enabled - saves will be uploaded to server');
+      }
+    }).catch(() => {});
+  }
 
   // Check for ?fresh=1 URL parameter to force a new game (skip loading saves)
   const urlParams = new URLSearchParams(window.location.search);
@@ -3750,6 +3750,7 @@ async function main() {
   // Create ChunkManager - will be upgraded to ServerBackedChunkManager if using shared planet
   let chunkManager: ChunkManager | ServerBackedChunkManager = new ChunkManager(3);
   let serverBackedChunkManager: ServerBackedChunkManager | null = null;
+  let entityPersistenceStream: EntityPersistenceStream | null = null;
 
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
@@ -4570,10 +4571,12 @@ async function main() {
       // Use selected planet type with some randomization
       homeworldConfig = generateRandomPlanetConfig(planetSeed, {
         type: planetType as any,
-        name: 'Homeworld',
-        id: 'planet:homeworld',
       });
     }
+
+    // Check for existing planet with matching type on the server (shared planet mode)
+    let existingPlanetBiosphere: any = null;
+    let serverPlanetId: string | null = null;
 
     // === INCREMENTAL PERSISTENCE: Update creation state with planet config ===
     if (!loadedCheckpoint) {
@@ -4587,10 +4590,6 @@ async function main() {
         console.warn('[CreationState] Failed to update planet config:', error);
       }
     }
-
-    // Check for existing planet with matching type on the server (shared planet mode)
-    let existingPlanetBiosphere: any = null;
-    let serverPlanetId: string | null = null;
 
     if (planetServerAvailable && existingPlanets.length > 0) {
       // Look for a planet with the same type that has a biosphere
@@ -4644,7 +4643,7 @@ async function main() {
     if (planetServerAvailable && !serverPlanetId) {
       try {
         const newPlanet = await planetClient.createPlanet({
-          name: homeworldConfig.name || 'Homeworld',
+          name: homeworldConfig.name || 'Unknown Planet',
           type: homeworldConfig.type as any,
           seed: homeworldConfig.seed,
           config: { seed: homeworldConfig.seed, type: homeworldConfig.type },
@@ -4728,6 +4727,26 @@ async function main() {
         console.log('[CreationState] Phase 2: planet_initialized saved');
       } catch (error) {
         console.warn('[CreationState] Failed to update creation state:', error);
+      }
+    }
+
+    // === ENTITY PERSISTENCE STREAM: Attach before entity creation ===
+    if (planetServerAvailable && serverPlanetId) {
+      entityPersistenceStream = new EntityPersistenceStream(planetClient, {
+        flushInterval: 5000,
+        maxBatchSize: 50,
+        persistChunks: true,
+      });
+      entityPersistenceStream.attach(gameLoop.world, serverPlanetId);
+      console.log(`[EntityPersistence] Stream attached for planet ${serverPlanetId}`);
+
+      // Subscribe to chunk generation events to mark chunks dirty on ServerBackedChunkManager
+      if (serverBackedChunkManager) {
+        gameLoop.world.eventBus.subscribe('chunk_background_generated', (event: any) => {
+          const { chunkX, chunkY } = event.data;
+          serverBackedChunkManager!.markDirty(chunkX, chunkY);
+        });
+        console.log('[EntityPersistence] Subscribed to chunk_background_generated for auto-save');
       }
     }
 
@@ -5037,6 +5056,24 @@ async function main() {
 
   // Take initial snapshot for new universes so reloading returns to the same universe
   if (!loadedCheckpoint) {
+    // Flush any pending entity/chunk data to server before snapshot
+    if (entityPersistenceStream) {
+      try {
+        await entityPersistenceStream.flush();
+        console.log('[EntityPersistence] Flushed pending entities before genesis snapshot');
+      } catch (error) {
+        console.warn('[EntityPersistence] Pre-snapshot flush failed:', error);
+      }
+    }
+    if (serverBackedChunkManager) {
+      try {
+        await serverBackedChunkManager.flushDirtyChunks();
+        console.log('[ChunkPersistence] Flushed dirty chunks before genesis snapshot');
+      } catch (error) {
+        console.warn('[ChunkPersistence] Pre-snapshot flush failed:', error);
+      }
+    }
+
     try {
       const worldUniverseName = (gameLoop.world as any)._universeName || 'Universe';
       const initialSaveName = `${worldUniverseName} - Genesis (Day 0)`;

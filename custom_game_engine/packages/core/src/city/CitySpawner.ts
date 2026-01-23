@@ -20,7 +20,6 @@ let _agentModule: AgentModule | null = null;
 async function getAgentModule(): Promise<AgentModule> {
   if (!_agentModule) {
     // Dynamic import to break circular dependency: core -> agents -> core
-    // @ts-expect-error - Module resolution handled at runtime
     _agentModule = await import('@ai-village/agents');
   }
   return _agentModule!;

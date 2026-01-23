@@ -25,6 +25,7 @@
     "lint:errors": "eslint . --quiet",
     "clean": "rm -rf packages/*/dist",
     "audit:systems": "npx tsx packages/core/src/scripts/audit-system-interactions.ts",
+    "check:interfaces": "npx tsx scripts/check-interface-duplication.ts",
     "detect-oscillation": "npx tsx scripts/detect-oscillation.ts",
     "metrics-server": "npx tsx --no-cache scripts/metrics-server.ts",
     "validate-data": "npx tsx scripts/validate-all-data.ts",

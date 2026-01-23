@@ -104,10 +104,10 @@ export class UniverseBrowserScreen {
 
     // Load data
     await this.loadLocalSaves();
-    await this.checkServerAvailability();
-    if (this.serverAvailable) {
-      await this.loadServerUniverses();
-    }
+    // Server availability check is deferred to avoid browser console errors
+    // when API server (port 3001) isn't running. Users can manually connect
+    // via the server section if available.
+    this.serverAvailable = false;
 
     this.render();
   }

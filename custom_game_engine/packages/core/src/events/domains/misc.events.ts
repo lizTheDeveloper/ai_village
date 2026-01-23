@@ -398,6 +398,11 @@ export interface MiscEvents {
   };
 
   // === Entity Events ===
+  'entity:created': {
+    entityId: EntityId;
+    archetype: string | null;
+  };
+
   'entity:destroyed': {
     entityId: EntityId;
     finalState?: unknown;

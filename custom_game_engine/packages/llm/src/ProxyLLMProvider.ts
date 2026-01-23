@@ -35,6 +35,8 @@ export class ProxyLLMProvider implements LLMProvider {
   private readonly sessionId: string;
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
   private cooldownState: Map<string, number> = new Map(); // provider → nextAllowedAt
+  private serverErrorCount: number = 0;
+  private disabledUntil: number = 0; // Circuit breaker: don't retry until this time
 
   constructor(proxyUrl: string = 'http://localhost:8766') {
     this.proxyUrl = proxyUrl.replace(/\/$/, ''); // Remove trailing slash
@@ -95,6 +97,12 @@ export class ProxyLLMProvider implements LLMProvider {
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
+    // Circuit breaker: if server has failed repeatedly, don't make network requests
+    const now = Date.now();
+    if (now < this.disabledUntil) {
+      throw new Error('LLM proxy temporarily disabled (no providers configured on server)');
+    }
+
     const proxyRequest = request as ProxyLLMRequest;
     const provider = this.detectProvider(proxyRequest.model);
     const maxRetries = 3; // Retry up to 3 times if server-side rate limited
@@ -159,6 +167,14 @@ export class ProxyLLMProvider implements LLMProvider {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          // If server returns 500 (no providers configured), enable circuit breaker
+          if (response.status === 500) {
+            this.serverErrorCount++;
+            // After 2 consecutive 500s, disable for 60 seconds
+            if (this.serverErrorCount >= 2) {
+              this.disabledUntil = Date.now() + 60000;
+            }
+          }
           throw new Error(
             errorData.message ||
             errorData.error ||

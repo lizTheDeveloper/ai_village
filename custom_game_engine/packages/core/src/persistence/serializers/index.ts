@@ -160,6 +160,7 @@ export function registerAllSerializers(): void {
     'afterlife',
     'realm',
     'llm_history', // LLM interaction history for debugging UI
+    'mutation_vector', // Entity-local mutation rates for StateMutatorSystem
   ];
 
   for (const componentType of genericComponents) {

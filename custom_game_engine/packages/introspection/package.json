@@ -6,6 +6,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
+    "prebuild": "rm -rf dist",
     "build": "tsc",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "test": "vitest run",

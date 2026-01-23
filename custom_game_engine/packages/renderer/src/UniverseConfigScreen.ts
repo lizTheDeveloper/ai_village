@@ -106,6 +106,20 @@ export class UniverseConfigScreen {
     crystal: { name: 'Crystal World', description: 'Crystalline terrain and refractive beauty', icon: '💎' },
   };
 
+  // Universe name roots for auto-generation
+  private static readonly UNIVERSE_PREFIXES = [
+    'Ae', 'Val', 'Cel', 'Eld', 'Ara', 'Nym', 'Ith', 'Zeph', 'Mor', 'Syl',
+    'Thal', 'Ven', 'Kyr', 'Orn', 'Pha', 'Elu', 'Ast', 'Vor', 'Kal', 'Lum',
+  ];
+  private static readonly UNIVERSE_MIDDLES = [
+    'ther', 'an', 'est', 'or', 'un', 'ar', 'el', 'en', 'os', 'al',
+    'ion', 'eth', 'and', 'ur', 'ax', 'em', 'on', 'is', 'ad', 'ir',
+  ];
+  private static readonly UNIVERSE_ENDINGS = [
+    'ia', 'os', 'is', 'um', 'a', 'on', 'heim', 'thas', 'ael', 'ion',
+    'ys', 'oth', 'nar', 'ium', 'ea', 'or', 'ith', 'ara', 'eon', 'us',
+  ];
+
   // Poetic suffixes the Fates might add to universe names
   private static readonly FATE_SUFFIXES = [
     'of the Eternal Dawn',
@@ -129,6 +143,25 @@ export class UniverseConfigScreen {
     'of the Burning Path',
     'where Hope Blooms',
   ];
+
+  /**
+   * Generate a random evocative universe name.
+   */
+  private static generateUniverseName(): string {
+    const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+    const prefix = pick(UniverseConfigScreen.UNIVERSE_PREFIXES);
+    const middle = pick(UniverseConfigScreen.UNIVERSE_MIDDLES);
+    const ending = pick(UniverseConfigScreen.UNIVERSE_ENDINGS);
+
+    // Vary the structure for more variety
+    const pattern = Math.floor(Math.random() * 3);
+    switch (pattern) {
+      case 0: return `${prefix}${middle}${ending}`;        // e.g. "Aetheria"
+      case 1: return `${prefix}${ending}`;                 // e.g. "Celheim"
+      default: return `${prefix}${middle}`;                // e.g. "Valan"
+    }
+  }
+
   private _onCreate: ((config: UniverseConfig) => void) | null = null;
   private pendingConfig: UniverseConfig | null = null;
 
@@ -212,7 +245,7 @@ export class UniverseConfigScreen {
 
     const stepLabels: Record<string, string> = {
       magic: 'Magic System',
-      planet: 'Choose Homeworld',
+      planet: 'Choose Planet',
       scenario: 'Your Story',
       naming: 'Name Your Universe',
       souls: 'Soul Ceremonies',
@@ -354,7 +387,7 @@ export class UniverseConfigScreen {
     const planetSummary = document.createElement('div');
     planetSummary.style.cssText = 'flex: 1; min-width: 250px; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px;';
     planetSummary.innerHTML = `
-      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">HOMEWORLD</div>
+      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">PLANET</div>
       <div style="color: #fff; font-size: 14px;">${planetInfo!.icon} ${planetInfo!.name}</div>
     `;
 
@@ -387,16 +420,38 @@ export class UniverseConfigScreen {
 
     const backButton = document.createElement('button');
     const backStep = this.options.skipPlanetStep ? 'magic' : 'planet';
-    const backLabel = this.options.skipPlanetStep ? 'Back to Magic System' : 'Back to Homeworld';
+    const backLabel = this.options.skipPlanetStep ? 'Back to Magic System' : 'Back to Planet';
     backButton.textContent = backLabel;
     backButton.style.cssText = 'padding: 15px 30px; font-size: 16px; font-family: monospace; background: #333; color: #aaa; border: 1px solid #555; border-radius: 8px; cursor: pointer;';
     backButton.onclick = () => { this.currentStep = backStep; this.render(); };
 
     const createButton = document.createElement('button');
-    createButton.textContent = 'Next: Name Your Universe';
+    createButton.textContent = 'Begin Soul Ceremonies';
     createButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer;';
     createButton.onclick = () => {
-      this.currentStep = 'naming';
+      // Auto-generate universe name (skip naming step)
+      const spectrum = this.getCurrentSpectrum();
+      const effects = resolveSpectrum(spectrum);
+      const firstParadigm = effects.enabledParadigms[0];
+      const generatedName = UniverseConfigScreen.generateUniverseName();
+      const shuffled = [...UniverseConfigScreen.FATE_SUFFIXES].sort(() => Math.random() - 0.5);
+      const fateSuffix = shuffled[0]!;
+      const fullUniverseName = `${generatedName} ${fateSuffix}`;
+
+      this.pendingConfig = {
+        magicParadigmId: firstParadigm ?? null,
+        magicSpectrum: spectrum,
+        spectrumEffects: effects,
+        planetType: this.selectedPlanetType,
+        planetId: this.selectedPlanetId,
+        scenarioPresetId: this.selectedScenario,
+        universeName: fullUniverseName,
+        seed: Date.now(),
+      };
+      if (this.selectedScenario === 'custom') {
+        this.pendingConfig.customScenarioText = this.customScenarioText;
+      }
+      this.currentStep = 'souls';
       this.render();
     };
 
@@ -426,7 +481,7 @@ export class UniverseConfigScreen {
     const planetSummary = document.createElement('div');
     planetSummary.style.cssText = 'flex: 1; min-width: 200px; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px;';
     planetSummary.innerHTML = `
-      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">HOMEWORLD</div>
+      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">PLANET</div>
       <div style="color: #fff; font-size: 14px;">${planetInfo!.icon} ${planetInfo!.name}</div>
     `;
 
@@ -482,6 +537,15 @@ export class UniverseConfigScreen {
     nameInput.oninput = (e) => {
       this.universeName = (e.target as HTMLInputElement).value;
       this.updateFatePreview();
+      // Update the next button's disabled state
+      const nextBtn = document.getElementById('begin-soul-ceremonies-btn') as HTMLButtonElement | null;
+      if (nextBtn) {
+        const hasName = this.universeName.trim().length > 0;
+        nextBtn.disabled = !hasName;
+        nextBtn.style.background = hasName ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#333';
+        nextBtn.style.color = hasName ? '#fff' : '#666';
+        nextBtn.style.cursor = hasName ? 'pointer' : 'not-allowed';
+      }
     };
     inputContainer.appendChild(nameInput);
 
@@ -588,6 +652,7 @@ export class UniverseConfigScreen {
     backButton.onclick = () => { this.currentStep = 'scenario'; this.render(); };
 
     const nextButton = document.createElement('button');
+    nextButton.id = 'begin-soul-ceremonies-btn';
     const hasName = this.universeName.trim().length > 0;
     nextButton.textContent = 'Begin Soul Ceremonies';
     nextButton.disabled = !hasName;
@@ -603,7 +668,7 @@ export class UniverseConfigScreen {
       cursor: ${hasName ? 'pointer' : 'not-allowed'};
     `;
     nextButton.onclick = () => {
-      if (!hasName) return;
+      if (!this.universeName.trim()) return;
 
       const firstParadigm = effects.enabledParadigms[0];
       const fullUniverseName = `${this.universeName.trim()} ${this.fateSuffix}`;
@@ -684,7 +749,7 @@ export class UniverseConfigScreen {
     // Next button
     const nextButton = document.createElement('button');
     const nextStep = this.options.skipPlanetStep ? 'scenario' : 'planet';
-    const nextLabel = this.options.skipPlanetStep ? 'Next: Choose Your Story' : 'Next: Choose Homeworld';
+    const nextLabel = this.options.skipPlanetStep ? 'Next: Choose Your Story' : 'Next: Choose Planet';
     nextButton.textContent = nextLabel;
     nextButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-top: 30px;';
     nextButton.onclick = () => { this.currentStep = nextStep; this.render(); };

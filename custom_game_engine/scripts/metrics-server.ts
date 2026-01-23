@@ -45,6 +45,9 @@
  *   PUT    /api/planets/:id/chunk/:x,:y - Save/update chunk
  *   GET    /api/planets/:id/locations  - Get named locations
  *   POST   /api/planets/:id/location   - Add named location
+ *   GET    /api/planets/:id/entities   - Get all entities
+ *   PUT    /api/planets/:id/entities   - Save batch of entities
+ *   DELETE /api/planets/:id/entities   - Clear all entities
  *   GET    /api/planets/help           - API help and documentation
  *
  * Sprite Generation API - /api/sprites/* (On-Demand Asset Creation):
@@ -7964,6 +7967,72 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     return;
   }
 
+  // ============================================================
+  // ENTITY OPERATIONS - /api/planets/:id/entities
+  // ============================================================
+
+  // GET /api/planets/:id/entities - Get all entities for a planet
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/entities$/) && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/entities', ''));
+
+    try {
+      const entities = await planetStorage.getEntities(planetId);
+      res.end(JSON.stringify({ success: true, planetId, entities, count: entities.length }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to get entities' }));
+    }
+    return;
+  }
+
+  // PUT /api/planets/:id/entities - Save batch of entities
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/entities$/) && req.method === 'PUT') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/entities', ''));
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        if (!data.entities || !Array.isArray(data.entities)) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Missing entities array' }));
+          return;
+        }
+
+        await planetStorage.saveEntities(planetId, data.entities);
+        res.end(JSON.stringify({ success: true, planetId, saved: data.entities.length }));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to save entities' }));
+      }
+    });
+    return;
+  }
+
+  // DELETE /api/planets/:id/entities - Clear all entities for a planet
+  if (pathname.match(/^\/api\/planet\/[^\/]+\/entities$/) && req.method === 'DELETE') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const planetId = decodeURIComponent(pathname.replace('/api/planets/', '').replace('/entities', ''));
+
+    try {
+      await planetStorage.clearEntities(planetId);
+      res.end(JSON.stringify({ success: true, planetId, cleared: true }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to clear entities' }));
+    }
+    return;
+  }
+
   // Planet API help
   if (pathname === '/api/planets' || pathname === '/api/planets/') {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -8043,6 +8112,17 @@ ENDPOINTS:
     curl -X POST http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/location \\
       -H "Content-Type: application/json" \\
       -d '{"chunkX": 5, "chunkY": 10, "name": "Valley of Dawn", "namedBy": "player:abc"}'
+
+15. GET ALL ENTITIES
+    curl http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/entities
+
+16. SAVE BATCH OF ENTITIES
+    curl -X PUT http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/entities \\
+      -H "Content-Type: application/json" \\
+      -d '{"entities": [{"id": "ent:123", "components": {...}, "createdAt": 1234567890}]}'
+
+17. CLEAR ALL ENTITIES
+    curl -X DELETE http://localhost:${HTTP_PORT}/api/planets/planet:magical:abc123/entities
 
 ================================================================================
 `;

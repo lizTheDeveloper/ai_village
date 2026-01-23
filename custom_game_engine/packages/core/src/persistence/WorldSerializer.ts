@@ -179,11 +179,10 @@ export class WorldSerializer {
         const versionedEntity = await this.serializeEntity(entity);
         serialized.push(versionedEntity);
       } catch (error) {
-        console.error(
-          `[WorldSerializer] Failed to serialize entity ${entity.id}:`,
-          error
+        console.warn(
+          `[WorldSerializer] Failed to serialize entity ${entity.id}, skipping:`,
+          (error as Error).message || error
         );
-        throw error;
       }
     }
 
@@ -204,16 +203,20 @@ export class WorldSerializer {
 
       if (!component) continue;
 
+      // Skip components without registered serializers (runtime-only components)
+      if (!componentSerializerRegistry.has(type)) {
+        continue;
+      }
+
       try {
         const serialized = componentSerializerRegistry.serialize(component);
         components.push(serialized);
       } catch (error) {
-        console.error(
+        console.warn(
           `[WorldSerializer] Failed to serialize component ${type} ` +
-          `for entity ${entity.id}:`,
-          error
+          `for entity ${entity.id}, skipping:`,
+          (error as Error).message || error
         );
-        throw error;
       }
     }
 

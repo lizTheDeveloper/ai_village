@@ -11,6 +11,7 @@
     }
   },
   "scripts": {
+    "prebuild": "rm -rf dist",
     "build": "cd ../.. && npx tsx scripts/validate-package-data.ts packages/core && cd packages/core && tsc",
     "dev": "tsc --watch",
     "test": "vitest run",

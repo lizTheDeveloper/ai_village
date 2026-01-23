@@ -38,7 +38,7 @@ import { generateRandomName } from '../utils/nameGenerator.js';
  * The actual LLMDecisionQueue from @ai-village/llm implements this interface.
  */
 export interface LLMQueue {
-  requestDecision(agentId: string, prompt: string, customConfig?: { tier?: string }): Promise<string>;
+  requestDecision(agentId: string, prompt: string, customConfig?: Record<string, unknown>): Promise<string>;
 }
 
 /**

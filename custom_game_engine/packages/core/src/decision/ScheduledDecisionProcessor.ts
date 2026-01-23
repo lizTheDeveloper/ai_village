@@ -75,6 +75,8 @@ export class ScheduledDecisionProcessor {
   private llmDecisionQueue: LLMDecisionQueue;
   private pendingLayerSelection: Map<string, DecisionLayer> = new Map();
   private pendingPrompts: Map<string, string> = new Map(); // Track prompts by entity ID
+  private lastErrorLogTime: number = 0;
+  private errorCount: number = 0;
 
   constructor(scheduler: LLMScheduler, llmDecisionQueue: LLMDecisionQueue) {
     this.scheduler = scheduler;
@@ -337,7 +339,14 @@ export class ScheduledDecisionProcessor {
 
     // Request decision from queue (fire-and-forget, will be ready next tick)
     this.llmDecisionQueue.requestDecision(entity.id, prompt, agent.customLLM).catch((error: Error) => {
-      console.error(`[ScheduledDecisionProcessor] LLM decision failed for ${entity.id}:`, error);
+      this.errorCount++;
+      const now = Date.now();
+      if (now - this.lastErrorLogTime > 30000) {
+        const countMsg = this.errorCount > 1 ? ` (${this.errorCount} failures since last log)` : '';
+        console.warn(`[ScheduledDecisionProcessor] LLM decision failed${countMsg}:`, error.message || error);
+        this.lastErrorLogTime = now;
+        this.errorCount = 0;
+      }
       this.pendingLayerSelection.delete(entity.id);
       this.pendingPrompts.delete(entity.id);
     });

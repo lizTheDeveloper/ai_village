@@ -32,11 +32,8 @@ let governorPromptBuilder: any = null;
 export async function initializeGovernorLLM(world: World): Promise<void> {
   try {
     // Dynamic import to avoid circular dependencies
-    // @ts-expect-error - Module resolution handled at runtime (circular dep: core -> llm -> core)
     const { LLMDecisionQueue } = await import('@ai-village/llm');
-    // @ts-expect-error - Module resolution handled at runtime
     const { GovernorPromptBuilder } = await import('@ai-village/llm');
-    // @ts-expect-error - Module resolution handled at runtime
     const { OpenAICompatProvider } = await import('@ai-village/llm');
 
     // Get LLM config from world settings

@@ -682,6 +682,85 @@ export class PlanetStorage {
 
     return `planet:${type}:${hashHex}`;
   }
+
+  // ============================================================
+  // ENTITY OPERATIONS
+  // ============================================================
+
+  /**
+   * Save a batch of entities (merges with existing).
+   * Entities are stored as a single compressed file per planet.
+   */
+  async saveEntities(planetId: string, entities: Array<{
+    id: string;
+    components: Record<string, unknown>;
+    createdAt: number;
+  }>): Promise<void> {
+    const planetDir = path.join(DATA_DIR, 'planets', planetId);
+    await fs.mkdir(planetDir, { recursive: true });
+
+    const entitiesPath = path.join(planetDir, 'entities.json.gz');
+
+    // Load existing entities and merge
+    let existing: Map<string, any> = new Map();
+    try {
+      const data = await this.decompressAndRead(entitiesPath);
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed.entities)) {
+        for (const e of parsed.entities) {
+          existing.set(e.id, e);
+        }
+      }
+    } catch {
+      // No existing file, start fresh
+    }
+
+    // Merge new entities (overwrites existing with same ID)
+    for (const entity of entities) {
+      existing.set(entity.id, entity);
+    }
+
+    // Write back
+    const output = JSON.stringify({
+      entities: Array.from(existing.values()),
+      lastSavedAt: Date.now(),
+      count: existing.size,
+    });
+
+    await this.compressAndWrite(output, entitiesPath);
+  }
+
+  /**
+   * Get all saved entities for a planet.
+   */
+  async getEntities(planetId: string): Promise<Array<{
+    id: string;
+    components: Record<string, unknown>;
+    createdAt: number;
+  }>> {
+    const entitiesPath = path.join(DATA_DIR, 'planets', planetId, 'entities.json.gz');
+
+    try {
+      const data = await this.decompressAndRead(entitiesPath);
+      const parsed = JSON.parse(data);
+      return parsed.entities ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Clear all entities for a planet.
+   */
+  async clearEntities(planetId: string): Promise<void> {
+    const entitiesPath = path.join(DATA_DIR, 'planets', planetId, 'entities.json.gz');
+
+    try {
+      await fs.unlink(entitiesPath);
+    } catch {
+      // File may not exist
+    }
+  }
 }
 
 // Export singleton instance

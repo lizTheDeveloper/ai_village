@@ -411,6 +411,80 @@ export class PlanetClient {
   }
 
   // ============================================================
+  // ENTITY OPERATIONS
+  // ============================================================
+
+  /**
+   * Save a batch of entities to the planet server.
+   * Entities are stored per-planet for resumability.
+   */
+  async saveEntities(planetId: string, entities: Array<{
+    id: string;
+    components: Record<string, unknown>;
+    createdAt: number;
+  }>): Promise<void> {
+    if (entities.length === 0) return;
+
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/entities`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          entities,
+          savedAt: Date.now(),
+          savedBy: this.playerId,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to save entities: ${error.error}`);
+    }
+  }
+
+  /**
+   * Get all saved entities for a planet.
+   */
+  async getEntities(planetId: string): Promise<Array<{
+    id: string;
+    components: Record<string, unknown>;
+    createdAt: number;
+  }>> {
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/entities`
+    );
+
+    if (response.status === 404) {
+      return [];
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to get entities: ${error.error}`);
+    }
+
+    const data = await response.json();
+    return data.entities ?? [];
+  }
+
+  /**
+   * Clear all saved entities for a planet (called after full genesis save).
+   */
+  async clearEntities(planetId: string): Promise<void> {
+    const response = await fetch(
+      `${this.baseUrl}/api/planets/${encodeURIComponent(planetId)}/entities`,
+      { method: 'DELETE' }
+    );
+
+    if (!response.ok && response.status !== 404) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(`Failed to clear entities: ${error.error}`);
+    }
+  }
+
+  // ============================================================
   // NAMED LOCATION OPERATIONS
   // ============================================================
 

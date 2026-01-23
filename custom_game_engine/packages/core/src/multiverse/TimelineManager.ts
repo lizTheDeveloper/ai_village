@@ -150,7 +150,7 @@ export class TimelineManager {
         BigInt(world.tick),
         'agent:born',
         `${data.name} was born (generation ${data.generation})`
-      ).catch(err => console.error('[TimelineManager] Failed to save on birth:', err));
+      ).catch(err => console.warn('[TimelineManager] Failed to save on birth:', (err as Error).message || err));
     });
 
     // Soul creation events
