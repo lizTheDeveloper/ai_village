@@ -1,5 +1,63 @@
 # Release Notes
 
+## 2026-01-23 - "Complete World Migration in Botany Tests" - 5 Files (+240, -2)
+
+### 🔧 World Type Unification: Botany Package Completion
+
+**Continuation of Cycle 62 migration** - Two botany test files missed in initial WorldImpl → World migration.
+
+**Files Changed:**
+- `packages/botany/src/__tests__/PlantSeedProduction.test.ts` (line 77)
+- `packages/botany/src/__tests__/PlantSystem.test.ts` (line 71)
+
+**Change:**
+```typescript
+// Before:
+world = new WorldImpl(eventBus);
+
+// After:
+world = new World(eventBus);
+```
+
+**Migration Status:**
+- ✅ Cycle 62: Core package (111 test files + 3 benchmarks)
+- ✅ Cycle 64: Botany package (2 test files)
+- **Complete:** All test files now use unified World type
+
+**Context:** Part of Step 1 of PLAN-circular-deps.md (5-step type cleanup plan)
+
+**Impact:** World type unification now complete across entire codebase. Backward compatibility alias (`export { World as WorldImpl }`) remains for any external references.
+
+---
+
+### 📝 New Demo Script
+
+**manual-playtest.ts** (240 lines) - Interactive playtest script for testing game scenarios
+
+**Purpose:** Manual testing tool for validating game mechanics and universe creation
+
+**Features:**
+- Interactive universe configuration
+- Manual scenario testing
+- Debug logging and validation
+- Quick iteration for feature testing
+
+**Location:** `demo/manual-playtest.ts`
+
+---
+
+### 🌍 New Planet Data
+
+**1 new planet directory:** `planet:magical:256473a9`
+
+**Files:**
+- `metadata.json` - Planet configuration (magical type, biosphere, chunks)
+- `locations.json` - Saved locations (empty)
+
+**Purpose:** Planet reuse testing data for UniverseConfigScreen
+
+---
+
 ## 2026-01-23 - "MeshWorker Type Safety Fix" - 1 File (+2, -1)
 
 ### 🔧 Code Quality: Remove Type Assertion Escape Hatch
