@@ -1,5 +1,42 @@
 # Release Notes
 
+## 2026-01-23 - "MeshWorker Type Safety Fix" - 1 File (+2, -1)
+
+### 🔧 Code Quality: Remove Type Assertion Escape Hatch
+
+**MeshWorker.ts** - Worker thread meshing (from Cycle 60)
+
+**Problem:** Used type assertion escape hatch `as unknown as Worker`
+
+**CLAUDE.md Rule #3**: "No Type Assertion Escape Hatches"
+```typescript
+// BAD: const foo = something as unknown as SomeType;
+// BAD: const bar = something as any;
+// GOOD: Use proper type guards or fix the actual type issue
+```
+
+**Why it matters:** `as unknown as Type` bypasses all type checking, just like `as any`. Masks real type safety issues.
+
+**Change:**
+```typescript
+// Before: Type assertion escape hatch
+(self as unknown as Worker).postMessage(response, transferables);
+
+// After: Standard Worker API (no assertions)
+postMessage(response, { transfer: transferables });
+```
+
+**Improvements:**
+1. **No type assertions**: postMessage is a global in worker scope, no cast needed
+2. **Standard API syntax**: Uses options object `{ transfer: [...] }` (modern syntax)
+3. **Added comment**: Clarifies postMessage availability
+
+**Context:** MeshWorker.ts created in Cycle 60 for off-thread chunk meshing (see WORKER_THREAD_MESHING_STATUS.md, IMPLEMENTATION_REPORT.md)
+
+**Impact:** Type safety improved, no functional change. Workers still use zero-copy transfer for mesh data.
+
+---
+
 ## 2026-01-23 - "Type Cleanup Steps 1-2: World Unification & LLM Interface Consolidation" - 161 Files (+534 net)
 
 ### 🎯 Type System Cleanup: Steps 1-2 ✅ COMPLETE
