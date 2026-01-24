@@ -6,9 +6,120 @@ import {
 } from '@ai-village/world';
 import type { Camera } from '../Camera.js';
 
+// =============================================================================
+// PERFORMANCE: Pre-computed color lookup tables (avoid parseInt/slice in hot loop)
+// =============================================================================
+
+/** Pre-computed wall material colors as RGB tuples for fast rgba() string building */
+const WALL_COLORS_RGB: Record<string, [number, number, number]> = {
+  wood: [139, 115, 85],
+  stone: [107, 107, 107],
+  mud_brick: [160, 130, 109],
+  ice: [184, 230, 255],
+  metal: [74, 74, 74],
+  glass: [135, 206, 235],
+  thatch: [212, 184, 150],
+};
+const DEFAULT_WALL_RGB: [number, number, number] = [107, 107, 107];
+
+/** Pre-computed door material colors as RGB tuples */
+const DOOR_COLORS_RGB: Record<string, [number, number, number]> = {
+  wood: [101, 67, 33],
+  stone: [80, 80, 80],
+  metal: [56, 56, 56],
+  cloth: [139, 69, 19],
+};
+const DEFAULT_DOOR_RGB: [number, number, number] = [101, 67, 33];
+
+/** Pre-computed roof material colors as RGB tuples */
+const ROOF_COLORS_RGB: Record<string, [number, number, number]> = {
+  thatch: [196, 163, 90],  // Golden straw
+  wood: [139, 105, 20],    // Darker wood
+  tile: [184, 92, 56],     // Terracotta
+  slate: [74, 85, 104],    // Gray slate
+  metal: [107, 114, 128],  // Metallic gray
+};
+const DEFAULT_ROOF_RGB: [number, number, number] = [196, 163, 90];
+
+// =============================================================================
+// CHUNK CACHE TYPES
+// =============================================================================
+
+interface CachedChunk {
+  canvas: HTMLCanvasElement | OffscreenCanvas;
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  version: number;
+  lastUsed: number; // Tick number for LRU eviction
+}
+
+// =============================================================================
+// CHUNK VERSION COMPUTATION
+// =============================================================================
+
+/**
+ * Compute a version hash for a chunk's tiles.
+ * This is a simple but effective hash that changes when tile data changes.
+ * Uses FNV-1a hash algorithm for speed.
+ */
+function computeChunkVersion(chunk: Chunk): number {
+  let hash = 2166136261; // FNV offset basis
+
+  for (const tile of chunk.tiles) {
+    // Hash terrain type
+    hash ^= tile.terrain.charCodeAt(0);
+    hash = Math.imul(hash, 16777619); // FNV prime
+
+    // Hash key tile properties that affect rendering
+    hash ^= (tile.tilled ? 1 : 0) | ((tile.moisture > 60 ? 1 : 0) << 1) | ((tile.fertilized ? 1 : 0) << 2);
+    hash = Math.imul(hash, 16777619);
+
+    // Hash building components if present
+    const tileWithBuilding = tile as typeof tile & {
+      wall?: { material: string; condition: number; constructionProgress?: number };
+      door?: { material: string; state: string; constructionProgress?: number };
+      window?: { material: string; condition: number; constructionProgress?: number };
+      roof?: { material: string; condition: number; constructionProgress?: number };
+    };
+
+    if (tileWithBuilding.wall) {
+      hash ^= tileWithBuilding.wall.material.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+      hash ^= Math.floor(tileWithBuilding.wall.constructionProgress ?? 100);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    if (tileWithBuilding.door) {
+      hash ^= tileWithBuilding.door.material.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+      hash ^= tileWithBuilding.door.state.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    if (tileWithBuilding.window) {
+      hash ^= Math.floor(tileWithBuilding.window.constructionProgress ?? 100);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    if (tileWithBuilding.roof) {
+      hash ^= tileWithBuilding.roof.material.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+      hash ^= Math.floor(tileWithBuilding.roof.constructionProgress ?? 100);
+      hash = Math.imul(hash, 16777619);
+    }
+  }
+
+  return hash >>> 0; // Convert to unsigned 32-bit integer
+}
+
 /**
  * Handles rendering of terrain chunks in top-down view.
  * Extracted from Renderer.ts to improve maintainability.
+ *
+ * PERFORMANCE OPTIMIZATION: Off-screen canvas caching
+ * - Each chunk is pre-rendered to an off-screen canvas and cached
+ * - Cache is invalidated only when chunk terrain changes (detected via version hash)
+ * - Zoom changes do NOT invalidate cache - we just scale the cached canvas
+ * - LRU eviction keeps cache size bounded (max 100 chunks = ~1.6MB at 16px tiles)
  */
 export class TerrainRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -17,12 +128,21 @@ export class TerrainRenderer {
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
   private hasLoggedWallRender = false; // Debug flag to log first wall rendering
 
+  // Chunk cache (key = "chunkX,chunkY")
+  private chunkCache = new Map<string, CachedChunk>();
+  private readonly MAX_CACHED_CHUNKS = 100;
+  private currentTick = 0; // Track "time" for LRU eviction
+
   constructor(ctx: CanvasRenderingContext2D, tileSize: number = 16) {
     this.ctx = ctx;
     this.tileSize = tileSize;
   }
 
   setShowTemperatureOverlay(show: boolean): void {
+    // Temperature overlay affects rendering, so invalidate all caches
+    if (this.showTemperatureOverlay !== show) {
+      this.invalidateAllCaches();
+    }
     this.showTemperatureOverlay = show;
   }
 
@@ -31,28 +151,161 @@ export class TerrainRenderer {
   }
 
   /**
-   * Render a single chunk.
-   *
-   * Handles ungenerated chunks gracefully by skipping rendering.
-   * This can happen when camera scrolls faster than background generation.
+   * Invalidate cache for a specific chunk.
+   * Call this when chunk terrain changes externally.
    */
-  renderChunk(chunk: Chunk, camera: Camera): void {
-    // Skip rendering ungenerated chunks
-    // This prevents rendering empty/placeholder tiles before generation completes
-    if (!chunk.generated) {
+  invalidateChunkCache(chunkX: number, chunkY: number): void {
+    const key = `${chunkX},${chunkY}`;
+    this.chunkCache.delete(key);
+  }
+
+  /**
+   * Invalidate all cached chunks.
+   * Call this when global rendering settings change (e.g., temperature overlay toggle).
+   */
+  invalidateAllCaches(): void {
+    this.chunkCache.clear();
+  }
+
+  /**
+   * Get cache statistics for debugging/monitoring.
+   */
+  getCacheStats(): { size: number; maxSize: number; hitRate?: number } {
+    return {
+      size: this.chunkCache.size,
+      maxSize: this.MAX_CACHED_CHUNKS,
+    };
+  }
+
+  /**
+   * Create or retrieve a cached off-screen canvas for a chunk.
+   * Returns null if cache is invalid and needs re-rendering.
+   */
+  private getCachedChunkCanvas(chunk: Chunk): CachedChunk | null {
+    const key = `${chunk.x},${chunk.y}`;
+    const cached = this.chunkCache.get(key);
+
+    // Compute current version of chunk data
+    const currentVersion = computeChunkVersion(chunk);
+
+    // Check if cache is valid
+    if (cached && cached.version === currentVersion) {
+      // Update LRU timestamp
+      cached.lastUsed = this.currentTick;
+      return cached;
+    }
+
+    return null;
+  }
+
+  /**
+   * Create a new off-screen canvas for caching a chunk.
+   * Uses OffscreenCanvas if available, falls back to HTMLCanvasElement.
+   */
+  private createOffscreenCanvas(): {
+    canvas: HTMLCanvasElement | OffscreenCanvas;
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+  } {
+    const canvasSize = CHUNK_SIZE * this.tileSize;
+
+    // Try OffscreenCanvas first (better performance, doesn't trigger layout)
+    if (typeof OffscreenCanvas !== 'undefined') {
+      const canvas = new OffscreenCanvas(canvasSize, canvasSize);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('Failed to get OffscreenCanvas 2D context');
+      }
+      return { canvas, ctx };
+    }
+
+    // Fallback to regular HTMLCanvasElement
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Failed to get Canvas 2D context');
+    }
+    return { canvas, ctx };
+  }
+
+  /**
+   * Evict least recently used cached chunks if cache is full.
+   */
+  private evictLRUIfNeeded(): void {
+    if (this.chunkCache.size < this.MAX_CACHED_CHUNKS) {
       return;
     }
 
+    // Find oldest entry (lowest lastUsed tick)
+    let oldestKey: string | null = null;
+    let oldestTick = Infinity;
+
+    for (const [key, cached] of this.chunkCache.entries()) {
+      if (cached.lastUsed < oldestTick) {
+        oldestTick = cached.lastUsed;
+        oldestKey = key;
+      }
+    }
+
+    if (oldestKey) {
+      this.chunkCache.delete(oldestKey);
+    }
+  }
+
+  /**
+   * Render a chunk to an off-screen canvas and cache it.
+   */
+  private renderChunkToCache(chunk: Chunk): CachedChunk {
+    // Create off-screen canvas
+    const { canvas, ctx } = this.createOffscreenCanvas();
+
+    // Render chunk to off-screen canvas (using local coordinates 0-based)
+    this.renderChunkToContext(chunk, ctx, 0, 0);
+
+    // Create cache entry
+    const cached: CachedChunk = {
+      canvas,
+      ctx,
+      version: computeChunkVersion(chunk),
+      lastUsed: this.currentTick,
+    };
+
+    // Store in cache (evict LRU if needed)
+    const key = `${chunk.x},${chunk.y}`;
+    this.evictLRUIfNeeded();
+    this.chunkCache.set(key, cached);
+
+    return cached;
+  }
+
+  /**
+   * Render a chunk's tiles to a given context at a given offset.
+   * This is the core rendering logic extracted so it can be used both for
+   * off-screen caching and direct rendering.
+   *
+   * @param chunk - The chunk to render
+   * @param ctx - The context to render to
+   * @param offsetX - X offset in the context (in pixels)
+   * @param offsetY - Y offset in the context (in pixels)
+   */
+  private renderChunkToContext(
+    chunk: Chunk,
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    offsetX: number,
+    offsetY: number
+  ): void {
+    // When rendering to cache, we use tileSize directly (zoom = 1)
+    const tilePixelSize = this.tileSize;
+
     for (let localY = 0; localY < CHUNK_SIZE; localY++) {
       for (let localX = 0; localX < CHUNK_SIZE; localX++) {
-        const worldX = (chunk.x * CHUNK_SIZE + localX) * this.tileSize;
-        const worldY = (chunk.y * CHUNK_SIZE + localY) * this.tileSize;
-
         const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
         if (!tile) continue;
 
-        const screen = camera.worldToScreen(worldX, worldY);
-        const tilePixelSize = this.tileSize * camera.zoom;
+        // Calculate screen position (offset-based for cache rendering)
+        const screenX = offsetX + localX * tilePixelSize;
+        const screenY = offsetY + localY * tilePixelSize;
 
         // Draw base tile
         const color = TERRAIN_COLORS[tile.terrain];
@@ -147,20 +400,11 @@ export class TerrainRenderer {
           const progress = wall.constructionProgress ?? 100;
           const alpha = progress >= 100 ? 1.0 : 0.4 + (progress / 100) * 0.4;
 
-          // Material-based colors
-          const wallColors: Record<string, string> = {
-            wood: '#8B7355',
-            stone: '#6B6B6B',
-            mud_brick: '#A0826D',
-            ice: '#B8E6FF',
-            metal: '#4A4A4A',
-            glass: '#87CEEB',
-            thatch: '#D4B896',
-          };
-          const wallColor = wallColors[wall.material] ?? '#6B6B6B';
+          // PERF: Use pre-computed RGB tuples instead of hex parsing
+          const rgb = WALL_COLORS_RGB[wall.material] ?? DEFAULT_WALL_RGB;
 
           // Fill wall tile
-          this.ctx.fillStyle = `rgba(${parseInt(wallColor.slice(1, 3), 16)}, ${parseInt(wallColor.slice(3, 5), 16)}, ${parseInt(wallColor.slice(5, 7), 16)}, ${alpha})`;
+          this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
           this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
 
           // Add border for wall definition
@@ -186,18 +430,12 @@ export class TerrainRenderer {
           const progress = door.constructionProgress ?? 100;
           const alpha = progress >= 100 ? 1.0 : 0.4 + (progress / 100) * 0.4;
 
-          // Material-based colors
-          const doorColors: Record<string, string> = {
-            wood: '#654321',
-            stone: '#505050',
-            metal: '#383838',
-            cloth: '#8B4513',
-          };
-          const doorColor = doorColors[door.material] ?? '#654321';
+          // PERF: Use pre-computed RGB tuples instead of hex parsing
+          const rgb = DOOR_COLORS_RGB[door.material] ?? DEFAULT_DOOR_RGB;
 
           if (door.state === 'open') {
             // Open door: render as thin outline (passable)
-            this.ctx.strokeStyle = `rgba(${parseInt(doorColor.slice(1, 3), 16)}, ${parseInt(doorColor.slice(3, 5), 16)}, ${parseInt(doorColor.slice(5, 7), 16)}, ${alpha})`;
+            this.ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
             this.ctx.lineWidth = Math.max(2, camera.zoom);
             this.ctx.strokeRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
             // Add dashed pattern to indicate open
@@ -206,7 +444,7 @@ export class TerrainRenderer {
             this.ctx.setLineDash([]);
           } else {
             // Closed/locked door: render as solid with handle
-            this.ctx.fillStyle = `rgba(${parseInt(doorColor.slice(1, 3), 16)}, ${parseInt(doorColor.slice(3, 5), 16)}, ${parseInt(doorColor.slice(5, 7), 16)}, ${alpha})`;
+            this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
             this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
 
             // Door frame (lighter)
@@ -262,19 +500,12 @@ export class TerrainRenderer {
           const progress = roof.constructionProgress ?? 100;
           const alpha = progress >= 100 ? 0.7 : 0.3 + (progress / 100) * 0.4;
 
-          // Material-based colors for roofs
-          const roofColors: Record<string, string> = {
-            thatch: '#C4A35A', // Golden straw
-            wood: '#8B6914', // Darker wood
-            tile: '#B85C38', // Terracotta
-            slate: '#4A5568', // Gray slate
-            metal: '#6B7280', // Metallic gray
-          };
-          const roofColor = roofColors[roof.material] ?? '#C4A35A';
+          // PERF: Use pre-computed RGB tuples instead of hex parsing
+          const rgb = ROOF_COLORS_RGB[roof.material] ?? DEFAULT_ROOF_RGB;
 
           // Draw roof with slight offset to show depth (rendering as if viewed from above)
           // Draw a diagonal pattern to indicate roofing
-          this.ctx.fillStyle = `rgba(${parseInt(roofColor.slice(1, 3), 16)}, ${parseInt(roofColor.slice(3, 5), 16)}, ${parseInt(roofColor.slice(5, 7), 16)}, ${alpha})`;
+          this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 
           // Draw roof as semi-transparent overlay with texture pattern
           this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);

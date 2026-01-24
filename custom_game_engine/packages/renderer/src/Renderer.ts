@@ -94,6 +94,24 @@ export class Renderer {
   private _agentPositions: Array<{ x: number; y: number }> = [];
   private _sortedEntities: Entity[] = [];
 
+  // Query result caching to avoid expensive ECS queries every frame
+  // Buildings rarely change, so cache for 60 frames (~3 seconds at 20 TPS)
+  private _cachedBuildingEntities: Entity[] = [];
+  private _buildingCacheLastRefresh = 0;
+  private readonly BUILDING_CACHE_REFRESH_INTERVAL = 60;
+
+  // Renderable entities change moderately (new plants, resources harvested)
+  // Cache for 20 frames (~1 second at 20 TPS)
+  private _cachedRenderableEntities: Entity[] = [];
+  private _renderableCacheLastRefresh = 0;
+  private readonly RENDERABLE_CACHE_REFRESH_INTERVAL = 20;
+
+  // Agent entities change frequently (agents spawned/killed)
+  // Cache for 10 frames (~0.5 seconds at 20 TPS)
+  private _cachedAgentEntities: Entity[] = [];
+  private _agentCacheLastRefresh = 0;
+  private readonly AGENT_CACHE_REFRESH_INTERVAL = 10;
+
   // Bound handlers for cleanup
   private boundResizeHandler: (() => void) | null = null;
 
@@ -308,6 +326,36 @@ export class Renderer {
   }
 
   /**
+   * Refresh cached query results based on tick intervals.
+   * This avoids running expensive ECS queries every frame.
+   *
+   * @param world World instance
+   * @param currentTick Current game tick
+   */
+  private refreshCachedQueries(world: World, currentTick: number): void {
+    // Refresh building cache every 60 frames (~3 seconds)
+    // Buildings are agent-created and rarely change
+    if (currentTick - this._buildingCacheLastRefresh >= this.BUILDING_CACHE_REFRESH_INTERVAL) {
+      this._cachedBuildingEntities = world.query().with('building').executeEntities();
+      this._buildingCacheLastRefresh = currentTick;
+    }
+
+    // Refresh renderable cache every 20 frames (~1 second)
+    // Renderable entities change moderately (plants grow, resources harvested)
+    if (currentTick - this._renderableCacheLastRefresh >= this.RENDERABLE_CACHE_REFRESH_INTERVAL) {
+      this._cachedRenderableEntities = world.query().with('position', 'renderable').executeEntities();
+      this._renderableCacheLastRefresh = currentTick;
+    }
+
+    // Refresh agent cache every 10 frames (~0.5 seconds)
+    // Agents can be spawned/killed, so refresh more frequently
+    if (currentTick - this._agentCacheLastRefresh >= this.AGENT_CACHE_REFRESH_INTERVAL) {
+      this._cachedAgentEntities = world.query().with('agent', 'position').executeEntities();
+      this._agentCacheLastRefresh = currentTick;
+    }
+  }
+
+  /**
    * Render the world.
    * @param world World instance
    * @param selectedEntity Optional selected entity to highlight (can be full Entity or just { id: string })
@@ -333,10 +381,13 @@ export class Renderer {
     // Update all sprite animations
     this.pixelLabEntityRenderer.updateAnimations(performance.now());
 
-    // Update phase-shifting animations for 5D buildings
-    // PERF: Only query buildings, not all entities
+    // Get current tick and refresh cached queries if needed
     const currentTick = world.tick;
-    const buildingEntities = world.query().with('building').executeEntities();
+    this.refreshCachedQueries(world, currentTick);
+
+    // Update phase-shifting animations for 5D buildings
+    // PERF: Use cached building entities instead of querying every frame
+    const buildingEntities = this._cachedBuildingEntities;
     for (const entity of buildingEntities) {
       const building = entity.components.get('building') as BuildingComponent | undefined;
       if (!building) continue;
@@ -394,11 +445,13 @@ export class Renderer {
     }
 
     // Draw entities (if any have position component)
-    const renderableEntities = world.query().with('position', 'renderable').executeEntities();
+    // PERF: Use cached renderable entities instead of querying every frame
+    const renderableEntities = this._cachedRenderableEntities;
 
     // Get agent positions for proximity culling - reuse array
+    // PERF: Use cached agent entities instead of querying every frame
     this._agentPositions.length = 0;
-    const agentEntities = world.query().with('agent', 'position').executeEntities();
+    const agentEntities = this._cachedAgentEntities;
     for (const agentEntity of agentEntities) {
       const pos = agentEntity.components.get('position') as PositionComponent | undefined;
       if (pos) {

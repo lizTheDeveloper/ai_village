@@ -217,13 +217,8 @@ export class AdminAngelSystem extends BaseSystem {
     if (this.llmQueue) {
       try {
         console.error(`[AdminAngelSystem] Calling LLM queue with tier=high for ${agentId}`);
-        // Queue the request (fire-and-forget, returns Promise<void>)
-        await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
-        // Retrieve the decision
-        const response = this.llmQueue.getDecision(agentId);
-        if (!response) {
-          throw new Error('No decision available from LLM queue');
-        }
+        // Note: tier is not part of CustomLLMConfig interface but is structurally typed by the implementation
+        const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' } as any);
         // Strip thinking tags if present (qwen models use them)
         return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       } catch (error) {

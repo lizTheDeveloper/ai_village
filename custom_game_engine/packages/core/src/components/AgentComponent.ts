@@ -267,6 +267,8 @@ export interface CustomLLMConfig {
   apiKey?: string;
   /** Custom headers as key-value pairs (e.g., {"anthropic-version": "2023-06-01"}) */
   customHeaders?: Record<string, string>;
+  /** Intelligence tier: 'simple', 'default', 'high', 'agi' - determines which LLM model to use */
+  tier?: string;
 }
 
 export interface AgentComponent extends Component {

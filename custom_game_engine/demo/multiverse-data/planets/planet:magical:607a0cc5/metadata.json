@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:607a0cc5",
+  "name": "Ariel Tertius",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769217957109",
+  "createdAt": 1769217957111,
+  "lastAccessedAt": 1769217957111,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769217957109",
+    "type": "magical"
+  }
+}

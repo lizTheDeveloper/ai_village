@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2ba0fc0b",
+  "name": "Gaia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769218949248",
+  "createdAt": 1769218949259,
+  "lastAccessedAt": 1769218949259,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769218949248",
+    "type": "magical"
+  }
+}

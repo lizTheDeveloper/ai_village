@@ -354,15 +354,20 @@ export class ChatRoomSystem extends BaseSystem {
       return null;
     }
 
-    // Get sender name
-    const sender = world.getEntity(senderId);
-    if (!sender) {
-      console.error(`[ChatRoomSystem] Sender not found: ${senderId}`);
-      return null;
-    }
+    // Get sender name (handle special 'player' ID for human players)
+    let senderName = 'Unknown';
+    if (senderId === 'player') {
+      senderName = 'Player';
+    } else {
+      const sender = world.getEntity(senderId);
+      if (!sender) {
+        console.error(`[ChatRoomSystem] Sender not found: ${senderId}`);
+        return null;
+      }
 
-    const identity = sender.getComponent<IdentityComponent>(ComponentType.Identity);
-    const senderName = identity?.name ?? 'Unknown';
+      const identity = sender.getComponent<IdentityComponent>(ComponentType.Identity);
+      senderName = identity?.name ?? 'Unknown';
+    }
 
     // Create message
     const message = createChatMessage(
@@ -587,9 +592,13 @@ export class ChatRoomSystem extends BaseSystem {
   }
 
   /**
-   * Initialize event listeners
+   * Initialize event listeners and permanent rooms
    */
   protected onInitialize(world: World): void {
+    // Create permanent rooms (divine_chat, etc.)
+    this.initializePermanentRooms(world);
+    this.initialized = true;
+
     // Listen for send_message events from UI panels
     world.eventBus.on('chat:send_message', (event) => {
       const data = event.data as {

@@ -98,6 +98,166 @@ export interface DashboardPerformanceMetrics {
   renderCount: number;
 }
 
+/**
+ * Session metrics from collector
+ */
+interface SessionMetrics {
+  totalBirths: number;
+  totalDeaths: number;
+}
+
+/**
+ * Stockpile entry
+ */
+interface StockpileEntry {
+  value: number;
+  timestamp?: number;
+}
+
+/**
+ * Economic metrics from collector
+ */
+interface EconomicMetrics {
+  stockpiles: Record<string, StockpileEntry[]>;
+}
+
+/**
+ * Agent lifecycle metrics
+ */
+interface AgentLifecycleMetrics {
+  [agentId: string]: {
+    initialStats?: {
+      intelligence?: number;
+    };
+  };
+}
+
+/**
+ * Spatial metrics from collector
+ */
+interface SpatialMetrics {
+  heatmap: Record<number, Record<number, number>>;
+}
+
+/**
+ * Social metrics from collector
+ */
+interface SocialMetrics {
+  relationshipsFormed: number;
+}
+
+/**
+ * Performance metrics from collector
+ */
+interface PerformanceMetrics {
+  fps: Array<{ value: number; timestamp?: number }>;
+}
+
+/**
+ * Milestone entry
+ */
+interface Milestone {
+  name: string;
+  timestamp: number;
+}
+
+/**
+ * Emergent metrics from collector
+ */
+interface EmergentMetrics {
+  milestones: Milestone[];
+}
+
+/**
+ * Type guard for SessionMetrics
+ */
+function isSessionMetrics(value: unknown): value is SessionMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return typeof obj.totalBirths === 'number' && typeof obj.totalDeaths === 'number';
+}
+
+/**
+ * Type guard for EconomicMetrics
+ */
+function isEconomicMetrics(value: unknown): value is EconomicMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  if (typeof obj.stockpiles !== 'object' || obj.stockpiles === null) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Type guard for AgentLifecycleMetrics
+ */
+function isAgentLifecycleMetrics(value: unknown): value is AgentLifecycleMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Type guard for SpatialMetrics
+ */
+function isSpatialMetrics(value: unknown): value is SpatialMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return typeof obj.heatmap === 'object' && obj.heatmap !== null;
+}
+
+/**
+ * Type guard for SocialMetrics
+ */
+function isSocialMetrics(value: unknown): value is SocialMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return typeof obj.relationshipsFormed === 'number';
+}
+
+/**
+ * Type guard for PerformanceMetrics
+ */
+function isPerformanceMetrics(value: unknown): value is PerformanceMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return Array.isArray(obj.fps);
+}
+
+/**
+ * Type guard for EmergentMetrics
+ */
+function isEmergentMetrics(value: unknown): value is EmergentMetrics {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return Array.isArray(obj.milestones);
+}
+
+/**
+ * Type guard for StockpileEntry
+ */
+function isStockpileEntry(value: unknown): value is StockpileEntry {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return typeof obj.value === 'number';
+}
+
 export class MetricsDashboard {
   private collector: MetricsCollector;
   private analysis: MetricsAnalysis;

@@ -125,7 +125,9 @@ export class DivineChatPanel implements IWindowPanel {
 
   // World reference
   private world?: World;
-  private playerDeityId?: string;
+
+  // Player ID (constant for human players chatting with angels)
+  private readonly playerId = 'player';
 
   // Chat state (refreshed from World)
   private chatRoomComponent: ChatRoomComponent | null = null;
@@ -138,7 +140,7 @@ export class DivineChatPanel implements IWindowPanel {
 
   /**
    * Refresh chat state from the World
-   * PERFORMANCE: Uses ECS query to get only deity entities (avoids full scan)
+   * PERFORMANCE: Uses ECS query to get divine chat room
    */
   private refreshFromWorld(world: World): void {
     this.world = world;
@@ -152,18 +154,6 @@ export class DivineChatPanel implements IWindowPanel {
         this.chatRoomComponent = chatComp;
       }
     }
-
-    // Find player-controlled deity
-    const deityEntities = world.query().with(CT.Deity).executeEntities();
-    for (const entity of deityEntities) {
-      const deityComp = entity.components.get('deity') as DeityComponent | undefined;
-      if (deityComp && deityComp.controller === 'player') {
-        this.playerDeityId = entity.id;
-        return;
-      }
-    }
-
-    this.playerDeityId = undefined;
   }
 
   /**
@@ -190,9 +180,15 @@ export class DivineChatPanel implements IWindowPanel {
   }
 
   /**
-   * Get deity name by ID
+   * Get deity name by ID (or player name for the human player)
    */
   private getDeityName(world: World, deityId: string): string {
+    // Handle human player ID
+    if (deityId === this.playerId) {
+      return 'Player';
+    }
+
+    // Handle deity entities
     const entity = world.getEntity(deityId);
     if (entity) {
       const identity = entity.components.get('identity') as IdentityComponent | undefined;
@@ -304,7 +300,8 @@ export class DivineChatPanel implements IWindowPanel {
     // Draw input area - always show it but indicate status
     const inputY = panelY + panelHeight - SIZES.inputHeight - SIZES.padding;
 
-    const canChat = this.playerDeityId && this.chatRoomComponent && this.chatRoomComponent.isActive;
+    // Chat is available if the room exists and is active
+    const canChat = this.chatRoomComponent && this.chatRoomComponent.isActive;
 
     if (canChat) {
       this.renderInput(ctx, panelX, inputY, panelWidth);
@@ -329,12 +326,10 @@ export class DivineChatPanel implements IWindowPanel {
 
       // Show specific reason why chat is disabled
       let reason = 'Chat unavailable';
-      if (!this.playerDeityId) {
-        reason = 'You must be a deity to chat';
-      } else if (!this.chatRoomComponent) {
+      if (!this.chatRoomComponent) {
         reason = 'No divine chat room exists';
       } else if (!this.chatRoomComponent.isActive) {
-        reason = 'Chat inactive (waiting for gods)';
+        reason = 'Chat inactive (waiting for angels)';
       }
       ctx.fillText(reason, panelX + SIZES.padding * 2, inputY + SIZES.inputHeight / 2 + 4);
     }
@@ -380,7 +375,7 @@ export class DivineChatPanel implements IWindowPanel {
     const memberIds = this.getPresentMemberIds();
     const deityNames = memberIds.map(id => {
       const name = this.getDeityName(world, id);
-      const isPlayer = id === this.playerDeityId;
+      const isPlayer = id === this.playerId;
       return { name, isPlayer };
     });
 
@@ -463,7 +458,7 @@ export class DivineChatPanel implements IWindowPanel {
     const maxTextWidth = contentWidth - SIZES.padding * 2;
 
     // Calculate heights for wrapped text
-    const isPlayer = message.senderId === this.playerDeityId;
+    const isPlayer = message.senderId === this.playerId;
     ctx.font = `bold ${SIZES.nameSize}px monospace`;
     const nameLines = this.wrapTextToLines(ctx, message.senderName, maxTextWidth);
 
@@ -736,7 +731,7 @@ export class DivineChatPanel implements IWindowPanel {
    * Send a message to the chat
    */
   private sendMessage(): void {
-    if (!this.world || !this.playerDeityId || !this.inputText.trim()) return;
+    if (!this.world || !this.inputText.trim()) return;
 
     // Emit event for ChatRoomSystem to handle
     this.world.eventBus.emit({
@@ -744,7 +739,7 @@ export class DivineChatPanel implements IWindowPanel {
       source: 'divine_chat_panel',
       data: {
         roomId: 'divine_chat',
-        senderId: this.playerDeityId,
+        senderId: this.playerId,
         message: this.inputText.trim(),
       },
     });

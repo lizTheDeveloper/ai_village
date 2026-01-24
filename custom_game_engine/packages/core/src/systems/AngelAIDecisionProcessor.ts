@@ -256,10 +256,10 @@ export class AngelAIDecisionProcessor {
       );
 
       // Call LLM with 'high' intelligence tier for angel responses
-      const responseText = await this.llmProvider.generate(prompt, { tier: 'high' });
+      const llmResponse = await this.llmProvider.generate({ prompt });
 
       // Parse response
-      const response = this.parseAngelResponse(responseText);
+      const response = this.parseAngelResponse(llmResponse.text);
       return response;
 
     } catch (error) {

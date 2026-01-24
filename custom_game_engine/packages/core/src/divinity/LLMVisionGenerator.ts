@@ -92,10 +92,10 @@ export class LLMVisionGenerator {
       const prompt = this.buildVisionPrompt(request, agent as EntityImpl, deity as EntityImpl, world);
 
       // Call LLM
-      const responseText = await this.llmProvider.generate(prompt);
+      const llmResponse = await this.llmProvider.generate({ prompt });
 
       // Parse response
-      const vision = this.parseVisionResponse(responseText, request.clarity);
+      const vision = this.parseVisionResponse(llmResponse.text, request.clarity);
       return vision;
 
     } catch (error) {

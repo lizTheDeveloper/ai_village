@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:4571178",
+  "name": "Nova Miranda",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769219151227",
+  "createdAt": 1769219151254,
+  "lastAccessedAt": 1769219151254,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769219151227",
+    "type": "magical"
+  }
+}

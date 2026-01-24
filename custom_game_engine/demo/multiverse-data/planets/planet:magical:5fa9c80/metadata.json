@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5fa9c80",
+  "name": "Epsilon Rhea",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769219068422",
+  "createdAt": 1769219068460,
+  "lastAccessedAt": 1769219068460,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769219068422",
+    "type": "magical"
+  }
+}

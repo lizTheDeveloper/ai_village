@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5b6cade9",
+  "name": "Mundo Secundus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769216083944",
+  "createdAt": 1769216083963,
+  "lastAccessedAt": 1769216083963,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769216083944",
+    "type": "magical"
+  }
+}

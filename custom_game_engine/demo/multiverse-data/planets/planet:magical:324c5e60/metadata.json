@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:324c5e60",
+  "name": "Galactic Oberon",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769218574203",
+  "createdAt": 1769218574205,
+  "lastAccessedAt": 1769218574205,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769218574203",
+    "type": "magical"
+  }
+}

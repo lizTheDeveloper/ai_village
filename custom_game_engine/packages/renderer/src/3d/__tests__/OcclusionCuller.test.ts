@@ -140,8 +140,11 @@ describe('OcclusionCuller', () => {
       // (2,0) is beyond radius 1 (distance = 2)
       expect(visible.has('2,0')).toBe(false);
       expect(visible.has('0,2')).toBe(false);
-      // (1,1) is within radius (distance = sqrt(2) ≈ 1.414)
-      expect(visible.has('1,1')).toBe(true);
+      // (1,1) has distance sqrt(2) ≈ 1.414, which is > 1, so should NOT be visible
+      expect(visible.has('1,1')).toBe(false);
+      // Only camera chunk and immediate neighbors within radius 1 should be visible
+      expect(visible.has('1,0')).toBe(true); // distance = 1
+      expect(visible.has('0,1')).toBe(true); // distance = 1
     });
 
     it('should propagate through passable chunks', () => {
@@ -158,35 +161,36 @@ describe('OcclusionCuller', () => {
     });
 
     it('should stop propagation at solid chunks', () => {
-      // Camera chunk is empty
-      culler.analyzeChunk(0, 0, () => 0, 4, 4);
-      // Neighbor at (1,0) is solid (no face connections)
-      culler.analyzeChunk(1, 0, () => 1, 4, 4);
-      // Chunk at (2,0) is empty but should be blocked by solid (1,0)
-      culler.analyzeChunk(2, 0, () => 0, 4, 4);
+      // The key to this test is that solid chunks don't propagate visibility
+      // because they have empty face connection sets.
 
-      const visible = culler.computeVisibleChunks(0, 0, 3);
+      // Build a complete wall around and beyond camera
+      culler.analyzeChunk(0, 0, () => 0, 4, 4); // Camera is empty
 
-      // Should see the solid chunk (it's visited even if it doesn't propagate)
+      // Create solid wall - need to block ALL possible paths
+      for (let x = -1; x <= 4; x++) {
+        for (let z = -2; z <= 2; z++) {
+          if (x === 0 && z === 0) continue; // Skip camera
+          // Create wall at x >= 1
+          if (x >= 1 && x <= 2) {
+            culler.analyzeChunk(x, z, () => 1, 4, 4); // Solid wall
+          } else if (x === -1) {
+            culler.analyzeChunk(x, z, () => 1, 4, 4); // Block west too
+          } else if (x >= 3) {
+            culler.analyzeChunk(x, z, () => 0, 4, 4); // Beyond wall is empty
+          }
+        }
+      }
+
+      const visible = culler.computeVisibleChunks(0, 0, 4);
+
+      // Should see immediate solid neighbors
       expect(visible.has('1,0')).toBe(true);
-      // Solid chunks with no face connections don't propagate visibility
-      // However, (2,0) might still be visible via other paths or due to default passable behavior
-      // Let me check if we're testing the actual behavior: solid chunks ARE added to visible set
-      // but they don't propagate through their faces. Since (1,0) has no face connections,
-      // (2,0) should not be reachable through (1,0).
-      // But with radius 3, it might be reachable through other neighbors that default to passable.
-      // Let's make all paths go through the solid chunk by analyzing all neighbors
-      culler.analyzeChunk(0, 1, () => 1, 4, 4); // North is solid
-      culler.analyzeChunk(0, -1, () => 1, 4, 4); // South is solid
-      culler.analyzeChunk(1, 1, () => 1, 4, 4); // Northeast is solid
-      culler.analyzeChunk(1, -1, () => 1, 4, 4); // Southeast is solid
 
-      const visible2 = culler.computeVisibleChunks(0, 0, 3);
-      // Now (2,0) can only be reached through (1,0), which is solid with no connections
-      // But wait - the algorithm adds all neighbors from the camera to the queue initially
-      // So (2,0) is still reachable if it's within radius and gets queued as a neighbor
-      // The real test is: can we see (3,0) through the solid (1,0)?
-      expect(visible2.has('3,0')).toBe(false);
+      // Should NOT see (3,0) because all paths through (1,x) and (2,x) are blocked
+      expect(visible.has('3,0')).toBe(false);
+      expect(visible.has('3,1')).toBe(false);
+      expect(visible.has('4,0')).toBe(false);
     });
 
     it('should propagate through chunks with tunnel connections', () => {
@@ -254,46 +258,39 @@ describe('OcclusionCuller', () => {
     });
 
     it('should only propagate through horizontal faces (not +Y/-Y)', () => {
-      // Create chunk with vertical tunnel but no horizontal connections
+      // The algorithm explicitly filters out +Y/-Y faces during propagation (line 311)
+      // Let's verify that vertical connectivity doesn't enable propagation
+
       culler.analyzeChunk(0, 0, () => 0, 4, 4); // Camera (empty)
 
-      // Neighbor only has vertical connectivity (no horizontal face connections)
-      culler.analyzeChunk(1, 0, (x, y, z) => {
+      // Chunk with only vertical connectivity (no horizontal passage)
+      const data = culler.analyzeChunk(1, 0, (x, y, z) => {
         if (x === 1 && z === 1) return 0; // Vertical tunnel only
         return 1;
       }, 4, 4);
 
-      // The chunk at (2,0) will be visible because when (1,0) is unknown or newly queued,
-      // the algorithm defaults to treating chunks as passable (line 300 in OcclusionCuller.ts)
-      // To properly test horizontal-only propagation, we need to ensure (1,0) blocks east
-      // by having it NOT connect -X to +X faces. With only a vertical tunnel,
-      // -X should not connect to +X. Let's verify this is the case.
-
-      const data = culler.analyzeChunk(1, 0, (x, y, z) => {
-        if (x === 1 && z === 1) return 0; // Vertical tunnel only at x=1
-        return 1;
-      }, 4, 4);
-
-      // Verify that -X does NOT connect to +X (no horizontal passage)
+      // Verify no horizontal connectivity
       expect(data.faceConnections.get('-X')?.has('+X')).toBe(false);
 
-      // Now compute visibility - (2,0) should NOT be reachable through (1,0)
-      // because (1,0) doesn't connect -X to +X
-      const visible = culler.computeVisibleChunks(0, 0, 3);
-
-      expect(visible.has('1,0')).toBe(true); // We can see (1,0)
-      // However, (2,0) can still be reached if there are other paths through analyzed chunks
-      // that default to passable. Since we only analyzed (0,0) and (1,0), other neighbors
-      // of (0,0) like (1,1) are unknown and default to passable, potentially providing alternate routes.
-      // To isolate the test, analyze all surrounding chunks as solid
-      culler.analyzeChunk(1, 1, () => 1, 4, 4);
-      culler.analyzeChunk(1, -1, () => 1, 4, 4);
+      // Block all diagonal/alternate routes with solid chunks
       culler.analyzeChunk(0, 1, () => 1, 4, 4);
       culler.analyzeChunk(0, -1, () => 1, 4, 4);
+      culler.analyzeChunk(1, 1, () => 1, 4, 4);
+      culler.analyzeChunk(1, -1, () => 1, 4, 4);
+      culler.analyzeChunk(2, 1, () => 1, 4, 4);
+      culler.analyzeChunk(2, -1, () => 1, 4, 4);
+      culler.analyzeChunk(-1, 0, () => 1, 4, 4);
+      culler.analyzeChunk(-1, 1, () => 1, 4, 4);
+      culler.analyzeChunk(-1, -1, () => 1, 4, 4);
 
-      const visible2 = culler.computeVisibleChunks(0, 0, 3);
-      // Now the only path to (2,0) is through (1,0), which has no horizontal connectivity
-      expect(visible2.has('2,0')).toBe(false);
+      // Analyze (2,0) as empty
+      culler.analyzeChunk(2, 0, () => 0, 4, 4);
+
+      const visible = culler.computeVisibleChunks(0, 0, 3);
+
+      expect(visible.has('1,0')).toBe(true); // Can see the chunk with vertical tunnel
+      // Cannot see (2,0) because (1,0) has no horizontal face connections
+      expect(visible.has('2,0')).toBe(false);
     });
 
     it('should handle large radius values', () => {
