@@ -37,25 +37,35 @@ export interface CombatStatsComponent extends Component {
   armor?: string | null;
 }
 
-export function createCombatStatsComponent(data: {
-  combatSkill: number;
-  [key: string]: any;
-}): CombatStatsComponent {
-  if (data.combatSkill === undefined) {
+/** Input type for factory use - accepts unknown values with runtime validation */
+export type CombatStatsInput = Record<string, unknown>;
+
+export function createCombatStatsComponent(data: CombatStatsInput): CombatStatsComponent {
+  const combatSkill = data.combatSkill as number | undefined;
+  const huntingSkill = data.huntingSkill as number | undefined;
+  const stealthSkill = data.stealthSkill as number | undefined;
+  const displaySkill = data.displaySkill as number | undefined;
+  const resourceHolding = data.resourceHolding as number | undefined;
+  const craftingSkill = data.craftingSkill as number | undefined;
+  const socialSkill = data.socialSkill as number | undefined;
+  const weapon = data.weapon as string | null | undefined;
+  const armor = data.armor as string | null | undefined;
+
+  if (combatSkill === undefined) {
     throw new Error('Combat skill is required');
   }
 
   return {
     type: 'combat_stats',
     version: 1,
-    combatSkill: data.combatSkill,
-    huntingSkill: data.huntingSkill || 0,
-    stealthSkill: data.stealthSkill || 0,
-    displaySkill: data.displaySkill || 0,
-    resourceHolding: data.resourceHolding || 0,
-    craftingSkill: data.craftingSkill || 0,
-    socialSkill: data.socialSkill || 0,
-    weapon: data.weapon || null,
-    armor: data.armor || null,
+    combatSkill,
+    huntingSkill: huntingSkill || 0,
+    stealthSkill: stealthSkill || 0,
+    displaySkill: displaySkill || 0,
+    resourceHolding: resourceHolding || 0,
+    craftingSkill: craftingSkill || 0,
+    socialSkill: socialSkill || 0,
+    weapon: weapon || null,
+    armor: armor || null,
   };
 }

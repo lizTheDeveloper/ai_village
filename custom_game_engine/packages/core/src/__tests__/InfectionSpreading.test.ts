@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { BodySystem } from '../systems/BodySystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { createBodyComponentFromPlan } from '../components/BodyPlanRegistry.js';

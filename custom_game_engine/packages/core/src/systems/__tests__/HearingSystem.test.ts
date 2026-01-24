@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl, EntityImpl, createEntityId } from '../../ecs/index.js';
+import { World, EntityImpl, createEntityId } from '../../ecs/index.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { HearingProcessor } from '../../perception/HearingProcessor.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';

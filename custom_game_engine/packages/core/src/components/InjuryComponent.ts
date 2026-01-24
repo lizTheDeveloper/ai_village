@@ -51,55 +51,58 @@ const VALID_INJURY_TYPES = ['laceration', 'puncture', 'blunt', 'burn', 'bite', '
 const VALID_SEVERITIES = ['minor', 'major', 'critical'];
 const VALID_LOCATIONS = ['head', 'torso', 'arms', 'legs', 'hands', 'feet'];
 
-export function createInjuryComponent(data: {
-  injuryType: InjuryComponent['injuryType'];
-  severity: InjuryComponent['severity'];
-  location: InjuryComponent['location'];
-  skillPenalties?: Record<string, number>;
-  movementPenalty?: number;
-  healingTime?: number;
-  elapsed?: number;
-  requiresTreatment?: boolean;
-  treated?: boolean;
-  untreatedDuration?: number;
-  injuries?: Array<{
+/** Input type for factory use - accepts unknown values with runtime validation */
+export type InjuryInput = Record<string, unknown>;
+
+export function createInjuryComponent(data: InjuryInput): InjuryComponent {
+  const injuryType = data.injuryType as InjuryComponent['injuryType'] | undefined;
+  const severity = data.severity as InjuryComponent['severity'] | undefined;
+  const location = data.location as InjuryComponent['location'] | undefined;
+  const skillPenalties = data.skillPenalties as Record<string, number> | undefined;
+  const movementPenalty = data.movementPenalty as number | undefined;
+  const healingTime = data.healingTime as number | undefined;
+  const elapsed = data.elapsed as number | undefined;
+  const requiresTreatment = data.requiresTreatment as boolean | undefined;
+  const treated = data.treated as boolean | undefined;
+  const untreatedDuration = data.untreatedDuration as number | undefined;
+  const injuries = data.injuries as Array<{
     injuryType: InjuryComponent['injuryType'];
     severity: InjuryComponent['severity'];
     location: InjuryComponent['location'];
-  }>;
-}): InjuryComponent {
-  if (!data.injuryType) {
+  }> | undefined;
+
+  if (!injuryType) {
     throw new Error('Injury type is required');
   }
-  if (!VALID_INJURY_TYPES.includes(data.injuryType)) {
-    throw new Error(`Invalid injury type: ${data.injuryType}`);
+  if (!VALID_INJURY_TYPES.includes(injuryType)) {
+    throw new Error(`Invalid injury type: ${injuryType}`);
   }
-  if (!data.severity) {
+  if (!severity) {
     throw new Error('Injury severity is required');
   }
-  if (!VALID_SEVERITIES.includes(data.severity)) {
-    throw new Error(`Invalid injury severity: ${data.severity}`);
+  if (!VALID_SEVERITIES.includes(severity)) {
+    throw new Error(`Invalid injury severity: ${severity}`);
   }
-  if (!data.location) {
+  if (!location) {
     throw new Error('Injury location is required');
   }
-  if (!VALID_LOCATIONS.includes(data.location)) {
-    throw new Error(`Invalid injury location: ${data.location}`);
+  if (!VALID_LOCATIONS.includes(location)) {
+    throw new Error(`Invalid injury location: ${location}`);
   }
 
   return {
     type: 'injury',
     version: 1,
-    injuryType: data.injuryType,
-    severity: data.severity,
-    location: data.location,
-    skillPenalties: data.skillPenalties || {},
-    movementPenalty: data.movementPenalty,
-    healingTime: data.healingTime,
-    elapsed: data.elapsed || 0,
-    requiresTreatment: data.requiresTreatment !== undefined ? data.requiresTreatment : (data.severity === 'major' || data.severity === 'critical'),
-    treated: data.treated || false,
-    untreatedDuration: data.untreatedDuration || 0,
-    injuries: data.injuries,
+    injuryType,
+    severity,
+    location,
+    skillPenalties: skillPenalties || {},
+    movementPenalty,
+    healingTime,
+    elapsed: elapsed || 0,
+    requiresTreatment: requiresTreatment !== undefined ? requiresTreatment : (severity === 'major' || severity === 'critical'),
+    treated: treated || false,
+    untreatedDuration: untreatedDuration || 0,
+    injuries,
   };
 }

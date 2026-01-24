@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:d0d368c",
+  "name": "Alpha Theia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769214114351",
+  "createdAt": 1769214114357,
+  "lastAccessedAt": 1769214114357,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769214114351",
+    "type": "magical"
+  }
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl } from '../packages/core/src/ecs/World.js';
+import { World } from '../packages/core/src/ecs/World.js';
 import { EventBusImpl } from '../packages/core/src/events/EventBus.js';
 import { EntityImpl, createEntityId } from '../packages/core/src/ecs/Entity.js';
 import { SoilSystem, FERTILIZERS } from '../packages/core/src/systems/SoilSystem.js';
@@ -26,7 +26,7 @@ describe('Phase 9: Soil/Tile System - Integration Tests', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     soilSystem = new SoilSystem();
     weatherSystem = new WeatherSystem();
     temperatureSystem = new TemperatureSystem();

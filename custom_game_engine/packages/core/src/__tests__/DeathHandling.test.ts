@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { DeathTransitionSystem } from '../systems/DeathTransitionSystem.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EventBusImpl, type EventBus } from '../events/EventBus.js';

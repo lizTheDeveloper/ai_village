@@ -20,7 +20,7 @@ import type { UniverseSnapshot } from '../types.js';
 function createTestWorld(): World {
   const eventBus = new EventBusImpl();
   const chunkManager = new ChunkManager(2); // loadRadius = 2
-  const world = new WorldImpl(eventBus, chunkManager);
+  const world = new World(eventBus, chunkManager);
   return world;
 }
 
@@ -94,7 +94,7 @@ describe('WorldSerializer terrain integration', () => {
   it('should serialize terrain as null when ChunkManager not set', async () => {
     // Setup: World without ChunkManager
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus); // No ChunkManager
+    const world = new World(eventBus); // No ChunkManager
 
     // Act: Serialize world
     const snapshot = await serializer.serializeWorld(

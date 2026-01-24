@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, EntityImpl, createEntityId } from '../../ecs/index.js';
+import { World, EntityImpl, createEntityId } from '../../ecs/index.js';
 import { BuildingSystem } from '../BuildingSystem.js';
 import { createBuildingComponent, isUnderConstruction, getRemainingWork, type BuildingComponent } from '../../components/BuildingComponent.js';
 import { EventBusImpl } from '../../events/EventBus.js';

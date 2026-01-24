@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl, type World } from '../World.js';
-import { EventBus } from '../../events/EventBus.js';
+import { World } from '../World.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 function createTestWorld(): World {
-  const eventBus = new EventBus();
+  const eventBus = new EventBusImpl();
   return new World(eventBus);
 }
 
@@ -16,12 +16,12 @@ describe('QueryCache Integration', () => {
 
   describe('query caching with world mutations', () => {
     it('should cache component-only queries', () => {
-      // Create entities
+      // Create entities - use world.addComponent for proper versioning
       const agent1 = world.createEntity();
-      (agent1 as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(agent1.id, { type: 'agent', version: 1, name: 'Alice' });
 
       const agent2 = world.createEntity();
-      (agent2 as any).addComponent({ type: 'agent', name: 'Bob' });
+      world.addComponent(agent2.id, { type: 'agent', version: 1, name: 'Bob' });
 
       // Query 1: Cache miss
       const results1 = world.query().with('agent').executeEntities();
@@ -42,7 +42,7 @@ describe('QueryCache Integration', () => {
 
     it('should invalidate cache when entity is added', () => {
       const agent1 = world.createEntity();
-      (agent1 as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(agent1.id, { type: 'agent', version: 1, name: 'Alice' });
 
       // Query 1: Cache miss
       const results1 = world.query().with('agent').executeEntities();
@@ -50,7 +50,7 @@ describe('QueryCache Integration', () => {
 
       // Add entity: Version increments
       const agent2 = world.createEntity();
-      (agent2 as any).addComponent({ type: 'agent', name: 'Bob' });
+      world.addComponent(agent2.id, { type: 'agent', version: 1, name: 'Bob' });
 
       // Query 2: Cache invalidated, cache miss
       const results2 = world.query().with('agent').executeEntities();
@@ -59,7 +59,7 @@ describe('QueryCache Integration', () => {
       const stats = world.queryCache.getStats();
       expect(stats.hits).toBe(0);
       expect(stats.misses).toBe(2);
-      expect(stats.invalidations).toBe(0); // First query was never hit before invalidation
+      expect(stats.invalidations).toBe(1); // First query was cached, then invalidated
     });
 
     it('should invalidate cache when component is added', () => {
@@ -69,8 +69,8 @@ describe('QueryCache Integration', () => {
       const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(0);
 
-      // Add agent component: Version increments
-      (entity as any).addComponent({ type: 'agent', name: 'Alice' });
+      // Add agent component via world API: Version increments
+      world.addComponent(entity.id, { type: 'agent', version: 1, name: 'Alice' });
 
       // Query again: Should find new agent
       const results2 = world.query().with('agent').executeEntities();
@@ -82,14 +82,14 @@ describe('QueryCache Integration', () => {
 
     it('should invalidate cache when component is removed', () => {
       const agent = world.createEntity();
-      (agent as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(agent.id, { type: 'agent', version: 1, name: 'Alice' });
 
       // Query 1: Find agent
       const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(1);
 
-      // Remove component: Version increments
-      (agent as any).removeComponent('agent');
+      // Remove component via world API: Version increments
+      world.removeComponent(agent.id, 'agent');
 
       // Query 2: Agent gone
       const results2 = world.query().with('agent').executeEntities();
@@ -101,17 +101,17 @@ describe('QueryCache Integration', () => {
 
     it('should invalidate cache when entity is destroyed', () => {
       const agent1 = world.createEntity();
-      (agent1 as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(agent1.id, { type: 'agent', version: 1, name: 'Alice' });
 
       const agent2 = world.createEntity();
-      (agent2 as any).addComponent({ type: 'agent', name: 'Bob' });
+      world.addComponent(agent2.id, { type: 'agent', version: 1, name: 'Bob' });
 
       // Query 1: Find 2 agents
       const results1 = world.query().with('agent').executeEntities();
       expect(results1).toHaveLength(2);
 
       // Destroy entity: Version increments
-      (world as any).destroyEntity(agent1.id, 'test');
+      world.destroyEntity(agent1.id, 'test');
 
       // Query 2: Only 1 agent remains
       const results2 = world.query().with('agent').executeEntities();
@@ -125,7 +125,7 @@ describe('QueryCache Integration', () => {
   describe('cache hit patterns', () => {
     it('should achieve high hit rate for repeated queries', () => {
       const agent = world.createEntity();
-      (agent as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(agent.id, { type: 'agent', version: 1, name: 'Alice' });
 
       // 1 miss, then 9 hits
       for (let i = 0; i < 10; i++) {
@@ -140,11 +140,11 @@ describe('QueryCache Integration', () => {
 
     it('should cache different queries independently', () => {
       const agent = world.createEntity();
-      (agent as any).addComponent({ type: 'agent', name: 'Alice' });
-      (agent as any).addComponent({ type: 'position', x: 0, y: 0 });
+      world.addComponent(agent.id, { type: 'agent', version: 1, name: 'Alice' });
+      world.addComponent(agent.id, { type: 'position', version: 1, x: 0, y: 0, chunkX: 0, chunkY: 0 });
 
       const building = world.createEntity();
-      (building as any).addComponent({ type: 'building', buildingType: 'house' });
+      world.addComponent(building.id, { type: 'building', version: 1, buildingType: 'house' });
 
       // Query agents: Miss
       world.query().with('agent').executeEntities();
@@ -168,11 +168,11 @@ describe('QueryCache Integration', () => {
 
     it('should handle without filters correctly', () => {
       const agent = world.createEntity();
-      (agent as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(agent.id, { type: 'agent', version: 1, name: 'Alice' });
 
       const deadAgent = world.createEntity();
-      (deadAgent as any).addComponent({ type: 'agent', name: 'Bob' });
-      (deadAgent as any).addComponent({ type: 'dead', cause: 'test' });
+      world.addComponent(deadAgent.id, { type: 'agent', version: 1, name: 'Bob' });
+      world.addComponent(deadAgent.id, { type: 'dead', version: 1, cause: 'test' });
 
       // Query living agents: Miss
       const results1 = world
@@ -199,7 +199,7 @@ describe('QueryCache Integration', () => {
   describe('non-cacheable queries', () => {
     it('should not cache spatial queries', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent({ type: 'position', x: 5, y: 5 });
+      world.addComponent(entity.id, { type: 'position', version: 1, x: 5, y: 5, chunkX: 0, chunkY: 0 });
 
       // Spatial queries should bypass cache
       world.query().inRect(0, 0, 10, 10).executeEntities();
@@ -213,7 +213,7 @@ describe('QueryCache Integration', () => {
 
     it('should not cache tag queries', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent({ type: 'tags', tags: ['test'] });
+      world.addComponent(entity.id, { type: 'tags', version: 1, tags: ['test'] });
 
       // Tag queries should bypass cache
       world.query().withTags('test').executeEntities();
@@ -227,10 +227,10 @@ describe('QueryCache Integration', () => {
 
     it('should not cache proximity queries', () => {
       const entity1 = world.createEntity();
-      (entity1 as any).addComponent({ type: 'position', x: 0, y: 0 });
+      world.addComponent(entity1.id, { type: 'position', version: 1, x: 0, y: 0, chunkX: 0, chunkY: 0 });
 
       const entity2 = world.createEntity();
-      (entity2 as any).addComponent({ type: 'position', x: 5, y: 5 });
+      world.addComponent(entity2.id, { type: 'position', version: 1, x: 5, y: 5, chunkX: 0, chunkY: 0 });
 
       // Proximity queries should bypass cache
       world.query().near(entity1.id, 10).executeEntities();
@@ -257,7 +257,7 @@ describe('QueryCache Integration', () => {
       const entity = world.createEntity();
       const v1 = world.archetypeVersion;
 
-      (entity as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(entity.id, { type: 'agent', version: 1, name: 'Alice' });
 
       const v2 = world.archetypeVersion;
       expect(v2).toBe(v1 + 1);
@@ -265,11 +265,11 @@ describe('QueryCache Integration', () => {
 
     it('should increment version on component removal', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent({ type: 'agent', name: 'Alice' });
+      world.addComponent(entity.id, { type: 'agent', version: 1, name: 'Alice' });
 
       const v1 = world.archetypeVersion;
 
-      (entity as any).removeComponent('agent');
+      world.removeComponent(entity.id, 'agent');
 
       const v2 = world.archetypeVersion;
       expect(v2).toBe(v1 + 1);
@@ -279,7 +279,7 @@ describe('QueryCache Integration', () => {
       const entity = world.createEntity();
       const v1 = world.archetypeVersion;
 
-      (world as any).destroyEntity(entity.id, 'test');
+      world.destroyEntity(entity.id, 'test');
 
       const v2 = world.archetypeVersion;
       expect(v2).toBe(v1 + 1);

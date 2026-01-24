@@ -16,7 +16,7 @@
  * Tier 5: Solar Sails (Dyson Swarm building blocks)
  */
 
-import { WorldImpl } from '../packages/core/src/ecs/World.js';
+import { World } from '../packages/core/src/ecs/World.js';
 import type { World } from '../packages/core/src/ecs/World.js';
 import type { Entity } from '../packages/core/src/ecs/Entity.js';
 import { ComponentType as CT } from '../packages/core/src/types/ComponentType.js';
@@ -596,7 +596,7 @@ async function main(): Promise<void> {
   console.log('╚═══════════════════════════════════════════════════════════════╝');
 
   // Create world
-  const world = new WorldImpl();
+  const world = new World();
 
   // Create systems
   const factoryAISystem = new FactoryAISystem();

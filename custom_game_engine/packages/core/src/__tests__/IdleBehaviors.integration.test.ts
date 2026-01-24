@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World';
+import { World } from '../ecs/World';
 import { EventBusImpl } from '../events/EventBus';
 import { IdleBehaviorSystem } from '../systems/IdleBehaviorSystem';
 import { ReflectionSystem } from '../systems/ReflectionSystem';

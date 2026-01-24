@@ -8,7 +8,7 @@
  * 4. "Cedar is always a builder" - soul consistency
  */
 
-import { WorldImpl, type World } from './packages/core/src/ecs/World.ts';
+import { World, type World } from './packages/core/src/ecs/World.ts';
 import { GameLoop } from './packages/core/src/loop/GameLoop.ts';
 import { SoulRepositorySystem } from './packages/core/src/systems/SoulRepositorySystem.ts';
 import { SoulCreationSystem } from './packages/core/src/systems/SoulCreationSystem.ts';

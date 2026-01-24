@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6379231",
+  "name": "Triton Gamma",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769214519234",
+  "createdAt": 1769214519367,
+  "lastAccessedAt": 1769214519367,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769214519234",
+    "type": "magical"
+  }
+}

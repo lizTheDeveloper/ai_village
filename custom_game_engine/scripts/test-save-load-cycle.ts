@@ -3,7 +3,7 @@
  * Creates a world with entities, saves it, loads it back, and verifies state
  */
 
-import { WorldImpl } from '../packages/core/src/ecs/World.js';
+import { World } from '../packages/core/src/ecs/World.js';
 import { EventBusImpl } from '../packages/core/src/events/EventBus.js';
 import { SaveStateManager } from '../packages/core/src/persistence/SaveStateManager.js';
 import { ComponentType as CT } from '../packages/core/src/types/ComponentType.js';
@@ -17,7 +17,7 @@ async function testSaveLoadCycle() {
   // Step 1: Create a world with some entities
   console.log('[1] Creating original world...');
   const eventBus1 = new EventBusImpl();
-  const world1 = new WorldImpl(eventBus1);
+  const world1 = new World(eventBus1);
 
   // Create a time entity
   const timeEntity = world1.createEntity();

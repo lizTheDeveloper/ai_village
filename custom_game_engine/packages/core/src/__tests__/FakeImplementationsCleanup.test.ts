@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World.js';
+import { World } from '../ecs/World.js';
 import { PlantSystem } from '@ai-village/botany';
 import { BuildingSystem } from '../systems/BuildingSystem.js';
 import { TimeSystem } from '../systems/TimeSystem.js';

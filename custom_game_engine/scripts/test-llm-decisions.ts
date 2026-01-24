@@ -2,7 +2,7 @@
  * Test script to verify LLM decisions are being made
  */
 
-import { WorldImpl } from '../packages/core/src/ecs/World.js';
+import { World } from '../packages/core/src/ecs/World.js';
 import { AgentBrainSystem } from '../packages/core/src/systems/AgentBrainSystem.js';
 import { LLMScheduler, LLMDecisionQueue } from '../packages/llm/src/index.js';
 import { ScheduledDecisionProcessor } from '../packages/core/src/decision/ScheduledDecisionProcessor.js';
@@ -11,7 +11,7 @@ import { ComponentType as CT } from '../packages/core/src/types/ComponentType.js
 async function testLLMDecisions() {
   console.log('[Test] Creating world and systems...');
 
-  const world = new WorldImpl();
+  const world = new World();
   const llmQueue = new LLMDecisionQueue();
   const scheduler = new LLMScheduler(llmQueue);
   const scheduledProcessor = new ScheduledDecisionProcessor(scheduler, llmQueue);

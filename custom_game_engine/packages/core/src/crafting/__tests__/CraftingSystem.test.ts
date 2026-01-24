@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, EntityImpl } from '../../ecs/index.js';
+import { World, EntityImpl } from '../../ecs/index.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { CraftingSystem } from '../CraftingSystem.js';
 import { RecipeRegistry } from '../RecipeRegistry.js';

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { MetricsCollector } from '../metrics/MetricsCollector';
 import { EventBusImpl, type EventBus } from '../events/EventBus';
 import { GameLoop } from '../loop/GameLoop';
-import { WorldImpl, type World } from '../ecs/World';
+import { World } from '../ecs/World';
 
 /**
  * SPECIFICATION TESTS - These tests define memory leak prevention requirements.

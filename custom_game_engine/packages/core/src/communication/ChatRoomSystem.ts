@@ -589,7 +589,7 @@ export class ChatRoomSystem extends BaseSystem {
   /**
    * Initialize event listeners
    */
-  public onInit(world: World): void {
+  protected onInitialize(world: World): void {
     // Listen for send_message events from UI panels
     world.eventBus.on('chat:send_message', (event) => {
       const data = event.data as {

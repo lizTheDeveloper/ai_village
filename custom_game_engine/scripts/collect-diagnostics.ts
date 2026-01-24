@@ -29,7 +29,7 @@ console.log('✅ Diagnostics enabled\n');
 const eventBus = new EventBusImpl();
 const chunkManager = new ChunkManager({ seed: 12345, chunkSize: 32 });
 const systemRegistry = new SystemRegistry();
-const world = new WorldImpl(eventBus, chunkManager, systemRegistry);
+const world = new World(eventBus, chunkManager, systemRegistry);
 
 // Register core systems
 console.log('Registering systems...');

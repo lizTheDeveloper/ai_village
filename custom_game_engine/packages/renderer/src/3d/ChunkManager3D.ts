@@ -61,8 +61,8 @@ export class ChunkManager3D {
   /** Occlusion culler for cave culling */
   private occlusionCuller: OcclusionCuller;
 
-  /** Whether occlusion culling is enabled */
-  private occlusionEnabled = true;
+  /** Whether occlusion culling is enabled (disabled by default until tested) */
+  private occlusionEnabled = false;
 
   /** Current camera chunk position */
   private cameraChunkX = 0;

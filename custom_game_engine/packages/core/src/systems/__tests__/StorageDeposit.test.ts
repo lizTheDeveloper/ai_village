@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, EntityImpl, createEntityId } from '../../ecs/index.js';
+import { World, EntityImpl, createEntityId } from '../../ecs/index.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { MovementSystem } from '../MovementSystem.js';

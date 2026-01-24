@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World';
+import { World } from '../ecs/World';
 import { EventBusImpl } from '../events/EventBus';
 import { DominanceChallengeSystem } from '../systems/DominanceChallengeSystem';
 import { Entity } from '../ecs/Entity';

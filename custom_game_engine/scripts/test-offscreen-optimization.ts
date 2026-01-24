@@ -10,7 +10,7 @@
  * 6. Verify production results match expected
  */
 
-import { WorldImpl } from '../packages/core/dist/index.js';
+import { World } from '../packages/core/dist/index.js';
 import { EventBusImpl } from '../packages/core/dist/index.js';
 import type { EntityImpl } from '../packages/core/dist/index.js';
 import { CraftingSystem } from '../packages/core/dist/crafting/CraftingSystem.js';
@@ -50,7 +50,7 @@ console.log('╚═════════════════════�
 // === Setup ===
 
 const eventBus = new EventBusImpl();
-const world = new WorldImpl(eventBus);
+const world = new World(eventBus);
 const craftingSystem = new CraftingSystem();
 const recipeRegistry = new RecipeRegistry();
 const itemRegistry = ItemInstanceRegistry.getInstance();

@@ -3,7 +3,7 @@
  * Spawns factories and verifies they craft items as expected.
  */
 
-import { WorldImpl, EventBusImpl } from '../packages/core/dist/index.js';
+import { World, EventBusImpl } from '../packages/core/dist/index.js';
 import type { EntityImpl } from '../packages/core/dist/index.js';
 import { CraftingSystem } from '../packages/core/dist/crafting/CraftingSystem.js';
 import { RecipeRegistry } from '../packages/core/dist/crafting/RecipeRegistry.js';
@@ -57,7 +57,7 @@ console.log('=== Automation System Test ===\n');
 // 1. Create world and systems
 console.log('1. Creating world and systems...');
 const eventBus = new EventBusImpl();
-const world = new WorldImpl(eventBus);
+const world = new World(eventBus);
 const craftingSystem = new CraftingSystem();
 const assemblySystem = new AssemblyMachineSystem();
 

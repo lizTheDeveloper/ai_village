@@ -8,7 +8,7 @@
  */
 
 import 'dotenv/config';
-import { WorldImpl } from './packages/core/src/ecs/World.js';
+import { World } from './packages/core/src/ecs/World.js';
 import { EventBusImpl } from './packages/core/src/events/EventBus.js';
 import { SoulCreationSystem } from './packages/core/src/systems/SoulCreationSystem.js';
 import { OpenAICompatProvider } from './packages/llm/src/OpenAICompatProvider.js';
@@ -22,7 +22,7 @@ async function main() {
 
   // Create minimal world
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
 
   // Create soul creation system
   const soulSystem = new SoulCreationSystem();

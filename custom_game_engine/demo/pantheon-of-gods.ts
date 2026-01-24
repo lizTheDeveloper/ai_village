@@ -854,7 +854,7 @@ async function main() {
 
   // Create world
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
 
   // Register systems
   const systems = await registerAllSystems(world as any, {

@@ -5,7 +5,7 @@
  * Demonstrates off-screen optimization with production rate calculations.
  */
 
-import { WorldImpl } from '../packages/core/dist/index.js';
+import { World } from '../packages/core/dist/index.js';
 import { EventBusImpl } from '../packages/core/dist/index.js';
 import { CraftingSystem } from '../packages/core/dist/crafting/CraftingSystem.js';
 import { RecipeRegistry } from '../packages/core/dist/crafting/RecipeRegistry.js';
@@ -19,7 +19,7 @@ console.log('╚═════════════════════�
 
 // Setup world
 const eventBus = new EventBusImpl();
-const world = new WorldImpl(eventBus);
+const world = new World(eventBus);
 const craftingSystem = new CraftingSystem();
 const recipeRegistry = new RecipeRegistry();
 const itemRegistry = ItemInstanceRegistry.getInstance();

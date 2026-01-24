@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CityManager } from '../CityManager.js';
-import { World } from '../../ecs/WorldImpl.js';
+import { World.js';
 import { EventBusImpl } from '../../events/EventBusImpl.js';
 
 describe('CityManager', () => {

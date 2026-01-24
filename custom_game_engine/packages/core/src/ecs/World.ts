@@ -720,10 +720,10 @@ const componentRegistry: Record<string, ComponentFactory> = {
     return new ExplorationStateComponent();
   },
   'episodic_memory': (data = {}) => new EpisodicMemoryComponent(data),
-  'dominance_rank': (data = {}) => createDominanceRankComponent(data as any),
-  'combat_stats': (data = {}) => createCombatStatsComponent(data as any),
-  'conflict': (data = {}) => createConflictComponent(data as any),
-  'guard_duty': (data = {}) => createGuardDutyComponent(data as any),
+  'dominance_rank': (data = {}) => createDominanceRankComponent(data),
+  'combat_stats': (data = {}) => createCombatStatsComponent(data),
+  'conflict': (data = {}) => createConflictComponent(data),
+  'guard_duty': (data = {}) => createGuardDutyComponent(data),
   'skills': (data = {}) => ({
     type: 'skills' as const,
     version: 1,
@@ -739,7 +739,7 @@ const componentRegistry: Record<string, ComponentFactory> = {
     version: 1,
     ...data,
   }),
-  'injury': (data = {}) => createInjuryComponent(data as any),
+  'injury': (data = {}) => createInjuryComponent(data),
   'inventory': (data = {}) => ({
     type: 'inventory' as const,
     version: 1,
@@ -1880,5 +1880,5 @@ export class World implements WorldMutator {
   }
 }
 
-// Backward-compatibility alias: class was renamed from WorldImpl to World
-export { World as WorldImpl };
+// Note: WorldImpl is now the primary class name (World)
+// The old separate World test helper has been merged into this class

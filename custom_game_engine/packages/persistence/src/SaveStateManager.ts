@@ -332,7 +332,7 @@ export class SaveStateManager {
    */
   async restoreWorld(saveState: SaveState): Promise<World> {
     const eventBus = new EventBusImpl();
-    const world = new WorldImpl(eventBus);
+    const world = new World(eventBus);
     // WorldImpl implements World interface, so this cast is safe
     await worldSerializer.deserializeWorld(saveState.snapshot, world as World);
     return world as World;

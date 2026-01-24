@@ -8,7 +8,7 @@
 
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
-import type { CustomLLMConfig } from '../components/AgentComponent.js';
+export type { CustomLLMConfig } from '../components/AgentComponent.js';
 
 /**
  * Decision layer type - determines which LLM behavior layer handles the decision
@@ -81,9 +81,10 @@ export interface LLMDecisionQueue {
   getDecision(entityId: string): string | null;
 
   /**
-   * Request a new decision (async, fire-and-forget)
+   * Request a new decision (async)
+   * Returns a promise that resolves with the LLM response text
    */
-  requestDecision(entityId: string, prompt: string, customLLM?: CustomLLMConfig): Promise<void>;
+  requestDecision(entityId: string, prompt: string, customLLM?: CustomLLMConfig): Promise<string>;
 }
 
 export interface LLMRequest {

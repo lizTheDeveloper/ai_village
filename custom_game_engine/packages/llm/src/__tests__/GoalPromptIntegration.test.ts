@@ -12,7 +12,7 @@ describe('Goal Prompt Integration', () => {
 
   beforeEach(() => {
     const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World(eventBus);
     promptBuilder = new StructuredPromptBuilder();
   });
 

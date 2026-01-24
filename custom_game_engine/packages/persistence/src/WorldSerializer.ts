@@ -2,7 +2,7 @@
  * WorldSerializer - Serializes/deserializes entire World instances
  */
 
-import type { World, WorldImpl } from '@ai-village/core';
+import { World } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { Component } from '@ai-village/core';
 import type { UniverseDivineConfig } from '@ai-village/divinity';

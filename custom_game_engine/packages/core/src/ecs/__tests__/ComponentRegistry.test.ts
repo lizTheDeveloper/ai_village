@@ -18,7 +18,7 @@ describe('ComponentRegistry', () => {
       version: 1,
       fields: [{ name: 'value', type: 'number', required: true, default: 0 }],
       validate: (data): data is TestComponent => {
-        return (data as any).type === 'test';
+        return typeof data === 'object' && data !== null && (data as { type?: string }).type === 'test';
       },
       createDefault: () => ({ type: 'test', version: 1, value: 0 }),
     };
@@ -70,7 +70,8 @@ describe('ComponentRegistry', () => {
       ...testSchema,
       migrateFrom: (data: unknown, fromVersion: number) => {
         if (fromVersion === 1) {
-          return { type: 'test', version: 2, value: (data as any).value * 2 };
+          const oldData = data as { value: number };
+          return { type: 'test', version: 2, value: oldData.value * 2 };
         }
         return data as TestComponent;
       },

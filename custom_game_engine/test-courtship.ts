@@ -6,7 +6,7 @@
 
 import { createWanderingAgent } from './packages/world/src/entities/AgentEntity.js';
 import { GameLoop } from './packages/core/src/index.js';
-import { WorldImpl } from './packages/core/src/ecs/World.js';
+import { World } from './packages/core/src/ecs/World.js';
 import { ComponentType as CT } from './packages/core/src/types/ComponentType.js';
 import { CourtshipSystem } from './packages/core/src/systems/CourtshipSystem.js';
 import { MovementSystem } from './packages/core/src/systems/MovementSystem.js';

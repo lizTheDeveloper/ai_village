@@ -107,11 +107,15 @@ export class ProfessionPersonalityGenerator {
   ): Promise<GeneratedPersonality> {
     const prompt = this.buildLLMPrompt(role, context);
 
-    // Request LLM generation
-    const response = await this.llmQueue!.requestDecision(
-      `personality_gen_${context.name}_${Date.now()}`,
-      prompt
-    );
+    // Request LLM generation (fire-and-forget, returns Promise<void>)
+    const entityId = `personality_gen_${context.name}_${Date.now()}`;
+    await this.llmQueue!.requestDecision(entityId, prompt);
+
+    // Retrieve the decision
+    const response = this.llmQueue!.getDecision(entityId);
+    if (!response) {
+      throw new Error('No decision available from LLM queue');
+    }
 
     // Parse LLM response (expects JSON)
     const parsed = this.parseLLMResponse(response);

@@ -6,7 +6,7 @@ import { EntityImpl, WorldImpl } from './packages/core/src/index.js';
 import { ExecutorPromptBuilder } from './packages/llm/src/ExecutorPromptBuilder.js';
 
 // Create minimal test world
-const world = new WorldImpl();
+const world = new World();
 
 // Create test agent with vision of resources
 const agent = new EntityImpl('test-agent', 0);

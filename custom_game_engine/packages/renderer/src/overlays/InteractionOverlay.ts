@@ -12,6 +12,43 @@ import type {
 import type { Camera } from '../Camera.js';
 
 /**
+ * Type guard to check if a value is a valid position object with x and y coordinates.
+ */
+function isPositionObject(value: unknown): value is { x: number; y: number } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'x' in value &&
+    'y' in value &&
+    typeof (value as { x: unknown }).x === 'number' &&
+    typeof (value as { y: unknown }).y === 'number'
+  );
+}
+
+/**
+ * Type guard to check if a component has action data properties.
+ */
+function hasActionData(component: Component): component is Component & {
+  targetPos?: { x: number; y: number };
+  target?: { x: number; y: number };
+} {
+  return typeof component === 'object' && component !== null;
+}
+
+/**
+ * Type guard to check if a component has queue-like methods and properties.
+ */
+function hasQueueMethods(component: Component): component is Component & {
+  peek?: () => unknown;
+  isEmpty?: () => boolean;
+  queue?: unknown[];
+  _queue?: unknown[];
+  actions?: unknown[];
+} {
+  return typeof component === 'object' && component !== null;
+}
+
+/**
  * Handles rendering of interaction overlays: agent-building interactions, navigation paths.
  * Extracted from Renderer.ts to improve maintainability.
  */
@@ -233,16 +270,13 @@ export class InteractionOverlay {
     // 5. Check pending_action for navigation targets
     if (targetX === undefined || targetY === undefined) {
       const pendingAction = entity.getComponent('pending_action') as Component | undefined;
-      if (pendingAction) {
-        const actionData = pendingAction as unknown as Record<string, unknown>;
-        const targetPos = actionData.targetPos as { x: number; y: number } | undefined;
-        const target = actionData.target as { x: number; y: number } | undefined;
-        if (targetPos) {
-          targetX = targetPos.x;
-          targetY = targetPos.y;
-        } else if (target) {
-          targetX = target.x;
-          targetY = target.y;
+      if (pendingAction && hasActionData(pendingAction)) {
+        if (pendingAction.targetPos && isPositionObject(pendingAction.targetPos)) {
+          targetX = pendingAction.targetPos.x;
+          targetY = pendingAction.targetPos.y;
+        } else if (pendingAction.target && isPositionObject(pendingAction.target)) {
+          targetX = pendingAction.target.x;
+          targetY = pendingAction.target.y;
         }
       }
     }
@@ -251,34 +285,32 @@ export class InteractionOverlay {
     if (targetX === undefined || targetY === undefined) {
       const actionQueue = entity.getComponent('action_queue') as Component | undefined;
 
-      if (actionQueue) {
+      if (actionQueue && hasQueueMethods(actionQueue)) {
         // Try to access queue data - the structure might vary
         let actions: unknown[] = [];
 
-        const queueWithMethods = actionQueue as unknown as {
-          peek?: () => unknown;
-          isEmpty?: () => boolean;
-          queue?: unknown[];
-          _queue?: unknown[];
-          actions?: unknown[];
-        };
-
-        if (typeof queueWithMethods.peek === 'function') {
-          const current = queueWithMethods.peek();
+        if (typeof actionQueue.peek === 'function') {
+          const current = actionQueue.peek();
           if (current) actions = [current];
-        } else if (Array.isArray(queueWithMethods.queue)) {
-          actions = queueWithMethods.queue;
-        } else if (typeof queueWithMethods.isEmpty === 'function' && !queueWithMethods.isEmpty()) {
+        } else if (Array.isArray(actionQueue.queue)) {
+          actions = actionQueue.queue;
+        } else if (typeof actionQueue.isEmpty === 'function' && !actionQueue.isEmpty()) {
           // Last resort: try internal queue property
-          actions = queueWithMethods._queue || queueWithMethods.actions || [];
+          actions = actionQueue._queue || actionQueue.actions || [];
         }
 
         if (actions.length > 0) {
-          const currentAction = actions[0] as Record<string, unknown>;
-          const targetPos = currentAction?.targetPos as { x: number; y: number } | undefined;
-          if (targetPos) {
-            targetX = targetPos.x;
-            targetY = targetPos.y;
+          const currentAction = actions[0];
+          if (
+            typeof currentAction === 'object' &&
+            currentAction !== null &&
+            'targetPos' in currentAction
+          ) {
+            const targetPos = (currentAction as { targetPos: unknown }).targetPos;
+            if (isPositionObject(targetPos)) {
+              targetX = targetPos.x;
+              targetY = targetPos.y;
+            }
           }
         }
       }

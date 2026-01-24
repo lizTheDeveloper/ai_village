@@ -35,46 +35,53 @@ export interface GuardDutyComponent extends Component {
   lastCheckTime?: number;
 }
 
-export function createGuardDutyComponent(data: {
-  assignmentType: GuardDutyComponent['assignmentType'];
-  alertness: number;
-  responseRadius: number;
-  [key: string]: any;
-}): GuardDutyComponent {
-  if (!data.assignmentType) {
+/** Input type for factory use - accepts unknown values with runtime validation */
+export type GuardDutyInput = Record<string, unknown>;
+
+export function createGuardDutyComponent(data: GuardDutyInput): GuardDutyComponent {
+  const assignmentType = data.assignmentType as GuardDutyComponent['assignmentType'] | undefined;
+  const targetLocation = data.targetLocation as { x: number; y: number; z: number } | undefined;
+  const targetPerson = data.targetPerson as EntityId | undefined;
+  const patrolRoute = data.patrolRoute as Array<{ x: number; y: number; z: number }> | undefined;
+  const patrolIndex = data.patrolIndex as number | undefined;
+  const alertness = data.alertness as number | undefined;
+  const responseRadius = data.responseRadius as number | undefined;
+  const lastCheckTime = data.lastCheckTime as number | undefined;
+
+  if (!assignmentType) {
     throw new Error('Guard assignment type is required');
   }
 
-  if (data.assignmentType === 'location' && !data.targetLocation) {
+  if (assignmentType === 'location' && !targetLocation) {
     throw new Error('Location guard assignment requires targetLocation');
   }
 
-  if (data.assignmentType === 'person' && !data.targetPerson) {
+  if (assignmentType === 'person' && !targetPerson) {
     throw new Error('Person guard assignment requires targetPerson');
   }
 
-  if (data.assignmentType === 'patrol' && !data.patrolRoute) {
+  if (assignmentType === 'patrol' && !patrolRoute) {
     throw new Error('Patrol assignment requires patrolRoute');
   }
 
-  if (data.alertness === undefined) {
+  if (alertness === undefined) {
     throw new Error('Alertness is required');
   }
 
-  if (data.responseRadius === undefined) {
+  if (responseRadius === undefined) {
     throw new Error('Response radius is required');
   }
 
   return {
     type: 'guard_duty',
     version: 1,
-    assignmentType: data.assignmentType,
-    targetLocation: data.targetLocation,
-    targetPerson: data.targetPerson,
-    patrolRoute: data.patrolRoute,
-    patrolIndex: data.patrolIndex || 0,
-    alertness: data.alertness,
-    responseRadius: data.responseRadius,
-    lastCheckTime: data.lastCheckTime || 0,
+    assignmentType,
+    targetLocation,
+    targetPerson,
+    patrolRoute,
+    patrolIndex: patrolIndex || 0,
+    alertness,
+    responseRadius,
+    lastCheckTime: lastCheckTime || 0,
   };
 }

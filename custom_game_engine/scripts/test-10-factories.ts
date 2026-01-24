@@ -10,7 +10,7 @@
  * - Logistics requests
  */
 
-import { WorldImpl } from '../packages/core/src/ecs/World.js';
+import { World } from '../packages/core/src/ecs/World.js';
 import type { World } from '../packages/core/src/ecs/World.js';
 import type { Entity } from '../packages/core/src/ecs/Entity.js';
 import { ComponentType as CT } from '../packages/core/src/types/ComponentType.js';
@@ -304,7 +304,7 @@ async function main(): Promise<void> {
   console.log('Testing Factory AI + Off-Screen Optimization\n');
 
   // Create world
-  const world = new WorldImpl();
+  const world = new World();
 
   // Create systems (no registry - systems are called manually)
   const factoryAISystem = new FactoryAISystem();

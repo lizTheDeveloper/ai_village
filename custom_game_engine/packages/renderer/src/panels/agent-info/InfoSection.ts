@@ -16,6 +16,34 @@ import type {
 } from './types.js';
 import type { PersonalGoal, SpiritualComponent, SoulIdentityComponent, DeityComponent, Component } from '@ai-village/core';
 import { ComponentType as CT } from '@ai-village/core';
+
+/** Type guard for ActionQueue component with methods */
+interface ActionQueueWithMethods extends Component {
+  isEmpty(): boolean;
+  size(): number;
+  peek(): QueuedAction | undefined;
+  queue: QueuedAction[];
+}
+
+/** Queued action from ActionQueue */
+interface QueuedAction {
+  type: string;
+  priority?: number;
+  targetId?: string;
+  targetPos?: { x: number; y: number };
+  [key: string]: unknown;
+}
+
+/** Type guard to check if component is an ActionQueue with methods */
+function isActionQueue(component: Component | undefined): component is ActionQueueWithMethods {
+  if (!component) return false;
+  return (
+    typeof (component as any).isEmpty === 'function' &&
+    typeof (component as any).size === 'function' &&
+    typeof (component as any).peek === 'function' &&
+    Array.isArray((component as any).queue)
+  );
+}
 import {
   wrapText,
   renderWrappedText,
@@ -566,8 +594,7 @@ export class InfoSection {
 
     // Action Queue section
     const actionQueue = entity.components.get('action_queue') as Component | undefined;
-    const queueWithMethods = actionQueue as unknown as { isEmpty?: () => boolean };
-    if (actionQueue && queueWithMethods.isEmpty && !queueWithMethods.isEmpty()) {
+    if (actionQueue && isActionQueue(actionQueue) && !actionQueue.isEmpty()) {
       currentY = this.renderActionQueue(ctx, x, currentY, actionQueue, padding, lineHeight);
     }
 
@@ -887,7 +914,7 @@ export class InfoSection {
     ctx: CanvasRenderingContext2D,
     panelX: number,
     y: number,
-    actionQueue: Component,
+    actionQueue: ActionQueueWithMethods,
     padding: number,
     lineHeight: number
   ): number {
@@ -897,23 +924,18 @@ export class InfoSection {
     ctx.font = 'bold 12px monospace';
     ctx.fillStyle = '#FFAA00';
 
-    const queueWithMethods = actionQueue as unknown as {
-      size?: () => number;
-      queue?: unknown[];
-    };
-
-    const queueSize = queueWithMethods.size?.() ?? 0;
+    const queueSize = actionQueue.size();
     ctx.fillText(`⚙️ Action Queue (${queueSize})`, panelX + padding, y);
     y += lineHeight + 5;
 
     // Get all actions by accessing the internal queue field
     // Since this is a UI display, we'll peek at the internal state
-    const actions = (queueWithMethods.queue as unknown[]) || [];
+    const actions = actionQueue.queue;
     const maxItems = Math.min(5, actions.length);
 
     ctx.font = '11px monospace';
     for (let i = 0; i < maxItems; i++) {
-      const action = actions[i] as Record<string, unknown>;
+      const action = actions[i];
       if (!action) continue;
 
       const isCurrent = i === 0;
@@ -925,7 +947,7 @@ export class InfoSection {
 
       ctx.fillStyle = isCurrent ? '#00FF00' : '#FFFFFF';
 
-      const actionType = (action.type as string) || 'unknown';
+      const actionType = action.type || 'unknown';
       const actionName = actionType.replace('_', ' ');
       const priorityText = action.priority ? ` [P${action.priority}]` : '';
       const statusIcon = isCurrent ? '▶' : '·';
@@ -937,11 +959,9 @@ export class InfoSection {
       // Show target if available
       if (action.targetId || action.targetPos) {
         ctx.fillStyle = '#888888';
-        const targetId = action.targetId as string | undefined;
-        const targetPos = action.targetPos as { x: number; y: number } | undefined;
-        const target = targetId
-          ? `ID: ${targetId.substring(0, 8)}`
-          : `Pos: (${targetPos?.x?.toFixed(0)}, ${targetPos?.y?.toFixed(0)})`;
+        const target = action.targetId
+          ? `ID: ${action.targetId.substring(0, 8)}`
+          : `Pos: (${action.targetPos?.x?.toFixed(0)}, ${action.targetPos?.y?.toFixed(0)})`;
         ctx.fillText(`  ${target}`, panelX + padding + 5, y);
         y += 12;
       }
@@ -1101,39 +1121,17 @@ export class InfoSection {
 
     // Check action queue for targetPos
     const actionQueue = entity.components.get('action_queue') as Component | undefined;
-    if (actionQueue) {
-      let actions: unknown[] = [];
-
-      const queueWithMethods = actionQueue as unknown as {
-        peek?: () => unknown;
-        isEmpty?: () => boolean;
-        queue?: unknown[];
-        _queue?: unknown[];
-        actions?: unknown[];
-      };
-
-      if (typeof queueWithMethods.peek === 'function') {
-        const current = queueWithMethods.peek();
-        if (current) actions = [current];
-      } else if (Array.isArray(queueWithMethods.queue)) {
-        actions = queueWithMethods.queue;
-      } else if (typeof queueWithMethods.isEmpty === 'function' && !queueWithMethods.isEmpty()) {
-        actions = queueWithMethods._queue || queueWithMethods.actions || [];
-      }
-
-      if (actions.length > 0) {
-        const currentAction = actions[0] as Record<string, unknown>;
-        const targetPos = currentAction?.targetPos as { x: number; y: number } | undefined;
-        if (targetPos) {
-          const targetInfo = this.findTargetEntityName(targetPos, world);
-          const actionType = (currentAction.type as string) || targetInfo.type;
-          return {
-            x: targetPos.x,
-            y: targetPos.y,
-            name: targetInfo.name,
-            type: actionType,
-          };
-        }
+    if (actionQueue && isActionQueue(actionQueue)) {
+      const currentAction = actionQueue.peek();
+      if (currentAction?.targetPos) {
+        const targetInfo = this.findTargetEntityName(currentAction.targetPos, world);
+        const actionType = currentAction.type || targetInfo.type;
+        return {
+          x: currentAction.targetPos.x,
+          y: currentAction.targetPos.y,
+          name: targetInfo.name,
+          type: actionType,
+        };
       }
     }
 

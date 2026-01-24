@@ -20,20 +20,23 @@ export interface DominanceRankComponent extends Component {
   canChallengeAbove: boolean;
 }
 
-export function createDominanceRankComponent(data: {
-  rank: number;
-  subordinates?: EntityId[];
-  canChallengeAbove?: boolean;
-}): DominanceRankComponent {
-  if (data.rank === undefined) {
+/** Input type for factory use - accepts unknown values with runtime validation */
+export type DominanceRankInput = Record<string, unknown>;
+
+export function createDominanceRankComponent(data: DominanceRankInput): DominanceRankComponent {
+  const rank = data.rank as number | undefined;
+  const subordinates = data.subordinates as EntityId[] | undefined;
+  const canChallengeAbove = data.canChallengeAbove as boolean | undefined;
+
+  if (rank === undefined) {
     throw new Error('Rank is required');
   }
 
   return {
     type: 'dominance_rank',
     version: 1,
-    rank: data.rank,
-    subordinates: data.subordinates || [],
-    canChallengeAbove: data.canChallengeAbove !== undefined ? data.canChallengeAbove : true,
+    rank,
+    subordinates: subordinates || [],
+    canChallengeAbove: canChallengeAbove !== undefined ? canChallengeAbove : true,
   };
 }

@@ -3,7 +3,7 @@
  * Demonstrates complete production chains with visualization.
  */
 
-import { WorldImpl } from '../packages/core/dist/index.js';
+import { World } from '../packages/core/dist/index.js';
 import { EventBusImpl } from '../packages/core/dist/index.js';
 import type { EntityImpl } from '../packages/core/dist/index.js';
 import { CraftingSystem } from '../packages/core/dist/crafting/CraftingSystem.js';
@@ -100,7 +100,7 @@ class FactorySimulation {
 
   constructor() {
     const eventBus = new EventBusImpl();
-    this.world = new WorldImpl(eventBus);
+    this.world = new World(eventBus);
 
     this.craftingSystem = new CraftingSystem();
     const recipeRegistry = new RecipeRegistry();

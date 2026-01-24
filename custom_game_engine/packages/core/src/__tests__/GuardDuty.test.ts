@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World';
+import { World } from '../ecs/World';
 import { GuardDutySystem } from '../systems/GuardDutySystem';
 import { Entity } from '../ecs/Entity';
 import { EventBusImpl, type EventBus } from '../events/EventBus';

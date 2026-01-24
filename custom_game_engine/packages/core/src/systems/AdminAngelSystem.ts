@@ -27,6 +27,7 @@ import {
   popPendingObservation,
 } from '../components/AdminAngelComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
+import { createTagsComponent } from '../components/TagsComponent.js';
 import { generateRandomName } from '../utils/nameGenerator.js';
 
 // ============================================================================
@@ -216,7 +217,13 @@ export class AdminAngelSystem extends BaseSystem {
     if (this.llmQueue) {
       try {
         console.error(`[AdminAngelSystem] Calling LLM queue with tier=high for ${agentId}`);
-        const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
+        // Queue the request (fire-and-forget, returns Promise<void>)
+        await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
+        // Retrieve the decision
+        const response = this.llmQueue.getDecision(agentId);
+        if (!response) {
+          throw new Error('No decision available from LLM queue');
+        }
         // Strip thinking tags if present (qwen models use them)
         return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       } catch (error) {
@@ -1362,6 +1369,9 @@ export function spawnAdminAngel(
   // Add identity for chat display
   // Note: Using deity species since angels are divine entities
   entity.addComponent(createIdentityComponent(name, 'deity', 0));
+
+  // Add deity tag so angel joins divine_chat room (criteria: 'tag:deity')
+  entity.addComponent(createTagsComponent('deity'));
 
   world.addEntity(entity);
 

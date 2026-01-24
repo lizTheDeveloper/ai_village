@@ -22,6 +22,7 @@ export default defineConfig({
     alias: {
       '@village/core': path.resolve(__dirname, './packages/core/src'),
       '@ai-village/core': path.resolve(__dirname, './packages/core/src'),
+      '@ai-village/agents': path.resolve(__dirname, './packages/agents/src'),
       '@ai-village/world': path.resolve(__dirname, './packages/world/src'),
       '@ai-village/renderer': path.resolve(__dirname, './packages/renderer/src'),
       '@ai-village/llm': path.resolve(__dirname, './packages/llm/src'),

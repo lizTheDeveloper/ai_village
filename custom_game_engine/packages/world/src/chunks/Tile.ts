@@ -507,14 +507,28 @@ export type BiomeType =
  * Create a default tile.
  * NOTE: This creates a temporary tile structure. Biome MUST be set by terrain generation.
  * Per CLAUDE.md: Tiles without biomes should not be used for farming operations.
+ *
+ * PERFORMANCE: All properties (including optional ones) are initialized to ensure
+ * consistent object shape for V8 hidden class optimization. This prevents
+ * megamorphic property access when tiles are modified later.
  */
 export function createDefaultTile(): Tile {
   return {
     terrain: 'grass',
-    // biome is intentionally undefined - MUST be set by TerrainGenerator
+    floor: undefined,         // V8: Initialize optional to maintain shape
     elevation: 0,
+    neighbors: createEmptyNeighbors(),
     moisture: 50,
     fertility: 50,
+    biome: undefined,         // MUST be set by TerrainGenerator
+
+    // Tile-based building system (V8: pre-initialize for shape consistency)
+    wall: undefined,
+    door: undefined,
+    window: undefined,
+    roof: undefined,
+
+    // Soil management
     tilled: false,
     plantability: 0,
     nutrients: {
@@ -529,8 +543,13 @@ export function createDefaultTile(): Tile {
     composted: false,
     plantId: null,
 
-    // Neighbors initialized to null, will be linked by ChunkManager
-    neighbors: createEmptyNeighbors(),
+    // Fluid & mining systems (V8: pre-initialize for shape consistency)
+    fluid: undefined,
+    oceanZone: undefined,
+    mineable: undefined,
+    embeddedResource: undefined,
+    resourceAmount: undefined,
+    ceilingSupported: undefined,
   };
 }
 

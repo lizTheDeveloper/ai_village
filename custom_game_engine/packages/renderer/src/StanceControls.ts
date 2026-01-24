@@ -1,6 +1,18 @@
 import type { EventBus, Entity, Component } from '@ai-village/core';
 
 /**
+ * Type guard to check if a component has a stance property
+ */
+function hasStance(component: Component): component is Component & { stance: string } {
+  return (
+    typeof component === 'object' &&
+    component !== null &&
+    'stance' in component &&
+    typeof (component as { stance: unknown }).stance === 'string'
+  );
+}
+
+/**
  * StanceControls - UI controls for setting combat stances
  *
  * REQ-COMBAT-004: Stance Controls
@@ -50,16 +62,16 @@ export class StanceControls {
       this.currentStance = 'passive';
     } else if (entities.length === 1 && entities[0]) {
       const conflict = entities[0].components.get('conflict') as Component | undefined;
-      if (conflict && (conflict as unknown as { stance?: string }).stance) {
-        this.currentStance = (conflict as unknown as { stance: string }).stance;
+      if (conflict && hasStance(conflict)) {
+        this.currentStance = conflict.stance;
       }
     } else {
       // Check if all entities have the same stance
       const stances = new Set<string>();
       for (const entity of entities) {
         const conflict = entity.components.get('conflict') as Component | undefined;
-        if (conflict && (conflict as unknown as { stance?: string }).stance) {
-          stances.add((conflict as unknown as { stance: string }).stance);
+        if (conflict && hasStance(conflict)) {
+          stances.add(conflict.stance);
         }
       }
 

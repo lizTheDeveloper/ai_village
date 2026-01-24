@@ -2,7 +2,7 @@
  * Test script to verify LLM decisions are actually being made after the fix
  */
 
-import { WorldImpl } from '../packages/core/src/ecs/World.js';
+import { World } from '../packages/core/src/ecs/World.js';
 import { AgentBrainSystem } from '../packages/core/src/systems/AgentBrainSystem.js';
 import { LLMScheduler, LLMDecisionQueue } from '../packages/llm/src/index.js';
 import { ScheduledDecisionProcessor } from '../packages/core/src/decision/ScheduledDecisionProcessor.js';
@@ -15,7 +15,7 @@ async function testLLMFix() {
 
   // Create world and systems
   const eventBus = new EventBusImpl();
-  const world = new WorldImpl(eventBus);
+  const world = new World(eventBus);
 
   // Initialize LLM provider
   const provider = new OpenAICompatProvider({

@@ -76,7 +76,7 @@ export class GameBridge {
 
   constructor() {
     // Create view-only components (NO SIMULATION)
-    this.viewWorld = new WorldImpl();
+    this.viewWorld = new World();
     this.viewActionQueue = new ActionQueue();
     this.viewSystemRegistry = new SystemRegistry();
     this.universeClient = new UniverseClient();

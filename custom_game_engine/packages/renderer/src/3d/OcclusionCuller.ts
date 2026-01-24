@@ -291,11 +291,19 @@ export class OcclusionCuller {
 
       // Get chunk occlusion data
       const data = this.chunkData.get(key);
-      if (!data) continue; // Unknown chunk, assume visible
 
-      // Find which faces we can see from entry face
-      const exitFaces = data.faceConnections.get(entryFace);
-      if (!exitFaces) continue;
+      // If no occlusion data, assume fully passable (can see through to all faces)
+      // This handles newly loaded chunks that haven't been analyzed yet
+      let exitFaces: Set<Face>;
+      if (!data) {
+        // Unknown chunk - assume all faces connect (fully passable)
+        exitFaces = new Set(['+X', '-X', '+Z', '-Z'] as Face[]);
+      } else {
+        // Find which faces we can see from entry face
+        const connections = data.faceConnections.get(entryFace);
+        if (!connections) continue;
+        exitFaces = connections;
+      }
 
       // Propagate to neighbors through visible faces
       exitFaces.forEach((exitFace) => {

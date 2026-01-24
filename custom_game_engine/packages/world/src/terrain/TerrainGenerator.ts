@@ -1971,12 +1971,22 @@ export class TerrainGenerator {
       };
     }
 
+    // V8 OPTIMIZATION: Always return object with identical shape for hidden class consistency.
+    // All optional properties must be explicitly set (to value or undefined) in same order.
     return {
       terrain: mappedTerrain,
-      biome,
+      floor: undefined, // V8: Initialize for consistent shape
       elevation: tileElevation,
+      neighbors: createEmptyNeighbors(),
       moisture: Math.max(0, Math.min(100, normalizedMoisture * 100)),
       fertility: Math.max(0, Math.min(100, fertility * 100)),
+      biome,
+      // Tile-based building system (V8: pre-initialize for shape consistency)
+      wall: undefined,
+      door: undefined,
+      window: undefined,
+      roof: undefined,
+      // Soil management
       tilled: false,
       plantability: 0,
       nutrients: {
@@ -1990,11 +2000,13 @@ export class TerrainGenerator {
       lastTilled: 0,
       composted: false,
       plantId: null,
-      ...(finalFluid && { fluid: finalFluid }), // Include fluid layer if present
-      ...(finalOceanZone && { oceanZone: finalOceanZone }), // Include ocean zone for water tiles
-
-      // Neighbors will be linked by ChunkManager after generation
-      neighbors: createEmptyNeighbors(),
+      // Fluid & mining systems (V8: always set, even if undefined)
+      fluid: finalFluid || undefined,
+      oceanZone: finalOceanZone || undefined,
+      mineable: undefined,
+      embeddedResource: undefined,
+      resourceAmount: undefined,
+      ceilingSupported: undefined,
     };
   }
 

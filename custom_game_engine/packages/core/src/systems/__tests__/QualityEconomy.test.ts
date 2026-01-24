@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl, type Entity } from '../../ecs/World.js';
+import { World, type Entity } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { TradingSystem } from '../TradingSystem';
 import { ComponentType } from '../../types/ComponentType.js';

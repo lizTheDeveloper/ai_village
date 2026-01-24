@@ -51,63 +51,66 @@ export interface ConflictComponent extends Component {
   lethal?: boolean;
 }
 
-export function createConflictComponent(data: {
-  conflictType: ConflictComponent['conflictType'];
-  target: EntityId;
-  state: string;
-  startTime: number;
-  endTime?: number;
-  huntingState?: ConflictComponent['huntingState'];
-  cause?: string;
-  surprise?: boolean;
-  modifiers?: Array<{ type: string; value: number }>;
-  attackerPower?: number;
-  defenderPower?: number;
-  outcome?: ConflictComponent['outcome'];
-  winner?: EntityId;
-  combatants?: EntityId[];
-  trigger?: ConflictComponent['trigger'];
-  metadata?: Record<string, any>;
-  method?: ConflictComponent['method'];
-  targetFollower?: EntityId;
-  consequence?: ConflictComponent['consequence'];
-  lethal?: boolean;
-}): ConflictComponent {
-  if (!data.conflictType) {
+/** Input type for factory use - accepts unknown values with runtime validation */
+export type ConflictInput = Record<string, unknown>;
+
+export function createConflictComponent(data: ConflictInput): ConflictComponent {
+  const conflictType = data.conflictType as ConflictComponent['conflictType'] | undefined;
+  const target = data.target as EntityId | undefined;
+  const state = data.state as string | undefined;
+  const startTime = data.startTime as number | undefined;
+  const endTime = data.endTime as number | undefined;
+  const huntingState = data.huntingState as ConflictComponent['huntingState'] | undefined;
+  const cause = data.cause as string | undefined;
+  const surprise = data.surprise as boolean | undefined;
+  const modifiers = data.modifiers as Array<{ type: string; value: number }> | undefined;
+  const attackerPower = data.attackerPower as number | undefined;
+  const defenderPower = data.defenderPower as number | undefined;
+  const outcome = data.outcome as ConflictComponent['outcome'] | undefined;
+  const winner = data.winner as EntityId | undefined;
+  const combatants = data.combatants as EntityId[] | undefined;
+  const trigger = data.trigger as ConflictComponent['trigger'] | undefined;
+  const metadata = data.metadata as Record<string, unknown> | undefined;
+  const method = data.method as ConflictComponent['method'] | undefined;
+  const targetFollower = data.targetFollower as EntityId | undefined;
+  const consequence = data.consequence as ConflictComponent['consequence'] | undefined;
+  const lethal = data.lethal as boolean | undefined;
+
+  if (!conflictType) {
     throw new Error('Conflict type is required');
   }
-  if (!data.target) {
+  if (!target) {
     throw new Error('Conflict target is required');
   }
-  if (data.state === undefined) {
+  if (state === undefined) {
     throw new Error('Conflict state is required');
   }
-  if (data.startTime === undefined) {
+  if (startTime === undefined) {
     throw new Error('Conflict start time is required');
   }
 
   return {
     type: 'conflict',
     version: 1,
-    conflictType: data.conflictType,
-    target: data.target,
-    state: data.state,
-    startTime: data.startTime,
-    endTime: data.endTime,
-    huntingState: data.huntingState,
-    cause: data.cause,
-    surprise: data.surprise,
-    modifiers: data.modifiers,
-    attackerPower: data.attackerPower,
-    defenderPower: data.defenderPower,
-    outcome: data.outcome,
-    winner: data.winner,
-    combatants: data.combatants,
-    trigger: data.trigger,
-    metadata: data.metadata,
-    method: data.method,
-    targetFollower: data.targetFollower,
-    consequence: data.consequence,
-    lethal: data.lethal,
+    conflictType,
+    target,
+    state,
+    startTime,
+    endTime,
+    huntingState,
+    cause,
+    surprise,
+    modifiers,
+    attackerPower,
+    defenderPower,
+    outcome,
+    winner,
+    combatants,
+    trigger,
+    metadata,
+    method,
+    targetFollower,
+    consequence,
+    lethal,
   };
 }

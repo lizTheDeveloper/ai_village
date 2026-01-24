@@ -18,6 +18,7 @@ import type { World } from '@ai-village/core';
 import {
   type ResearchStateComponent,
   type SkillsComponent,
+  type SkillId,
   type IdentityComponent,
   type TagsComponent,
   type NeedsComponent,
@@ -2134,8 +2135,8 @@ export class DevPanel implements IWindowPanel {
         if (skillNames.length === 0) continue;
 
         // Grant XP to a random skill
-        const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
-        const currentLevel = (skills.levels as any)[randomSkill] || 0;
+        const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]! as SkillId;
+        const currentLevel = skills.levels[randomSkill] ?? 0;
         const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
 
         // Update the skill component
@@ -2296,13 +2297,24 @@ export class DevPanel implements IWindowPanel {
               break;
             }
 
+            // Type guard for AngelSystem with createAngel method
+            interface AngelSystemWithCreate {
+              createAngel(
+                deityId: string,
+                world: World,
+                rank: string,
+                purpose: string,
+                options: { autonomousAI?: boolean; tier?: number; name?: string }
+              ): unknown;
+            }
+
             // Create angel (messenger rank, autonomous AI)
-            const angel = (angelSystem as any).createAngel(
+            const angel = (angelSystem as AngelSystemWithCreate).createAngel(
               deity.id,
               this.world,
               'messenger',
               'deliver_messages',
-              true
+              { autonomousAI: true }
             );
 
             if (angel) {
@@ -2467,14 +2479,33 @@ export class DevPanel implements IWindowPanel {
   private placeBlueprintForConstruction(worldX: number, worldY: number): void {
     if (!this.world || !this.selectedBlueprintId) return;
 
+    // Type guard for TileConstructionSystem with required methods
+    interface TileConstructionSystemWithMethods {
+      createTask(
+        world: World,
+        blueprintId: string,
+        x: number,
+        y: number,
+        rotation: number
+      ): { id: string };
+      startTask(world: World, taskId: string): void;
+    }
+
     // Get TileConstructionSystem from world
-    const tileConstructionSystem = this.world.getSystem?.('tile_construction') as any;
+    const tileConstructionSystem = this.world.getSystem?.('tile_construction');
     if (!tileConstructionSystem) {
       throw new Error('TileConstructionSystem not found in world');
     }
 
+    // Type guard check
+    if (!('createTask' in tileConstructionSystem) || !('startTask' in tileConstructionSystem)) {
+      throw new Error('TileConstructionSystem missing required methods');
+    }
+
+    const typedSystem = tileConstructionSystem as TileConstructionSystemWithMethods;
+
     // Create construction task
-    const task = tileConstructionSystem.createTask(
+    const task = typedSystem.createTask(
       this.world,
       this.selectedBlueprintId,
       Math.floor(worldX),
@@ -2483,7 +2514,7 @@ export class DevPanel implements IWindowPanel {
     );
 
     // Start the task
-    tileConstructionSystem.startTask(this.world, task.id);
+    typedSystem.startTask(this.world, task.id);
 
     this.log(`Placed blueprint: ${this.selectedBlueprintId} at (${Math.floor(worldX)}, ${Math.floor(worldY)}) - Agents will build`);
   }
@@ -2596,8 +2627,8 @@ export class DevPanel implements IWindowPanel {
         return;
       }
 
-      const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
-      const currentLevel = (skills.levels as any)[randomSkill] || 0;
+      const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]! as SkillId;
+      const currentLevel = skills.levels[randomSkill] ?? 0;
       const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
 
       // Update the skill component
@@ -2836,26 +2867,33 @@ export class DevPanel implements IWindowPanel {
         const testEntity = schema.createDefault();
 
         // Set some interesting test values for specific components
-        // Type assertion to Record for property access since we're dynamically setting test values
-        const entityRecord = testEntity as unknown as Record<string, unknown>;
-
+        // Use type guards to safely set test values
         if (this.selectedIntrospectionComponent === 'identity' && 'name' in testEntity) {
-          entityRecord.name = 'Test Entity';
-          entityRecord.age = 1000;
-          entityRecord.species = 'elf';
+          // Type guard: if name exists, we can safely treat it as an object with those properties
+          if (typeof testEntity === 'object' && testEntity !== null) {
+            (testEntity as { name: string; age: number; species: string }).name = 'Test Entity';
+            (testEntity as { name: string; age: number; species: string }).age = 1000;
+            (testEntity as { name: string; age: number; species: string }).species = 'elf';
+          }
         } else if (this.selectedIntrospectionComponent === 'personality' && 'openness' in testEntity) {
-          entityRecord.openness = 0.9;
-          entityRecord.agreeableness = 0.8;
-          entityRecord.spirituality = 0.7;
+          if (typeof testEntity === 'object' && testEntity !== null) {
+            (testEntity as { openness: number; agreeableness: number; spirituality: number }).openness = 0.9;
+            (testEntity as { openness: number; agreeableness: number; spirituality: number }).agreeableness = 0.8;
+            (testEntity as { openness: number; agreeableness: number; spirituality: number }).spirituality = 0.7;
+          }
         } else if (this.selectedIntrospectionComponent === 'skills' && 'levels' in testEntity) {
-          const levels = entityRecord.levels as Record<string, number>;
-          levels.exploration = 5;
-          levels.crafting = 4;
-          levels.farming = 3;
+          if (typeof testEntity === 'object' && testEntity !== null && 'levels' in testEntity) {
+            const levels = (testEntity as { levels: Record<string, number> }).levels;
+            levels.exploration = 5;
+            levels.crafting = 4;
+            levels.farming = 3;
+          }
         } else if (this.selectedIntrospectionComponent === 'needs' && 'hunger' in testEntity) {
-          entityRecord.hunger = 0.3;
-          entityRecord.energy = 0.4;
-          entityRecord.socialContact = 0.2;
+          if (typeof testEntity === 'object' && testEntity !== null) {
+            (testEntity as { hunger: number; energy: number; socialContact: number }).hunger = 0.3;
+            (testEntity as { hunger: number; energy: number; socialContact: number }).energy = 0.4;
+            (testEntity as { hunger: number; energy: number; socialContact: number }).socialContact = 0.2;
+          }
         }
 
         this.introspectionTestEntities.set(this.selectedIntrospectionComponent, testEntity);
@@ -2867,9 +2905,9 @@ export class DevPanel implements IWindowPanel {
           (fieldName: string, newValue: unknown) => {
             // Update the test entity
             const entity = this.introspectionTestEntities.get(this.selectedIntrospectionComponent);
-            if (entity) {
-              const entityRecord = entity as Record<string, unknown>;
-              entityRecord[fieldName] = newValue;
+            if (entity && typeof entity === 'object' && entity !== null && fieldName in entity) {
+              // Safe property assignment with runtime check
+              (entity as Record<string, unknown>)[fieldName] = newValue;
               this.log(`Updated ${this.selectedIntrospectionComponent}.${fieldName} to ${newValue}`);
             }
           }
