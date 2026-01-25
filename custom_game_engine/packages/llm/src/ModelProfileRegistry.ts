@@ -75,7 +75,8 @@ export class ModelProfileRegistry {
 
   constructor() {
     // Load default profile from JSON
-    const defaultData = modelProfilesData.defaultProfile as any;
+    const data = modelProfilesData as ModelProfilesData;
+    const defaultData = data.defaultProfile;
     this.defaultProfile = {
       ...defaultData,
       modelPattern: new RegExp(defaultData.modelPattern, 'i')
@@ -89,7 +90,8 @@ export class ModelProfileRegistry {
    * Register all built-in model profiles from JSON data.
    */
   private registerBuiltInProfiles(): void {
-    const profiles = modelProfilesData.profiles as any[];
+    const data = modelProfilesData as ModelProfilesData;
+    const profiles = data.profiles;
 
     // Profiles are already in the correct order in JSON (most specific first)
     for (const profileData of profiles) {

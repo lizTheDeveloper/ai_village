@@ -11,6 +11,45 @@ import type { PersonalityComponent } from '@ai-village/core';
 import personalityVariationsData from '../data/personality-variations.json';
 
 /**
+ * Type definition for the personality-variations.json structure
+ */
+interface PersonalityVariationsData {
+  openness: {
+    very_high: string[];
+    high: string[];
+    low: string[];
+  };
+  extraversion: {
+    very_high: string[];
+    high: string[];
+    low: string[];
+  };
+  agreeableness: {
+    very_high: string[];
+    high: string[];
+    low: string[];
+  };
+  workEthic: {
+    very_high: string[];
+    high: string[];
+    low: string[];
+  };
+  leadership: {
+    very_high: string[];
+    high: string[];
+    low: string[];
+  };
+  creativity: {
+    high: string[];
+    low: string[];
+  };
+  neuroticism: {
+    high: string[];
+    low: string[];
+  };
+}
+
+/**
  * Simple string hash function for consistent variation selection.
  */
 function hashString(str: string): number {

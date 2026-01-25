@@ -420,8 +420,8 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   setPriorities(priorities: StrategicPriorities): void {
-    this.cityManager.setPriorities(priorities as any);
-    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities as any);
+    this.cityManager.setPriorities(priorities);
+    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
     this.emit('priorities-changed', priorities);
   }
 
@@ -440,7 +440,7 @@ export class HeadlessCitySimulator {
   // ---------------------------------------------------------------------------
 
   getWorld(): World {
-    return this.gameLoop.world as any;
+    return this.gameLoop.world;
   }
 
   getCityManager(): CityManager {

@@ -92,7 +92,13 @@ export interface EntityVisibilityRequirement {
  * Entity type to visibility requirements mapping.
  * Empty array = visible to everyone (no skill required).
  */
-export const ENTITY_VISIBILITY_MAP: Record<string, EntityVisibilityRequirement[]> = skillsData.entityVisibilityMap as any;
+export const ENTITY_VISIBILITY_MAP: Record<string, EntityVisibilityRequirement[]> = ((): Record<string, EntityVisibilityRequirement[]> => {
+  // Type guard: validate that skillsData.entityVisibilityMap is an object
+  if (typeof skillsData.entityVisibilityMap !== 'object' || skillsData.entityVisibilityMap === null) {
+    throw new Error('skillsData.entityVisibilityMap must be an object');
+  }
+  return skillsData.entityVisibilityMap as Record<string, EntityVisibilityRequirement[]>;
+})();
 
 /**
  * Check if an entity type is visible with given skill level.

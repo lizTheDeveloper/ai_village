@@ -769,7 +769,13 @@ export function getSpecializationBonus(
  * Default specializations by skill.
  * Each skill can have multiple methods/approaches.
  */
-export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = skillsData.skillSpecializations as any;
+export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = ((): Record<SkillId, string[]> => {
+  // Type guard: validate that skillsData.skillSpecializations is an object
+  if (typeof skillsData.skillSpecializations !== 'object' || skillsData.skillSpecializations === null) {
+    throw new Error('skillsData.skillSpecializations must be an object');
+  }
+  return skillsData.skillSpecializations as Record<SkillId, string[]>;
+})();
 
 /**
  * Get signature task (best/most practiced task) for a skill domain.

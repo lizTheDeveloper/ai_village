@@ -41,26 +41,32 @@ async function main() {
   console.log('\n=== EMPIRE DETAILS ===\n');
   const empires = world.query().with(CT.Empire).executeEntities();
   for (const e of empires) {
-    const emp = e.getComponent(CT.Empire) as any;
-    console.log(`👑 ${emp?.empireName}:`);
-    console.log(`   Nations linked: ${emp?.territory?.nations?.length || 0}`);
-    console.log(`   Nation records: ${emp?.nationRecords?.length || 0}`);
-    console.log(`   Treasury: ${emp?.economy?.imperialTreasury?.toLocaleString()}`);
-    console.log(`   Total population: ${emp?.territory?.totalPopulation?.toLocaleString()}`);
-    if (emp?.nationRecords?.length > 0) {
-      console.log(`   First nation: ${emp.nationRecords[0].nationName} (GDP: ${emp.nationRecords[0].gdp?.toLocaleString()})`);
+    const component = e.getComponent(CT.Empire);
+    if (component && component.type === 'empire') {
+      const emp = component as import('@ai-village/core').EmpireComponent;
+      console.log(`👑 ${emp.empireName}:`);
+      console.log(`   Nations linked: ${emp.territory.nations.length || 0}`);
+      console.log(`   Nation records: ${emp.nationRecords.length || 0}`);
+      console.log(`   Treasury: ${emp.economy.imperialTreasury.toLocaleString()}`);
+      console.log(`   Total population: ${emp.territory.totalPopulation.toLocaleString()}`);
+      if (emp.nationRecords.length > 0) {
+        console.log(`   First nation: ${emp.nationRecords[0].nationName} (GDP: ${emp.nationRecords[0].gdp?.toLocaleString()})`);
+      }
     }
   }
 
   console.log('\n=== NAVY DETAILS ===\n');
   const navies = world.query().with(CT.Navy).executeEntities();
   for (const e of navies) {
-    const nav = e.getComponent(CT.Navy) as any;
-    console.log(`⚓ ${nav?.name}:`);
-    console.log(`   Armadas: ${nav?.assets?.armadaIds?.length || 0}`);
-    console.log(`   Total ships: ${nav?.assets?.totalShips || 0}`);
-    console.log(`   Total crew: ${nav?.assets?.totalCrew || 0}`);
-    console.log(`   Budget: ${nav?.budget?.toLocaleString()}`);
+    const component = e.getComponent(CT.Navy);
+    if (component && component.type === 'navy') {
+      const nav = component as import('@ai-village/core').NavyComponent;
+      console.log(`⚓ ${nav.name}:`);
+      console.log(`   Armadas: ${nav.assets.armadaIds.length || 0}`);
+      console.log(`   Total ships: ${nav.assets.totalShips || 0}`);
+      console.log(`   Total crew: ${nav.assets.totalCrew || 0}`);
+      console.log(`   Budget: ${nav.budget.toLocaleString()}`);
+    }
   }
 
   console.log('\n=== SHIP DETAILS ===\n');
