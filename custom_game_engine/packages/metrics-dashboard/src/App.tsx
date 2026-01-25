@@ -7,7 +7,15 @@ import SpatialView from './components/SpatialView';
 import InequalityView from './components/InequalityView';
 import CulturalDiffusionView from './components/CulturalDiffusionView';
 import TimeSeriesView from './components/TimeSeriesView';
-import { useMetricsStore } from './store/metricsStore';
+import {
+  useMetricsStore,
+  type NetworkData,
+  type TimelineData,
+  type SpatialData,
+  type InequalityData,
+  type CulturalData,
+  type TimeSeriesData,
+} from './store/metricsStore';
 import { getWebSocket } from './utils/websocket';
 import { apiClient } from './utils/apiClient';
 
@@ -81,12 +89,12 @@ function App() {
             apiClient.getTimeSeriesMetrics(),
           ]);
 
-        setNetworkData(network as any);
-        setTimelineData(timeline as any);
-        setSpatialData(spatial as any);
-        setInequalityData(inequality as any);
-        setCulturalData(cultural as any);
-        setTimeSeriesData(timeseries as any);
+        setNetworkData(network as NetworkData | null);
+        setTimelineData(timeline as TimelineData | null);
+        setSpatialData(spatial as SpatialData | null);
+        setInequalityData(inequality as InequalityData | null);
+        setCulturalData(cultural as CulturalData | null);
+        setTimeSeriesData(timeseries as TimeSeriesData | null);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to load data');
       } finally {
