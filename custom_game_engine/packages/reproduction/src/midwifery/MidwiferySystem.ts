@@ -156,8 +156,11 @@ export class MidwiferySystem extends BaseSystem {
     }
 
     // Subscribe to conception events using the events manager
-    this.events.subscribe('conception', (event: any) => {
-      this.handleConception(event.data);
+    this.events.subscribe('conception', (event: unknown) => {
+      const e = event as { data?: { pregnantAgentId: string; otherParentId: string; conceptionTick: number; expectedOffspringCount?: number } };
+      if (e.data) {
+        this.handleConception(e.data);
+      }
     });
 
     // Build initial caches for O(1) component access
@@ -236,32 +239,32 @@ export class MidwiferySystem extends BaseSystem {
 
     // Rebuild caches periodically to sync with entity changes (every 10 updates = 50 seconds)
     if (currentTick % (this.UPDATE_INTERVAL * 10) === 0) {
-      this.rebuildCaches(ctx.world as any);
+      this.rebuildCaches(ctx.world);
     }
 
     // Update all pregnant entities
     if (this.pregnancyCache.size > 0) {
-      this.updatePregnancies(ctx.world as any, currentTick, deltaTicks);
+      this.updatePregnancies(ctx.world, currentTick, deltaTicks);
     }
 
     // Update all entities in labor
     if (this.laborCache.size > 0) {
-      this.updateLabors(ctx.world as any, currentTick, deltaTicks);
+      this.updateLabors(ctx.world, currentTick, deltaTicks);
     }
 
     // Update postpartum recovery
     if (this.postpartumCache.size > 0) {
-      this.updatePostpartum(ctx.world as any, deltaTicks);
+      this.updatePostpartum(ctx.world, deltaTicks);
     }
 
     // Update infants
     if (this.infantCache.size > 0) {
-      this.updateInfants(ctx.world as any, currentTick, deltaTicks);
+      this.updateInfants(ctx.world, currentTick, deltaTicks);
     }
 
     // Update nursing mothers
     if (this.nursingCache.size > 0) {
-      this.updateNursing(ctx.world as any, currentTick, deltaTicks);
+      this.updateNursing(ctx.world, currentTick, deltaTicks);
     }
   }
 
