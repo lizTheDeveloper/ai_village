@@ -2,7 +2,7 @@
  * WorldSerializer - Serializes/deserializes entire World instances
  */
 
-import type { WorldMutator } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';

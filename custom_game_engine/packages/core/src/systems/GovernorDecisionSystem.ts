@@ -742,7 +742,7 @@ export class GovernorDecisionSystem extends BaseSystem {
   private buildGovernorPrompt(
     governor: EntityImpl,
     govComp: GovernorComponent,
-    context: Record<string, unknown>
+    context: GovernorContext
   ): string {
     // Build personality context (if available)
     const personalityContext = this.buildPersonalityContext(governor, govComp);
