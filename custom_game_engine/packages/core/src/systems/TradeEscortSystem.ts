@@ -179,8 +179,8 @@ export class TradeEscortSystem extends BaseSystem {
 
     // For now, we'll add escort metadata to the agreement structure
     // In practice, this would be part of TradeAgreement interface
-    const metadata = agreement.crossRealmMetadata as any;
-    if (!metadata.escort) return undefined;
+    const metadata = agreement.crossRealmMetadata;
+    if (!metadata?.escort) return undefined;
 
     return metadata.escort;
   }
@@ -197,7 +197,7 @@ export class TradeEscortSystem extends BaseSystem {
     const escortReq = this.getEscortRequirement(agreement);
     if (!escortReq) return;
 
-    const metadata = (agreement.crossRealmMetadata as any)?.escort;
+    const metadata = agreement.crossRealmMetadata?.escort;
     if (!metadata) return;
 
     const currentSquadronId = metadata.escortSquadronId;
@@ -438,7 +438,7 @@ export function assignEscort(
   const updatedAgreements = tradeComp.activeAgreements.map((a) => {
     if (a.id !== tradeAgreementId) return a;
 
-    const metadata = a.crossRealmMetadata as any;
+    const metadata = a.crossRealmMetadata;
     return {
       ...a,
       crossRealmMetadata: {
@@ -507,7 +507,7 @@ export function releaseEscort(
   }
 
   // Get current escort squadron ID
-  const metadata = agreement.crossRealmMetadata as any;
+  const metadata = agreement.crossRealmMetadata;
   const squadronId = metadata?.escort?.escortSquadronId;
 
   if (!squadronId) {
@@ -536,7 +536,7 @@ export function releaseEscort(
   const updatedAgreements = tradeComp.activeAgreements.map((a) => {
     if (a.id !== tradeAgreementId) return a;
 
-    const meta = a.crossRealmMetadata as any;
+    const meta = a.crossRealmMetadata;
     return {
       ...a,
       crossRealmMetadata: {
@@ -588,7 +588,7 @@ export function getEscortedTrades(world: World, squadronId: string): string[] {
     for (const agreement of tradeComp.activeAgreements) {
       if (agreement.status !== 'active') continue;
 
-      const metadata = agreement.crossRealmMetadata as any;
+      const metadata = agreement.crossRealmMetadata;
       if (metadata?.escort?.escortSquadronId === squadronId) {
         escortedTrades.push(agreement.id);
       }

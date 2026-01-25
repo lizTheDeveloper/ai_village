@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:b31b690",
+  "name": "Galactic Miranda",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769316380928",
+  "createdAt": 1769316380934,
+  "lastAccessedAt": 1769316380934,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769316380928",
+    "type": "magical"
+  }
+}

@@ -757,18 +757,18 @@ export class EffectValidationPipeline {
     // Create a minimal mock world for testing
     const entities: Map<string, Entity> = new Map();
 
-    const mockWorld = {
+    const mockWorld: World = {
       entities,
       createEntity: () => {
-        const entity = this.createMockEntity(mockWorld as any, `entity_${entities.size}`);
+        const entity = this.createMockEntity(mockWorld, `entity_${entities.size}`);
         entities.set(entity.id, entity);
         return entity;
       },
       getEntity: (id: string) => entities.get(id),
-      addComponent: (entityId: string, component: any) => {
+      addComponent: (entityId: string, component: Record<string, unknown>) => {
         const entity = entities.get(entityId);
-        if (entity) {
-          (entity.components as Map<string, any>).set(component.type, component);
+        if (entity && typeof component === 'object' && component !== null && 'type' in component && typeof component.type === 'string') {
+          (entity.components as Map<string, Record<string, unknown>>).set(component.type, component);
         }
       },
       query: () => ({
@@ -776,26 +776,28 @@ export class EffectValidationPipeline {
           executeEntities: () => Array.from(entities.values()),
         }),
       }),
-    } as any;
+    } as World;
 
     return mockWorld;
   }
 
   private createMockEntity(world: World, id: string): Entity {
-    const components = new Map<string, any>();
+    const components = new Map<string, Record<string, unknown>>();
 
-    const entity = {
+    const entity: Entity = {
       id,
       components,
       hasComponent: (type: string) => components.has(type),
       getComponent: (type: string) => components.get(type),
-      addComponent: (comp: any) => {
-        components.set(comp.type, comp);
+      addComponent: (comp: Record<string, unknown>) => {
+        if (typeof comp === 'object' && comp !== null && 'type' in comp && typeof comp.type === 'string') {
+          components.set(comp.type, comp);
+        }
       },
       removeComponent: (type: string) => {
         components.delete(type);
       },
-    } as any;
+    } as Entity;
 
     // Add default components
     entity.addComponent({
@@ -866,12 +868,16 @@ export class EffectValidationPipeline {
     const issues: ValidationIssue[] = [];
 
     // Check if area operations are used with single target
-    const hasAreaOps = effect.operations.some((op) =>
-      ['spawn_entity', 'spawn_item', 'emit_event'].includes((op as any).op)
-    );
-    const hasSingleTargetOps = effect.operations.some((op) =>
-      ['deal_damage', 'heal', 'apply_status', 'modify_stat'].includes((op as any).op)
-    );
+    const hasAreaOps = effect.operations.some((op) => {
+      if (typeof op !== 'object' || op === null || !('op' in op)) return false;
+      const opType = op.op;
+      return ['spawn_entity', 'spawn_item', 'emit_event'].includes(opType);
+    });
+    const hasSingleTargetOps = effect.operations.some((op) => {
+      if (typeof op !== 'object' || op === null || !('op' in op)) return false;
+      const opType = op.op;
+      return ['deal_damage', 'heal', 'apply_status', 'modify_stat'].includes(opType);
+    });
 
     if (hasAreaOps && effect.target.type === 'single') {
       issues.push({
@@ -893,7 +899,10 @@ export class EffectValidationPipeline {
 
     // Check if self-targeting makes sense
     if (effect.target.type === 'self') {
-      const hasDamageOps = effect.operations.some((op) => (op as any).op === 'deal_damage');
+      const hasDamageOps = effect.operations.some((op) => {
+        if (typeof op !== 'object' || op === null || !('op' in op)) return false;
+        return op.op === 'deal_damage';
+      });
       if (hasDamageOps) {
         issues.push({
           severity: 'warning',
@@ -911,8 +920,14 @@ export class EffectValidationPipeline {
     const issues: ValidationIssue[] = [];
 
     // Check for conflicting operations
-    const hasDamage = effect.operations.some((op) => (op as any).op === 'deal_damage');
-    const hasHeal = effect.operations.some((op) => (op as any).op === 'heal');
+    const hasDamage = effect.operations.some((op) => {
+      if (typeof op !== 'object' || op === null || !('op' in op)) return false;
+      return op.op === 'deal_damage';
+    });
+    const hasHeal = effect.operations.some((op) => {
+      if (typeof op !== 'object' || op === null || !('op' in op)) return false;
+      return op.op === 'heal';
+    });
 
     if (hasDamage && hasHeal) {
       issues.push({
