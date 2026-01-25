@@ -27,6 +27,24 @@ interface InterfaceTemplate {
 }
 
 /**
+ * Type definition for the deity-interface-templates.json structure
+ */
+interface DeityTemplatesData {
+  interfaces: {
+    cosmic_help_desk: InterfaceTemplate;
+    inscrutable_oracle: InterfaceTemplate;
+    wrathful_firewall: InterfaceTemplate;
+    chaos_randomizer: InterfaceTemplate;
+    distant_observer: InterfaceTemplate;
+    bureaucratic_administrator: InterfaceTemplate;
+    glitchy_beta: InterfaceTemplate;
+  };
+  voiceStyles: Record<string, string>;
+  verbosityLevels: Record<string, string>;
+  formalityLevels: Record<string, string>;
+}
+
+/**
  * Generate a playful deity interface description.
  * This describes HOW the god communicates, not just WHAT they say.
  * Loaded from ../data/deity-interface-templates.json

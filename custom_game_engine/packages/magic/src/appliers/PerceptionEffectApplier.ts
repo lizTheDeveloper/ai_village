@@ -107,31 +107,39 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
       perception.activePerceptions = [];
     }
 
-    // Determine perception type from effect
-    const perceptionType = (effect as any).perceptionType || 'unknown';
+    // Determine perception type from effect (extending PerceptionEffect interface)
+    interface ExtendedPerceptionEffect extends PerceptionEffect {
+      perceptionType?: string;
+      detectionRange?: number;
+      visionRangeBonus?: number;
+      identifyDetails?: boolean;
+      detectionTypes?: string[];
+    }
+    const extendedEffect = effect as unknown as ExtendedPerceptionEffect;
+    const perceptionType = extendedEffect.perceptionType || 'unknown';
 
     // Calculate detection range with scaling
     let detectionRange = 0;
-    if ((effect as any).detectionRange !== undefined) {
+    if (extendedEffect.detectionRange !== undefined) {
       const scaled = context.scaledValues.get('detection_range');
       if (scaled) {
         detectionRange = scaled.value;
         appliedValues.detectionRange = detectionRange;
       } else {
-        detectionRange = (effect as any).detectionRange;
+        detectionRange = extendedEffect.detectionRange;
         appliedValues.detectionRange = detectionRange;
       }
     }
 
     // Calculate vision range bonus with scaling
     let visionRangeBonus = 0;
-    if ((effect as any).visionRangeBonus !== undefined) {
+    if (extendedEffect.visionRangeBonus !== undefined) {
       const scaled = context.scaledValues.get('vision_range');
       if (scaled) {
         visionRangeBonus = scaled.value;
         appliedValues.visionRangeBonus = visionRangeBonus;
       } else {
-        visionRangeBonus = (effect as any).visionRangeBonus;
+        visionRangeBonus = extendedEffect.visionRangeBonus;
         appliedValues.visionRangeBonus = visionRangeBonus;
       }
     }
@@ -203,7 +211,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
         if (!perception.detectionTypes.includes('magic')) {
           perception.detectionTypes.push('magic');
         }
-        const identifyDetails = (effect as any).identifyDetails || false;
+        const identifyDetails = extendedEffect.identifyDetails || false;
         perception.activePerceptions.push({
           perceptionType: 'magic',
           range: detectionRange,
@@ -247,7 +255,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
 
       case 'multi_detection':
         // Handle multiple detection types simultaneously
-        const detectionTypes = (effect as any).detectionTypes || [];
+        const detectionTypes = extendedEffect.detectionTypes || [];
         for (const type of detectionTypes) {
           if (!perception.detectionTypes.includes(type)) {
             perception.detectionTypes.push(type);

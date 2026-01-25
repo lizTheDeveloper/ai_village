@@ -765,18 +765,18 @@ export class GovernorDecisionSystem extends BaseSystem {
   /**
    * Build tier-specific prompt template
    */
-  private buildTierPromptTemplate(tier: PoliticalTier, context: Record<string, unknown>): string {
+  private buildTierPromptTemplate(tier: PoliticalTier, context: GovernorContext): string {
     // Map each tier to its prompt template
     switch (tier) {
       case 'galactic_council':
-        return buildGalacticCouncilPrompt(context as unknown as GalacticCouncilContext);
+        return buildGalacticCouncilPrompt(context as GalacticCouncilContext);
       case 'empire':
-        return buildEmperorPrompt(context as unknown as EmpireContext);
+        return buildEmperorPrompt(context as EmpireContext);
       case 'nation':
         // Parliament member role - default to 'member'
-        return buildParliamentPrompt(context as unknown as NationContext, 'member');
+        return buildParliamentPrompt(context as NationContext, 'member');
       case 'province':
-        return buildMayorPrompt(context as unknown as ProvinceGovernorContext);
+        return buildMayorPrompt(context as ProvinceGovernorContext);
       case 'village':
         // No LLM for village tier
         return '';

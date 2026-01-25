@@ -64,6 +64,21 @@ const ANIMATION_CONFIG = {
   animationType: 'walking-8-frames',
 };
 
+// LOD (Level of Detail) configuration for distant sprites
+// Reduces CPU load by skipping animation updates for distant entities
+interface LODLevel {
+  maxDistanceSquared: number;  // Squared distance for fast comparison
+  animationUpdateRate: number; // 1 = every frame, 2 = every 2nd frame, 0 = no animation
+  scale: number;               // Sprite scale multiplier
+}
+
+const LOD_LEVELS: LODLevel[] = [
+  { maxDistanceSquared: 400,   animationUpdateRate: 1, scale: 1.0 },   // 0-20 units: full detail
+  { maxDistanceSquared: 2500,  animationUpdateRate: 2, scale: 0.9 },   // 20-50 units: half animation rate
+  { maxDistanceSquared: 10000, animationUpdateRate: 4, scale: 0.8 },   // 50-100 units: quarter animation rate
+  { maxDistanceSquared: Infinity, animationUpdateRate: 0, scale: 0.6 }, // 100+ units: no animation, reduced scale
+];
+
 // TERRAIN_COLORS moved to src/3d/ChunkMesh.ts (handled by ChunkManager3D)
 
 const BUILDING_COLORS: Record<string, number> = {
@@ -230,6 +245,9 @@ export class Renderer3D {
   private _animationStartTime: number = 0;
   private _currentGlobalFrame: number = 0;
   private _lastGlobalFrameTime: number = 0;
+
+  // PERF: LOD frame counter for skipping animation updates on distant entities
+  private _lodFrameCounter: number = 0;
 
   // Lighting
   private sunLight: THREE.DirectionalLight | null = null;
