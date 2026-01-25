@@ -74,23 +74,29 @@ async function main() {
   console.log(`Total ships found: ${ships.length}`);
   if (ships.length > 0) {
     const firstShip = ships[0]!;
-    const shipComp = firstShip.getComponent(CT.Spaceship) as any;
-    console.log(`First ship: ${shipComp?.name}`);
-    console.log(`  Type: ${shipComp?.shipType}`);
-    console.log(`  Crew members: ${shipComp?.crew?.member_ids?.length || 0}`);
-    console.log(`  Crew coherence: ${shipComp?.crew?.coherence}`);
+    const component = firstShip.getComponent(CT.Spaceship);
+    if (component && component.type === 'spaceship') {
+      const shipComp = component as import('@ai-village/core').SpaceshipComponent;
+      console.log(`First ship: ${shipComp.name}`);
+      console.log(`  Type: ${shipComp.shipType}`);
+      console.log(`  Crew members: ${shipComp.crew.member_ids.length || 0}`);
+      console.log(`  Crew coherence: ${shipComp.crew.coherence}`);
+    }
   }
 
   console.log('\n=== MEGASTRUCTURE DETAILS ===\n');
   const megas = world.query().with(CT.Megastructure).executeEntities();
   for (const e of megas) {
-    const mega = e.getComponent(CT.Megastructure) as any;
-    console.log(`🏗️ ${mega?.name}:`);
-    console.log(`   Category: ${mega?.category}`);
-    console.log(`   Type: ${mega?.structureType}`);
-    console.log(`   Operational: ${mega?.operational}`);
-    console.log(`   Integrity: ${mega?.integrity}`);
-    console.log(`   Workers: ${mega?.workerIds?.length || 0}`);
+    const component = e.getComponent(CT.Megastructure);
+    if (component && component.type === 'megastructure') {
+      const mega = component as import('@ai-village/core').MegastructureComponent;
+      console.log(`🏗️ ${mega.name}:`);
+      console.log(`   Category: ${mega.category}`);
+      console.log(`   Type: ${mega.structureType}`);
+      console.log(`   Operational: ${mega.operational}`);
+      console.log(`   Integrity: ${mega.integrity}`);
+      console.log(`   Workers: ${mega.capabilities.workerIds?.length || 0}`);
+    }
   }
 
   // Test gameplay actions
@@ -109,12 +115,17 @@ async function main() {
 
     // Check if relation was set
     const empire1 = world.getEntity(spawned.empires[0]!);
-    const emp1Comp = empire1?.getComponent(CT.Empire) as any;
-    const relation = emp1Comp?.diplomacy?.relations?.get(spawned.empires[1]!);
-    console.log(`  Relation established: ${relation ? '✅ YES' : '❌ NO'}`);
-    if (relation) {
-      console.log(`  Relationship: ${relation.relationship}`);
-      console.log(`  Treaties: ${relation.treaties?.join(', ')}`);
+    if (empire1) {
+      const component = empire1.getComponent(CT.Empire);
+      if (component && component.type === 'empire') {
+        const emp1Comp = component as import('@ai-village/core').EmpireComponent;
+        const relation = emp1Comp.diplomacy.relations.get(spawned.empires[1]!);
+        console.log(`  Relation established: ${relation ? '✅ YES' : '❌ NO'}`);
+        if (relation) {
+          console.log(`  Relationship: ${relation.relationship}`);
+          console.log(`  Treaties: ${relation.treaties?.join(', ')}`);
+        }
+      }
     }
   }
 

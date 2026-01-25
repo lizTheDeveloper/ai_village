@@ -196,14 +196,23 @@ export class MetricsAnalysis {
    * Detect resource shortage
    */
   private detectResourceShortage(): Insight | null {
-    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+    const rawMetrics = this.collector.getMetric('economic_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return null;
+    }
+    if (!('resourcesGathered' in rawMetrics) || !('resourcesConsumed' in rawMetrics)) {
+      return null;
+    }
+    const economicMetrics = rawMetrics as {
+      resourcesGathered: Record<string, { totalGathered: number }>;
+      resourcesConsumed: Record<string, { totalConsumed: number }>;
+    };
 
     for (const [resourceType, gathered] of Object.entries(economicMetrics.resourcesGathered)) {
       const consumed = economicMetrics.resourcesConsumed[resourceType];
-      const gatherData = gathered as { totalGathered: number };
 
-      if (consumed && gatherData.totalGathered < consumed.totalConsumed) {
-        const deficit = consumed.totalConsumed - gatherData.totalGathered;
+      if (consumed && gathered.totalGathered < consumed.totalConsumed) {
+        const deficit = consumed.totalConsumed - gathered.totalGathered;
         const deficitPercent = Math.round((deficit / consumed.totalConsumed) * 100);
 
         return {
@@ -288,7 +297,11 @@ export class MetricsAnalysis {
    * Detect primary cause of death
    */
   private detectPrimaryDeathCause(): Insight | null {
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as Record<string, { causeOfDeath?: string }>;
+    const rawMetrics = this.collector.getMetric('agent_lifecycle');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return null;
+    }
+    const lifecycleMetrics = rawMetrics as Record<string, { causeOfDeath?: string }>;
     const causes = new Map<string, number>();
     let totalDeaths = 0;
 
@@ -393,21 +406,30 @@ export class MetricsAnalysis {
    */
   private detectStockpileAnomalies(resourceType: string): Anomaly[] {
     const anomalies: Anomaly[] = [];
-    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+    const rawMetrics = this.collector.getMetric('economic_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return anomalies;
+    }
+    if (!('stockpiles' in rawMetrics)) {
+      return anomalies;
+    }
+    const economicMetrics = rawMetrics as {
+      stockpiles: Record<string, Array<{ value: number; timestamp: number }>>;
+    };
     const stockpile = economicMetrics.stockpiles[resourceType];
 
     if (!stockpile || stockpile.length < 2) return anomalies;
 
     // Check for sudden depletion
     for (let i = 1; i < stockpile.length; i++) {
-      const prev = stockpile[i - 1].value;
-      const curr = stockpile[i].value;
+      const prev = stockpile[i - 1]!.value;
+      const curr = stockpile[i]!.value;
 
       if (prev > 500 && curr === 0) {
         anomalies.push({
           type: 'depletion',
           severity: 8,
-          timestamp: stockpile[i].timestamp,
+          timestamp: stockpile[i]!.timestamp,
           metric: `stockpile_${resourceType}`,
           description: `Sudden depletion of ${resourceType} stockpile`,
         });
@@ -422,14 +444,23 @@ export class MetricsAnalysis {
    */
   private detectFPSAnomalies(): Anomaly[] {
     const anomalies: Anomaly[] = [];
-    const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
+    const rawMetrics = this.collector.getMetric('performance_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return anomalies;
+    }
+    if (!('fps' in rawMetrics)) {
+      return anomalies;
+    }
+    const performanceMetrics = rawMetrics as {
+      fps: Array<{ value: number; timestamp: number }>;
+    };
     const fpsData = performanceMetrics.fps;
 
     if (fpsData.length < 10) return anomalies;
 
     // Calculate baseline
     const baseline = fpsData.slice(0, -1).reduce((sum: number, d: { value: number }) => sum + d.value, 0) / (fpsData.length - 1);
-    const latest = fpsData[fpsData.length - 1];
+    const latest = fpsData[fpsData.length - 1]!;
 
     // Detect significant drop
     if (baseline > 55 && latest.value < 20) {
@@ -722,7 +753,16 @@ export class MetricsAnalysis {
    * Detect specialization pattern
    */
   private detectSpecialization(): RecognizedPattern | null {
-    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+    const rawMetrics = this.collector.getMetric('economic_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return null;
+    }
+    if (!('resourcesGathered' in rawMetrics)) {
+      return null;
+    }
+    const economicMetrics = rawMetrics as {
+      resourcesGathered: Record<string, unknown>;
+    };
     const resourcesGathered = economicMetrics.resourcesGathered;
 
     // Check if different agents specialize in different resources
@@ -746,7 +786,11 @@ export class MetricsAnalysis {
    * Detect trade route pattern
    */
   private detectTradeRoutes(): RecognizedPattern | null {
-    const spatialMetrics = this.collector.getMetric('spatial_metrics') as Record<string, any>;
+    const rawMetrics = this.collector.getMetric('spatial_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return null;
+    }
+    const spatialMetrics = rawMetrics as Record<string, unknown>;
 
     // spatialMetrics has a flattened structure where agent metrics are at top level
     // Look for agents with significant distance traveled (indicates repeated movement)
@@ -756,6 +800,7 @@ export class MetricsAnalysis {
     // Iterate over all keys in spatialMetrics except heatmap and pathfindingFailures
     for (const [key, value] of Object.entries(spatialMetrics)) {
       if (key === 'heatmap' || key === 'pathfindingFailures') continue;
+      if (typeof value !== 'object' || value === null) continue;
 
       const agentMetrics = value as { totalDistanceTraveled?: number };
       if (agentMetrics.totalDistanceTraveled && agentMetrics.totalDistanceTraveled > 100) {

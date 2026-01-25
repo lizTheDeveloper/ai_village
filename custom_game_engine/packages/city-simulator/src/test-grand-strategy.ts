@@ -45,7 +45,10 @@ async function main() {
   console.log(`  Found ${empireQuery.length} Empire entities`);
   for (const e of empireQuery) {
     const comp = e.getComponent('empire');
-    console.log(`    - ${(comp as any)?.name || 'unnamed'} (${e.id})`);
+    if (comp && comp.type === 'empire') {
+      const empireComp = comp as import('@ai-village/core').EmpireComponent;
+      console.log(`    - ${empireComp.empireName || 'unnamed'} (${e.id})`);
+    }
   }
 
   // Query federations
@@ -53,7 +56,10 @@ async function main() {
   console.log(`  Found ${fedQuery.length} Federation entities`);
   for (const e of fedQuery) {
     const comp = e.getComponent('federation_governance');
-    console.log(`    - ${(comp as any)?.name || 'unnamed'} (${e.id})`);
+    if (comp && comp.type === 'federation_governance') {
+      const fedComp = comp as import('@ai-village/core').FederationGovernanceComponent;
+      console.log(`    - ${fedComp.name || 'unnamed'} (${e.id})`);
+    }
   }
 
   // Query galactic councils
@@ -61,7 +67,10 @@ async function main() {
   console.log(`  Found ${councilQuery.length} Galactic Council entities`);
   for (const e of councilQuery) {
     const comp = e.getComponent('galactic_council');
-    console.log(`    - ${(comp as any)?.name || 'unnamed'} (${e.id})`);
+    if (comp && comp.type === 'galactic_council') {
+      const councilComp = comp as import('@ai-village/core').GalacticCouncilComponent;
+      console.log(`    - ${councilComp.name || 'unnamed'} (${e.id})`);
+    }
   }
 
   // Query navies
@@ -69,7 +78,10 @@ async function main() {
   console.log(`  Found ${navyQuery.length} Navy entities`);
   for (const e of navyQuery) {
     const comp = e.getComponent('navy');
-    console.log(`    - ${(comp as any)?.name || 'unnamed'} (${e.id})`);
+    if (comp && comp.type === 'navy') {
+      const navyComp = comp as import('@ai-village/core').NavyComponent;
+      console.log(`    - ${navyComp.name || 'unnamed'} (${e.id})`);
+    }
   }
 
   // Query megastructures
@@ -77,7 +89,10 @@ async function main() {
   console.log(`  Found ${megaQuery.length} Megastructure entities`);
   for (const e of megaQuery) {
     const comp = e.getComponent('megastructure');
-    console.log(`    - ${(comp as any)?.name || 'unnamed'} (${e.id})`);
+    if (comp && comp.type === 'megastructure') {
+      const megaComp = comp as import('@ai-village/core').MegastructureComponent;
+      console.log(`    - ${megaComp.name || 'unnamed'} (${e.id})`);
+    }
   }
 
   console.log('\n✅ Running 100 ticks...');
