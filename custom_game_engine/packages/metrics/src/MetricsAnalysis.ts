@@ -828,7 +828,15 @@ export class MetricsAnalysis {
    * Detect social clustering
    */
   private detectSocialClustering(): RecognizedPattern | null {
-    const socialMetrics = this.collector.getMetric('social_metrics') as any;
+    const rawMetrics = this.collector.getMetric('social_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return null;
+    }
+    const socialMetrics = rawMetrics as {
+      relationshipsFormed: number;
+      conversationsPerDay: number;
+      socialNetworkDensity: number;
+    };
 
     // Look for clustering when there are enough relationships and conversations
     // Use relationshipsFormed as the primary signal since conversations trigger relationship events
@@ -856,8 +864,17 @@ export class MetricsAnalysis {
    */
   findPerformanceBottlenecks(): PerformanceBottleneck[] {
     const bottlenecks: PerformanceBottleneck[] = [];
-    const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
-    const systemTiming = performanceMetrics.systemTiming as Record<string, number>;
+    const rawMetrics = this.collector.getMetric('performance_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return bottlenecks;
+    }
+    if (!('systemTiming' in rawMetrics)) {
+      return bottlenecks;
+    }
+    const performanceMetrics = rawMetrics as {
+      systemTiming: Record<string, number>;
+    };
+    const systemTiming = performanceMetrics.systemTiming;
 
     for (const [system, duration] of Object.entries(systemTiming)) {
       const avgDuration = typeof duration === 'number' ? duration : 0;
@@ -891,7 +908,16 @@ export class MetricsAnalysis {
    */
   getOptimizationSuggestions(): OptimizationSuggestion[] {
     const suggestions: OptimizationSuggestion[] = [];
-    const spatialMetrics = this.collector.getMetric('spatial_metrics') as any;
+    const rawMetrics = this.collector.getMetric('spatial_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return suggestions;
+    }
+    if (!('pathfindingFailures' in rawMetrics)) {
+      return suggestions;
+    }
+    const spatialMetrics = rawMetrics as {
+      pathfindingFailures: number;
+    };
 
     // Check pathfinding failure rate
     if (spatialMetrics.pathfindingFailures > 50) {
@@ -910,7 +936,18 @@ export class MetricsAnalysis {
    * Calculate overall performance score
    */
   calculatePerformanceScore(): number {
-    const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
+    const rawMetrics = this.collector.getMetric('performance_metrics');
+    if (typeof rawMetrics !== 'object' || rawMetrics === null) {
+      return 0;
+    }
+    if (!('fps' in rawMetrics) || !('avgFps' in rawMetrics) || !('frameDrops' in rawMetrics)) {
+      return 0;
+    }
+    const performanceMetrics = rawMetrics as {
+      fps: Array<unknown>;
+      avgFps: number;
+      frameDrops: number;
+    };
 
     if (performanceMetrics.fps.length === 0) {
       return 0;
