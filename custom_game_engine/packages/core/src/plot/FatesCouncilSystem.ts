@@ -149,7 +149,7 @@ export class FatesCouncilSystem extends BaseSystem {
 
   private lastCouncilDay = -1;
   private llmQueue: LLMDecisionQueue | null = null;
-  private llmProvider?: any; // LLMProvider type from LLMTypes
+  private llmProvider?: { generate: (params: { prompt: string; temperature: number; maxTokens: number }) => Promise<{ text: string }> };
 
   // Recent exotic events tracked for council
   private recentExoticEvents: ExoticEvent[] = [];
@@ -179,7 +179,7 @@ export class FatesCouncilSystem extends BaseSystem {
   /**
    * Set LLM provider for Fates conversations
    */
-  setLLMProvider(provider: any): void {
+  setLLMProvider(provider: { generate: (params: { prompt: string; temperature: number; maxTokens: number }) => Promise<{ text: string }> }): void {
     this.llmProvider = provider;
   }
 
@@ -311,7 +311,7 @@ export class FatesCouncilSystem extends BaseSystem {
   private analyzeSoulThread(soul: Entity, world: World): EntityThread | null {
     const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
     const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(CT.SilverThread);
+    const thread = soul.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
 
     if (!soulIdentity || !plotLines) return null;
 
@@ -319,8 +319,9 @@ export class FatesCouncilSystem extends BaseSystem {
     const activePlotIds = plotLines.active.map(p => p.instance_id);
 
     // Assess if needs challenge
+    const headTick = thread?.head?.personal_tick ?? 0;
     const hasRecentPlot = plotLines.active.some(p =>
-      ((thread as any)?.head?.personal_tick ?? 0) - p.assigned_at_personal_tick < 10000
+      headTick - p.assigned_at_personal_tick < 10000
     );
     const needsChallenge = !hasRecentPlot && (soulIdentity.wisdom_level ?? 0) > 20;
 
@@ -364,18 +365,25 @@ export class FatesCouncilSystem extends BaseSystem {
     // Extract recent actions from deity's episodic memory
     const recentActions = this.extractRecentActions(deity);
 
+    // DeityComponent has identity field directly
+    const deityName = deityComp.identity?.primaryName || deity.id;
+    const deityDomain = deityComp.identity?.domain || 'unknown domain';
+
+    // Use current belief as "wisdom" level for deities
+    const deityWisdom = deityComp.belief?.currentBelief || 100;
+
     return {
       entityId: deity.id,
       entityType: 'deity',
-      name: (deityComp as any).identity?.primaryName || deity.id,
+      name: deityName,
       activePlots: plotLines?.active.map(p => p.instance_id) || [],
       completedPlots: plotLines?.completed.length || 0,
-      wisdom: (deityComp as any).divinePower || 100,  // Use divine power as "wisdom"
+      wisdom: deityWisdom,
       recentActions,
       storyPotential: 0.5,  // Deities always have potential
       needsChallenge: false,
       overwhelmed: false,
-      context: `Deity of ${(deityComp as any).domain || 'unknown domain'}`,
+      context: `Deity of ${deityDomain}`,
     };
   }
 
@@ -896,9 +904,9 @@ export class FatesCouncilSystem extends BaseSystem {
 
     // Get soul ID (for souls) or use entity ID
     const soulIdentity = entity.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
-    const thread = entity.getComponent(CT.SilverThread);
+    const thread = entity.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
     const soulId = soulIdentity?.true_name || entityId;
-    const personalTick = (thread as any)?.head?.personal_tick || tick;
+    const personalTick = thread?.head?.personal_tick || tick;
 
     // Instantiate plot
     const plotInstance = instantiatePlot(
@@ -920,7 +928,11 @@ export class FatesCouncilSystem extends BaseSystem {
     };
 
     // Update the component in the world
-    (world as any).addComponent(entityId, updatedPlotLines);
+    if ('addComponent' in world && typeof world.addComponent === 'function') {
+      world.addComponent(entityId, updatedPlotLines);
+    } else {
+      throw new Error('[FatesCouncilSystem] World.addComponent is not available');
+    }
 
     console.warn(`[FatesCouncilSystem] Plot woven: ${plotTemplateId} → ${soulId} (${reasoning})`);
   }
@@ -931,21 +943,38 @@ export class FatesCouncilSystem extends BaseSystem {
   private subscribeToExoticEvents(): void {
     // Subscribe to divinity events
     this.events.onGeneric('divinity:deity_relationship_critical', (data: unknown) => {
+      interface DeityRelationshipData {
+        agentId: string;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('agentId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid deity_relationship_critical data:', data);
+        return;
+      }
+      const eventData = data as DeityRelationshipData;
       this.trackExoticEvent({
         type: 'deity_relationship_critical',
-        entityId: (data as any).agentId,
+        entityId: eventData.agentId,
         description: `Deity relationship reached critical level`,
-        tick: (data as any).tick,
+        tick: eventData.tick,
         severity: 0.8,
       });
     });
 
     // Subscribe to multiverse invasion
     this.events.onGeneric('multiverse:invasion_triggered', (data: unknown) => {
+      interface MultiverseInvasionData {
+        invaderUniverse: string;
+      }
+      if (!data || typeof data !== 'object' || !('invaderUniverse' in data)) {
+        console.error('[FatesCouncilSystem] Invalid invasion_triggered data:', data);
+        return;
+      }
+      const eventData = data as MultiverseInvasionData;
       this.trackExoticEvent({
         type: 'multiverse_invasion',
         entityId: 'universe',  // Affects whole universe
-        description: `Invasion from ${(data as any).invaderUniverse}`,
+        description: `Invasion from ${eventData.invaderUniverse}`,
         tick: this.world?.tick || 0,
         severity: 0.9,
       });
@@ -1164,8 +1193,8 @@ export class FatesCouncilSystem extends BaseSystem {
     let assignedCount = 0;
 
     for (const soul of souls) {
-      const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent;
-      const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent;
+      const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
+      const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
 
       if (!soulIdentity || !plotLines) continue;
 
@@ -1184,8 +1213,8 @@ export class FatesCouncilSystem extends BaseSystem {
       }
 
       // Assign the epic plot
-      const thread = soul.getComponent(CT.SilverThread);
-      const personalTick = (thread as any)?.head?.personal_tick || tick;
+      const thread = soul.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
+      const personalTick = thread?.head?.personal_tick || tick;
 
       console.warn(`[FatesCouncilSystem] EPIC ASCENSION: ${soulIdentity.true_name} → ${templateId} (wisdom: ${soulIdentity.wisdom_level})`);
 
@@ -1338,10 +1367,15 @@ export class FatesCouncilSystem extends BaseSystem {
    * Check if entity has skill affinity (any skill at level 2+)
    */
   private hasSkillAffinity(entity: Entity, skills: string[]): boolean {
-    const skillsComp = entity.getComponent(CT.Skills);
+    interface SkillsComponent {
+      type: 'skills';
+      levels?: Record<string, number>;
+    }
+
+    const skillsComp = entity.getComponent(CT.Skills) as SkillsComponent | undefined;
     if (!skillsComp) return false;
 
-    const levels = (skillsComp as any).levels || {};
+    const levels = skillsComp.levels || {};
     return skills.some(skill => (levels[skill] ?? 0) >= 2);
   }
 
@@ -1349,10 +1383,18 @@ export class FatesCouncilSystem extends BaseSystem {
    * Check if entity has strong deity relationship
    */
   private hasDeityRelationship(entity: Entity, world: World, minTrust: number): boolean {
-    const relationships = entity.getComponent(CT.Relationship);
+    interface RelationshipData {
+      trust?: number;
+    }
+    interface RelationshipComponent {
+      type: 'relationship';
+      relationships?: Map<string, RelationshipData>;
+    }
+
+    const relationships = entity.getComponent(CT.Relationship) as RelationshipComponent | undefined;
     if (!relationships) return false;
 
-    const relMap = (relationships as any).relationships || new Map();
+    const relMap = relationships.relationships || new Map();
 
     // Check all relationships for deity with high trust
     for (const [targetId, rel] of relMap.entries()) {
@@ -1375,16 +1417,24 @@ export class FatesCouncilSystem extends BaseSystem {
    * Count descendants of entity
    */
   private countDescendants(entity: Entity, world: World): number {
+    interface ChildResponsibility {
+      childId?: string;
+    }
+    interface ParentingComponent {
+      type: 'parenting';
+      children?: Array<string | ChildResponsibility>;
+    }
+
     // Check for parenting component
-    const parenting = entity.getComponent(CT.Parenting);
+    const parenting = entity.getComponent(CT.Parenting) as ParentingComponent | undefined;
     if (!parenting) return 0;
 
-    const responsibilities = (parenting as any).children || [];
+    const responsibilities = parenting.children || [];
     let count = responsibilities.length;
 
     // Recursively count descendants
     for (const resp of responsibilities) {
-      const childId = typeof resp === 'string' ? resp : (resp as any).childId;
+      const childId = typeof resp === 'string' ? resp : resp.childId;
       if (!childId) continue;
 
       const childEntity = world.getEntity(childId);

@@ -2,11 +2,14 @@
  * Renders speech bubbles above agents when they speak
  */
 export class SpeechBubbleRenderer {
-  private activeSpeech: Map<string, { text: string; timestamp: number }> = new Map();
+  private activeSpeech: Map<string, { text: string; timestamp: number; lines?: string[] }> = new Map();
   private readonly DISPLAY_DURATION = 5000; // 5 seconds
   private readonly MAX_WIDTH = 200;
   private readonly PADDING = 8;
   private readonly BUBBLE_OFFSET_Y = -40;
+  // PERF: Cache for text wrapping - avoids measureText() calls per frame
+  // Text wrapping is expensive and speech text doesn't change while displayed
+  private _wrappedTextCache: Map<string, string[]> = new Map();
 
   /**
    * Register speech from an agent
@@ -27,6 +30,9 @@ export class SpeechBubbleRenderer {
     const now = Date.now();
     for (const [agentId, speech] of this.activeSpeech.entries()) {
       if (now - speech.timestamp > this.DISPLAY_DURATION) {
+        // Clean up wrapped text cache for expired speech
+        const cacheKey = `${speech.text}|${this.MAX_WIDTH}`;
+        this._wrappedTextCache.delete(cacheKey);
         this.activeSpeech.delete(agentId);
       }
     }
@@ -146,8 +152,16 @@ export class SpeechBubbleRenderer {
 
   /**
    * Wrap text to fit within max width
+   * PERF: Results are cached because measureText() is expensive and
+   * speech text doesn't change while the bubble is displayed
    */
   private wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    // Check cache first
+    const cacheKey = `${text}|${maxWidth}`;
+    const cached = this._wrappedTextCache.get(cacheKey);
+    if (cached) return cached;
+
+    // Not cached - compute wrapped lines
     const words = text.split(' ');
     const lines: string[] = [];
     let currentLine = '';
@@ -169,6 +183,9 @@ export class SpeechBubbleRenderer {
     if (currentLine) {
       lines.push(currentLine);
     }
+
+    // Cache result (cache auto-clears when speech expires via update())
+    this._wrappedTextCache.set(cacheKey, lines);
 
     return lines;
   }

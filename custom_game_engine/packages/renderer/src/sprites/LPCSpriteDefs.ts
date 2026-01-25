@@ -24,12 +24,16 @@ export type LPCAnimation = 'walkcycle' | 'slash' | 'spellcast' | 'thrust' | 'sho
 export const LPC_FRAME_SIZE = lpcConfig.defaults.frameSize;
 
 /** Animation frame counts (loaded from config) */
-export const LPC_ANIMATION_FRAMES: Record<LPCAnimation, number> =
-  lpcConfig.animations as Record<LPCAnimation, { frames: number }> as any as Record<LPCAnimation, number>;
+export const LPC_ANIMATION_FRAMES: Record<LPCAnimation, number> = {} as Record<LPCAnimation, number>;
 
 // Convert the config structure to the expected format
 Object.keys(lpcConfig.animations).forEach((key) => {
-  (LPC_ANIMATION_FRAMES as any)[key] = (lpcConfig.animations as any)[key].frames;
+  const animKey = key as LPCAnimation;
+  const configAnims = lpcConfig.animations as Record<string, { frames: number }>;
+  const animData = configAnims[key];
+  if (animData) {
+    LPC_ANIMATION_FRAMES[animKey] = animData.frames;
+  }
 });
 
 /** Part types that can be composited */

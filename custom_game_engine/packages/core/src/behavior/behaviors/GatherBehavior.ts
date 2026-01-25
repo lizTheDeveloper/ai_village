@@ -113,10 +113,10 @@ export class GatherBehavior extends BaseBehavior {
   readonly name = 'gather' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
-    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
+    const agent = entity.getComponent(ComponentType.Agent)!;
+    const needs = entity.getComponent(ComponentType.Needs);
 
     // Disable steering system so it doesn't override our gather movement
     this.disableSteering(entity);
@@ -249,7 +249,7 @@ export class GatherBehavior extends BaseBehavior {
     }
 
     // Get gathering skill level
-    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skillsComp = entity.getComponent(ComponentType.Skills);
     const gatheringLevel = skillsComp?.levels.gathering ?? 0;
 
     // Check if we're already gathering this resource
@@ -297,7 +297,7 @@ export class GatherBehavior extends BaseBehavior {
     const state = agent.behaviorState as GatherBehaviorState;
     const resourceImpl = resourceEntity as EntityImpl;
     const voxelComp = resourceImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
-    const agentPos = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const agentPos = entity.getComponent(ComponentType.Position)!;
 
     // Skip depleted or falling resources
     if (voxelComp.height <= 0 || voxelComp.isFalling || !voxelComp.harvestable) {
@@ -312,7 +312,7 @@ export class GatherBehavior extends BaseBehavior {
     }));
 
     // Get gathering skill level
-    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skillsComp = entity.getComponent(ComponentType.Skills);
     const gatheringLevel = skillsComp?.levels.gathering ?? 0;
 
     // Check if we're already gathering this resource
@@ -369,7 +369,7 @@ export class GatherBehavior extends BaseBehavior {
   ): void {
     const resourceImpl = resourceEntity as EntityImpl;
     const voxelComp = resourceImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
-    const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
+    const resourcePos = resourceImpl.getComponent(ComponentType.Position);
 
     // Double-check resource is still harvestable
     if (voxelComp.height <= 0 || voxelComp.isFalling) {
@@ -416,7 +416,7 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       // Award gathering XP (higher XP for voxel resources due to difficulty)
-      const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+      const skillsComp = entity.getComponent(ComponentType.Skills);
       if (skillsComp) {
         const baseXP = 10 * result.amountAdded; // 10 XP per resource from voxels
         const oldLevel = skillsComp.levels.gathering;
@@ -474,7 +474,7 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       // Reinforce memory of this resource location
-      const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+      const spatialMemory = entity.getComponent(ComponentType.SpatialMemory);
       if (spatialMemory && resourcePos) {
         addSpatialMemory(
           spatialMemory,
@@ -538,7 +538,7 @@ export class GatherBehavior extends BaseBehavior {
   ): void {
     const resourceImpl = resourceEntity as EntityImpl;
     const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
-    const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
+    const resourcePos = resourceImpl.getComponent(ComponentType.Position);
 
     // Double-check resource still has at least 1 unit
     if (resourceComp.amount < 1) {
@@ -571,7 +571,7 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       // Award gathering XP (5 base XP per resource gathered)
-      const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+      const skillsComp = entity.getComponent(ComponentType.Skills);
       if (skillsComp) {
         const baseXP = 5 * result.amountAdded;
         const oldLevel = skillsComp.levels.gathering;
@@ -632,7 +632,7 @@ export class GatherBehavior extends BaseBehavior {
 
       // Reinforce memory of this resource location
       // Update spatial memory with resource location
-      const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+      const spatialMemory = entity.getComponent(ComponentType.SpatialMemory);
       if (spatialMemory && resourcePos) {
         addSpatialMemory(
           spatialMemory,
@@ -761,7 +761,7 @@ export class GatherBehavior extends BaseBehavior {
         for (const resource of globalResources) {
           const resourceImpl = resource as EntityImpl;
           const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
-          const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+          const resourcePos = resourceImpl.getComponent(ComponentType.Position)!;
 
           if (!resourceComp.harvestable) continue;
           if (resourceComp.amount <= 0) continue;
@@ -788,7 +788,7 @@ export class GatherBehavior extends BaseBehavior {
       for (const { entity: resource, distance: distanceToAgent } of resourcesInRadius) {
         const resourceImpl = resource as EntityImpl;
         const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
-        const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const resourcePos = resourceImpl.getComponent(ComponentType.Position)!;
 
         // Skip non-harvestable resources
         if (!resourceComp.harvestable) continue;
@@ -829,7 +829,7 @@ export class GatherBehavior extends BaseBehavior {
       for (const { entity: voxelResource, distance: distanceToAgent } of voxelResourcesInRadius) {
         const voxelImpl = voxelResource as EntityImpl;
         const voxelComp = voxelImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
-        const voxelPos = voxelImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const voxelPos = voxelImpl.getComponent(ComponentType.Position)!;
 
         // Skip non-harvestable, depleted, or falling resources
         if (!voxelComp.harvestable) continue;
@@ -870,7 +870,7 @@ export class GatherBehavior extends BaseBehavior {
       for (const resource of resources) {
         const resourceImpl = resource as EntityImpl;
         const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
-        const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const resourcePos = resourceImpl.getComponent(ComponentType.Position)!;
 
         // Skip non-harvestable resources
         if (!resourceComp.harvestable) continue;
@@ -912,7 +912,7 @@ export class GatherBehavior extends BaseBehavior {
       for (const voxelResource of voxelResources) {
         const voxelImpl = voxelResource as EntityImpl;
         const voxelComp = voxelImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
-        const voxelPos = voxelImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const voxelPos = voxelImpl.getComponent(ComponentType.Position)!;
 
         // Skip non-harvestable, depleted, or falling resources
         if (!voxelComp.harvestable) continue;
@@ -973,8 +973,8 @@ export class GatherBehavior extends BaseBehavior {
 
       for (const { entity: plant, distance: distanceToAgent } of plantsInRadius) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const plantComp = plantImpl.getComponent(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent(ComponentType.Position)!;
 
         if (!plantComp) continue;
 
@@ -1014,8 +1014,8 @@ export class GatherBehavior extends BaseBehavior {
 
       for (const plant of plants) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const plantComp = plantImpl.getComponent(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent(ComponentType.Position)!;
 
         if (!plantComp) continue;
 
@@ -1076,8 +1076,8 @@ export class GatherBehavior extends BaseBehavior {
 
       for (const { entity: plant, distance: distanceToAgent } of plantsInRadius) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const plantComp = plantImpl.getComponent(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent(ComponentType.Position)!;
 
         if (!plantComp) continue;
 
@@ -1118,8 +1118,8 @@ export class GatherBehavior extends BaseBehavior {
 
       for (const plant of plants) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+        const plantComp = plantImpl.getComponent(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent(ComponentType.Position)!;
 
         if (!plantComp) continue;
 
@@ -1158,7 +1158,7 @@ export class GatherBehavior extends BaseBehavior {
   }
 
   private calculateWorkSpeed(entity: EntityImpl): number {
-    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+    const needs = entity.getComponent(ComponentType.Needs);
 
     if (!needs) {
       return 1.0; // No needs = full speed
@@ -1195,7 +1195,7 @@ export class GatherBehavior extends BaseBehavior {
     workSpeedMultiplier: number
   ): void {
     const plantImpl = plantEntity as EntityImpl;
-    const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+    const plantComp = plantImpl.getComponent(ComponentType.Plant);
 
     if (!plantComp) {
       return;
@@ -1208,7 +1208,7 @@ export class GatherBehavior extends BaseBehavior {
     const stageMod = plantComp.stage === 'seeding' ? 1.5 : 1.0;
 
     // Get farming skill from agent's skills component (0-5 level scale)
-    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skillsComp = entity.getComponent(ComponentType.Skills);
     const farmingLevel = skillsComp?.levels?.farming ?? 0;
     // Convert skill level (0-5) to 0-100 scale for formula compatibility
     const farmingSkill = farmingLevel * 20; // 0→0, 1→20, 2→40, 3→60, 4→80, 5→100
@@ -1276,12 +1276,12 @@ export class GatherBehavior extends BaseBehavior {
 
       // Check if inventory is now full
       if (result.inventory.currentWeight >= result.inventory.maxWeight) {
-        const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+        const agent = entity.getComponent(ComponentType.Agent)!;
         this.handleInventoryFull(entity, world, agent);
       }
     } catch (error) {
       // Inventory full
-      const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+      const agent = entity.getComponent(ComponentType.Agent)!;
       this.handleInventoryFull(entity, world, agent);
     }
   }
@@ -1299,7 +1299,7 @@ export class GatherBehavior extends BaseBehavior {
     workSpeedMultiplier: number
   ): void {
     const plantImpl = plantEntity as EntityImpl;
-    const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+    const plantComp = plantImpl.getComponent(ComponentType.Plant);
 
     if (!plantComp) {
       return;
@@ -1332,7 +1332,7 @@ export class GatherBehavior extends BaseBehavior {
     }
 
     // Calculate fruit quality based on gathering skill and plant health
-    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skillsComp = entity.getComponent(ComponentType.Skills);
     const gatheringLevel = skillsComp?.levels.gathering ?? 0;
     // Fruit quality: base 50 + (skill * 5) + (health / 5) - gives range ~50-100
     const fruitQuality = Math.min(100, Math.max(0,
@@ -1406,12 +1406,12 @@ export class GatherBehavior extends BaseBehavior {
 
       // Check if inventory is now full
       if (result.inventory.currentWeight >= result.inventory.maxWeight) {
-        const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+        const agent = entity.getComponent(ComponentType.Agent)!;
         this.handleInventoryFull(entity, world, agent);
       }
     } catch (error) {
       // Inventory full
-      const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+      const agent = entity.getComponent(ComponentType.Agent)!;
       this.handleInventoryFull(entity, world, agent);
     }
   }
@@ -1677,7 +1677,7 @@ function findGatherTargetWithContext(
     const nearbyPlants = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Plant]);
     for (const { entity: plant, position: plantPos, distance } of nearbyPlants) {
       const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      const plantComp = plantImpl.getComponent(ComponentType.Plant);
       if (!plantComp) continue;
 
       const hasFruit = (plantComp.fruitCount ?? 0) > 0;
@@ -1697,7 +1697,7 @@ function findGatherTargetWithContext(
     const nearbyPlants = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Plant]);
     for (const { entity: plant, position: plantPos, distance } of nearbyPlants) {
       const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      const plantComp = plantImpl.getComponent(ComponentType.Plant);
       if (!plantComp) continue;
 
       if (isSeekingSeeds) {
@@ -1760,7 +1760,7 @@ function findGatherTargetWithContext(
     const nearbyPlants = ctx.getEntitiesInRadius(GATHER_MAX_RANGE, [ComponentType.Plant]);
     for (const { entity: plant, position: plantPos, distance } of nearbyPlants) {
       const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      const plantComp = plantImpl.getComponent(ComponentType.Plant);
       if (!plantComp) continue;
 
       const hasFruit = (plantComp.fruitCount ?? 0) > 0;

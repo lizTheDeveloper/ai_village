@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:65e0dc0",
+  "name": "Alpha Miranda",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769227132467",
+  "createdAt": 1769227132469,
+  "lastAccessedAt": 1769227132469,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769227132467",
+    "type": "magical"
+  }
+}

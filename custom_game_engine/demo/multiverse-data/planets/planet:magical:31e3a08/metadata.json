@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:31e3a08",
+  "name": "Epsilon Terra",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769227303157",
+  "createdAt": 1769227303173,
+  "lastAccessedAt": 1769227303173,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769227303157",
+    "type": "magical"
+  }
+}

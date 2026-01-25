@@ -64,9 +64,9 @@ export class RepairBehavior extends BaseBehavior {
     const currentTick = world.tick;
     const phase = (state.phase as RepairPhase) ?? 'searching';
 
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     if (!agent || !position) {
       throw new Error(`[RepairBehavior] Agent ${entity.id} missing required components: agent=${!!agent}, position=${!!position}`);
@@ -164,7 +164,7 @@ export class RepairBehavior extends BaseBehavior {
       return;
     }
 
-    const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+    const buildingComp = (building as EntityImpl).getComponent(ComponentType.Building);
     if (!buildingComp || buildingComp.condition >= 100) {
       // Building was repaired by someone else
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
@@ -206,7 +206,7 @@ export class RepairBehavior extends BaseBehavior {
       return { complete: true, reason: 'building_not_found' };
     }
 
-    const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+    const buildingComp = (building as EntityImpl).getComponent(ComponentType.Building);
     if (!buildingComp) {
       return { complete: true, reason: 'building_missing_component' };
     }
@@ -233,7 +233,7 @@ export class RepairBehavior extends BaseBehavior {
     }
 
     // Check distance (may have moved) - using squared distance for performance
-    const buildingPos = (building as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+    const buildingPos = (building as EntityImpl).getComponent(ComponentType.Position);
     if (buildingPos) {
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
@@ -246,7 +246,7 @@ export class RepairBehavior extends BaseBehavior {
     }
 
     // Calculate repair rate based on skills
-    const skills = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skills = entity.getComponent(ComponentType.Skills);
     const buildingSkill = skills?.levels?.building ?? 0;
     const repairRate = REPAIR_CONFIG.BASE_REPAIR_RATE +
       (buildingSkill * REPAIR_CONFIG.SKILL_BONUS_MULTIPLIER);
@@ -308,8 +308,8 @@ export class RepairBehavior extends BaseBehavior {
     const searchRadiusSquared = REPAIR_CONFIG.SEARCH_RADIUS * REPAIR_CONFIG.SEARCH_RADIUS;
 
     for (const buildingEntity of buildings) {
-      const building = (buildingEntity as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
-      const position = (buildingEntity as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+      const building = (buildingEntity as EntityImpl).getComponent(ComponentType.Building);
+      const position = (buildingEntity as EntityImpl).getComponent(ComponentType.Position);
 
       if (!building || !position) continue;
 

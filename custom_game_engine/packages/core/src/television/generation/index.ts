@@ -12,5 +12,7 @@ export {
   type ScriptGenerationResult,
   type DialogueGenerationRequest,
   type DialogueGenerationResult,
-  type LLMProvider,
 } from './ScriptGenerator.js';
+
+// Re-export LLMProvider from canonical source
+export type { LLMProvider } from '../../types/LLMTypes.js';

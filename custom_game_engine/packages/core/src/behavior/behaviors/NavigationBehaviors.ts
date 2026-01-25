@@ -25,7 +25,7 @@ export class NavigateBehavior extends BaseBehavior {
   readonly name = 'navigate';
 
   execute(entity: EntityImpl, _world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const agent = entity.getComponent(ComponentType.Agent)!;
 
     // Check if we have a target
     if (!agent.behaviorState || !agent.behaviorState.target) {
@@ -103,7 +103,7 @@ export class FollowGradientBehavior extends BaseBehavior {
   readonly name = 'follow_gradient';
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const agent = entity.getComponent(ComponentType.Agent)!;
 
     // Check if we have social gradient component
     if (!entity.hasComponent(CT.SocialGradient)) {

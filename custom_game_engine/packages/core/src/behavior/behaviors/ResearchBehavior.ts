@@ -52,8 +52,8 @@ export class ResearchBehavior extends BaseBehavior {
   readonly name = 'research' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -88,7 +88,7 @@ export class ResearchBehavior extends BaseBehavior {
    * Find nearest research building
    */
   private findBuilding(entity: EntityImpl, world: World, state: ResearchBehaviorState): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     if (!position) {
       return { complete: true, reason: 'No position component' };
     }
@@ -118,8 +118,8 @@ export class ResearchBehavior extends BaseBehavior {
 
     for (const building of buildings) {
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+      const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
       if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 
@@ -160,7 +160,7 @@ export class ResearchBehavior extends BaseBehavior {
    * Move to target research building
    */
   private moveToBuilding(entity: EntityImpl, world: World, state: ResearchBehaviorState): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     if (!position) {
       return { complete: true, reason: 'No position component' };
     }
@@ -179,7 +179,7 @@ export class ResearchBehavior extends BaseBehavior {
       return;
     }
 
-    const targetPos = (targetBuilding as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+    const targetPos = (targetBuilding as EntityImpl).getComponent(ComponentType.Position);
     if (!targetPos) {
       return { complete: true, reason: 'Target building has no position' };
     }
@@ -204,7 +204,7 @@ export class ResearchBehavior extends BaseBehavior {
    * Conduct research at building
    */
   private conductResearch(entity: EntityImpl, world: World, state: ResearchBehaviorState): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const agent = entity.getComponent(ComponentType.Agent);
     if (!agent) {
       return { complete: true, reason: 'No agent component' };
     }

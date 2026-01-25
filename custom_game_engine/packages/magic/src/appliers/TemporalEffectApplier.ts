@@ -95,7 +95,8 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
       timeFactor = scaledValue.value;
     } else {
       // Apply proficiency scaling ourselves
-      const proficiency = (context as any).proficiency ?? 50; // 0-100
+      const contextWithProficiency = context as unknown as { proficiency?: number };
+      const proficiency = contextWithProficiency.proficiency ?? 50; // 0-100
       const proficiencyFactor = proficiency / 50; // 0.0 to 2.0
 
       if (effect.temporalType === 'slow' || effect.temporalType === 'stop') {

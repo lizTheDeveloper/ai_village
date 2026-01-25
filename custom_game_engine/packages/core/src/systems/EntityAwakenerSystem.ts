@@ -57,8 +57,27 @@ export class EntityAwakenerSystem implements System {
    */
   private eventBus?: EventBus;
 
+  /**
+   * EventBus unsubscribe functions: event type -> unsubscribe function.
+   * Used to clean up EventBus subscriptions when no entities are listening.
+   */
+  private eventBusUnsubscribers = new Map<string, () => void>();
+
+  /**
+   * World reference (needed for wakeEntityInternal in event handlers).
+   */
+  private world?: World;
+
   initialize(world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.world = world;
+
+    // Subscribe to entity destruction events for automatic cleanup
+    eventBus.subscribe('entity:destroyed', (event) => {
+      if (event.data?.entityId) {
+        this.removeEntity(event.data.entityId);
+      }
+    });
   }
 
   update(world: World, entities: ReadonlyArray<Entity>): void {
@@ -136,15 +155,21 @@ export class EntityAwakenerSystem implements System {
   subscribeToEvent(entityId: string, eventType: string): void {
     if (!this.eventSubscriptions.has(eventType)) {
       this.eventSubscriptions.set(eventType, new Set());
+
+      // Create EventBus subscription for this event type
+      if (this.eventBus && this.world) {
+        // Note: eventType may not be in GameEventMap - cast as any to support arbitrary events
+        const unsubscribe = this.eventBus.subscribe(eventType as any, () => {
+          // Wake all entities subscribed to this event
+          // Safe to use this.world here because it's set in initialize() before any subscriptions
+          if (this.world) {
+            this.wakeOnEvent(this.world, eventType);
+          }
+        });
+        this.eventBusUnsubscribers.set(eventType, unsubscribe);
+      }
     }
     this.eventSubscriptions.get(eventType)!.add(entityId);
-
-    // Subscribe to event bus if available
-    if (this.eventBus) {
-      // Note: EventBus.on() requires a callback - we'll wake entities when events fire
-      // This would require extending EventBus to support wildcard event listeners
-      // For now, systems must call wakeOnEvent() directly when emitting events
-    }
   }
 
   /**
@@ -155,7 +180,13 @@ export class EntityAwakenerSystem implements System {
     if (subscribers) {
       subscribers.delete(entityId);
       if (subscribers.size === 0) {
+        // No more entities listening to this event - clean up EventBus subscription
         this.eventSubscriptions.delete(eventType);
+        const unsubscribe = this.eventBusUnsubscribers.get(eventType);
+        if (unsubscribe) {
+          unsubscribe();
+          this.eventBusUnsubscribers.delete(eventType);
+        }
       }
     }
   }
@@ -235,7 +266,44 @@ export class EntityAwakenerSystem implements System {
     return this.activeThisTick.size;
   }
 
+  /**
+   * Remove entity from all tracking structures.
+   * Called automatically when entities are destroyed via entity:destroyed event.
+   * Can also be called manually for explicit cleanup.
+   */
+  removeEntity(entityId: string): void {
+    // Remove from wake queue
+    this.wakeQueue.delete(entityId);
+
+    // Remove from all event subscriptions
+    this.eventSubscriptions.forEach((subscribers, eventType) => {
+      if (subscribers.has(entityId)) {
+        subscribers.delete(entityId);
+        // If no more entities subscribed to this event, clean up EventBus subscription
+        if (subscribers.size === 0) {
+          this.eventSubscriptions.delete(eventType);
+          const unsubscribe = this.eventBusUnsubscribers.get(eventType);
+          if (unsubscribe) {
+            unsubscribe();
+            this.eventBusUnsubscribers.delete(eventType);
+          }
+        }
+      }
+    });
+
+    // Remove from active set
+    this.activeThisTick.delete(entityId);
+  }
+
   cleanup(): void {
+    // Clean up all EventBus subscriptions
+    this.eventBusUnsubscribers.forEach(unsubscribe => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    });
+    this.eventBusUnsubscribers.clear();
+
     this.wakeQueue.clear();
     this.eventSubscriptions.clear();
     this.activeThisTick.clear();

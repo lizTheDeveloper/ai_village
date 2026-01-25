@@ -505,8 +505,11 @@ export class CityFengShuiAnalyzer {
 
     for (const street of layout.streets) {
       if (street.points.length >= 2) {
-        const dx = Math.abs(street.points[1].x - street.points[0].x);
-        const dy = Math.abs(street.points[1].y - street.points[0].y);
+        const p0 = street.points[0];
+        const p1 = street.points[1];
+        if (!p0 || !p1) continue;
+        const dx = Math.abs(p1.x - p0.x);
+        const dy = Math.abs(p1.y - p0.y);
         if (dx > dy) hasHorizontal = true;
         else hasVertical = true;
       }
@@ -560,9 +563,10 @@ export class CityFengShuiAnalyzer {
         const d1 = layout.districts[i];
         const d2 = layout.districts[j];
 
-        if (this.areAdjacent(d1, d2)) {
+        if (d1 && d2 && this.areAdjacent(d1, d2)) {
           const affinity1 = DISTRICT_AFFINITIES[d1.type];
           const affinity2 = DISTRICT_AFFINITIES[d2.type];
+          if (!affinity1 || !affinity2) continue;
 
           const d1AvoidD2 = affinity1.avoid.includes(d2.type);
           const d2AvoidD1 = affinity2.avoid.includes(d1.type);
@@ -704,7 +708,7 @@ export class CityFengShuiAnalyzer {
       metal: 'fire',
       water: 'earth',
     };
-    return controls[element];
+    return controls[element] || 'unknown';
   }
 
   private getElementSuggestion(element: keyof CityElementBalance): string {
@@ -715,7 +719,7 @@ export class CityFengShuiAnalyzer {
       metal: 'military structures, workshops',
       water: 'wells, fountains, markets',
     };
-    return suggestions[element];
+    return suggestions[element] || 'various features';
   }
 
   // ===========================================================================
@@ -734,6 +738,7 @@ export class CityFengShuiAnalyzer {
           const severity = straightLength >= 15 ? 'severe' : straightLength >= 10 ? 'moderate' : 'minor';
           const from = street.points[0];
           const to = street.points[street.points.length - 1];
+          if (!from || !to) continue;
 
           paths.push({
             from,
@@ -761,14 +766,21 @@ export class CityFengShuiAnalyzer {
   private getStraightLength(points: Position[]): number {
     if (points.length < 2) return 0;
 
+    const p0 = points[0];
+    const p1 = points[1];
+    if (!p0 || !p1) return 0;
+
     // Check if all points are roughly in a line
-    const dx = points[1].x - points[0].x;
-    const dy = points[1].y - points[0].y;
+    const dx = p1.x - p0.x;
+    const dy = p1.y - p0.y;
 
     let straightCount = 0;
     for (let i = 1; i < points.length; i++) {
-      const thisDx = points[i].x - points[i - 1].x;
-      const thisDy = points[i].y - points[i - 1].y;
+      const curr = points[i];
+      const prev = points[i - 1];
+      if (!curr || !prev) break;
+      const thisDx = curr.x - prev.x;
+      const thisDy = curr.y - prev.y;
 
       // Same direction?
       if ((dx === 0 && thisDx === 0) || (dy === 0 && thisDy === 0)) {

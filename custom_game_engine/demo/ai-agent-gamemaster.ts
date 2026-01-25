@@ -17,7 +17,7 @@ dotenv.config();
 
 import {
   GameLoop,
-  WorldImpl,
+  World,
   EventBusImpl,
   registerAllSystems,
   initializeNetworkManager,

@@ -11,7 +11,7 @@ import { RecipeListSection } from '../RecipeListSection';
 import { BuildingPlacementUI } from '../BuildingPlacementUI';
 import { Camera } from '../Camera';
 import {
-  WorldImpl,
+  World,
   EventBusImpl,
   ResearchRegistry,
   UnlockQueryService,

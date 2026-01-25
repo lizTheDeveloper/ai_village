@@ -1,0 +1,586 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/scripts/test-automation.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">custom_game_engine/scripts</a> test-automation.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/120</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/120</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/**<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+ * Test script to verify automation systems produce correct output.
+ * Spawns factories and verifies they craft items as expected.
+ */
+&nbsp;
+<span class="cstat-no" title="statement not covered" >import { World, EventBusImpl } from '../packages/core/dist/index.js';</span>
+import type { EntityImpl } from '../packages/core/dist/index.js';
+<span class="cstat-no" title="statement not covered" >import { CraftingSystem } from '../packages/core/dist/crafting/CraftingSystem.js';</span>
+<span class="cstat-no" title="statement not covered" >import { RecipeRegistry } from '../packages/core/dist/crafting/RecipeRegistry.js';</span>
+<span class="cstat-no" title="statement not covered" >import { ItemInstanceRegistry } from '../packages/core/dist/items/ItemInstanceRegistry.js';</span>
+<span class="cstat-no" title="statement not covered" >import { AssemblyMachineSystem } from '../packages/core/dist/systems/AssemblyMachineSystem.js';</span>
+<span class="cstat-no" title="statement not covered" >import { createPositionComponent } from '../packages/core/dist/components/PositionComponent.js';</span>
+<span class="cstat-no" title="statement not covered" >import { createAssemblyMachine } from '../packages/core/dist/components/AssemblyMachineComponent.js';</span>
+<span class="cstat-no" title="statement not covered" >import { createMachineConnection } from '../packages/core/dist/components/MachineConnectionComponent.js';</span>
+<span class="cstat-no" title="statement not covered" >import { createPowerConsumer } from '../packages/core/dist/components/PowerComponent.js';</span>
+import type { Recipe } from '../packages/core/dist/crafting/Recipe.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >const itemInstanceRegistry = ItemInstanceRegistry.getInstance();</span>
+&nbsp;
+// Test recipes
+<span class="cstat-no" title="statement not covered" >const IRON_PLATE_RECIPE: Recipe = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'iron_plate',</span>
+<span class="cstat-no" title="statement not covered" >  name: 'Iron Plate',</span>
+<span class="cstat-no" title="statement not covered" >  category: 'Crafting',</span>
+<span class="cstat-no" title="statement not covered" >  ingredients: [</span>
+<span class="cstat-no" title="statement not covered" >    { itemId: 'iron_ingot', quantity: 1 },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  output: {</span>
+<span class="cstat-no" title="statement not covered" >    itemId: 'iron_plate',</span>
+<span class="cstat-no" title="statement not covered" >    quantity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  craftingTime: 1.0, // 1 second at 20 TPS = 20 ticks</span>
+<span class="cstat-no" title="statement not covered" >  requiredSkills: {},</span>
+<span class="cstat-no" title="statement not covered" >  requiredTools: [],</span>
+<span class="cstat-no" title="statement not covered" >  stationRequired: 'assembly_machine',</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >const IRON_GEAR_RECIPE: Recipe = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'iron_gear',</span>
+<span class="cstat-no" title="statement not covered" >  name: 'Iron Gear',</span>
+<span class="cstat-no" title="statement not covered" >  category: 'Crafting',</span>
+<span class="cstat-no" title="statement not covered" >  ingredients: [</span>
+<span class="cstat-no" title="statement not covered" >    { itemId: 'iron_plate', quantity: 2 },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  output: {</span>
+<span class="cstat-no" title="statement not covered" >    itemId: 'iron_gear',</span>
+<span class="cstat-no" title="statement not covered" >    quantity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  craftingTime: 0.5, // 0.5 seconds = 10 ticks</span>
+<span class="cstat-no" title="statement not covered" >  requiredSkills: {},</span>
+<span class="cstat-no" title="statement not covered" >  requiredTools: [],</span>
+<span class="cstat-no" title="statement not covered" >  stationRequired: 'assembly_machine',</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log('=== Automation System Test ===\n');</span>
+&nbsp;
+// 1. Create world and systems
+<span class="cstat-no" title="statement not covered" >console.log('1. Creating world and systems...');</span>
+<span class="cstat-no" title="statement not covered" >const eventBus = new EventBusImpl();</span>
+<span class="cstat-no" title="statement not covered" >const world = new World(eventBus);</span>
+<span class="cstat-no" title="statement not covered" >const craftingSystem = new CraftingSystem();</span>
+<span class="cstat-no" title="statement not covered" >const assemblySystem = new AssemblyMachineSystem();</span>
+&nbsp;
+// 2. Set up recipe registry
+<span class="cstat-no" title="statement not covered" >console.log('2. Setting up recipe registry...');</span>
+<span class="cstat-no" title="statement not covered" >const recipeRegistry = new RecipeRegistry();</span>
+<span class="cstat-no" title="statement not covered" >recipeRegistry.registerRecipe(IRON_PLATE_RECIPE);</span>
+<span class="cstat-no" title="statement not covered" >recipeRegistry.registerRecipe(IRON_GEAR_RECIPE);</span>
+<span class="cstat-no" title="statement not covered" >craftingSystem.setRecipeRegistry(recipeRegistry);</span>
+&nbsp;
+// 3. Set up world references
+<span class="cstat-no" title="statement not covered" >console.log('3. Connecting world to systems...');</span>
+<span class="cstat-no" title="statement not covered" >(world as any).setCraftingSystem(craftingSystem);</span>
+<span class="cstat-no" title="statement not covered" >(world as any).setItemInstanceRegistry(itemInstanceRegistry);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`   - Crafting system registered: ${!!world.craftingSystem}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`   - Item registry registered: ${!!world.itemInstanceRegistry}`);</span>
+&nbsp;
+// 4. Create assembly machine entity
+<span class="cstat-no" title="statement not covered" >console.log('\n4. Creating assembly machine entity...');</span>
+<span class="cstat-no" title="statement not covered" >const machine = world.createEntity() as EntityImpl;</span>
+&nbsp;
+// Add position
+<span class="cstat-no" title="statement not covered" >machine.addComponent(createPositionComponent(10, 10));</span>
+&nbsp;
+// Add assembly machine component with recipe configured
+<span class="cstat-no" title="statement not covered" >const assemblyComp = createAssemblyMachine('assembly_machine_i', 1);</span>
+<span class="cstat-no" title="statement not covered" >assemblyComp.currentRecipe = 'iron_plate';</span>
+<span class="cstat-no" title="statement not covered" >assemblyComp.speed = 1.0;</span>
+<span class="cstat-no" title="statement not covered" >machine.addComponent(assemblyComp);</span>
+&nbsp;
+// Add machine connection with input/output slots
+<span class="cstat-no" title="statement not covered" >const connection = createMachineConnection();</span>
+// Input slot (north) - pre-populated with iron ingots
+<span class="cstat-no" title="statement not covered" >connection.inputs[0]!.items = [</span>
+<span class="cstat-no" title="statement not covered" >  { instanceId: 'ing1', definitionId: 'iron_ingot', quality: 50, condition: 100 },</span>
+<span class="cstat-no" title="statement not covered" >  { instanceId: 'ing2', definitionId: 'iron_ingot', quality: 50, condition: 100 },</span>
+<span class="cstat-no" title="statement not covered" >  { instanceId: 'ing3', definitionId: 'iron_ingot', quality: 50, condition: 100 },</span>
+<span class="cstat-no" title="statement not covered" >  { instanceId: 'ing4', definitionId: 'iron_ingot', quality: 50, condition: 100 },</span>
+<span class="cstat-no" title="statement not covered" >  { instanceId: 'ing5', definitionId: 'iron_ingot', quality: 50, condition: 100 },</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+<span class="cstat-no" title="statement not covered" >machine.addComponent(connection);</span>
+&nbsp;
+// Add power component (always powered for this test)
+<span class="cstat-no" title="statement not covered" >const power = createPowerConsumer('electrical', 100);</span>
+<span class="cstat-no" title="statement not covered" >power.isPowered = true;</span>
+<span class="cstat-no" title="statement not covered" >power.efficiency = 1.0;</span>
+<span class="cstat-no" title="statement not covered" >machine.addComponent(power);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`   - Machine ID: ${machine.id}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`   - Recipe: ${assemblyComp.currentRecipe}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`   - Input items: ${connection.inputs[0]!.items.length} iron ingots`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`   - Output items: ${connection.outputs[0]!.items.length}`);</span>
+&nbsp;
+// 5. Run simulation
+<span class="cstat-no" title="statement not covered" >console.log('\n5. Running simulation...');</span>
+<span class="cstat-no" title="statement not covered" >const TICKS_PER_SECOND = 20;</span>
+<span class="cstat-no" title="statement not covered" >const SIMULATION_SECONDS = 3;</span>
+<span class="cstat-no" title="statement not covered" >const TOTAL_TICKS = TICKS_PER_SECOND * SIMULATION_SECONDS;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >for (let tick = 0; tick &lt; TOTAL_TICKS; tick++) {</span>
+  // Run assembly machine system
+<span class="cstat-no" title="statement not covered" >  assemblySystem.update(world, [machine], 1.0 / TICKS_PER_SECOND);</span>
+&nbsp;
+  // Advance world tick
+<span class="cstat-no" title="statement not covered" >  (world as any).advanceTick();</span>
+&nbsp;
+  // Log progress every second
+<span class="cstat-no" title="statement not covered" >  if ((tick + 1) % TICKS_PER_SECOND === 0) {</span>
+<span class="cstat-no" title="statement not covered" >    const machineComp = machine.getComponent&lt;typeof assemblyComp&gt;('assembly_machine')!;</span>
+<span class="cstat-no" title="statement not covered" >    const connectionComp = machine.getComponent&lt;typeof connection&gt;('machine_connection')!;</span>
+<span class="cstat-no" title="statement not covered" >    const second = (tick + 1) / TICKS_PER_SECOND;</span>
+<span class="cstat-no" title="statement not covered" >    console.log(`   Tick ${tick + 1} (${second}s): Progress ${machineComp.progress.toFixed(1)}%, Outputs: ${connectionComp.outputs[0]!.items.length}, Inputs: ${connectionComp.inputs[0]!.items.length}`);</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+// 6. Verify results
+<span class="cstat-no" title="statement not covered" >console.log('\n6. Verification:');</span>
+<span class="cstat-no" title="statement not covered" >const finalMachine = machine.getComponent&lt;typeof assemblyComp&gt;('assembly_machine')!;</span>
+<span class="cstat-no" title="statement not covered" >const finalConnection = machine.getComponent&lt;typeof connection&gt;('machine_connection')!;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`   - Final progress: ${finalMachine.progress.toFixed(1)}%`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`   - Input items remaining: ${finalConnection.inputs[0]!.items.length}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`   - Output items produced: ${finalConnection.outputs[0]!.items.length}`);</span>
+&nbsp;
+// Check output items
+<span class="cstat-no" title="statement not covered" >const outputItems = finalConnection.outputs[0]!.items;</span>
+<span class="cstat-no" title="statement not covered" >console.log('\n7. Output item details:');</span>
+<span class="cstat-no" title="statement not covered" >for (let i = 0; i &lt; outputItems.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >  const item = outputItems[i]!;</span>
+<span class="cstat-no" title="statement not covered" >  console.log(`   Item ${i + 1}: ${item.definitionId} (quality: ${item.quality}, condition: ${item.condition}, instanceId: ${item.instanceId})`);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+// Verify expectations
+<span class="cstat-no" title="statement not covered" >const EXPECTED_CRAFTS = Math.floor(SIMULATION_SECONDS / IRON_PLATE_RECIPE.craftingTime);</span>
+<span class="cstat-no" title="statement not covered" >const SUCCESS = outputItems.length === EXPECTED_CRAFTS &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >                outputItems.every(item =&gt; item.definitionId === 'iron_plate');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log('\n=== Test Results ===');</span>
+<span class="cstat-no" title="statement not covered" >console.log(`Expected crafts: ${EXPECTED_CRAFTS} iron plates`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`Actual output: ${outputItems.length} items`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`All items correct type: ${outputItems.every(item =&gt; item.definitionId === 'iron_plate')}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`\nTest ${SUCCESS ? '✓ PASSED' : '✗ FAILED'}`);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >if (!SUCCESS) {</span>
+<span class="cstat-no" title="statement not covered" >  process.exit(1);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

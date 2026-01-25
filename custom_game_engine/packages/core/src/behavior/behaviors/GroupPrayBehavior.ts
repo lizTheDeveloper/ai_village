@@ -82,9 +82,9 @@ export class GroupPrayBehavior extends BaseBehavior {
     const currentTick = world.tick;
     const phase = (state.phase as GroupPrayerPhase) ?? 'gathering';
 
-    const spiritual = entity.getComponent<SpiritualComponent>(ComponentType.Spiritual);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const spiritual = entity.getComponent(ComponentType.Spiritual);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
 
     if (!spiritual || !agent || !position) {
       throw new Error(`[GroupPrayBehavior] Agent ${entity.id} missing required components: spiritual=${!!spiritual}, agent=${!!agent}, position=${!!position}`);
@@ -288,7 +288,7 @@ export class GroupPrayBehavior extends BaseBehavior {
         participants,
         tick: currentTick,
         duration: participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_BONUS + GROUP_PRAYER_CONFIG.BASE_DURATION,
-        deityId: entity.getComponent<SpiritualComponent>(ComponentType.Spiritual)?.believedDeity,
+        deityId: entity.getComponent(ComponentType.Spiritual)?.believedDeity,
         answered: false,
         prayerPower: amplification,
       },
@@ -301,7 +301,7 @@ export class GroupPrayBehavior extends BaseBehavior {
         source: 'group_pray_behavior' as const,
         data: {
           participants,
-          deityId: entity.getComponent<SpiritualComponent>(ComponentType.Spiritual)?.believedDeity,
+          deityId: entity.getComponent(ComponentType.Spiritual)?.believedDeity,
           clarity: Math.min(1.0, 0.6 + (participants.length * 0.05)),
           prayerPower: amplification,
         },
@@ -348,9 +348,9 @@ export class GroupPrayBehavior extends BaseBehavior {
       if (agent.id === leader.id) continue;
       if (participants.length >= GROUP_PRAYER_CONFIG.MAX_PARTICIPANTS) break;
 
-      const agentPos = agent.getComponent<PositionComponent>(ComponentType.Position);
-      const spiritual = agent.getComponent<SpiritualComponent>(ComponentType.Spiritual);
-      const agentComp = agent.getComponent<AgentComponent>(ComponentType.Agent);
+      const agentPos = agent.getComponent(ComponentType.Position);
+      const spiritual = agent.getComponent(ComponentType.Spiritual);
+      const agentComp = agent.getComponent(ComponentType.Agent);
 
       if (!agentPos || !spiritual || !agentComp) continue;
 

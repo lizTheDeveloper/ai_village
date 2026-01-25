@@ -35,9 +35,9 @@ export class FollowAgentBehavior extends BaseBehavior {
     // Disable steering system
     this.disableSteering(entity);
 
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const position = entity.getComponent(ComponentType.Position)!;
+    const movement = entity.getComponent(ComponentType.Movement)!;
+    const agent = entity.getComponent(ComponentType.Agent)!;
 
     const targetId = agent.behaviorState?.targetId as string | undefined;
     if (!targetId) {
@@ -52,7 +52,7 @@ export class FollowAgentBehavior extends BaseBehavior {
     }
 
     const targetImpl = targetEntity as EntityImpl;
-    const targetPos = targetImpl.getComponent<PositionComponent>(ComponentType.Position);
+    const targetPos = targetImpl.getComponent(ComponentType.Position);
     if (!targetPos) {
       return { complete: true, reason: 'Target has no position' };
     }
@@ -120,7 +120,7 @@ export function followAgentBehaviorWithContext(ctx: BehaviorContext): ContextBeh
   }
 
   const targetEntity = target as EntityImpl;
-  const targetPos = targetEntity.getComponent<PositionComponent>(ComponentType.Position);
+  const targetPos = targetEntity.getComponent(ComponentType.Position);
   if (!targetPos) {
     return ctx.complete('Target has no position');
   }

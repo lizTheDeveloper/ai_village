@@ -1,0 +1,2101 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/structural_engineering-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> structural_engineering-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LOAD_BEARING_CALCULATIONS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'load_bearing_calculations',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Load Bearing Calculations',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_load_bearing_calculations' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Load Bearing Calculations: A Foundational Treatise on Not Having Things Fall On Your Head</span>
+&nbsp;
+The fundamental principle of load bearing calculations rests upon a deceptively simple question: will this structure remain upright, or will it demonstrate gravity's unwavering commitment to bringing all things to the lowest possible point?* The ancient Mesopotamians understood this intuitively when they discovered that piling stones seventeen high without any particular system resulted in what scholars now term "an educational collapse."† Modern engineering has refined this wisdom into mathematical precision, though the underlying principle remains unchanged: things are heavy, gravity is persistent, and the ground has opinions about what it will support.‡
+&nbsp;
+Load bearing calculations require understanding three essential forces: compression (pushing down), tension (pulling apart), and shear (sliding sideways in a manner that makes engineers wake up in cold sweats).** The weight of a structure must be distributed through its supports to the foundation, which must in turn distribute it to the soil, which must distribute it to the bedrock, which must distribute it to the Earth's mantle, which frankly has enough to worry about already.†† The calculation itself involves determining the maximum load a structural element can support before experiencing what the Technical Institute of Prætorius terms "catastrophic geometry adjustment."‡‡ This is typically expressed in pounds per square inch, newtons per square meter, or in the case of the Ankh-Morpork Building Council, "bits per hour."***
+&nbsp;
+In practice, engineers apply safety factors ranging from 1.5 to 4.0, meaning structures are designed to support considerably more weight than expected.††† This accounts for unexpected loads such as additional floors added by optimistic contractors, collections of unusually dense books,‡‡‡ or the spontaneous manifestation of relatives during holiday seasons.**** The Guild of Structural Engineers maintains that 73.4% of load bearing failures result from someone saying "it'll probably be fine" followed by inadequate calculation.†††† The remaining 26.6% involves wizards, which is why the Unseen University requires its own engineering department.‡‡‡‡
+&nbsp;
+Historical development of load bearing theory progressed through a series of increasingly sophisticated collapses.***** The Romans perfected the arch through extensive trial and error, mostly error, until they discovered that the weight of a properly constructed arch actually makes it stronger – a concept so counterintuitive that three separate emperors declared it witchcraft before accepting the evidence.††††† Medieval master builders relied on geometric proportion and what they called "divine inspiration," which modern analysis reveals to have been remarkably accurate empirical observation combined with survivor bias.‡‡‡‡‡ The mathematical formalization of load bearing calculations in the 17th century by scholars such as Hooke and Bernoulli transformed architecture from an art form that occasionally defied gravity into an engineering discipline that defied gravity consistently.****** Modern computer analysis can calculate load distribution through complex structures in seconds, though experienced engineers still prefer to squint at blueprints and say "hmm" thoughtfully, as it maintains professional mystique.††††††
+&nbsp;
+The practical application of load bearing calculations extends beyond merely preventing collapse; it encompasses material selection, cost optimization, and ensuring that staircases remain stable when three teenage boys decide to race down them simultaneously.‡‡‡‡‡‡ Proper calculation allows engineers to use exactly as much material as necessary and not one gram more, leading to the elegant efficiency of modern structures that can support tremendous loads while appearing improbably delicate.******* The key insight, understood by load bearing calculators throughout history, is that gravity never takes a day off, never gets distracted, and has been practicing its craft since the formation of the universe – making it an adversary deserving of respect and careful mathematics.†††††††
+&nbsp;
+---
+&nbsp;
+*Gravity, according to the Celestial Mechanics Department at Unseen University, is "unreasonably consistent" and "shows favoritism toward the center of planetary bodies." Their petition to negotiate with gravity for reduced rates during construction projects was denied on grounds that gravity does not accept appeals.
+&nbsp;
+†The Mesopotamian Incident of 2847 BCE involved a ziggurat that achieved what builders called "an unplanned demonstration of the arc principle" when it shed its top three levels over the course of a ceremonial feast. Contemporary clay tablets describe it as "most educational" and "surprisingly gradual," suggesting observers had time to place bets on which section would fall next.
+&nbsp;
+‡Soil mechanics is an entire subdiscipline devoted to understanding what dirt thinks about buildings. The answer, according to geotechnical engineers, is "it depends," followed by extensive testing that basically amounts to poking the ground with increasingly sophisticated sticks and measuring how much it complains.
+&nbsp;
+**Shear force is named after Professor Edmund Shear (1673-1741), who discovered it when his experimental bridge began sliding apart sideways during the opening ceremony. He is reported to have said, "I accounted for down and up, but not for THAT direction," before quickly calculating that he had 12.4 seconds to evacuate the dignitaries.* The bridge was later rebuilt with more diagonal bracing and considerably fewer politicians.
+&nbsp;
+*Professor Shear's notebooks reveal he had also failed to account for "the collective weight of civic pride," which he later quantified as "negligible in structural terms but devastating in political ones."
+&nbsp;
+††The Earth's mantle has been under continuous load for approximately 4.5 billion years and is reportedly "getting tired of this." Geologists suggest it occasionally expresses displeasure through volcanic activity, though this remains controversial within the scientific community.**
+&nbsp;
+**The Vulcanological Society of Prague maintains that volcanoes are "Earth's way of saying it's reached its load bearing capacity for nonsense." This theory gained traction after Mount Vesuvius erupted shortly after Pompeii approved an additional amphitheater.
+&nbsp;
+‡‡The Technical Institute of Prætorius, located in a deliberately over-engineered building that could support seventeen times its own weight, defines "catastrophic geometry adjustment" as "what happens when a structure decides to explore alternative configurations not specified in the original blueprints." Their safety manual includes an entire chapter on "recognizing when geometry is becoming distressed" with warning signs such as "unexpected ventilation holes" and "novel acoustic properties."†
+&nbsp;
+†The Institute's building once survived an earthquake that destroyed everything around it. When asked how, the Dean of Engineering reportedly said, "spite, mostly," and refused to elaborate.
+&nbsp;
+‡‡‡The personal library of Lord Havelock Vetinari weighs approximately 4.3 tons and includes several books that are metaphysically as well as physically heavy.‡ Standard floor joists were deemed inadequate; his study floor is supported by a system of steel beams normally reserved for industrial facilities. The Palace Architect noted that "some books exert gravitational influence beyond their physical mass," particularly volumes concerning taxation law and treatises on the nature of power.
+&nbsp;
+‡Metaphysical weight is not recognized by mainstream engineering codes, but the Guild of Architects maintains an unofficial appendix listing materials that are "narratively dense" and require additional support. These include original manuscripts of epic poetry (2.3x physical weight), ancient prophecies (variable), and anything written in a language that predates recorded history (consult specialist).
+&nbsp;
+****The Winterheart Holiday Load Coefficient, established by the Greater Harmonious Institute of Weight Distribution, states that residential floors must support an additional 37.2 pounds per adult relative expected to arrive during holidays, plus 12.1 pounds per relative under age 16 (who are somehow denser), plus 89.6 pounds per relative who "just needs to stay for a little while" after their previous living arrangement encountered its own structural failure (metaphorical or literal).
+&nbsp;
+†††††Engineers employ safety factors because every structure ever built immediately begins collecting unexpected loads the moment it's occupied. The Complete Registry of Unanticipated Structural Burdens, maintained by the International Council of Long-Suffering Architects, lists 3,247 categories including: water damage from houseplants (common), unauthorized libraries (frequent), amateur taxidermy collections (distressingly regular), and floor-mounted anvils installed by residents who "used to do some smithing."**
+&nbsp;
+**The Anvil Incident of 1883 involved a Manchester apartment whose second-floor tenant decided to resume his blacksmithing hobby indoors. The anvil, weighing 312 pounds, was positioned directly over the dining room of the flat below. The resulting structural failure occurred during a dinner party, leading to what contemporary newspapers described as "an unexpected blending of the floors" and what engineers now call "inadequate consideration of operational loads."
+&nbsp;
+‡‡‡The Technical University of Genua studied the phenomenon of "sudden book accumulation syndrome" and determined that personal libraries expand at a rate of 14.3 books per year for casual readers and 127.6 books per year for academics who "really should stop attending publishers' sales." A typical hardcover book weighs 1.5 pounds; over twenty years, this represents`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding load bearing calculations in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STRESS_DISTRIBUTION_ANALYSIS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stress_distribution_analysis',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stress Distribution Analysis',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['load_bearing_calculations'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stress_distribution_analysis' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `STRESS DISTRIBUTION ANALYSIS: A PRACTICAL GUIDE TO NOT FALLING DOWN</span>
+By Professor Millicent Weatherwax-Pemberton, Chair of Applied Gravitational Resistance Studies, 
+The Unseen University Department of Things That Should Probably Stay Up
+&nbsp;
+The fundamental principle of stress distribution analysis rests upon a deceptively simple truth: when you push on something, it pushes back*, and where exactly it pushes back matters rather more than most people initially suppose**. In engineering contexts, stress distribution refers to the manner in which forces spread themselves throughout a material or structure, much like how gossip spreads through a small village†, but with more predictable mathematical properties and fewer accusations of impropriety. The analysis of these distributions allows engineers to determine whether a structure will gracefully support its intended load or whether it will demonstrate what the Ancient Guild of Catastrophic Failure Prevention†† calls "sudden and regrettable reconfiguration."
+&nbsp;
+The practical application of stress distribution analysis involves several key techniques, beginning with the creation of free-body diagrams‡ and progressing through increasingly sophisticated mathematical models that attempt to predict where, precisely, things might go terribly wrong. Modern engineers employ finite element analysis*, a method that involves dividing a structure into thousands of tiny pieces** and calculating the stress in each one, which sounds tedious because it absolutely is†††. The process requires careful consideration of material properties‡‡, loading conditions, and boundary constraints—essentially asking the questions "what is this made of?", "what's pushing on it?", and "what's stopping it from leaving?"‡‡‡ in increasingly mathematical terms. Historical records indicate that structures designed without proper stress distribution analysis tend to exhibit what the legendary engineer Isambard Kingdom Brunel§ once described as "unscheduled disassembly events."
+&nbsp;
+Safety considerations in stress distribution analysis cannot be overstated, particularly given the Department of Structural Integrity's §§ extensive archives of incidents involving inadequate analysis. The primary danger lies in assuming uniform stress distribution when reality has other plans*, leading to concentration of forces in unexpected locations**—typically the locations where you most fervently wish forces would not concentrate. Best practices include applying appropriate safety factors†, conducting sensitivity analyses††, and maintaining a healthy respect for the fundamental principle that materials will fail‡ when asked to do more than they are capable of doing§§§. The Guild of Engineers Who Have Learned From Experience* recommends always analyzing stress distribution before construction, not after**, though they acknowledge this advice comes approximately three centuries too late for several notable bridges†††.
+&nbsp;
+The historical development of stress distribution analysis traces back to ancient times when builders relied primarily on rules of thumb‡‡ and the observational method of "build it and see what happens"§. The formalization of stress analysis as a discipline began in earnest during the Industrial Revolution**, when the sudden proliferation of iron structures provided both opportunity and cautionary examples in roughly equal measure. Early pioneers like Claude-Louis Navier†† and Augustin-Louis Cauchy‡‡‡ developed the mathematical frameworks we still use today, though one suspects they would be horrified by some of the applications*. Modern understanding incorporates computer-aided analysis, advanced materials science, and a considerably better grasp of why things fall down**, though the fundamental principles remain unchanged: forces must go somewhere, materials have limits, and ignoring either of these facts leads to what insurance companies refer to as "events"†††.
+&nbsp;
+---
+&nbsp;
+*Isaac Newton's Third Law, which he discovered after an incident involving an apple, a head, and what historians now believe was a significantly more complex series of events involving a ladder, a very angry goose, and someone's washing line. The goose is rarely mentioned in physics textbooks.
+&nbsp;
+**The Ankh-Morpork School of Applied Practicality estimates that approximately 73.4% of structural failures occur because someone assumed the stress would "sort itself out somehow." The remaining 26.6% involve wine, bets, or both.
+&nbsp;
+†With the crucial difference that stress tends to follow load paths dictated by material properties and geometry, whereas gossip follows Mrs. Henderson's afternoon tea route with remarkable precision.
+&nbsp;
+††Founded in the year 1742, shortly after the Great Bridge Incident of 1741*, which the Guild prefers not to discuss in detail. Their motto, loosely translated from the original Latin, reads: "We Told You So."
+&nbsp;
+*The Great Bridge Incident of 1741 involved a bridge, a parade, seventeen elephants, and a fundamental misunderstanding of the term "load bearing capacity." The bridge designer's notes, recovered from the rubble, contained the phrase "should be fine" in increasingly large handwriting.
+&nbsp;
+‡Free-body diagrams are so named because they require you to imagine the body is floating in an infinite void, free from all earthly constraints except the specific forces you're analyzing. The psychological impact of repeatedly imagining objects as disembodied entities floating in the void is not covered in most engineering curricula, though the Department of Engineering Psychology† suggests it explains a great deal about engineers' social skills.
+&nbsp;
+†The Department of Engineering Psychology was disbanded in 1987 after determining that understanding why engineers behave as they do was "detrimental to departmental morale."
+&nbsp;
+*The term "finite element" is deliberately misleading. While technically finite, the elements in a proper analysis number in the millions, leading to what computational engineers call "going out for a very long coffee while the computer thinks about it." The Ancient Brotherhood of Slide Rule Users‡ views this as moral weakness.
+&nbsp;
+**The record for smallest element size in a finite element analysis belongs to Dr. Thaddeus Pembridge-Smythe, who divided a simple bracket into 47 million elements. The analysis took six weeks to run and produced results accurate to seventeen decimal places, fourteen more than the manufacturing tolerances could achieve. Dr. Pembridge-Smythe was gently retired shortly thereafter.
+&nbsp;
+†††The Gnomish word for this process translates approximately to "breaking-things-into-smaller-pieces-until-mathematics-happens-or-you-give-up," though linguists note that Gnomish has seventeen different words for various types of analytical tedium‡‡.
+&nbsp;
+‡‡The most specific being "thrrgrugnix," meaning specifically "the type of tedium experienced when performing structural calculations on underground dwellings carved from living rock by distant ancestors who definitely knew what they were doing, unlike yourself."
+&nbsp;
+‡‡Material properties include such vital characteristics as Young's modulus (named after Thomas Young, who was neither young nor particularly cheerful when he discovered it), Poisson's ratio (named after Siméon Denis Poisson, who made important contributions to probability theory and also, somewhat randomly, to stress analysis), and the yield strength, which is the point at which a material politely informs you it has had quite enough of your nonsense.
+&nbsp;
+‡‡‡Questions that seem simple until you attempt to answer them for a real structure, at which point they reveal themselves to be cosmic koans of engineering. The sound of one hand clapping is considerably easier to determine than the effective boundary conditions of a partially fixed connection in a steel frame subjected to wind loading.
+&nbsp;
+§Brunel did not actually say this, as the term "unscheduled disassembly event" was not coined until 1973 by a NASA engineer describing the Skylab incident. However, Brunel did witness several bridges demonstrating what he termed "structural enthusiasm for returning to their constituent parts," which amounts to the same thing.
+&nbsp;
+§§The Department of Structural Integrity maintains its offices in a building specifically designed to be over-engineered by a factor of seven. The building has seventeen redundant load paths, backup columns for the backup columns, and foundations that could support a building three times its size. Visitors often comment on the excessive nature of this design, to which the Department responds by pointing at their filing cabinets.
+&nbsp;
+*Specifically, the bit about forces concentrating where you don't want them to. Stress concentrations occur at geometric discontinuities—holes, corners, sharp transitions—with the intensity of concentration proportional to the sharpness of the discontinuity. This is why experienced engineers develop an instinctive distrust of sharp corners, a trait that extends into their personal lives and explains why so many prefer round dining tables†.
+&nbsp;
+†The Statistical Survey of Engineering Preferences in Furniture (1998) found that 67.3% of structural engineers prefer round or oval tables, compared to only 23.1% of the general population. The survey was conducted by Dr. Helena Forthright at the Institute of Unnecessarily Specific Research‡.
+&nbsp;
+‡The Institute of Unnecessarily Specific Research also produced groundbreaking studies on "The Exact Shade of Blue Preferred by Civil Engineers for Blueprint Backgrounds" and "Optimal Coffee Temperature for Maintaining Concentration During Finite Element Analysis Sessions." Both papers won awards, though nobody is quite sure what for.
+&nbsp;
+**Such concentrations manifest as local regions of very high stress, increasing the probability of crack initiation by factors ranging from "somewhat concerning" to "evacuate`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stress distribution analysis in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COMPRESSION_TENSION_FORCES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'compression_tension_forces',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Compression Tension Forces',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stress_distribution_analysis'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_compression_tension_forces' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Compression Tension Forces: A Foundational Study in Structural Engineering</span>
+&nbsp;
+The fundamental dichotomy of compression and tension represents perhaps the oldest conversation in engineering—one structure pushing down while another pulls up, neither particularly interested in what the engineer thinks about the arrangement*. Compression occurs when forces push inward upon a material, attempting to squeeze it into a smaller space†, while tension occurs when forces pull outward, stretching the material like an overly optimistic baker attempting to make one loaf of bread feed the multitude‡. These forces exist in nearly every structure humans have ever built, from the humblest garden shed to the Tower of Unpronounceable Height in the Forty-Seventh Province**. Understanding how materials respond to these forces allows engineers to predict whether a structure will stand proudly for centuries or collapse with what the Royal Society of Structural Integrity calls "unfortunate promptness"††.
+&nbsp;
+In practical applications, compression and tension rarely exist in isolation, but rather engage in an elaborate dance of mutual dependence that would make a married couple of fifty years look like casual acquaintances‡‡. A simple beam supported at both ends experiences compression along its top edge and tension along its bottom edge when loaded, with a neutral axis running through the middle where the material remains blissfully unaware of the drama occurring above and below***. Arches primarily work in compression, which is why the Romans built so many of them†††—they had mastered concrete but their iron was somewhat optimistic in quality‡‡‡. Suspension bridges, conversely, rely heavily on tension in their cables, trusting that steel wires pulled taut will hold up rather better than if you simply compressed them, which would result in what Professor Heinrich Doomsbottom termed "expensive confetti"****.
+&nbsp;
+The historical development of our understanding of these forces reads like a catalogue of expensive mistakes punctuated by occasional insights†††††. Ancient builders developed intuitive understanding through trial and error, with error featuring rather more prominently in the early records‡‡‡‡. The mathematical formalization came much later, when engineers finally admitted that perhaps measuring things might be preferable to simply building larger and hoping for the best*****. Modern engineering employs precise calculations to determine stress distribution, maximum loading, and safety factors†††††† —typically calculated at 1.5 to 2.0 times expected loads, because engineers have collectively learned that clients always, always lie about what they're planning to store in the building‡‡‡‡‡. The key principle remains elegantly simple: materials fail when internal stresses exceed material strength, a lesson learned repeatedly throughout history by approximately 73.4% of civilizations at a cost averaging 15% of their annual GDP******.
+&nbsp;
+Safety considerations in dealing with compression and tension forces cannot be overstated, though they are frequently understated, usually by contractors bidding on jobs†††††††. Materials respond differently to these forces—concrete excels in compression but cracks under tension like a nervous student taking examinations‡‡‡‡‡‡, while steel performs admirally in both but costs considerably more and occasionally vanishes overnight when left unsupervised in certain neighborhoods*******. Engineers must account for dynamic loads, fatigue, temperature variations, and what insurance companies delicately term "human creativity in finding new ways to break things"††††††††. The critical insight, hammered home by centuries of bridges that stayed up and the ones that memorably didn't‡‡‡‡‡‡‡, is that forces must be traced through the entire structure, from point of application to final foundation********, and any discontinuity in this chain will be enthusiastically discovered by gravity at the least convenient moment†††††††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The engineer's opinion becomes relevant only after the structure has collapsed, at which point it is sought with great urgency and accompanied by the phrase "what went wrong?" The correct answer—"you didn't listen to me"—is rarely appreciated at coroner's inquests.
+&nbsp;
+†This is occasionally successful. The material becomes denser, stronger, and deeply resentful. Engineers report that compressed materials have been known to "spring back" with what Professor Emmeline Crushworth-Bendel of the Institute for Materials Who Remember Grudges called "vindictive enthusiasm."
+&nbsp;
+‡The Biblical incident was later analyzed by structural theologians who determined that the real miracle wasn't the multiplication but rather that the distribution system didn't collapse under the load. The supporting disciples demonstrated excellent understanding of load-bearing paths, possibly divinely inspired.
+&nbsp;
+**The Tower of Unpronounceable Height earned its name not from its altitude—a respectable but not remarkable 847 feet—but from the architect's insistence on naming it in a dead language that no one could actually pronounce. After the third official opening ceremony where the mayor pulled a muscle attempting the name, it was quietly renamed. The Tower still stands, mostly out of spite.
+&nbsp;
+††This phrase appears in 47% of structural failure reports, second only to "in accordance with the client's wishes" (63%) and "within budgetary constraints" (78%). When all three phrases appear in the same report, insurance premiums typically triple.
+&nbsp;
+‡‡Engineers have proposed several models for this relationship. The "Married Couple Theory of Structural Mechanics," published in 1847 by Professor Adalbert Tensionworth, suggests that compression and tension work best when they stop trying to change each other and simply accept their fundamental differences. The paper was rejected by three journals before being published in "Engineering Philosophy Quarterly," a journal that folded after six issues.
+&nbsp;
+***This neutral axis was discovered independently by several engineers and at least one very observant carpenter named Jim, who noticed it but didn't have the mathematical notation to publish. Jim's contribution is commemorated by the informal "Jim's Line" used by practical builders, which while not strictly accurate, gets you close enough for government work†.
+&nbsp;
+†A subsidiary footnote seems appropriate here. The phrase "close enough for government work" originated during the Arch of Reasonable Adequacy project in 1523, when royal inspectors determined that precision to the nearest inch was "probably sufficient" for a ceremonial gateway. The arch stood for three weeks before exhibiting what court documents called "increasing interpretive flexibility in the vertical dimension." It collapsed during the king's procession, though His Majesty was not injured, being somewhat behind schedule due to an unrelated incident involving a disagreeable swan.
+&nbsp;
+†††The Roman approach to engineering was admirably pragmatic: build it bigger, build it heavier, and if it falls down, build it again with more concrete. This resulted in structures of remarkable durability and equally remarkable cost overruns. Recent analysis of Roman construction budgets suggests that the phrase "within budget" appeared in exactly zero contemporary documents.
+&nbsp;
+‡‡‡Roman iron was produced with charming inconsistency, having a tensile strength that ranged from "adequate" to "decorative" depending on which ironworker had been assigned to the project and whether they'd broken fast that morning. Consequently, Roman engineers preferred to work with materials that didn't require trusting metallurgy, namely stone, concrete, and the occasional enslaved population.
+&nbsp;
+****Professor Doomsbottom, whose real name was Heinrich Müller but who adopted the pseudonym after his third bridge failure, became famous for his categorization of structural failures into: Sudden (Category I), Gradual (Category II), Unexpected (Category III), and Humorous Only In Retrospect (Category IV). His work "On The Many Ways Structures Express Displeasure" remains required reading, though it has been noted that his pessimistic outlook may have been influenced by his being sued seventeen times.
+&nbsp;
+†††††The Babylonians kept cuneiform tablets documenting structural failures, which makes for depressing reading. The tablet "Things That Fell Down This Year" from circa 1800 BCE lists forty-seven incidents, including several towers, a granary, and something translated as either "decorative arch" or "expensive mistake"—the script is unclear.
+&nbsp;
+‡‡‡‡The early records skip lightly over the errors, preferring to focus on successes. This historiographic bias means we have excellent documentation of the Temple of Seven Columns That Still Stand but virtually nothing about the Temple of Nine Columns That Stood Only Briefly Before Adopting A More Horizontal Configuration‡.
+&nbsp;
+‡A temple excavated in 1923 revealed evidence of hasty reconstruction and what appeared to be curse tablets directed at the original architect. One particularly eloquent tablet wished that the architect's own house would demonstrate "the same creative interpretation of load-bearing principles" as the temple. Property records suggest this curse was fulfilled, though modern scholars debate whether supernatural intervention or informed sabotage was responsible.
+&nbsp;
+*****The shift from intuition to mathematics occurred gradually, with engineers resisting the change with the kind of stubbornness usually reserved for cats being given baths. The famous dispute between the Guild of Master Builders and the newly-formed Society for Engineering Mathematics (1673-1681) resulted in several dueling papers, two actual duels**, and ultimately`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding compression tension forces in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SHEAR_FORCE_UNDERSTANDING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'shear_force_understanding',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Shear Force Understanding',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['compression_tension_forces'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_shear_force_understanding' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Shear Force Understanding: A Treatise on Forces That Pass in the Night</span>
+&nbsp;
+The fundamental nature of shear force can be understood through a simple thought experiment: imagine two hands attempting to slide past one another while pressed together, much like the unfortunate handshake between Lord Pemberton and the Ambassador of Klatch, which resulted in what the Royal Society of Engineers later termed "catastrophic social failure."* Shear force, unlike its more straightforward cousins tension and compression†, operates in a plane parallel to the surface upon which it acts, creating what engineers describe as "slidey-pushiness"†† or, in more academic circles, "parallel stress distribution." This perpendicular-to-perpendicular action has confounded students since the establishment of the First Academy of Applied Forces in 1743‡, when Professor Hieronymous Spackle attempted to explain it using trained ferrets‡‡.
+&nbsp;
+The practical applications of shear force understanding extend far beyond mere academic curiosity and into the realm of everyday survival*. Consider the humble bolt, which experiences shear stress whenever loads attempt to slide the connected materials past each other—a phenomenon that the Bolt Manufacturers Guild tracks with obsessive precision, publishing quarterly reports that run to approximately 847 pages per quarter**. The shear strength of materials determines whether your bookshelf remains attached to the wall or recreates the Tragic Incident of Thursday Afternoon††, and engineers calculate these forces using formulas that would make the ancient Mathematicians of Ur weep with joy***. Modern beam analysis requires understanding how transverse loads create internal shear forces that vary along the beam's length, reaching maximum values at supports—a discovery that came at considerable expense to the bridge-building industry‡‡‡.
+&nbsp;
+Historical development of shear force understanding follows a trajectory best described as "painfully empirical."*** The early Romans understood shear failure intimately, though they lacked the mathematical framework to predict it, leading to what contemporary historians call "an impressive number of learning opportunities"****. Medieval engineers developed rule-of-thumb calculations based on observing which structures stood and which provided dramatic entertainment†††, while the Renaissance brought mathematical rigor through scholars like Leonardo da Vinci, who filled seventeen notebooks with shear force diagrams before becoming distracted by helicopter designs‡‡‡‡. The modern era, beginning with the Enlightenment's obsessive measuring of everything*****, has blessed us with precise shear stress equations, failure theories, and the ability to predict material behavior before the inevitable "oh dear" moment******.
+&nbsp;
+Safety considerations in shear force applications cannot be overstated, though they frequently are*****. The Three Laws of Shear Safety, established after the Convention of Worried Engineers in 1891******, state clearly that one must: (1) always calculate maximum shear stress before installation, (2) never assume material properties without testing, and (3) avoid standing beneath anything held together solely by friction and optimism. Modern safety factors typically range from 1.5 to 4, depending on how many lawyers have reviewed the design†††††, and engineers must account for both static and dynamic shear loading conditions‡‡‡‡‡. The practice of "stress concentration awareness"—understanding that shear forces magnify around holes, notches, and other discontinuities—has saved countless structures from failure and countless engineers from explaining themselves to insurance investigators*******.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The incident, recorded in the Annals of Diplomatic Disasters (Vol. 47, pp. 234-892), occurred when Lord Pemberton gripped with 847 Newtons of normal force while simultaneously attempting to withdraw his hand at a rate of 0.3 meters per second. The resulting shear stress exceeded the coefficient of static friction between his glove and the Ambassador's palm, causing what witnesses described as "a most undignified slide-slap motion" that nearly triggered an international incident. The Ambassador later published a paper suggesting that all future diplomatic handshakes be subjected to finite element analysis.
+&nbsp;
+†Tension pulls, compression pushes, but shear? Shear slides. It's the difference between a proper argument where everyone states their position clearly and a family dinner where everyone passive-aggressively moves the conversation sideways. The Old Gods understood this, which is why they built their temples with interlocking stones—they'd seen what happened when forces acted in parallel rather than in opposition.
+&nbsp;
+††This technical term appears in exactly one engineering textbook: "Applied Forces for the Bewildered" by Professor Margery Clickwheel of the Ankh-Morpork College of Engineering†. The book was recalled after three weeks when it was discovered that Professor Clickwheel had made up approximately 40% of engineering terminology in an attempt to make the subject "more accessible." The term, however, perfectly describes the phenomenon and has been adopted by working engineers worldwide who don't have time for fancy words.
+&nbsp;
+†Professor Clickwheel herself famously claimed that "engineering is just cooking with metal and math" before being asked to leave the university. She now runs a successful bakery where she applies beam theory to wedding cake construction. Her cakes never collapse, though they occasionally require scaffolding during transport.
+&nbsp;
+‡The Academy lasted exactly seventeen months before its main lecture hall experienced catastrophic shear failure during a demonstration, ironically, of shear force. The building's designer had used the theoretical minimum amount of structural support, believing that "nature abhors inefficiency." Nature, it turned out, abhors incorrectly calculated shear strength more.
+&nbsp;
+‡‡The ferrets, named Newton, Hooke, and Descartes, were trained to run in opposite directions while connected by a tiny harness. The experiment successfully demonstrated shear force once, after which the ferrets refused to cooperate and instead formed a union demanding better working conditions and hazard pay. Their great-great-great-great-great-great-great-grandferrets now serve as the official mascots of the International Society of Structural Engineers‡.
+&nbsp;
+‡They are depicted on the Society's crest attempting to bite through a steel beam while looking extremely annoyed.
+&nbsp;
+*In the year 2017, the Global Survey of Engineering Accidents (GSEA) reported that improper shear force calculation contributed to 23.7% of structural failures, 15.2% of mechanical device malfunctions, and 100% of what the survey delicately termed "regrettable episodes involving DIY furniture assembly." These statistics are updated quarterly and available for purchase at the remarkably specific price of £47.38, not including postage.
+&nbsp;
+**The Guild's dedication to documentation borders on the pathological. Their most recent report included a 47-page appendix discussing the shear failure modes of decorative brass bolts in Victorian-era coat hooks, complete with electron microscope imagery and a surprisingly moving tribute to "all the coats that fell." The Guild's motto, "In Minutiae We Trust," adorns their headquarters—which, notably, uses 340% more bolts than structurally necessary.
+&nbsp;
+††The Tragic Incident of Thursday Afternoon is not discussed in polite engineering society, though everyone knows about it. It involved an overly ambitious bookshelf, a complete set of the Encyclopedia Universalis Giganticus††, and a doctoral candidate named Reginald Stripewise who had calculated the shear strength of his wall anchors using what he called "vibes-based engineering." The subsequent investigation lasted longer than the construction of most cathedrals.
+&nbsp;
+††Each volume weighing approximately 18.7 kilograms and containing knowledge that, ironically, could have prevented the incident had anyone actually read Volume 34: "Practical Applications of Shear Force in Domestic Settings."
+&nbsp;
+***The Mathematicians of Ur, a civilization that predated writing but somehow developed advanced mathematics through interpretive dance and aggressive pointing, would have recognized shear stress equations as "the sacred formulas of sideways doom." Archaeologists remain puzzled by clay tablets depicting what appear to be free-body diagrams, though some scholars argue they might just be really abstract art.
+&nbsp;
+‡‡‡The expense came primarily from rebuilding collapsed bridges, which the Roman Empire did with remarkable frequency and equanimity. Contemporary records suggest that bridge failures were considered educational opportunities, with spectators gathering to watch and place bets on which section would fail first. The Pont du Gard still stands because someone finally decided to use three times the calculatedly necessary stone—a technique known as "the Roman Safety Factor" or "just keep adding arches until it stops falling down."
+&nbsp;
+***The phrase "painfully empirical" comes from the diary of Nathaniel Crackjoint, a 15th-century carpenter who tested various joint designs by standing beneath them until they failed. His diary ends abruptly on page 73. His final entry: "Tuesday: Testing the mortise and tenon with reduced shoulder area. It seems perfectly solida—" The dash is quite prominent in the manuscript.
+&nbsp;
+****These learning opportunities included the Collapse of the Winchester Watchtower (1247), the Great Barn Beam Incident (1302), and the still-`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding shear force understanding in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MOMENT_FORCE_CALCULATIONS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'moment_force_calculations',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Moment Force Calculations',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['shear_force_understanding'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_moment_force_calculations' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Moment Force Calculations: A Treatise on Leverage, Regret, and Why Your Bridge Might Pivot</span>
+&nbsp;
+The fundamental principle of moment force—that mysterious quantity by which a force applied at a distance from a pivot point causes rotation*—has been understood, misunderstood, and catastrophically ignored since time immemorial. The moment, M, is calculated by the deceptively simple equation M = F × d, where F represents the applied force and d represents the perpendicular distance from the line of action to the pivot point**. What this equation fails to adequately communicate is the sheer number of ways one can misidentify either the force or the distance, leading to structures that rotate when they should remain still, doors that swing when they should stay shut, and seesaws that catapult small children into low Earth orbit†.
+&nbsp;
+The practical application of moment calculations requires not merely mathematical competence but a certain philosophical acceptance of the universe's tendency toward unexpected rotation††. Engineers must calculate not only the moment created by intended loads—the weight of crossing pedestrians, the pressure of accumulated snow, the passage of heavily laden wagons—but also the moments created by loads that absolutely should not be there but somehow are†††. The counterclockwise and clockwise moments acting upon any given pivot must balance precisely, achieving what the ancient texts call "equilibrium" and what practicing engineers call "the thing that probably won't happen but we'll pretend it will"‡. The sum of all moments about any point must equal zero for static equilibrium, a condition that sounds reassuringly absolute until one encounters real-world conditions such as wind, vibration, thermal expansion, and the determined efforts of small children to break everything they touch‡‡.
+&nbsp;
+The historical development of moment force understanding reads like a chronicle of expensive lessons learned through structural failure. The Gothminster Rotating Tower Incident of 1847**** taught engineers that one cannot simply assume symmetry without checking calculations, while the Great Seesaw Catastrophe of Bumblebridge‡‡‡ demonstrated that multiplying force by the wrong perpendicular distance produces not merely incorrect results but actively offensive ones. Modern computational methods have made moment calculations significantly more reliable, though this has paradoxically increased the spectacular nature of failures when they do occur, as miscalculated moments now affect larger, more expensive structures§. The principle of moments extends beyond simple levers to cantilever beams, crane arms, and any structure where forces conspire to cause rotation about an axis, which is to say, nearly everything humans have ever built§§.
+&nbsp;
+Safety considerations in moment force calculations begin with the sobering recognition that angular acceleration is unforgiving and that structures in rotation tend to remain in rotation until something expensive stops them§§§. Best practices include: always identifying the correct pivot point (surprisingly difficult when everything is moving), using consistent units (the Confederation of Engineering Standards reports that 73.4% of moment calculation errors stem from mixing imperial and metric measurements****), calculating moments about multiple points to verify equilibrium (paranoia is professionally appropriate), and never, under any circumstances, assuming that a moment arm of "approximately zero" is actually zero†††††. The moment of force represents humanity's ongoing negotiation with rotational mechanics—a field where small errors in judgment produce large and often spinning consequences.
+&nbsp;
+---
+&nbsp;
+*The ancient Greeks understood this through their invention of the lever, which Archimedes famously claimed could move the Earth if only he had somewhere to stand. What he failed to mention was that moving the Earth would require a moment arm approximately 6.4 × 10^22 times longer than the lever's current length, and that finding a suitable fulcrum would present logistical difficulties. The mathematics were sound; the practicality was aspirational at best.
+&nbsp;
+**The perpendicular distance is critical and frequently misunderstood. The line of action extends infinitely in both directions along the force vector, and the distance must be measured at a right angle to this line. Measuring along any other angle produces what engineers technically call "complete nonsense" and what insurance adjusters call "an interesting claim."
+&nbsp;
+†The Oakshire Seesaw Incident of 1923 involved a miscalculation of moment arms that resulted in a nine-year-old being launched approximately 4.7 meters vertically. The child was reportedly unharmed but complained that the experience "lacked adequate warning" and "went on for too long." The playground was redesigned. The engineer was not invited back.
+&nbsp;
+††Professor Wendell Crankshaft of the Tumbledown Technical Institute once wrote: "The pivot point cares nothing for your intentions, only for the mathematics you've brought it. Treat it with respect, or it will teach you physics the expensive way." He wrote this while his laboratory building was slowly rotating on its improperly calculated foundation‡.
+&nbsp;
+‡The Tumbledown Technical Institute eventually stopped rotating after emergency remediation by the Royal Society of Engineers Who Fix Other Engineers' Mistakes†. The building now leans at a permanent 3.7-degree angle, which the Institute markets as "characterful" and "a teaching opportunity."
+&nbsp;
+†This Society was founded in 1672 and has never lacked for work. Their motto, "Sic Transit Gloria Rotundi" (Thus Passes the Glory of Rotation), adorns their crest featuring a crown, a wrench, and what appears to be a small building falling over.
+&nbsp;
+†††The Third Earl of Feasington famously calculated that his new hunting lodge could support a tower on its eastern corner without considering that this would create an unbalanced moment about the building's foundation. The lodge now leans westward at such an angle that the eastern rooms are only accessible via rope ladder. His descendants have elected not to repair it, claiming it "builds character" and "discourages unwanted guests."
+&nbsp;
+‡The Perpendicularity Paradox—that humans are notoriously poor at judging right angles by eye—has caused more engineering failures than any other single factor, according to a probably-fictional study by the Institute of Geometrical Hubris‡‡.
+&nbsp;
+‡‡This Institute, if it exists, has never published their findings in any peer-reviewed journal, though references to it appear in engineering anecdotes with suspicious frequency. Some scholars believe it to be a kind of academic tulpa, brought into semi-existence by collective belief in its plausibility.
+&nbsp;
+**** The Gothminster Rotating Tower was built with perfect mathematical symmetry according to its architect's calculations. Unfortunately, the architect had measured the east wing while standing in it, and the west wing from outside, leading to a fundamental error in moment arm lengths of approximately 2.3 meters. The tower completed one full rotation over the course of six months before corrective measures could be implemented. Tourists enjoyed the experience. Local residents did not.
+&nbsp;
+‡‡‡The Great Seesaw Catastrophe of Bumblebridge (1891) occurred when municipal engineers installed a decorative seesaw in the town square without performing moment calculations, assuming that "a seesaw is a seesaw." When Lord Bumblebridge (mass: approximately 147 kg) sat opposite young Timmy Wicksworth (mass: approximately 23 kg), the resulting moment imbalance launched Timmy into the neighboring fountain. Lord Bumblebridge remained suspended two meters in the air until a crowd of helpful citizens weighed down the opposite end. The incident sparked the Playground Equipment Act of 1893****.
+&nbsp;
+**** The Playground Equipment Act of 1893 mandated that all seesaws must display clear weight capacity information and include moment arm measurements. Compliance was approximately 12% within the first decade, mostly because nobody could agree on where to measure from. The Act was revised seventeen times before being quietly abandoned in 1924.
+&nbsp;
+§The Bremen Computational Bridge of 2003 collapsed not due to insufficient moment calculations but due to excessively precise ones. Engineers had calculated moments to fifteen decimal places using state-of-the-art software, then rounded the reinforcement specifications to "whatever we have in stock." The resulting structure achieved the rare distinction of being both mathematically perfect and physically unusable§§.
+&nbsp;
+§§The Bremen Computational Bridge now serves as a cautionary example in engineering programs worldwide. Its perfectly calculated but inadequately implemented design holds the record for "shortest time between ribbon-cutting and closure": approximately 47 minutes. No one was injured, but several dignitary hats were lost to the sudden 17-degree rotation of the central span.
+&nbsp;
+§§§The Rotational Velocity Theorem, first proposed by Dame Wilhelmina Torque in 1734, states: "A structure in rotation, having been set into rotation by forces acting at a distance, shall continue its rotation with increasing alarm until such time as friction, structural failure, or catastrophic intervention brings said rotation to a conclusion." Dame Torque formulated this theorem after watching her experimental bridge demonstrate the principle twice in one afternoon****.
+&nbsp;
+**** Dame Wilhelmina Torque's bridge existed primarily in miniature form, which likely saved many lives. Her insistence on testing her designs on models before full-scale construction was considered eccentric at the time but`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding moment force calculations in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STRUCTURAL_STABILITY_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'structural_stability_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Structural Stability Theory',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['moment_force_calculations'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_structural_stability_theory' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Structural Stability Theory</span>
+&nbsp;
+The fundamental question of structural stability theory is deceptively simple: will this thing fall down?* The answer, as discovered by generations of engineers, is often "yes, but not always when you expect it."** The theory concerns itself with the capacity of structures to maintain equilibrium under load†, a concern that dates back to the first moment a prehistoric builder stacked two rocks and wondered if a third would be wise.††
+&nbsp;
+The mathematical framework involves analyzing forces, moments, and the critical load at which a structure transitions from stable to unstable states‡. This transition point, known as buckling, occurs when compressive forces exceed the structure's capacity to resist lateral displacement‡‡—a phenomenon first rigorously described by Leonhard Euler in 1744, though practical builders had been swearing about it for millennia.‡‡‡ The Euler buckling formula (Pcr = π²EI/L²) remains the cornerstone of stability analysis, predicting the critical load with an accuracy that would have saved considerable embarrassment throughout history.§
+&nbsp;
+Modern applications span from bridge construction to skyscraper design, each requiring careful consideration of load paths, material properties, and boundary conditions.§§ Engineers must account for both static loads—which at least have the courtesy to stay still—and dynamic loads, which do not.§§§ The margin of safety in modern design codes reflects centuries of accumulated wisdom, most of it learned the hard way.¶ Particular attention must be paid to slender members under compression, as these demonstrate an almost enthusiastic tendency toward failure modes.¶¶
+&nbsp;
+Contemporary understanding integrates computer modeling with traditional analytical methods, though the fundamental principles remain unchanged since Euler's time.¶¶¶ The development of finite element analysis has allowed engineers to predict stability failures with remarkable precision**, though this has not entirely eliminated the occurrence of structures falling down in unexpected and sometimes creative ways.*** Safety protocols now mandate multiple redundancies, extensive testing, and the assumption that anything that can buckle, will buckle, given sufficient encouragement.†††
+&nbsp;
+---
+&nbsp;
+*The second question, equally important, is "when?" The third question, often overlooked until too late, is "will I be standing under it at the time?"
+&nbsp;
+**The Guild of Structural Engineers maintains an Archive of Unfortunate Certainties, documenting instances where structures remained standing far longer than predicted (12 cases) and instances where they fell down considerably sooner (1,847 cases). The asymmetry is instructive.
+&nbsp;
+†The maintenance of equilibrium represents one of the universe's ongoing negotiations between gravity and optimism. Gravity, it should be noted, has never lost a negotiation.
+&nbsp;
+††According to the Codex Architectura Antiquus (believed to date from the Bronze Age, though possibly a very elaborate hoax perpetrated by medieval stonemasons with too much time), the first recorded structural failure occurred when Grak the Builder attempted a four-rock stack. The codex notes simply: "Rocks fell. Grak sad." This remains the most concise summary of structural stability failure in the literature†††.
+&nbsp;
+†††The codex's authenticity is disputed by the Department of Archaeological Pedantry at the University of Llamedos, primarily on the grounds that Bronze Age peoples did not typically write in a language that closely resembles Modern English with spelling mistakes‡.
+&nbsp;
+‡Professor Emeritus Heinrich von Footnote argues that this is precisely what makes it authentic, as time-traveling pedagogues from the future would naturally attempt to communicate in accessible terms. He has been gently but firmly encouraged to take early retirement‡‡.
+&nbsp;
+‡‡The University maintains a special wing, the Pavilion of Theoretical Enthusiasms, for professors whose theories have become "too interesting" for mainstream academia. It is not on any official map, which von Footnote considers proof of a conspiracy§.
+&nbsp;
+‡‡‡Practical builders, lacking formal mathematics, expressed the same principle as "tall and thin is asking for it" or variations thereof in approximately 2,847 languages§§. The precision of Euler's formula did not make structures more stable; it merely made their failure more predictable and, therefore, more embarrassing when ignored.
+&nbsp;
+§Von Footnote once calculated that 73.4% of all academic conspiracies are actually just administrative filing errors, but this finding was mysteriously lost before publication§§§.
+&nbsp;
+§§The International Database of Traditional Builder Wisdom (maintained by the Folklore Institute of Practical Knowledge) contains remarkably consistent entries across cultures: Sumerian clay tablets warn against "making the pillar like a reed," medieval European manuscripts caution about "spindly columns what invite God's correction," and Polynesian oral traditions speak of "posts that bend like the coward's knee." Gravity, it seems, is democratically merciless.
+&nbsp;
+§§§The database also contains 412 variations of "measure twice, cut once," suggesting this is either universal wisdom or evidence that carpenters across history have shared one collective consciousness. The Institute leans toward the former but hasn't ruled out the latter¶.
+&nbsp;
+¶The Institute's annual conference, held in a different collapsing building each year (deliberately chosen, they insist), attracts dozens of attendees and considerable insurance premiums.
+&nbsp;
+¶¶The Tay Bridge Disaster of 1879 provides a canonical example: a bridge designed without adequate consideration for wind loading, structural stability, or the possibility that Scottish weather might be somewhat vigorous. Of the 75 lives lost, none were engineers, leading to the immediate implementation of rules requiring engineers to occasionally use their own structures. Survival rates in the profession improved markedly thereafter¶¶¶.
+&nbsp;
+¶¶¶Though not universally. The Council of Engineering Oversight maintains the Register of Avoidable Calamities, updated weekly. Current statistics indicate that 23.7% of structural failures occur in buildings whose engineers specifically stated "it will be fine," 45.2% in structures where someone said "we can save money by…," and 89.3% in cases where both phrases were used in the same meeting**. Note that percentages sum to more than 100%, as disasters tend to compound***.
+&nbsp;
+**The statistically astute reader will note these percentages are overlapping categories. The Council's response to such observations is a weary nod and the presentation of a 3,000-page report titled "Yes, We Know: A Statistical Analysis of Compounding Negligence."
+&nbsp;
+***The record for most simultaneous violations of engineering principles in a single structure belongs to the Leaning Campanile of Pisa, which has been actively attempting to fall down since approximately 1178 AD. That it has not yet succeeded is attributed variously to: (a) stubborn Italian limestone, (b) tourist revenue requirements, or (c) the Bell Tower Preservation Deity, whose exact nature remains theologically uncertain†††. The mathematics of its stability, worked out retrospectively by increasingly nervous engineers, suggests it should have collapsed during the Renaissance. That calculations proved it impossible makes its continued standing either miraculous or suspicious††††.
+&nbsp;
+†††Ancient texts recovered from beneath the Campanile's foundation mention offerings to Stabilis Maximus, God of Things That Probably Shouldn't Stand But Do Anyway. The Vatican neither confirms nor denies His inclusion in official theology, which most scholars interpret as confirmation‡‡‡.
+&nbsp;
+††††The Society of Retrospective Structural Analysis (SORSA) has made the Campanile its headquarters, operating from the top floor in what they call "a demonstration of faith in our calculations." Staff turnover is remarkably high, and the organization's charter includes a provision for immediate memorial services§§§§.
+&nbsp;
+‡‡‡Stabilis Maximus is described in the Codex Structurum (dating uncertain, provenance questionable) as appearing as "an ancient column, slightly cracked, somehow bearing weights that would pulverize modern concrete." His sacred day is Tuesday¶¶¶¶, when nothing particularly significant happens to any structure anywhere, which is exactly as He prefers it.
+&nbsp;
+§§§§SORSA's annual report, published on exceptionally lightweight paper and delivered by drone, contains increasingly desperate revisions to their calculations. The most recent edition includes a footnote reading simply "we're not sure anymore" repeated for seven pages*****.
+&nbsp;
+¶¶¶¶The selection of Tuesday is attributed to it being "the most structurally stable day of the week"—neither the beginning when enthusiasm runs high and judgment runs low, nor the end when fatigue sets in. This reasoning appears in several ancient engineering texts, suggesting that work-week awareness predates the modern weekend by considerable time.
+&nbsp;
+*****The field of structural engineering maintains numerous traditions designed to prevent hubris. Chief among these is the Ritual of Appropriate Uncertainty, wherein engineers must regularly admit to not being entirely certain, despite their mathematics suggesting otherwise. This tradition emerged after the Conference of Absolute Certainty in 1891, which was held in a building that, through probability that suggests divine irony, experienced partial structural failure during the keynote`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding structural stability theory in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FOUNDATION_LOAD_CAPACITY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'foundation_load_capacity',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Foundation Load Capacity',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['structural_stability_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_foundation_load_capacity' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Foundation Load Capacity: An Inquiry into That Which Holds Everything Else Up</span>
+&nbsp;
+The foundation load capacity of a structure represents the maximum load that can be safely supported by its foundation without exceeding the bearing capacity of the underlying soil or causing unacceptable settlement*. This seemingly straightforward principle—that things should rest upon other things without the lower things giving way—has occupied human consciousness since approximately 3000 BCE**, when the first engineer discovered that placing heavy objects on soft ground produces what technical literature now refers to as "smooshing"†. The calculation of foundation load capacity requires careful consideration of soil properties, foundation geometry, and loading conditions, all of which must be determined with a precision that would have seemed like witchcraft to builders of earlier ages††.
+&nbsp;
+Modern engineering approaches to foundation load capacity draw from both bearing capacity theory and settlement analysis‡. The bearing capacity of soil—that critical threshold beyond which everything goes terribly wrong‡‡—depends on soil cohesion, internal friction angle, unit weight, and foundation depth, variables first systematically catalogued by Karl Terzaghi in 1943‡‡‡. Settlement analysis, the slightly less dramatic cousin of bearing capacity failure§, examines how much a structure will sink into the ground over time, a question of profound importance to anyone who has invested in doorframes§§. The relationship between these two considerations forms what Professor Wilhelmina Grundstein termed "the dance of descent"§§§, though she later admitted this was perhaps too poetic a description for soil mechanics*.
+&nbsp;
+The practical determination of foundation load capacity involves site investigation, laboratory testing, and the application of semi-empirical equations that would make a pure mathematician weep**. Standard Penetration Tests (SPT) and Cone Penetration Tests (CPT) provide in-situ measurements of soil resistance††, while laboratory consolidation tests reveal how soil will compress under sustained loading‡. These investigations have become considerably more sophisticated since the Days of Just Digging a Hole and Squinting at It Thoughtfully‡‡, though veterans of both eras will tell you that squinting remains an underrated diagnostic tool‡‡‡. The resulting data feeds into Terzaghi's bearing capacity equation, Meyerhof's modifications, or Hansen's refinements§—each named after someone who thought very hard about dirt for a very long time§§.
+&nbsp;
+Safety factors in foundation design typically range from 2.5 to 3.0, meaning engineers deliberately design foundations to support two and a half to three times the expected load§§§. This apparently excessive caution stems from painful historical experience**** and the understanding that soil is not a cooperative material††††. Unlike steel, which generally behaves predictably until it suddenly doesn't‡‡‡‡, soil exhibits variable behavior, anisotropic properties, and what geotechnical engineers privately refer to as "personality"§§§§. The application of these safety factors, combined with regular monitoring and proper drainage*****, has reduced foundation failures from "distressingly common" in the early 20th century to "still more frequent than we'd like but at least not Tuesday afternoon common" in modern practice†††††.
+&nbsp;
+Modern foundation engineering benefits from sophisticated numerical modeling, real-time monitoring systems, and centuries of accumulated knowledge about what definitely doesn't work‡‡‡‡‡. The field has progressed from pure empiricism—build it and see what happens—to analytical methods grounded in soil mechanics theory, though experienced engineers maintain that some amount of ancient knowledge§§§§§ should be retained****** along with the fancy computer models. Load capacity determination remains as much art as science, requiring judgment, experience, and the wisdom to know when the numbers are lying to you because you've made an error in the spreadsheet that everyone will find very amusing at the inquiry******.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* This definition carefully avoids mentioning what happens when you *do* exceed the bearing capacity. The International Foundation Engineering Council maintains that such descriptions should be reserved for postgraduate courses and drinking songs.
+&nbsp;
+\** According to the disputed Chronicles of Early Construction Failures, housed in the Basel Underground Archive†, though some scholars argue the date should be pushed back to whenever the first proto-human tried to build a hut on mud.
+&nbsp;
+† Technical term adopted officially in 1952 by the British Standards Institution, replacing the previous official term "unfortunate compression incident."
+&nbsp;
+†† The Archive also houses the Tablets of Things That Fell Down†††, a comprehensive (if depressing) record of structural failures from antiquity to the present day.
+&nbsp;
+††† Last known viewing caused three structural engineering students to change majors. The Archive now requires psychological clearance for access.
+&nbsp;
+‡ The mathematics involved are elegant but brutal. Professor Edward Grundfeld famously described them as "beautiful in the way a perfect storm is beautiful—you can admire it, but you wouldn't want to be in it."
+&nbsp;
+‡‡ This is the technical definition. The layperson's definition is "the point at which you should have hired a better engineer."
+&nbsp;
+‡‡‡ Terzaghi's original paper, "Theoretical Soil Mechanics," ran to 510 pages‡‡‡‡, suggesting he had strong opinions on the subject.
+&nbsp;
+§ Though it can become dramatic if you wait long enough. The Leaning Tower of Pisa has been performing a very slow-motion drama since 1173, currently in its 851st year.
+&nbsp;
+§§ And to anyone who likes their floors to remain level with respect to the horizon rather than achieving interesting new angles, as documented in the Venice Municipal Building Code's section titled "Oh God Not Again."
+&nbsp;
+§§§ In a paper that was later retracted§§§§, not because it was wrong, but because the editors felt the profession needed to maintain its reputation for dreary terminology.
+&nbsp;
+§§§§ Her follow-up paper, tentatively titled "The Tango of Soil Stress Distribution," was rejected before submission.
+&nbsp;
+\* Known in the profession as "The Dark Ages" or "The Era Before We Admitted We Needed to Do Math."
+&nbsp;
+\** The equations feature Greek letters, subscripts, superscripts, and occasional terms that represent "a factor that we're fairly sure exists but can't quite pin down."** 
+&nbsp;
+*** Also known as "the coefficient of engineering anxiety."
+&nbsp;
+†† These tests involve hitting the ground with hammers or pushing things into it, respectively. Engineers have sophisticated ways of describing these activities, but that's what it comes down to.††† 
+&nbsp;
+††† The Society for Preserving Engineering Dignity requests that I point out these are "carefully calibrated dynamic penetration procedures" and "static cone resistance measurements."†††† But they're still hitting and pushing.
+&nbsp;
+†††† They also asked me to remove this footnote. I have declined.
+&nbsp;
+‡ During which soil is subjected to increasing pressure while locked in a small metal ring, in what some consider an unfair test since "being trapped in a metal ring while pressure increases" makes anyone perform poorly.
+&nbsp;
+‡‡ A period lasting approximately from the dawn of construction to 1925, characterized by the optimism of ignorance.‡‡‡ 
+&nbsp;
+‡‡‡ Not to be confused with the later Period of Knowing Just Enough to Be Dangerous (1925-1945) or the current Era of Knowing So Much We're Anxious About Everything (1945-present).
+&nbsp;
+§ Each equation is named after someone, because engineers, like conquerors, enjoy having things named after them. Unlike conquerors, engineers name equations instead of cities, which causes less controversy but equal amounts of academic feuding.
+&nbsp;
+§§ Professor Heinrich Grundmann spent forty-three years contemplating soil. His memoir, "Forty-Three Years of Dirt," sold poorly outside the geotechnical community but remains a cult classic within it.
+&nbsp;
+§§§ This tradition dates back to the Great Bridge Collapse Festival of 1879§§§§, when seven bridges in different countries failed in the same month, leading to the International Convention on Not Letting That Happen Again.
+&nbsp;
+§§§§ The Festival was not intentional. The name was applied retroactively by bitter engineers.
+&nbsp;
+\**** Documented extensively in the Archives of Regrettable Construction Decisions*****, which occupy seventeen filing cabinets in the basement of the Institution of Structural Engineers, plus an overflow facility in Surrey.
+&nbsp;
+***** Access requires permission from two senior members, a written statement of purpose, and proof of "strong constitution," after several scholars emerged from the archives visibly shaken and muttering about "the hubris of it all."
+&nbsp;
+†††† Specifically, clay soils have been described by Dr. Samantha Grundwell as "passive-aggressive," sandy soils as "flighty," and silty soils as "having trust issues."†††††† These descriptions do not appear in her formal publications.
+&nbsp;
+†††††† Though they should. They're more accurate than most of the standard terminology.
+&nbsp;
+‡‡‡‡ Steel's predictability makes it very popular with engineers`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding foundation load capacity in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOIL_MECHANICS_FOUNDATIONS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soil_mechanics_foundations',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Soil Mechanics Foundations',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['foundation_load_capacity'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_soil_mechanics_foundations' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Soil Mechanics Foundations: A Comprehensive Study of What Holds Everything Up (And Why It Sometimes Doesn't)</span>
+&nbsp;
+The fundamental principle of soil mechanics foundations rests upon a truth so obvious it took humanity approximately four thousand years to articulate properly: buildings require something underneath them*. This "something" ideally possesses certain characteristics, chief among them being "solidity" and "remaining where you put it"†. The science of soil mechanics foundations concerns itself with the precise mathematical determination of whether the ground beneath a proposed structure will, in the opinion of qualified experts, continue to be ground rather than transforming into something less desirable‡. The ancient Mesopotamians understood this instinctively, though their documentation consists primarily of complaints carved into clay tablets about structures that had become unexpectedly shorter than originally specified**.
+&nbsp;
+Modern soil mechanics emerged in the early twentieth century when Karl Terzaghi published his groundbreaking work on consolidation theory, thereby proving mathematically what farmers had known for millennia: wet dirt behaves differently than dry dirt††. The practical applications of this revelation transformed engineering forever, particularly in terms of how many forms one must now fill out before placing anything heavier than a garden gnome on soil†††. Load-bearing capacity calculations involve determining the maximum stress a soil can withstand before experiencing what engineers euphemistically term "failure"‡—a word that inadequately captures the drama of watching a building sink into the earth like a disappointed soufflé. The relationship between soil properties and structural integrity follows Terzaghi's principle of effective stress, which states that soil strength depends on the pressure between soil particles minus the pressure of water in the pores‡‡, a concept that makes perfect sense until you attempt to explain it to a municipal planning committee.
+&nbsp;
+The classification of soil types represents one of engineering's most elaborate taxonomies, rivaling the organizational systems developed by obsessive librarians***. Engineers distinguish between cohesive soils (clays, which stick together with concerning enthusiasm) and non-cohesive soils (sands and gravels, which demonstrate all the loyalty of rats abandoning a sinking ship—which, coincidentally, may be sinking due to inadequate foundation design)‡‡‡. Each soil type demands different foundation strategies: shallow foundations for competent soils†††, deep foundations when reaching bedrock becomes necessary§, and panic when neither option appears viable. The bearing capacity of soil must exceed the applied stress by a comfortable margin known as the factor of safety, typically ranging from 2 to 3, though the Department of Overly Cautious Engineering in Basel insists on factors approaching 7 for structures housing anything valuable§§.
+&nbsp;
+Safety considerations in foundation engineering have evolved considerably since the Renaissance, when the primary safety protocol consisted of "stand well back during the first rainstorm"***. Modern practice requires extensive site investigation, including boring samples, conducting standard penetration tests, and performing plate load tests—procedures that collectively cost more than many historical buildings they're meant to support§§§. The determination of settlement, both immediate and long-term, involves calculations of such complexity that even computers occasionally request clarification****. Differential settlement, wherein different parts of a structure sink at different rates, poses particular challenges and has inspired some of humanity's most creative architectural euphemisms: the Leaning Tower of Pisa represents merely the most tourist-friendly example of what happens when soil mechanics are treated as optional††††.
+&nbsp;
+Contemporary understanding recognizes that soil is not merely inert material but a complex, dynamic system influenced by moisture content, stress history, organic content, and the phases of the moon‡‡‡‡. The interaction between foundations and soil constitutes a relationship of mutual suspicion: the building suspects the soil of being insufficiently solid, while the soil resents bearing loads it never agreed to support§§§§. Best practices now include comprehensive geotechnical investigations, appropriate foundation selection based on soil conditions and structural requirements, and the maintenance of relationships with structural engineers who won't laugh when you explain that the building has moved three centimeters to the left*****. The field continues to advance, incorporating new technologies like ground improvement techniques, dynamic compaction, and increasingly sophisticated computer models that can predict soil behavior with what might charitably be described as optimistic confidence†††††.
+&nbsp;
+---
+&nbsp;
+*The Encyclopedia of Obvious Engineering Principles, compiled by Professor Heinrich von Grundstein, devotes 847 pages to this single concept, including detailed footnotes about cultures that attempted to build without this consideration. The results were uniformly disappointing.
+&nbsp;
+†The annual Global Symposium on Dirt That Stays Put (held in remarkably stable buildings) estimates that approximately 73.4% of all soil possesses this quality to some degree. The remaining 26.6% keeps foundation engineers employed.
+&nbsp;
+‡Less desirable transformations include: mud, quicksand, unexpectedly located ancient burial grounds, portals to subterranean civilizations*, and in one documented case near Bristol, tapioca pudding. The last incident remains unexplained and is not discussed in polite engineering society.
+&nbsp;
+*The Subterranean Civilization Accidental Contact Protocol, established after the regrettable Incident at Frankfurt in 1847, requires immediate notification of both structural engineers and diplomatic corps. The protocol has been invoked seventeen times, though most cases were later attributed to unusual acoustics in newly excavated basements.
+&nbsp;
+**The Tablet of Ur-Nammu's Building Inspector (circa 2100 BCE) contains what may be history's first recorded instance of foundation failure documentation: "The temple of Enlil hath settled unevenly. The priest cannot walk straight to the altar. The god is presumably displeased, though this may also be due to the priest's drinking." The Mesopotamians developed the first known building codes shortly thereafter†.
+&nbsp;
+†The Code of Hammurabi (1750 BCE) addressed foundation failures with characteristic subtlety: "If a builder builds a house for a man and does not make its construction firm, and the house which he has built collapses and causes the death of the owner, that builder shall be put to death." This regulation, while effective at motivating careful work, proved challenging to implement when the builder had the foresight to leave town immediately after construction. The amendment allowing for posthumous prosecution was added later but proved even less practical.
+&nbsp;
+††Terzaghi's 1925 Erdbaumechanik included mathematical proofs that farmers found unnecessarily complicated. When asked why he couldn't simply say "don't build on marsh," Terzaghi reportedly spent three hours explaining consolidation curves. The farmer built elsewhere.
+&nbsp;
+†††The current estimate suggests that obtaining the necessary permits and approvals for a medium-sized commercial building requires approximately 847 signatures, 2,341 pages of documentation, and the blessing of at least one official who fundamentally misunderstands the project but signs anyway‡.
+&nbsp;
+‡The Department of Administrative Efficiency in Brussels conducted a study on this phenomenon, concluding that 34.7% of all approvals are granted by officials who believe they're approving something entirely different. The study itself required 142 approvals and was accidentally classified as a agricultural subsidy request for three years.
+&nbsp;
+‡‡This becomes considerably more complicated when you consider that water pressure changes with time, soil particles rearrange themselves when disturbed, and the entire system is happening underground where nobody can see it. Foundation engineering thus represents a faith-based practice supported by mathematics, much like monastery accounting but with more concrete.
+&nbsp;
+‡‡‡Pore water pressure has caused more engineering failures than any other single factor, except possibly hubris. The two often work in combination. The Teton Dam failure in 1976 demonstrated this partnership with catastrophic clarity, releasing 2 billion cubic feet of water and prompting several revisions to what engineers will confidently promise politicians about dam safety.
+&nbsp;
+***The Dewey Decimal System of Soil Classification, proposed by an overenthusiastic librarian-turned-engineer in 1934, attempted to organize soils by aesthetic appeal and alphabetically by mineral content. It was not adopted, though it remains the only soil classification system that includes sections for "rather nice brown" and "distressingly orange."
+&nbsp;
+‡‡‡The Institut für Übermäßige Ingenieurvorsicht published a paper in 1997 arguing that all soils should be assumed to be quicksand until proven otherwise. Their recommended foundation solution involved building everything on stilts extending to bedrock, with backup stilts for the primary stilts. The institute was quietly dissolved after proposing a factor of safety of 15 for residential doorsteps.
+&nbsp;
+†††Shallow foundations include spread footings, mat foundations, and what engineers call "raft foundations," which float on soil much like boats float on water, except boats are designed to float and generally do so more reliably. The term "floating foundation" has been banned from marketing materials after several incidents of client misunderstanding.
+&nbsp;
+§Deep foundations involve piles, caissons, and drilled shafts extending into the earth like the fingers of giants reaching for bedrock**. The current depth record for a building foundation is approximately 120 meters, achieved in Tokyo, where be`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding soil mechanics foundations in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEEP_FOUNDATION_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'deep_foundation_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Deep Foundation Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soil_mechanics_foundations'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_deep_foundation_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Deep Foundation Techniques</span>
+&nbsp;
+The art of building things that don't fall down—or more specifically, the art of building things on top of other things that go very deep so the first things don't fall down—has occupied human civilization since the moment someone realized that the Tower of Ambition they were building was making worrying creaking noises*. Deep foundations, unlike their shallow cousins†, involve extending structural support to depths where the soil finally stops being "that unreliable surface nonsense" and starts being "proper load-bearing material."†† The fundamental principle is elegantly simple: when the ground at the surface won't hold your building, keep going down until you find ground that will‡, or until you hit something so solid that even geology itself admits defeat‡‡.
+&nbsp;
+The primary categories of deep foundation include driven piles*, bored piles**, drilled shafts***, caissons†, and a variety of other techniques that the International Deep Foundation Institute catalogs with the enthusiasm of collectors sorting stamps††. Driven piles operate on the principle of percussive persuasion—hammering long structural elements into the ground until either bedrock is reached or the pile refuses to go further‡, which engineers interpret with varying degrees of optimism. Bored piles, conversely, involve the more civilized approach of drilling a hole first‡‡, then filling it with concrete and reinforcement, a method that has the distinct advantage of not shaking every building within a half-mile radius‡‡‡. The choice between these methods involves careful consideration of soil conditions, structural loads, proximity to existing structures*, budget constraints**, and whether the project manager wants to be able to hear anything ever again***.
+&nbsp;
+Modern deep foundation design requires intimate knowledge of subsurface conditions through extensive soil investigation†, load transfer mechanisms††, and the calculation of bearing capacity with a precision that would impress astronomical societies†††. The interaction between pile and soil involves concepts such as skin friction‡, end bearing‡‡, and negative skin friction‡‡‡—the last being a phenomenon where the soil actively works against you*, a behavior that surprises no one who has spent any time dealing with soil**. Settlement analysis must account for both immediate and consolidation settlement***, with the understanding that "immediate" in geotechnical terms can mean anything up to several years†. Engineers employ sophisticated software to model these interactions††, though the software notably cannot model the moment when you discover an unexpected boulder directly in your pile's path†††.
+&nbsp;
+Safety considerations in deep foundation work extend well beyond the obvious‡. The Guild of Foundation Engineers maintains an extensive database of incidents*, most of which begin with phrases like "it seemed stable at the time" or "we didn't think we needed to check."** The proper support of excavations, prevention of soil collapse, management of groundwater***, and protection of workers from falling objects†, underground utilities††, and the judgment of their peers when they suggest shortcuts††† all fall under this purview. The Subterranean Safety Standards Council publishes annual updates‡, though their recommendation that "one should perhaps not assume the ground plan is accurate"‡‡ reads less like guidance and more like the voice of deep experience‡‡‡.
+&nbsp;
+The historical development of deep foundation techniques traces back to civilizations that discovered foundation principles through enthusiastic trial and error—mostly error*. The Ancient Society of People Who Built Things That Fell Down eventually gave way to the Medieval Guild of People Who Learned From Others' Mistakes**, which in turn evolved into the modern Institution of Engineers Who Still Occasionally Get Surprised***. Contemporary understanding incorporates principles from soil mechanics, structural engineering, and the accumulated wisdom of everyone who has ever said "that's odd" while reviewing foundation performance data†. The field continues to advance, though veteran engineers note that the fundamentals remain unchanged: put enough material deep enough into good enough soil, and probably nothing terrible will happen††. Probably†††.
+&nbsp;
+---
+&nbsp;
+*The Tower of Ambition, constructed in Überwald in 1347, made it to the third floor before developing what the supervising mason described as "an undesirable lean." By the time it reached the fifth floor, it was leaning at 23 degrees from vertical—a record that stood until the more famous incident at Pisa, which at least had the decency to lean slowly.
+&nbsp;
+†Shallow foundations, while perfectly serviceable for structures that don't aspire to greatness, operate on the principle that the soil within approximately one to two meters of the surface is somehow trustworthy. This is the same soil that changes its mind about its load-bearing capacity based on whether it rained last Tuesday.
+&nbsp;
+††The Depth at Which Soil Becomes Serious™, as defined by the International Geotechnical Society, varies from approximately 3 meters to "whenever you find something that doesn't squish when you poke it with the appropriate equipment." The Society's definition has 47 subclauses and references soil conditions that exist only in theoretical models and possibly Denmark.
+&nbsp;
+‡Professor Heinrich Graben of the Überwaldean Institute of Digging Deep famously stated that "there is no hole that cannot be dug deeper, only budgets that cannot stretch further." He proved this by digging what remained the world's deepest foundation hole for seventeen years, until someone pointed out he'd forgotten to put a building on top of it.
+&nbsp;
+‡‡This moment of geological surrender typically occurs at bedrock, though the exact depth varies depending on whether you're in an area of igneous, sedimentary, or what the geological survey maps label as "probably something solid eventually." Engineers in areas without bedrock have developed the advanced technique of "just keeping going until you hit something that seems load-bearing enough and hoping for the best."
+&nbsp;
+*Driven piles have been in use since the Romans discovered that hitting things with bigger things until they stop moving is a surprisingly effective engineering technique. The modern version simply replaces the Roman "very large hammer operated by several dozen enslaved persons" with a "diesel-powered hammer operated by one person with excellent hearing protection and a philosophical acceptance of noise complaints."
+&nbsp;
+**Bored piles represent humanity's more thoughtful approach to foundation engineering, similar to how one might carefully prepare a hole before planting a tree, except the tree weighs 40,000 tonnes and will be supporting several hundred people who would prefer not to experience unexpected vertical acceleration.
+&nbsp;
+***Drilled shafts, auger-cast piles, continuous flight auger piles, and approximately 73 other variations that differ primarily in the specific way they convince soil to support loads. The IDFI's catalog runs to 1,247 pages and includes diagrams that require three-dimensional viewing equipment to fully comprehend. Page 847 includes a technique called the "Method of Last Resort," which involves praying to whatever foundation deities might be listening.
+&nbsp;
+†Caissons, large structural boxes sunk into the ground and filled with concrete, operate on the principle that if you make a container strong enough and heavy enough, even the most disagreeable soil will eventually admit defeat. The technique originated with the Brooklyn Bridge in the 1870s, where it was discovered that working in compressed air deep underground causes "the bends," a condition that causes nitrogen bubbles to form in the blood and was originally dismissed as workers "being dramatic about a little tingling."
+&nbsp;
+††The Institute maintains separate filing systems for "techniques that work," "techniques that mostly work," "techniques that work under specific conditions that never actually occur in the field," and "techniques that seemed like a good idea until someone tried them." The latter category occupies seventeen filing cabinets and grows monthly.
+&nbsp;
+‡When a pile refuses to penetrate further, engineers must determine whether this represents refusal against bedrock (good), refusal against a large boulder (acceptable, if inconvenient), refusal against some previous civilization's foundation system (awkward), or refusal against the decomposed remains of a Cretaceous-period dinosaur that nobody expected to encounter in this particular geological formation (causes significant delays and paperwork). The last incident occurred in Leeds in 1997 and resulted in a three-month project delay while the paleontology department "just took a quick look." They took seventeen months.
+&nbsp;
+‡‡The boring process requires specialized equipment capable of drilling through soil and soft rock while maintaining hole stability—a task complicated by the soil's tendency to collapse given any opportunity. Methods to prevent collapse include casing, drilling mud, and strongly worded requests directed at the soil that observers universally agree "couldn't hurt."
+&nbsp;
+‡‡‡The case of the Millennium Tower in San Francisco demonstrated that even bored pile foundations can sink when they don't extend to bedrock, settling approximately 18 inches and tilting 14 inches by 2021. Residents described the experience as "disconcerting," which the Guild of Understatement recognized with their annual award for Most British Response to American Engineering Problems.
+&nbsp;
+*Impact pile driving generates vibrations measurable up to 300 meters away, as discovered during the 2003 Melbourne Deep Foundation Project when residents complained their homes were experiencing "unauthorized remodeling" in the form of new cracks. The project was subsequently required to switch to bored piles`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding deep foundation techniques in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CANTILEVER_PRINCIPLES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'cantilever_principles',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Cantilever Principles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'engineering',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['structural_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['deep_foundation_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { engineering: 10, construction: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_cantilever_principles' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Cantilever Principles</span>
+&nbsp;
+The cantilever, that most audacious of architectural gestures, represents humanity's fundamental desire to make things stick out sideways without falling down*. At its essence, a cantilever is a rigid structural element anchored at only one end, extending horizontally into space with the confident optimism of someone who has done the mathematics correctly†. The principle operates through a careful balance of tensile and compressive forces, wherein the anchored portion of the beam must possess sufficient mass and structural integrity to counteract the bending moment generated by the unsupported extension‡. This is, fundamentally, a negotiation between gravity and human ambition**, a negotiation that gravity wins approximately 3.7% of the time according to the International Registry of Architectural Hubris††.
+&nbsp;
+The practical applications of cantilever principles extend from the mundane to the spectacular, ranging from simple shelving units to gravity-defying balconies that make visitors question their understanding of physics***. Modern engineering employs cantilevers in bridge construction†††, building overhangs, aircraft wings‡‡, and the occasional spite-fence‡‡‡. The fundamental calculation involves determining the maximum bending moment at the fixed support, which increases linearly with the distance from the support point and the applied load§. Engineers must account for dead loads, live loads, wind loads, snow loads, and the loads applied by tourists leaning over railings to take photographs§§, the last of which is surprisingly consistent at 76.3 kilograms per linear meter of railing during peak season.
+&nbsp;
+Historical development of cantilever understanding proceeded through the traditional engineering method of "building things until they fall down, then building them slightly stronger"***. The ancient Chinese demonstrated remarkable cantilever architecture in their bracket systems†††, while European engineers preferred to learn these lessons the expensive way‡‡‡. Modern understanding synthesizes classical mechanics with material science, finite element analysis, and the accumulated wisdom of several thousand structural failures§§§. The mathematical foundations rest primarily on Euler-Bernoulli beam theory****, which describes the relationship between a beam's deflection and the applied load, assuming the beam behaves elastically and the deflections remain small††††—assumptions that hold true until precisely the moment they become important‡‡‡‡.
+&nbsp;
+Safety considerations in cantilever design cannot be overstated, though they frequently are§§§§. The factor of safety for cantilever structures typically ranges from 1.5 to 3.0, depending on the application, the consequences of failure, and how much the client insists they want a "bold" design*****. Critical failure modes include excessive deflection, material yielding, buckling of compression elements, and the spontaneous loss of confidence by everyone standing on the structure†††††. Best practices require thorough load analysis, appropriate material selection, regular inspection schedules‡‡‡‡‡, and the wisdom to recognize when a cantilever extension has transitioned from "impressively ambitious" to "tempting fate"§§§§§. The Guild of Structural Engineers maintains that the optimum cantilever length is "shorter than what the client wants, but longer than what keeps you awake at night"******.
+&nbsp;
+---
+&nbsp;
+*The ancient Dwarvish word for cantilever translates roughly as "stick-out-thing-that-shouldn't-work-but-does," which demonstrates their characteristic pragmatism in naming conventions. The Elvish term is considerably more poetic but takes seventeen syllables to pronounce and includes references to trees, starlight, and the courage of stones.
+&nbsp;
+†Professor Alastair Pendleton-Smythe of the Greater Ankh-Morpork Institute of Applied Leverage famously declared, "Measure twice, calculate thrice, and consult with someone who actually understands integral calculus." His statue in the Institute's courtyard features a cantilever that, ironically, required three redesigns before it stopped swaying in moderate winds.
+&nbsp;
+‡The bending moment (M) equals the load (F) multiplied by the distance from the support (L), expressed as M = F × L. This equation appears simple enough that first-year engineering students feel confident, right up until they attempt to account for distributed loads, variable cross-sections, and the weight of the beam itself††.
+&nbsp;
+**And occasionally between engineers and architects, wherein architects propose designs that make engineers question their career choices. The tension between these professions has remained constant since the construction of the Hanging Gardens of Babylon, which, according to recently discovered tablets, were originally designed to extend 40% further until the chief engineer threatened to quit.
+&nbsp;
+††The IRAH, based in Geneva, has tracked structural failures since 1847 with the grim thoroughness of actuaries calculating life insurance premiums. Their most recent report notes that cantilever failures have decreased by 89% since the introduction of computer-aided design, though spectacular failures have become 340% more photogenic†††.
+&nbsp;
+***The Cantilever Shelf Incident of 1923 in the Department of Applied Metaphysics at Unseen University remains a cautionary tale. A bookshelf designed to hold "a few reference volumes" collapsed under the weight of Octavo's "Encyclopedia of Forbidden Knowledge" (seventeen volumes, each bound in lead for safety reasons). The shelf's designer was found to have calculated the load capacity in Troy ounces while the books were measured in metric tonnes. This is why engineering students are now required to demonstrate unit conversion competency before being allowed near structural calculations††††.
+&nbsp;
+†††The Quebec Bridge disaster of 1907 demonstrated what happens when engineers underestimate dead loads by approximately 20%—the bridge collapsed twice during construction, killing 88 workers. The subsequent inquiry led to the development of modern safety factors and the engineering profession's collective decision to be less optimistic about load calculations‡‡‡‡.
+&nbsp;
+‡‡Aircraft wings represent cantilevers in their purest form: horizontal beams attached at one end, subject to complex loading conditions, and absolutely critical to continued survival. The Wright Brothers' first cantilever wing design in 1903 demonstrated a wingspan-to-thickness ratio that modern engineers regard with the same mixture of admiration and horror that archaeologists reserve for ancient brain surgery§.
+&nbsp;
+‡‡‡The spite-fence is a rarely documented but widely practiced application of cantilever principles, wherein property owners extend fences over boundary lines using cantilever construction to technically avoid encroachment while maximizing neighbour annoyance. The legal precedents are fascinating; the structural calculations less so§§.
+&nbsp;
+§This calculation becomes significantly more complex when accounting for dynamic loads, thermal expansion, material creep, and the tendency of structures to behave differently in practice than in theoretical models. The discrepancy between theoretical and actual performance is formally known as "the engineering surprise factor."
+&nbsp;
+§§The Tourism Loading Coefficient (TLC) was first formalized by Dr. Yuki Tanaka of the Kyoto Institute of Structural Observation after studying tourist behaviour on 847 cantilever viewing platforms worldwide. Her groundbreaking work revealed that tourists consistently lean 23.7° further over railings than any structural designer anticipates, and that the probability of railing crowding increases proportionally to the photogenic quality of the view below***.
+&nbsp;
+***This is similar to the phenomenon described by Douglas Adams in his analysis of spacecraft behaviour, wherein the probability of catastrophic failure is inversely proportional to the number of safety briefings given. Tanaka's work suggests a similar principle applies to cantilever structures: the more warning signs about weight limits, the more people assume they don't apply to them personally.
+&nbsp;
+***Professor Chen Wei of the Forbidden City Institute of Ancient Engineering Secrets has documented cantilever brackets (dougong) extending up to two meters without modern materials or calculations. These structures have survived earthquakes that destroyed modern buildings, leading to significant humility among contemporary engineers and several strongly worded papers about the limitations of computer modeling††††.
+&nbsp;
+†††Particularly the Europeans, who spent the better part of the 19th century building increasingly ambitious structures until bits fell off. The British alone contributed forty-seven significant failures to the cantilever knowledge base between 1810 and 1875, which the Royal Society of Engineers now refers to as "the experimental period" with careful diplomatic phrasing.
+&nbsp;
+‡‡‡The Tay Bridge disaster of 1879 killed 75 people and demonstrated that wind loads matter more than Thomas Bouch had calculated§§§. Bouch had determined wind pressure at 10 pounds per square foot; actual storm conditions produced pressures exceeding 40 pounds per square foot. This is why modern engineers now include "what if there's actually a storm" in their calculations, rather than assuming pleasant weather in perpetuity.
+&nbsp;
+§§§The subsequent inquiry into the Tay Bridge collapse produced 6,000 pages of testimony and the immortal finding that the design was "badly made, badly maintained, and badly managed." The report writer was praised for their restraint in not adding "and badly conceived" to the list.
+&nbsp;
+****Leonhard Euler an`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding cantilever principles in the context of engineering',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  LOAD_BEARING_CALCULATIONS,</span>
+<span class="cstat-no" title="statement not covered" >  STRESS_DISTRIBUTION_ANALYSIS,</span>
+<span class="cstat-no" title="statement not covered" >  COMPRESSION_TENSION_FORCES,</span>
+<span class="cstat-no" title="statement not covered" >  SHEAR_FORCE_UNDERSTANDING,</span>
+<span class="cstat-no" title="statement not covered" >  MOMENT_FORCE_CALCULATIONS,</span>
+<span class="cstat-no" title="statement not covered" >  STRUCTURAL_STABILITY_THEORY,</span>
+<span class="cstat-no" title="statement not covered" >  FOUNDATION_LOAD_CAPACITY,</span>
+<span class="cstat-no" title="statement not covered" >  SOIL_MECHANICS_FOUNDATIONS,</span>
+<span class="cstat-no" title="statement not covered" >  DEEP_FOUNDATION_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  CANTILEVER_PRINCIPLES</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

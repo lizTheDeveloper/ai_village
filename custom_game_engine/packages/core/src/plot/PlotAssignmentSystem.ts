@@ -13,9 +13,8 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
-import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
-import type { SilverThreadComponent } from '../soul/SilverThreadComponent.js';
-import type { PlotLinesComponent, PlotLineInstance, PlotScale } from './PlotTypes.js';
+import type { PlotLineInstance, PlotScale } from './PlotTypes.js';
+import type { PlotLinesComponent } from './PlotTypes.js';
 import { addActivePlot } from './PlotTypes.js';
 import { plotLineRegistry, instantiatePlot } from './PlotLineRegistry.js';
 
@@ -70,9 +69,9 @@ export class PlotAssignmentSystem extends BaseSystem {
    * Assign initial plot to newly created soul
    */
   assignInitialPlot(soul: Entity, _world: World): PlotLineInstance | null {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity);
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
+    const thread = soul.getComponent(ComponentType.SilverThread);
 
     if (!identity || !plotLines || !thread) {
       console.warn(`[PlotAssignment] Soul ${soul.id} missing required components`);
@@ -119,9 +118,9 @@ export class PlotAssignmentSystem extends BaseSystem {
    * Assign follow-up plot after completion (Phase 4: scale-aware)
    */
   assignFollowUpPlot(soul: Entity, completedPlotId: string, _world: World): PlotLineInstance | null {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity);
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
+    const thread = soul.getComponent(ComponentType.SilverThread);
 
     if (!identity || !plotLines || !thread) {
       return null;
@@ -210,8 +209,8 @@ export class PlotAssignmentSystem extends BaseSystem {
       .executeEntities();
 
     for (const soul of souls) {
-      const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-      const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+      const identity = soul.getComponent(ComponentType.SoulIdentity);
+      const plotLines = soul.getComponent(ComponentType.PlotLines);
 
       if (!identity || !plotLines) continue;
 
@@ -220,7 +219,7 @@ export class PlotAssignmentSystem extends BaseSystem {
       if (scalesNeeding.length === 0) continue;
 
       // Get silver thread for personal tick
-      const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+      const thread = soul.getComponent(ComponentType.SilverThread);
       if (!thread) continue;
 
       // Get eligible templates
@@ -277,9 +276,9 @@ export class PlotAssignmentSystem extends BaseSystem {
     _world: World,
     preferredScale?: PlotScale
   ): PlotLineInstance | null {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity);
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
+    const thread = soul.getComponent(ComponentType.SilverThread);
 
     if (!identity || !plotLines || !thread) return null;
 
@@ -339,8 +338,8 @@ export class PlotAssignmentSystem extends BaseSystem {
   ): Array<{ templateId: string; reason: string }> {
     const opportunities: Array<{ templateId: string; reason: string }> = [];
 
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+    const identity = soul.getComponent(ComponentType.SoulIdentity);
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
 
     if (!identity || !plotLines) return opportunities;
 
@@ -382,8 +381,8 @@ export class PlotAssignmentSystem extends BaseSystem {
     templateId: string,
     _world: World
   ): PlotLineInstance | null {
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
+    const thread = soul.getComponent(ComponentType.SilverThread);
 
     if (!plotLines || !thread) return null;
 
@@ -422,7 +421,7 @@ export class PlotAssignmentSystem extends BaseSystem {
     let soulsAtMax = 0;
 
     for (const soul of souls) {
-      const plotLines = soul.getComponent(ComponentType.PlotLines) as unknown as PlotLinesComponent | undefined;
+      const plotLines = soul.getComponent(ComponentType.PlotLines);
       if (!plotLines) continue;
 
       if (plotLines.active.length > 0) {

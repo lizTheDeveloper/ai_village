@@ -103,7 +103,7 @@ export class GoToActionHandler implements ActionHandler {
     }
 
     // Set navigate behavior with target coordinates
-    const agentComp = actor.components.get(ComponentType.Agent) as AgentComponent | undefined;
+    const agentComp = actor.getComponent(ComponentType.Agent);
     if (!agentComp) {
       return {
         success: false,
@@ -149,7 +149,7 @@ export class GoToActionHandler implements ActionHandler {
     const searchName = locationName.toLowerCase().trim();
 
     // 1. Check agent's assigned locations first (home, work, etc.)
-    const agentComp = actor.components.get(ComponentType.Agent) as AgentComponent | undefined;
+    const agentComp = actor.getComponent(ComponentType.Agent);
     if (agentComp) {
       const assigned = getAssignedLocation(agentComp, searchName);
       if (assigned) {
@@ -164,7 +164,7 @@ export class GoToActionHandler implements ActionHandler {
     }
 
     // 2. Check agent's spatial memory (personal chunk names)
-    const spatialMem = actor.components.get(ComponentType.SpatialMemory) as SpatialMemoryComponent | undefined;
+    const spatialMem = actor.getComponent(ComponentType.SpatialMemory);
     if (spatialMem) {
       const chunk = findChunkByName(spatialMem, searchName);
       if (chunk) {

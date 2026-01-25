@@ -24,8 +24,8 @@ export class FleeToHomeBehavior extends BaseBehavior {
   readonly name = 'flee_to_home' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };

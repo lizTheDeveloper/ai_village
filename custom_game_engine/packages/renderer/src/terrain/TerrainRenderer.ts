@@ -238,15 +238,16 @@ export class TerrainRenderer {
     }
 
     // Find oldest entry (lowest lastUsed tick)
+    // PERF: Iterate Map directly instead of allocating Array.from()
     let oldestKey: string | null = null;
     let oldestTick = Infinity;
 
-    for (const [key, cached] of this.chunkCache.entries()) {
+    this.chunkCache.forEach((cached, key) => {
       if (cached.lastUsed < oldestTick) {
         oldestTick = cached.lastUsed;
         oldestKey = key;
       }
-    }
+    });
 
     if (oldestKey) {
       this.chunkCache.delete(oldestKey);
@@ -309,13 +310,8 @@ export class TerrainRenderer {
 
         // Draw base tile
         const color = TERRAIN_COLORS[tile.terrain];
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(
-          screen.x,
-          screen.y,
-          tilePixelSize,
-          tilePixelSize
-        );
+        ctx.fillStyle = color;
+        ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
 
         // Draw tilled indicator (VERY PROMINENT - must be clearly visible!)
         if (tile.tilled) {
@@ -327,62 +323,62 @@ export class TerrainRenderer {
           // CRITICAL: Make tilled soil VERY different from untilled dirt
           // Use an EVEN DARKER brown base for maximum distinction
           // This creates extreme contrast with both grass (green) and natural dirt (light brown)
-          this.ctx.fillStyle = 'rgba(45, 25, 10, 1.0)'; // EVEN DARKER, 100% opacity for maximum visibility
-          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.fillStyle = 'rgba(45, 25, 10, 1.0)'; // EVEN DARKER, 100% opacity for maximum visibility
+          ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
 
           // Add EXTRA THICK horizontal furrows (visible even at low zoom)
           // Use nearly black furrows with increased thickness
-          this.ctx.strokeStyle = 'rgba(15, 8, 3, 1.0)'; // Even darker furrows
-          this.ctx.lineWidth = Math.max(4, camera.zoom * 3); // THICKER lines (was 3, now 4 minimum)
+          ctx.strokeStyle = 'rgba(15, 8, 3, 1.0)'; // Even darker furrows
+          ctx.lineWidth = Math.max(4, this.tileSize * 3); // THICKER lines (constant since zoom=1 in cache)
           const furrowCount = 7; // Even more furrows for unmistakable pattern
           const furrowSpacing = tilePixelSize / (furrowCount + 1);
 
           for (let i = 1; i <= furrowCount; i++) {
-            const y = screen.y + furrowSpacing * i;
-            this.ctx.beginPath();
-            this.ctx.moveTo(screen.x, y);
-            this.ctx.lineTo(screen.x + tilePixelSize, y);
-            this.ctx.stroke();
+            const y = screenY + furrowSpacing * i;
+            ctx.beginPath();
+            ctx.moveTo(screenX, y);
+            ctx.lineTo(screenX + tilePixelSize, y);
+            ctx.stroke();
           }
 
           // Add vertical lines for grid pattern (makes it unmistakable)
-          this.ctx.strokeStyle = 'rgba(15, 8, 3, 0.9)'; // Match furrow color
-          this.ctx.lineWidth = Math.max(3, camera.zoom * 1.5); // Thicker vertical lines
+          ctx.strokeStyle = 'rgba(15, 8, 3, 0.9)'; // Match furrow color
+          ctx.lineWidth = Math.max(3, this.tileSize * 1.5); // Thicker vertical lines
           const verticalCount = 5; // More vertical lines for denser grid
           const verticalSpacing = tilePixelSize / (verticalCount + 1);
 
           for (let i = 1; i <= verticalCount; i++) {
-            const x = screen.x + verticalSpacing * i;
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, screen.y);
-            this.ctx.lineTo(x, screen.y + tilePixelSize);
-            this.ctx.stroke();
+            const x = screenX + verticalSpacing * i;
+            ctx.beginPath();
+            ctx.moveTo(x, screenY);
+            ctx.lineTo(x, screenY + tilePixelSize);
+            ctx.stroke();
           }
 
           // Add DOUBLE BORDER for maximum visibility
           // Inner border: BRIGHTER orange for extreme visibility
-          this.ctx.strokeStyle = 'rgba(255, 140, 60, 1.0)'; // BRIGHTER orange (increased from 200,120,60)
-          this.ctx.lineWidth = Math.max(4, camera.zoom * 1.5); // THICKER inner border (was 3)
-          this.ctx.strokeRect(screen.x + 1, screen.y + 1, tilePixelSize - 2, tilePixelSize - 2);
+          ctx.strokeStyle = 'rgba(255, 140, 60, 1.0)'; // BRIGHTER orange (increased from 200,120,60)
+          ctx.lineWidth = Math.max(4, this.tileSize * 1.5); // THICKER inner border (was 3)
+          ctx.strokeRect(screenX + 1, screenY + 1, tilePixelSize - 2, tilePixelSize - 2);
 
           // Outer border: darker for contrast
-          this.ctx.strokeStyle = 'rgba(90, 50, 20, 1.0)'; // Even darker outer border for more contrast
-          this.ctx.lineWidth = Math.max(3, camera.zoom); // Thicker outer border (was 2)
-          this.ctx.strokeRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.strokeStyle = 'rgba(90, 50, 20, 1.0)'; // Even darker outer border for more contrast
+          ctx.lineWidth = Math.max(3, this.tileSize); // Thicker outer border (was 2)
+          ctx.strokeRect(screenX, screenY, tilePixelSize, tilePixelSize);
         }
 
         // Draw moisture indicator (blue tint for wet tiles)
         if (tile.moisture > 60) {
           const moistureAlpha = ((tile.moisture - 60) / 40) * 0.3; // 0-0.3 based on moisture 60-100
-          this.ctx.fillStyle = `rgba(30, 144, 255, ${moistureAlpha})`;
-          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.fillStyle = `rgba(30, 144, 255, ${moistureAlpha})`;
+          ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
         }
 
         // Draw fertilized indicator (golden glow)
         if (tile.fertilized) {
-          this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)'; // Gold
-          this.ctx.lineWidth = Math.max(1, camera.zoom);
-          this.ctx.strokeRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)'; // Gold
+          ctx.lineWidth = Math.max(1, this.tileSize);
+          ctx.strokeRect(screenX, screenY, tilePixelSize, tilePixelSize);
         }
 
         // ====================================================================
@@ -404,23 +400,23 @@ export class TerrainRenderer {
           const rgb = WALL_COLORS_RGB[wall.material] ?? DEFAULT_WALL_RGB;
 
           // Fill wall tile
-          this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+          ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
 
           // Add border for wall definition
-          this.ctx.strokeStyle = `rgba(40, 40, 40, ${alpha * 0.8})`;
-          this.ctx.lineWidth = Math.max(1, camera.zoom * 0.5);
-          this.ctx.strokeRect(screen.x + 1, screen.y + 1, tilePixelSize - 2, tilePixelSize - 2);
+          ctx.strokeStyle = `rgba(40, 40, 40, ${alpha * 0.8})`;
+          ctx.lineWidth = Math.max(1, this.tileSize * 0.5);
+          ctx.strokeRect(screenX + 1, screenY + 1, tilePixelSize - 2, tilePixelSize - 2);
 
           // Show construction progress if incomplete
           if (progress < 100) {
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            this.ctx.font = `${Math.max(8, camera.zoom * 6)}px sans-serif`;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(`${Math.round(progress)}%`, screen.x + tilePixelSize / 2, screen.y + tilePixelSize / 2);
-            this.ctx.textAlign = 'left';
-            this.ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = `${Math.max(8, this.tileSize * 6)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${Math.round(progress)}%`, screenX + tilePixelSize / 2, screenY + tilePixelSize / 2);
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
           }
         }
 
@@ -435,34 +431,34 @@ export class TerrainRenderer {
 
           if (door.state === 'open') {
             // Open door: render as thin outline (passable)
-            this.ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-            this.ctx.lineWidth = Math.max(2, camera.zoom);
-            this.ctx.strokeRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
+            ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+            ctx.lineWidth = Math.max(2, this.tileSize);
+            ctx.strokeRect(screenX + 2, screenY + 2, tilePixelSize - 4, tilePixelSize - 4);
             // Add dashed pattern to indicate open
-            this.ctx.setLineDash([3, 3]);
-            this.ctx.strokeRect(screen.x + 4, screen.y + 4, tilePixelSize - 8, tilePixelSize - 8);
-            this.ctx.setLineDash([]);
+            ctx.setLineDash([3, 3]);
+            ctx.strokeRect(screenX + 4, screenY + 4, tilePixelSize - 8, tilePixelSize - 8);
+            ctx.setLineDash([]);
           } else {
             // Closed/locked door: render as solid with handle
-            this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-            this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+            ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+            ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
 
             // Door frame (lighter)
-            this.ctx.strokeStyle = `rgba(160, 120, 80, ${alpha})`;
-            this.ctx.lineWidth = Math.max(1, camera.zoom * 0.3);
-            this.ctx.strokeRect(screen.x + 1, screen.y + 1, tilePixelSize - 2, tilePixelSize - 2);
+            ctx.strokeStyle = `rgba(160, 120, 80, ${alpha})`;
+            ctx.lineWidth = Math.max(1, this.tileSize * 0.3);
+            ctx.strokeRect(screenX + 1, screenY + 1, tilePixelSize - 2, tilePixelSize - 2);
 
             // Door handle (small circle on right side)
-            this.ctx.fillStyle = door.state === 'locked' ? 'rgba(200, 200, 80, 0.9)' : 'rgba(180, 140, 100, 0.9)';
-            this.ctx.beginPath();
-            this.ctx.arc(screen.x + tilePixelSize * 0.75, screen.y + tilePixelSize * 0.5, Math.max(2, camera.zoom), 0, Math.PI * 2);
-            this.ctx.fill();
+            ctx.fillStyle = door.state === 'locked' ? 'rgba(200, 200, 80, 0.9)' : 'rgba(180, 140, 100, 0.9)';
+            ctx.beginPath();
+            ctx.arc(screenX + tilePixelSize * 0.75, screenY + tilePixelSize * 0.5, Math.max(2, this.tileSize), 0, Math.PI * 2);
+            ctx.fill();
 
             // Lock indicator for locked doors
             if (door.state === 'locked') {
-              this.ctx.strokeStyle = 'rgba(200, 200, 80, 0.9)';
-              this.ctx.lineWidth = Math.max(1, camera.zoom * 0.5);
-              this.ctx.strokeRect(screen.x + tilePixelSize * 0.7, screen.y + tilePixelSize * 0.35, tilePixelSize * 0.1, tilePixelSize * 0.15);
+              ctx.strokeStyle = 'rgba(200, 200, 80, 0.9)';
+              ctx.lineWidth = Math.max(1, this.tileSize * 0.5);
+              ctx.strokeRect(screenX + tilePixelSize * 0.7, screenY + tilePixelSize * 0.35, tilePixelSize * 0.1, tilePixelSize * 0.15);
             }
           }
         }
@@ -474,21 +470,21 @@ export class TerrainRenderer {
           const alpha = progress >= 100 ? 0.6 : 0.3 + (progress / 100) * 0.3;
 
           // Semi-transparent glass effect
-          this.ctx.fillStyle = `rgba(135, 206, 235, ${alpha})`; // Sky blue glass
-          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.fillStyle = `rgba(135, 206, 235, ${alpha})`; // Sky blue glass
+          ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
 
           // Window frame (dark border)
-          this.ctx.strokeStyle = `rgba(60, 40, 30, ${alpha + 0.2})`;
-          this.ctx.lineWidth = Math.max(2, camera.zoom * 0.7);
-          this.ctx.strokeRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
+          ctx.strokeStyle = `rgba(60, 40, 30, ${alpha + 0.2})`;
+          ctx.lineWidth = Math.max(2, this.tileSize * 0.7);
+          ctx.strokeRect(screenX + 2, screenY + 2, tilePixelSize - 4, tilePixelSize - 4);
 
           // Cross pattern for window panes
-          this.ctx.beginPath();
-          this.ctx.moveTo(screen.x + tilePixelSize / 2, screen.y + 2);
-          this.ctx.lineTo(screen.x + tilePixelSize / 2, screen.y + tilePixelSize - 2);
-          this.ctx.moveTo(screen.x + 2, screen.y + tilePixelSize / 2);
-          this.ctx.lineTo(screen.x + tilePixelSize - 2, screen.y + tilePixelSize / 2);
-          this.ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(screenX + tilePixelSize / 2, screenY + 2);
+          ctx.lineTo(screenX + tilePixelSize / 2, screenY + tilePixelSize - 2);
+          ctx.moveTo(screenX + 2, screenY + tilePixelSize / 2);
+          ctx.lineTo(screenX + tilePixelSize - 2, screenY + tilePixelSize / 2);
+          ctx.stroke();
         }
 
         // Render roof tiles (overlay on interior tiles)
@@ -505,33 +501,33 @@ export class TerrainRenderer {
 
           // Draw roof with slight offset to show depth (rendering as if viewed from above)
           // Draw a diagonal pattern to indicate roofing
-          this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 
           // Draw roof as semi-transparent overlay with texture pattern
-          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+          ctx.fillRect(screenX, screenY, tilePixelSize, tilePixelSize);
 
           // Add diagonal line pattern to indicate roof texture
-          this.ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
-          this.ctx.lineWidth = Math.max(1, camera.zoom * 0.3);
+          ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
+          ctx.lineWidth = Math.max(1, this.tileSize * 0.3);
 
           // Draw diagonal lines for roof texture
           const step = Math.max(3, tilePixelSize / 4);
           for (let i = 0; i < tilePixelSize * 2; i += step) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(screen.x + i, screen.y);
-            this.ctx.lineTo(screen.x, screen.y + i);
-            this.ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(screenX + i, screenY);
+            ctx.lineTo(screenX, screenY + i);
+            ctx.stroke();
           }
 
           // Show construction progress if incomplete
           if (progress < 100) {
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            this.ctx.font = `${Math.max(8, camera.zoom * 6)}px sans-serif`;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(`${Math.round(progress)}%`, screen.x + tilePixelSize / 2, screen.y + tilePixelSize / 2);
-            this.ctx.textAlign = 'left';
-            this.ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = `${Math.max(8, this.tileSize * 6)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${Math.round(progress)}%`, screenX + tilePixelSize / 2, screenY + tilePixelSize / 2);
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
           }
         }
 
@@ -540,8 +536,8 @@ export class TerrainRenderer {
         const tileWithTemp = tile as typeof tile & { temperature?: number };
         if (this.showTemperatureOverlay && tileWithTemp.temperature !== undefined) {
           // Draw semi-transparent background for readability
-          this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-          this.ctx.fillRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.fillRect(screenX + 2, screenY + 2, tilePixelSize - 4, tilePixelSize - 4);
 
           // Color-code temperature: cold = blue, warm = orange, hot = red
           let tempColor = '#FFFFFF';
@@ -558,19 +554,64 @@ export class TerrainRenderer {
             tempColor = '#FF6E40'; // Hot red
           }
 
-          this.ctx.fillStyle = tempColor;
-          this.ctx.font = `bold ${Math.max(8, camera.zoom * 8)}px monospace`;
-          this.ctx.textAlign = 'center';
-          this.ctx.textBaseline = 'middle';
-          this.ctx.fillText(
+          ctx.fillStyle = tempColor;
+          ctx.font = `bold ${Math.max(8, this.tileSize * 8)}px monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(
             Math.round(temp).toString() + '°',
-            screen.x + tilePixelSize / 2,
-            screen.y + tilePixelSize / 2
+            screenX + tilePixelSize / 2,
+            screenY + tilePixelSize / 2
           );
-          this.ctx.textAlign = 'left';
-          this.ctx.textBaseline = 'alphabetic';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'alphabetic';
         }
       }
     }
+  }
+
+  /**
+   * Render a single chunk (public API).
+   *
+   * Handles ungenerated chunks gracefully by skipping rendering.
+   * This can happen when camera scrolls faster than background generation.
+   *
+   * PERFORMANCE: Uses cached off-screen canvas when possible.
+   */
+  renderChunk(chunk: Chunk, camera: Camera): void {
+    // Skip rendering ungenerated chunks
+    // This prevents rendering empty/placeholder tiles before generation completes
+    if (!chunk.generated) {
+      return;
+    }
+
+    // Increment tick for LRU tracking
+    this.currentTick++;
+
+    // Try to use cached canvas
+    let cached = this.getCachedChunkCanvas(chunk);
+
+    // If no valid cache, render to new off-screen canvas
+    if (!cached) {
+      cached = this.renderChunkToCache(chunk);
+    }
+
+    // Draw the cached canvas to the main canvas
+    // Calculate world position of chunk's top-left corner
+    const worldX = chunk.x * CHUNK_SIZE * this.tileSize;
+    const worldY = chunk.y * CHUNK_SIZE * this.tileSize;
+    const screen = camera.worldToScreen(worldX, worldY);
+
+    // Size of chunk on screen (affected by zoom)
+    const chunkPixelSize = CHUNK_SIZE * this.tileSize * camera.zoom;
+
+    // Draw cached canvas scaled by zoom
+    this.ctx.drawImage(
+      cached.canvas as CanvasImageSource,
+      screen.x,
+      screen.y,
+      chunkPixelSize,
+      chunkPixelSize
+    );
   }
 }

@@ -61,8 +61,8 @@ export class ChunkManager3D {
   /** Occlusion culler for cave culling */
   private occlusionCuller: OcclusionCuller;
 
-  /** Whether occlusion culling is enabled (disabled by default until tested) */
-  private occlusionEnabled = false;
+  /** Whether occlusion culling is enabled */
+  private occlusionEnabled = true;
 
   /** Current camera chunk position */
   private cameraChunkX = 0;
@@ -79,6 +79,9 @@ export class ChunkManager3D {
     rebuildCount: 0,
     cullCount: 0,
   };
+
+  /** Max chunk rebuilds per frame to prevent frame drops */
+  private readonly MAX_REBUILDS_PER_FRAME = 2;
 
   /** World tile accessor */
   private getTileAt: ((x: number, y: number) => { terrain?: string; elevation?: number } | null) | null = null;
@@ -228,29 +231,43 @@ export class ChunkManager3D {
   }
 
   /**
-   * Rebuild all dirty chunks
+   * Rebuild dirty chunks with rate limiting to prevent frame drops
+   * Prioritizes chunks closest to camera
    */
   private rebuildDirtyChunks(): void {
     this.stats.rebuildCount = 0;
 
+    // Collect dirty chunks and sort by distance (closest first)
+    const dirtyChunks: ChunkEntry[] = [];
     this.chunks.forEach((entry) => {
       if (entry.chunk.isDirty()) {
-        entry.chunk.rebuild();
-
-        // Update occlusion data when chunk changes
-        if (this.occlusionEnabled) {
-          this.occlusionCuller.analyzeChunk(
-            entry.chunk.chunkX,
-            entry.chunk.chunkZ,
-            (x, y, z) => entry.chunk.getBlock(x, y, z)?.type ?? 0,
-            this.config.chunkSize,
-            64
-          );
-        }
-
-        this.stats.rebuildCount++;
+        dirtyChunks.push(entry);
       }
     });
+
+    // Sort by distance - rebuild closest chunks first
+    dirtyChunks.sort((a, b) => a.distanceToCamera - b.distanceToCamera);
+
+    // Rebuild up to MAX_REBUILDS_PER_FRAME chunks
+    const rebuildCount = Math.min(dirtyChunks.length, this.MAX_REBUILDS_PER_FRAME);
+    for (let i = 0; i < rebuildCount; i++) {
+      // Safe: i < rebuildCount <= dirtyChunks.length guarantees valid index
+      const entry = dirtyChunks[i]!;
+      entry.chunk.rebuild();
+
+      // Update occlusion data when chunk changes
+      if (this.occlusionEnabled) {
+        this.occlusionCuller.analyzeChunk(
+          entry.chunk.chunkX,
+          entry.chunk.chunkZ,
+          (x, y, z) => entry.chunk.getBlock(x, y, z)?.type ?? 0,
+          this.config.chunkSize,
+          64
+        );
+      }
+
+      this.stats.rebuildCount++;
+    }
   }
 
   /**

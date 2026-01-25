@@ -87,7 +87,7 @@ const RECIPES: Recipe[] = [
 // === Simulation Class ===
 
 class FactorySimulation {
-  private world: WorldImpl;
+  private world: World;
   private systems: {
     power: PowerGridSystem;
     directConnection: DirectConnectionSystem;

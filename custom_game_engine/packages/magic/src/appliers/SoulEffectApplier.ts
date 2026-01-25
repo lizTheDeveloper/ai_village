@@ -416,7 +416,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     let perceptionEffects = caster.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
     if (!perceptionEffects) {
       perceptionEffects = { type: 'perception_effects' };
-      (caster as any).components.set('perception_effects', perceptionEffects);
+      caster.addComponent({ type: 'perception_effects' } as Component);
     }
 
     // Enable soul detection

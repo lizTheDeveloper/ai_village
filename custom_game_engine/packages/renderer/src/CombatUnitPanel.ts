@@ -80,7 +80,7 @@ export class CombatUnitPanel implements IWindowPanel {
 
     // Subscribe to entity selection events
     this.entitySelectedHandler = this.handleEntitySelected.bind(this);
-    this.eventBus.on('ui:entity:selected', this.entitySelectedHandler as any);
+    this.eventBus.on('ui:entity:selected', this.entitySelectedHandler);
   }
 
   /**
@@ -411,7 +411,7 @@ export class CombatUnitPanel implements IWindowPanel {
    */
   public cleanup(): void {
     if (this.entitySelectedHandler) {
-      this.eventBus.off('ui:entity:selected', this.entitySelectedHandler as any);
+      this.eventBus.off('ui:entity:selected', this.entitySelectedHandler);
       this.entitySelectedHandler = null;
     }
   }

@@ -68,7 +68,8 @@ export class InputRecorder {
   /** Serialize for save/export */
   serialize(): { inputs: GameInput[]; checkpointTicks: number[] } {
     return {
-      inputs: [...this.inputs],
+      // Deep copy inputs to ensure serialized data is independent
+      inputs: this.inputs.map(input => ({ ...input, data: { ...input.data } })),
       checkpointTicks: Array.from(this.checkpoints.keys()),
     };
   }

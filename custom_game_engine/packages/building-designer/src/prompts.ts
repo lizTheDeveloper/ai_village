@@ -134,6 +134,9 @@ W.....W
  */
 export function generateBuildingPrompt(request: BuildingGenerationRequest): string {
   const sizeConstraints = SIZE_CONSTRAINTS[request.size];
+  if (!sizeConstraints) {
+    throw new Error(`Unknown size: ${request.size}`);
+  }
 
   let prompt = `Design a ${request.size} ${request.category} building.
 

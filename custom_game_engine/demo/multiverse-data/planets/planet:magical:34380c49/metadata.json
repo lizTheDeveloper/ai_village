@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:34380c49",
+  "name": "Triton Major",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769226573691",
+  "createdAt": 1769226573700,
+  "lastAccessedAt": 1769226573700,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769226573691",
+    "type": "magical"
+  }
+}

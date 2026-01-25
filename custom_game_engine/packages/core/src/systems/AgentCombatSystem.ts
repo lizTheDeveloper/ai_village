@@ -697,21 +697,14 @@ export class AgentCombatSystem extends BaseSystem {
       }
     }
 
+    // TODO: Narrative generation not yet implemented in canonical LLMProvider
+    // The generateNarrative method needs to be added to the LLMProvider interface
+    // or combat narratives should be generated via the standard generate() method
     try {
-      await this.llmProvider.generateNarrative({
-        type: 'agent_combat',
-        attacker: {
-          id: attacker.id,
-          name: attackerAgent?.name || 'Attacker',
-        },
-        defender: {
-          id: defender.id,
-          name: defenderAgent?.name || 'Defender',
-        },
-        cause: conflict.cause,
-        outcome,
-        witnesses,
-      });
+      // Placeholder for future narrative generation
+      // await this.llmProvider.generate({
+      //   prompt: `Generate combat narrative for ${attackerAgent?.name} vs ${defenderAgent?.name}...`
+      // });
     } catch (error) {
       console.error('[AgentCombatSystem] LLM narrative generation failed:', error);
     }

@@ -176,7 +176,12 @@ function isSessionMetrics(value: unknown): value is SessionMetrics {
     return false;
   }
   const obj = value as Record<string, unknown>;
-  return typeof obj.totalBirths === 'number' && typeof obj.totalDeaths === 'number';
+  return (
+    'totalBirths' in obj &&
+    'totalDeaths' in obj &&
+    typeof obj.totalBirths === 'number' &&
+    typeof obj.totalDeaths === 'number'
+  );
 }
 
 /**
@@ -186,8 +191,12 @@ function isEconomicMetrics(value: unknown): value is EconomicMetrics {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
+  if (!('stockpiles' in value)) {
+    return false;
+  }
   const obj = value as Record<string, unknown>;
-  if (typeof obj.stockpiles !== 'object' || obj.stockpiles === null) {
+  const stockpiles = obj.stockpiles;
+  if (typeof stockpiles !== 'object' || stockpiles === null) {
     return false;
   }
   return true;
@@ -210,8 +219,12 @@ function isSpatialMetrics(value: unknown): value is SpatialMetrics {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
+  if (!('heatmap' in value)) {
+    return false;
+  }
   const obj = value as Record<string, unknown>;
-  return typeof obj.heatmap === 'object' && obj.heatmap !== null;
+  const heatmap = obj.heatmap;
+  return typeof heatmap === 'object' && heatmap !== null;
 }
 
 /**
@@ -219,6 +232,9 @@ function isSpatialMetrics(value: unknown): value is SpatialMetrics {
  */
 function isSocialMetrics(value: unknown): value is SocialMetrics {
   if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  if (!('relationshipsFormed' in value)) {
     return false;
   }
   const obj = value as Record<string, unknown>;
@@ -232,6 +248,9 @@ function isPerformanceMetrics(value: unknown): value is PerformanceMetrics {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
+  if (!('fps' in value)) {
+    return false;
+  }
   const obj = value as Record<string, unknown>;
   return Array.isArray(obj.fps);
 }
@@ -243,6 +262,9 @@ function isEmergentMetrics(value: unknown): value is EmergentMetrics {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
+  if (!('milestones' in value)) {
+    return false;
+  }
   const obj = value as Record<string, unknown>;
   return Array.isArray(obj.milestones);
 }
@@ -252,6 +274,9 @@ function isEmergentMetrics(value: unknown): value is EmergentMetrics {
  */
 function isStockpileEntry(value: unknown): value is StockpileEntry {
   if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  if (!('value' in value)) {
     return false;
   }
   const obj = value as Record<string, unknown>;
@@ -333,7 +358,10 @@ export class MetricsDashboard {
     } catch (e) {
       // Fallback to session metrics
       try {
-        const sessionMetrics = this.collector.getMetric('session_metrics') as any;
+        const sessionMetrics = this.collector.getMetric('session_metrics');
+        if (!isSessionMetrics(sessionMetrics)) {
+          throw new Error('Invalid session metrics structure');
+        }
         this.state.liveMetrics.population = sessionMetrics.totalBirths - sessionMetrics.totalDeaths;
       } catch {
         // Ignore if no data
@@ -352,10 +380,16 @@ export class MetricsDashboard {
 
     // Update resource stockpiles
     try {
-      const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+      const economicMetrics = this.collector.getMetric('economic_metrics');
+      if (!isEconomicMetrics(economicMetrics)) {
+        throw new Error('Invalid economic metrics structure');
+      }
       for (const [resourceType, stockpile] of Object.entries(economicMetrics.stockpiles)) {
         if (Array.isArray(stockpile) && stockpile.length > 0) {
-          this.state.liveMetrics.resourceStockpiles[resourceType] = stockpile[stockpile.length - 1].value;
+          const lastEntry = stockpile[stockpile.length - 1];
+          if (lastEntry && isStockpileEntry(lastEntry)) {
+            this.state.liveMetrics.resourceStockpiles[resourceType] = lastEntry.value;
+          }
         }
       }
     } catch (e) {
@@ -440,14 +474,22 @@ export class MetricsDashboard {
    * Generate resource balance chart
    */
   private generateResourceBalanceChart(chartType: ChartType): ChartData {
-    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+    const economicMetrics = this.collector.getMetric('economic_metrics');
+    if (!isEconomicMetrics(economicMetrics)) {
+      throw new Error('Invalid economic metrics structure');
+    }
     const datasets: Array<{ label: string; data: number[] }> = [];
 
     for (const [resourceType, stockpile] of Object.entries(economicMetrics.stockpiles)) {
       if (Array.isArray(stockpile)) {
         datasets.push({
           label: resourceType,
-          data: stockpile.map(d => d.value),
+          data: stockpile.map(entry => {
+            if (!isStockpileEntry(entry)) {
+              throw new Error(`Invalid stockpile entry for ${resourceType}`);
+            }
+            return entry.value;
+          }),
         });
       }
     }
@@ -464,10 +506,13 @@ export class MetricsDashboard {
    * Generate intelligence distribution histogram
    */
   private generateIntelligenceDistribution(chartType: ChartType): ChartData {
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as any;
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+    if (!isAgentLifecycleMetrics(lifecycleMetrics)) {
+      throw new Error('Invalid agent lifecycle metrics structure');
+    }
     const intelligenceValues: number[] = [];
 
-    for (const metrics of Object.values(lifecycleMetrics) as Array<{ initialStats?: { intelligence?: number } }>) {
+    for (const metrics of Object.values(lifecycleMetrics)) {
       if (metrics.initialStats?.intelligence !== undefined) {
         intelligenceValues.push(metrics.initialStats.intelligence);
       }
@@ -502,7 +547,10 @@ export class MetricsDashboard {
    * Generate spatial heatmap
    */
   private generateSpatialHeatmap(chartType: ChartType): ChartData {
-    const spatialMetrics = this.collector.getMetric('spatial_metrics') as any;
+    const spatialMetrics = this.collector.getMetric('spatial_metrics');
+    if (!isSpatialMetrics(spatialMetrics)) {
+      throw new Error('Invalid spatial metrics structure');
+    }
 
     return {
       type: chartType,
@@ -517,7 +565,10 @@ export class MetricsDashboard {
    */
   private generateSocialNetworkGraph(chartType: ChartType): ChartData {
     // Build graph from social metrics
-    const socialMetrics = this.collector.getMetric('social_metrics') as any;
+    const socialMetrics = this.collector.getMetric('social_metrics');
+    if (!isSocialMetrics(socialMetrics)) {
+      throw new Error('Invalid social metrics structure');
+    }
     const nodes: Array<{ id: string; label: string }> = [];
     const edges: Array<{ from: string; to: string }> = [];
 
@@ -526,7 +577,10 @@ export class MetricsDashboard {
     // In a real implementation, this would track all relationships
 
     // Create unique nodes from agents in lifecycle
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as any;
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle');
+    if (!isAgentLifecycleMetrics(lifecycleMetrics)) {
+      throw new Error('Invalid agent lifecycle metrics structure');
+    }
     const agentIds = Object.keys(lifecycleMetrics);
 
     for (const agentId of agentIds) {
@@ -587,13 +641,23 @@ export class MetricsDashboard {
     this.state.alerts = this.state.alerts.filter(alert => {
       // Check if alert condition still exists
       if (alert.metric === 'food_stockpile') {
-        const economicMetrics = this.collector.getMetric('economic_metrics') as any;
-        const foodStockpile = economicMetrics.stockpiles['food'];
-        if (foodStockpile && foodStockpile.length > 0) {
-          const latestAmount = foodStockpile[foodStockpile.length - 1].value;
-          if (latestAmount >= alert.threshold) {
-            return false; // Remove alert - condition resolved
+        try {
+          const economicMetrics = this.collector.getMetric('economic_metrics');
+          if (!isEconomicMetrics(economicMetrics)) {
+            return true; // Keep alert if we can't validate
           }
+          const foodStockpile = economicMetrics.stockpiles['food'];
+          if (foodStockpile && foodStockpile.length > 0) {
+            const lastEntry = foodStockpile[foodStockpile.length - 1];
+            if (lastEntry && isStockpileEntry(lastEntry)) {
+              const latestAmount = lastEntry.value;
+              if (latestAmount >= alert.threshold) {
+                return false; // Remove alert - condition resolved
+              }
+            }
+          }
+        } catch {
+          // Keep alert if we can't check
         }
       }
       return true; // Keep alert
@@ -601,19 +665,25 @@ export class MetricsDashboard {
 
     // Check for low food stockpile
     try {
-      const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+      const economicMetrics = this.collector.getMetric('economic_metrics');
+      if (!isEconomicMetrics(economicMetrics)) {
+        throw new Error('Invalid economic metrics structure');
+      }
       const foodStockpile = economicMetrics.stockpiles['food'];
       if (foodStockpile && foodStockpile.length > 0) {
-        const latestAmount = foodStockpile[foodStockpile.length - 1].value;
-        if (latestAmount < 10 && !this.state.alerts.some(a => a.metric === 'food_stockpile')) {
-          this.addAlert({
-            type: 'warning',
-            message: `Low food stockpile: ${latestAmount} units`,
-            metric: 'food_stockpile',
-            threshold: 10,
-            currentValue: latestAmount,
-            timestamp: Date.now(),
-          });
+        const lastEntry = foodStockpile[foodStockpile.length - 1];
+        if (lastEntry && isStockpileEntry(lastEntry)) {
+          const latestAmount = lastEntry.value;
+          if (latestAmount < 10 && !this.state.alerts.some(a => a.metric === 'food_stockpile')) {
+            this.addAlert({
+              type: 'warning',
+              message: `Low food stockpile: ${latestAmount} units`,
+              metric: 'food_stockpile',
+              threshold: 10,
+              currentValue: latestAmount,
+              timestamp: Date.now(),
+            });
+          }
         }
       }
     } catch {
@@ -622,9 +692,16 @@ export class MetricsDashboard {
 
     // Check for FPS drop
     try {
-      const performanceMetrics = this.collector.getMetric('performance_metrics') as any;
+      const performanceMetrics = this.collector.getMetric('performance_metrics');
+      if (!isPerformanceMetrics(performanceMetrics)) {
+        throw new Error('Invalid performance metrics structure');
+      }
       if (performanceMetrics.fps.length > 0) {
-        const latestFps = performanceMetrics.fps[performanceMetrics.fps.length - 1].value;
+        const lastFpsEntry = performanceMetrics.fps[performanceMetrics.fps.length - 1];
+        if (!lastFpsEntry) {
+          throw new Error('Missing FPS entry');
+        }
+        const latestFps = lastFpsEntry.value;
         if (latestFps < 30 && !this.state.alerts.some(a => a.metric === 'fps')) {
           this.addAlert({
             type: 'critical',
@@ -642,7 +719,10 @@ export class MetricsDashboard {
 
     // Check for milestones
     try {
-      const emergentMetrics = this.collector.getMetric('emergent_metrics') as any;
+      const emergentMetrics = this.collector.getMetric('emergent_metrics');
+      if (!isEmergentMetrics(emergentMetrics)) {
+        throw new Error('Invalid emergent metrics structure');
+      }
       for (const milestone of emergentMetrics.milestones) {
         // Only create alert for recent milestones (last 5 seconds)
         if (Date.now() - milestone.timestamp < 5000) {

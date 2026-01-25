@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:662d4ab1",
+  "name": "Oberon IX",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769241968634",
+  "createdAt": 1769241968639,
+  "lastAccessedAt": 1769241968639,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769241968634",
+    "type": "magical"
+  }
+}

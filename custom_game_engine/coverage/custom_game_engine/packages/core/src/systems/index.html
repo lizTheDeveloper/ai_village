@@ -1,0 +1,3491 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/core/src/systems</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> custom_game_engine/packages/core/src/systems</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">7.83% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>5045/64412</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">13.61% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>35/257</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">1.05% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>28/2643</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">7.83% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>5045/64412</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <div class="pad1">
+<table class="coverage-summary">
+<thead>
+<tr>
+   <th data-col="file" data-fmt="html" data-html="true" class="file">File</th>
+   <th data-col="pic" data-type="number" data-fmt="html" data-html="true" class="pic"></th>
+   <th data-col="statements" data-type="number" data-fmt="pct" class="pct">Statements</th>
+   <th data-col="statements_raw" data-type="number" data-fmt="html" class="abs"></th>
+   <th data-col="branches" data-type="number" data-fmt="pct" class="pct">Branches</th>
+   <th data-col="branches_raw" data-type="number" data-fmt="html" class="abs"></th>
+   <th data-col="functions" data-type="number" data-fmt="pct" class="pct">Functions</th>
+   <th data-col="functions_raw" data-type="number" data-fmt="html" class="abs"></th>
+   <th data-col="lines" data-type="number" data-fmt="pct" class="pct">Lines</th>
+   <th data-col="lines_raw" data-type="number" data-fmt="html" class="abs"></th>
+</tr>
+</thead>
+<tbody><tr>
+	<td class="file low" data-value="AIGodBehaviorSystem.ts"><a href="AIGodBehaviorSystem.ts.html">AIGodBehaviorSystem.ts</a></td>
+	<td data-value="3.9" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.9" class="pct low">3.9%</td>
+	<td data-value="589" class="abs low">23/589</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="3.9" class="pct low">3.9%</td>
+	<td data-value="589" class="abs low">23/589</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AdminAngelSystem.ts"><a href="AdminAngelSystem.ts.html">AdminAngelSystem.ts</a></td>
+	<td data-value="3.38" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.38" class="pct low">3.38%</td>
+	<td data-value="976" class="abs low">33/976</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="4" class="abs low">0/4</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="26" class="abs low">0/26</td>
+	<td data-value="3.38" class="pct low">3.38%</td>
+	<td data-value="976" class="abs low">33/976</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AfterlifeMemoryFadingSystem.ts"><a href="AfterlifeMemoryFadingSystem.ts.html">AfterlifeMemoryFadingSystem.ts</a></td>
+	<td data-value="5.38" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.38" class="pct low">5.38%</td>
+	<td data-value="130" class="abs low">7/130</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="4" class="abs low">0/4</td>
+	<td data-value="5.38" class="pct low">5.38%</td>
+	<td data-value="130" class="abs low">7/130</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AfterlifeNeedsSystem.ts"><a href="AfterlifeNeedsSystem.ts.html">AfterlifeNeedsSystem.ts</a></td>
+	<td data-value="9.9" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.9" class="pct low">9.9%</td>
+	<td data-value="111" class="abs low">11/111</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="9.9" class="pct low">9.9%</td>
+	<td data-value="111" class="abs low">11/111</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AgeTrackingSystem.ts"><a href="AgeTrackingSystem.ts.html">AgeTrackingSystem.ts</a></td>
+	<td data-value="21.27" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 21%"></div><div class="cover-empty" style="width: 79%"></div></div>
+	</td>
+	<td data-value="21.27" class="pct low">21.27%</td>
+	<td data-value="141" class="abs low">30/141</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="21.27" class="pct low">21.27%</td>
+	<td data-value="141" class="abs low">30/141</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AgentBrainSystem.ts"><a href="AgentBrainSystem.ts.html">AgentBrainSystem.ts</a></td>
+	<td data-value="3.22" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.22" class="pct low">3.22%</td>
+	<td data-value="496" class="abs low">16/496</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="3.22" class="pct low">3.22%</td>
+	<td data-value="496" class="abs low">16/496</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AgentCombatSystem.ts"><a href="AgentCombatSystem.ts.html">AgentCombatSystem.ts</a></td>
+	<td data-value="5.48" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.48" class="pct low">5.48%</td>
+	<td data-value="583" class="abs low">32/583</td>
+	<td data-value="75" class="pct medium">75%</td>
+	<td data-value="4" class="abs medium">3/4</td>
+	<td data-value="9.09" class="pct low">9.09%</td>
+	<td data-value="22" class="abs low">2/22</td>
+	<td data-value="5.48" class="pct low">5.48%</td>
+	<td data-value="583" class="abs low">32/583</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AgentSwimmingSystem.ts"><a href="AgentSwimmingSystem.ts.html">AgentSwimmingSystem.ts</a></td>
+	<td data-value="3.62" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.62" class="pct low">3.62%</td>
+	<td data-value="276" class="abs low">10/276</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="3.62" class="pct low">3.62%</td>
+	<td data-value="276" class="abs low">10/276</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AgentVisualsSystem.ts"><a href="AgentVisualsSystem.ts.html">AgentVisualsSystem.ts</a></td>
+	<td data-value="14.7" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 14%"></div><div class="cover-empty" style="width: 86%"></div></div>
+	</td>
+	<td data-value="14.7" class="pct low">14.7%</td>
+	<td data-value="34" class="abs low">5/34</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="14.7" class="pct low">14.7%</td>
+	<td data-value="34" class="abs low">5/34</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AncestorTransformationSystem.ts"><a href="AncestorTransformationSystem.ts.html">AncestorTransformationSystem.ts</a></td>
+	<td data-value="41.52" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 41%"></div><div class="cover-empty" style="width: 59%"></div></div>
+	</td>
+	<td data-value="41.52" class="pct low">41.52%</td>
+	<td data-value="118" class="abs low">49/118</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="41.52" class="pct low">41.52%</td>
+	<td data-value="118" class="abs low">49/118</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AngelAIDecisionProcessor.ts"><a href="AngelAIDecisionProcessor.ts.html">AngelAIDecisionProcessor.ts</a></td>
+	<td data-value="19.93" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 19%"></div><div class="cover-empty" style="width: 81%"></div></div>
+	</td>
+	<td data-value="19.93" class="pct low">19.93%</td>
+	<td data-value="316" class="abs low">63/316</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="17" class="abs low">0/17</td>
+	<td data-value="19.93" class="pct low">19.93%</td>
+	<td data-value="316" class="abs low">63/316</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AngelPhoneSystem.ts"><a href="AngelPhoneSystem.ts.html">AngelPhoneSystem.ts</a></td>
+	<td data-value="8.58" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.58" class="pct low">8.58%</td>
+	<td data-value="268" class="abs low">23/268</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="18" class="abs low">0/18</td>
+	<td data-value="8.58" class="pct low">8.58%</td>
+	<td data-value="268" class="abs low">23/268</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AngelSystem.ts"><a href="AngelSystem.ts.html">AngelSystem.ts</a></td>
+	<td data-value="7.16" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.16" class="pct low">7.16%</td>
+	<td data-value="307" class="abs low">22/307</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="19" class="abs low">0/19</td>
+	<td data-value="7.16" class="pct low">7.16%</td>
+	<td data-value="307" class="abs low">22/307</td>
+	</tr>
+
+<tr>
+	<td class="file high" data-value="AngelTypes.ts"><a href="AngelTypes.ts.html">AngelTypes.ts</a></td>
+	<td data-value="100" class="pic high">
+	<div class="chart"><div class="cover-fill cover-full" style="width: 100%"></div><div class="cover-empty" style="width: 0%"></div></div>
+	</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="17" class="abs high">17/17</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="17" class="abs high">17/17</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AnimalHousingSystem.ts"><a href="AnimalHousingSystem.ts.html">AnimalHousingSystem.ts</a></td>
+	<td data-value="6.1" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.1" class="pct low">6.1%</td>
+	<td data-value="131" class="abs low">8/131</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="6.1" class="pct low">6.1%</td>
+	<td data-value="131" class="abs low">8/131</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AnimalProductionSystem.ts"><a href="AnimalProductionSystem.ts.html">AnimalProductionSystem.ts</a></td>
+	<td data-value="4.04" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.04" class="pct low">4.04%</td>
+	<td data-value="173" class="abs low">7/173</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="4" class="abs low">0/4</td>
+	<td data-value="4.04" class="pct low">4.04%</td>
+	<td data-value="173" class="abs low">7/173</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AnimalSystem.ts"><a href="AnimalSystem.ts.html">AnimalSystem.ts</a></td>
+	<td data-value="4.66" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.66" class="pct low">4.66%</td>
+	<td data-value="193" class="abs low">9/193</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="4.66" class="pct low">4.66%</td>
+	<td data-value="193" class="abs low">9/193</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AnimalVisualsSystem.ts"><a href="AnimalVisualsSystem.ts.html">AnimalVisualsSystem.ts</a></td>
+	<td data-value="13.72" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 13%"></div><div class="cover-empty" style="width: 87%"></div></div>
+	</td>
+	<td data-value="13.72" class="pct low">13.72%</td>
+	<td data-value="51" class="abs low">7/51</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="4" class="abs low">0/4</td>
+	<td data-value="13.72" class="pct low">13.72%</td>
+	<td data-value="51" class="abs low">7/51</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AnimationSystem.ts"><a href="AnimationSystem.ts.html">AnimationSystem.ts</a></td>
+	<td data-value="10.41" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.41" class="pct low">10.41%</td>
+	<td data-value="48" class="abs low">5/48</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="10.41" class="pct low">10.41%</td>
+	<td data-value="48" class="abs low">5/48</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AquaticAnimalSpawningSystem.ts"><a href="AquaticAnimalSpawningSystem.ts.html">AquaticAnimalSpawningSystem.ts</a></td>
+	<td data-value="4.6" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.6" class="pct low">4.6%</td>
+	<td data-value="217" class="abs low">10/217</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="4.6" class="pct low">4.6%</td>
+	<td data-value="217" class="abs low">10/217</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ArchaeologySystem.ts"><a href="ArchaeologySystem.ts.html">ArchaeologySystem.ts</a></td>
+	<td data-value="11.95" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 11%"></div><div class="cover-empty" style="width: 89%"></div></div>
+	</td>
+	<td data-value="11.95" class="pct low">11.95%</td>
+	<td data-value="343" class="abs low">41/343</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="18" class="abs low">0/18</td>
+	<td data-value="11.95" class="pct low">11.95%</td>
+	<td data-value="343" class="abs low">41/343</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ArmadaSystem.ts"><a href="ArmadaSystem.ts.html">ArmadaSystem.ts</a></td>
+	<td data-value="5.24" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.24" class="pct low">5.24%</td>
+	<td data-value="248" class="abs low">13/248</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="5.24" class="pct low">5.24%</td>
+	<td data-value="248" class="abs low">13/248</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AssemblyMachineSystem.ts"><a href="AssemblyMachineSystem.ts.html">AssemblyMachineSystem.ts</a></td>
+	<td data-value="6.21" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.21" class="pct low">6.21%</td>
+	<td data-value="177" class="abs low">11/177</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="6.21" class="pct low">6.21%</td>
+	<td data-value="177" class="abs low">11/177</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AutoSaveSystem.ts"><a href="AutoSaveSystem.ts.html">AutoSaveSystem.ts</a></td>
+	<td data-value="6.97" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.97" class="pct low">6.97%</td>
+	<td data-value="258" class="abs low">18/258</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="6.97" class="pct low">6.97%</td>
+	<td data-value="258" class="abs low">18/258</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="AvatarSystem.ts"><a href="AvatarSystem.ts.html">AvatarSystem.ts</a></td>
+	<td data-value="15.96" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.96" class="pct low">15.96%</td>
+	<td data-value="119" class="abs low">19/119</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="15.96" class="pct low">15.96%</td>
+	<td data-value="119" class="abs low">19/119</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BackgroundChunkGeneratorSystem.ts"><a href="BackgroundChunkGeneratorSystem.ts.html">BackgroundChunkGeneratorSystem.ts</a></td>
+	<td data-value="27.27" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 27%"></div><div class="cover-empty" style="width: 73%"></div></div>
+	</td>
+	<td data-value="27.27" class="pct low">27.27%</td>
+	<td data-value="22" class="abs low">6/22</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="27.27" class="pct low">27.27%</td>
+	<td data-value="22" class="abs low">6/22</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BackgroundUniverseSystem.ts"><a href="BackgroundUniverseSystem.ts.html">BackgroundUniverseSystem.ts</a></td>
+	<td data-value="0" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 0%"></div><div class="cover-empty" style="width: 100%"></div></div>
+	</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="42" class="abs low">0/42</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="42" class="abs low">0/42</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BeliefFormationSystem.ts"><a href="BeliefFormationSystem.ts.html">BeliefFormationSystem.ts</a></td>
+	<td data-value="6.47" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.47" class="pct low">6.47%</td>
+	<td data-value="139" class="abs low">9/139</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="6.47" class="pct low">6.47%</td>
+	<td data-value="139" class="abs low">9/139</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BeliefGenerationSystem.ts"><a href="BeliefGenerationSystem.ts.html">BeliefGenerationSystem.ts</a></td>
+	<td data-value="16.96" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 16%"></div><div class="cover-empty" style="width: 84%"></div></div>
+	</td>
+	<td data-value="16.96" class="pct low">16.96%</td>
+	<td data-value="112" class="abs low">19/112</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="16.96" class="pct low">16.96%</td>
+	<td data-value="112" class="abs low">19/112</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BeltSystem.ts"><a href="BeltSystem.ts.html">BeltSystem.ts</a></td>
+	<td data-value="9.34" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.34" class="pct low">9.34%</td>
+	<td data-value="107" class="abs low">10/107</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="9.34" class="pct low">9.34%</td>
+	<td data-value="107" class="abs low">10/107</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BodySystem.ts"><a href="BodySystem.ts.html">BodySystem.ts</a></td>
+	<td data-value="5.69" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.69" class="pct low">5.69%</td>
+	<td data-value="316" class="abs low">18/316</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="5.69" class="pct low">5.69%</td>
+	<td data-value="316" class="abs low">18/316</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BookstoreSystem.ts"><a href="BookstoreSystem.ts.html">BookstoreSystem.ts</a></td>
+	<td data-value="9.24" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.24" class="pct low">9.24%</td>
+	<td data-value="173" class="abs low">16/173</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="9.24" class="pct low">9.24%</td>
+	<td data-value="173" class="abs low">16/173</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BuildingMaintenanceSystem.ts"><a href="BuildingMaintenanceSystem.ts.html">BuildingMaintenanceSystem.ts</a></td>
+	<td data-value="21.42" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 21%"></div><div class="cover-empty" style="width: 79%"></div></div>
+	</td>
+	<td data-value="21.42" class="pct low">21.42%</td>
+	<td data-value="140" class="abs low">30/140</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="21.42" class="pct low">21.42%</td>
+	<td data-value="140" class="abs low">30/140</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BuildingSpatialAnalysisSystem.ts"><a href="BuildingSpatialAnalysisSystem.ts.html">BuildingSpatialAnalysisSystem.ts</a></td>
+	<td data-value="10.44" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.44" class="pct low">10.44%</td>
+	<td data-value="134" class="abs low">14/134</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="10.44" class="pct low">10.44%</td>
+	<td data-value="134" class="abs low">14/134</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BuildingSummoningSystem.ts"><a href="BuildingSummoningSystem.ts.html">BuildingSummoningSystem.ts</a></td>
+	<td data-value="7.38" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.38" class="pct low">7.38%</td>
+	<td data-value="149" class="abs low">11/149</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="7.38" class="pct low">7.38%</td>
+	<td data-value="149" class="abs low">11/149</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="BuildingSystem.ts"><a href="BuildingSystem.ts.html">BuildingSystem.ts</a></td>
+	<td data-value="3.28" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.28" class="pct low">3.28%</td>
+	<td data-value="701" class="abs low">23/701</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="20" class="abs low">0/20</td>
+	<td data-value="3.28" class="pct low">3.28%</td>
+	<td data-value="701" class="abs low">23/701</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CanonEventDescriptions.ts"><a href="CanonEventDescriptions.ts.html">CanonEventDescriptions.ts</a></td>
+	<td data-value="6.42" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.42" class="pct low">6.42%</td>
+	<td data-value="109" class="abs low">7/109</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="6.42" class="pct low">6.42%</td>
+	<td data-value="109" class="abs low">7/109</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CanonEventDetector.ts"><a href="CanonEventDetector.ts.html">CanonEventDetector.ts</a></td>
+	<td data-value="35.89" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 35%"></div><div class="cover-empty" style="width: 65%"></div></div>
+	</td>
+	<td data-value="35.89" class="pct low">35.89%</td>
+	<td data-value="39" class="abs low">14/39</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="3" class="abs high">3/3</td>
+	<td data-value="30" class="pct low">30%</td>
+	<td data-value="10" class="abs low">3/10</td>
+	<td data-value="35.89" class="pct low">35.89%</td>
+	<td data-value="39" class="abs low">14/39</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CanonEventSystem.ts"><a href="CanonEventSystem.ts.html">CanonEventSystem.ts</a></td>
+	<td data-value="1.64" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 1%"></div><div class="cover-empty" style="width: 99%"></div></div>
+	</td>
+	<td data-value="1.64" class="pct low">1.64%</td>
+	<td data-value="304" class="abs low">5/304</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="1.64" class="pct low">1.64%</td>
+	<td data-value="304" class="abs low">5/304</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CastingState.ts"><a href="CastingState.ts.html">CastingState.ts</a></td>
+	<td data-value="9.67" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.67" class="pct low">9.67%</td>
+	<td data-value="31" class="abs low">3/31</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="9.67" class="pct low">9.67%</td>
+	<td data-value="31" class="abs low">3/31</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CheckpointNamingService.ts"><a href="CheckpointNamingService.ts.html">CheckpointNamingService.ts</a></td>
+	<td data-value="16.5" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 16%"></div><div class="cover-empty" style="width: 84%"></div></div>
+	</td>
+	<td data-value="16.5" class="pct low">16.5%</td>
+	<td data-value="103" class="abs low">17/103</td>
+	<td data-value="66.66" class="pct medium">66.66%</td>
+	<td data-value="3" class="abs medium">2/3</td>
+	<td data-value="22.22" class="pct low">22.22%</td>
+	<td data-value="9" class="abs low">2/9</td>
+	<td data-value="16.5" class="pct low">16.5%</td>
+	<td data-value="103" class="abs low">17/103</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CheckpointRetentionPolicy.ts"><a href="CheckpointRetentionPolicy.ts.html">CheckpointRetentionPolicy.ts</a></td>
+	<td data-value="41.58" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 41%"></div><div class="cover-empty" style="width: 59%"></div></div>
+	</td>
+	<td data-value="41.58" class="pct low">41.58%</td>
+	<td data-value="101" class="abs low">42/101</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="5" class="abs high">5/5</td>
+	<td data-value="30.76" class="pct low">30.76%</td>
+	<td data-value="13" class="abs low">4/13</td>
+	<td data-value="41.58" class="pct low">41.58%</td>
+	<td data-value="101" class="abs low">42/101</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ChunkLoadingSystem.ts"><a href="ChunkLoadingSystem.ts.html">ChunkLoadingSystem.ts</a></td>
+	<td data-value="6.53" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.53" class="pct low">6.53%</td>
+	<td data-value="153" class="abs low">10/153</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="6.53" class="pct low">6.53%</td>
+	<td data-value="153" class="abs low">10/153</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ChunkSyncSystem.ts"><a href="ChunkSyncSystem.ts.html">ChunkSyncSystem.ts</a></td>
+	<td data-value="12.5" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 12%"></div><div class="cover-empty" style="width: 88%"></div></div>
+	</td>
+	<td data-value="12.5" class="pct low">12.5%</td>
+	<td data-value="64" class="abs low">8/64</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="12.5" class="pct low">12.5%</td>
+	<td data-value="64" class="abs low">8/64</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CityBuildingGenerationSystem.ts"><a href="CityBuildingGenerationSystem.ts.html">CityBuildingGenerationSystem.ts</a></td>
+	<td data-value="17.42" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 17%"></div><div class="cover-empty" style="width: 83%"></div></div>
+	</td>
+	<td data-value="17.42" class="pct low">17.42%</td>
+	<td data-value="241" class="abs low">42/241</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="17.42" class="pct low">17.42%</td>
+	<td data-value="241" class="abs low">42/241</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CityDirectorSystem.ts"><a href="CityDirectorSystem.ts.html">CityDirectorSystem.ts</a></td>
+	<td data-value="5.41" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.41" class="pct low">5.41%</td>
+	<td data-value="351" class="abs low">19/351</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="5.41" class="pct low">5.41%</td>
+	<td data-value="351" class="abs low">19/351</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CityGovernanceSystem.ts"><a href="CityGovernanceSystem.ts.html">CityGovernanceSystem.ts</a></td>
+	<td data-value="4.95" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.95" class="pct low">4.95%</td>
+	<td data-value="202" class="abs low">10/202</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="4.95" class="pct low">4.95%</td>
+	<td data-value="202" class="abs low">10/202</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CollapseSystem.ts"><a href="CollapseSystem.ts.html">CollapseSystem.ts</a></td>
+	<td data-value="15.21" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.21" class="pct low">15.21%</td>
+	<td data-value="322" class="abs low">49/322</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="15.21" class="pct low">15.21%</td>
+	<td data-value="322" class="abs low">49/322</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CommunicationSystem.ts"><a href="CommunicationSystem.ts.html">CommunicationSystem.ts</a></td>
+	<td data-value="10.52" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.52" class="pct low">10.52%</td>
+	<td data-value="171" class="abs low">18/171</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="10" class="pct low">10%</td>
+	<td data-value="10" class="abs low">1/10</td>
+	<td data-value="10.52" class="pct low">10.52%</td>
+	<td data-value="171" class="abs low">18/171</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CompanionSystem.ts"><a href="CompanionSystem.ts.html">CompanionSystem.ts</a></td>
+	<td data-value="3.67" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.67" class="pct low">3.67%</td>
+	<td data-value="462" class="abs low">17/462</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="3.67" class="pct low">3.67%</td>
+	<td data-value="462" class="abs low">17/462</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ConversionWarfareSystem.ts"><a href="ConversionWarfareSystem.ts.html">ConversionWarfareSystem.ts</a></td>
+	<td data-value="13.73" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 13%"></div><div class="cover-empty" style="width: 87%"></div></div>
+	</td>
+	<td data-value="13.73" class="pct low">13.73%</td>
+	<td data-value="182" class="abs low">25/182</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="16" class="abs low">0/16</td>
+	<td data-value="13.73" class="pct low">13.73%</td>
+	<td data-value="182" class="abs low">25/182</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CookingSystem.ts"><a href="CookingSystem.ts.html">CookingSystem.ts</a></td>
+	<td data-value="15.92" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.92" class="pct low">15.92%</td>
+	<td data-value="157" class="abs low">25/157</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="15.92" class="pct low">15.92%</td>
+	<td data-value="157" class="abs low">25/157</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CourtshipSystem.ts"><a href="CourtshipSystem.ts.html">CourtshipSystem.ts</a></td>
+	<td data-value="4.33" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.33" class="pct low">4.33%</td>
+	<td data-value="300" class="abs low">13/300</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="4.33" class="pct low">4.33%</td>
+	<td data-value="300" class="abs low">13/300</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CreatorInterventionSystem.ts"><a href="CreatorInterventionSystem.ts.html">CreatorInterventionSystem.ts</a></td>
+	<td data-value="5.42" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.42" class="pct low">5.42%</td>
+	<td data-value="553" class="abs low">30/553</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="3.7" class="pct low">3.7%</td>
+	<td data-value="27" class="abs low">1/27</td>
+	<td data-value="5.42" class="pct low">5.42%</td>
+	<td data-value="553" class="abs low">30/553</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CreatorSurveillanceSystem.ts"><a href="CreatorSurveillanceSystem.ts.html">CreatorSurveillanceSystem.ts</a></td>
+	<td data-value="8.58" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.58" class="pct low">8.58%</td>
+	<td data-value="198" class="abs low">17/198</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="8.58" class="pct low">8.58%</td>
+	<td data-value="198" class="abs low">17/198</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CrewStressSystem.ts"><a href="CrewStressSystem.ts.html">CrewStressSystem.ts</a></td>
+	<td data-value="15.82" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.82" class="pct low">15.82%</td>
+	<td data-value="158" class="abs low">25/158</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="15.82" class="pct low">15.82%</td>
+	<td data-value="158" class="abs low">25/158</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="CrossRealmPhoneSystem.ts"><a href="CrossRealmPhoneSystem.ts.html">CrossRealmPhoneSystem.ts</a></td>
+	<td data-value="7.31" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.31" class="pct low">7.31%</td>
+	<td data-value="383" class="abs low">28/383</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="25" class="abs low">0/25</td>
+	<td data-value="7.31" class="pct low">7.31%</td>
+	<td data-value="383" class="abs low">28/383</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DeathBargainSystem.ts"><a href="DeathBargainSystem.ts.html">DeathBargainSystem.ts</a></td>
+	<td data-value="4.02" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.02" class="pct low">4.02%</td>
+	<td data-value="919" class="abs low">37/919</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="34" class="abs low">0/34</td>
+	<td data-value="4.02" class="pct low">4.02%</td>
+	<td data-value="919" class="abs low">37/919</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DeathJudgmentSystem.ts"><a href="DeathJudgmentSystem.ts.html">DeathJudgmentSystem.ts</a></td>
+	<td data-value="4.45" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.45" class="pct low">4.45%</td>
+	<td data-value="292" class="abs low">13/292</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="4.45" class="pct low">4.45%</td>
+	<td data-value="292" class="abs low">13/292</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DeathTransitionSystem.ts"><a href="DeathTransitionSystem.ts.html">DeathTransitionSystem.ts</a></td>
+	<td data-value="4.06" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.06" class="pct low">4.06%</td>
+	<td data-value="590" class="abs low">24/590</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="20" class="abs low">0/20</td>
+	<td data-value="4.06" class="pct low">4.06%</td>
+	<td data-value="590" class="abs low">24/590</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DeityEmergenceSystem.ts"><a href="DeityEmergenceSystem.ts.html">DeityEmergenceSystem.ts</a></td>
+	<td data-value="5.36" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.36" class="pct low">5.36%</td>
+	<td data-value="578" class="abs low">31/578</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="21" class="abs low">0/21</td>
+	<td data-value="5.36" class="pct low">5.36%</td>
+	<td data-value="578" class="abs low">31/578</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DirectConnectionSystem.ts"><a href="DirectConnectionSystem.ts.html">DirectConnectionSystem.ts</a></td>
+	<td data-value="11.11" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 11%"></div><div class="cover-empty" style="width: 89%"></div></div>
+	</td>
+	<td data-value="11.11" class="pct low">11.11%</td>
+	<td data-value="72" class="abs low">8/72</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="11.11" class="pct low">11.11%</td>
+	<td data-value="72" class="abs low">8/72</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DivergenceTrackingSystem.ts"><a href="DivergenceTrackingSystem.ts.html">DivergenceTrackingSystem.ts</a></td>
+	<td data-value="2.88" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 2%"></div><div class="cover-empty" style="width: 98%"></div></div>
+	</td>
+	<td data-value="2.88" class="pct low">2.88%</td>
+	<td data-value="208" class="abs low">6/208</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="2.88" class="pct low">2.88%</td>
+	<td data-value="208" class="abs low">6/208</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DivineBodyModification.ts"><a href="DivineBodyModification.ts.html">DivineBodyModification.ts</a></td>
+	<td data-value="10.87" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.87" class="pct low">10.87%</td>
+	<td data-value="423" class="abs low">46/423</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="20" class="abs low">0/20</td>
+	<td data-value="10.87" class="pct low">10.87%</td>
+	<td data-value="423" class="abs low">46/423</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DivinePowerSystem.ts"><a href="DivinePowerSystem.ts.html">DivinePowerSystem.ts</a></td>
+	<td data-value="1.41" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 1%"></div><div class="cover-empty" style="width: 99%"></div></div>
+	</td>
+	<td data-value="1.41" class="pct low">1.41%</td>
+	<td data-value="1060" class="abs low">15/1060</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="1.41" class="pct low">1.41%</td>
+	<td data-value="1060" class="abs low">15/1060</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DivineWeatherControl.ts"><a href="DivineWeatherControl.ts.html">DivineWeatherControl.ts</a></td>
+	<td data-value="17.41" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 17%"></div><div class="cover-empty" style="width: 83%"></div></div>
+	</td>
+	<td data-value="17.41" class="pct low">17.41%</td>
+	<td data-value="201" class="abs low">35/201</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="17.41" class="pct low">17.41%</td>
+	<td data-value="201" class="abs low">35/201</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DominanceChallengeSystem.ts"><a href="DominanceChallengeSystem.ts.html">DominanceChallengeSystem.ts</a></td>
+	<td data-value="4.2" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.2" class="pct low">4.2%</td>
+	<td data-value="428" class="abs low">18/428</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="4.2" class="pct low">4.2%</td>
+	<td data-value="428" class="abs low">18/428</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DoorSystem.ts"><a href="DoorSystem.ts.html">DoorSystem.ts</a></td>
+	<td data-value="10.61" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.61" class="pct low">10.61%</td>
+	<td data-value="113" class="abs low">12/113</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="10.61" class="pct low">10.61%</td>
+	<td data-value="113" class="abs low">12/113</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="DurabilitySystem.ts"><a href="DurabilitySystem.ts.html">DurabilitySystem.ts</a></td>
+	<td data-value="12.4" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 12%"></div><div class="cover-empty" style="width: 88%"></div></div>
+	</td>
+	<td data-value="12.4" class="pct low">12.4%</td>
+	<td data-value="137" class="abs low">17/137</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="12.4" class="pct low">12.4%</td>
+	<td data-value="137" class="abs low">17/137</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EmpireDiplomacySystem.ts"><a href="EmpireDiplomacySystem.ts.html">EmpireDiplomacySystem.ts</a></td>
+	<td data-value="7.1" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.1" class="pct low">7.1%</td>
+	<td data-value="366" class="abs low">26/366</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="22" class="abs low">0/22</td>
+	<td data-value="7.1" class="pct low">7.1%</td>
+	<td data-value="366" class="abs low">26/366</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EmpireDynastyManager.ts"><a href="EmpireDynastyManager.ts.html">EmpireDynastyManager.ts</a></td>
+	<td data-value="1.23" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 1%"></div><div class="cover-empty" style="width: 99%"></div></div>
+	</td>
+	<td data-value="1.23" class="pct low">1.23%</td>
+	<td data-value="324" class="abs low">4/324</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="1.23" class="pct low">1.23%</td>
+	<td data-value="324" class="abs low">4/324</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EmpireSystem.ts"><a href="EmpireSystem.ts.html">EmpireSystem.ts</a></td>
+	<td data-value="5.69" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.69" class="pct low">5.69%</td>
+	<td data-value="527" class="abs low">30/527</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="26" class="abs low">0/26</td>
+	<td data-value="5.69" class="pct low">5.69%</td>
+	<td data-value="527" class="abs low">30/527</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EmpireWarSystem.ts"><a href="EmpireWarSystem.ts.html">EmpireWarSystem.ts</a></td>
+	<td data-value="6.61" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.61" class="pct low">6.61%</td>
+	<td data-value="272" class="abs low">18/272</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="6.61" class="pct low">6.61%</td>
+	<td data-value="272" class="abs low">18/272</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EntityAwakenerSystem.ts"><a href="EntityAwakenerSystem.ts.html">EntityAwakenerSystem.ts</a></td>
+	<td data-value="11.11" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 11%"></div><div class="cover-empty" style="width: 89%"></div></div>
+	</td>
+	<td data-value="11.11" class="pct low">11.11%</td>
+	<td data-value="162" class="abs low">18/162</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="16" class="abs low">0/16</td>
+	<td data-value="11.11" class="pct low">11.11%</td>
+	<td data-value="162" class="abs low">18/162</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EquipmentSystem.ts"><a href="EquipmentSystem.ts.html">EquipmentSystem.ts</a></td>
+	<td data-value="9.56" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.56" class="pct low">9.56%</td>
+	<td data-value="209" class="abs low">20/209</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="6.25" class="pct low">6.25%</td>
+	<td data-value="16" class="abs low">1/16</td>
+	<td data-value="9.56" class="pct low">9.56%</td>
+	<td data-value="209" class="abs low">20/209</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EventCoalescingMonitorSystem.ts"><a href="EventCoalescingMonitorSystem.ts.html">EventCoalescingMonitorSystem.ts</a></td>
+	<td data-value="25" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 25%"></div><div class="cover-empty" style="width: 75%"></div></div>
+	</td>
+	<td data-value="25" class="pct low">25%</td>
+	<td data-value="20" class="abs low">5/20</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="25" class="pct low">25%</td>
+	<td data-value="20" class="abs low">5/20</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="EventReportingSystem.ts"><a href="EventReportingSystem.ts.html">EventReportingSystem.ts</a></td>
+	<td data-value="2.24" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 2%"></div><div class="cover-empty" style="width: 98%"></div></div>
+	</td>
+	<td data-value="2.24" class="pct low">2.24%</td>
+	<td data-value="401" class="abs low">9/401</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="14.28" class="pct low">14.28%</td>
+	<td data-value="7" class="abs low">1/7</td>
+	<td data-value="2.24" class="pct low">2.24%</td>
+	<td data-value="401" class="abs low">9/401</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ExperimentationSystem.ts"><a href="ExperimentationSystem.ts.html">ExperimentationSystem.ts</a></td>
+	<td data-value="5.02" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.02" class="pct low">5.02%</td>
+	<td data-value="418" class="abs low">21/418</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="18" class="abs low">0/18</td>
+	<td data-value="5.02" class="pct low">5.02%</td>
+	<td data-value="418" class="abs low">21/418</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ExplorationDiscoverySystem.ts"><a href="ExplorationDiscoverySystem.ts.html">ExplorationDiscoverySystem.ts</a></td>
+	<td data-value="6.4" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.4" class="pct low">6.4%</td>
+	<td data-value="484" class="abs low">31/484</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="6.4" class="pct low">6.4%</td>
+	<td data-value="484" class="abs low">31/484</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ExplorationSystem.ts"><a href="ExplorationSystem.ts.html">ExplorationSystem.ts</a></td>
+	<td data-value="6.53" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.53" class="pct low">6.53%</td>
+	<td data-value="245" class="abs low">16/245</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="6.53" class="pct low">6.53%</td>
+	<td data-value="245" class="abs low">16/245</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FactoryAISystem.ts"><a href="FactoryAISystem.ts.html">FactoryAISystem.ts</a></td>
+	<td data-value="4.61" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.61" class="pct low">4.61%</td>
+	<td data-value="368" class="abs low">17/368</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="4.61" class="pct low">4.61%</td>
+	<td data-value="368" class="abs low">17/368</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FaithMechanicsSystem.ts"><a href="FaithMechanicsSystem.ts.html">FaithMechanicsSystem.ts</a></td>
+	<td data-value="14.28" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 14%"></div><div class="cover-empty" style="width: 86%"></div></div>
+	</td>
+	<td data-value="14.28" class="pct low">14.28%</td>
+	<td data-value="161" class="abs low">23/161</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="14.28" class="pct low">14.28%</td>
+	<td data-value="161" class="abs low">23/161</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FederationGovernanceSystem.ts"><a href="FederationGovernanceSystem.ts.html">FederationGovernanceSystem.ts</a></td>
+	<td data-value="3.22" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.22" class="pct low">3.22%</td>
+	<td data-value="682" class="abs low">22/682</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="18" class="abs low">0/18</td>
+	<td data-value="3.22" class="pct low">3.22%</td>
+	<td data-value="682" class="abs low">22/682</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FireSpreadSystem.ts"><a href="FireSpreadSystem.ts.html">FireSpreadSystem.ts</a></td>
+	<td data-value="26.5" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 26%"></div><div class="cover-empty" style="width: 74%"></div></div>
+	</td>
+	<td data-value="26.5" class="pct low">26.5%</td>
+	<td data-value="449" class="abs low">119/449</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="26.5" class="pct low">26.5%</td>
+	<td data-value="449" class="abs low">119/449</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FleetCoherenceSystem.ts"><a href="FleetCoherenceSystem.ts.html">FleetCoherenceSystem.ts</a></td>
+	<td data-value="4.12" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.12" class="pct low">4.12%</td>
+	<td data-value="315" class="abs low">13/315</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="4.12" class="pct low">4.12%</td>
+	<td data-value="315" class="abs low">13/315</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FleetCombatSystem.ts"><a href="FleetCombatSystem.ts.html">FleetCombatSystem.ts</a></td>
+	<td data-value="3.98" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.98" class="pct low">3.98%</td>
+	<td data-value="326" class="abs low">13/326</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="3.98" class="pct low">3.98%</td>
+	<td data-value="326" class="abs low">13/326</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FleetSystem.ts"><a href="FleetSystem.ts.html">FleetSystem.ts</a></td>
+	<td data-value="4.8" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.8" class="pct low">4.8%</td>
+	<td data-value="250" class="abs low">12/250</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="4.8" class="pct low">4.8%</td>
+	<td data-value="250" class="abs low">12/250</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FluidDynamicsSystem.ts"><a href="FluidDynamicsSystem.ts.html">FluidDynamicsSystem.ts</a></td>
+	<td data-value="5.93" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.93" class="pct low">5.93%</td>
+	<td data-value="236" class="abs low">14/236</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="5.93" class="pct low">5.93%</td>
+	<td data-value="236" class="abs low">14/236</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="FriendshipSystem.ts"><a href="FriendshipSystem.ts.html">FriendshipSystem.ts</a></td>
+	<td data-value="14.63" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 14%"></div><div class="cover-empty" style="width: 86%"></div></div>
+	</td>
+	<td data-value="14.63" class="pct low">14.63%</td>
+	<td data-value="82" class="abs low">12/82</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="14.28" class="pct low">14.28%</td>
+	<td data-value="7" class="abs low">1/7</td>
+	<td data-value="14.63" class="pct low">14.63%</td>
+	<td data-value="82" class="abs low">12/82</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="GalacticCouncilSystem.ts"><a href="GalacticCouncilSystem.ts.html">GalacticCouncilSystem.ts</a></td>
+	<td data-value="4.97" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.97" class="pct low">4.97%</td>
+	<td data-value="543" class="abs low">27/543</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="23" class="abs low">0/23</td>
+	<td data-value="4.97" class="pct low">4.97%</td>
+	<td data-value="543" class="abs low">27/543</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="GoalDescriptionLibrary.ts"><a href="GoalDescriptionLibrary.ts.html">GoalDescriptionLibrary.ts</a></td>
+	<td data-value="3.79" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.79" class="pct low">3.79%</td>
+	<td data-value="237" class="abs low">9/237</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="3.79" class="pct low">3.79%</td>
+	<td data-value="237" class="abs low">9/237</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="GoalGenerationSystem.ts"><a href="GoalGenerationSystem.ts.html">GoalGenerationSystem.ts</a></td>
+	<td data-value="5.73" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.73" class="pct low">5.73%</td>
+	<td data-value="488" class="abs low">28/488</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="32" class="abs low">0/32</td>
+	<td data-value="5.73" class="pct low">5.73%</td>
+	<td data-value="488" class="abs low">28/488</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="GovernanceDataSystem.ts"><a href="GovernanceDataSystem.ts.html">GovernanceDataSystem.ts</a></td>
+	<td data-value="4.76" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.76" class="pct low">4.76%</td>
+	<td data-value="294" class="abs low">14/294</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="4.76" class="pct low">4.76%</td>
+	<td data-value="294" class="abs low">14/294</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="GovernorDecisionSystem.ts"><a href="GovernorDecisionSystem.ts.html">GovernorDecisionSystem.ts</a></td>
+	<td data-value="19.96" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 19%"></div><div class="cover-empty" style="width: 81%"></div></div>
+	</td>
+	<td data-value="19.96" class="pct low">19.96%</td>
+	<td data-value="516" class="abs low">103/516</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="23" class="abs low">0/23</td>
+	<td data-value="19.96" class="pct low">19.96%</td>
+	<td data-value="516" class="abs low">103/516</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="GuardDutySystem.ts"><a href="GuardDutySystem.ts.html">GuardDutySystem.ts</a></td>
+	<td data-value="5.29" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.29" class="pct low">5.29%</td>
+	<td data-value="321" class="abs low">17/321</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="5.29" class="pct low">5.29%</td>
+	<td data-value="321" class="abs low">17/321</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="HeartChamberNetworkSystem.ts"><a href="HeartChamberNetworkSystem.ts.html">HeartChamberNetworkSystem.ts</a></td>
+	<td data-value="5.93" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.93" class="pct low">5.93%</td>
+	<td data-value="320" class="abs low">19/320</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="5.93" class="pct low">5.93%</td>
+	<td data-value="320" class="abs low">19/320</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="HolyTextSystem.ts"><a href="HolyTextSystem.ts.html">HolyTextSystem.ts</a></td>
+	<td data-value="14.17" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 14%"></div><div class="cover-empty" style="width: 86%"></div></div>
+	</td>
+	<td data-value="14.17" class="pct low">14.17%</td>
+	<td data-value="127" class="abs low">18/127</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="14.17" class="pct low">14.17%</td>
+	<td data-value="127" class="abs low">18/127</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="HuntingSystem.ts"><a href="HuntingSystem.ts.html">HuntingSystem.ts</a></td>
+	<td data-value="4.54" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.54" class="pct low">4.54%</td>
+	<td data-value="242" class="abs low">11/242</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="4.54" class="pct low">4.54%</td>
+	<td data-value="242" class="abs low">11/242</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="IdleBehaviorSystem.ts"><a href="IdleBehaviorSystem.ts.html">IdleBehaviorSystem.ts</a></td>
+	<td data-value="7.4" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.4" class="pct low">7.4%</td>
+	<td data-value="81" class="abs low">6/81</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="7.4" class="pct low">7.4%</td>
+	<td data-value="81" class="abs low">6/81</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="InjurySystem.ts"><a href="InjurySystem.ts.html">InjurySystem.ts</a></td>
+	<td data-value="6.55" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.55" class="pct low">6.55%</td>
+	<td data-value="183" class="abs low">12/183</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="6.55" class="pct low">6.55%</td>
+	<td data-value="183" class="abs low">12/183</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="InterestEvolutionSystem.ts"><a href="InterestEvolutionSystem.ts.html">InterestEvolutionSystem.ts</a></td>
+	<td data-value="24.35" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 24%"></div><div class="cover-empty" style="width: 76%"></div></div>
+	</td>
+	<td data-value="24.35" class="pct low">24.35%</td>
+	<td data-value="349" class="abs low">85/349</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="18" class="abs low">1/18</td>
+	<td data-value="24.35" class="pct low">24.35%</td>
+	<td data-value="349" class="abs low">85/349</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="InterestsSystem.ts"><a href="InterestsSystem.ts.html">InterestsSystem.ts</a></td>
+	<td data-value="7.45" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.45" class="pct low">7.45%</td>
+	<td data-value="161" class="abs low">12/161</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="7.45" class="pct low">7.45%</td>
+	<td data-value="161" class="abs low">12/161</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="InvasionPlotHandler.ts"><a href="InvasionPlotHandler.ts.html">InvasionPlotHandler.ts</a></td>
+	<td data-value="8.23" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.23" class="pct low">8.23%</td>
+	<td data-value="437" class="abs low">36/437</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="16" class="abs low">0/16</td>
+	<td data-value="8.23" class="pct low">8.23%</td>
+	<td data-value="437" class="abs low">36/437</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="InvasionSystem.ts"><a href="InvasionSystem.ts.html">InvasionSystem.ts</a></td>
+	<td data-value="8.6" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.6" class="pct low">8.6%</td>
+	<td data-value="453" class="abs low">39/453</td>
+	<td data-value="66.66" class="pct medium">66.66%</td>
+	<td data-value="3" class="abs medium">2/3</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="16" class="abs low">0/16</td>
+	<td data-value="8.6" class="pct low">8.6%</td>
+	<td data-value="453" class="abs low">39/453</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="JournalingSystem.ts"><a href="JournalingSystem.ts.html">JournalingSystem.ts</a></td>
+	<td data-value="9.52" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.52" class="pct low">9.52%</td>
+	<td data-value="105" class="abs low">10/105</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="9.52" class="pct low">9.52%</td>
+	<td data-value="105" class="abs low">10/105</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="KnowledgePreservationSystem.ts"><a href="KnowledgePreservationSystem.ts.html">KnowledgePreservationSystem.ts</a></td>
+	<td data-value="15" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15" class="pct low">15%</td>
+	<td data-value="300" class="abs low">45/300</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="15" class="pct low">15%</td>
+	<td data-value="300" class="abs low">45/300</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="LandmarkNamingSystem.ts"><a href="LandmarkNamingSystem.ts.html">LandmarkNamingSystem.ts</a></td>
+	<td data-value="9.09" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.09" class="pct low">9.09%</td>
+	<td data-value="286" class="abs low">26/286</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="9.09" class="pct low">9.09%</td>
+	<td data-value="286" class="abs low">26/286</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="LibrarySystem.ts"><a href="LibrarySystem.ts.html">LibrarySystem.ts</a></td>
+	<td data-value="10.59" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.59" class="pct low">10.59%</td>
+	<td data-value="151" class="abs low">16/151</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="10.59" class="pct low">10.59%</td>
+	<td data-value="151" class="abs low">16/151</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="LoreSpawnSystem.ts"><a href="LoreSpawnSystem.ts.html">LoreSpawnSystem.ts</a></td>
+	<td data-value="23.88" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 23%"></div><div class="cover-empty" style="width: 77%"></div></div>
+	</td>
+	<td data-value="23.88" class="pct low">23.88%</td>
+	<td data-value="180" class="abs low">43/180</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="23.88" class="pct low">23.88%</td>
+	<td data-value="180" class="abs low">43/180</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MagicSystem.ts"><a href="MagicSystem.ts.html">MagicSystem.ts</a></td>
+	<td data-value="9.47" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.47" class="pct low">9.47%</td>
+	<td data-value="211" class="abs low">20/211</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="17" class="abs low">0/17</td>
+	<td data-value="9.47" class="pct low">9.47%</td>
+	<td data-value="211" class="abs low">20/211</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MarketEventSystem.ts"><a href="MarketEventSystem.ts.html">MarketEventSystem.ts</a></td>
+	<td data-value="7.22" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.22" class="pct low">7.22%</td>
+	<td data-value="166" class="abs low">12/166</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="7.22" class="pct low">7.22%</td>
+	<td data-value="166" class="abs low">12/166</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MassEventSystem.ts"><a href="MassEventSystem.ts.html">MassEventSystem.ts</a></td>
+	<td data-value="13.49" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 13%"></div><div class="cover-empty" style="width: 87%"></div></div>
+	</td>
+	<td data-value="13.49" class="pct low">13.49%</td>
+	<td data-value="289" class="abs low">39/289</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="17" class="abs low">0/17</td>
+	<td data-value="13.49" class="pct low">13.49%</td>
+	<td data-value="289" class="abs low">39/289</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MegastructureConstructionSystem.ts"><a href="MegastructureConstructionSystem.ts.html">MegastructureConstructionSystem.ts</a></td>
+	<td data-value="5.61" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.61" class="pct low">5.61%</td>
+	<td data-value="570" class="abs low">32/570</td>
+	<td data-value="33.33" class="pct low">33.33%</td>
+	<td data-value="3" class="abs low">1/3</td>
+	<td data-value="4.76" class="pct low">4.76%</td>
+	<td data-value="21" class="abs low">1/21</td>
+	<td data-value="5.61" class="pct low">5.61%</td>
+	<td data-value="570" class="abs low">32/570</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MegastructureMaintenanceSystem.ts"><a href="MegastructureMaintenanceSystem.ts.html">MegastructureMaintenanceSystem.ts</a></td>
+	<td data-value="40.06" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 40%"></div><div class="cover-empty" style="width: 60%"></div></div>
+	</td>
+	<td data-value="40.06" class="pct low">40.06%</td>
+	<td data-value="629" class="abs low">252/629</td>
+	<td data-value="33.33" class="pct low">33.33%</td>
+	<td data-value="3" class="abs low">1/3</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="22" class="abs low">0/22</td>
+	<td data-value="40.06" class="pct low">40.06%</td>
+	<td data-value="629" class="abs low">252/629</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MemoryConsolidationSystem.ts"><a href="MemoryConsolidationSystem.ts.html">MemoryConsolidationSystem.ts</a></td>
+	<td data-value="8" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8" class="pct low">8%</td>
+	<td data-value="250" class="abs low">20/250</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="8" class="pct low">8%</td>
+	<td data-value="250" class="abs low">20/250</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MemoryFormationSystem.ts"><a href="MemoryFormationSystem.ts.html">MemoryFormationSystem.ts</a></td>
+	<td data-value="2.65" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 2%"></div><div class="cover-empty" style="width: 98%"></div></div>
+	</td>
+	<td data-value="2.65" class="pct low">2.65%</td>
+	<td data-value="603" class="abs low">16/603</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="7.69" class="pct low">7.69%</td>
+	<td data-value="13" class="abs low">1/13</td>
+	<td data-value="2.65" class="pct low">2.65%</td>
+	<td data-value="603" class="abs low">16/603</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MemorySystem.ts"><a href="MemorySystem.ts.html">MemorySystem.ts</a></td>
+	<td data-value="17.24" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 17%"></div><div class="cover-empty" style="width: 83%"></div></div>
+	</td>
+	<td data-value="17.24" class="pct low">17.24%</td>
+	<td data-value="29" class="abs low">5/29</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="17.24" class="pct low">17.24%</td>
+	<td data-value="29" class="abs low">5/29</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MetricsCollectionSystem.ts"><a href="MetricsCollectionSystem.ts.html">MetricsCollectionSystem.ts</a></td>
+	<td data-value="2.9" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 2%"></div><div class="cover-empty" style="width: 98%"></div></div>
+	</td>
+	<td data-value="2.9" class="pct low">2.9%</td>
+	<td data-value="827" class="abs low">24/827</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="2.9" class="pct low">2.9%</td>
+	<td data-value="827" class="abs low">24/827</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MilestoneSystem.ts"><a href="MilestoneSystem.ts.html">MilestoneSystem.ts</a></td>
+	<td data-value="7" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7" class="pct low">7%</td>
+	<td data-value="157" class="abs low">11/157</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="7" class="pct low">7%</td>
+	<td data-value="157" class="abs low">11/157</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MoodSystem.ts"><a href="MoodSystem.ts.html">MoodSystem.ts</a></td>
+	<td data-value="3.98" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.98" class="pct low">3.98%</td>
+	<td data-value="351" class="abs low">14/351</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="3.98" class="pct low">3.98%</td>
+	<td data-value="351" class="abs low">14/351</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MovementSystem.ts"><a href="MovementSystem.ts.html">MovementSystem.ts</a></td>
+	<td data-value="1.88" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 1%"></div><div class="cover-empty" style="width: 99%"></div></div>
+	</td>
+	<td data-value="1.88" class="pct low">1.88%</td>
+	<td data-value="637" class="abs low">12/637</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="1.88" class="pct low">1.88%</td>
+	<td data-value="637" class="abs low">12/637</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MythGenerationSystem.ts"><a href="MythGenerationSystem.ts.html">MythGenerationSystem.ts</a></td>
+	<td data-value="4.53" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.53" class="pct low">4.53%</td>
+	<td data-value="1192" class="abs low">54/1192</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="51" class="abs low">0/51</td>
+	<td data-value="4.53" class="pct low">4.53%</td>
+	<td data-value="1192" class="abs low">54/1192</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="MythRetellingSystem.ts"><a href="MythRetellingSystem.ts.html">MythRetellingSystem.ts</a></td>
+	<td data-value="4.39" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.39" class="pct low">4.39%</td>
+	<td data-value="273" class="abs low">12/273</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="4.39" class="pct low">4.39%</td>
+	<td data-value="273" class="abs low">12/273</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="NationSystem.ts"><a href="NationSystem.ts.html">NationSystem.ts</a></td>
+	<td data-value="4.91" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.91" class="pct low">4.91%</td>
+	<td data-value="855" class="abs low">42/855</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="38" class="abs low">0/38</td>
+	<td data-value="4.91" class="pct low">4.91%</td>
+	<td data-value="855" class="abs low">42/855</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="NavyBudgetSystem.ts"><a href="NavyBudgetSystem.ts.html">NavyBudgetSystem.ts</a></td>
+	<td data-value="4.55" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.55" class="pct low">4.55%</td>
+	<td data-value="351" class="abs low">16/351</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="4.55" class="pct low">4.55%</td>
+	<td data-value="351" class="abs low">16/351</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="NavyPersonnelSystem.ts"><a href="NavyPersonnelSystem.ts.html">NavyPersonnelSystem.ts</a></td>
+	<td data-value="10.27" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.27" class="pct low">10.27%</td>
+	<td data-value="253" class="abs low">26/253</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="10.27" class="pct low">10.27%</td>
+	<td data-value="253" class="abs low">26/253</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="NavySystem.ts"><a href="NavySystem.ts.html">NavySystem.ts</a></td>
+	<td data-value="4.27" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.27" class="pct low">4.27%</td>
+	<td data-value="304" class="abs low">13/304</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="4.27" class="pct low">4.27%</td>
+	<td data-value="304" class="abs low">13/304</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="NeedsSystem.ts"><a href="NeedsSystem.ts.html">NeedsSystem.ts</a></td>
+	<td data-value="3.73" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.73" class="pct low">3.73%</td>
+	<td data-value="134" class="abs low">5/134</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="3.73" class="pct low">3.73%</td>
+	<td data-value="134" class="abs low">5/134</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="OffScreenProductionSystem.ts"><a href="OffScreenProductionSystem.ts.html">OffScreenProductionSystem.ts</a></td>
+	<td data-value="7.33" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.33" class="pct low">7.33%</td>
+	<td data-value="150" class="abs low">11/150</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="7.33" class="pct low">7.33%</td>
+	<td data-value="150" class="abs low">11/150</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ParadoxDetectionSystem.ts"><a href="ParadoxDetectionSystem.ts.html">ParadoxDetectionSystem.ts</a></td>
+	<td data-value="6.02" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.02" class="pct low">6.02%</td>
+	<td data-value="481" class="abs low">29/481</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="4.16" class="pct low">4.16%</td>
+	<td data-value="24" class="abs low">1/24</td>
+	<td data-value="6.02" class="pct low">6.02%</td>
+	<td data-value="481" class="abs low">29/481</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ParentingSystem.ts"><a href="ParentingSystem.ts.html">ParentingSystem.ts</a></td>
+	<td data-value="8.51" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.51" class="pct low">8.51%</td>
+	<td data-value="188" class="abs low">16/188</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="8.51" class="pct low">8.51%</td>
+	<td data-value="188" class="abs low">16/188</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PassageSystem.ts"><a href="PassageSystem.ts.html">PassageSystem.ts</a></td>
+	<td data-value="5.55" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="180" class="abs low">10/180</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="180" class="abs low">10/180</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PassageTraversalSystem.ts"><a href="PassageTraversalSystem.ts.html">PassageTraversalSystem.ts</a></td>
+	<td data-value="7.02" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.02" class="pct low">7.02%</td>
+	<td data-value="242" class="abs low">17/242</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="10" class="pct low">10%</td>
+	<td data-value="10" class="abs low">1/10</td>
+	<td data-value="7.02" class="pct low">7.02%</td>
+	<td data-value="242" class="abs low">17/242</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PixelLabSpriteGenerationSystem.ts"><a href="PixelLabSpriteGenerationSystem.ts.html">PixelLabSpriteGenerationSystem.ts</a></td>
+	<td data-value="5.19" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.19" class="pct low">5.19%</td>
+	<td data-value="443" class="abs low">23/443</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="5.19" class="pct low">5.19%</td>
+	<td data-value="443" class="abs low">23/443</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PlanetTravelSystem.ts"><a href="PlanetTravelSystem.ts.html">PlanetTravelSystem.ts</a></td>
+	<td data-value="5.26" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.26" class="pct low">5.26%</td>
+	<td data-value="323" class="abs low">17/323</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="5.26" class="pct low">5.26%</td>
+	<td data-value="323" class="abs low">17/323</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PlanetaryCurrentsSystem.ts"><a href="PlanetaryCurrentsSystem.ts.html">PlanetaryCurrentsSystem.ts</a></td>
+	<td data-value="15.06" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.06" class="pct low">15.06%</td>
+	<td data-value="73" class="abs low">11/73</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="15.06" class="pct low">15.06%</td>
+	<td data-value="73" class="abs low">11/73</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PlantVisualsSystem.ts"><a href="PlantVisualsSystem.ts.html">PlantVisualsSystem.ts</a></td>
+	<td data-value="38.22" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 38%"></div><div class="cover-empty" style="width: 62%"></div></div>
+	</td>
+	<td data-value="38.22" class="pct low">38.22%</td>
+	<td data-value="225" class="abs low">86/225</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="16.66" class="pct low">16.66%</td>
+	<td data-value="6" class="abs low">1/6</td>
+	<td data-value="38.22" class="pct low">38.22%</td>
+	<td data-value="225" class="abs low">86/225</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PlayerInputSystem.ts"><a href="PlayerInputSystem.ts.html">PlayerInputSystem.ts</a></td>
+	<td data-value="10.52" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.52" class="pct low">10.52%</td>
+	<td data-value="95" class="abs low">10/95</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="10.52" class="pct low">10.52%</td>
+	<td data-value="95" class="abs low">10/95</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PortalSystem.ts"><a href="PortalSystem.ts.html">PortalSystem.ts</a></td>
+	<td data-value="9.52" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.52" class="pct low">9.52%</td>
+	<td data-value="105" class="abs low">10/105</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="9.52" class="pct low">9.52%</td>
+	<td data-value="105" class="abs low">10/105</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PossessionSystem.ts"><a href="PossessionSystem.ts.html">PossessionSystem.ts</a></td>
+	<td data-value="4.67" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.67" class="pct low">4.67%</td>
+	<td data-value="214" class="abs low">10/214</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="4.67" class="pct low">4.67%</td>
+	<td data-value="214" class="abs low">10/214</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PowerGridSystem.ts"><a href="PowerGridSystem.ts.html">PowerGridSystem.ts</a></td>
+	<td data-value="7.07" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.07" class="pct low">7.07%</td>
+	<td data-value="198" class="abs low">14/198</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="7.07" class="pct low">7.07%</td>
+	<td data-value="198" class="abs low">14/198</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PrayerAnsweringSystem.ts"><a href="PrayerAnsweringSystem.ts.html">PrayerAnsweringSystem.ts</a></td>
+	<td data-value="8.45" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.45" class="pct low">8.45%</td>
+	<td data-value="201" class="abs low">17/201</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="8.45" class="pct low">8.45%</td>
+	<td data-value="201" class="abs low">17/201</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PrayerSystem.ts"><a href="PrayerSystem.ts.html">PrayerSystem.ts</a></td>
+	<td data-value="4.5" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.5" class="pct low">4.5%</td>
+	<td data-value="244" class="abs low">11/244</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="4.5" class="pct low">4.5%</td>
+	<td data-value="244" class="abs low">11/244</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PredatorAttackSystem.ts"><a href="PredatorAttackSystem.ts.html">PredatorAttackSystem.ts</a></td>
+	<td data-value="4" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4" class="pct low">4%</td>
+	<td data-value="400" class="abs low">16/400</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="4" class="pct low">4%</td>
+	<td data-value="400" class="abs low">16/400</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PredictiveChunkLoadingSystem.ts"><a href="PredictiveChunkLoadingSystem.ts.html">PredictiveChunkLoadingSystem.ts</a></td>
+	<td data-value="6.71" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.71" class="pct low">6.71%</td>
+	<td data-value="134" class="abs low">9/134</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="20" class="pct low">20%</td>
+	<td data-value="5" class="abs low">1/5</td>
+	<td data-value="6.71" class="pct low">6.71%</td>
+	<td data-value="134" class="abs low">9/134</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PriesthoodSystem.ts"><a href="PriesthoodSystem.ts.html">PriesthoodSystem.ts</a></td>
+	<td data-value="20" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 20%"></div><div class="cover-empty" style="width: 80%"></div></div>
+	</td>
+	<td data-value="20" class="pct low">20%</td>
+	<td data-value="90" class="abs low">18/90</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="20" class="pct low">20%</td>
+	<td data-value="90" class="abs low">18/90</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ProbabilityScoutSystem.ts"><a href="ProbabilityScoutSystem.ts.html">ProbabilityScoutSystem.ts</a></td>
+	<td data-value="9.13" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.13" class="pct low">9.13%</td>
+	<td data-value="197" class="abs low">18/197</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="9.13" class="pct low">9.13%</td>
+	<td data-value="197" class="abs low">18/197</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ProductionScalingSystem.ts"><a href="ProductionScalingSystem.ts.html">ProductionScalingSystem.ts</a></td>
+	<td data-value="4.3" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.3" class="pct low">4.3%</td>
+	<td data-value="209" class="abs low">9/209</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="4.3" class="pct low">4.3%</td>
+	<td data-value="209" class="abs low">9/209</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ProfessionWorkSimulationSystem.ts"><a href="ProfessionWorkSimulationSystem.ts.html">ProfessionWorkSimulationSystem.ts</a></td>
+	<td data-value="5.47" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.47" class="pct low">5.47%</td>
+	<td data-value="530" class="abs low">29/530</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="22" class="abs low">0/22</td>
+	<td data-value="5.47" class="pct low">5.47%</td>
+	<td data-value="530" class="abs low">29/530</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ProvinceGovernanceSystem.ts"><a href="ProvinceGovernanceSystem.ts.html">ProvinceGovernanceSystem.ts</a></td>
+	<td data-value="4.71" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.71" class="pct low">4.71%</td>
+	<td data-value="382" class="abs low">18/382</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="4.71" class="pct low">4.71%</td>
+	<td data-value="382" class="abs low">18/382</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PublishingProductionSystem.ts"><a href="PublishingProductionSystem.ts.html">PublishingProductionSystem.ts</a></td>
+	<td data-value="6.77" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.77" class="pct low">6.77%</td>
+	<td data-value="192" class="abs low">13/192</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="6.77" class="pct low">6.77%</td>
+	<td data-value="192" class="abs low">13/192</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="PublishingUnlockSystem.ts"><a href="PublishingUnlockSystem.ts.html">PublishingUnlockSystem.ts</a></td>
+	<td data-value="11.4" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 11%"></div><div class="cover-empty" style="width: 89%"></div></div>
+	</td>
+	<td data-value="11.4" class="pct low">11.4%</td>
+	<td data-value="149" class="abs low">17/149</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="11.4" class="pct low">11.4%</td>
+	<td data-value="149" class="abs low">17/149</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="QueryCacheMonitorSystem.ts"><a href="QueryCacheMonitorSystem.ts.html">QueryCacheMonitorSystem.ts</a></td>
+	<td data-value="23.8" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 23%"></div><div class="cover-empty" style="width: 77%"></div></div>
+	</td>
+	<td data-value="23.8" class="pct low">23.8%</td>
+	<td data-value="21" class="abs low">5/21</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="23.8" class="pct low">23.8%</td>
+	<td data-value="21" class="abs low">5/21</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RealityAnchorSystem.ts"><a href="RealityAnchorSystem.ts.html">RealityAnchorSystem.ts</a></td>
+	<td data-value="5.79" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.79" class="pct low">5.79%</td>
+	<td data-value="259" class="abs low">15/259</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="5.79" class="pct low">5.79%</td>
+	<td data-value="259" class="abs low">15/259</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RealmManager.ts"><a href="RealmManager.ts.html">RealmManager.ts</a></td>
+	<td data-value="10.25" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.25" class="pct low">10.25%</td>
+	<td data-value="195" class="abs low">20/195</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="17" class="abs low">0/17</td>
+	<td data-value="10.25" class="pct low">10.25%</td>
+	<td data-value="195" class="abs low">20/195</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RealmTimeSystem.ts"><a href="RealmTimeSystem.ts.html">RealmTimeSystem.ts</a></td>
+	<td data-value="25" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 25%"></div><div class="cover-empty" style="width: 75%"></div></div>
+	</td>
+	<td data-value="25" class="pct low">25%</td>
+	<td data-value="36" class="abs low">9/36</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="25" class="pct low">25%</td>
+	<td data-value="36" class="abs low">9/36</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RebellionEventSystem.ts"><a href="RebellionEventSystem.ts.html">RebellionEventSystem.ts</a></td>
+	<td data-value="4.24" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.24" class="pct low">4.24%</td>
+	<td data-value="707" class="abs low">30/707</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="27" class="abs low">0/27</td>
+	<td data-value="4.24" class="pct low">4.24%</td>
+	<td data-value="707" class="abs low">30/707</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ReflectionSystem.ts"><a href="ReflectionSystem.ts.html">ReflectionSystem.ts</a></td>
+	<td data-value="4.54" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.54" class="pct low">4.54%</td>
+	<td data-value="330" class="abs low">15/330</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="4.54" class="pct low">4.54%</td>
+	<td data-value="330" class="abs low">15/330</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ReincarnationSystem.ts"><a href="ReincarnationSystem.ts.html">ReincarnationSystem.ts</a></td>
+	<td data-value="5.47" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.47" class="pct low">5.47%</td>
+	<td data-value="402" class="abs low">22/402</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="5.47" class="pct low">5.47%</td>
+	<td data-value="402" class="abs low">22/402</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RelationshipConversationSystem.ts"><a href="RelationshipConversationSystem.ts.html">RelationshipConversationSystem.ts</a></td>
+	<td data-value="7.8" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.8" class="pct low">7.8%</td>
+	<td data-value="141" class="abs low">11/141</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="7.8" class="pct low">7.8%</td>
+	<td data-value="141" class="abs low">11/141</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ReligiousCompetitionSystem.ts"><a href="ReligiousCompetitionSystem.ts.html">ReligiousCompetitionSystem.ts</a></td>
+	<td data-value="10.87" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.87" class="pct low">10.87%</td>
+	<td data-value="239" class="abs low">26/239</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="18" class="abs low">0/18</td>
+	<td data-value="10.87" class="pct low">10.87%</td>
+	<td data-value="239" class="abs low">26/239</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ReproductionSystem.ts"><a href="ReproductionSystem.ts.html">ReproductionSystem.ts</a></td>
+	<td data-value="6.27" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.27" class="pct low">6.27%</td>
+	<td data-value="510" class="abs low">32/510</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="23" class="abs low">0/23</td>
+	<td data-value="6.27" class="pct low">6.27%</td>
+	<td data-value="510" class="abs low">32/510</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ResearchSystem.ts"><a href="ResearchSystem.ts.html">ResearchSystem.ts</a></td>
+	<td data-value="5.58" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.58" class="pct low">5.58%</td>
+	<td data-value="430" class="abs low">24/430</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="21" class="abs low">0/21</td>
+	<td data-value="5.58" class="pct low">5.58%</td>
+	<td data-value="430" class="abs low">24/430</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ResourceGatheringSystem.ts"><a href="ResourceGatheringSystem.ts.html">ResourceGatheringSystem.ts</a></td>
+	<td data-value="12.9" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 12%"></div><div class="cover-empty" style="width: 88%"></div></div>
+	</td>
+	<td data-value="12.9" class="pct low">12.9%</td>
+	<td data-value="62" class="abs low">8/62</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="20" class="pct low">20%</td>
+	<td data-value="5" class="abs low">1/5</td>
+	<td data-value="12.9" class="pct low">12.9%</td>
+	<td data-value="62" class="abs low">8/62</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RitualSystem.ts"><a href="RitualSystem.ts.html">RitualSystem.ts</a></td>
+	<td data-value="17.34" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 17%"></div><div class="cover-empty" style="width: 83%"></div></div>
+	</td>
+	<td data-value="17.34" class="pct low">17.34%</td>
+	<td data-value="98" class="abs low">17/98</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="17.34" class="pct low">17.34%</td>
+	<td data-value="98" class="abs low">17/98</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="RoofRepairSystem.ts"><a href="RoofRepairSystem.ts.html">RoofRepairSystem.ts</a></td>
+	<td data-value="6.47" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.47" class="pct low">6.47%</td>
+	<td data-value="139" class="abs low">9/139</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="6.47" class="pct low">6.47%</td>
+	<td data-value="139" class="abs low">9/139</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SacredSiteSystem.ts"><a href="SacredSiteSystem.ts.html">SacredSiteSystem.ts</a></td>
+	<td data-value="13.58" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 13%"></div><div class="cover-empty" style="width: 87%"></div></div>
+	</td>
+	<td data-value="13.58" class="pct low">13.58%</td>
+	<td data-value="265" class="abs low">36/265</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="20" class="abs low">0/20</td>
+	<td data-value="13.58" class="pct low">13.58%</td>
+	<td data-value="265" class="abs low">36/265</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SchismSystem.ts"><a href="SchismSystem.ts.html">SchismSystem.ts</a></td>
+	<td data-value="10.36" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.36" class="pct low">10.36%</td>
+	<td data-value="193" class="abs low">20/193</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="10.36" class="pct low">10.36%</td>
+	<td data-value="193" class="abs low">20/193</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ShipCombatSystem.ts"><a href="ShipCombatSystem.ts.html">ShipCombatSystem.ts</a></td>
+	<td data-value="5.21" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.21" class="pct low">5.21%</td>
+	<td data-value="364" class="abs low">19/364</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="5.21" class="pct low">5.21%</td>
+	<td data-value="364" class="abs low">19/364</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ShippingLaneSystem.ts"><a href="ShippingLaneSystem.ts.html">ShippingLaneSystem.ts</a></td>
+	<td data-value="0" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 0%"></div><div class="cover-empty" style="width: 100%"></div></div>
+	</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="378" class="abs low">0/378</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="378" class="abs low">0/378</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ShipyardProductionSystem.ts"><a href="ShipyardProductionSystem.ts.html">ShipyardProductionSystem.ts</a></td>
+	<td data-value="27.98" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 27%"></div><div class="cover-empty" style="width: 73%"></div></div>
+	</td>
+	<td data-value="27.98" class="pct low">27.98%</td>
+	<td data-value="393" class="abs low">110/393</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="27.98" class="pct low">27.98%</td>
+	<td data-value="393" class="abs low">110/393</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SkillSystem.ts"><a href="SkillSystem.ts.html">SkillSystem.ts</a></td>
+	<td data-value="4.06" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.06" class="pct low">4.06%</td>
+	<td data-value="197" class="abs low">8/197</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="4.06" class="pct low">4.06%</td>
+	<td data-value="197" class="abs low">8/197</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SleepSystem.ts"><a href="SleepSystem.ts.html">SleepSystem.ts</a></td>
+	<td data-value="14.33" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 14%"></div><div class="cover-empty" style="width: 86%"></div></div>
+	</td>
+	<td data-value="14.33" class="pct low">14.33%</td>
+	<td data-value="265" class="abs low">38/265</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="14.33" class="pct low">14.33%</td>
+	<td data-value="265" class="abs low">38/265</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SnapshotDecayPolicy.ts"><a href="SnapshotDecayPolicy.ts.html">SnapshotDecayPolicy.ts</a></td>
+	<td data-value="15.62" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.62" class="pct low">15.62%</td>
+	<td data-value="128" class="abs low">20/128</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="2" class="abs high">2/2</td>
+	<td data-value="22.22" class="pct low">22.22%</td>
+	<td data-value="9" class="abs low">2/9</td>
+	<td data-value="15.62" class="pct low">15.62%</td>
+	<td data-value="128" class="abs low">20/128</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SoASyncSystem.ts"><a href="SoASyncSystem.ts.html">SoASyncSystem.ts</a></td>
+	<td data-value="12.3" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 12%"></div><div class="cover-empty" style="width: 88%"></div></div>
+	</td>
+	<td data-value="12.3" class="pct low">12.3%</td>
+	<td data-value="65" class="abs low">8/65</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="5" class="abs low">0/5</td>
+	<td data-value="12.3" class="pct low">12.3%</td>
+	<td data-value="65" class="abs low">8/65</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SocialFatigueSystem.ts"><a href="SocialFatigueSystem.ts.html">SocialFatigueSystem.ts</a></td>
+	<td data-value="17.44" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 17%"></div><div class="cover-empty" style="width: 83%"></div></div>
+	</td>
+	<td data-value="17.44" class="pct low">17.44%</td>
+	<td data-value="86" class="abs low">15/86</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="14.28" class="pct low">14.28%</td>
+	<td data-value="7" class="abs low">1/7</td>
+	<td data-value="17.44" class="pct low">17.44%</td>
+	<td data-value="86" class="abs low">15/86</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SocialGradientSystem.ts"><a href="SocialGradientSystem.ts.html">SocialGradientSystem.ts</a></td>
+	<td data-value="6.41" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.41" class="pct low">6.41%</td>
+	<td data-value="156" class="abs low">10/156</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="6.41" class="pct low">6.41%</td>
+	<td data-value="156" class="abs low">10/156</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SoilSystem.ts"><a href="SoilSystem.ts.html">SoilSystem.ts</a></td>
+	<td data-value="10.76" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.76" class="pct low">10.76%</td>
+	<td data-value="446" class="abs low">48/446</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="10.76" class="pct low">10.76%</td>
+	<td data-value="446" class="abs low">48/446</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SoulAnimationProgressionSystem.ts"><a href="SoulAnimationProgressionSystem.ts.html">SoulAnimationProgressionSystem.ts</a></td>
+	<td data-value="0" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 0%"></div><div class="cover-empty" style="width: 100%"></div></div>
+	</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="167" class="abs low">0/167</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="167" class="abs low">0/167</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SoulCreationSystem.ts"><a href="SoulCreationSystem.ts.html">SoulCreationSystem.ts</a></td>
+	<td data-value="3.25" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.25" class="pct low">3.25%</td>
+	<td data-value="676" class="abs low">22/676</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="19" class="abs low">0/19</td>
+	<td data-value="3.25" class="pct low">3.25%</td>
+	<td data-value="676" class="abs low">22/676</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SoulRepositorySystem.ts"><a href="SoulRepositorySystem.ts.html">SoulRepositorySystem.ts</a></td>
+	<td data-value="8.09" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.09" class="pct low">8.09%</td>
+	<td data-value="247" class="abs low">20/247</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="17" class="abs low">0/17</td>
+	<td data-value="8.09" class="pct low">8.09%</td>
+	<td data-value="247" class="abs low">20/247</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SpaceshipConstructionSystem.ts"><a href="SpaceshipConstructionSystem.ts.html">SpaceshipConstructionSystem.ts</a></td>
+	<td data-value="28.7" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 28%"></div><div class="cover-empty" style="width: 72%"></div></div>
+	</td>
+	<td data-value="28.7" class="pct low">28.7%</td>
+	<td data-value="418" class="abs low">120/418</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="28.7" class="pct low">28.7%</td>
+	<td data-value="418" class="abs low">120/418</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SpaceshipManagementSystem.ts"><a href="SpaceshipManagementSystem.ts.html">SpaceshipManagementSystem.ts</a></td>
+	<td data-value="4.28" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.28" class="pct low">4.28%</td>
+	<td data-value="397" class="abs low">17/397</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="4.28" class="pct low">4.28%</td>
+	<td data-value="397" class="abs low">17/397</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SpatialGridMaintenanceSystem.ts"><a href="SpatialGridMaintenanceSystem.ts.html">SpatialGridMaintenanceSystem.ts</a></td>
+	<td data-value="15.62" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 15%"></div><div class="cover-empty" style="width: 85%"></div></div>
+	</td>
+	<td data-value="15.62" class="pct low">15.62%</td>
+	<td data-value="32" class="abs low">5/32</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="15.62" class="pct low">15.62%</td>
+	<td data-value="32" class="abs low">5/32</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SpatialMemoryQuerySystem.ts"><a href="SpatialMemoryQuerySystem.ts.html">SpatialMemoryQuerySystem.ts</a></td>
+	<td data-value="6.77" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.77" class="pct low">6.77%</td>
+	<td data-value="192" class="abs low">13/192</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="6.77" class="pct low">6.77%</td>
+	<td data-value="192" class="abs low">13/192</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SpeciesCreationSystem.ts"><a href="SpeciesCreationSystem.ts.html">SpeciesCreationSystem.ts</a></td>
+	<td data-value="16.98" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 16%"></div><div class="cover-empty" style="width: 84%"></div></div>
+	</td>
+	<td data-value="16.98" class="pct low">16.98%</td>
+	<td data-value="159" class="abs low">27/159</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="16.98" class="pct low">16.98%</td>
+	<td data-value="159" class="abs low">27/159</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SpiritualResponseSystem.ts"><a href="SpiritualResponseSystem.ts.html">SpiritualResponseSystem.ts</a></td>
+	<td data-value="8.25" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.25" class="pct low">8.25%</td>
+	<td data-value="218" class="abs low">18/218</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="8.25" class="pct low">8.25%</td>
+	<td data-value="218" class="abs low">18/218</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SquadronCombatSystem.ts"><a href="SquadronCombatSystem.ts.html">SquadronCombatSystem.ts</a></td>
+	<td data-value="11.85" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 11%"></div><div class="cover-empty" style="width: 89%"></div></div>
+	</td>
+	<td data-value="11.85" class="pct low">11.85%</td>
+	<td data-value="312" class="abs low">37/312</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="11.85" class="pct low">11.85%</td>
+	<td data-value="312" class="abs low">37/312</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SquadronSystem.ts"><a href="SquadronSystem.ts.html">SquadronSystem.ts</a></td>
+	<td data-value="20.14" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 20%"></div><div class="cover-empty" style="width: 80%"></div></div>
+	</td>
+	<td data-value="20.14" class="pct low">20.14%</td>
+	<td data-value="283" class="abs low">57/283</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="20.14" class="pct low">20.14%</td>
+	<td data-value="283" class="abs low">57/283</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="StateMutatorSystem.ts"><a href="StateMutatorSystem.ts.html">StateMutatorSystem.ts</a></td>
+	<td data-value="8.53" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 8%"></div><div class="cover-empty" style="width: 92%"></div></div>
+	</td>
+	<td data-value="8.53" class="pct low">8.53%</td>
+	<td data-value="82" class="abs low">7/82</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="4" class="abs low">0/4</td>
+	<td data-value="8.53" class="pct low">8.53%</td>
+	<td data-value="82" class="abs low">7/82</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="StatisticalModeManager.ts"><a href="StatisticalModeManager.ts.html">StatisticalModeManager.ts</a></td>
+	<td data-value="7.65" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.65" class="pct low">7.65%</td>
+	<td data-value="222" class="abs low">17/222</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="13" class="abs low">0/13</td>
+	<td data-value="7.65" class="pct low">7.65%</td>
+	<td data-value="222" class="abs low">17/222</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SteeringSystem.ts"><a href="SteeringSystem.ts.html">SteeringSystem.ts</a></td>
+	<td data-value="4.51" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.51" class="pct low">4.51%</td>
+	<td data-value="332" class="abs low">15/332</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="12" class="abs low">0/12</td>
+	<td data-value="4.51" class="pct low">4.51%</td>
+	<td data-value="332" class="abs low">15/332</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="StellarMiningSystem.ts"><a href="StellarMiningSystem.ts.html">StellarMiningSystem.ts</a></td>
+	<td data-value="4.96" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.96" class="pct low">4.96%</td>
+	<td data-value="383" class="abs low">19/383</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="4.96" class="pct low">4.96%</td>
+	<td data-value="383" class="abs low">19/383</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="StragglerRecoverySystem.ts"><a href="StragglerRecoverySystem.ts.html">StragglerRecoverySystem.ts</a></td>
+	<td data-value="5.36" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.36" class="pct low">5.36%</td>
+	<td data-value="429" class="abs low">23/429</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="19" class="abs low">0/19</td>
+	<td data-value="5.36" class="pct low">5.36%</td>
+	<td data-value="429" class="abs low">23/429</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SvetzRetrievalSystem.ts"><a href="SvetzRetrievalSystem.ts.html">SvetzRetrievalSystem.ts</a></td>
+	<td data-value="9.33" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.33" class="pct low">9.33%</td>
+	<td data-value="225" class="abs low">21/225</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="9.33" class="pct low">9.33%</td>
+	<td data-value="225" class="abs low">21/225</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="SyncretismSystem.ts"><a href="SyncretismSystem.ts.html">SyncretismSystem.ts</a></td>
+	<td data-value="10.44" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10.44" class="pct low">10.44%</td>
+	<td data-value="249" class="abs low">26/249</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="18" class="abs low">0/18</td>
+	<td data-value="10.44" class="pct low">10.44%</td>
+	<td data-value="249" class="abs low">26/249</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TamingSystem.ts"><a href="TamingSystem.ts.html">TamingSystem.ts</a></td>
+	<td data-value="5.5" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.5" class="pct low">5.5%</td>
+	<td data-value="236" class="abs low">13/236</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="5.5" class="pct low">5.5%</td>
+	<td data-value="236" class="abs low">13/236</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TechnologyEraSystem.ts"><a href="TechnologyEraSystem.ts.html">TechnologyEraSystem.ts</a></td>
+	<td data-value="20.74" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 20%"></div><div class="cover-empty" style="width: 80%"></div></div>
+	</td>
+	<td data-value="20.74" class="pct low">20.74%</td>
+	<td data-value="323" class="abs low">67/323</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="20.74" class="pct low">20.74%</td>
+	<td data-value="323" class="abs low">67/323</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TechnologyUnlockSystem.ts"><a href="TechnologyUnlockSystem.ts.html">TechnologyUnlockSystem.ts</a></td>
+	<td data-value="5.29" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.29" class="pct low">5.29%</td>
+	<td data-value="189" class="abs low">10/189</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="5.29" class="pct low">5.29%</td>
+	<td data-value="189" class="abs low">10/189</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TemperatureSystem.ts"><a href="TemperatureSystem.ts.html">TemperatureSystem.ts</a></td>
+	<td data-value="7.23" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 7%"></div><div class="cover-empty" style="width: 93%"></div></div>
+	</td>
+	<td data-value="7.23" class="pct low">7.23%</td>
+	<td data-value="318" class="abs low">23/318</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="7.23" class="pct low">7.23%</td>
+	<td data-value="318" class="abs low">23/318</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TempleSystem.ts"><a href="TempleSystem.ts.html">TempleSystem.ts</a></td>
+	<td data-value="13.49" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 13%"></div><div class="cover-empty" style="width: 87%"></div></div>
+	</td>
+	<td data-value="13.49" class="pct low">13.49%</td>
+	<td data-value="126" class="abs low">17/126</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="13.49" class="pct low">13.49%</td>
+	<td data-value="126" class="abs low">17/126</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TerrainModificationSystem.ts"><a href="TerrainModificationSystem.ts.html">TerrainModificationSystem.ts</a></td>
+	<td data-value="18.49" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 18%"></div><div class="cover-empty" style="width: 82%"></div></div>
+	</td>
+	<td data-value="18.49" class="pct low">18.49%</td>
+	<td data-value="173" class="abs low">32/173</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="18.49" class="pct low">18.49%</td>
+	<td data-value="173" class="abs low">32/173</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="ThreatResponseSystem.ts"><a href="ThreatResponseSystem.ts.html">ThreatResponseSystem.ts</a></td>
+	<td data-value="2.26" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 2%"></div><div class="cover-empty" style="width: 98%"></div></div>
+	</td>
+	<td data-value="2.26" class="pct low">2.26%</td>
+	<td data-value="441" class="abs low">10/441</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="2.26" class="pct low">2.26%</td>
+	<td data-value="441" class="abs low">10/441</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TileConstructionSystem.ts"><a href="TileConstructionSystem.ts.html">TileConstructionSystem.ts</a></td>
+	<td data-value="9.04" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 9%"></div><div class="cover-empty" style="width: 91%"></div></div>
+	</td>
+	<td data-value="9.04" class="pct low">9.04%</td>
+	<td data-value="542" class="abs low">49/542</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="3.44" class="pct low">3.44%</td>
+	<td data-value="29" class="abs low">1/29</td>
+	<td data-value="9.04" class="pct low">9.04%</td>
+	<td data-value="542" class="abs low">49/542</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TimeCompressionSystem.ts"><a href="TimeCompressionSystem.ts.html">TimeCompressionSystem.ts</a></td>
+	<td data-value="5.55" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="378" class="abs low">21/378</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="15" class="abs low">0/15</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="378" class="abs low">21/378</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TimeSystem.ts"><a href="TimeSystem.ts.html">TimeSystem.ts</a></td>
+	<td data-value="5.08" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.08" class="pct low">5.08%</td>
+	<td data-value="177" class="abs low">9/177</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="5.08" class="pct low">5.08%</td>
+	<td data-value="177" class="abs low">9/177</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TimeThrottleCoordinator.ts"><a href="TimeThrottleCoordinator.ts.html">TimeThrottleCoordinator.ts</a></td>
+	<td data-value="37.79" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 37%"></div><div class="cover-empty" style="width: 63%"></div></div>
+	</td>
+	<td data-value="37.79" class="pct low">37.79%</td>
+	<td data-value="172" class="abs low">65/172</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="2" class="abs medium">1/2</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="11" class="abs low">0/11</td>
+	<td data-value="37.79" class="pct low">37.79%</td>
+	<td data-value="172" class="abs low">65/172</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TimelineMergerSystem.ts"><a href="TimelineMergerSystem.ts.html">TimelineMergerSystem.ts</a></td>
+	<td data-value="1.89" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 1%"></div><div class="cover-empty" style="width: 99%"></div></div>
+	</td>
+	<td data-value="1.89" class="pct low">1.89%</td>
+	<td data-value="475" class="abs low">9/475</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="1.89" class="pct low">1.89%</td>
+	<td data-value="475" class="abs low">9/475</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TradeAgreementSystem.ts"><a href="TradeAgreementSystem.ts.html">TradeAgreementSystem.ts</a></td>
+	<td data-value="3.67" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.67" class="pct low">3.67%</td>
+	<td data-value="924" class="abs low">34/924</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="30" class="abs low">0/30</td>
+	<td data-value="3.67" class="pct low">3.67%</td>
+	<td data-value="924" class="abs low">34/924</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TradeEscortSystem.ts"><a href="TradeEscortSystem.ts.html">TradeEscortSystem.ts</a></td>
+	<td data-value="5.88" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.88" class="pct low">5.88%</td>
+	<td data-value="357" class="abs low">21/357</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="14" class="abs low">0/14</td>
+	<td data-value="5.88" class="pct low">5.88%</td>
+	<td data-value="357" class="abs low">21/357</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TradeNetworkSystem.ts"><a href="TradeNetworkSystem.ts.html">TradeNetworkSystem.ts</a></td>
+	<td data-value="0" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 0%"></div><div class="cover-empty" style="width: 100%"></div></div>
+	</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="956" class="abs low">0/956</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="956" class="abs low">0/956</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TradingSystem.ts"><a href="TradingSystem.ts.html">TradingSystem.ts</a></td>
+	<td data-value="3.76" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 3%"></div><div class="cover-empty" style="width: 97%"></div></div>
+	</td>
+	<td data-value="3.76" class="pct low">3.76%</td>
+	<td data-value="345" class="abs low">13/345</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="3.76" class="pct low">3.76%</td>
+	<td data-value="345" class="abs low">13/345</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="TreeFellingSystem.ts"><a href="TreeFellingSystem.ts.html">TreeFellingSystem.ts</a></td>
+	<td data-value="13.51" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 13%"></div><div class="cover-empty" style="width: 87%"></div></div>
+	</td>
+	<td data-value="13.51" class="pct low">13.51%</td>
+	<td data-value="185" class="abs low">25/185</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="13.51" class="pct low">13.51%</td>
+	<td data-value="185" class="abs low">25/185</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="UniverseForkingSystem.ts"><a href="UniverseForkingSystem.ts.html">UniverseForkingSystem.ts</a></td>
+	<td data-value="5.88" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.88" class="pct low">5.88%</td>
+	<td data-value="221" class="abs low">13/221</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="10" class="abs low">0/10</td>
+	<td data-value="5.88" class="pct low">5.88%</td>
+	<td data-value="221" class="abs low">13/221</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="UniversityResearchManagementSystem.ts"><a href="UniversityResearchManagementSystem.ts.html">UniversityResearchManagementSystem.ts</a></td>
+	<td data-value="27" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 27%"></div><div class="cover-empty" style="width: 73%"></div></div>
+	</td>
+	<td data-value="27" class="pct low">27%</td>
+	<td data-value="137" class="abs low">37/137</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="7" class="abs low">0/7</td>
+	<td data-value="27" class="pct low">27%</td>
+	<td data-value="137" class="abs low">37/137</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="UniversitySystem.ts"><a href="UniversitySystem.ts.html">UniversitySystem.ts</a></td>
+	<td data-value="4.42" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.42" class="pct low">4.42%</td>
+	<td data-value="226" class="abs low">10/226</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="4.42" class="pct low">4.42%</td>
+	<td data-value="226" class="abs low">10/226</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="UpliftDiplomacySystem.ts"><a href="UpliftDiplomacySystem.ts.html">UpliftDiplomacySystem.ts</a></td>
+	<td data-value="4.72" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 4%"></div><div class="cover-empty" style="width: 96%"></div></div>
+	</td>
+	<td data-value="4.72" class="pct low">4.72%</td>
+	<td data-value="487" class="abs low">23/487</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="19" class="abs low">0/19</td>
+	<td data-value="4.72" class="pct low">4.72%</td>
+	<td data-value="487" class="abs low">23/487</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="VerificationSystem.ts"><a href="VerificationSystem.ts.html">VerificationSystem.ts</a></td>
+	<td data-value="6.14" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.14" class="pct low">6.14%</td>
+	<td data-value="179" class="abs low">11/179</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="8" class="abs low">0/8</td>
+	<td data-value="6.14" class="pct low">6.14%</td>
+	<td data-value="179" class="abs low">11/179</td>
+	</tr>
+
+<tr>
+	<td class="file medium" data-value="VillageDefenseSystem.ts"><a href="VillageDefenseSystem.ts.html">VillageDefenseSystem.ts</a></td>
+	<td data-value="50" class="pic medium">
+	<div class="chart"><div class="cover-fill" style="width: 50%"></div><div class="cover-empty" style="width: 50%"></div></div>
+	</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="10" class="abs medium">5/10</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="50" class="pct medium">50%</td>
+	<td data-value="10" class="abs medium">5/10</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="VillageGovernanceSystem.ts"><a href="VillageGovernanceSystem.ts.html">VillageGovernanceSystem.ts</a></td>
+	<td data-value="5.55" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="216" class="abs low">12/216</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="5.55" class="pct low">5.55%</td>
+	<td data-value="216" class="abs low">12/216</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="WeatherSystem.ts"><a href="WeatherSystem.ts.html">WeatherSystem.ts</a></td>
+	<td data-value="10" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 10%"></div><div class="cover-empty" style="width: 90%"></div></div>
+	</td>
+	<td data-value="10" class="pct low">10%</td>
+	<td data-value="90" class="abs low">9/90</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="6" class="abs low">0/6</td>
+	<td data-value="10" class="pct low">10%</td>
+	<td data-value="90" class="abs low">9/90</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="WildAnimalSpawningSystem.ts"><a href="WildAnimalSpawningSystem.ts.html">WildAnimalSpawningSystem.ts</a></td>
+	<td data-value="5.85" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.85" class="pct low">5.85%</td>
+	<td data-value="205" class="abs low">12/205</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="9" class="abs low">0/9</td>
+	<td data-value="5.85" class="pct low">5.85%</td>
+	<td data-value="205" class="abs low">12/205</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="WisdomGoddessSystem.ts"><a href="WisdomGoddessSystem.ts.html">WisdomGoddessSystem.ts</a></td>
+	<td data-value="5.89" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 5%"></div><div class="cover-empty" style="width: 95%"></div></div>
+	</td>
+	<td data-value="5.89" class="pct low">5.89%</td>
+	<td data-value="560" class="abs low">33/560</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="24" class="abs low">0/24</td>
+	<td data-value="5.89" class="pct low">5.89%</td>
+	<td data-value="560" class="abs low">33/560</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="WorkerMonitorSystem.ts"><a href="WorkerMonitorSystem.ts.html">WorkerMonitorSystem.ts</a></td>
+	<td data-value="6.66" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 6%"></div><div class="cover-empty" style="width: 94%"></div></div>
+	</td>
+	<td data-value="6.66" class="pct low">6.66%</td>
+	<td data-value="90" class="abs low">6/90</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="1" class="abs low">0/1</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="3" class="abs low">0/3</td>
+	<td data-value="6.66" class="pct low">6.66%</td>
+	<td data-value="90" class="abs low">6/90</td>
+	</tr>
+
+<tr>
+	<td class="file high" data-value="index.ts"><a href="index.ts.html">index.ts</a></td>
+	<td data-value="100" class="pic high">
+	<div class="chart"><div class="cover-fill cover-full" style="width: 100%"></div><div class="cover-empty" style="width: 0%"></div></div>
+	</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="1" class="abs high">1/1</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="1" class="abs high">1/1</td>
+	</tr>
+
+<tr>
+	<td class="file low" data-value="registerAllSystems.ts"><a href="registerAllSystems.ts.html">registerAllSystems.ts</a></td>
+	<td data-value="0.51" class="pic low">
+	<div class="chart"><div class="cover-fill" style="width: 0%"></div><div class="cover-empty" style="width: 100%"></div></div>
+	</td>
+	<td data-value="0.51" class="pct low">0.51%</td>
+	<td data-value="388" class="abs low">2/388</td>
+	<td data-value="100" class="pct high">100%</td>
+	<td data-value="0" class="abs high">0/0</td>
+	<td data-value="0" class="pct low">0%</td>
+	<td data-value="2" class="abs low">0/2</td>
+	<td data-value="0.51" class="pct low">0.51%</td>
+	<td data-value="388" class="abs low">2/388</td>
+	</tr>
+
+</tbody>
+</table>
+</div>
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

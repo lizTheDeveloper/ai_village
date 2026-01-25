@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
-  WorldImpl,
+  World,
   EventBusImpl,
   createInventoryComponent,
   createAgentComponent,

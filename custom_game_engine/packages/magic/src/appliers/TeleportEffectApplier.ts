@@ -31,6 +31,142 @@ import type {
 } from '../types/ComponentTypes.js';
 
 // ============================================================================
+// Extended Types for Teleport Effects
+// ============================================================================
+
+/** Extended result type for teleport effects with additional metadata */
+interface TeleportEffectApplicationResult extends EffectApplicationResult {
+  targetPlane?: string;
+  targetsTeleported?: number;
+  eventsTriggered?: string[];
+}
+
+// ============================================================================
+// Type Guards
+// ============================================================================
+
+function isPositionComponent(component: unknown): component is PositionComponentData {
+  if (typeof component !== 'object' || component === null) {
+    return false;
+  }
+  const comp = component as Record<string, unknown>;
+  return (
+    'x' in comp &&
+    'y' in comp &&
+    typeof comp.x === 'number' &&
+    typeof comp.y === 'number'
+  );
+}
+
+function isOrientationComponent(component: unknown): component is OrientationComponent {
+  if (typeof component !== 'object' || component === null) {
+    return false;
+  }
+  const comp = component as Record<string, unknown>;
+  return (
+    'type' in comp &&
+    'facing' in comp &&
+    comp.type === 'orientation' &&
+    typeof comp.facing === 'number'
+  );
+}
+
+function isTeleportAnchorsComponent(component: unknown): component is TeleportAnchorsComponent {
+  if (typeof component !== 'object' || component === null) {
+    return false;
+  }
+  const comp = component as Record<string, unknown>;
+  return (
+    'type' in comp &&
+    'anchors' in comp &&
+    comp.type === 'teleport_anchors' &&
+    Array.isArray(comp.anchors)
+  );
+}
+
+function isStatsComponent(component: unknown): component is StatsComponent {
+  if (typeof component !== 'object' || component === null) {
+    return false;
+  }
+  const comp = component as Record<string, unknown>;
+  return 'type' in comp && comp.type === 'stats';
+}
+
+function isResistanceComponent(component: unknown): component is ResistanceComponent {
+  if (typeof component !== 'object' || component === null) {
+    return false;
+  }
+  const comp = component as Record<string, unknown>;
+  return 'type' in comp && comp.type === 'resistance';
+}
+
+// ============================================================================
+// Helper Functions for Safe Property Access
+// ============================================================================
+
+/**
+ * Safely get a number property from an object, with fallback
+ */
+function getNumberProp(obj: unknown, key: string, fallback: number): number {
+  if (typeof obj !== 'object' || obj === null) {
+    return fallback;
+  }
+  const value = (obj as Record<string, unknown>)[key];
+  return typeof value === 'number' ? value : fallback;
+}
+
+/**
+ * Safely get a string property from an object, with fallback
+ */
+function getStringProp(obj: unknown, key: string, fallback?: string): string | undefined {
+  if (typeof obj !== 'object' || obj === null) {
+    return fallback;
+  }
+  const value = (obj as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value : fallback;
+}
+
+/**
+ * Safely get a boolean property from an object, with fallback
+ */
+function getBooleanProp(obj: unknown, key: string, fallback: boolean): boolean {
+  if (typeof obj !== 'object' || obj === null) {
+    return fallback;
+  }
+  const value = (obj as Record<string, unknown>)[key];
+  return typeof value === 'boolean' ? value : fallback;
+}
+
+/**
+ * Safely get a location property from an object
+ */
+function getLocationProp(obj: unknown, key: string): { x: number; y: number } | undefined {
+  if (typeof obj !== 'object' || obj === null) {
+    return undefined;
+  }
+  const value = (obj as Record<string, unknown>)[key];
+  if (typeof value !== 'object' || value === null) {
+    return undefined;
+  }
+  const loc = value as Record<string, unknown>;
+  if (typeof loc.x === 'number' && typeof loc.y === 'number') {
+    return { x: loc.x, y: loc.y };
+  }
+  return undefined;
+}
+
+/**
+ * Safely get an array property from an object
+ */
+function getArrayProp<T>(obj: unknown, key: string): T[] | undefined {
+  if (typeof obj !== 'object' || obj === null) {
+    return undefined;
+  }
+  const value = (obj as Record<string, unknown>)[key];
+  return Array.isArray(value) ? value as T[] : undefined;
+}
+
+// ============================================================================
 // TeleportEffectApplier
 // ============================================================================
 
@@ -46,10 +182,11 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     target: Entity,
     world: World,
     context: EffectContext
-  ): EffectApplicationResult {
+  ): TeleportEffectApplicationResult {
+
     // Validate target has position component
-    const targetPos = target.getComponent('position');
-    if (!targetPos) {
+    const targetPosRaw = target.getComponent('position');
+    if (!targetPosRaw || !isPositionComponent(targetPosRaw)) {
       return {
         success: false,
         effectId: effect.id,
@@ -62,9 +199,11 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         spellId: context.spell.id,
       };
     }
+    const targetPos = targetPosRaw;
 
-    // Get teleport type from effect (with type assertion for tests)
-    const teleportType = (effect as any).teleportType || effect.teleportType;
+    // Get teleport type from effect (could be extended with additional types at runtime)
+    // Widen to string to handle runtime extensions beyond base union type
+    const teleportType: string = effect.teleportType;
 
     // Calculate destination based on teleport type
     const destination = this.calculateDestination(
@@ -90,14 +229,20 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     // Validate range based on teleport type
-    const pos = targetPos as unknown as PositionComponentData;
-    const casterPos = caster.getComponent('position') as PositionComponentData | undefined;
+    const pos = targetPos;
+    const casterPosRaw = caster.getComponent('position');
+    const casterPos = casterPosRaw && isPositionComponent(casterPosRaw) ? casterPosRaw : undefined;
 
     // For self/directional/random teleports, measure from current position to destination
     // For target teleports, measure from caster to target (range limits targeting, not destination)
     let rangeCheckDistance: number;
 
-    if (teleportType === 'target' || teleportType === 'target_to_caster' || teleportType === 'swap' || teleportType === 'mass') {
+    // Extended teleport types that may not be in base union
+    const isTargetTeleport = teleportType === 'target' || teleportType === 'target_to_caster' ||
+                             teleportType === 'mass';
+    const isSwapTeleport = teleportType === 'swap';
+
+    if (isTargetTeleport || isSwapTeleport) {
       // Range check is caster-to-target distance (can we reach the target to teleport them?)
       if (casterPos) {
         // PERFORMANCE: Keep sqrt here as value is used for error message display
@@ -116,9 +261,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     const maxRange = context.scaledValues.get('range')?.value
-      ?? (effect as any).range
-      ?? effect.maxDistance
-      ?? 100;
+      ?? getNumberProp(effect, 'range', effect.maxDistance ?? 100);
 
     if (rangeCheckDistance > maxRange && maxRange > 0) {
       return {
@@ -141,7 +284,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     );
 
     // Check resistance for unwilling teleport
-    if ((effect as any).allowsResistance && target !== caster) {
+    if (getBooleanProp(effect, 'allowsResistance', false) && target !== caster) {
       const resisted = this.checkResistance(target, context);
       if (resisted) {
         return {
@@ -159,7 +302,9 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     // Check terrain blocking
-    if ((context as any).terrainBlocked || ((effect as any).checkTerrain && this.isTerrainBlocked(destination.x, destination.y, world))) {
+    const terrainBlocked = getBooleanProp(context, 'terrainBlocked', false);
+    const checkTerrain = getBooleanProp(effect, 'checkTerrain', false);
+    if (terrainBlocked || (checkTerrain && this.isTerrainBlocked(destination.x, destination.y, world))) {
       return {
         success: false,
         effectId: effect.id,
@@ -199,33 +344,41 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
 
     // Trigger events if enabled
     const eventsTriggered: string[] = [];
-    if ((effect as any).triggersEvents) {
+    if (getBooleanProp(effect, 'triggersEvents', false)) {
       eventsTriggered.push('teleport_departure', 'teleport_arrival');
     }
 
-    const result: any = {
+    // Build applied values object - EffectApplicationResult expects Record<string, number>
+    const appliedValues: Record<string, number> = {
+      x: destination.x,
+      y: destination.y,
+      distance: teleportDistance,
+    };
+
+    const duration = getNumberProp(effect, 'duration', -1);
+    if (duration !== -1) {
+      appliedValues.duration = duration;
+    }
+
+    const blinkInterval = getNumberProp(effect, 'blinkInterval', -1);
+    if (blinkInterval !== -1) {
+      appliedValues.blinkInterval = blinkInterval;
+    }
+
+    // Build result with proper typing
+    const result: TeleportEffectApplicationResult = {
       success: true,
       effectId: effect.id,
       targetId: target.id,
-      appliedValues: {
-        x: destination.x,
-        y: destination.y,
-        distance: teleportDistance,
-        ...(destination.targetPlane && { targetPlane: destination.targetPlane }),
-        ...(((effect as any).duration !== undefined) && { duration: (effect as any).duration }),
-        ...(((effect as any).blinkInterval !== undefined) && { blinkInterval: (effect as any).blinkInterval }),
-      },
+      appliedValues,
       resisted: false,
       appliedAt: context.tick,
       casterId: caster.id,
       spellId: context.spell.id,
       eventsTriggered: eventsTriggered.length > 0 ? eventsTriggered : undefined,
+      targetPlane: destination.targetPlane,
+      targetsTeleported: teleportResult.targetsTeleported,
     };
-
-    // Add top-level fields for mass teleport results
-    if (teleportResult.targetsTeleported !== undefined) {
-      result.targetsTeleported = teleportResult.targetsTeleported;
-    }
 
     return result;
   }
@@ -269,14 +422,14 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     context: EffectContext,
     teleportType: string
   ): { success: true; x: number; y: number; targetPlane?: string } | { success: false; error: string } {
-    const targetPos = target.getComponent('position');
-    const casterPos = caster.getComponent('position');
+    const targetPosRaw = target.getComponent('position');
+    const casterPosRaw = caster.getComponent('position');
 
     switch (teleportType) {
       case 'self':
       case 'target': {
         // Use context.targetLocation if available, otherwise from effect
-        const targetLocation = (context as any).targetLocation || (effect as any).targetLocation;
+        const targetLocation = getLocationProp(context, 'targetLocation') || getLocationProp(effect, 'targetLocation');
         if (!targetLocation) {
           return { success: false, error: 'No target location specified' };
         }
@@ -285,85 +438,82 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
 
       case 'target_to_caster': {
         // Teleport target to caster's location
-        if (!casterPos) {
+        if (!casterPosRaw || !isPositionComponent(casterPosRaw)) {
           return { success: false, error: 'Caster lacks position component' };
         }
-        return { success: true, x: (casterPos as unknown as PositionComponentData).x, y: (casterPos as unknown as PositionComponentData).y };
+        return { success: true, x: casterPosRaw.x, y: casterPosRaw.y };
       }
 
       case 'swap': {
         // Swap positions - destination is caster's current position
         // (caster will be moved to target's position in performTeleport)
-        if (!casterPos) {
+        if (!casterPosRaw || !isPositionComponent(casterPosRaw)) {
           return { success: false, error: 'Caster lacks position component' };
         }
-        return { success: true, x: (casterPos as unknown as PositionComponentData).x, y: (casterPos as unknown as PositionComponentData).y };
+        return { success: true, x: casterPosRaw.x, y: casterPosRaw.y };
       }
 
       case 'directional': {
         // Teleport in a cardinal direction
-        if (!targetPos) {
+        if (!targetPosRaw || !isPositionComponent(targetPosRaw)) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as unknown as PositionComponentData;
-        const direction = (context as any).direction || (effect as any).direction;
-        const distance = (effect as any).distance || 10;
+        const direction = getStringProp(context, 'direction') || getStringProp(effect, 'direction') || 'north';
+        const distance = getNumberProp(effect, 'distance', 10);
 
         const offset = this.getDirectionalOffset(direction, distance);
         return {
           success: true,
-          x: tPos.x + offset.x,
-          y: tPos.y + offset.y,
+          x: targetPosRaw.x + offset.x,
+          y: targetPosRaw.y + offset.y,
         };
       }
 
       case 'forward': {
         // Teleport in facing direction
-        if (!targetPos) {
+        if (!targetPosRaw || !isPositionComponent(targetPosRaw)) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as unknown as PositionComponentData;
-        const orientation = target.getComponent('orientation') as OrientationComponent | undefined;
-        if (!orientation) {
+        const orientationRaw = target.getComponent('orientation');
+        if (!orientationRaw || !isOrientationComponent(orientationRaw)) {
           return { success: false, error: 'Target lacks orientation component' };
         }
-        const distance = (effect as any).distance || 10;
-        const dx = Math.cos(orientation.facing) * distance;
-        const dy = Math.sin(orientation.facing) * distance;
+        const distance = getNumberProp(effect, 'distance', 10);
+        const dx = Math.cos(orientationRaw.facing) * distance;
+        const dy = Math.sin(orientationRaw.facing) * distance;
         return {
           success: true,
-          x: tPos.x + dx,
-          y: tPos.y + dy,
+          x: targetPosRaw.x + dx,
+          y: targetPosRaw.y + dy,
         };
       }
 
       case 'self_random':
       case 'blink': {
         // Random teleport within range
-        if (!targetPos) {
+        if (!targetPosRaw || !isPositionComponent(targetPosRaw)) {
           return { success: false, error: 'Target lacks position component' };
         }
-        const tPos = targetPos as unknown as PositionComponentData;
-        const maxRange = (context as any).range || (effect as any).range || effect.maxDistance || 15;
+        const maxRange = getNumberProp(context, 'range', getNumberProp(effect, 'range', effect.maxDistance ?? 15));
         const angle = Math.random() * Math.PI * 2;
         const dist = Math.random() * maxRange;
         const dx = Math.cos(angle) * dist;
         const dy = Math.sin(angle) * dist;
         return {
           success: true,
-          x: tPos.x + dx,
-          y: tPos.y + dy,
+          x: targetPosRaw.x + dx,
+          y: targetPosRaw.y + dy,
         };
       }
 
       case 'anchor': {
         // Teleport to marked anchor location
-        const anchorName = (context as any).anchorName || (effect as any).anchorName;
-        const anchors = caster.getComponent('teleport_anchors') as TeleportAnchorsComponent | undefined;
-        if (!anchors) {
+        const anchorName = getStringProp(context, 'anchorName') || getStringProp(effect, 'anchorName');
+        const anchorsRaw = caster.getComponent('teleport_anchors');
+        if (!anchorsRaw || !isTeleportAnchorsComponent(anchorsRaw)) {
           return { success: false, error: 'No teleport anchors found' };
         }
-        const anchor = anchors.anchors.find((a) => a.name === anchorName);
+        const anchor = anchorsRaw.anchors.find((a) => a.name === anchorName);
         if (!anchor) {
           return { success: false, error: `Anchor '${anchorName}' not found` };
         }
@@ -372,8 +522,8 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
 
       case 'planar': {
         // Planar teleport (dimension shift)
-        const targetLocation = (context as any).targetLocation || (effect as any).targetLocation;
-        const targetPlane = (context as any).targetPlane || (effect as any).targetPlane;
+        const targetLocation = getLocationProp(context, 'targetLocation') || getLocationProp(effect, 'targetLocation');
+        const targetPlane = getStringProp(context, 'targetPlane') || getStringProp(effect, 'targetPlane');
         if (!targetLocation) {
           return { success: false, error: 'No target location specified for planar shift' };
         }
@@ -387,7 +537,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
 
       case 'mass': {
         // Mass teleport - same destination for all targets
-        const targetLocation = (context as any).targetLocation || (effect as any).targetLocation;
+        const targetLocation = getLocationProp(context, 'targetLocation') || getLocationProp(effect, 'targetLocation');
         if (!targetLocation) {
           return { success: false, error: 'No target location specified' };
         }
@@ -428,46 +578,46 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     context: EffectContext,
     teleportType: string
   ): { success: true; targetsTeleported?: number } | { success: false; error: string } {
-    const targetPos = target.getComponent('position') as PositionComponentData | undefined;
-    if (!targetPos) {
+    const targetPosRaw = target.getComponent('position');
+    if (!targetPosRaw || !isPositionComponent(targetPosRaw)) {
       return { success: false, error: 'Target lacks position component' };
     }
 
     // Handle swap teleport (exchange positions)
     if (teleportType === 'swap') {
-      const casterPos = caster.getComponent('position') as PositionComponentData | undefined;
-      if (!casterPos) {
+      const casterPosRaw = caster.getComponent('position');
+      if (!casterPosRaw || !isPositionComponent(casterPosRaw)) {
         return { success: false, error: 'Caster lacks position component' };
       }
 
       // Store original positions
-      const originalTargetX = targetPos.x;
-      const originalTargetY = targetPos.y;
+      const originalTargetX = targetPosRaw.x;
+      const originalTargetY = targetPosRaw.y;
 
       // Swap positions
-      targetPos.x = casterPos.x;
-      targetPos.y = casterPos.y;
-      casterPos.x = originalTargetX;
-      casterPos.y = originalTargetY;
+      targetPosRaw.x = casterPosRaw.x;
+      targetPosRaw.y = casterPosRaw.y;
+      casterPosRaw.x = originalTargetX;
+      casterPosRaw.y = originalTargetY;
 
       return { success: true };
     }
 
     // Handle mass teleport
     if (teleportType === 'mass') {
-      const additionalTargets = (context as any).additionalTargets || [];
+      const additionalTargets = getArrayProp<Entity>(context, 'additionalTargets') || [];
       let teleportedCount = 1; // Start with main target
 
       // Teleport main target
-      targetPos.x = destination.x;
-      targetPos.y = destination.y;
+      targetPosRaw.x = destination.x;
+      targetPosRaw.y = destination.y;
 
       // Teleport additional targets
       for (const entity of additionalTargets) {
-        const pos = entity.getComponent('position') as PositionComponentData | undefined;
-        if (pos) {
-          pos.x = destination.x;
-          pos.y = destination.y;
+        const posRaw = entity.getComponent('position');
+        if (posRaw && isPositionComponent(posRaw)) {
+          posRaw.x = destination.x;
+          posRaw.y = destination.y;
           teleportedCount++;
         }
       }
@@ -476,8 +626,8 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     }
 
     // Standard teleport
-    targetPos.x = destination.x;
-    targetPos.y = destination.y;
+    targetPosRaw.x = destination.x;
+    targetPosRaw.y = destination.y;
 
     // Handle planar shift (add/update plane component)
     if (destination.targetPlane) {
@@ -493,16 +643,25 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
    */
   private checkResistance(target: Entity, context: EffectContext): boolean {
     // Check willpower resistance
-    const stats = target.getComponent('stats') as StatsComponent | undefined;
+    const statsRaw = target.getComponent('stats');
+    const stats = statsRaw && isStatsComponent(statsRaw) ? statsRaw : undefined;
     const willpower = stats?.willpower ?? 10;
 
     // Check teleport resistance trait
-    const resistance = target.getComponent('resistance') as ResistanceComponent | undefined;
+    const resistanceRaw = target.getComponent('resistance');
+    const resistance = resistanceRaw && isResistanceComponent(resistanceRaw) ? resistanceRaw : undefined;
     const teleportResistance = resistance?.teleport ?? 0;
 
     // High willpower or resistance can resist
     // Resistance check: willpower > proficiency * 0.8 OR random < teleportResistance
-    const proficiency = (context.casterMagic?.techniqueProficiency as any)?.teleport ?? 50;
+    // Access techniqueProficiency safely
+    const techniqueProficiency = context.casterMagic?.techniqueProficiency;
+    const proficiency = (
+      techniqueProficiency &&
+      typeof techniqueProficiency === 'object' &&
+      'teleport' in techniqueProficiency &&
+      typeof techniqueProficiency.teleport === 'number'
+    ) ? techniqueProficiency.teleport : 50;
 
     if (willpower > proficiency * 0.8) {
       return Math.random() < 0.5; // 50% chance to resist if high willpower

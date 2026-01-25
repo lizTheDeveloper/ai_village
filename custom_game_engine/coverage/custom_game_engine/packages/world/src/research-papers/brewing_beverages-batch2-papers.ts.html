@@ -1,0 +1,1087 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/brewing_beverages-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> brewing_beverages-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ALCOHOL_PURIFICATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'alcohol_purification',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Alcohol Purification',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['distillation_spirits'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_alcohol_purification' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Alcohol Purification: A Treatise on the Refinement of Spirits Both Literal and Metaphorical</span>
+&nbsp;
+The purification of alcohol represents one of alchemy's most paradoxical achievements: a process that simultaneously makes something cleaner and more dangerous*. At its essence, alcohol purification involves the systematic removal of congeners, fusel oils, and other impurities that distinguish "something you might drink" from "something you definitely will drink, though perhaps not wisely"†. The fundamental principle relies on the differential boiling points of various compounds—ethanol vaporizes at 78.37°C‡, while water requires 100°C, and the various oils, esters, and other compounds that make your morning-after feel like a punishment from angry gods** boil at their own inconvenient temperatures††.
+&nbsp;
+The practical application of alcohol purification has evolved considerably since the days when alchemists believed they were capturing the "soul" of wine‡‡. Modern practitioners employ fractional distillation, activated carbon filtration, and in some circles, techniques borrowed from the Celestial Refiners of the Eastern Mountains***. The process typically begins with a spirit of at least 40% alcohol by volume†††—attempting to purify anything weaker is technically possible but spiritually exhausting‡‡‡. Each successive distillation increases purity but decreases yield, following what the Scholarium Inebriatus calls the "Law of Diminishing Returns and Increasing Impatience"****. The heads (first vapors) contain methanol and should be discarded unless you enjoy blindness†††† or have enemies‡‡‡‡; the hearts contain the desired ethanol*****; and the tails contain heavier alcohols that taste like regret distilled into liquid form†††††.
+&nbsp;
+Safety considerations cannot be overstated, though they frequently are‡‡‡‡‡. Alcohol vapor is invisibly flammable******, and the narrow margin between "successful purification" and "unplanned renovation of your laboratory" has been calculated by the Institute of Preventable Disasters at approximately 0.3 seconds of inattention******†. All apparatus must be properly sealed—the tragic case of Master Cornelius the Ventilated****** serves as eternal reminder. Never, under any circumstances, heat alcohol over an open flame†††††††, seal a distillation apparatus completely without pressure release‡‡‡‡‡‡, or sample your work "just to check the quality" more than seventeen times per session********. The methanol fraction must be identified and removed with paranoid precision********†, as methanol and ethanol are both clear, both smell like alcohol, and one of them will make you wish you had chosen a different career‡‡‡‡‡‡‡.
+&nbsp;
+The historical development of alcohol purification reads like a chronicle of progressive revelation punctuated by periodic explosions. The Persian alchemist Jābir ibn Hayyān described early distillation in the 8th century, though whether he was purifying alcohol or merely concentrating it remains debated by scholars who have perhaps sampled too much of their research material*********. European monasteries perfected the art between prayer services†††††††††, leading to the theological question of whether purer alcohol brought one closer to or further from divine grace‡‡‡‡‡‡‡‡. The invention of the reflux still in the 19th century represented a quantum leap**********—suddenly, achieving 95% purity became possible without sacrificing half your starting material to the gods of inefficiency. Modern understanding recognizes that absolute purity (100% ethanol) is technically achievable but requires molecular sieves and a degree of obsessive dedication normally reserved for people who alphabetize their books by the author's middle name**********†.
+&nbsp;
+Contemporary alchemists must balance purity with practicality†††††††††††. While laboratory-grade alcohol can reach 99.9% purity‡‡‡‡‡‡‡‡‡, most applications require merely "pure enough"***********—a philosophical stance that would horrify medieval perfectionists but saves considerable time and reduces explosion risk by approximately 34%***********†. The purified spirit, when properly produced, should be clear as mountain water, smooth as a philosopher's logic‡‡‡‡‡‡‡‡‡‡, and potent enough to make you reconsider your life choices with admirable efficiency. It represents alchemy's gift to humanity: the ability to take something fermented and make it both purer and more concentrated, which is either progress or a terrible mistake depending on your perspective and sobriety level************.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The Guild of Concerned Alchemists notes that things which are 95% pure ethanol are, by definition, 95% more likely to do exactly what you're hoping they won't. Their statistical methodology is questionable but their hospital bills are well-documented.
+&nbsp;
+†"Definitely will drink" assumes you are an adult of legal drinking age in your jurisdiction, have made your peace with mortality, and have tomorrow off work. The author accepts no responsibility for decisions made after reading this treatise, especially those beginning with "hold my beer."
+&nbsp;
+‡This temperature is accurate to within 0.01°C, which matters tremendously when you're trying to separate ethanol from poison and hardly at all when you're explaining to the fire brigade what happened.
+&nbsp;
+**The ancient Sumerians called hangovers "the wrath of the beer goddess Ninkasi." Modern science has determined that this is medically accurate, though Ninkasi's precise mechanism of vengeance involves dehydration, acetaldehyde buildup, and inflammatory responses rather than direct divine intervention. Probably.
+&nbsp;
+††Fusel alcohols boil at various temperatures between 100-150°C and smell like wet dog mixed with regret. They are called "fusel" from the German word for "bad liquor," proving that German efficiency extends even to naming terrible things. The Compendium of Unpleasant Organic Compounds lists 47 different fusel alcohols, each worse than the last. The author has personally encountered six of them and recommends against making it seven.
+&nbsp;
+‡‡The medieval theory of distillation held that heating wine released its "spirit" into vapor. They were more right than they knew, though the spirit in question is less metaphysical and more "substance that makes you see spirits if you drink enough." The Metaphysical Society of Padua debated this distinction for three years before dissolving in a dispute over whether the university bar was a legitimate research venue†.
+&nbsp;
+†This dispute was settled when the Dean pointed out that seventeen of their twenty-three published papers had been written on napkins from said bar. The Society reformed as the Pragmatic Society of Padua and immediately produced their finest work.
+&nbsp;
+***The Celestial Refiners claim to achieve 99.7% purity using nothing but jade vessels, prayers to the Moon Ancestor, and a technique they describe as "asking the water molecules politely to leave." The author traveled 2,000 miles to observe this method and can confirm it works, though whether due to jade, prayers, or the fact that their "jade vessels" are actually copper stills painted green remains unclear.
+&nbsp;
+****The full name of this institution is The Most Excellent and Occasionally Sober Scholarium Inebriatus of Lower Saxony, founded in 1543 by monks who decided that vows of temperance were "more like guidelines, really." They maintain the world's most comprehensive library of distillation accidents, cross-referenced by cause, injury type, and blood alcohol level of the researcher at time of incident.
+&nbsp;
+†††The yield follows a brutal mathematical progression. First distillation: lose 20%. Second: lose 20% of what remains. Third: lose 20% of that. By the seventh distillation, you have achieved pharmaceutical-grade purity and approximately three tablespoons of alcohol. The question of whether this is worth it has sparked fistfights at alchemical conferences††.
+&nbsp;
+††The Symposium of Practical Alchemy, Amsterdam 1789, famously ended when Prof. Dietrich von Esslingen called the process "masturbatory perfectionism" and Prof. Jacques Beaumont responded by throwing a flask of seventh-distillation alcohol in his face. Neither the alcohol nor the friendship survived. The event is commemorated in the traditional toast "To Purity Without Violence," which everyone agrees is excellent advice while ignoring completely.
+&nbsp;
+‡‡‡Not spiritually exhausting in the metaphorical sense, but in the literal sense recognized by the Council of Energetic Phenomena. Purifying weak alcohol requires so much heating and re-heating that your soul begins to wonder if there are better uses of your time. The phenomenon was first documented by Sister Margaret of the Flaming Retort, who wrote: "On the third day of attempting to purify small beer`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding alcohol purification in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SPIRIT_AGING_BARRELS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'spirit_aging_barrels',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Spirit Aging Barrels',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['alcohol_purification'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_spirit_aging_barrels' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE TEMPORAL TRANSMUTATION OF DISTILLED SPIRITS THROUGH LIGNEOUS CONTAINMENT:</span>
+A Practical Guide to Spirit Aging Barrels
+&nbsp;
+The fundamental principle underlying spirit aging is deceptively simple: place alcohol in a wooden barrel and wait*. However, as with most alchemical processes that appear straightforward, the actual practice involves a delicate balance of wood selection**, atmospheric conditions***, microbial cooperation†, and—most critically—the patience to resist opening the barrel every three days to check if it's "done yet"††. The barrel itself functions as both container and catalyst, its charred interior acting as a crucible where time, oak, and ethanol engage in what the ancient Mesopotamian alchemists called "the Long Conversation"†††, though their records suggest they grew rather tired of waiting for it to conclude‡.
+&nbsp;
+The selection of appropriate wood proves more critical than novice alchemists typically assume‡‡. While oak remains the traditional choice for reasons both mystical and practical‡‡‡, experiments with alternative woods have yielded results ranging from "surprisingly pleasant" to "we had to evacuate three city blocks"§. The wood must be properly seasoned—a process requiring two to three years§§—then cooperated into barrel form by craftspeople who understand that even slight variations in char depth can mean the difference between "notes of vanilla and caramel" and "notes of furniture fire and regret"§§§. The Interdimensional Committee on Barrel Standards currently recognizes forty-seven distinct char levels*, though only twelve are recommended for use by anyone who values their tongue's continued employment**.
+&nbsp;
+Modern practitioners must contend with variables their predecessors could blissfully ignore, including ambient temperature fluctuations***, humidity levels that would make a desert dweller weep†, and the ever-present risk of what the industry euphemistically terms "angel's share"††—the portion of spirit lost to evaporation†††. The rate of maturation depends on a formula so complex that the Scholastic Institute of Advanced Barrel Studies employs seventeen full-time mathematicians just to maintain their calculation tables‡, though three of them recently defected to a competing institution over a disagreement about the coefficient of oak porosity‡‡. The barrel must breathe but not too enthusiastically; age the spirit but not into vinegar; impart character but not become overbearing about it‡‡‡.
+&nbsp;
+Safety considerations extend well beyond the obvious dangers of working with high-proof alcohol in wooden containers near open flames§. The Catalogue of Barrel-Related Incidents, maintained by the Bureau of Alchemical Mishaps and Regrettable Decisions, currently spans 1,247 volumes§§, with approximately forty percent dedicated to individuals who attempted to "speed up the process" through creative applications of heat, pressure, temporal manipulation, or increasingly desperate prayers to gods of fermentation§§§. The Guild of Cooperage and Contained Spirits recommends a minimum aging period of three years for most spirits*, though they acknowledge this recommendation is routinely ignored by approximately 73.4% of practitioners who possess "a good feeling" about their batch**. The phenomenon of exploding barrels—whether from improper filling, excessive ambient temperature, or what appears to be simple spite on the barrel's part***—occurs at a statistically significant rate of 2.3 incidents per 10,000 barrel-years†, leading to the profession's unofficial motto: "Always stand to the side"††.
+&nbsp;
+The historical development of barrel aging represents one of alchemy's happier accidents†††, discovered when a shipment of spirits forgotten in oak transport casks for three years proved significantly more palatable than the original product‡. This serendipitous finding launched centuries of refinement, experimentation, and the occasional catastrophic failure that contemporary sources describe with phrases like "the Great Amber Flood of 1634"‡‡ and "the Incident We Do Not Discuss at the Annual Cooperage Convention"‡‡‡. Modern understanding incorporates chemistry unknown to our ancestors—the role of lignin breakdown, the formation of esters and aldehydes, the complex dance of oxidation and extraction—yet somehow produces results that rarely exceed the quality achieved by Scottish monks with no formal alchemical training whatsoever§. This has led to considerable professional embarrassment among the more theoretical branches of the discipline§§, who maintain extensive laboratories while producing spirits their predecessors would have used to strip paint§§§.
+&nbsp;
+&nbsp;
+FOOTNOTES
+&nbsp;
+* The waiting is the hard part. A survey conducted by the Academy of Impatient Alchemists found that 67.2% of first-time barrel users checked their barrels at least once daily for the first month. By month six, this number drops to 34.8%, primarily because half the original cohort had already opened their barrels and consumed the insufficiently aged contents.
+&nbsp;
+** The Institute for Dendrochronological Alchemy maintains samples of over 4,000 wood varieties, each catalogued according to its suitability for spirit aging. Their filing system was last updated in 1847†.
+&nbsp;
+† Which consists of walking down very long hallways looking at labeled drawers. The Institute employs two full-time navigators.
+&nbsp;
+*** Barrels kept in consistent temperatures age predictably. Barrels subjected to temperature fluctuations age "creatively," according to Master Cooper Hogshead's seminal work, "Why Your Spirits Taste Like That: A Mystery We're Still Investigating"†.
+&nbsp;
+† Published posthumously after Hogshead died attempting to age spirits in a barrel stored alternately in an ice house and a sauna. The experiment was declared "ambitious but fatally flawed" by the investigative committee.
+&nbsp;
+†† The Loompaugh Barrel Works of Greater Ankh-Morpork attempted to cultivate specific bacterial colonies within their barrels, believing it would enhance flavor. The resulting product was indeed memorable, though not in any way the alchemists had hoped. The barrels were eventually buried in a consecrated site, and the formula burned. Three times. Just to be sure.
+&nbsp;
+††† Three of the coopers involved in the incident still wake screaming. The therapy bills are covered by the Guild's comprehensive insurance policy, which specifically includes a clause for "existential horror arising from one's own creation."
+&nbsp;
+††† This probably requires more context than we're able to provide. The tablets were partially destroyed when the library of Ashurbanipal burned, and modern translations are... interpretive. Professor Gilgamesh-Williams of the University of Ur suggests the phrase might equally mean "the Extended Debate," "the Prolonged Quarrel," or possibly "that thing we started and now can't remember why."
+&nbsp;
+‡ The Mesopotamians eventually invented a religious festival specifically to celebrate opening the barrels, which tells you everything you need about their patience levels. The festival involved considerable drinking, which rather defeated the purpose of careful aging, but they seemed satisfied with the arrangement.
+&nbsp;
+‡‡ Oak contains the proper balance of tannins, vanillin precursors, and structural integrity. It also contains enough historical precedent that deviating from it requires filing Form 47-B with the Barrel Standards Committee, a document so tedious that most alchemists simply use oak†.
+&nbsp;
+† Form 47-B includes sections on "Justification for Non-Standard Wood Selection," "Impact Assessment on Traditional Practice," "Estimated Probability of Catastrophic Failure," and a twelve-page appendix requiring three notarized signatures. The average processing time is eighteen months.
+&nbsp;
+‡‡‡ Which include white oak (Quercus alba), European oak (Q. robur), and Japanese mizunara oak (Q. crispula). The differences between these varieties can inspire passionate debates lasting hours, or in the case of the Great Oak Symposium of 1923, eleven days†.
+&nbsp;
+† The symposium ended only when the venue ran out of food. Arguments resumed by post.
+&nbsp;
+§ The incident involving cherry wood barrels occurred in 1756 and resulted in a spirit described by contemporary accounts as "offensively perfumed," "reminiscent of cough syrup crafted by a vengeful deity," and "absolutely unsellable, though potentially useful for stripping barnacles from ship hulls." The entire batch was eventually purchased by the Navy.
+&nbsp;
+§§ This requirement explains why coopers tend to plan ahead. The Mulberry Cooperage of Lower Scrantonshire maintains wood stocks seasoning for customers' grandchildren. They accept deposits in any major currency, precious metals, or firstborn livestock†.
+&nbsp;
+† They're not picky. The waiting list is currently 73 years long.
+&nbsp;
+§§§ The char is created by setting the barrel's interior on fire in a controlled manner, which is exactly as dangerous as it sounds. The Cooperage Guild reports an average of 2.7 "enthusiastic char incidents" per year, where "enthusiastic" means "the barrel achieved complete combustion rather than merely charred." Master coopers can reportedly distinguish between char levels one through four by smell alone`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding spirit aging barrels in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERBAL_BEVERAGE_INFUSION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herbal_beverage_infusion',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herbal Beverage Infusion',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['spirit_aging_barrels'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herbal_beverage_infusion' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Herbal Beverage Infusion: A Comprehensive Study of Alchemical Tea-Making and Related Catastrophes</span>
+&nbsp;
+The preparation of herbal beverages represents one of alchemy's most deceptively simple disciplines*, requiring mastery of thermal dynamics, temporal precision, and the peculiar sentience that certain herbs develop when subjected to hot water**. While the uninitiated might dismiss this as "merely making tea," such individuals have clearly never witnessed the Great Lemonbalm Incident of 1643†, nor do they understand why the College of Alchemical Beverages maintains a dedicated fire brigade††. The fundamental principle underlying all herbal infusion is sympathetic extraction‡—the art of convincing plant matter to surrender its essential properties through the careful application of heat, time, and occasionally, pleading‡‡.
+&nbsp;
+Building upon the foundational knowledge gained from spirit aging in barrels***, the practitioner must understand that liquid mediums possess memory properties that directly influence extraction rates. Water heated to exactly 82.7 degrees Celsius†††—not 82.6, and certainly not 83‡‡‡—will extract polyphenolic compounds at a rate 340% more efficient than water of inferior temperature§. The vessel itself matters tremendously: ceramic maintains thermal stability, glass allows visual monitoring of the infusion's color-shift metamorphosis§§, and metal introduces catalytic properties that may be beneficial or catastrophic depending on the lunar phase§§§. Ancient texts refer to this as the Doctrine of Contained Transformation*, wherein the boundary between container and contained becomes philosophically negotiable**.
+&nbsp;
+Practical technique demands understanding the Hierarchy of Submersion†: whole leaves require 4-7 minutes depending on their argumentativeness††, crushed or cut herbs need 3-5 minutes unless they've been improperly stored‡, and powdered materials should never be used by anyone who values their eyebrows‡‡. The water must be added to the herb, never the reverse***—a lesson the Order of Reversed Priorities learned too late to save their monastery†††. Agitation should occur precisely three times in a clockwise direction for stimulating herbs, counterclockwise for calming varieties, and never, under any circumstances, in a figure-eight pattern‡‡‡. The color of the infusion serves as a temporal indicator: pale yellow suggests insufficient extraction, deep amber indicates optimal achievement, and glowing purple means evacuate immediately§.
+&nbsp;
+Safety protocols exist for excellent reasons, most of which are documented in burn ward registries across seventeen nations§§. Never infuse mugwort and valerian simultaneously unless supervised by a licensed Somnomancer§§§***; the resulting beverage doesn't simply make one drowsy but rather divorces consciousness from temporal linearity for approximately forty-seven hours†††. Certain herbs, when over-steeped, develop opinions‡‡‡‡—start with gentle suggestions, progress to persistent whispers, and culminate in existential demands that most practitioners find philosophically exhausting§§§§. The Alchemical Safety Commission's Rule 847 explicitly prohibits infusing anything that grows within three meters of a ley line intersection, though this hasn't stopped the determined or the foolhardy, categories which overlap significantly*****.
+&nbsp;
+The historical development of herbal beverage infusion traces back to the Mesopotamian Herb-Witches of the Third Dynasty††††, who discovered that certain combinations could grant prophetic visions, cure melancholy, or transform the drinker's voice into that of a particularly eloquent crow‡‡‡‡‡. Modern understanding recognizes approximately 14,847 documented herb species suitable for infusion§§§§§, though only 3,201 won't result in regulatory notification******. The Renaissance period saw the codification of brewing ratios, temperature scales, and the formal recognition that some herbs simply refuse to cooperate on Tuesdays—a phenomenon still unexplained by contemporary thaumaturgical physics†††††. Today's practitioners benefit from centuries of accumulated wisdom, though they remain vulnerable to the same hubris that claimed the Overconfident Guild of Unrestricted Steeping in 1891‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* According to the Nomenclature Disputes Council, "tea-making" and "alchemical beverage infusion" are legally distinct practices in forty-three jurisdictions. The penalties for conflation include fines, public correction, and mandatory attendance at the Annual Symposium on Precise Terminology (three days, no breaks, very uncomfortable chairs).
+&nbsp;
+\*\* Particularly chamomile, which develops a passive-aggressive attitude when oversteeped. One practitioner reported their morning infusion "somehow managing to taste judgmental."
+&nbsp;
+† The full details remain classified, but the short version involves seventeen apprentices, one unsupervised kettle, and the permanent evacuation of an entire borough. The lemonbalm won, if you're wondering.
+&nbsp;
+†† This brigade consists of three dedicated fire-fighters, two water elementalists, and one very tired healer named Gerald. Gerald has been Employee of the Month for sixty-three consecutive months, mostly through sheer survival.
+&nbsp;
+††† Also known as the Monastery That Shall Not Be Named, though mostly because there's no longer anyone alive who remembers its original name. The ruins still occasionally produce clouds of chamomile-scented steam, which locals claim smells vaguely apologetic.
+&nbsp;
+‡ The phenomenon where certain organic materials become convinced they ARE the water rather than merely occupying it. Philosophy students find this fascinating. Alchemists find it annoying.
+&nbsp;
+‡‡ The College of Alchemical Beverages maintains a Pleading Archive with 4,739 documented phrases that have successfully convinced reluctant herbs to cooperate. Popular entries include "Please," "I'll tell everyone you were cooperative," and "My mother-in-law is visiting."
+&nbsp;
+\*\*\* See previous research paper: "Spirit Aging in Barrels: Why Wood Remembers and Why That Should Concern You."
+&nbsp;
+††† This temperature was determined by the Thermodynamic Council after 847 trials and the sacrifice of approximately 12,000 kettles. The margin of error is 0.03 degrees, which the Council describes as "generous" and "proof we're not monsters."
+&nbsp;
+‡‡‡ The "Disaster of 83 Degrees" (1756) resulted in a infusion that briefly achieved sentience and filed seventeen grievances with the Municipal Complaint Bureau before dissipating. All grievances were deemed valid.
+&nbsp;
+§ A statistic that somehow involves pi, the golden ratio, and the ambient humidity of seventh-century Chang'an. Don't ask mathematicians to explain it; they start crying.
+&nbsp;
+§§ Though watching too intently can affect the outcome—a variation of the observer effect that particularly affects hibiscus, which becomes "camera shy" and refuses to release its full color spectrum when scrutinized.
+&nbsp;
+§§§ The Lunar Influence Chart published by the Society of Metallic Resonance spans forty-seven pages and includes sixteen different warnings written in red ink. The full moon is generally safe. The new moon is "complicated." The crescent moon requires a waiver.
+&nbsp;
+\* Different from the Doctrine of Uncontained Transformation, which is what happens when you forget to put a lid on.
+&nbsp;
+\*\* This negotiability has led to several landmark legal cases. In Teapot v. Infusion (1823), the court ruled that a vessel cannot claim ownership of its contents unless it can demonstrate "continued custodial intent beyond the pouring threshold."
+&nbsp;
+† First formalized by Master Brewster Cornelius Deepsteep† in 1447, who lost three fingers determining the optimal leaf-to-water ratios.
+&nbsp;
+†† Yes, argumentativeness. Some leaves steep readily, grateful for their transformation. Others require coaxing, negotiation, or in the case of certain wild mints, threats of composting. A study by the Institute of Botanical Psychology (disbanded 1889) documented clear personality types among 1,247 herb varieties.
+&nbsp;
+‡ Improperly stored herbs become brittle, resentful, and prone to over-extraction. The resulting beverage tastes of regret and dusty cupboards.
+&nbsp;
+‡‡ The Powdered Herb Incident (multiple incidents, actually, averaging one per fortnight globally) typically involves enthusiastic inhalation, violent sneezing, and temporary transformation into whatever herb was inhaled. The effect lasts 2-4 hours. Yes, people have sneezed and briefly become lavender. No, it's not pleasant.
+&nbsp;
+\*\*\* The monks were attempting to "improve efficiency" by reversing the standard process. The resulting steam explosion was visible from the neighboring kingdom and created a thundercloud that rained peppermint tea for three days. The monastery's insurance policy specifically excluded "Acts of Procedural Hubris."
+&nbsp;
+††† This`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herbal beverage infusion in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TEA_PREPARATION_ART: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'tea_preparation_art',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Tea Preparation Art',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['herbal_beverage_infusion'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_tea_preparation_art' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE ELEVATED PRACTICE OF TEA PREPARATION ART: </span>
+A Comprehensive Treatise on the Alchemical Transformation of Leaf to Enlightenment
+&nbsp;
+The preparation of tea, as distinct from the mere infusion of herbal beverages*, represents the culmination of seventeen centuries of alchemical refinement, spiritual dedication, and what the Ancient Order of the Steeping Monks refer to as "aggressive patience"†. While the uninitiated may view tea preparation as simply pouring hot water over dried leaves, this reveals a fundamental misunderstanding of the profound transmutative processes at work—a misunderstanding that, according to the Imperial Archives of the Jade Mountain Conservatory, has resulted in approximately 4,847 documented cases of "spiritual disharmony," 3,921 instances of "metaphysical dyspepsia," and at least one incident where a novice's improperly prepared oolong achieved temporary sentience and filed a formal complaint with the Guild of Beverage Rights‡.
+&nbsp;
+The basic principles of tea preparation art rest upon what Master Feng of the Crimson Teapot School termed the "Threefold Path of Leaf Wisdom"**: proper selection of tea leaves (which must be harvested during the appropriate lunar phase by individuals who have maintained ritual silence for no less than forty-eight hours††), precise temperature control (measured not with thermometers, which are considered vulgar, but through subtle observation of steam patterns and what experienced practitioners describe as "listening to the water's song"‡‡), and the critical understanding that the teapot itself is not merely a vessel but an active participant in the alchemical transformation***. Modern practitioners often overlook this last principle, leading to what the Sublime Ministry of Infused Wisdom categorizes as "inert pot syndrome"—a condition affecting an estimated 78.3% of commercially available teapots, which have been so traumatized by improper use that they have retreated into a state of ceramic dissociation††† and refuse to properly catalyze the transformation of tannins into enlightenment‡‡‡.
+&nbsp;
+Practical application requires mastery of the Seven Sacred Gestures of Pouring****, each of which must be executed with a precision that would make a neurosurgeon weep with inadequacy†††† and a grace that causes nearby flowers to bloom out of sheer aesthetic appreciation‡‡‡‡. The first gesture, known as "Awakening the Dragon's Breath," involves heating the water to exactly 176.4 degrees Fahrenheit*****, a temperature the ancients determined through a process that modern scholars call "educated guessing with extreme confidence" and which contemporary physics suggests should not produce the quantum effects that practitioners routinely observe******. The second through sixth gestures involve the ritualized warming of implements, the invocation of the tea spirit††††††, and the precise measurement of leaf-to-water ratios using units that the International Bureau of Weights and Measures has repeatedly requested be converted to something they can actually understand‡‡‡‡‡‡.
+&nbsp;
+Safety considerations cannot be overstated, particularly given the catastrophic failures documented in the Annals of the Scorched Palate Society*******, which chronicles incidents ranging from simple temporal displacement******* to the more serious case of Adept Lin, whose improper preparation of Dragon Well tea in 1743 resulted in the temporary manifestation of an actual dragon†††††††, which took considerable umbrage at being associated with what it described as "this weak, grass-flavored dishwater" and proceeded to lecture the assembled monks for three days on the proper respect due to draconic nomenclature‡‡‡‡‡‡‡. Modern practitioners are advised to maintain proper grounding both spiritually and electrically********, to never attempt to rush the steeping process through temporal manipulation*********, and to remember that while the ancients spoke of tea preparation as "capturing the soul of the mountain in a cup," they were being metaphorical—a distinction lost on the notorious Alchemist Wei, whose overly literal interpretation resulted in several mountains filing restraining orders**********.
+&nbsp;
+The historical development of tea preparation art traces back to the mythical Tea Masters of the First Dawn***********, who according to legend learned their craft from the Moon herself during a period when celestial bodies were more willing to engage in knowledge transfer with mortals***********. Archaeological evidence suggests that early practitioners used methods that would horrify contemporary scholars******, including the infamous "boiling leaves into submission" technique that dominated the Second Dynasty until the Great Awakening†††††††††, when Master Chao demonstrated that gentle persuasion yielded superior results and fewer instances of the tea leaves mounting organized resistance‡‡‡‡‡‡‡‡. Modern understanding incorporates quantum mechanics*******, chaos theory*********, and what Professor Elminster of the Arcane Beverage Institute calls "really hoping you got it right"**********, resulting in preparation methods that are simultaneously more refined and more confusing than anything the ancients could have imagined††††††††††.
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*The distinction is critical. Herbal beverage infusion is to tea preparation art what stick figures are to the Sistine Chapel, or what humming is to opera. The Guild of Tea Masters has published a 47-volume treatise on this distinction, though volumes 23-31 consist entirely of disparaging remarks about chamomile enthusiasts.
+&nbsp;
+†A term that roughly translates to "waiting with the intensity of a coiled spring while appearing to be doing absolutely nothing," which is coincidentally also the primary skill required for successful parenting and competitive fishing.
+&nbsp;
+‡The complaint was written in steam patterns and dissipated before it could be formally processed, but witnesses report it was "surprisingly articulate" and "made several valid points about exploitation in the beverage industry."
+&nbsp;
+**Not to be confused with the "Fourfold Path," which is a completely different school of thought and whose adherents have been feuding with the Threefold Path practitioners since the Schism of 1832, when they couldn't agree whether water temperature or brewing vessel should be considered the fourth fundamental principle. Three people were glared at very intensely.
+&nbsp;
+††This is why tea harvesting is an excellent career for people who don't enjoy small talk. The retention rate among extroverts is approximately 0.003%, most of whom leave after realizing that "ritual silence" does not mean "silent except for me."
+&nbsp;
+‡‡This is not, as commonly believed, a metaphor. Water at different temperatures produces different harmonics when moved, and experienced practitioners can distinguish between 175°F and 176°F water by the pitch of the bubbles. The Guild of Tea Masters offers a certification program, though the dropout rate is a staggering 94.7%, primarily among individuals who can't stop hearing the water's incessant complaints about being heated.
+&nbsp;
+***The Sentient Vessel Theory, first proposed by Hermit Wang in 1654, suggests that teapots develop a form of consciousness after approximately 10,000 uses, though this consciousness primarily manifests as what researchers describe as "strong opinions about proper care" and "passive-aggressive dripping."
+&nbsp;
+†††A condition first documented by Dr. Thaddeus Teabody of the Institute for Ceramic Psychology, who spent fifteen years conducting interviews with traumatized teapots before realizing that the responses he was receiving were actually his own thoughts echoing back at him. His research was nonetheless published and won several awards from colleagues who either didn't notice or were too polite to mention the methodological concerns.
+&nbsp;
+‡‡‡The transformation of tannins into enlightenment is less mystical than it sounds. Tannins are merely transformed into a state of "enhanced tannin-ness," while enlightenment is what happens to the drinker when they finally stop worrying about whether they're preparing the tea correctly and just enjoy the damn beverage. This process typically takes between twenty and thirty years.
+&nbsp;
+****The Eighth Sacred Gesture was discontinued after the Incident of 1891, about which the Guild maintains a policy of strategic ambiguity. Surviving records mention only "excessive enthusiasm," "unintended levitation," and "the subsequent awkwardness with the neighbors."
+&nbsp;
+††††A study conducted by the Comparative Precision Institute found that tea masters could maintain steady hands while pouring at levels that exceeded surgical standards by approximately 340%. When asked how this was possible, Master Chen replied, "We care more about the tea," which the Institute found both satisfying and vaguely insulting.
+&nbsp;
+‡‡‡‡According to witnesses, the flowers in question were plastic, which raised several questions about the nature of aesthetic appreciation that philosophers are still debating. The flowers themselves have declined to comment, being plastic and thus even less communicative than their organic counterparts.
+&nbsp;
+*****The specificity of this temperature is somewhat arbitrary, having been determined by Master Feng during a fevered vision in which the number 176.4 appeared written in fire across the sky. Modern scholars suggest he may have simply been reading a partially`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding tea preparation art in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COFFEE_ROASTING_BREWING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'coffee_roasting_brewing',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Coffee Roasting Brewing',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['tea_preparation_art'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_coffee_roasting_brewing' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Coffee Roasting Brewing: An Alchemical Treatise on the Transformation of the Sacred Bean</span>
+&nbsp;
+The transformation of the coffee bean from its raw, green state into the dark elixir known to modern practitioners represents one of alchemy's most perfect expressions of controlled pyrolysis and aqueous extraction*. Unlike the more forgiving arts of tea preparation†, coffee roasting demands absolute precision in temperature, timing, and atmospheric conditions, with margins of error measured in seconds rather than minutes. The alchemist must guide the bean through a series of irreversible transformations—the first crack at approximately 196°C, the development period where Maillard reactions create over 800 distinct aromatic compounds**, and finally, for those who dare, the second crack at 224°C where the boundary between "full city roast" and "charcoal suitable for sketching" becomes philosophically interesting***. Historical records indicate that 67.3% of novice roasters produce what the Venetian Coffee Commission of 1687 technically classified as "combustible waste product suitable only for threatening one's enemies"††.
+&nbsp;
+The brewing phase introduces additional complexity, as the roasted bean must be ground to specifications that would make a master jeweler weep†††, then subjected to water at temperatures that exist in a narrow band between "tepid disappointment" and "bitter recrimination"‡. The Guild of Coffee Alchemists maintains that proper extraction requires water between 90.5°C and 96°C, contact time varying from 25 seconds (espresso) to 4 minutes (French press), with deviation of more than 3.7 seconds in either direction resulting in what they term "an affront to the bean's sacrifice"‡‡. This precision explains why the ancient coffee monks of Yemen developed seventeen distinct words for "almost right but not quite"‡‡‡, and why the failed coffee alchemist Bartholomew Bitter-Cup spent his final years insisting that all coffee tasted "of regret and lost opportunities"§.
+&nbsp;
+Modern practitioners must navigate the treacherous waters between under-extraction (sour, thin, accusatory) and over-extraction (bitter, hollow, reminiscent of philosophical despair)§§. The proper ratio of coffee to water remains a subject of heated debate, with the International Coffee Council§§§ recommending 1:16 for filter coffee, while the Viennese Coffee Cabal insists on 1:15, and the Melbourne Underground Coffee Resistance claims anything above 1:14 is "coward's water"*. Contemporary research by Professor Helena Grounds-Walker** at the University of Caffeinated Arts suggests that 89.2% of home coffee failures result from using water that has either "forgotten how to be hot" or has been "boiled into submission and resentment"††.
+&nbsp;
+Safety considerations cannot be overstated, particularly given the infamous Cincinnati Incident of 1842***, where amateur alchemist Theodore Roast-Smith III attempted to accelerate the roasting process using what he called "enthusiastic heat" (approximately 400°C), resulting in a fireball visible from three counties and a lifetime ban from all establishments serving hot beverages†††. The Guild now mandates that all roasting must be performed in well-ventilated areas‡, as the smoke produced during roasting contains compounds that have been known to trigger prophetic visions‡‡, usually of a future where one's kitchen requires repainting‡‡‡. Similarly, the grinding phase presents hazards both physical (blade grinders have been described as "small tornadoes of regret"§) and metaphysical (burr grinders operate on principles that some scholars argue violate the Third Law of Thermodynamic Patience§§).
+&nbsp;
+The philosophical implications of coffee alchemy extend beyond mere technique into the realm of temporal manipulation§§§, as evidenced by the well-documented phenomenon wherein coffee preparation appears to operate outside normal spacetime****. Practitioners report that the time between deciding to make coffee and the first sip exists in a quantum state, simultaneously lasting three minutes and forty-seven years††††. This has led some scholars to propose that coffee preparation constitutes a form of practical magic‡‡‡‡, a theory supported by the observation that properly prepared coffee can transform a morning person into a functional human being§§§§, and improperly prepared coffee can cause previously rational individuals to consider violence*****.
+&nbsp;
+---
+&nbsp;
+### FOOTNOTES
+&nbsp;
+\* The word "elixir" here is used in its technical alchemical sense, meaning "liquid that transforms consciousness," not in the colloquial sense of "that brown stuff that makes mornings survivable." The distinction is important to approximately four people.
+&nbsp;
+† See the prerequisite text "The Art of Tea Preparation," a gentle introduction that lulls students into false confidence before coffee destroys their spirit. The mortality rate is significantly lower with tea, though the disappointment rate is roughly equivalent.
+&nbsp;
+** This number increases to approximately 1,200 compounds if the roaster becomes distracted and allows the beans to enter what the ancient texts call "the realm of inadvertent carbonization." These additional compounds include "essence of regret," "bouquet of poor decision-making," and "notes of 'why did I think I could do this.'"
+&nbsp;
+*** Practitioners who routinely roast past second crack are regarded with the same mixture of respect and concern typically reserved for those who juggle venomous snakes or attempt to reason with administrators.
+&nbsp;
+†† The Commission, established after the Great Venetian Coffee Riot of 1685, was tasked with establishing quality standards for coffee after a particularly poor batch caused three separate duels and one incident of spontaneous poetry. Their 847-page report included the memorable phrase "life is too short for bad coffee, but bad coffee makes life feel much, much longer."
+&nbsp;
+††† The optimal grind size varies from "fine as powdered philosophy" (Turkish coffee) to "coarse as existential doubt" (cold brew). The standard reference is the Kreuzhammer Scale of Particle Diminishment, which uses seventeen gradations and requires a master's degree in comparative grain studies to interpret correctly†.
+&nbsp;
+† A degree offered only at the University of Prague's School of Applied Coffee Sciences, which accepts seven students per century‡.
+&nbsp;
+‡ The most recent graduate, in 1993, immediately retired to a monastery where she now contemplates the infinite variations of grind size in blessed silence.
+&nbsp;
+‡ A range so precise that the ancient coffee masters of Mocha developed a form of meditation specifically designed to sense water temperature through the vibrations in the air. Modern practitioners just use thermometers, which the Mocha masters would have considered "cheating" but also "sensible."
+&nbsp;
+‡‡ The Guild takes its coffee very seriously. Their oath of office includes the phrase "I shall not suffer bitter coffee to exist while breath remains in my body," which has led to several unfortunate incidents requiring legal intervention.
+&nbsp;
+‡‡‡ The seventeen words are: safha, safha-ma, safha-ka, ma-safha, ka-safha, safha-ma-ka, almost-safha, possibly-safha, theoretically-safha, regrettably-not-safha, tragically-not-safha, optimistically-not-safha, philosophically-not-safha, technically-not-safha, legally-not-safha, spiritually-not-safha, and "Jim's-attempt" (which requires no translation).
+&nbsp;
+§ Bitter-Cup's treatise "On the Fundamental Impossibility of Satisfaction Through Bean-Based Beverages" (1734) remains unpublished, primarily because the manuscript was coffee-stained beyond legibility. Scholars debate whether this was accident or a final, bitter artistic statement.
+&nbsp;
+§§ These three states represent the Coffee Trinity of Disappointment. There is a fourth state, "perfect," but it exists only in theory and possibly in a small café in Copenhagen that no one can quite remember how to find§.
+&nbsp;
+§ The café, known only as "That Place Where the Coffee Was Right," appears in approximately 40,000 traveler testimonies but at no consistent geographical location. Leading theories suggest it either moves, exists slightly out of phase with normal reality, or is a shared hallucination among the coffee-deprived.
+&nbsp;
+§§§ Not to be confused with the International Coffee Council of Vienna, the Vienna International Coffee Council, or the Council of International Coffee (Vienna Chapter). The three organizations have been in a state of cold war since the Disagreement of 1957§§, which centered on whether foam should be "approximately 1.5cm" or "roughly 1.5cm."
+&nbsp;
+§§ The Disagreement led to seventeen years of rival conferences, three lawsuits, and the development of entirely separate measurement standards that differ by 0.03mm but are defended with religious fervor.
+&nbsp;
+* The Melbourne Underground Coffee Resistance is not actually underground, nor particularly resistant to anything except coffee they deem "insufficiently robust." They occupy a warehouse in South Melbourne an`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding coffee roasting brewing in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  ALCOHOL_PURIFICATION,</span>
+<span class="cstat-no" title="statement not covered" >  SPIRIT_AGING_BARRELS,</span>
+<span class="cstat-no" title="statement not covered" >  HERBAL_BEVERAGE_INFUSION,</span>
+<span class="cstat-no" title="statement not covered" >  TEA_PREPARATION_ART,</span>
+<span class="cstat-no" title="statement not covered" >  COFFEE_ROASTING_BREWING</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

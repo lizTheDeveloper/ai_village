@@ -93,22 +93,25 @@ export class Renderer {
   private _visibleEntities: Entity[] = [];
   private _agentPositions: Array<{ x: number; y: number }> = [];
   private _sortedEntities: Entity[] = [];
+  // Position cache for sorting - avoids repeated component lookups during sort comparator
+  // Format: [entity_index, y, z, entity_index, y, z, ...] - parallel with _sortedEntities
+  private _sortPositionCache: Float32Array = new Float32Array(1024 * 3);
 
   // Query result caching to avoid expensive ECS queries every frame
   // Buildings rarely change, so cache for 60 frames (~3 seconds at 20 TPS)
-  private _cachedBuildingEntities: Entity[] = [];
+  private _cachedBuildingEntities: ReadonlyArray<Entity> = [];
   private _buildingCacheLastRefresh = 0;
   private readonly BUILDING_CACHE_REFRESH_INTERVAL = 60;
 
   // Renderable entities change moderately (new plants, resources harvested)
   // Cache for 20 frames (~1 second at 20 TPS)
-  private _cachedRenderableEntities: Entity[] = [];
+  private _cachedRenderableEntities: ReadonlyArray<Entity> = [];
   private _renderableCacheLastRefresh = 0;
   private readonly RENDERABLE_CACHE_REFRESH_INTERVAL = 20;
 
   // Agent entities change frequently (agents spawned/killed)
   // Cache for 10 frames (~0.5 seconds at 20 TPS)
-  private _cachedAgentEntities: Entity[] = [];
+  private _cachedAgentEntities: ReadonlyArray<Entity> = [];
   private _agentCacheLastRefresh = 0;
   private readonly AGENT_CACHE_REFRESH_INTERVAL = 10;
 
@@ -565,27 +568,50 @@ export class Renderer {
     } else {
       // Top-down mode: sort by Y (lower Y = further from camera = render first)
       // Then by Z (lower Z = underground = render first)
-      // Copy to _sortedEntities for sorting (don't modify _visibleEntities)
-      this._sortedEntities.length = 0;
-      for (const entity of entities) {
-        this._sortedEntities.push(entity);
-      }
-      entities = this._sortedEntities;
+      // PERF: Use index-based sort with cached positions to avoid
+      // repeated component lookups in the sort comparator
+      const entitiesArray = entities as Entity[];
+      const count = entitiesArray.length;
 
-      // Sort in-place (no spread allocation!)
-      entities.sort((a, b) => {
-        const posA = a.components.get('position') as PositionComponent | undefined;
-        const posB = b.components.get('position') as PositionComponent | undefined;
-        if (!posA || !posB) return 0;
+      // Ensure position cache is large enough (stores y, z per entity)
+      const neededSize = count * 2;
+      if (this._sortPositionCache.length < neededSize) {
+        this._sortPositionCache = new Float32Array(Math.max(neededSize * 2, 2048));
+      }
+
+      // Cache positions once (O(n) component lookups instead of O(n log n))
+      const posCache = this._sortPositionCache;
+      for (let i = 0; i < count; i++) {
+        const pos = entitiesArray[i].components.get('position') as PositionComponent | undefined;
+        const idx = i * 2;
+        posCache[idx] = pos?.y ?? 0;
+        posCache[idx + 1] = pos?.z ?? 0;
+      }
+
+      // Copy to sorted array
+      this._sortedEntities.length = 0;
+      for (let i = 0; i < count; i++) {
+        this._sortedEntities.push(entitiesArray[i]);
+      }
+
+      // Sort using WeakMap for O(1) index lookup
+      const entityToIndex = new Map<Entity, number>();
+      for (let i = 0; i < count; i++) {
+        entityToIndex.set(entitiesArray[i], i);
+      }
+
+      this._sortedEntities.sort((a, b) => {
+        const idxA = entityToIndex.get(a)! * 2;
+        const idxB = entityToIndex.get(b)! * 2;
 
         // Primary sort by Y (lower Y renders first - back to front)
-        if (posA.y !== posB.y) {
-          return posA.y - posB.y;
-        }
+        const yDiff = posCache[idxA] - posCache[idxB];
+        if (yDiff !== 0) return yDiff;
 
         // Secondary sort by Z
-        return posA.z - posB.z;
+        return posCache[idxA + 1] - posCache[idxB + 1];
       });
+      entities = this._sortedEntities;
     }
 
     for (const entity of entities) {

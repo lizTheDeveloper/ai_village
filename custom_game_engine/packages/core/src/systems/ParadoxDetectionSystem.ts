@@ -209,7 +209,7 @@ export class ParadoxDetectionSystem extends BaseSystem {
         const victim = ctx.world.getEntity(death.victimId);
         const agentComp = victim?.getComponent(CT.Agent);
         const victimName = (agentComp && typeof agentComp === 'object' && 'name' in agentComp)
-          ? (agentComp as unknown as { name?: string }).name || 'Unknown'
+          ? agentComp.name || 'Unknown'
           : 'Unknown';
 
         const paradox: DetectedParadox = {

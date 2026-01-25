@@ -54,9 +54,9 @@ export class CraftBehavior extends BaseBehavior {
   readonly name = 'craft' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
+    const inventory = entity.getComponent(ComponentType.Inventory);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -120,7 +120,7 @@ export class CraftBehavior extends BaseBehavior {
       return;
     }
 
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const position = entity.getComponent(ComponentType.Position)!;
 
     // Find nearby crafting station of the required type
     const station = this.findNearestStation(world, position, recipe.stationRequired);
@@ -261,8 +261,8 @@ export class CraftBehavior extends BaseBehavior {
 
     for (const building of buildings) {
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+      const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
       if (!buildingComp || !buildingPos) continue;
 
@@ -305,7 +305,7 @@ export class CraftBehavior extends BaseBehavior {
     recipe: Recipe,
     quantity: number
   ): BehaviorResult {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const agent = entity.getComponent(ComponentType.Agent);
     if (!agent) {
       return { complete: true, reason: 'Missing agent component' };
     }

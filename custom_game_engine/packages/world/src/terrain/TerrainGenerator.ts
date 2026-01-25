@@ -521,15 +521,15 @@ export class TerrainGenerator {
               if (treeType < 0.6) {
                 // 60% oak trees (6-15 voxels)
                 const treeHeight = 6 + Math.floor(Math.random() * 10);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
               } else if (treeType < 0.9) {
                 // 30% pine trees (8-18 voxels)
                 const treeHeight = 8 + Math.floor(Math.random() * 11);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
               } else {
-                // 10% generic trees (4-12 voxels)
+                // 10% willow trees near water (4-12 voxels)
                 const treeHeight = 4 + Math.floor(Math.random() * 9);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
               }
             }
             // Understory plants
@@ -550,7 +550,7 @@ export class TerrainGenerator {
             }
             // Rocks in dense forest - scattered boulders - 8% chance
             if (Math.random() < 0.08) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'limestone');
             }
             // Berry bushes - 12% chance in dense forest
             if (Math.random() < 0.12) {
@@ -565,15 +565,15 @@ export class TerrainGenerator {
               if (treeType < 0.4) {
                 // 40% oak trees
                 const treeHeight = 6 + Math.floor(Math.random() * 10);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
               } else if (treeType < 0.8) {
                 // 40% pine trees
                 const treeHeight = 8 + Math.floor(Math.random() * 11);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
               } else {
                 // 20% generic trees
                 const treeHeight = 4 + Math.floor(Math.random() * 9);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
               }
             }
             // Understory - 30% mushrooms, 30% ferns, 40% moss
@@ -586,7 +586,7 @@ export class TerrainGenerator {
             }
             // Rocks in young forest - 10% chance
             if (Math.random() < 0.10) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'limestone');
             }
             // Berry bushes - 15% chance
             if (Math.random() < 0.15) {
@@ -601,15 +601,15 @@ export class TerrainGenerator {
               if (treeType < 0.3) {
                 // 30% oak trees
                 const treeHeight = 6 + Math.floor(Math.random() * 10);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
               } else if (treeType < 0.6) {
                 // 30% pine trees
                 const treeHeight = 8 + Math.floor(Math.random() * 11);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
               } else {
                 // 40% generic trees
                 const treeHeight = 4 + Math.floor(Math.random() * 9);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
               }
             }
             // Understory - 20% mushrooms, 20% ferns, 30% moss
@@ -619,7 +619,7 @@ export class TerrainGenerator {
             }
             // Rocks in open woodland - more exposed - 15% chance
             if (Math.random() < 0.15) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'limestone');
             }
             // Berry bushes - 18% chance
             if (Math.random() < 0.18) {
@@ -642,7 +642,7 @@ export class TerrainGenerator {
             }
             // Rocks in clearings - exposed boulders - 20% chance
             if (Math.random() < 0.20) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'limestone');
             }
             // Wild garlic, herbs - 25% chance
             if (Math.random() < 0.25) {
@@ -654,7 +654,7 @@ export class TerrainGenerator {
             // Trees - 15-20% chance (increased for variety)
             if (Math.random() > 0.82) {
               const treeHeight = 4 + Math.floor(Math.random() * 9);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
             }
           }
         }
@@ -701,7 +701,7 @@ export class TerrainGenerator {
             }
             // Rocks - higher density (10-15%)
             if (placementValue < -0.2 && Math.random() < 0.12) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'limestone');
             }
           }
           // Meadow patches (flower-rich)
@@ -748,7 +748,7 @@ export class TerrainGenerator {
             // Scattered trees - 5% chance
             if (placementValue > 0.3 && Math.random() < 0.05) {
               const treeHeight = Math.floor(Math.random() * 3);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
             }
           }
         }
@@ -762,7 +762,7 @@ export class TerrainGenerator {
           if (placementValue > 0.1 && Math.random() < woodlandDensity) {
             // Medium trees (1-3 tiles)
             const treeHeight = 1 + Math.floor(Math.random() * 3);
-            createTree(world, worldX, worldY, treeHeight);
+            createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
           }
 
           // Leaf piles: 15% chance
@@ -781,7 +781,7 @@ export class TerrainGenerator {
           // Wetland: 20-30% tree density, short trees
           if (placementValue > 0.3 && Math.random() < 0.25) {
             const treeHeight = Math.floor(Math.random() * 3); // 0-2 tiles
-            createTree(world, worldX, worldY, treeHeight);
+            createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
           }
 
           // High vegetation density (marsh plants, reeds, etc.)
@@ -795,7 +795,7 @@ export class TerrainGenerator {
           // Savanna: 10-15% tree density, widely spaced trees
           if (placementValue > 0.5 && Math.random() < 0.12) {
             const treeHeight = 1 + Math.floor(Math.random() * 3);
-            createTree(world, worldX, worldY, treeHeight);
+            createTree(world, worldX, worldY, treeHeight, { speciesId: 'oak-tree' });
           }
 
           // Grass and hardy plants: 35% chance
@@ -814,7 +814,7 @@ export class TerrainGenerator {
 
           // Rocks: 15-20% density
           if (placementValue < 0.0 && Math.random() < 0.18) {
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'sandstone');
           }
         }
 
@@ -843,12 +843,12 @@ export class TerrainGenerator {
 
           // Rocks on exposed bedrock - 40% chance
           if (isExposedBedrock && Math.random() < 0.40) {
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'basalt');
           }
 
           // Scattered rocks on permafrost - 8% chance
           if (permafrostNoise > 0.3 && Math.random() < 0.08) {
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'basalt');
           }
 
           // Sparse tundra vegetation (lichen, moss, hardy shrubs) - 15% chance
@@ -859,7 +859,7 @@ export class TerrainGenerator {
           // Very rare stunted trees in sheltered areas - 2% chance
           if (tile.moisture > 50 && placementValue > 0.4 && Math.random() < 0.02) {
             const treeHeight = Math.floor(Math.random() * 2); // Very short trees (0-1)
-            createTree(world, worldX, worldY, treeHeight);
+            createTree(world, worldX, worldY, treeHeight, { speciesId: 'wind_pine' });
           }
         }
 
@@ -896,15 +896,15 @@ export class TerrainGenerator {
               if (treeType < 0.6) {
                 // 60% spruce (6-14 voxels)
                 const treeHeight = 6 + Math.floor(Math.random() * 9);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
               } else if (treeType < 0.9) {
                 // 30% pine (5-12 voxels)
                 const treeHeight = 5 + Math.floor(Math.random() * 8);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
               } else {
                 // 10% birch (4-10 voxels)
                 const treeHeight = 4 + Math.floor(Math.random() * 7);
-                createTree(world, worldX, worldY, treeHeight);
+                createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
               }
             }
             // Understory plants - 25% chance
@@ -924,7 +924,7 @@ export class TerrainGenerator {
             // Stunted trees - 15% chance
             if (Math.random() < 0.15) {
               const treeHeight = 2 + Math.floor(Math.random() * 4);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
             }
             // Sphagnum moss and sedges - 50% chance
             if (Math.random() < 0.50) {
@@ -938,7 +938,7 @@ export class TerrainGenerator {
             // Rocky outcrops - exposed granite
             // Rocks - 35% chance
             if (Math.random() < 0.35) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'granite');
             }
             // Hardy plants in rock crevices - 10% chance
             if (Math.random() < 0.10) {
@@ -949,7 +949,7 @@ export class TerrainGenerator {
             // Scattered conifers - 30% chance
             if (Math.random() < 0.30) {
               const treeHeight = 4 + Math.floor(Math.random() * 6);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'pine-tree' });
             }
             // Ground cover - 40% chance
             if (Math.random() < 0.40) {
@@ -1000,7 +1000,7 @@ export class TerrainGenerator {
             // Young trees competing for light - 40% chance
             if (Math.random() < 0.40) {
               const treeHeight = 2 + Math.floor(Math.random() * 4);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
             // Fruit trees in gaps - 25% chance
             if (Math.random() < 0.25) {
@@ -1011,7 +1011,7 @@ export class TerrainGenerator {
             // Mangrove/swamp trees - 50% chance
             if (Math.random() < 0.50) {
               const treeHeight = 3 + Math.floor(Math.random() * 5);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
             // Aquatic plants - 60% chance
             if (Math.random() < 0.60) {
@@ -1022,7 +1022,7 @@ export class TerrainGenerator {
             // Giant trees - 60% chance
             if (Math.random() < 0.60) {
               const treeHeight = 10 + Math.floor(Math.random() * 10);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
             // Dense undergrowth - 55% chance
             if (Math.random() < 0.55) {
@@ -1033,12 +1033,12 @@ export class TerrainGenerator {
             // Emergent layer trees (very tall) - 15% chance
             if (placementValue > 0.4 && Math.random() < 0.15) {
               const treeHeight = 12 + Math.floor(Math.random() * 8);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
             // Canopy layer trees - 70% chance
             else if (Math.random() < 0.70) {
               const treeHeight = 8 + Math.floor(Math.random() * 6);
-              createTree(world, worldX, worldY, treeHeight);
+              createTree(world, worldX, worldY, treeHeight, { speciesId: 'willow' });
             }
             // Dense understory - 80% chance
             if (Math.random() < 0.80) {
@@ -1054,7 +1054,7 @@ export class TerrainGenerator {
             }
             // Rocks are rare in dense jungle - 3% chance
             if (placementValue < -0.4 && Math.random() < 0.03) {
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'shale');
             }
           }
         }
@@ -1064,13 +1064,13 @@ export class TerrainGenerator {
           // Foothills: 5-15% tree density at high moisture
           if (tile.moisture > 50 && placementValue > 0.4 && Math.random() < 0.10) {
             const treeHeight = 1 + Math.floor(Math.random() * 2); // Short alpine trees
-            createTree(world, worldX, worldY, treeHeight);
+            createTree(world, worldX, worldY, treeHeight, { speciesId: 'wind_pine' });
           }
 
           // Rocks: 20-40% density based on elevation (using placementValue as proxy)
           const rockDensity = 0.20 + Math.max(0, Math.min(0.20, placementValue * 0.30));
           if (Math.random() < rockDensity) {
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'granite');
           }
         }
 
@@ -1078,7 +1078,7 @@ export class TerrainGenerator {
         if (tile.terrain === 'stone' && placementValue < -0.2) {
           if (Math.random() > 0.5) {
             // 50% chance (increased from 20% for better resource availability)
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'granite');
           }
         }
 
@@ -1096,7 +1096,7 @@ export class TerrainGenerator {
         if (tile.terrain === 'sand' && placementValue < 0) {
           if (Math.random() > 0.9) {
             // 10% chance for rocks on beaches
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'sandstone');
           }
         }
 
@@ -1159,49 +1159,49 @@ export class TerrainGenerator {
           if (isMesaEdge) {
             if (Math.random() > 0.15) {
               // 85% chance - forms continuous rock walls on mesa cliffs
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
           // 1a. Rock spires/hoodoos on mesa tops (isolated erosion remnants)
           else if (isMesaRegion && !isMesaEdge && placementValue > 0.4) {
             if (Math.random() > 0.90) {
               // 10% chance - tall rock spires rising from mesa surface
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
           // 2. Canyon walls - stratified rock layers
           else if (isCanyonWall) {
             if (Math.random() > 0.20) {
               // 80% chance - visible canyon walls
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
           // 3. Arroyo banks - erosion debris
           else if (isArroyoBank) {
             if (Math.random() > 0.35) {
               // 65% chance - rocks exposed by water erosion
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
           // 4. Canyon/arroyo floors - scattered boulders
           else if ((isCanyon || isArroyo) && placementValue < -0.1) {
             if (Math.random() > 0.70) {
               // 30% chance - fallen rocks and debris
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
           // 5. Rocky desert outcroppings (not dunes)
           else if (!isDuneField && placementValue < -0.25) {
             if (Math.random() > 0.25) {
               // 75% chance in outcrop zones - hoodoos and rock formations
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
           // 6. Dune fields - very rare rocks (mostly sandy)
           else if (isDuneField && placementValue < -0.5) {
             if (Math.random() > 0.92) {
               // 8% chance - occasional exposed bedrock in dunes
-              createRock(world, worldX, worldY);
+              createRock(world, worldX, worldY, 'sandstone');
             }
           }
         }
@@ -1213,7 +1213,7 @@ export class TerrainGenerator {
         if (distFromOriginSquared < maxSpawnDistSquared && tile.terrain === 'grass') {
           if (Math.random() > 0.95) {
             // 5% chance for rocks on grass near spawn
-            createRock(world, worldX, worldY);
+            createRock(world, worldX, worldY, 'limestone');
           }
         }
 

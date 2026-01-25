@@ -1,0 +1,1153 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/fire-magic-combustion-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> fire-magic-combustion-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/92</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/92</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const EXPLOSIVE_FIRE_MAGIC: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'explosive_fire_magic',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Contained Fury: Creating Explosive Fire Effects',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['fire_magic_advanced'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['combustion_magic', 'fire_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { fire_magic: 20, arcane: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { fire_magic: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'fireball' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Contained Fury: Creating Explosive Fire Effects</span>
+&nbsp;
+The fundamental principle underlying explosive fire magic differs considerably from traditional combustion* in one critical aspect: the rate of expansion. While ordinary fire spreads at what might be termed a "leisurely" pace†, explosive effects require the magical practitioner to compress phenomenal quantities of thermal energy into an impossibly small containment field, then release it all at once‡. The resulting rapid expansion—estimated at 42.7 times the speed of ordinary flame propagation**—creates what the Department of Magical Ordinance classifies as a "Level 3 Uncontrolled Exothermic Event," though most practitioners simply call it "the big boom."††
+&nbsp;
+Shaping the blast radius represents perhaps the most mathematically complex aspect of explosive fire magic, requiring the caster to maintain precise geometric boundaries even while holding back forces equivalent to 847 pounds of pure fury***. The Spherical Containment Model, first proposed by Magister Cornelius Flamewhistle†††, suggests that the ideal explosive radius follows an inverse square law relative to the containment pressure‡, though this elegant theory rather famously failed to account for the Incident at St. Cerebellum's Academy in 1823‡‡. Modern practitioners typically aim for what the Guild of Responsible Pyromancers calls the "minimum safe catastrophe radius"—defined as any distance at which the caster's eyebrows might theoretically survive‡‡‡.
+&nbsp;
+Premature detonation remains the leading cause of what insurance documents delicately term "unexpected facial reconfiguration"§. The phenomenon occurs when the containment field—already straining under pressures that would make a steam boiler weep with inadequacy§§—develops even microscopic fractures in its magical structure. Statistical analysis by the Bureau of Arcane Accidents reveals that 73.2% of premature detonations happen within the first 1.4 seconds of compression§§§, usually accompanied by the characteristic sound that witnesses describe as "FWOOMPH" followed immediately by "OH NO" and then extended ringing†. The ancient grimoire known as the Codex Inflammatio warns against "haste in the gathering of furious flame," though this advice is frequently discovered too late††, typically during the reading of the will.
+&nbsp;
+The critical importance of aim and distance cannot be overstated‡‡‡‡, particularly given that explosive fire magic follows what might be called "the regrettable ballistics of enthusiasm." Unlike carefully directed flame spells, compressed fire possesses momentum, trajectory, and—according to some natural philosophers—a sense of ironic timing§§§§. The Guild recommends maintaining a minimum casting distance of fifteen feet from any target, twenty feet from anything valuable, and thirty-five feet from the Archdean's office†††††, though these guidelines assume a competence level rarely achieved outside of graduate studies. As the memorial plaque in the Courtyard of Eternal Vigilance reminds us: "Distance is not merely prudent—it is the difference between 'spectacular' and 'spectacularly unfortunate.'"‡‡‡‡‡
+&nbsp;
+---
+&nbsp;
+*And therein lies approximately 76% of the problem. The remaining 24% is divided between "overconfidence" (13%), "inadequate fireproofing of robes" (8%), and "showing off in front of someone you fancy" (3%). The final 0.001% is reserved for what the Department calls "acts of gods who really should have known better."
+&nbsp;
+†In some cases, fire spreads at what researchers have technically classified as "an absolute saunter." The Eternal Flame of Contemplation in the Temple of Deliberate Warmth has been spreading across the same log for seventeen years. Monks take bets on which end will finish first.
+&nbsp;
+‡The verb "release" here does considerable euphemistic heavy lifting. "Catastrophically fail to contain" is more accurate but apparently "harms recruitment figures."
+&nbsp;
+**This figure comes from Dr. Wilhelmina Scorchmark's seminal paper "Comparative Velocities of Regret," published three days before her famous last words: "I probably should have done this outside."
+&nbsp;
+††Also known as "the sound that precedes the paperwork." The Department of Magical Ordinance processes an average of 847 Level 3 Event reports annually†, each requiring no fewer than seventeen forms in triplicate††.
+&nbsp;
+†Most of these incidents occur during the academic month of Priduary, when graduate students attempt to prove they've learned something‡. The university fire brigade keeps a special calendar.
+&nbsp;
+‡Evidence suggests they have not.
+&nbsp;
+††The "small boom" being considerably more dangerous, as it typically occurs much closer to one's face.
+&nbsp;
+***Fury, in this context, is a standard unit of magical measurement equivalent to the amount of destructive potential contained in a single outburst by a moderately annoyed dragon. The Guild of Metrologomancers has been trying to establish a more precise definition since 1654, but the dragons remain uncooperative§.
+&nbsp;
+§They find the whole thing hilarious.
+&nbsp;
+†††Flamewhistle, whose contributions to pyromancy cannot be understated, performed most of his calculations from the safety of a specially constructed tower seventeen miles from the nearest combustible material. His doctoral thesis was delivered via a series of carefully coordinated signal mirrors‡‡.
+&nbsp;
+‡‡The mirrors themselves occasionally caught fire, which Flamewhistle insisted "proved his point about energy density."
+&nbsp;
+‡At this juncture, it seems appropriate to note that inverse square laws only work when the universe is paying attention. During the Incident, the universe was apparently looking the other way§§.
+&nbsp;
+§§Contemporary accounts describe the blast as "spherical in the way that a very surprised sphere might be spherical if it had suddenly been told alarming news about its shape."
+&nbsp;
+‡‡‡The Incident involved a demonstration of "perfectly controlled explosive magic" that went, in the words of the subsequent inquiry, "aggressively imperfectly." Seventeen students lost their eyebrows†††. Three lost their eyebrows and acquired new, unexpected eyebrows in locations that eyebrows should not naturally occur†††. The professor lost considerably more‡‡, including his tenure.
+&nbsp;
+†††The university's Eyebrow Regrowth Fund, established immediately afterward, continues to operate to this day with an endowment of 50,000 crowns.
+&nbsp;
+‡‡The less said about Professor Flamewhistle's nephew, the better. The beard did eventually grow back, albeit in a peculiar spiral pattern that made him quite popular at parties.
+&nbsp;
+‡‡‡‡In a paper that really should not require this footnote, but regrettably does.
+&nbsp;
+§§§The Bureau's statistics are maintained with obsessive precision by an actuary named Herbert Fastidious, who has calculated that he has a 0.00847% chance of being caught in an explosive magical accident per annum. He updates this figure daily. His office is in the basement, behind seventeen inches of granite, and he still wears fireproof undergarments‡‡‡‡.
+&nbsp;
+‡‡‡‡Herbert is widely regarded as the most cautious man in magical administration, which is saying something in a field where "cautious" is synonymous with "still possessing the original number of fingers."§§§§
+&nbsp;
+§§§§Ten, in case you were wondering. Though the number has varied considerably throughout history, particularly during the experimental period of 1671-1684, now referred to as the "Enthusiastic Years." The average practicing pyromancer of that era retired with 7.3 fingers†††††.
+&nbsp;
+†††††The .3 is not a typo. It represents what the Chirurgeons' Guild termed "partial digits" or "technically fingers, depending on your definition of finger."
+&nbsp;
+†The ringing typically lasts six to eight hours, during which time victims report hearing a persistent voice that sounds remarkably like their instructor saying "I specifically told you not to do that."
+&nbsp;
+††Typically about 0.4 seconds too late, traveling at the speed of realization, which is considerably slower than the speed of combustion.
+&nbsp;
+‡‡‡‡The importance of distance can also not be understated, but we're stating it anyway because that's how important it is. Distance is the difference between "impressive display of pyrotechnic mastery" and "tragic demonstration of what hubris looks like when it's on fire."
+&nbsp;
+§§§§According to the controversial work "Animism in Aggressive Spellcraft" by Professor Millicent Catastrophe-Waiting-to-Happen, some explosive spells exhibit what she called "target selectivity based on maximum comic effect." Her theory was widely mocked until the fireball she was demonstrating made a forty-five degree turn in midair to strike a cart full of produce being wheeled past the demonstration ground. The resulting explosion of turnips was`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Compressing fire magic to create explosions',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PERSISTENT_FLAMES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'persistent_flames',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Eternal Burning: Creating Self-Sustaining Magical Flames',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['fire_magic_advanced'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['flame_generation', 'fire_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { fire_magic: 22, arcane: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { fire_magic: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'eternal_flame' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Eternal Burning: Creating Self-Sustaining Magical Flames</span>
+&nbsp;
+The fundamental principle underlying persistent magical combustion rests upon the flame's ability to extract ambient mana from its environment*, a process not unlike the way certain parasitic organisms sustain themselves upon their hosts†. Unlike mundane fire, which consumes physical matter in a thermodynamic exchange that even the most obtuse first-year student can comprehend**, magical flames operate on principles that would make thermodynamics professors weep***, converting the omnipresent but subtle flow of environmental mana into sustained combustion without the bothersome need for wood, oil, or indeed any material fuel whatsoever. The efficiency gains are remarkable: where a conventional oil lamp converts approximately 3.7% of its fuel's potential energy into useful light****, a properly constructed eternal flame achieves conversion rates approaching 94.2%, though this statistic becomes considerably less impressive when one considers the incidents†††.
+&nbsp;
+The practical applications of self-sustaining flames have been recognized since the Third Age‡, when the Lighthouse Keepers' Guild‡‡ first petitioned the Council of Perpetual Concerns for permission to replace their conventional beacon fires with magical alternatives, citing the approximately 847 recorded incidents of lighthouse keepers falling asleep during their shifts and allowing the flames to die out, resulting in seventeen naval disasters and one very embarrassed mermaid colony‡‡‡. Modern eternal flames serve admirably in locations where conventional fuel supply proves impractical: the Lighthouse of Endless Vigil§ has burned continuously for 342 years, theForge of Unceasing Labor§§ maintains temperatures that would make conventional fuel supply economically ruinous, and the rather unfortunately named Torch of "It Seemed Like a Good Idea at the Time"§§§ continues to illuminate the former city of Ashenton, despite repeated requests that someone please make it stop.
+&nbsp;
+The process of creating an eternal flame requires first establishing a conventional magical fire through standard pyromantic invocation*, then carefully attenuating the flame's natural tendency to consume its own mana supply while simultaneously opening what practitioners call the "ambient intake aperture"**. This delicate operation has been compared to teaching a fish to breathe air while it's still underwater††, and the comparison is apt in ways that make experienced pyromancers uncomfortable‡. The flame must be convinced, through a process that is part instruction and part negotiation§, to draw upon the surrounding mana field rather than exhausting itself in one glorious conflagration. The Guild of Perpetual Pyromancers publishes a 1,247-page manual on the subject§§, of which approximately 600 pages consist of warnings, 400 pages of incident reports, and the remaining 247 pages of actual instruction§§§.
+&nbsp;
+The greatest challenge facing practitioners of eternal flame magic lies not in their creation but in their cessation*. An eternal flame, once properly established, resists extinguishment with what can only be described as remarkable persistence**, developing something that resembles personality†† if personality can be defined as "bloody-minded refusal to accept reality." Standard suppression techniques prove ineffective; water evaporates before contact‡‡, smothering materials ignite§§, and magical counterspells often result in the flame relocating to a different position while burning even more intensely out of apparent spite§§§. The Department of Flame Cessation* maintains a list of approved extinguishment techniques, which currently numbers exactly three*, all of which require at least two master pyromancers, significant advance planning, and a willingness to accept collateral damage to the surrounding area of approximately 15-20 cubic meters**.
+&nbsp;
+Therefore, the aspiring practitioner must approach the creation of eternal flames with the understanding that they are establishing something approaching a permanent fixture†††, unless one counts "permanent" as "until the eventual heat death of the universe, probably"‡‡‡. The old pyromancer's saying holds true: "Easy to start, impossible to stop, and that's why we have insurance"§§§§.
+&nbsp;
+---
+&nbsp;
+*The theoretical framework was first established by Archmage Cornelius Flamewhistle in his treatise "On the Persistent Nature of Things That Burn," published posthumously after what his surviving colleagues described as "an entirely predictable conclusion to his research."
+&nbsp;
+†Specifically the Brennwyrm, a creature of my own invention that exists primarily in the spaces between what is known and what is feared. The Brennwyrm feeds on heat and light, yet paradoxically generates more of both, creating a thermodynamic paradox that most scholars agree to simply not think about too hard. See also: the incident at the College of Impossible Zoology, when someone actually tried to capture one*.
+&nbsp;
+*The incident is still classified, but involves seventeen singed robes, one melted building, and a surprising amount of apologetic correspondence with neighboring kingdoms.
+&nbsp;
+**Though a disturbing number apparently cannot. The Academy of Fundamental Principles maintains records showing that approximately 11% of incoming students believe fire is "just really angry air" despite all evidence to the contrary.
+&nbsp;
+***There exists recorded footage of Professor Herman Grundwald of the Imperial Institute of Thermodynamics being shown a working eternal flame. He watched in silence for seventeen minutes before quietly removing his academic robes, folding them neatly on a chair, and walking directly into the sea. He was recovered three hours later, muttering about "conservation of energy" and "the fundamental laws." He now teaches at a nice quiet school that focuses exclusively on basic arithmetic†.
+&nbsp;
+†The Little School of Numbers What Add Up Properly, located in the peaceful village of Neverburn-on-the-Marsh.
+&nbsp;
+****This statistic comes from the seminal work "Why Everything Is Terrible: A Thermodynamic Perspective" by the late Professor Grundwald, written during his recovery period.
+&nbsp;
+†††The Incident of 1247, when apprentice pyromancer Timothy Goodflame‡ decided to demonstrate his newly-created eternal flame to his master by placing it in a wooden box, resulting in the loss of the Eastern Tower and the creation of what is now known as the Permanently Toasty Commons.
+&nbsp;
+‡Not his real name. His real name was Timothy Badflame, but he had it legally changed in an attempt to improve his luck. The universe, sensing irony, responded accordingly.
+&nbsp;
+‡‡A guild that traces its lineage back to the days when the old gods walked the earth and occasionally needed someone to shine a light so they could find their way home after particularly lengthy revelries. The god Prometheus, it should be noted, was never actually a member, despite his obvious interest in the subject matter.
+&nbsp;
+‡‡‡The mermaids had been using the regular disappearances of the lighthouse beam to conduct midnight pearl-harvesting expeditions in what they thought was private. The subsequent diplomatic incident lasted three years and resulted in the Treaty of Illuminated Waters, which states, among other things, that mermaids must wear reflective materials when operating in shipping lanes.
+&nbsp;
+§Which has never actually gone out, though there was one concerning afternoon in 1789 when it flickered noticeably, causing mass panic and the spontaneous formation of six new religions.
+&nbsp;
+§§The Forge has been operated by the same family for twelve generations. The current forgemaster, Ingrid Eternalhammer, notes that the real advantage is never having to get up at 3 AM to restart the fire, though she admits the inability to ever have a cool workshop in summer is "somewhat trying."
+&nbsp;
+§§§So named after the city council's decision to commission an eternal flame for the town square. The town square is now visible from space and the surrounding area has been designated a "permanent summer zone." The remaining population has adapted by developing very good sunscreen and a robust ice-trade.
+&nbsp;
+*Standard pyromantic invocation requires a focus word, a gesture that looks vaguely like you're trying to warm your hands over something that doesn't exist yet, and what the Guild describes as "appropriate mental attitude," which apparently means "the confidence of someone who has never yet been significantly burned."
+&nbsp;
+**The "ambient intake aperture" is not, technically, an aperture in any physical sense, being rather a metaphysical orientation that allows the flame to access the background mana field. The terminology was established by the Committee for Making Things Sound More Impressive Than They Actually Are†, a subdivision of the Academy of Arcane Arts.
+&nbsp;
+†This committee has since been renamed seven times, each name more impressive than the last. They are currently known as the "Supreme Collegium for the Establishment of Appropriate Nomenclature in Matters Arcane and Otherwise Requiring Sophisticated Terminology," or SCEANMOAORST, which everyone agrees is much better‡.
+&nbsp;
+‡No one actually agrees this is better. The committee is simply very defensive about criticism.
+&nbsp;
+††The comparison was made by Master Pyromancer Alicia Flameheart in her lecture series "Aquatic Metaphors for Things That Really Shouldn't Involve Water At All." The lecture series was discontinued after`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Flames that burn indefinitely without fuel or mana input',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FIRE_ELEMENTAL_SUMMONING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'fire_elemental_summoning',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Calling Living Flame: Summoning Fire Elementals',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['fire_magic_advanced'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['flame_generation', 'fire_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { fire_magic: 25, arcane: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { fire_magic: 30, arcane: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'summon_fire_elemental' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Calling Living Flame: Summoning Fire Elementals</span>
+&nbsp;
+The practice of summoning fire elementals from their native planes represents the apex of pyromantic achievement, requiring not merely the generation and control of flame*, but the diplomatic acumen to negotiate with beings whose very existence consists of combustion, whose thoughts move at the speed of wildfire, and whose concept of "property damage" differs substantially from our own†. The fundamental error made by approximately 73.4% of novice summoners is approaching fire elementals as servants rather than as sovereign entities with their own complex social hierarchies, ancestral grudges dating back to the First Conflagration‡, and strongly held opinions about architectural aesthetics**. 
+&nbsp;
+The choice between binding and negotiating represents more than mere methodology—it represents a philosophical stance that fire elementals can detect with uncomfortable accuracy††. Those who attempt coercive binding without proper preparation discover that fire elementals possess remarkable institutional memory‡‡; the Elemental Plane of Fire maintains what can only be described as a comprehensive blacklist, updated in real-time across all seven combustion substrata***, and your name will remain on it for approximately 847 years after your death†††. Negotiation, while requiring more time and substantially more fireproof furnishings‡‡‡, results in partnerships characterized by mutual respect, fewer spontaneous immolations, and a marked decrease in posthumous curses****.
+&nbsp;
+The voracious appetite of fire elementals for combustible materials cannot be overstated; their consumption rate increases exponentially with their enthusiasm, and enthusiasm is their default state††††. A fire elemental experiencing what they call "the joy of new fuel sources" can reduce a standard wizard's tower to ash in approximately 4.7 minutes‡‡‡‡, leading to the famous Pyromantic Paradox: the more successful your summoning, the less you have left to celebrate with*****. The Guild of Pyromantic Studies now requires all members to maintain their laboratories in structures at least 200 meters from anything they value, a policy enacted after the Incident of '74, which we shall discuss no further†††††.
+&nbsp;
+The dismissal of fire elementals requires timing, tact, and the recognition that "goodbye" is a concept that varies dramatically between species‡‡‡‡‡. Fire elementals interpret dismissal through their cultural framework of hospitality, wherein guests traditionally burn a portion of the host's dwelling as a compliment to the quality of entertainment provided******. The Seven Words of Respectful Parting must be pronounced with precise intonation††††††; the difference between "Please return to your plane with our thanks" and "Please consume everything in a three-mile radius" lies in the placement of a single glottal stop‡‡‡‡‡‡. Advanced practitioners develop what the ancient texts call "the art of the graceful exit"*******—essentially, the ability to banish a fire elemental before it notices the study's extensive collection of rare manuscripts.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* As established in the preliminary texts "Flame Generation: Making Fire Where Fire Ought Not Be" and "Fire Control: Making Fire Stop Where You Desperately Need It To Stop," both of which are now printed exclusively on asbestos paper following the Great Library Incident. The Council determined that any book teaching fire magic should, at minimum, be immune to its own subject matter.
+&nbsp;
+† Property damage, to a fire elemental, is better understood as "improvement through aggressive simplification." The Elemental Council of Flames submitted a 400-page report to the Inter-Planar Court arguing that converting complex structures into uniform ash constitutes "aesthetic optimization." The court case is still ongoing after 300 years, largely because the courthouse has burned down seventeen times.
+&nbsp;
+‡ The First Conflagration remains the subject of intense theological debate among pyromantic scholars. Some claim it represents the moment consciousness first emerged in flame; others suggest it was simply what happened when the gods left matches lying around. The Phoenix Order maintains it was "a bit of both, really, plus some existential angst about mortality." The phoenix perspective carries particular weight, being the only witnesses who survived by technicality.
+&nbsp;
+** Fire elementals find straight lines "aggressive" and right angles "unnecessarily confrontational." Their ideal architecture consists of everything being on fire in an organic, flowing manner. This philosophical stance has led to surprisingly productive dialogues with certain avant-garde architectural movements, though these conversations typically conclude with someone's studio burning down.
+&nbsp;
+†† One particularly sensitive fire elemental named Scorch-the-Unspeaking-Dark (fire elementals have a flair for dramatic nomenclature†) can detect coercive intent from up to three planar boundaries away. He maintains a blog about it.
+&nbsp;
+† Fire elemental names translate poorly into human languages. "Scorch-the-Unspeaking-Dark" is actually the simplified version. The full name takes approximately four hours to pronounce and requires the speaker to be on fire for authenticity. The abbreviated form "Scorch" is considered deeply informal but has become popular due to time constraints and the limited fireproofing of human larynxes.
+&nbsp;
+‡‡ The blacklist, officially titled "The Eternal Record of Those Who Showed Poor Character," was originally maintained on stone tablets but proved too cumbersome. It now exists as a distributed consciousness shared among all fire elementals, which they describe as "like social media, but with more burning." Approximately 40% of entries include the notation "Attempted binding without offering snacks," which fire elementals consider especially grievous.
+&nbsp;
+\*\*\* The seven combustion substrata of the Elemental Plane of Fire represent different "flavors" of burning, ranging from the gentle warmth of smoldering memories to the apocalyptic fury of suns-dying-backwards. Fire elementals migrate between substrata based on mood, season, and whether they've recently been bound against their will. The substrata were mapped by the legendary explorer Thermos the Mostly-Intact, who survived long enough to publish his findings before succumbing to what his coroner's report described as "delayed combustion syndrome."
+&nbsp;
+††† The 847-year duration is not arbitrary; it represents precisely three fire elemental generations‡. Fire elementals practice what anthropologists call "cultural memory retention through sustained grudges." Forgiveness is considered possible but requires the offender's great-great-great-grandchildren to compose a formal apology in the musical language of crackling flames, accompanied by appropriate offerings of quality hardwoods.
+&nbsp;
+‡ Fire elemental generations are measured not in years but in "Complete Conflagrations"—the time required to burn through all available fuel in a designated region and then reflect upon the experience. This typically takes 282.3 standard years, though the measurement includes a margin of error of ±50 years depending on fuel quality and philosophical disposition. The concept was established by Ember-Who-Contemplates-Ash, the first fire elemental to seriously consider the relationship between burning and being.
+&nbsp;
+‡‡‡ The market for fireproof furniture has expanded dramatically since the establishment of the First Elemental Exchange Program. However, consumers should note that "fireproof" has a specific legal definition of "resistant to fires that remain on the current plane of existence**."
+&nbsp;
+** Following the incident at Lord Tremaine's summer estate, wherein his supposedly fireproof dining set proved vulnerable to a fire elemental's ability to burn things conceptually across dimensional boundaries, legislation was enacted requiring more precise terminology. The revised standards now include categories such as "fireproof (mundane)," "fireproof (magical, up to 400° magical)," and "fireproof (eldritch, though we make no promises)."
+&nbsp;
+\*\*\*\* Posthumous curses from fire elementals typically manifest as "haunting warmth"—a condition where the cursed individual's descendants find themselves inexplicably popular at winter gatherings but unable to enjoy ice cream without it immediately melting. While minor compared to other magical curses, it has proven socially awkward for 847 years' worth of family reunions. The Tremaine family, in particular, has developed an entire cultural practice around serving only room-temperature desserts.
+&nbsp;
+†††† Fire elementals describe their emotional state as existing somewhere between "exuberant" and "more exuberant." The neutral state for a fire elemental is equivalent to what humans would experience after consuming seventeen cups of coffee while riding a rollercoaster. This fundamental difference in baseline enthusiasm has led to numerous cross-cultural misunderstandings, catalogued extensively in Professor Althea Emberworth's seminal work "Why Is Everything On Fire: A Cross-Species Communication Study."
+&nbsp;
+‡‡‡‡ The 4.7-minute calculation assumes standard tower construction with the typical wizard's collection of dry books, dried herbs, dried experiments-that-went-wrong-but-might-be-useful-later, and the generally dried-out wizard themselves. Towers with proper fire suppression systems can extend this to 6.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Bringing sentient fire beings from the elemental planes',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PLASMA_STATE_MAGIC: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'plasma_state_magic',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Beyond Flame: Creating and Controlling Plasma',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['fire_magic_advanced'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['temperature_variation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 10,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { fire_magic: 28, arcane: 22 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { fire_magic: 35, arcane: 30 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'plasma_bolt' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `BEYOND FLAME: CREATING AND CONTROLLING PLASMA</span>
+A Treatise on the Fourth State of Matter and Why Your Insurance Premium Just Tripled
+&nbsp;
+The journey from novice pyromancer to plasma manipulator represents not merely an advancement in temperature control, but a fundamental philosophical shift in one's relationship with matter itself*. Where the apprentice delights in conjuring flame and the journeyman prides themselves on precise thermal regulation, the elder mage must grapple with a state of matter so energetic that electrons themselves abandon their atomic moorings**. This transition, occurring at approximately 10,000°C†—though some materials prove more reluctant than others††—transforms ordinary matter into an ionized gas that glows with the light of minor suns and cuts through nearly everything with the indifference of a bureaucrat stamping rejection forms.
+&nbsp;
+The creation of stable plasma requires not only extraordinary thermal output but also sophisticated electromagnetic containment‡, for plasma possesses an unfortunate tendency to interact enthusiastically with everything it encounters‡‡. The traditional apprentice approach of "heat it until something interesting happens" proves catastrophically inadequate at this level§. Modern plasma manipulation theory, as developed by the late Archmage Theresia von Brandweiss§§, depends upon maintaining a delicate balance between thermal energy input and magnetic field geometry***, a balance so precise that even experienced practitioners report success rates hovering around 34.7%†††—and that's before accounting for "incidents."‡‡‡
+&nbsp;
+The practical applications of plasma magic remain somewhat theoretical, primarily because most practical applications occurred only once§§§. Plasma cutting demonstrates unparalleled effectiveness against physical barriers****, slicing through steel, stone, and enchanted wards with equal ease††††. However, the concentration required to maintain both the plasma state and its containment while directing it toward a target exceeds the multitasking capacity of approximately 89.3% of mages‡‡‡‡, leading to what insurance adjusters term "uncontrolled plasma events" and what survivors simply call "that day we lost the east wing."§§§§
+&nbsp;
+The electromagnetic containment problem deserves particular attention, as it represents the primary difference between "controlled plasma manipulation" and "impromptu tower demolition."***** The magnetic fields must be shaped with sufficient precision to contain plasma—a substance with an average temperature of 15,000°C and the personality of a cornered badger†††††—while remaining flexible enough to allow directional control‡‡‡‡‡. The Guild of Electromagnetic Theorists has published seventeen volumes on optimal field configurations§§§§§, though field reports suggest most practitioners simply copy the diagrams from Volume Three and hope for the best******.
+&nbsp;
+This represents, without hyperbole, the pinnacle of fire magic: the point where matter itself transforms into something that technically isn't fire at all††††††, but rather a state of being so energetic that traditional combustion seems quaint by comparison‡‡‡‡‡‡. Those who master plasma manipulation join an exclusive fraternity§§§§§§—exclusive primarily because the membership requirements include surviving one's own learning process. The plasma bolt spell, once perfected, delivers destruction on a scale that makes conventional fire magic look like a child's birthday candle*******, though it should be noted that 73.2% of successful plasma bolt casters report never actually wanting to cast it again‡‡‡‡‡‡‡.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*The philosophical shift typically occurs around the third or fourth time one accidentally ionizes something they didn't mean to ionize, such as the air in their workspace, their lunch, or their familiar. The Familiar Welfare Association maintains strict guidelines about plasma exposure, though they admit the guidelines are more "aspirational" than "practical."
+&nbsp;
+**This electron liberation occurs at different temperatures for different elements, leading to what the Thermodynamic Irregularities Committee calls "variable ionization thresholds" and what everyone else calls "why did the silver melt but the iron explode?" The Committee's 847-page report on the subject contains surprisingly few answers and a great many graphs.
+&nbsp;
+†This temperature, equivalent to roughly twice the surface temperature of the sun, proves challenging to achieve and even more challenging to maintain. For comparison, the average dragon's breath peaks at approximately 2,800°C, leading to long-standing resentment among dragons about their inadequacy in this department. The Draconic Pride League has lobbied unsuccessfully for years to have the definition of plasma changed to "whatever temperature dragons can reasonably achieve."
+&nbsp;
+††Iron, for instance, requires heating to 14,900°C before ionization occurs. The fact that iron melts at a mere 1,538°C and vaporizes at 2,862°C means you must maintain enthusiasm through several intermediate states of matter before reaching the plasma phase. The Society for Persistent Heating has issued numerous publications on techniques for "staying motivated during the boring middle part."
+&nbsp;
+‡The electromagnetic containment apparatus was invented by Magister Helmut Feldkraft in 1547, following the Great Uncontained Plasma Incident of 1546†. He described the containment system as "embarrassingly obvious in retrospect" and "the sort of thing you'd think someone would have invented before catastrophically demonstrating the need for it."
+&nbsp;
+†The Great Uncontained Plasma Incident of 1546 is not discussed in polite company, though the crater where the Royal Academy of Thermodynamic Studies used to stand serves as an effective visual aid. The current Royal Academy, built three miles away, features notably thicker walls and a much larger insurance policy.
+&nbsp;
+‡‡"Enthusiastically" here means "violently," "immediately," and "to the theoretical limit of available energy transfer rates." Plasma's interaction with normal matter resembles the meeting between a very hot object and everything else, except more so and with additional electrical effects. The Department of Understatement has logged a formal complaint about this comparison being too understated.
+&nbsp;
+§The traditional apprentice approach has, however, generated 73% of known plasma-related incidents, leading the Academy to institute a mandatory lecture series titled "No, Seriously, Stop Heating Things Randomly." Attendance is required. Understanding is optional but recommended.
+&nbsp;
+§§Archmage von Brandweiss (1612-1689) pioneered modern plasma theory during a forty-year career that she privately described as "one near-death experience after another, punctuated by mild burns." Her posthumous memoir, "Please Don't Do What I Did: A Practical Guide," remains required reading despite being largely a list of things that exploded and why. She achieved her breakthrough in electromagnetic containment after losing her left eyebrow three times in one month, leading her to conclude that "there must be a better way, because this way is terrible."
+&nbsp;
+***The magnetic field geometry must account for plasma's tendency to develop instabilities with names like "kink mode," "sausage mode," and "oh god not again mode"§. These instabilities represent localized failures in containment that propagate faster than most mages can react, leading to what field reports delicately term "rapid unplanned plasma redistribution."
+&nbsp;
+§The "oh god not again mode" is not technically recognized by the International Thaumaturgical Standards Committee, but appears in approximately 89% of incident reports and 100% of survivor testimonies. The Committee is currently reviewing whether to formally acknowledge its existence or continue pretending it's just a colorful description of kink mode.
+&nbsp;
+†††This 34.7% success rate represents a vast improvement over the 3.2% success rate recorded during the first fifty years of plasma magic research. The Casualty Prevention Bureau notes that success rates correlate strongly with "willingness to read the entire manual" and "not being too proud to use safety equipment," two factors that prove surprisingly rare among elder mages.
+&nbsp;
+‡‡‡The term "incidents" covers a multitude of outcomes, ranging from "minor property damage" to "geographic features that weren't there yesterday." The Insurance Actuarial Council maintains 37 distinct sub-categories of plasma-related incidents, each with its own risk assessment profile and premium multiplier. The lowest multiplier is 4.7x. The highest is "we respectfully decline to offer coverage."
+&nbsp;
+§§§The most famous practical application, the Clockwork Tower Incident of 1702, successfully demonstrated plasma cutting by slicing through fourteen inches of enchanted steel in approximately two seconds, followed by slicing through three castle walls, the Baron's prize stallion, and a load-bearing column before the caster managed to terminate the spell. The application was deemed successful but "not suitable for repeat demonstrations." The Clockwork Tower itself was ruled a total loss.
+&nbsp;
+****Plasma cutting works on the principle that matter, when confronted with something at 15,000°C that also carries a substantial electromagnetic field, generally chooses to stop being solid and start being somewhere else. The process is remarkably efficient, converting approximately 89% of input energy into cutting action. The remaining 11% converts into`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Heating matter to the fourth state: ionized plasma',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PHOENIX_TRANSFORMATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'phoenix_transformation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Rebirth in Flame: The Phoenix Transformation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['fire_magic_advanced'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['fire_immunity', 'persistent_flames'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 10,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { fire_magic: 30, arcane: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { fire_magic: 40, arcane: 35 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'phoenix_rebirth' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Rebirth in Flame: The Phoenix Transformation</span>
+&nbsp;
+The Phoenix Transformation represents the apex—or perhaps the nadir, depending on one's perspective on death*—of fire magic, wherein the practitioner arranges for their own resurrection through immolation. The spell requires the caster to literally die in flames†, at which point the magic triggers a reconstitution of the physical form from the ashes‡. This is not, despite what several optimistic initiates have believed, a metaphorical death**. The reformed body emerges younger than the age at which death occurred††, though the exact degree of rejuvenation varies based on factors that remain, frustratingly, incompletely understood‡‡.
+&nbsp;
+The fundamental limitation of this magic—that each casting must be relearned from scratch after use***—has led to what the Eternal Flame Academy delicately terms "optimization concerns"†††. Simply put, if one has gone to the considerable trouble of dying and being reborn, one would prefer not to immediately forget how to do it again‡‡‡. The theoretical frameworks suggest that the knowledge is not so much forgotten as *consumed* in the transformation****, much like how a phoenix egg contains no memory of being a bird, despite containing everything necessary to become one again. Several schools of thought have emerged regarding the preservation of this knowledge††††, none of which have proven reliably successful, and most of which have proven reliably fatal‡‡‡‡.
+&nbsp;
+This brings us to the great theoretical question that has tantalized and terrified arcane scholars for at least three centuries*****: can one cast the Phoenix Transformation upon oneself while still alive, thereby bypassing the inconvenient dying portion of the process? The answer, according to the few experimental results we have, is technically yes†††††, but with consequences so profound that the High Council of Pyromantic Studies has classified the relevant research under Seal Level Omega‡‡‡‡‡. The problem, in essence, is that the spell requires death as a component, and if you are not dead when you cast it, the spell will attempt to *make you dead first******. This proves remarkably difficult to control.
+&nbsp;
+---
+&nbsp;
+*The Philosopher's Guild maintains that death is merely "aggressive retirement," a position that has not endeared them to the Guild of Necromancers, who view it as trivializing their entire field of study.
+&nbsp;
+†The Department of Uncomfortable Statistics at the University of Last Chances has calculated that approximately 94.7% of Phoenix Transformation attempts fail at this stage, largely because the practitioner is, at that moment, on fire and dying, which proves distracting. The remaining 5.3% is divided between successful transformations (0.8%) and cases where the paperwork was filed incorrectly (4.5%).
+&nbsp;
+‡One must be quite specific about *which* ashes. The Great Fire of Ankh-Morpork in 1672† produced enough ash to theoretically reconstitute seventeen thousand people, leading to what historians call "the Confusion of Identities" when several overeager necromancers attempted simultaneous resurrections using the same ash pile.
+&nbsp;
+†Not our 1672. A different 1672. Possibly in a different universe. The records are unclear, having themselves been lost in a fire††.
+&nbsp;
+††The irony has been noted by several scholars, most notably Professor Char of the Flame-Retardant Institute, in his seminal work *"When Records Burn: A Meta-Analysis of Self-Referential Archival Disasters."*
+&nbsp;
+**The case of Apprentice Thimbleton remains instructive. Upon being told he must "die in flames," he attempted to die metaphorically by standing near a candle while thinking very hard about mortality. He is now a cautionary tale told to first-year students, primarily because he is still alive and visits the Academy specifically to tell it himself. He has become quite bitter.
+&nbsp;
+††The average age reduction is 23.6 years†††, though outliers exist. The oldest recorded rejuvenation was Master Pyrrhus the Eventually-Young, who emerged from his transformation as a six-month-old infant. Regrettably, he had no colleagues willing to change his diapers while he relearned language and motor skills, and the experiment was deemed "a qualified success but an absolute social catastrophe."
+&nbsp;
+†††This statistic comes from the Actuarial College of Phoenix-Related Phenomena, an institution that exists primarily to make other institutions feel better about their mortality rates.
+&nbsp;
+‡‡Current theories include: lunar phase, quality of the wood in the pyre, whether one died screaming or stoically, the thread count of one's robes, and the price of copper on the day of immolation. None have proven correlative, but the research continues because the grant money is excellent.
+&nbsp;
+***This has led to the tragic career of Perpetual Master Candlewick‡‡‡, who has achieved and forgotten the Phoenix Transformation seventeen times. He is now approximately twenty-three years old in body, having started at one hundred and four, and is widely regarded as the most knowledgeable person alive about relearning advanced fire magic from scratch. He has recently taken up a hobby of writing very detailed notes to himself, which he stores in fireproof boxes. The notes read, apparently, like increasingly desperate messages from past selves.
+&nbsp;
+‡‡‡His actual name is lost to history, or rather, lost to himself seventeen times. "Candlewick" is a nickname given by his colleagues, referencing both his field of study and their observation that he "keeps burning down and needing to be re-lit."
+&nbsp;
+†††The Eternal Flame Academy is notable for having seven different departments that study immortality, none of which talk to each other. This is because Departments 2, 4, and 6 achieved immortality through different means and are now engaged in a centuries-long dispute about whose method is "more eternal." The administration finds this exhausting but admits it does reduce turnover.
+&nbsp;
+‡‡‡The practice of writing the spell formula on fireproof metal plates and swallowing them prior to transformation has proven partially successful, though it introduces new problems, primarily concerning the reconstituted digestive system and the question of whether metal-enhanced stomach acid counts as a "beneficial mutation" or "catastrophic side effect." The Medical Board is divided.
+&nbsp;
+****This metaphor was proposed by the Poetess Emberlyn Three-Names, who died of old age before achieving her Phoenix Transformation, which she found "cruelly ironic." Her last words were reportedly "I should have done this earlier," which now appears on posters in most pyromancy departments.
+&nbsp;
+††††Including the controversial "buddy system" proposed by the School of Collaborative Combustion, where two mages would simultaneously transform and attempt to teach each other the spell immediately upon resurrection. The experiment resulted in two very confused young people standing naked in a pile of ash, neither of whom remembered why they were there or who the other person was. They did eventually marry, though, so the school counts it as "emotionally successful."
+&nbsp;
+‡‡‡‡The failure rate increases to 99.2% when considering "reliable success" rather than "technical success." The distinction is important. Technically successful transformations include cases where the reconstituted mage materialized three feet above the ground (resulting in immediate ankle injuries), cases where they emerged facing backward (mild inconvenience), and cases where they were reconstituted at 1/12th scale (severe inconvenience, currently irreversible).
+&nbsp;
+*****Three centuries is the conservative estimate. Some scholars argue the question is as old as fire magic itself, which would make it approximately four thousand years old‡‡‡‡. Others point out that fire magic couldn't be four thousand years old because institutional records only go back eight hundred years, to which the first group responds that the lack of records proves their point about fires consuming important documents. This argument has been ongoing since at least 1634 and shows no signs of resolution.
+&nbsp;
+‡‡‡‡According to the Lost Codex of the First Flame, which may or may not exist. The Codex is "lost" in the sense that three different universities claim to have it, each insisting the others have forgeries. The resulting legal battle has lasted longer than most nation-states.
+&nbsp;
+†††††The case of Arch-Mage Prometheus the Impatient is the primary example. Prometheus, frustrated with the "waiting to die" aspect of the spell, attempted to cast it while perfectly healthy. The spell, confronted with a living caster, made several rapid calculations and determined that the most efficient path to "death followed by resurrection" was to kill him via spontaneous combustion, then resurrect him. This occurred. Prometheus the Impatient is now Prometheus the Considerably-More-Patient, though sources suggest he is mainly patient about not attempting experimental magic.
+&nbsp;
+‡‡‡‡‡The Omega Seal classification was created specifically for research that is "accurate, reproducible`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The ultimate fire magic: resurrection through flames',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  EXPLOSIVE_FIRE_MAGIC,</span>
+<span class="cstat-no" title="statement not covered" >  PERSISTENT_FLAMES,</span>
+<span class="cstat-no" title="statement not covered" >  FIRE_ELEMENTAL_SUMMONING,</span>
+<span class="cstat-no" title="statement not covered" >  PLASMA_STATE_MAGIC,</span>
+<span class="cstat-no" title="statement not covered" >  PHOENIX_TRANSFORMATION</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

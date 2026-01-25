@@ -36,7 +36,8 @@ export function getPlayerId(): string {
  */
 export function getUniverseId(): string {
   // Access via window.game (set up by setupDebugAPI in main.ts)
-  const game = (window as any).game;
+  const windowWithGame = window as { game?: { gameLoop?: { universeId?: string } } };
+  const game = windowWithGame.game;
   if (!game || !game.gameLoop) {
     console.warn('[GameStateHelpers] window.game.gameLoop not available. Using fallback "local-universe".');
     return 'local-universe';

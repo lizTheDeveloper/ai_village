@@ -1,0 +1,979 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/blood-magic-healing-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> blood-magic-healing-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/91</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/91</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BLOOD_TRANSFUSION_MAGIC: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'blood_transfusion_magic',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Life Transfer: Magical Blood Transfusion Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_healing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['blood_type_affinity', 'blood_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 16, medicine: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'blood_transfusion' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Life Transfer: Magical Blood Transfusion Techniques</span>
+&nbsp;
+The practice of magically transferring blood between individuals represents one of the more delicate* intersections of thaumaturgic principle and biological necessity. Despite what early practitioners believed†, the addition of magical energy to the transfusion process does not eliminate the fundamental requirement for blood type compatibility‡—a lesson learned through what the Royal College of Chirurgeons refers to only as "The Crimson Tuesday Incident of 1847"**. The primary advantage of magical transfusion over its mundane counterpart lies not in circumventing natural law, but rather in the acceleration of the process†† and the simultaneous purification of disease vectors‡‡, though one must still observe proper volume limitations***.
+&nbsp;
+The mechanism by which magical transfusion operates requires the practitioner to establish what ancient texts call a "crimson bridge"††† between donor and recipient, a metaphor that becomes uncomfortably literal if one loses concentration‡‡‡. This bridge functions as both conduit and filter****, purging the transferring blood of pathogenic organisms, parasitic enchantments†††† and, in one documented case, an unusually persistent ancestral curse‡‡‡‡. The rate of transfer can be adjusted to match the recipient's capacity to receive*****, with experienced practitioners managing flows of up to 500 milliliters per minute†††††—approximately twelve times faster than gravitational methods allow‡‡‡‡‡. However, the temptation to exceed these rates has led to what Dr. Hemlock Threadwell calls "catastrophic hydrostatic events"******.
+&nbsp;
+Recovery from blood loss following magical transfusion follows the same temporal constraints as mundane blood donation*******, despite the persistent folk belief that magic somehow "speeds up" the body's production of replacement blood cells†††††††. The standard guideline remains six to eight weeks between donations of whole blood‡‡‡‡‡‡, though the Guild of Life-Givers maintains that proper nutritional support can reduce this to five weeks and three days********. Donors must be screened for both medical and magical contraindications, as the presence of certain enchantments in the donor's bloodstream can transfer to the recipient with unpredictable results††††††††. The famous case of Lord Pemberton, who inadvertently transferred his lycanthropic sensitivity during an emergency transfusion, remains a cornerstone of curricula at the Academy of Applied Hemomancy‡‡‡‡‡‡‡.
+&nbsp;
+The purification aspect of magical transfusion, while invaluable, requires constant vigilance and considerable magical stamina*********. The spell must distinguish between harmful pathogens and beneficial symbiotic organisms, between toxic enchantments and therapeutic ones, between blood components and blood contaminants—all while maintaining the structural integrity of red blood cells, white blood cells, and platelets†††††††††. The Mental Strain Index for a complete transfusion averages 7.3 on the Weatherwax Scale‡‡‡‡‡‡‡‡, roughly equivalent to simultaneously solving differential equations while juggling**********, or approximately 2.4 times the mental effort required to maintain polite conversation at a particularly tedious dinner party***********. Practitioners are therefore advised to work in pairs when possible, with one mage maintaining the bridge and another managing the purification protocols, a arrangement formally known as the "Dual-Practitioner Method"††††††††††† but informally referred to as "not dying of brain fever"‡‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*Though "delicate" here means "if you get it wrong, someone dies in a spectacular fashion that requires three cleaning spells and a new carpet."
+&nbsp;
+†The early thaumaturgist Cornelius Bloodworth (1603-1651) famously declared that "magic transcends the petty limitations of flesh" before attempting to transfuse horse blood into his assistant. The assistant survived. Bloodworth's reputation did not. The assistant did develop an unfortunate tendency to whinny when startled, but the Royal College maintains this was psychosomatic.
+&nbsp;
+‡Type O-negative remains the universal donor blood type even when transferred via a bridge made of pure arcane energy and the hopes and dreams of third-year medical students. The fundamental laws of antibody interaction care not for your magical prowess.
+&nbsp;
+**The College only acknowledges that it happened, that it involved seventeen patients, three practitioners, and one very confident graduate student. The actual details are sealed under the Medical Disasters Act of 1849, though rumors persist about the color the walls ended up being. And the ceiling. And several previously uninvolved walls in adjacent buildings.
+&nbsp;
+††Specifically, magical transfusion operates at approximately 12.7 times the speed of gravity-fed transfusion, 8.3 times the speed of pump-assisted transfusion, and infinity times faster than asking someone very nicely to "share blood" (which is not a recognized medical procedure despite what some village healers claim).
+&nbsp;
+‡‡The Purification Protocol, as documented in Threadwell's "Comprehensive Grimoire of Not Killing Your Patients," removes bacteria (99.97%), viruses (99.89%), fungi (99.93%), and dark enchantments (97.2%, though the remaining 2.8% are usually the ones you really wanted to get rid of).
+&nbsp;
+***The absolute maximum volume that can be safely transfused magically in a single session is 1.8 liters for an average adult human†, though the Guild strongly recommends not exceeding 1.5 liters unless you're particularly confident in your patient's cardiovascular system and your own malpractice insurance.
+&nbsp;
+†Defined by the Guild as "a human of approximately 70 kilograms, 170 centimeters height, moderate physical fitness, no significant magical mutations, and crucially, not currently in the middle of turning into anything else."
+&nbsp;
+†††The term "crimson bridge" comes from the ancient Akkadian text "The Tablets of Life-Giving," though modern translations suggest the original phrase might have been "the scary red thing between people that we don't really understand but it seems to work so don't question it too hard." Ancient Akkadian is notoriously imprecise about magical terminology.
+&nbsp;
+‡‡‡Professor Millicent Ravenscar of the Unseen University notes that losing concentration during bridge formation results in what she clinically describes as "a spectacular arterial fountain" and what her patients describe as "OH GODS OH GODS MAKE IT STOP." Her published paper on the subject includes seventeen footnotes that are just the word "don't" repeated.
+&nbsp;
+****The bridge functions on principles similar to the ancient Golem filtration systems‡, using thaumic resonance to identify and eliminate threats while preserving essential blood components. Think of it as a very sophisticated coffee filter, except the coffee is alive and will sue you if you filter out the wrong bits.
+&nbsp;
+‡The Golem civilization, which flourished briefly in what is now the Sto Plains around 800 BCE, discovered seventeen different applications for magical filtration before discovering the eighteenth one, which filtered out the thing that kept them alive. Archaeological records end there quite abruptly.
+&nbsp;
+††††Parasitic enchantments—commonly known as "hitchhiker hexes"—have a disturbing tendency to hide in blood cells and transfer between hosts during transfusion. The most famous case involved the Curse of Perpetual Hiccups, which spread through six patients before a practitioner noticed and cast the proper Exorcism of Minor Annoyances.
+&nbsp;
+‡‡‡‡The Pemberton Ancestral Curse, which caused male descendants to speak only in limericks after their 30th birthday, was successfully removed during an emergency transfusion in 1923. Unfortunately, it transferred to the recipient, a Miss Cordelia Whitebrook, who spent the next three years speaking in nothing but sonnets. Magical law regarding cursed blood is now significantly more comprehensive.
+&nbsp;
+*****Volume reception capacity varies significantly based on the recipient's current blood volume, cardiovascular health, ambient magical field strength, whether they've eaten breakfast, and according to Dr. Threadwell, "how much they believe in the process, which matters more than it should, frankly."
+&nbsp;
+††††††This rate was first achieved by Magus Helena Fastflow in 1891, though her record-keeping was questioned after it was discovered she measured time using a water clock that she'd accidentally enchanted to run faster. When adjusted for actual temporal flow, her rate was closer to 380 milliliters per minute, which is still impressive if slightly less record-breaking.
+&nbsp;
+‡‡‡‡‡Gravitational methods rely on blood flowing downhill from a suspended bag into a patient's vein, operating at approximately 40-80 milliliters per minute depending on viscosity, tubing diameter,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Using magic to transfer blood safely between individuals',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const REGENERATION_THROUGH_BLOOD: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'regeneration_through_blood',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Sanguine Vitality: Accelerated Healing via Blood Magic',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_healing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['hemomantic_efficiency'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 20, medicine: 14 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { blood_magic: 20, medicine: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'blood_regeneration' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `SANGUINE VITALITY: ACCELERATED HEALING VIA BLOOD MAGIC</span>
+&nbsp;
+The fundamental principle of blood regeneration lies in the conversion of one's own vital fluid into directed healing energy*, a process that operates on the ancient hermetic principle of "as within, so without"†. The practitioner must first achieve a state of hemomantic resonance‡, wherein the blood itself becomes aware of its duties beyond mere circulation**. This awareness, once achieved, permits the redirection of sanguine potential from sustaining current tissue to repairing damaged tissue, though this creates what the Guild of Concerned Healers refers to as "the fundamental bloody problem."††
+&nbsp;
+The trade-off inherent in blood magic remains stubbornly consistent across all recorded traditions‡‡: one cannot simultaneously possess blood and spend it***. The average adult human contains approximately 5.2 liters of blood†††, of which 1.7 liters are considered "expendable" by the Ankh-Morpork College of Hemomancy‡‡‡—though this figure notably excludes the blood contained within the College's Ethics Committee, who resigned en masse upon learning of this classification****. A moderate wound requiring closure demands roughly 0.3 liters of blood-as-fuel, while a serious laceration may require upward of 1.2 liters*****. The mathematics, as Professor Benedikt Vorpal-Schnauzenfeinstein once observed, are "distressingly straightforward and disappointingly finite."†††††
+&nbsp;
+The persistent question of limb regeneration‡‡‡‡ continues to vex practitioners, despite seventeen centuries of increasingly desperate experimentation******. The issue lies not in the blood's willingness—blood, it must be noted, remains philosophically neutral on most matters†††††† —but in the sheer informational complexity required to encode an entire limb‡‡‡‡‡. A fingernail, for instance, requires approximately 0.02 liters of blood to regenerate and contains roughly 847 distinct cellular decisions*******. A complete arm, by contrast, would require not only 14.7 liters of blood††††††† but also the simultaneous coordination of approximately 2.7 billion cellular instructions‡‡‡‡‡‡, which explains why Archmage Torrens's 1743 attempt resulted in three elbows and a philosophical crisis********.
+&nbsp;
+The phenomenon of over-healing represents perhaps the most insidious danger of blood regeneration magic, as it operates on the principle that if some healing is good, more healing must be better—a logical fallacy that has created more monsters than any demon summoning circle*********. Excessive application of blood magic to a single area produces not supernaturally perfect flesh but rather dense, inflexible scar tissue that can ossify into what old wives correctly identify as "blood stones"††††††††. The Catastrophic Registry of the Imperial Healing Academy‡‡‡‡‡‡‡ documents 2,847 cases of "enthusiastic self-treatment" resulting in anything from minor calcification to complete encasement in one's own bones**********, the latter condition being "irreversible, uncomfortable, and extremely difficult to transport."†††††††††
+&nbsp;
+The practitioner is therefore advised to approach blood regeneration with the same measured restraint one might apply to drinking, gambling, or summoning entities from before the first sunrise***********—which is to say, with careful attention to dosage, consequence, and the very real possibility that one might wake up somewhere unexpected, explaining things to authorities‡‡‡‡‡‡‡‡. The blood remembers************, even if you would prefer it didn't.
+&nbsp;
+---
+&nbsp;
+*The process, first codified by the Mesopotamian School of Useful Bleeding (circa 2400 BCE), was initially discovered when a priest cut himself while performing a sacrifice and noticed that the blood flowing INTO the ceremonial bowl seemed to be arguing with the blood trying to LEAVE his finger. See Tablet VI of the Hammurabi Medical Addendums, specifically the section titled "When Blood Has Opinions."
+&nbsp;
+†Not to be confused with "as without, so within," which is specifically prohibited by the Council of Safe Mysticism following the 1823 Incident, wherein Magister Hollowell attempted to heal himself from the outside in and achieved consciousness transfer with his own bandages. He remained sentient linen for six weeks before the effect wore off. His writings from this period, while technically impressive, are difficult to read and kept unraveling.
+&nbsp;
+‡The achievement of hemomantic resonance requires approximately 40 hours of meditation, or alternatively, being stabbed. Most practitioners choose the latter. The Guild of Unnecessary Suffering offers a certification program for the former, but enrollment has been declining steadily since 1997, when someone calculated that 40 hours of meditation costs more than a really good stabbing.
+&nbsp;
+**Blood's opinion of its own duties has been hotly debated since the Prague Symposium on Cellular Autonomy (1687), where blood samples were finally asked directly. The results were published as "red, wet, and largely illegible," though a later translation suggested the blood's position could be summarized as "just keep us moving, we'll sort it out." See the appendices for the full correspondence, which is both longer and damper than necessary.
+&nbsp;
+††The Guild of Concerned Healers, founded in 1512 specifically to worry about things, maintains a comprehensive list of "fundamental problems" in healing magic. "The Bloody Problem" ranks #3, after "why can't we fix death?" and "why DO corpses sometimes sit up?" but before "teeth." The Guild meets quarterly to add to the list. They have never removed an item.
+&nbsp;
+‡‡The Principle of Bloody Conservation, first formulated by Archhealer Sanguinus in 247 CE, states: "Thou cannot make blood from nothing, spend blood as blood, and still have blood for being blood." This was considered revolutionary at the time, though in retrospect it seems rather obvious. Sanguinus also formulated the Principle of Wet Conservation and the Principle of Not Putting That In Your Mouth, both of which were even more revolutionary.
+&nbsp;
+***There exists a persistent folk tradition of "having one's blood and spending it too," practiced primarily in the Duchy of Münzhausen, where the local nobility claim descent from Baron von Münzhausen himself. Their method involves complex financial instruments, blood futures, and what they call "hemomantic derivatives." The Duchy's economy collapsed in 1891. The blood market remains volatile.
+&nbsp;
+†††This figure represents the statistical mean for adults aged 25-55 of average build, excluding Thursdays, when all measurements are 4% higher for reasons that remain under investigation by the Temporal Metrology Institute. Please adjust calculations accordingly if performing blood magic on or near Thursday. The Institute recommends simply waiting until Friday when possible.
+&nbsp;
+‡‡‡The Ankh-Morpork College of Hemomancy occupies a surprisingly cheerful building on Treacle Mine Road, distinguished by its red-tinted windows and the perpetual smell of iron. Their motto, "We Put The Life Back In Your Life-Fluid," was challenged by the Advertising Standards Bureau but ultimately approved on grounds of technical accuracy. Tours are available Tuesdays and Thursdays. Fainting is common and considered part of the educational experience.
+&nbsp;
+****The Ethics Committee's letter of resignation, dated March 17th, 1999, consisted of a single page on which "WE'RE OUT" was written in increasingly desperate handwriting, followed by what appeared to be blood splatters but was later confirmed to be spilled tea. The Committee reformed three months later under the new name "The Committee for Thinking About Things Until We Feel Uncomfortable," which has proven more sustainable.
+&nbsp;
+*****These figures assume optimal conditions: a healthy practitioner, a fresh wound, adequate hydration, and what the Guild Technical Manual describes as "a properly respectful attitude toward one's own blood." Under sub-optimal conditions—which includes most actual emergencies—multiply these values by 1.4 to account for panic, inefficiency, and screaming. The Guild notes that screaming, while cathartic, is "hemomantically wasteful."
+&nbsp;
+††††††Professor Vorpal-Schnauzenfeinstein (1842-1921) held the Grünwald Chair of Pessimistic Mathematics at the University of Hoffenholm, where he specialized in calculating exactly how impossible things were. His seventeen-volume work "No, Actually: A Comprehensive Rejection of Optimistic Numerology" remains the definitive text on mathematical disappointment. He died doing what he loved: proving it couldn't be done.
+&nbsp;
+‡‡‡‡The Great Limb Question has spawned no fewer than forty-seven separate academic journals, two international conferences (one of which is specifically about why the other conference is wrong), an`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Using one\'s own blood to fuel rapid tissue regeneration',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BLOOD_DISEASE_PURGING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'blood_disease_purging',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Cleansing the Crimson: Purifying Blood of Disease and Poison',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_healing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['blood_transfusion_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 22, medicine: 16 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { blood_magic: 25, medicine: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'purge_blood' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `CLEANSING THE CRIMSON: PURIFYING BLOOD OF DISEASE AND POISON</span>
+&nbsp;
+The purification of vital humours has occupied magical practitioners since the Third Age*, when the Mad Hermit of Thornwick discovered that his blood had turned an alarming shade of purple after what he described as "an incident with questionable mushrooms and a friendly wyvern."† The fundamental principle remains unchanged: blood, being the river of life, must occasionally be dredged‡. The process involves filtering one's blood through a carefully constructed matrix of crystallized moonlight, ground silver, and what the Consortium of Hemomancers tactfully refers to as "sympathetic resonance lattices"**—though we all know they mean the expensive ones that don't explode††. The spell creates a separation between the vital essence and the unwanted passenger, whether that passenger be poison, disease, or the particularly stubborn curse placed upon you by your mother-in-law‡‡.
+&nbsp;
+However, certain afflictions prove remarkably resistant to purging***, demonstrating what Professor Malthus Grimweather termed "ontological stubbornness"†††. Some diseases have been with humanity so long they have developed what can only be described as squatter's rights‡‡‡. The Crimson Wasting, for instance, integrates itself so thoroughly into the blood's fundamental nature that attempting to remove it is akin to trying to unstir cream from tea**—theoretically possible, but requiring more energy than the universe has readily available***. Curses present a different challenge altogether: they don't merely inhabit the blood, they rewrite its essential story††††, changing what the blood believes itself to be‡‡‡‡. The Codex Sanguinis warns that attempting to purge certain elder curses may result in the blood deciding it would rather not be blood anymore, which leads to unfortunate rigidity****.
+&nbsp;
+The exhaustion attendant upon full blood purification cannot be understated†††††. The spell requires the caster to maintain perfect concentration while their entire blood volume cycles through the purging matrix approximately seventeen times‡‡‡‡‡—a process taking roughly forty-seven minutes*****, during which the caster must remain absolutely still******, lest they create what the medical texts euphemistically call "catastrophic shunting errors"†††††††. The body's response to having its blood temporarily removed, purified, and returned is roughly equivalent to running three marathons while simultaneously taking a comprehensive examination in advanced mathematics‡‡‡‡‡‡. Most practitioners sleep for sixteen hours afterward******* and wake with an insatiable craving for rare steak and sympathy********.
+&nbsp;
+The true sophistication emerges when purification is combined with transfusion magic†††††††, allowing one to purge the blood while simultaneously replacing depleted volume with fresh, clean vitae. The Grimwald-Thessaly Technique‡‡‡‡‡‡‡, developed after the unfortunate events of 1823*********, allows for continuous operation: tainted blood flows out through the purging matrix while clean blood flows in through a parallel channel**********. This approach reduces the exhaustion period to a mere six hours and cuts the catastrophic shunting error rate from "worryingly common" to "only occasional"†††††††††. However, this method requires a donor‡‡‡‡‡‡‡‡, and finding someone willing to spend an hour connected to your circulatory system while your blood is being wrung out like a dishrag is, as Professor Grimweather noted, "a test of true friendship, or at the very least, substantial financial incentive."********** The Combined Schools of Hemomancy and Transfusion Medicine maintain that this represents the pinnacle of blood-cleansing arts, though they are notably vague about the success rate***********, and their pamphlet on the subject contains an unusually lengthy section on choosing next of kin************.
+&nbsp;
+Modern practitioners should note that blood purification is not a casual undertaking, nor is it a suitable hangover cure, despite what your roommate from the Academy might have told you************. The spell requires precise calibration to each individual's blood signature‡‡‡‡‡‡‡‡‡, extensive preparation including a three-day purification fast†††††††††††, and ideally, a qualified medical professional standing by with restorative draughts and a shocked expression‡‡‡‡‡‡‡‡‡‡. Yet for those suffering from genuine affliction—be it the bite of a dire serpent, the plague of a cursed city, or the subtle poison of a political rival**************—the exhaustion is a small price to pay for life itself. As the ancient Hemomancers' Oath reminds us: "Better tired than dead, better pure than poisoned, and better to have a friend with clean blood than an enemy with a stiletto."
+&nbsp;
+&nbsp;
+*The Third Age being that period of history when humans had discovered magic but not yet common sense.
+&nbsp;
+†The Hermit survived, though his blood never quite returned to its original color. He lived to the impressive age of 147, during which time he founded the Chromatic Hemomancy Institute and discovered seventeen new shades of purple. The wyvern, for its part, became a vegetarian.
+&nbsp;
+‡This metaphor is more literal than comfortable. The average adult human blood volume is approximately 5 liters, which is roughly equivalent to a small municipal waterway. The amount of refuse that accumulates over a lifetime of consuming questionable tavern food, breathing city air, and engaging in what the Medical College delicately terms "contact with the unwashed masses" is substantial.
+&nbsp;
+**The Consortium charges seven hundred gold pieces for a basic resonance lattice. The luxury model, which features "artisanal crystallization" and "ethically sourced moonlight," costs twelve hundred. They are functionally identical, but the expensive ones come in a nicer box.
+&nbsp;
+††The Incident at the Southwick Academy in 1789 demonstrated the importance of proper lattice construction. Three students attempted to save money by building their own matrices from glass, copper wire, and what they assured the subsequent inquiry was "definitely not cursed quartz from the forbidden section of the geology department." The explosion was visible from three counties away. The students survived but are now collectively known as "The Translucent Trio" due to their unfortunate newfound property of partial transparency†.
+&nbsp;
+†The effect is permanent. They have adapted surprisingly well, though they no longer play cards together.
+&nbsp;
+‡‡Particularly if you married into the Blackthorne family. Their curses are noted for both persistence and creativity‡.
+&nbsp;
+‡Grandmother Esmeralda Blackthorne's famous "May Your Blood Remember Every Slight" curse of 1654 is still active in three family lines, causing descendants to spontaneously develop hives when they tell even small lies.
+&nbsp;
+***Professor Grimweather maintained a collection of "Impertinent Pathogens" in his laboratory—diseases that had successfully resisted purging attempts. They were kept in bottles with labels like "Stubborn Bastard #7" and "The One That Laughed." The collection was destroyed in 1891 when his assistant sneezed near the cabinet. The resulting plague killed seven people but developed a cure for three previously incurable diseases, so the Medical College ruled it "net neutral" and declined to prosecute.
+&nbsp;
+†††Ontological stubbornness is measured on the Grimweather Scale, which ranges from 1 ("goes away if you ask nicely") to 10 ("would survive the heat death of the universe out of spite").
+&nbsp;
+‡‡‡The common cold, for instance, has been with humanity since the dawn of time††. It has been present at every major historical event. It attended the signing of the First Compact. It was there when the Dragon Kings fell. Some scholars believe it predates humanity itself and merely tolerates our existence as convenient hosts.
+&nbsp;
+††This is possibly why attempts to magically cure the common cold always fail. The cold simply has seniority.
+&nbsp;
+**The record for closest achievement was Archmagus Thessaly's attempt in 1817, which successfully unstirred cream from tea but required the combined power output of six hundred mages working in concert for three hours. The resulting tea was described as "technically perfect but spiritually wrong."
+&nbsp;
+***The Crimson Wasting is unusual in that it improves certain physical attributes while slowly killing you. Sufferers report enhanced strength, improved night vision, and an unfortunate tendency to cough up blood at dinner parties. Several aristocratic families deliberately maintain low-level infections for the enhanced attributes, considering it a reasonable trade-off, though their life insurance premiums are substantial.
+&nbsp;
+††††This concept from the Ancient Schools of Blood-Memory, which held that blood maintains a narrative identity. Thus, a curse doesn't merely poison the blood; it convinces the blood that being poisone`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Removing toxins, diseases, and curses from blood',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LIFE_EXTENSION_BLOOD: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'life_extension_blood',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Sanguine Elixir: Blood Magic and Life Extension',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_healing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['regeneration_through_blood', 'blood_disease_purging'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 25, medicine: 18 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { blood_magic: 30, medicine: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'extend_lifespan' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# The Sanguine Elixir: Blood Magic and Life Extension</span>
+&nbsp;
+The practice of blood renewal for life extension represents one of the oldest continuously researched branches of arcane medicine, with documentation stretching back to the Third Age of Ambition*. The fundamental principle operates on a surprisingly straightforward mechanism: by regularly renewing one's blood through controlled magical cycles, practitioners can effectively "reset" the cellular aging clock, as blood cells carry the temporal signature of their creation throughout the body**. The Institute for Extended Mortality Studies has documented cases of practitioners maintaining apparent biological ages thirty to forty years below their chronological age through diligent application of this technique†. The process requires drawing approximately one-eighth of one's blood volume during the waxing moon, subjecting it to purification rituals‡, and reintroducing it during the waning phase—a schedule that must be maintained with religious precision‡‡.
+&nbsp;
+However, the promise of practical immortality through blood renewal encounters what the Conclave of Geriatric Sorcery terms the "Diminishing Returns Catastrophe"††. Initial renewals produce dramatic results, with practitioners reporting increased vitality, improved cognitive function, and a general sense of having "borrowed back" lost years†††. Yet with each subsequent cycle, the benefits decrease by an average of 3.7% while the magical energy required increases by 4.2%‡‡‡. By the fifteenth year of continuous practice, most practitioners find themselves investing six hours daily in rituals that produce barely perceptible benefits*. The theoretical maximum lifespan extension achieved through pure blood renewal appears to plateau at approximately sixty-three years beyond natural expectancy**, a number that has remained frustratingly consistent across cultures, time periods, and individual magical potency***. This has led some desperate practitioners to seek more... permanent solutions†.
+&nbsp;
+The critical distinction between therapeutic blood renewal and vampirism cannot be overstated, despite the superficial similarities that have confused countless novices and several embarrassingly qualified Council members††. Vampirism represents a complete ontological transformation—the practitioner's blood ceases to be their own and becomes instead a parasitic system requiring constant external supplementation‡. The vampire's immortality comes at the cost of their fundamental humanity, requiring them to drain life force from living beings to sustain their unnatural state‡‡. As the Codex Hemomanticus warns: "He who seeks to live forever by consuming others shall find himself living forever among the consumed"***. The documented cases of intentional self-vampirism number in the low thousands, and of these, precisely zero have reported satisfaction with their choice after the first century††. The Guild of Reformed Hemomancers maintains a permanent exhibition of cautionary correspondence from such individuals, though visitors are advised that the letters become increasingly unhinged after page forty‡‡‡.
+&nbsp;
+The ethical considerations surrounding life extension through blood magic extend far beyond personal choice into the realm of social responsibility and cosmic balance†††. The Conclave's Ethics Committee has documented seventeen distinct civilizational collapses attributable to immortal ruling classes who refused to cede power to younger generations*. Furthermore, there exists the question of resource allocation—if only the wealthy and magically gifted can access life extension, does this not create an aristocracy of the aged***? The philosopher-mage Tertius the Perpetually Middle-Aged argued that death serves as "the great equalizer, the final democratic institution, the only truly fair distribution system the universe ever invented"**. Yet the counterargument persists: if we possess the knowledge to extend healthy, productive life, do we not have a moral obligation to use it? The debate continues, though notably, most of those arguing against life extension are themselves quite young†.
+&nbsp;
+The responsible practitioner must approach blood renewal with humility, precision, and a clear understanding of both its potential and its limitations††. It offers not immortality but rather a careful extension of one's productive years, a gift of time to complete unfinished work or simply to enjoy a few more springs‡‡. The magic asks for discipline, demands ethical consideration, and rewards patience with years of vitality‡‡‡. But it cannot and will not make one a god, merely a human with slightly more time to make the same old mistakes***. As the sage Wilhelmina the Eventually Deceased observed in her final treatise: "I have lived two hundred and six years, and I can report with authority that while the quantity of time matters, it is the quality of wisdom acquired that determines whether those years were worth the candles burned in their pursuit"††††.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+\* The Third Age of Ambition lasted from approximately 1240 to 1520 CE by the Common Calendar, though dating this period is complicated by the fact that several of its key figures were actively manipulating temporal records to obscure their true ages. The Age earned its name from the unusually high percentage of arcane research devoted to immortality projects—estimated at 67% of all magical scholarship during its peak, compared to the current rate of approximately 23%. It ended rather abruptly when the Council of Inevitable Consequences declared that "everyone needs to calm down about living forever and focus on practical magic like making crops grow and preventing plagues." † Ironically, this proclamation was delivered by Council Head Erasmus the Undying, who was himself 340 years old at the time and would live another 200 years before finally succumbing to what his death certificate listed as "terminal boredom."
+&nbsp;
+\** The cellular aging clock operates on principles first documented by Sister Haematia of the Order of Perpetual Examination, who spent sixty years studying her own blood under increasingly powerful microscopes of her own design. Her final paper, "The Telomeric Catastrophe and Why We're All Doomed Unless We Do Something About It," ran to 1,247 pages and included seventeen different proposals for cheating death, three of which actually worked. †† The other fourteen resulted in what the Order's records delicately term "instructive failures," though witnesses described them using substantially more colorful language. One particularly ambitious experiment resulted in Sister Haematia temporarily existing in three different time periods simultaneously, which she reported as "uncomfortable" and "philosophically distressing." ††† After her death at the respectable age of 187, her body was discovered to contain blood cells of three different ages: some fresh from the previous week, some approximately forty years old, and a small population that appeared to predate her birth by several decades. The Order never did figure out where those came from.
+&nbsp;
+† The Institute for Extended Mortality Studies occupies a sprawling campus in the city of Perpetua, where the average age of faculty members is 156 years. The Institute's entrance bears the somewhat ominous motto: "Not Dead Yet." Their research ethics committee meets monthly to review ongoing projects, though attendance has been declining steadily as members keep dying despite their best efforts. ‡ The Institute maintains the world's largest collection of age-related medical data, including detailed case studies of every documented hemomantic life extension attempt since 1450. They offer tours on Wednesdays, though visitors frequently report feeling "existentially unsettled" by the archive of photographs showing the same researchers over 150-year spans. The gift shop sells t-shirts reading "I Visited the Institute for Extended Mortality Studies and All I Got Was This Lousy Shirt and An Existential Crisis."
+&nbsp;
+‡ The purification rituals vary considerably by tradition, but all share certain common elements: exposure to moonlight, filtration through sanctified silver vessels, and the addition of what the Codex Hemomanticus calls "regenerative catalysts." ** These catalysts typically include powdered moonstone, essence of spring water collected at dawn, and according to some traditions, "three tears shed in joy." †† The tears requirement has generated considerable debate, with the Literalist School insisting on genuine tears while the Pragmatic School accepts any saline solution produced while thinking happy thoughts. The Conclave eventually ruled that either interpretation was acceptable, though they noted that the Literalist approach had a 2.3% higher success rate and "significantly better vibes." ††† A cottage industry of professional joy-tear producers emerged briefly in the 1680s, but collapsed after it was discovered that one couldn't actually fake genuine emotion for profit without eventually suffering what therapists termed "emotional bankruptcy." Several former tear-producers now run support groups for each other.
+&nbsp;
+‡‡ The precision required cannot be overstated. The Ledger of Lamentable Scheduling Errors documents over 4,000 cases where practitioners attempted the renewal during the wrong lunar phase, resulting in effects ranging from "mild temporal disorientation" to "catastrophic age reversal into nonexistence." ‡ Case #2,847 involved a practitioner who miscalculated the moon phase by three hours and aged backwards so rapidly that observers described him as "de-evolving through his own timeline like a film played in reverse." He stabilized at the apparent age of seven months and had to be raised by his great-great-grandchildren, who reported that the experience was "`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Using blood magic to slow aging and extend natural lifespan',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RESURRECTION_BLOOD_MAGIC: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'resurrection_blood_magic',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Final Barrier: Blood Magic and True Resurrection',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_healing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['life_extension_blood'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 10,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 30, necromancy: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { blood_magic: 35, necromancy: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'blood_resurrection' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# The Final Barrier: Blood Magic and True Resurrection</span>
+&nbsp;
+By Archmage Delphinia Vex-Mortensen, Department of Terminal Complications, The Scholomance
+&nbsp;
+---
+&nbsp;
+The resurrection of the truly dead—not the recently deceased, not the mostly dead, not the dramatically inconvenienced*—represents the apex of blood magical theory and the nadir of practical application. Where life extension merely postpones the inevitable†, true resurrection demands that Death itself be persuaded, bribed, or temporarily distracted while the soul is smuggled back across the veil‡. The fundamental requirement is blood, and not just any blood: the Grimoire Vitalis specifies "enough to make the gods themselves uncomfortable," which subsequent scholarship has quantified at approximately 47.3 liters per resurrection attempt**, though this ratio increases exponentially with each hour the deceased has been, well, deceased††. The mechanism operates on a principle discovered by the legendary necromancer Vadim Dreadshire‡‡: that blood, being the currency of life, can be exchanged at a fixed rate with Death, provided one has enough capital and very poor investment advisors***.
+&nbsp;
+The temporal window for successful resurrection proves surprisingly narrow, contradicting the popular misconception that Death operates on a leisurely schedule†††. Research conducted by the Thanatological Institute of Kezmarth‡‡‡ demonstrates that the soul begins its journey toward wherever it is souls actually go**** immediately upon death, traveling at a speed proportional to the deceased's eagerness to leave†††† and the number of embarrassing memories they'd rather not confront‡‡‡‡. Within the first hour, retrieval remains theoretically possible if one has the requisite blood supply, a tolerance for screaming****, and either exceptional luck or exceptional lawyers†††††. Between one and three hours, the difficulty increases by a factor of twelve, requiring not only more blood but also a willingness to negotiate with entities best left unmentioned in polite society‡‡‡‡‡. Beyond four hours, the soul has typically reached what scholars euphemistically call "the point of bureaucratic entanglement,"****** at which point resurrection becomes less a matter of magic and more a matter of filling out the correct forms in triplicate while entities with names like Azgrath the Twice-Burnt review your application††††††.
+&nbsp;
+Perhaps the most overlooked aspect of resurrection magic is the necessity of consent‡‡‡‡‡‡, a detail that has resulted in more spectacular failures than any other single factor*******. The soul must genuinely wish to return, a condition that proves far more restrictive than early practitioners imagined†††††††. In the words of the infamous blood-mage Cornelius Rasp: "Turns out, death is quite relaxing, and explaining to the deceased why they should abandon eternal peace to deal with their creditors again is surprisingly difficult."‡‡‡‡‡‡‡ The Vex-Mortensen Scale of Enthusiasm for Corporeal Re-embodiment, developed after the disaster at Thornwall Keep********, categorizes souls on a spectrum from "absolutely champing at the bit to return" to "actively casting spectral hexes at would-be rescuers."††††††††
+&nbsp;
+The catastrophic alternative to successful resurrection—the creation of undead‡‡‡‡‡‡‡‡—occurs with distressing frequency, accounting for approximately 94.7% of all attempted resurrections according to the Guild of Mortuary Correction*********. The transformation mechanism operates on a principle best described as "close enough for government work"†††††††††: if the blood sacrifice proves insufficient, the soul unwilling, or the timing inappropriate‡‡‡‡‡‡‡‡‡, the magical energy must go *somewhere*, and the somewhere it chooses is typically "right back into the corpse with catastrophically reanimating consequences."********** The Codex Mortuarius documents 237 distinct varieties of resurrection-induced undeath, ranging from the merely inconvenient (zombies with excellent motor control and poor social boundaries) to the genuinely apocalyptic (liches created accidentally by graduate students who misread the appendix)††††††††††. Current safety protocols‡‡‡‡‡‡‡‡‡‡ require all resurrection attempts to be conducted within a consecrated circle, with a cleric on standby, an exorcist in the next room, and someone manning the "emergency obliteration" lever at all times***********.
+&nbsp;
+Modern blood resurrection theory, as developed by this author and her numerous deceased predecessors††††††††††††, acknowledges these limitations while seeking to establish workable parameters for controlled application‡‡‡‡‡‡‡‡‡‡‡. The spell matrix detailed in the appendix represents three centuries of refinement, twelve institutional reviews, and the consolidated wisdom of practitioners who learned, often fatally, what not to do************. Success requires precision, preparation, and the sort of cavalier disregard for natural law that characterizes all truly advanced magical research, tempered by enough caution to avoid becoming a cautionary tale oneself††††††††††††‡.
+&nbsp;
+---
+&nbsp;
+**FOOTNOTES**
+&nbsp;
+\* The medical distinction between "dead" and "mostly dead" was established by the Guild of Chirurgeons in 1247 CE, following the embarrassing incident where Surgeon-General Maltheus pronounced Duke Vexford deceased at 3 PM, only to have the Duke recover consciousness during his own wake at 7 PM and fire the Surgeon-General in front of 200 witnesses. The subsequent lawsuit established that death requires cessation of at least three major organ systems for a minimum of seven minutes, though the Duke lobbied for ten.
+&nbsp;
+† See the companion paper "Life Extension Through Blood Magic: Or, How to Make Death Wait in the Lobby While You Finish Just One More Thing."
+&nbsp;
+‡ Death is, contrary to popular theology, quite amenable to negotiation, though extremely particular about contract language. The Department of Terminal Metaphysics at Kezmarth maintains 3,400 cubic feet of documentation on Death-related jurisprudence, most of it concerning comma placement.
+&nbsp;
+** Originally measured in "sufficient buckets to make the squeamish faint," this was revised to metric standards following the Harmonization of Mystical Measurements Act of 1782. One graduate student attempting to convert historical texts spent three months determining that a "bucket" ranged anywhere from 2 to 40 liters depending on whether the author was being literal or poetic.
+&nbsp;
+†† The exponential increase follows the formula B = 47.3 * (1.8^h) where B is blood required in liters and h is hours deceased. This means attempting resurrection at the four-hour mark requires approximately 497 liters, which explains why most mages simply give up and tell the family there was "too much paperwork."
+&nbsp;
+‡‡ Dreadshire's seminal work, "On the Exchange Rate Between Life and Unliving," was published posthumously, which some felt undermined its credibility until Dreadshire published a rebuttal himself, also posthumously, which rather proved his point.
+&nbsp;
+*** The Guild of Necromantic Financial Planning has never recovered from the reputational damage caused by Dreadshire's work. Their current motto, "At Least We're Honest About Your Money Being Gone," reflects a certain resignation.
+&nbsp;
+††† Death does not, in fact, operate on any schedule. Death operates on a sort of "showing up whenever it feels like it" basis, which is why time-of-death pronouncements carry a margin of error of ±15 minutes.
+&nbsp;
+‡‡‡ The Institute's funding comes primarily from life insurance companies with a vested interest in establishing exactly when people are "really, properly dead" for purposes of claim processing.
+&nbsp;
+**** Current theological debate centers on whether souls go to: a) The Heaven (or Heavens) of their choosing, b) A cosmic sorting facility where they're processed by entities in middle management positions, c) Simply nowhere, ceasing to exist, which has disappointing implications for the resurrection business, or d) Somewhere so incomprehensible that mortal minds default to imagining it as "a nice meadow with pleasant weather."
+&nbsp;
+†††† Measured in "spiritual meters per second," a unit that physicists hate and mystics insist is perfectly valid. The fastest recorded soul departure was that of Tax Assessor Grimwald Fent, who achieved 47 spiritual meters per second, suggesting either exceptional eagerness to leave or that he knew something about the afterlife that made mortal existence comparatively tedious.
+&nbsp;
+‡‡‡‡ During the autopsy review phase, Assessor Fent's memories included: three extramarital affairs, embezzlement of municipal funds, and an incident involving the Mayor's daughter, a ferret, and circumstances "best`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The theoretical and practical limits of bringing the dead back to life',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  BLOOD_TRANSFUSION_MAGIC,</span>
+<span class="cstat-no" title="statement not covered" >  REGENERATION_THROUGH_BLOOD,</span>
+<span class="cstat-no" title="statement not covered" >  BLOOD_DISEASE_PURGING,</span>
+<span class="cstat-no" title="statement not covered" >  LIFE_EXTENSION_BLOOD,</span>
+<span class="cstat-no" title="statement not covered" >  RESURRECTION_BLOOD_MAGIC</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

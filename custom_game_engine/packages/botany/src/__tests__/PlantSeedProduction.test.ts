@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  WorldImpl,
+  World,
   PlantComponent,
   EntityImpl,
   createEntityId,
@@ -14,7 +14,7 @@ import { PlantSystem } from '../systems/PlantSystem.js';
  * Tests that plants produce seeds correctly when transitioning through stages
  */
 describe('PlantSeedProduction Integration', () => {
-  let world: WorldImpl;
+  let world: World;
   let plantSystem: PlantSystem;
   let eventBus: EventBusImpl;
 

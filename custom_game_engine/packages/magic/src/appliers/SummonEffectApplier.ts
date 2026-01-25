@@ -94,7 +94,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
-        summonedEntity.addComponent(positionComponent as any);
+        summonedEntity.addComponent(positionComponent as Component);
 
         // Set owner if controllable
         if (effect.controllable) {

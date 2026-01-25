@@ -335,13 +335,31 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
     }
 
     // Add adaptation
+    const additionalChannels = Array.isArray(effect.parameters.additionalChannels)
+      ? effect.parameters.additionalChannels.map((c: unknown) => {
+          if (typeof c === 'object' && c !== null && 'type' in c) {
+            return (c as ChannelData).type;
+          }
+          return undefined;
+        }).filter((t): t is string => t !== undefined)
+      : undefined;
+
+    const additionalRisks = Array.isArray(effect.parameters.additionalRisks)
+      ? effect.parameters.additionalRisks.map((r: unknown) => {
+          if (typeof r === 'object' && r !== null && 'type' in r) {
+            return (r as RiskData).type;
+          }
+          return undefined;
+        }).filter((t): t is string => t !== undefined)
+      : undefined;
+
     targetMagic.adaptations.push({
       spellId,
       adaptationType,
       modifications: {
         costModifier: effect.parameters.costModifier as number | undefined,
-        additionalChannels: (effect.parameters.additionalChannels as any)?.map((c: any) => c.type as any),
-        additionalRisks: (effect.parameters.additionalRisks as any)?.map((r: any) => r.type as any),
+        additionalChannels,
+        additionalRisks,
       },
     });
 

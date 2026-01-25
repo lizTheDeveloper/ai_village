@@ -1,0 +1,2473 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/rune-magic-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> rune-magic-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/407</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/407</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a>
+<a name='L677'></a><a href='#L677'>677</a>
+<a name='L678'></a><a href='#L678'>678</a>
+<a name='L679'></a><a href='#L679'>679</a>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a>
+<a name='L685'></a><a href='#L685'>685</a>
+<a name='L686'></a><a href='#L686'>686</a>
+<a name='L687'></a><a href='#L687'>687</a>
+<a name='L688'></a><a href='#L688'>688</a>
+<a name='L689'></a><a href='#L689'>689</a>
+<a name='L690'></a><a href='#L690'>690</a>
+<a name='L691'></a><a href='#L691'>691</a>
+<a name='L692'></a><a href='#L692'>692</a>
+<a name='L693'></a><a href='#L693'>693</a>
+<a name='L694'></a><a href='#L694'>694</a>
+<a name='L695'></a><a href='#L695'>695</a>
+<a name='L696'></a><a href='#L696'>696</a>
+<a name='L697'></a><a href='#L697'>697</a>
+<a name='L698'></a><a href='#L698'>698</a>
+<a name='L699'></a><a href='#L699'>699</a>
+<a name='L700'></a><a href='#L700'>700</a>
+<a name='L701'></a><a href='#L701'>701</a>
+<a name='L702'></a><a href='#L702'>702</a>
+<a name='L703'></a><a href='#L703'>703</a>
+<a name='L704'></a><a href='#L704'>704</a>
+<a name='L705'></a><a href='#L705'>705</a>
+<a name='L706'></a><a href='#L706'>706</a>
+<a name='L707'></a><a href='#L707'>707</a>
+<a name='L708'></a><a href='#L708'>708</a>
+<a name='L709'></a><a href='#L709'>709</a>
+<a name='L710'></a><a href='#L710'>710</a>
+<a name='L711'></a><a href='#L711'>711</a>
+<a name='L712'></a><a href='#L712'>712</a>
+<a name='L713'></a><a href='#L713'>713</a>
+<a name='L714'></a><a href='#L714'>714</a>
+<a name='L715'></a><a href='#L715'>715</a>
+<a name='L716'></a><a href='#L716'>716</a>
+<a name='L717'></a><a href='#L717'>717</a>
+<a name='L718'></a><a href='#L718'>718</a>
+<a name='L719'></a><a href='#L719'>719</a>
+<a name='L720'></a><a href='#L720'>720</a>
+<a name='L721'></a><a href='#L721'>721</a>
+<a name='L722'></a><a href='#L722'>722</a>
+<a name='L723'></a><a href='#L723'>723</a>
+<a name='L724'></a><a href='#L724'>724</a>
+<a name='L725'></a><a href='#L725'>725</a>
+<a name='L726'></a><a href='#L726'>726</a>
+<a name='L727'></a><a href='#L727'>727</a>
+<a name='L728'></a><a href='#L728'>728</a>
+<a name='L729'></a><a href='#L729'>729</a>
+<a name='L730'></a><a href='#L730'>730</a>
+<a name='L731'></a><a href='#L731'>731</a>
+<a name='L732'></a><a href='#L732'>732</a>
+<a name='L733'></a><a href='#L733'>733</a>
+<a name='L734'></a><a href='#L734'>734</a>
+<a name='L735'></a><a href='#L735'>735</a>
+<a name='L736'></a><a href='#L736'>736</a>
+<a name='L737'></a><a href='#L737'>737</a>
+<a name='L738'></a><a href='#L738'>738</a>
+<a name='L739'></a><a href='#L739'>739</a>
+<a name='L740'></a><a href='#L740'>740</a>
+<a name='L741'></a><a href='#L741'>741</a>
+<a name='L742'></a><a href='#L742'>742</a>
+<a name='L743'></a><a href='#L743'>743</a>
+<a name='L744'></a><a href='#L744'>744</a>
+<a name='L745'></a><a href='#L745'>745</a>
+<a name='L746'></a><a href='#L746'>746</a>
+<a name='L747'></a><a href='#L747'>747</a>
+<a name='L748'></a><a href='#L748'>748</a>
+<a name='L749'></a><a href='#L749'>749</a>
+<a name='L750'></a><a href='#L750'>750</a>
+<a name='L751'></a><a href='#L751'>751</a>
+<a name='L752'></a><a href='#L752'>752</a>
+<a name='L753'></a><a href='#L753'>753</a>
+<a name='L754'></a><a href='#L754'>754</a>
+<a name='L755'></a><a href='#L755'>755</a>
+<a name='L756'></a><a href='#L756'>756</a>
+<a name='L757'></a><a href='#L757'>757</a>
+<a name='L758'></a><a href='#L758'>758</a>
+<a name='L759'></a><a href='#L759'>759</a>
+<a name='L760'></a><a href='#L760'>760</a>
+<a name='L761'></a><a href='#L761'>761</a>
+<a name='L762'></a><a href='#L762'>762</a>
+<a name='L763'></a><a href='#L763'>763</a>
+<a name='L764'></a><a href='#L764'>764</a>
+<a name='L765'></a><a href='#L765'>765</a>
+<a name='L766'></a><a href='#L766'>766</a>
+<a name='L767'></a><a href='#L767'>767</a>
+<a name='L768'></a><a href='#L768'>768</a>
+<a name='L769'></a><a href='#L769'>769</a>
+<a name='L770'></a><a href='#L770'>770</a>
+<a name='L771'></a><a href='#L771'>771</a>
+<a name='L772'></a><a href='#L772'>772</a>
+<a name='L773'></a><a href='#L773'>773</a>
+<a name='L774'></a><a href='#L774'>774</a>
+<a name='L775'></a><a href='#L775'>775</a>
+<a name='L776'></a><a href='#L776'>776</a>
+<a name='L777'></a><a href='#L777'>777</a>
+<a name='L778'></a><a href='#L778'>778</a>
+<a name='L779'></a><a href='#L779'>779</a>
+<a name='L780'></a><a href='#L780'>780</a>
+<a name='L781'></a><a href='#L781'>781</a>
+<a name='L782'></a><a href='#L782'>782</a>
+<a name='L783'></a><a href='#L783'>783</a>
+<a name='L784'></a><a href='#L784'>784</a>
+<a name='L785'></a><a href='#L785'>785</a>
+<a name='L786'></a><a href='#L786'>786</a>
+<a name='L787'></a><a href='#L787'>787</a>
+<a name='L788'></a><a href='#L788'>788</a>
+<a name='L789'></a><a href='#L789'>789</a>
+<a name='L790'></a><a href='#L790'>790</a>
+<a name='L791'></a><a href='#L791'>791</a>
+<a name='L792'></a><a href='#L792'>792</a>
+<a name='L793'></a><a href='#L793'>793</a>
+<a name='L794'></a><a href='#L794'>794</a>
+<a name='L795'></a><a href='#L795'>795</a>
+<a name='L796'></a><a href='#L796'>796</a>
+<a name='L797'></a><a href='#L797'>797</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { ResearchPaper } from './types.js';
+&nbsp;
+/**
+ * Rune Magic Research Papers
+ *
+ * The knowledge tree for discovering and mastering the art of rune-craft,
+ * from basic symbol recognition to inscribing elder runes of power.
+ *
+ * Footnote styles: Pratchett (informative humor), Moers (fantastical),
+ * Gaiman (mythological), Adams (bureaucratic absurdity)
+ */
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SYMBOL_RECOGNITION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'symbol_recognition',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'On the Recognition of Marks That Mean: An Introduction to Runic Symbols',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 5, arcane: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'carve_basic_runes' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'rune_of_light' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'rune_of_protection' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 1, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['basic_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `The first treatise on distinguishing between "a scratch in the rock" and "a scratch in the rock that will set you on fire*." The author, whose name has been carefully omitted from all copies**, provides practical guidelines for identifying intentional markings from natural erosion, vandalism, and the particularly aggressive forms of lichen***.</span>
+&nbsp;
+The work establishes the Three Questions of Recognition:† 1) Does it look like someone put it there on purpose? 2) Does it make you feel slightly uncomfortable?†† 3) If you touch it, does anything happen?†††
+&nbsp;
+Special emphasis is given to the phenomenon of "accidental runes"‡ - marks that, through pure chance, form power-bearing symbols. The author notes seventeen documented cases of farmers inadvertently creating runes while scratching their names into fence posts‡‡.
+&nbsp;
+*This distinction has proven harder to make than one might hope. The line between "meaningful mark" and "random scratch" is philosophically blurry and practically dangerous.
+&nbsp;
+**The omission was not the author's choice. Their name was removed by the Rune-Keepers' Guild after it was discovered that the author's signature, when viewed sideways, formed the rune for "minor explosion." This has happened to 47% of runic authors throughout history.
+&nbsp;
+***Certain lichens grow in patterns that resemble ancient script. This is either coincidental or evidence that lichens are more literate than previously suspected. The Botanical Runic Society maintains it is the latter and will fight you about it.
+&nbsp;
+†The Three Questions were formalized by the Council of Cautious Scholars in the Year of the Unexpected Fire. The Council had previously used only two questions, which proved insufficient. The addition of the third question reduced accidental activations by 73%.
+&nbsp;
+††"Slightly uncomfortable" is the technical term. The sensation ranges from "vaguely watched" to "actively threatened" to "why is the air tasting purple?" Calibration of discomfort requires practice and a willingness to be occasionally wrong.
+&nbsp;
+†††Testing for magical effects has claimed the fingers of many hasty researchers. The recommended procedure is: assign someone else to touch it, stand at least twenty feet away, have running water nearby. The Touching Protocol of 1247 runs to forty-seven pages.
+&nbsp;
+‡Accidental runes are statistically improbable but practically common, suggesting the universe has a sense of humor, terrible luck, or insufficient random number generation. Mathematicians and theologians remain divided.
+&nbsp;
+‡‡Farmer Grundleson's fence post accidentally created the rune for "prosperity," resulting in a farm so successful it had to be divided into three separate farms to prevent economic destabilization of the region. He is remembered fondly, though his descendants suspect he knew exactly what he was doing.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Basic principles of distinguishing intentional runic symbols from random markings, with safety protocols for identification.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 100,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 1</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CARVING_FUNDAMENTALS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'carving_fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Cutter\'s Handbook: Basic Techniques in Rune Inscription',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 5, crafting: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'carve_basic_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 1, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['basic_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A practical manual on cutting marks into things without cutting yourself*, written by someone who learned through extensive trial, error, and bandages**. The work covers tool selection***, material preparation, and the critical distinction between "carving a rune" and "vandalism"†.</span>
+&nbsp;
+The author introduces the concept of "sympathetic carving" - the idea that the rune should be carved with intent matching its purpose††. A protection rune carved carefully differs from one carved frantically†††, though both technically function‡.
+&nbsp;
+Chapter 7, "On the Importance of Measuring Twice and Carving Once," is accompanied by seventeen cautionary tales‡‡. The appendix on "What To Do When You Carve The Wrong Rune" has been consulted more than any other section.
+&nbsp;
+*This proves harder than expected. The ratio of "rune successfully carved" to "finger accidentally carved" begins at approximately 3:1 for novices. Experienced carvers reduce this to 50:1. Masters claim 1000:1, though many are missing fingers from their learning years.
+&nbsp;
+**The author's personal collection of bandages has been donated to the Museum of Practical Magic, where it forms the third-largest exhibit. The largest is a collection of "things that exploded" and the second-largest is "things that should not have worked but did."
+&nbsp;
+***Tool selection is treated with the gravitas usually reserved for choosing godparents or naming ships. The wrong tool creates the wrong line creates the wrong rune creates the wrong effect creates the right lawsuit.
+&nbsp;
+†Legally speaking, vandalism becomes rune-craft when: (a) you own the surface being carved, (b) the mark has magical properties, or (c) you can prove religious/cultural significance. The Council of Surfaces maintains a 300-page guideline that somehow makes this more confusing.
+&nbsp;
+††The theory of sympathetic carving holds that intent flows through the carver's hands into the mark. Critics argue this is metaphysical nonsense. Practitioners respond by carving runes while thinking very hard about the critics.  The runes work anyway, which proves either everything or nothing.
+&nbsp;
+†††Protection runes carved while being chased by bears have a notably aggressive quality to their protection. Several such runes have been known to attack threats that weren't actually threats, just suspicious-looking travelers.
+&nbsp;
+‡"Technically functions" is doing significant work in this sentence. Yes, the rune works. Yes, it might work too well. Yes, you might want to stand behind something fireproof.
+&nbsp;
+‡‡The tales include: The Backwards Rune Incident, The Upside-Down Catastrophe, The Mirror Image Disaster, and The Thing We Don't Speak About Because The Rune Is Still Active And We Can't Turn It Off.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Fundamental techniques for inscribing runes into various materials, with emphasis on safety and precision.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 100,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 1</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MATERIAL_SYMPATHIES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'material_sympathies',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Substances and Sigils: The Affinities of Carving Materials',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['symbol_recognition', 'carving_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 10, nature: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'building', buildingId: 'rune_workshop' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 2, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `An exhaustive study on why runes carved in oak behave differently from those carved in granite, which behave differently from those carved in bone*, which we really wish you wouldn't carve runes into, but here we are**. The author traveled extensively*** to test runes on every substance imaginable† and several that shouldn't be††.</span>
+&nbsp;
+The central thesis is elegant: materials remember their nature†††, and runes inherit these memories‡. Wood retains the memory of growth‡‡. Stone remembers pressure and time‡‡‡. Metal remembers the forge◊. Each material whispers its history into the rune, coloring the magic with qualities both predictable and surprising.
+&nbsp;
+Of particular interest is the notorious Chapter 11: "On Carving Runes in Living Flesh"◊◊, which the censors tried to remove but couldn't find without reading it, thus defeating the purpose of censorship.
+&nbsp;
+*Bone adds an unsettling quality to any rune. Even runes of healing carved into bone have a certain "I am helping you, but ominously" vibe.
+&nbsp;
+**The ethics of bone-carving occupied philosophers for decades. Consensus: carving runes into your own bones is your business (and your poor life choices). Carving runes into someone else's bones requires consent, which should really go without saying but apparently needed to be written down.
+&nbsp;
+***The author's travel log reads like a geographical survey crossed with a list of increasingly questionable decisions. Highlights include the Glittering Caves (beautiful, dangerous), the Obsidian Fields (sharp, dangerous), and the Fleshcrafters' Guild (disturbing, dangerous, we have questions).
+&nbsp;
+†"Every substance imaginable" turned out to be 247 materials. The author then tested 63 unimaginable materials, which by definition shouldn't exist but do anyway, including consolidated moonlight, frozen time, and whatever it is that forms in the corner of very old libraries.
+&nbsp;
+††You cannot carve runes in water. You can try. The author tried seventeen different approaches. The water was unimpressed.
+&nbsp;
+†††Materials possessing memory is either poetic metaphor or literal truth depending on which faculty you ask. The Materialists say it's nonsense. The Runecrafters say it's obvious. Both sides have empirical evidence, which is philosophically problematic.
+&nbsp;
+‡Inheritance here is both metaphorical and irritatingly literal. Runes do not technically inherit properties through genetic mechanisms because rocks lack genes. The mechanism is more like... the universe's tendency toward thematic consistency.
+&nbsp;
+‡‡Wood-carved runes tend toward growth, expansion, and life. They also tend to splinter, rot, and eventually decompose, which limits their permanence but adds a certain organic authenticity.
+&nbsp;
+‡‡‡Stone runes are patient. Disturbingly patient. They wait. They endure. They outlast civilizations and then quietly activate when someone three thousand years later stumbles over them.
+&nbsp;
+◊Metal remembers being hurt (forged) and becoming stronger. Metal runes are consequently resilient and slightly aggressive, as if the rune itself has a chip on its shoulder about being hammered into shape.
+&nbsp;
+◊◊The chapter exists in three versions: the original (banned), the censored (ineffective), and the annotated edition (more dangerous than the original because it includes detailed footnotes explaining everything the censors tried to hide).`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Comprehensive analysis of how different carving materials affect runic properties and outcomes.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 200,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 2</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RUNE_COMBINATIONS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rune_combinations',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Compound Inscriptions: The Art of Combining Runic Symbols',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['material_sympathies', 'carving_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 15, logic: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'combine_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic', 'compound_runes'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A groundbreaking work proposing that runes can be combined like words into sentences*, with similarly disastrous results when grammar is ignored**. The author demonstrates that certain rune pairs synergize (enhance each other), others antagonize (cancel out), and some combinations should never be attempted under any circumstances*** yet were attempted anyway for science†.</span>
+&nbsp;
+The Combinatorial Theory states: rune sequences create emergent effects beyond the sum of components††. A protection rune followed by a strength rune creates not "protection and strength" but "aggressive defense"†††. The order matters‡. The spacing matters‡‡. Everything matters, which makes runecraft simultaneously precise and maddening.
+&nbsp;
+The infamous Third Appendix documents 73 forbidden combinations‡‡‡, carefully detailed so that researchers know exactly what not to do. Approximately 40% of forbidden combination research occurs via people reading about forbidden combinations and thinking "but what if..."◊
+&nbsp;
+*This analogy delighted linguists and horrified runecrafters in equal measure. Language scholars began analyzing runic "grammar." Runecrafters began worrying about spelling errors that explode.
+&nbsp;
+**The Grammatical Explosion of 1347 resulted from someone treating runes too much like language and adding what they thought was a comma for clarity. The comma rune does not mean pause. It means "invert all previous meanings." The resulting chaos was clarifying in its own terrible way.
+&nbsp;
+***"Under any circumstances" is defined in the Restricted Practices Act of 1289 as: "including but not limited to academic curiosity, dares, attempts to impress romantic interests, boredom, financial incentive, divine mandate, or combinations thereof."
+&nbsp;
+†Scientific method requires testing hypotheses. Safety protocols require not doing obviously dangerous things. These requirements occasionally conflict, usually at the researcher's expense.
+&nbsp;
+††Emergent effects range from "pleasantly surprising" to "evacuate the building" to "evacuate the city" to "we've decided to abandon this entire valley and speak of it only in whispers."
+&nbsp;
+†††"Aggressive defense" manifests as protection that attacks threats pre-emptively. Very effective. Also very likely to attack things that weren't actually threats, like door-to-door salespeople or pigeons.
+&nbsp;
+‡Reversing the order creates "strengthened protection," which is defensive but not aggressive. The difference is critically important and frequently fatal to forget.
+&nbsp;
+‡‡Spacing affects power flow between runes. Too close: they merge into something new. Too far: they function independently. Just right: they synergize. "Just right" is determined through careful testing or sudden unexpected catastrophe.
+&nbsp;
+‡‡‡The list of forbidden combinations is itself considered dangerous knowledge. Some combinations are forbidden because they're too powerful. Others because they're too unpredictable. Three are forbidden because nobody knows what they do and nobody wants to find out.
+&nbsp;
+◊The "but what if" impulse has driven both scientific advancement and spectacular disasters. The ratio depends on whether you count "produced interesting data" as advancement even when the data is primarily about structural fire damage.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Theory and practice of combining multiple runes into compound inscriptions with emergent properties.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 300,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 3</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ACTIVATION_METHODS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'activation_methods',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Awakening the Mark: Methods of Runic Activation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['material_sympathies', 'rune_combinations'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 20, arcane: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'rune_of_fire' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'rune_of_frost' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic', 'triggered_runes'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A comprehensive taxonomy of how to make runes actually do something*, written by someone who spent decades doing rune-related somethings and lived to catalog them**. The work distinguishes between passive runes (always active), triggered runes (activate under conditions), and command runes (activate on demand)***.</span>
+&nbsp;
+The Seven Methods of Activation† are exhaustively documented: Touch (simple but limiting), Blood (powerful but costly), Word (elegant but loud), Will (difficult but flexible), Time (precise but inflexible), Proximity (convenient but imprecise), and Sacrifice (effective but exactly as bad as it sounds)††.
+&nbsp;
+Of particular scholarly interest is the section on "accidental activation"†††, which reads less like an academic paper and more like a collection of apologies to various municipal authorities.
+&nbsp;
+*Making runes "do something" is the central challenge of runecraft. Carving a protection rune is useless if it just sits there looking pretty‡. Though to be fair, some protection runes are quite aesthetically pleasing.
+&nbsp;
+**Survival bias is acknowledged. The author notes that their conclusions represent only successful activations by people who lived. Failed activations are harder to document, as the researchers are variously deceased, transformed into newts, or refuse to discuss what happened‡‡.
+&nbsp;
+***The distinction seems straightforward until you encounter edge cases: What about a passive rune that becomes triggered under certain conditions? What about a command rune that mishears its activation word and activates on its own schedule? Taxonomy is hard.
+&nbsp;
+†The Council of Seven Methods spent four years debating whether there were seven methods or eight. The eighth proposed method (Accident) was ruled to be "not actually a method" despite being responsible for approximately 23% of historical runic activations.
+&nbsp;
+††Sacrifice-activated runes require giving up something of value. This ranges from "a gold coin" to "your firstborn child," depending on the rune's power and the ethical flexibility of its creator. The Ethical Runecraft Society maintains strict guidelines that are widely ignored in practice.
+&nbsp;
+†††Accidental activation occurs when: you touch a rune while thinking too hard about it, you say the activation word without realizing it's an activation word (common with ancient languages), you bleed on a rune (very common), or the universe just decides it's time (uncommon but unstoppable).
+&nbsp;
+‡A non-functional protection rune is technically art. Several expensive pieces of abstract art in noble houses are actually failed rune experiments. Their owners remain blissfully unaware, which is probably for the best.
+&nbsp;
+‡‡The Transformation Registry lists 147 "temporary" transformations that have lasted multiple decades. Three wizards remain newts to this day, though they've adapted remarkably well to pond life and claim to prefer it.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Complete classification and methodology for activating runic inscriptions through various means.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 300,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 4</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RUNE_SYNTAX: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rune_syntax',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Grammar of Power: Syntactic Rules for Rune Sequences',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'symbol_recognition'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 26, logic: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 18, logic: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'write_complex_rune_sequences' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A linguistic approach to runecraft* arguing that runes follow grammatical rules** like language***. The author's key insight: "Runes are not random symbols but structured communication with reality itself†."</span>
+&nbsp;
+The work identifies syntactic categories: subject runes†† (what acts), verb runes††† (what action), modifier runes‡ (how or when), and connector runes‡‡ (joining concepts). Invalid combinations produce "sentences reality cannot parse," resulting in nothing or disaster.
+&nbsp;
+*Applying linguistic theory to magic was controversial. Traditional runemasters worked by intuition and tradition. This systematic approach revealed patterns they knew implicitly but never articulated.
+&nbsp;
+**Rules include: subject must precede verb, modifiers must be adjacent to what they modify, and certain runes are mutually exclusive (you cannot combine "bind" and "release" meaningfully).
+&nbsp;
+***The analogy to language is imperfect but useful. Just as "Colorless green ideas sleep furiously" is grammatically correct but semantically nonsense, some rune sequences are technically valid but meaningless to reality.
+&nbsp;
+†This philosophical position treats reality as an entity that "reads" runes and responds accordingly. Whether reality is actually conscious or just appears so is debated. The practical effect is the same.
+&nbsp;
+††Subject runes specify what or who is affected: person, object, location, concept. Clear subjects create focused effects. Vague subjects create unpredictable results.
+&nbsp;
+†††Verb runes define action: bind, protect, illuminate, conceal. The author notes: "Every rune sequence needs a verb, just as every sentence needs action. Runes without verbs sit there doing nothing, like philosophical treatises."
+&nbsp;
+‡Modifiers include intensity (weak/strong), duration (temporary/permanent), condition (always/sometimes), and others. Placement matters: wrong placement changes meaning or breaks the sequence.
+&nbsp;
+‡‡Connector runes join multiple concepts: and, or, if-then. Advanced runic programming uses complex conditional logic. The author warns: "Nested conditionals in rune sequences are possible but test the limits of human sanity and reality's patience."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Systematic analysis of runic grammar including syntactic rules, semantic meaning, and sequence validity.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 310,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GEOMETRIC_PATTERNS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'geometric_patterns',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Sacred Geometry: The Power of Runic Arrangement',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'material_sympathies'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 23 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 16 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'arrange_geometric_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `An exploration of how geometric arrangement affects runic power*, demonstrating that shape matters as much as symbols**. The author documents power differentials between linear*** (weak), circular† (moderate), and complex geometric patterns†† (strong but dangerous†††).</span>
+&nbsp;
+The work catalogs traditional patterns: circle‡ (containment, protection), triangle‡‡ (stability, power focus), square (grounding, permanence), and pentacle (balance, complexity). Each shape imparts qualities to the rune sequence it contains.
+&nbsp;
+*Experiments showed identical runes arranged differently produced different effects. A protection rune in a line provides weak protection. The same rune in a circle provides strong protection. In a pentacle: very strong protection with side effects.
+&nbsp;
+**This revolutionized runecraft by showing arrangement as an additional variable to optimize. Traditional runemasters knew this intuitively but lacked systematic analysis.
+&nbsp;
+***Linear arrangements (straight lines, simple paths) are easy to create but inefficient. Power flows one direction and dissipates. The author: "Lines are training wheels for runecraft."
+&nbsp;
+†Circular arrangements (circles, spirals) contain power, preventing dissipation. Power cycles continuously within the pattern. Circles are the "default choice for anything requiring sustained effect."
+&nbsp;
+††Complex geometries (pentagrams, hexagrams, interlocking patterns) multiply runic power but require precise execution. Imperfect geometry creates "power turbulence" ranging from inefficiency to catastrophic failure.
+&nbsp;
+†††The danger of complex patterns: more power, more ways to fail. The author documents seventeen accidents involving misdrawn pentacles, ranging from "embarrassing fizzle" to "emergency evacuations."
+&nbsp;
+‡Circles are forgiving: slight imperfections barely matter. The author recommends circles for beginners: "Hard to get wrong, hard to cause disasters, still effective."
+&nbsp;
+‡‡The triangle focuses power at its three points. Used for directing effects outward from the pattern. Alignment of points matters: pointing up invokes, pointing down grounds. Horizontal: balance.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Analysis of geometric patterns in runecraft and their effects on power containment, focus, and amplification.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 270,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 4</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CHROMATIC_RUNECRAFT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'chromatic_runecraft',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Color Theory in Runes: The Significance of Pigment',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['carving_fundamentals', 'material_sympathies'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 18 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 13, crafting: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'color_enhance_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 2, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A colorful treatise on how pigment affects runic function*, challenging the assumption that carved runes are colorless**. The author demonstrates that colored inks, paints, and inlays modify runic properties in predictable ways***.</span>
+&nbsp;
+Color associations are documented: red† (power, passion, danger), blue†† (calm, protection, water), green††† (growth, nature, healing), white‡ (purity, clarity, light), black‡‡ (binding, shadow, void), and others. Each color shifts the rune's effect toward its associated qualities.
+&nbsp;
+*Traditional rune carving involves no color: bare stone, wood, or metal. Adding color was considered decorative. This work proves it's functional, changing how the rune operates.
+&nbsp;
+**The assumption came from ancient runes being found colorless. The author points out: "We find them colorless because the pigments degraded over centuries. Originally, they were quite vibrant." Archaeological testing confirmed this.
+&nbsp;
+***Predictability has limits. Color modification is subtle, not transformative. A red protection rune is more aggressive in defense, not a different rune entirely.
+&nbsp;
+†Red pigments (iron oxide, cochineal) increase runic intensity but reduce stability. Red runes are powerful but exhausting to maintain. The author: "Red is the color of urgent situations, not long-term solutions."
+&nbsp;
+††Blue pigments (lapis, indigo) provide calming, stabilizing effects. Blue protection runes defend gently, redirecting threats rather than destroying them. Popular for home wards.
+&nbsp;
+†††Green (malachite, plant dyes) enhances growth-related magic. Green runes on plants accelerate growth. The author notes unexpected applications: healing runes work better in green, as the body "grows" toward health.
+&nbsp;
+‡White (chalk, titanium) purifies and clarifies. White runes are visible but subtle in function, providing enhancement without dominating. Popular for runes meant to support rather than lead.
+&nbsp;
+‡‡Black (charcoal, soot) grounds and contains. Black runes bind things in place, prevent change, maintain status quo. The author warns: "Black is for holding, not for releasing. Choose wisely."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Study of color application to runes and how different pigments modify runic properties and effects.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 240,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 3</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PHONETIC_ACTIVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'phonetic_activation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Words of Power: Sound-Based Rune Activation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['activation_methods', 'symbol_recognition'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 22 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 15, arcane: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'voice_activate_runes' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'word_of_command' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A phonological study of vocal rune activation*, exploring how specific sounds trigger inscribed magic**. The author's central finding: "The right word spoken correctly is as powerful as the right rune carved properly***."</span>
+&nbsp;
+The work catalogs activation words† for common runes, analyzing phonetic patterns††: harsh consonants††† (binding, striking), flowing vowels‡ (healing, growth), and complex combinations‡‡ (sophisticated effects). Pronunciation precision is critical—mispronunciation ranges from ineffective to disastrous.
+&nbsp;
+*Vocal activation allows triggering runes without physical contact. Useful for distant activation, emergency situations, and "showing off to impressed onlookers."
+&nbsp;
+**Sound as activation method works because: runes are patterns, sound is patterns, matching patterns create resonance. When the spoken pattern matches the carved pattern, activation occurs.
+&nbsp;
+***This equivalence revolutionized portable runecraft. Instead of carrying carved objects, carry knowledge of words. Lighter, more discrete, though you can't accidentally trigger a carved rune by thinking too hard (you can absolutely accidentally speak activation words).
+&nbsp;
+†Activation words are usually ancient languages: Old Nordic, Sumerian, Proto-Elvish. The author theorizes: "Ancient languages developed alongside runecraft, each influencing the other, creating deep phonetic-runic correspondence."
+&nbsp;
+††Phonetic patterns show consistency: sharp sounds (k, t, g) activate aggressive runes, soft sounds (l, m, n) activate gentle ones, sibilants (s, sh, z) activate flowing effects like water or wind.
+&nbsp;
+†††Harsh consonants require precise articulation. The difference between "kat" and "kad" might mean "light a candle" versus "start a fire." The author emphasizes practice: "Words of power demand powerful pronunciation."
+&nbsp;
+‡Flowing vowels sustain activation. Long vowel sounds maintain effects, short vowels trigger then release. Duration matters as much as tone.
+&nbsp;
+‡‡Complex combinations (multiple syllables, tonal variations) activate sophisticated multi-rune sequences. Mastery requires linguistic skill and musical ability. The author notes: "The best vocal runemasters are often singers or poets."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Phonetic theory and practice of vocal rune activation including pronunciation, tonal variation, and linguistic patterns.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 280,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 4</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TEMPORAL_INSCRIPTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'temporal_inscription',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Time-Delayed Runes: Inscriptions That Wait',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['activation_methods', 'rune_combinations'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 30, arcane: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 22, arcane: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'create_delayed_runes' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'temporal_ward' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 4, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A temporal study of runes that activate at specified future times*, which the author calls "appointments with destiny**." The work explores delay mechanisms***: astronomical (phase of moon, season), conditional† (when someone specific passes), and absolute†† (exact duration from inscription).</span>
+&nbsp;
+The central challenge: creating stable dormancy†††. Active runes drain power continuously. Dormant runes conserve power but must reliably wake. The balance between "too dormant" (never activates) and "too active" (depletes before trigger) is precise‡.
+&nbsp;
+*Time-delayed runes enable: traps (activate when enemy approaches), time capsules (preserve knowledge for future), succession planning (transfer power upon death), and "birthday presents that can't be opened early‡‡."
+&nbsp;
+**The author's poetic phrasing conceals technical complexity. Creating reliable temporal triggers requires advanced understanding of runic dormancy, trigger conditions, and power conservation.
+&nbsp;
+***Astronomical triggers are self-explanatory: "activate at full moon" or "during winter solstice." Reliable because celestial mechanics are predictable. The author notes: "The moon never forgets its appointment."
+&nbsp;
+†Conditional triggers wait for specific conditions: person, object, or situation. Examples: "activate when heir arrives," "trigger if defenses fail," "release upon my death." Conditions must be precisely defined or the rune waits forever for ambiguous fulfillment.
+&nbsp;
+††Absolute delays count time: "activate in one year," "trigger after 1000 days." Precise but inflexible. The author documents a rune set to activate in a century, which did, long after everyone who knew about it had died. Surprise inheritance for descendants.
+&nbsp;
+†††Dormancy mechanisms vary: minimal power circulation (slow drain), suspended animation (complex, risky), external power source (dependent), or "aggressive energy conservation" (the author's term for ruthless efficiency at the cost of responsiveness).
+&nbsp;
+‡The author compares this to walking a tightrope: too much power consumption means the rune dies before activation, too little means it won't wake when needed. Calibration is "part art, part mathematics, part prayer."
+&nbsp;
+‡‡The birthday present application was mentioned as a joke but apparently works. Several noble families use time-locked rune chests for coming-of-age gifts. The author reports a 73% success rate, which seems concerningly low for presents.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Methods for creating time-delayed and conditionally activated runes including dormancy mechanisms and trigger design.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 320,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LAYERED_RUNES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'layered_runes',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Depth in Inscription: The Art of Layered Runes',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'material_sympathies'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 28, arcane: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 21, crafting: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'carve_layered_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 4, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `An investigation into inscribing multiple runes in the same physical space*, achieving effects impossible with surface-only inscription**. The author describes layering as "building vertically when horizontal space runs out***."</span>
+&nbsp;
+The technique requires carving runes at different depths†: surface rune (immediate effect), mid-depth rune†† (sustained effect), and deep rune††† (foundational power). Each layer operates independently but influences the others through "vertical resonance‡."
+&nbsp;
+The practical limit is five layers‡‡, beyond which materials crack or runes interfere destructively.
+&nbsp;
+*Same location, different depths. Viewed from above, appears as single rune. From cross-section, reveals multiple distinct carvings stacked vertically.
+&nbsp;
+**Surface-only runes are limited by available space and interference between adjacent runes. Layering solves both: same space holds multiple runes without lateral interference.
+&nbsp;
+***The spatial metaphor is apt. Flat surfaces have limited area. Adding depth provides a new dimension for inscription. The author notes: "We were writing on paper when we should have been carving in blocks."
+&nbsp;
+†Carving depth affects temporal priority: surface runes activate first, deeper runes later. This creates sequential activation from single trigger, enabling complex programmed responses.
+&nbsp;
+††Mid-depth runes are hardest to carve (already carved surface layer complicates access) but provide sustained power. The author likens them to "middle management: not glamorous but essential."
+&nbsp;
+†††Deep runes serve as foundations, providing stable power that upper layers draw upon. Deep runes are simple, stable, and permanent. Surface runes can be complex and temporary, supported by deep stability.
+&nbsp;
+‡Vertical resonance: runes at different depths vibrate in sympathy, amplifying or modulating each other's effects. Harmonious layering multiplies power. Dissonant layering creates interference.
+&nbsp;
+‡‡Five-layer limit determined empirically: deeper carving weakens material structure, additional layers create overwhelming interference. The author reports testing six-layer runes resulted in "immediate structural failure and embarrassment."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Advanced technique of carving multiple runes at different depths in the same location for enhanced complexity and power.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 300,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RUNE_ERASURE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rune_erasure',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Safe Removal: Deactivating and Erasing Runes',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['carving_fundamentals', 'activation_methods'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 24 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 17 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'safely_erase_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A necessary but overlooked work on removing runes safely*, addressing the awkward reality: "Carving runes is taught extensively. Removing them safely is assumed obvious. It is not obvious**."</span>
+&nbsp;
+The paper distinguishes deactivation*** (stopping function while preserving inscription) from erasure† (physical removal). Methods vary by material††, rune power†††, and urgency‡. The universal principle: "Remove power before removing symbols‡‡."
+&nbsp;
+*Unsafe removal includes: chiseling active runes (releases stored power violently), sanding them off (gradual release, still dangerous), and "optimistic ignorance" (hoping the rune isn't important).
+&nbsp;
+**The author documents thirty-seven removal accidents ranging from mild (temporary blindness) to severe (permanent feature rearrangement). Most were preventable with basic safety protocols.
+&nbsp;
+***Deactivation methods: counter-rune (inscribe cancellation), power drain (external siphon), natural decay (wait decades), or disruption (mar one critical line carefully). The author recommends counter-runes for safety.
+&nbsp;
+†Erasure after deactivation is safer but still requires care. Broken fragments of powerful runes retain weak echoes of original power. The author: "Dispose of rune fragments properly or they'll haunt your workshop literally."
+&nbsp;
+††Material-specific challenges: stone runes are hard to remove physically (grinding required), wood runes burn (releases power as smoke), metal runes can be melted (dangerous if still active). Each requires adapted protocols.
+&nbsp;
+†††Powerful runes store significant energy. Sudden release (from careless removal) manifests as: light flash, heat pulse, kinetic blast, or "localized reality disagreement" (the author's euphemism for things getting weird).
+&nbsp;
+‡Urgency matters: emergency removal (curse, trap, imminent disaster) accepts higher risk. Non-urgent removal (renovation, aesthetics) should prioritize safety. The author: "Rushing rune removal is how you become a cautionary tale."
+&nbsp;
+‡‡This principle cannot be overemphasized. Every accident documented involved removing symbols before neutralizing power. "Power first, symbols second" saves lives and dignity.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Safe methods for deactivating and physically removing runes including power neutralization and material-specific techniques.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 270,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 4</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PROTECTIVE_WARDS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'protective_wards',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Circles of Safety: Designing Protective Ward Patterns',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'geometric_patterns'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 25, arcane: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 18, arcane: 9 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'create_protective_wards' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'ward_of_protection' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A comprehensive guide to creating protective ward circles*, the most common application of geometric runecraft**. The author systematizes ward design from first principles: "Define what you're protecting, from what threats, for how long***."</span>
+&nbsp;
+Ward categories are clearly delineated: passive† (constant protection, low power), reactive†† (activates on threat, moderate power), and aggressive††† (counterattacks threats, high power). Each serves different needs and requires different power investment‡.
+&nbsp;
+The work includes ready-to-use ward patterns for common scenarios‡‡: home protection, workshop safety, personal defense, and "keeping your food from being stolen by opportunistic familiars."
+&nbsp;
+*Protective wards are circular (or geometric) arrangements of runes that defend an area or person. Circles are preferred for their complete coverage and power efficiency.
+&nbsp;
+**Ward creation is taught everywhere, but quality varies wildly. This work standardizes best practices, eliminating "folk wisdom" ranging from useful to catastrophically wrong.
+&nbsp;
+***Defining parameters clarifies design: protecting a bedroom from thieves for one night requires different ward than protecting a vault from magical intrusion for centuries. Precision prevents over-engineering or inadequate protection.
+&nbsp;
+†Passive wards maintain constant barriers. Low power drain makes them suitable for long-term use. The author: "Passive wards are fire insurance: you pay steadily hoping you never need them."
+&nbsp;
+††Reactive wards sleep until triggered, conserving power. When threat detected, they activate fully. More power-efficient for intermittent threats. Drawback: brief activation delay (usually milliseconds, occasionally critical).
+&nbsp;
+†††Aggressive wards don't merely block threats—they strike back. Effective deterrent, high power cost, and ethical questions. The author notes: "Aggressive wards have legal implications. Check local regulations before installation."
+&nbsp;
+‡Power investment determines ward strength and duration. Strong wards protecting large areas require significant power sources: embedded crystals, ley line access, or regular manual recharging by a skilled runecrafter.
+&nbsp;
+‡‡The practical patterns section is extensively copied by ward-crafters. The author's simple designs for common problems (food protection, workshop privacy, sleep security) are found throughout practical runecraft with varying attribution.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Design principles and practical patterns for protective ward circles including passive, reactive, and aggressive ward types.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 290,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 4</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BINDING_INSCRIPTIONS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'binding_inscriptions',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Runes of Restraint: Binding and Containment Inscriptions',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'activation_methods'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 29, arcane: 14 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 21, arcane: 11 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'create_binding_runes' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'rune_of_binding' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 4, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `An ethically complex treatise on runes that restrain*, examining the theory and practice of binding everything from objects** to entities***. The author begins with a disclaimer: "Binding is powerful, useful, and dangerous. This knowledge enables both protection and imprisonment†."</span>
+&nbsp;
+Binding categories include: physical†† (prevents movement), conceptual††† (prevents specific actions), dimensional‡ (prevents planar travel), and absolute‡‡ (prevents everything, rarely achievable). Each requires different runic structures and power levels.
+&nbsp;
+*Binding runes create constraints: "You cannot move," "You cannot speak," "You cannot leave this circle." The constraint's strength depends on runic power, precision, and the bound subject's resistance.
+&nbsp;
+**Object binding is straightforward: prevent theft (bind object to location), prevent use (bind weapon inactive), prevent destruction (bind structure intact). Common applications with few ethical complications.
+&nbsp;
+***Entity binding—restraining conscious beings—is ethically fraught. Legitimate uses include: containing dangerous entities, preventing harm, temporary restraint. Illegitimate uses: slavery, illegal imprisonment, coercion. The author: "With great binding power comes great potential for abuse."
+&nbsp;
+†The ethical section is longer than the technical section, unusual for runecraft literature. The author clearly struggled with publishing binding knowledge while preventing misuse. Their compromise: publish everything, include extensive ethical framework.
+&nbsp;
+††Physical binding prevents motion through space. Strong against physical entities, weak against incorporeal ones. The author documents binding strength vs. subject strength: mice are easy, dragons require collaborative effort.
+&nbsp;
+†††Conceptual binding is subtle: prevent lying, prevent violence, prevent specific words. More complex to design than physical binding, harder to break, and philosophically troubling. The author: "Preventing actions prevents choice. Use sparingly."
+&nbsp;
+‡Dimensional binding traps entities in specific planes or locations, preventing plane-shifting, teleportation, or dimensional travel. Essential for containing extra-planar entities. The author notes: "Without dimensional binding, powerful entities simply leave when inconvenienced."
+&nbsp;
+‡‡Absolute binding prevents all action: no movement, no magic, no thought. Described as "magical suspended animation." The author documents only three successful absolute bindings in history, each requiring master runemasters working in concert.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Theory and practice of binding runes for restraining objects and entities including ethical considerations and power requirements.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 340,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RUNE_AMPLIFICATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rune_amplification',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Resonant Enhancement: Amplifying Runic Power',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'material_sympathies'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 27, arcane: 13 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 19, arcane: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'amplify_runes' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 3, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A technical study of increasing runic power beyond base capacity*, exploring resonance**, power channeling***, and material enhancement†. The author's thesis: "Every rune has natural power. Amplification reveals power beyond natural limits††."</span>
+&nbsp;
+Methods documented include: resonant pairing††† (placing compatible runes adjacently), power focus‡ (geometric concentration), external power sources‡‡ (crystals, ley lines), and sacrificial amplification (consuming resources for temporary boost).
+&nbsp;
+*Base capacity: a rune's power when carved competently in appropriate material. Adequate for most purposes but insufficient for demanding applications. Amplification bridges this gap.
+&nbsp;
+**Resonance occurs when multiple runes vibrate sympathetically, amplifying each other. Sympathetic runes enhance, antipathetic runes cancel. The author: "Resonance is free power but requires knowledge and planning."
+&nbsp;
+***Power channeling uses conduits (grooves, inlays) to direct external power into runes. Like irrigation for crops, channeling provides sustained power input. More reliable than resonance but requires power source.
+&nbsp;
+†Material enhancement: superior materials (precious metals, rare stones, exotic woods) hold more power than common materials. The author provides cost-benefit analysis: "Platinum holds 10x more power than iron but costs 100x more. Choose wisely."
+&nbsp;
+††The phrasing "beyond natural limits" concerned some reviewers who worried about encouraging dangerous overreach. The author clarified: "Beyond natural doesn't mean beyond safe. Respect limits while understanding they're not absolute."
+&nbsp;
+†††Resonant pairing requires compatible runes: healing+growth, protection+strength, light+warmth. Incompatible pairings create interference. The author includes extensive compatibility tables.
+&nbsp;
+‡Power focus uses geometric shapes (circles, spirals, pentagrams) to concentrate ambient power into central runes. The geometry acts as lens, gathering dispersed power and focusing it. Effectiveness varies by location (ley line intersections are ideal).
+&nbsp;
+‡‡External power sources provide sustained amplification. Embedded power crystals supply steady power for years. Ley line connections tap planetary energy indefinitely. The author notes: "External power is reliable but creates dependency."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Techniques for amplifying runic power through resonance, channeling, materials, and geometric focus.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 300,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 4</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SYMPATHETIC_LINKING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'sympathetic_linking',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Connection at Distance: Sympathetic Links Between Runes',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'material_sympathies'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 33, arcane: 16 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 24, arcane: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'link_distant_runes' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'sympathetic_bond' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 4, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `A groundbreaking work on connecting separated runes*, enabling action-at-a-distance** that defies spatial limitations***. The author demonstrates that properly linked runes can communicate and coordinate despite physical separation†.</span>
+&nbsp;
+Link types include: paired†† (two runes, bidirectional), networked††† (multiple runes, many-to-many), and broadcast‡ (one source, many receivers). Each topology serves different applications‡‡.
+&nbsp;
+*Linked runes maintain sympathetic connection: affecting one affects the other. Activate first rune, second activates. Damage first, second weakens. The connection transcends space but not power limitations.
+&nbsp;
+**Action-at-a-distance was controversial when proposed. Critics claimed impossible without direct contact. Experimental demonstration silenced skeptics: activate rune in one city, paired rune in distant city activated simultaneously.
+&nbsp;
+***Spatial separation is meaningless to sympathetic links. Distance degrades signal quality (weak links fail over distance) but doesn't prevent linking. The author documents successful links across continents, though maintaining them was challenging.
+&nbsp;
+†Communication through links is limited: state information (active/inactive, power level, basic status) transmits reliably. Complex information (specific activation parameters, nuanced conditions) transmits unreliably. The author: "Linked runes exchange simple messages effectively, complex conversations poorly."
+&nbsp;
+††Paired links are simplest and most reliable. Two runes connected bidirectionally. Common applications: emergency communication (trigger alarm elsewhere), remote sensing (detect conditions at distance), coordinated action (synchronized activation).
+&nbsp;
+†††Networked links connect multiple runes in complex topologies. Allows sophisticated coordination but requires careful design. Power and signal routing through network determines which runes affect which others.
+&nbsp;
+‡Broadcast links: one master rune connects to many slave runes. Master activation triggers all slaves simultaneously. Used for coordinated defenses, synchronized lighting, and "really impressive magical displays that look more complex than they are."
+&nbsp;
+‡‡Applications vary by topology: paired links for communication, networked links for distributed sensing and control, broadcast links for synchronized effects across large areas.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Advanced linking techniques for creating sympathetic connections between distant runes including paired, networked, and broadcast topologies.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 330,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RUNIC_ARRAYS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'runic_arrays',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Large-Scale Magic: Designing and Deploying Runic Arrays',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'sympathetic_linking', 'geometric_patterns'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 35, arcane: 18 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 26, arcane: 14 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'design_runic_arrays' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'grand_array' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 4, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['advanced_rune_magic', 'reality_alteration'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `The culmination of systematic runecraft*, describing arrays of hundreds or thousands of interconnected runes** working as unified systems***. The author frames arrays as "orchestras of power where individual runes are instruments and the designer is conductor†."</span>
+&nbsp;
+Array design principles include: modular architecture†† (independent subsystems), redundancy††† (graceful degradation on failure), power distribution‡ (balanced load), and maintainability‡‡ (arrays last decades, require upkeep).
+&nbsp;
+The work documents historical arrays: The Warding of Winterhold (973 runes, still active), The Great Lighthouse Array (2,400 runes, decommissioned), and the Eternal Garden (unknown count, partially lost).
+&nbsp;
+*Large-scale runecraft represents the ultimate application of accumulated knowledge. Single runes affect small areas. Arrays affect cities, regions, or conceptual domains.
+&nbsp;
+**Numbers matter: dozens of runes create modest effects, hundreds create substantial effects, thousands create effects bordering on miraculous. The author: "Quantity has a quality all its own, in runecraft as in warfare."
+&nbsp;
+***Unified systems mean individual runes support collective function rather than operating independently. Like cells in an organism versus individual organisms. The collective achieves what individuals cannot.
+&nbsp;
+†The conductor metaphor is apt: timing, coordination, and balance determine success. Arrays with perfect runes but poor coordination fail. Arrays with adequate runes and excellent coordination succeed.
+&nbsp;
+††Modular architecture divides arrays into functional subsystems: power generation, distribution, effect manifestation, monitoring, control. Subsystems interface through defined connections. Failure in one subsystem doesn't cascade to others.
+&nbsp;
+†††Redundancy prevents single-point failures. Critical functions duplicate across multiple runes. If one fails, others compensate. The author notes: "Redundancy is expensive but necessary. The larger the array, the more certainty that something will fail."
+&nbsp;
+‡Power distribution is critical at scale. Power sources (ley lines, crystals, manual charging) must supply all active runes adequately. Poor distribution creates "power deserts" (inactive runes) and "power floods" (overloaded runes that burn out).
+&nbsp;
+‡‡Maintainability determines practical lifespan. Arrays with accessible runes, clear documentation, and straightforward repair last centuries. Arrays with hidden runes, lost documentation, and complex dependencies last until first major failure.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Principles and practices for designing large-scale runic arrays including architecture, redundancy, power management, and maintenance.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 380,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ELDER_RUNES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'elder_runes',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Ancient Script: A Study of Elder Runes and Forbidden Marks',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['rune_magic'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rune_combinations', 'activation_methods'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 10,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { rune_craft: 40, arcane: 30 },</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { rune_craft: 30, arcane: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'carve_elder_runes' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'elder_rune_of_binding' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'elder_rune_of_unmaking' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  published: false,</span>
+<span class="cstat-no" title="statement not covered" >  tier: 5, // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  technologyTags: ['elder_rune_magic', 'reality_alteration'], // Legacy</span>
+<span class="cstat-no" title="statement not covered" >  description: `The most dangerous book in the library*, documenting runes that predate recorded history** and should probably postdate it as well***. The author, whose identity is sealed under three separate spells, describes runes that do not simply affect reality but rewrite its rules†.</span>
+&nbsp;
+Elder runes exist in that uncomfortable space between magic and fundamental law††. They are not symbols that channel power - they are symbols that *are* power†††. Carving an elder rune doesn't create magic; it reveals magic that was always there, sleeping‡. This is either profound or terrifying depending on your philosophical stance and proximity to the rune‡‡.
+&nbsp;
+The work catalogs seventeen confirmed elder runes‡‡‡ and references forty-three suspected ones. Each description is accompanied by extensive warnings, safety protocols, and documentation of what happened to previous researchers◊. The casualty rate is remarkably specific: 73.4%◊◊.
+&nbsp;
+*This designation is both literal (most dangerous) and contested (several other books compete for the title, mostly because they're competing about everything). The library maintains a "Dangerous Books" section that requires written permission to access and next-of-kin notification.
+&nbsp;
+**"Predate recorded history" means "we found them already carved into rocks older than writing." This raises troubling questions: Who carved them? When? Why? And how did they know what they were doing when the art of runecraft supposedly didn't exist yet?
+&nbsp;
+***The temporal mechanics of this sentence gave the author a headache that lasted three weeks.
+&nbsp;
+†Rewriting reality's rules is exactly as dangerous as it sounds, plus 30-40% more dangerous than you're currently imagining, plus an additional danger surcharge for hubris.
+&nbsp;
+††The uncomfortable space in question is the same space occupied by paradoxes, quantum effects, and that feeling you get when you're certain someone called your name but nobody's there.
+&nbsp;
+†††This is the doctrine of Runic Revelation, which holds that elder runes are not created but discovered, not written but read from the fabric of existence itself. Critics note this makes no sense. Practitioners note it works anyway, which trumps sense.
+&nbsp;
+‡The sleeping magic metaphor appears in seventeen different traditions across nine hundred years, suggesting either parallel discovery or a very patient teacher traveling through time. Both explanations are equally plausible and equally disturbing.
+&nbsp;
+‡‡Philosophers tend toward "profound" until they witness an elder rune activation, at which point they abruptly shift to "terrifying" and take up less abstract hobbies like gardening.
+&nbsp;
+‡‡‡The seventeen confirmed elder runes: Sovereignty, Transformation, Entropy, Creation, Binding, Severance, Truth, Lies, Beginning, Ending, Memory, Forgetting, Law, Chaos, Self, Other, and one whose name was removed from all records for reasons that became apparent when someone tried to say it.
+&nbsp;
+◊"What happened to previous researchers" is documented with clinical precision: 17 disappeared entirely, 23 were found but profoundly changed, 11 succeeded but refuse to discuss their work, 34 died (various causes, mostly unusual), and 4 claimed it was "totally worth it" despite visible evidence to the contrary.
+&nbsp;
+◊◊The .4% represents Researcher Marlowe, who lost only part of themselves - specifically, their shadow. It now operates independently and last year published its own paper on elder runes, which disagrees with Marlowe on several key points.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Advanced study of ancient, powerful runes that alter fundamental aspects of reality. Extremely dangerous.',</span>
+<span class="cstat-no" title="statement not covered" >  estimatedReadingTime: 500,</span>
+<span class="cstat-no" title="statement not covered" >  authoringDifficulty: 5</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RUNE_MAGIC_PAPERS = [</span>
+  // Rune Magic (18 papers - complexity 2-10)
+<span class="cstat-no" title="statement not covered" >  SYMBOL_RECOGNITION,</span>
+<span class="cstat-no" title="statement not covered" >  CARVING_FUNDAMENTALS,</span>
+<span class="cstat-no" title="statement not covered" >  MATERIAL_SYMPATHIES,</span>
+<span class="cstat-no" title="statement not covered" >  RUNE_COMBINATIONS,</span>
+<span class="cstat-no" title="statement not covered" >  ACTIVATION_METHODS,</span>
+<span class="cstat-no" title="statement not covered" >  CHROMATIC_RUNECRAFT,</span>
+<span class="cstat-no" title="statement not covered" >  GEOMETRIC_PATTERNS,</span>
+<span class="cstat-no" title="statement not covered" >  PHONETIC_ACTIVATION,</span>
+<span class="cstat-no" title="statement not covered" >  RUNE_SYNTAX,</span>
+<span class="cstat-no" title="statement not covered" >  PROTECTIVE_WARDS,</span>
+<span class="cstat-no" title="statement not covered" >  RUNE_ERASURE,</span>
+<span class="cstat-no" title="statement not covered" >  RUNE_AMPLIFICATION,</span>
+<span class="cstat-no" title="statement not covered" >  TEMPORAL_INSCRIPTION,</span>
+<span class="cstat-no" title="statement not covered" >  LAYERED_RUNES,</span>
+<span class="cstat-no" title="statement not covered" >  BINDING_INSCRIPTIONS,</span>
+<span class="cstat-no" title="statement not covered" >  SYMPATHETIC_LINKING,</span>
+<span class="cstat-no" title="statement not covered" >  RUNIC_ARRAYS,</span>
+<span class="cstat-no" title="statement not covered" >  ELDER_RUNES</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

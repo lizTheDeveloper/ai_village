@@ -1,0 +1,976 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/underground_construction-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> underground_construction-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SUBTERRANEAN_CITY_PLANNING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'subterranean_city_planning',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Subterranean City Planning',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['cavern_stabilization'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_subterranean_city_planning' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `SUBTERRANEAN CITY PLANNING: A COMPREHENSIVE GUIDE TO NOT BRINGING THE CEILING DOWN ON EVERYONE</span>
+&nbsp;
+The fundamental principle of subterranean city planning, as established by the Dwarvish Royal Academy of Things That Should Stay Up*, is that one must plan the city before one digs it, not afterward†. This seemingly obvious observation has been violated approximately 847 times in recorded history‡, with results ranging from "mildly inconvenient" to "where did the east quarter go?"** The successful subterranean planner must therefore maintain a peculiar dual consciousness: the ability to visualize vast civic infrastructure while simultaneously calculating load-bearing capacity in cubic tons per square yard††. It is, in many ways, like playing three-dimensional chess while someone keeps removing pieces and replacing them with drainage pipes.
+&nbsp;
+The practical applications of subterranean city planning extend well beyond the simple excavation of living spaces. One must consider the flow of air***, water‡‡, waste§, traffic§§, and—in the more unfortunate cases—magma***. The Undermountain Collective's seminal work, "Everything Flows Somewhere: A Meditation on Gravity and Regret," established the critical importance of planning water systems before residential areas†††, a lesson learned at considerable expense to the Third Deep Quarter of Karak-Undermound‡‡‡. Modern planners employ a sophisticated system of overlapping maps§§§, each representing a different utility or civic function, which when stacked together create a document of such Byzantine complexity that most cities employ a full-time Map-Interpreter****, whose primary job is to prevent the Chief Engineer from weeping openly.
+&nbsp;
+Safety considerations in subterranean construction differ markedly from their surface equivalents in that the consequences of failure involve significantly more crushing††††. The Institute for Below-Ground Civic Planning maintains that the minimum acceptable safety margin for residential ceiling support is "enough that you don't think about it more than once per week"‡‡‡‡, though this varies by culture§§§§. Support pillar placement follows what the ancient Dwarrowdelve Masters called the "Law of Adequate Suspicion"*****—if a space looks like it might collapse without a pillar, it definitely will. The mathematical formula for this is surprisingly simple: P = (C × W) / S, where P is required pillars, C is ceiling area, W is weight of everything above, and S is how much you trust your initial calculations†††††.
+&nbsp;
+The historical development of subterranean city planning can be traced back to the First Delving Age, when cities were less "planned" and more "aggressively hoped for"‡‡‡‡‡. The transition to systematic planning occurred after what the ancient texts call the "Seventeen Discrete Incidents of Involuntary Urban Reconfiguration"§§§§§, though modern scholars suspect this number has been revised downward for morale purposes. The breakthrough came with the recognition that underground cities are fundamentally inverted surface cities—everything that pulls down above ground pushes up below ground******—combined with the discovery that rock, while generally cooperative, holds grudges††††††. Modern subterranean planning has synthesized these ancient wisdoms with contemporary engineering principles, creating the field we know today: one part geology, one part architecture, and three parts controlled paranoia‡‡‡‡‡‡.
+&nbsp;
+Contemporary best practices insist upon what the Guild of Undercity Planners terms "defensive redundancy"§§§§§§—the principle that every critical system should have a backup, every backup should have a backup, and every backup's backup should be physically located in a different postal district. This applies particularly to ventilation systems*******, water supplies††††††††, and emergency exits‡‡‡‡‡‡‡. The successful subterranean city must account not merely for current population but for future growth, which inevitably leads to the Planner's Paradox: cities designed for specific populations invariably attract more residents than intended§§§§§§§, leading to the need for expansion, which requires more planning, which requires more planners, who also need housing, thereby requiring additional expansion********, and so forth into a fractal nightmare of perpetual construction†††††††††.
+&nbsp;
+---
+&nbsp;
+* The Academy's motto, roughly translated from Old Dwarvish, is "Gravity Always Wins Eventually, But Not Today." They have maintained an unbroken 3,000-year streak of "today," which they consider their greatest achievement.
+&nbsp;
+† The City of Enthusiastic Burrowing (founded 1247, collapsed 1249) serves as the primary cautionary example here. Survivors reported that they had an excellent central plaza before realizing they had forgotten to include any way to reach it.
+&nbsp;
+‡ This figure is from the Subterranean Civic Failures Database, maintained by the University of Rockholm. The actual number is believed to be significantly higher, as it does not include incidents where the city vanished entirely and thus could not file a failure report.
+&nbsp;
+** The disappearance of the East Quarter of Deep-Minton remains technically unexplained, though leading theories involve either a miscalculation in tunnel junctions or "probably a dragon." The official inquiry concluded with the phrase "insufficient evidence due to absence of subject matter."
+&nbsp;
+†† A cubic ton per square yard is not, strictly speaking, a coherent unit of measurement. This has not stopped the engineering profession from using it for approximately 600 years. Attempts to reform the system have been met with hostility, as it would require recalculating every structural support equation in every underground city, and nobody wants to be the one who finds out the old calculations were wrong.
+&nbsp;
+‡‡ The direction of water flow was not always considered obvious. The City of Hopeful Hydraulics spent seventeen years attempting to make water flow upward through "civic enthusiasm and positive thinking" before admitting defeat. Their elaborate pumping system now serves as a museum exhibit titled "Hubris in Bronze and Copper."
+&nbsp;
+§ Waste disposal in subterranean cities represents one of humanity's most carefully not-discussed triumphs. The Dwarrowdelve Sanitation Treatises run to forty-seven volumes, all of which are kept in a separate library wing with excellent ventilation. Readers must sign a waiver acknowledging they can never un-know what they are about to learn.
+&nbsp;
+§§ The Guild of Underground Cartographers maintains that traffic planning is 40% engineering, 30% psychology, and 30% accepting that people will absolutely create unofficial shortcuts through load-bearing walls if the official route is even slightly inconvenient. Modern planning incorporates "sacrifice tunnels" for this purpose—designated areas where shortcuts are permitted and, critically, expected.
+&nbsp;
+*** Planning for magma flow is largely restricted to cities built near volcanic systems, though the definition of "near" becomes surprisingly flexible when magma is involved. The Lava Liability Index, developed after the Spontaneous Relocation Incident of Forge-Heart City†, measures the probability of unexpected thermal features on a scale from "geologically stable" to "surprise volcano."
+&nbsp;
+††† The Third Deep Quarter experienced what the official report delicately termed "unexpected aquatic integration" when workers discovered that several residential chambers had been built directly into an underground river's anticipated future course. The residents were compensated with housing in the Fourth Deep Quarter, which was specifically constructed away from any geological features that looked "suspiciously damp."
+&nbsp;
+‡‡‡ Karak-Undermound now features a Memorial Fountain in its Third Deep Quarter, which city planners insist is entirely intentional and not at all a structural failure they have decided to pretend was the plan all along. The fountain operates twenty-four hours per day because nobody can find the shut-off valve, assuming one exists.
+&nbsp;
+§§§ The standard planning package includes: structural map, utilities map, residential zoning map, commercial zoning map, mineral rights map‡, political boundaries map, historical tunnel map (showing all previous excavations, including the ill-advised ones), current tunnel map (showing where tunnels actually are versus where they were supposed to be), and the Optimistic Future Expansion map (showing where tunnels will probably go, assuming the budget holds).
+&nbsp;
+‡ Mineral rights underground follow the ancient legal principle of "I was here first, actually," which has led to several memorable court cases. The landmark decision in Deepstone Mining Cooperative v. The Entire City of Their Headquarters established that cities have priority over mining operations in civic spaces, though the exact boundary of "civic spaces" was left deliberately vague to preserve future employment for lawyers.
+&nbsp;
+**** The position of Map-Interpreter requires a Master's degree in cartography, a working knowledge of seven languages (three of them dead), and what the job posting describes as "an almost supernatural ability to determine what the previous city planner meant by this squiggle here." The current Map-Interpreter of Greater Underholm has been in therapy for six years, primarily regarding what he found in Layer`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding subterranean city planning in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const UNDERGROUND_LIGHTING_SYSTEMS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'underground_lighting_systems',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Underground Lighting Systems',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['subterranean_city_planning'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_underground_lighting_systems' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Underground Lighting Systems</span>
+&nbsp;
+The fundamental challenge of underground lighting systems, as any competent excavation engineer will attest, lies not in the provision of illumination itself—a relatively straightforward matter of electrical conduits and luminaire placement—but rather in the simultaneous management of heat dissipation, moisture resistance, structural integrity, and what the Royal Society of Subterranean Architects delightfully terms "psychological luminance adequacy"*. The basic principle operates on a deceptively simple formula: sealed fixtures† plus redundant power systems‡ plus adequate ventilation** equals a minimally acceptable underground environment, though this calculation notably excludes approximately forty-seven other critical variables††, many of which only reveal themselves during what insurance assessors categorically refuse to call "incidents"‡‡.
+&nbsp;
+Practical applications of underground lighting systems have evolved considerably since the Unfortunate Events of 1847***, when the London Underground's first experimental electric lighting system achieved the technically impressive but practically catastrophic distinction of simultaneously illuminating three stations while setting fire to two†††. Modern installations typically employ LED technology with IP68-rated enclosures‡‡‡, distributed along tunnels at intervals determined by a complex interplay of ambient light requirements (measured in lux)****, tunnel geometry, reflective surface coefficients, and—according to the Bureau of Underground Infrastructure Standards—the statistical probability of emergency evacuation in conditions of zero visibility††††. The installation process itself requires specialized training, as evidenced by the fact that the International Guild of Tunnel Illumination Engineers maintains a thirty-seven-volume set of safety protocols‡‡‡‡, of which volumes twelve through eighteen concern solely what not to do with waterproof junction boxes*****.
+&nbsp;
+Safety considerations in underground lighting demand particular attention to power supply redundancy, with current best practices mandating no fewer than three independent circuits******—a requirement established after the Great Blackout Incident of the Munich Metro†††††, wherein forty-three minutes of absolute darkness resulted in the complete reorganization of the municipal emergency response framework and several hastily revised doctoral theses on crowd psychology. Emergency lighting must activate within 0.5 seconds of primary system failure‡‡‡‡‡, maintain minimum illumination levels of 10 lux along escape routes******, and operate for no less than ninety minutes on battery backup†††††††—specifications that appear reasonable until one considers the actual cost‡‡‡‡‡‡, which explains why the Association of Municipal Budget Directors has proposed, at seventeen consecutive annual conferences, that everyone simply carry flashlights and be done with it*******.
+&nbsp;
+The historical development of underground lighting systems traces an arc from the coal-oil lamps of Victorian excavations********—which combined minimal illumination with maximal asphyxiation risk††††††††—through the arc lamp period‡‡‡‡‡‡‡ (1880-1920, never to be repeated if anyone has any sense), to modern solid-state solutions that theoretically last fifty thousand hours********* and practically last until the next budget cycle requires their replacement†††††††††. Contemporary understanding acknowledges that underground lighting serves not merely functional purposes but psychological ones‡‡‡‡‡‡‡‡: humans, it transpires, evolved under open skies and regard enclosed spaces with the same enthusiasm they reserve for tax audits, family reunions, and encountering spiders in small rooms**********, which is why modern underground facilities increasingly incorporate "daylight simulation systems"†††††††††† that cost approximately the same as a modest suburban house‡‡‡‡‡‡‡‡‡ and maintain the comforting fiction that one is not, in fact, twenty meters beneath the surface in a concrete tube***********.
+&nbsp;
+The integration of smart lighting systems represents the current frontier, wherein sensors detect occupancy, adjust color temperature according to circadian rhythms, and report their status to central management systems*********** that generate more data than anyone actually reviews†††††††††††, creating a perfect storm of modern efficiency: complicated, expensive, theoretically optimal, and producing metrics that look impressive in presentations to people who will never actually visit the tunnels‡‡‡‡‡‡‡‡‡‡. The future likely holds further innovations, though one suspects that the fundamental challenge—making humans comfortable in places they instinctively wish to leave—will remain essentially unchanged, requiring only periodic rebranding and increasingly sophisticated technical specifications to describe what ultimately amounts to "bright enough to see, reliable enough to trust, and expensive enough to require extensive justification in triplicate"************.
+&nbsp;
+---
+&nbsp;
+*The Royal Society of Subterranean Architects, founded in 1823 after the Thames Tunnel incident that no one discusses at parties, defines "psychological luminance adequacy" as "that quality of illumination which prevents workers from spontaneously requesting transfers to surface operations." Their research indicates this threshold varies by culture, with Norwegian tunnel workers requiring approximately 40% less illumination than their Mediterranean counterparts, a finding that has generated seventeen heated academic papers and one fistfight at the 2019 International Conference on Underground Construction.
+&nbsp;
+†Sealed fixtures must achieve ratings of IP67 or higher, where IP stands for "Ingress Protection" and the numbers translate roughly to "really quite waterproof" and "seriously, we mean it." The IP68 rating, reserved for fixtures expected to survive continuous submersion, costs approximately 340% more than IP65-rated equipment—a markup that the Fixture Manufacturers' Consortium defends as "necessary engineering precision" and that purchasing departments worldwide refer to as "extortion with technical specifications."
+&nbsp;
+‡Redundant power systems operate on the principle that if one circuit fails, another should immediately activate, theoretically preventing darkness but practically creating situations where maintenance workers must trace faults through three separate electrical pathways while receiving contradictory instructions from the surface control room. The average troubleshooting time for redundant systems is 2.7 times longer than for simple circuits, leading to the paradoxical situation where increased safety measures result in extended periods of uncertainty.
+&nbsp;
+**Adequate ventilation in tunnel lighting systems serves dual purposes: dissipating heat from fixtures and providing oxygen for workers, though not necessarily in that order of priority according to cost-benefit analyses prepared by firms that will remain nameless. The recommended air change rate of six complete exchanges per hour proves surprisingly expensive to achieve, which is why budget proposals invariably include the phrase "staged implementation over fiscal years 2024-2031" in carefully passive-voice constructions.
+&nbsp;
+††These forty-seven variables include but are not limited to: reflectance degradation from tunnel soot accumulation (variable 23), vibration-induced fixture misalignment (variable 31), unauthorized creative reinterpretation of electrical codes by local contractors (variable 44), and acts of God or gods (variable 47, covered in a separate section of the insurance policy written in what lawyers call "strategic ambiguity").
+&nbsp;
+‡‡The term "incident" has been so thoroughly overused in safety documentation that it now encompasses everything from "minor flicker noticed by one worker" to "rapid unscheduled disassembly of electrical infrastructure accompanied by dramatic visual effects." The Underwriters' Association for Underground Construction maintains a seventeen-category taxonomy of incidents, each with its own reporting requirements, though categories 14-17 simply read "ask for legal counsel before documenting."
+&nbsp;
+***The Unfortunate Events of 1847 remain poorly documented, primarily because the responsible parties moved to America shortly thereafter and assumed new identities. Historical accounts mention "innovative wire insulation techniques" that proved less innovative and more combustible than anticipated, "experimental voltage regulation" that regulated nothing while experimenting enthusiastically with fire propagation, and "a fundamental misunderstanding of Ohm's Law" that would have horrified Herr Ohm had he lived to witness it. The only contemporary documentation consists of insurance claims totaling £47,000 (equivalent to approximately £6.2 million today) and a hastily published pamphlet titled "On the Inadvisability of Certain Recently Attempted Methods of Underground Illumination."
+&nbsp;
+†††The London Underground fire of 1847 led directly to the establishment of the Board of Subterranean Safety, whose first act was to ban experimental lighting systems "in perpetuity or until sufficient evidence of non-catastrophic operation can be demonstrated, whichever comes later." This ban remained in effect for thirty-seven years, during which tunnel workers labored by oil lamp, creating different but equally concerning fire hazards that the Board chose to categorize as "traditional risks" rather than "experimental disasters."
+&nbsp;
+‡‡‡IP68-rated enclosures theoretically withstand continuous immersion in water beyond one meter depth. In practice, this rating means the fixture will survive "most reasonable flood scenarios" and "several unreasonable ones," though the manufacturers' liability specifically excludes "acts of nature that insurance companies refuse to cover," "creative applications not envisioned during design," and "installation methods that violate both physics and common sense but remain disturbingly common." The test protocol for IP68 certification involves placing fixtures in pressure`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding underground lighting systems in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const UNDERGROUND_AGRICULTURE_CHAMBERS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'underground_agriculture_chambers',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Underground Agriculture Chambers',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['underground_lighting_systems'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_underground_agriculture_chambers' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Underground Agriculture Chambers</span>
+&nbsp;
+The cultivation of subterranean foodstuffs represents one of humanity's more optimistic responses to the fundamental problem of "not enough surface"*, a challenge that has plagued civilizations since the first dwarf looked up at the sun and said "too bright" and the first human looked down at perfectly good underground space and said "too dark."** The construction of underground agriculture chambers requires a sophisticated understanding of hydrogeology, thermodynamics, and what the Undermountain Agricultural Institute charmingly refers to as "aggressive root negotiation"†—the delicate art of convincing plants that growing downward in the dark is actually a perfectly reasonable life choice. Modern practitioners must master the integration of artificial lighting systems‡ with ventilation networks capable of managing both the carbon dioxide requirements of photosynthesis and the methane production of decomposing organic matter, though the ratio between "successful crop rotation" and "accidental swamp gas accumulation" remains disappointingly close to 1:1.2 for beginners.††
+&nbsp;
+The fundamental architecture of an underground chamber suitable for agriculture demands consideration of factors that surface farmers have the luxury of ignoring, such as load-bearing capacity‡‡, drainage patterns that acknowledge water's stubborn insistence on flowing downward***, and the psychological wellbeing of workers who must explain to their families that yes, they farm for a living, and no, they never see the sun.††† The chamber must maintain temperature within remarkably narrow tolerances—the Guild of Underground Horticulturists specifies 15-21°C with less than 3% daily variation‡‡‡—while simultaneously managing humidity levels that satisfy both plant transpiration requirements and the structural integrity of support timbers§. Historical records suggest that approximately 40% of failed underground agricultural projects can be attributed to what the Journal of Subterranean Cultivation tactfully describes as "insufficient attention to the fact that plants require air and water is heavy."§§
+&nbsp;
+Critical to success is the matter of soil selection and maintenance, particularly given that one cannot simply wait for natural topsoil formation processes§§§, which operate on geological timescales notably longer than most agricultural business plans*. The Deepvault Method**, developed after the catastrophic Millstone Incident of 1847††, involves layering imported surface soil with mineral-rich subterranean material, composted organic waste, and what the original documentation mysteriously refers to as "amendments best not discussed with surface authorities."‡‡ The resulting growing medium must support root development while maintaining sufficient porosity for both water drainage and air circulation, a balance that the Fraternity of Downward Farmers describes as "like trying to build a mattress that's simultaneously a sponge, a fortress, and a restaurant."***
+&nbsp;
+Perhaps the most challenging aspect involves the orchestration of artificial lighting to replicate solar cycles†††, as plants prove surprisingly resistant to well-meaning suggestions that they might prefer a nice 24-hour workday‡‡‡. The spectral composition must include sufficient blue wavelengths for vegetative growth and red wavelengths for flowering§§, while the intensity must vary through a programmed day/night cycle that accounts for seasonal variations plants theoretically shouldn't know about but somehow do§§§. The Academy of Applied Underground Agriculture reports that chambers equipped with proper full-spectrum lighting achieve yields approximately 80% of surface equivalents, though this drops to 35% if one succumbs to the tempting belief that "light is light" and attempts to grow tomatoes under the same crystals used for reading****.
+&nbsp;
+Contemporary underground agricultural construction represents a synthesis of ancient mining knowledge††††, modern horticultural science‡‡‡‡, and what might charitably be termed "aggressive problem-solving"§§§§. The successful chamber exists in a state of carefully maintained disequilibrium*—too much order and the soil dies, too much chaos and everything floods—requiring constant attention from practitioners who understand that they are not so much farming as negotiating a three-way treaty between plants, stone, and water**. Those who master this art produce food in spaces previously considered useful only for storing things you'd prefer not to think about††, thereby converting humanity's instinct to dig holes into something that occasionally produces actual carrots‡‡.
+&nbsp;
+---
+&nbsp;
+*The technical term is "arable land scarcity," but this fails to capture the essential comedy of fighting over dirt.
+&nbsp;
+**The historical record contains numerous proposals to simply "flip everything over" so the underground becomes the surface. These proposals are filed in the Archive of Ideas That Sound Reasonable at 3 AM, maintained by the Royal Society of Second Thoughts.
+&nbsp;
+†A phrase that sounds much more pleasant than "convincing plants to abandon millions of years of evolutionary programming through aggressive manipulation of their environment." The Institute's public relations department works very hard.
+&nbsp;
+††This figure improves to 1:1.05 after five years of experience, suggesting that the primary lesson learned is "slightly better panic management when the warning bells sound." The Guild maintains a wall of remembrance for chambers lost to methane events. It's quite long.
+&nbsp;
+‡A prerequisite technology that most historical underground farmers either didn't have or didn't fully understand, leading to what the Subterranean Studies Department at Deepholm University calls "the Dark Ages," a term they insist is completely literal and not at all ironic.
+&nbsp;
+‡‡Specifically, the load-bearing capacity of ceiling structures above chambers that are, by definition, hollow and filled with increasingly damp soil. The mathematics involves a level of prayer unusual in engineering disciplines.
+&nbsp;
+***Water's philosophical commitment to downward motion has undermined more underground projects than all other factors combined. The Deep Agriculture Quarterly once published an entire issue titled "Water: That Bastard," which remains their best-selling edition.
+&nbsp;
+†††Many early underground farmers attempted to solve this through "relocation therapy," encouraging workers to redefine their relationship with natural light. The therapy had a 0% success rate and a 100% rate of workers requesting transfers back to surface operations.
+&nbsp;
+‡‡‡The tolerances are technically specified as ±1.5°C, but the Guild unofficially acknowledges that "close enough" is acceptable if you don't tell the plants. Plants, it should be noted, are terrible secret-keepers and will wilt accusatorially.
+&nbsp;
+§The rivalry between those who advocate for stone support structures versus treated timber is legendary and occasionally violent. The Great Column Debate of 1823 resulted in seventeen injuries, none of them directly related to structural failure.
+&nbsp;
+§§This is Archive-speak for "they ignored basic physics and everything fell down." The Journal maintains a reputation for exquisite tact in describing disasters.
+&nbsp;
+§§§Natural topsoil formation requires approximately 100 years to produce one centimeter under ideal conditions. Most agricultural investors lack this level of patience, and most crops lack this level of longevity.
+&nbsp;
+*This observation originally appeared in the Farmer's Guide to Things That Seemed Like a Good Idea at the Time, a surprisingly thick volume.
+&nbsp;
+**Named after its inventor, though "developer" might be more accurate, as the actual invention was by someone else who left insufficient documentation and died under circumstances the historical record describes only as "regrettable"†.
+&nbsp;
+†The Millstone Incident involved an experimental underground farm that utilized millstones to crush rock into agricultural soil. The farm succeeded brilliantly until someone noticed the millstones were crushing their way downward through the chamber floor at approximately 2cm per day. The evacuation was reportedly orderly, though several farmers refused to leave without their root vegetables, demonstrating the peculiar priorities that develop in agricultural professions.
+&nbsp;
+‡‡Contemporary scholars suspect this refers to waste material from surface industries that had trouble finding legitimate disposal methods. The truth is presumably archived somewhere, filed under "Plausible Deniability."
+&nbsp;
+***This metaphor appeared in their annual publication "Why Underground Farming Requires Drinking" and has achieved legendary status among practitioners, who regard it as the single most accurate technical description in the field.
+&nbsp;
+†††The Circadian Compliance Protocol, as established by the International Subterranean Growing Standards Committee, runs to 847 pages. Page 423 contains the memorable warning: "Plants know when you're lying. We don't know how they know. They just do."
+&nbsp;
+‡‡‡This suggestion was actually made at the 1876 Underground Agriculture Convention by a delegate who was politely escorted out and banned from future conferences. His name is recorded in the minutes only as "That Idiot from Sector Seven."
+&nbsp;
+§§Blue light promotes vegetative growth through photosystem II activation, while red light triggers photosystem I and flowering responses. This is mentioned primarily to demonstrate that real science exists beneath all this absurdity, though it doesn't make the absurdity less true.
+&nbsp;
+§§§The phenomenon of plants somehow detecting seasonal changes despite being 50 meters underground in controlled conditions remains unexplained. The prevailing theory is "plants are spite-based lifeforms." This theory lacks academic rigor but has never been successfully disproven.
+&nbsp;
+****The resulting crop was described in incident reports as "technically alive in a philosophical sense."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding underground agriculture chambers in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GEOTHERMAL_HEAT_UTILIZATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'geothermal_heat_utilization',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Geothermal Heat Utilization',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['underground_agriculture_chambers'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_geothermal_heat_utilization' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Geothermal Heat Utilization</span>
+&nbsp;
+The fundamental principle of geothermal heat utilization rests upon a truth so ancient that even the Old Gods knew it*: the earth is warm, and if one digs deep enough, one may borrow this warmth**. The practice of harnessing geothermal energy for construction purposes involves the strategic placement of heat exchange systems at depths ranging from thirty-seven to several thousand feet†, depending on local geology, budgetary constraints, and how many times the surveying team got lost underground††. Modern geothermal systems operate on the thermodynamic principle that heat naturally flows from warmer to cooler regions†††, a phenomenon discovered independently by every culture that ever dug a cellar in winter and noticed it was warmer than outside‡. The essential mechanism involves circulating a working fluid—traditionally water, though the Dwarfs of Höllengratschlucht preferred molasses for reasons they never adequately explained‡‡—through underground pipes that absorb the earth's constant temperature, then returning this heat to surface structures where it may be utilized for heating, cooling, or the preparation of perpetual stew‡‡‡.
+&nbsp;
+The practical implementation of geothermal systems in construction requires three fundamental components: the heat exchange loop buried in the earth*, the heat pump mechanism that transfers energy**, and the distribution system that delivers warmth to inhabited spaces†. Installation begins with geological surveying to determine heat availability††, followed by the drilling of boreholes or excavation of horizontal trenches†††, and concludes with system integration that would be straightforward were it not for the seventeen different trades involved‡, each possessing their own arcane terminology‡‡ and blood feuds with at least two other trades‡‡‡. The closed-loop system, wherein fluid circulates entirely within sealed pipes, presents fewer complications than the open-loop variant§, which draws groundwater directly and must contend with mineral deposits§§, dissolved cave creatures§§§, and occasional messages in bottles from previous civilizations¶. Heat pumps themselves operate at a coefficient of performance between 3.0 and 5.0¶¶, meaning they move three to five units of heat for every unit of electrical energy consumed¶¶¶, a ratio that seems suspiciously close to getting something for nothing and has resulted in them being banned in twelve jurisdictions on grounds of witchcraft**.
+&nbsp;
+Historical development of geothermal utilization stretches back to the Third Age of Stone†, when the Thermomancers of Krakatoa‡ first attempted to heat their ceremonial baths by drilling directly into volcanic chambers§, an experiment that achieved remarkable success for approximately four minutes¶ before achieving even more remarkable failure**. The Romans, characteristically, approached the matter with both engineering brilliance and complete disregard for safety regulations††, installing geothermal heating in over two hundred bathhouses‡‡ without once consulting what lay beneath them§§. Modern understanding began in 1904 when Prince Piero Ginori Conti successfully generated electricity from geothermal steam in Larderello, Italy¶¶, thus proving that the earth's heat could be converted to power and inaugurating an era of increasingly optimistic drilling programs***. Contemporary systems benefit from advances in materials science†††, drill technology‡‡‡, and the hard-won knowledge that some depths are best left unplumbed§§§. The integration of geothermal heating with underground agricultural chambers¶¶¶ represents a particular triumph, creating self-sustaining environments that maintain optimal temperatures year-round***, though the unexpected discovery that certain root vegetables grow sentient at constant temperatures above 73°F has complicated harvesting procedures†††.
+&nbsp;
+Safety considerations in geothermal construction cannot be overstated, though they are regularly understated by contractors seeking to minimize insurance premiums‡‡‡. Primary concerns include ground subsidence§§§, thermal pollution of aquifers¶¶¶, equipment failure under pressure****, and the theoretical but never-formally-acknowledged possibility of drilling into something that was sleeping and would prefer to remain so††††. The Guild of Geothermal Engineers maintains strict protocols‡‡‡‡ requiring redundant safety systems, continuous monitoring, and a minimum safe distance of three hundred yards from any structure described in legend as "cursed," "forbidden," or "the place where the old gods went when they died"§§§§. Workers must be trained to recognize warning signs¶¶¶¶ including unexpected hot spots, mysterious vapors, and the sound of knocking from inside sealed pipes that seems to respond intelligently to human speech*****. The Incident at Þermisbörg†††††, wherein an improperly sealed borehole released not only superheated steam but also several hundred years' worth of accumulated regret‡‡‡‡‡, serves as eternal reminder that geological features often have good reasons for remaining undisturbed§§§§§.
+&nbsp;
+The economic and environmental benefits of geothermal heating justify the initial capital investment¶¶¶¶¶, which typically ranges from fifteen to forty thousand currency units per installation****** depending on depth, complexity, and how much one wishes to spend on systems that don't occasionally emit prophetic whispers††††††. Operating costs remain minimal—approximately 0.3 cents per kilowatt-hour‡‡‡‡‡‡ compared to conventional heating—and environmental impact proves negligible when systems are properly maintained§§§§§§, which they rarely are¶¶¶¶¶¶. Maintenance schedules should account for standard concerns such as pump wear, fluid replacement, and checking that one's heat exchanger hasn't spontaneously evolved consciousness*******, a phenomenon reported in 0.03% of systems operating continuously for over twenty years†††††††. The longevity of geothermal installations—often exceeding fifty years for underground components‡‡‡‡‡‡‡—makes them generational investments§§§§§§§, assuming one's descendants don't object to inheriting infrastructure that occasionally hums in a frequency that causes unease¶¶¶¶¶¶¶.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*According to the *Codex Geologicus Primordialis*, discovered in a cave system beneath what is now suburban Reykjavik, the goddess Þermungandr specifically instructed early peoples to "delve deep but not too deep, lest ye disturb mine sister, who sleeps poorly and vengefully."
+&nbsp;
+**The technical term is "thermal extraction," though field workers prefer "heat stealing" and philosophers question whether one can steal from that which was never claimed. The earth has not filed complaints, though certain volcanic eruptions have been deemed "suspiciously well-timed."
+&nbsp;
+†The Guild of Depth Surveyors publishes annual statistics. The average geothermal installation depth is 347.3 feet. The median is 285 feet. The mode is "however far we got before hitting something hard, weird, or both." These numbers differ significantly.
+&nbsp;
+††The Surveying Corps of Upper Saxony holds the record for survey expeditions that took longer underground than anticipated: fourteen separate occasions in 1887 alone. On the fifteenth occasion, they simply didn't come back, though their equipment is still transmitting data suggesting they're fine and have "discovered something really interesting."†
+&nbsp;
+†Lost surveying teams remain a persistent industry problem. The Department of Underground Labor Statistics estimates seventeen teams currently missing, though this number excludes those who send occasional messages claiming they've "found a better way" and "shouldn't come looking for them."
+&nbsp;
+†††This principle appears in *Concerning the Nature of Heat* by Thermidor the Scorched, written in 1643 while recovering from his experimental work with "really, quite impressively hot" springs. The book is mostly legible despite the burn marks.
+&nbsp;
+‡Including but not limited to: the ancient Sumerians, who noticed granaries stayed cool; the Chinese, who designed ice houses using natural earth cooling; the Inuit, who understood permafrost; and Mrs. Henderson of Shropshire, who independently discovered it in 1823 and was very put out that nobody seemed impressed.
+&nbsp;
+‡‡The Höllengratschlucht Dwarfs maintained that molasses "had better thermal properties and excellent taste during system testing." Their Technical Manual includes a chapter titled "Why We Can Eat Our Infrastructure and You Cannot." Modern engineers use water.‡
+&nbsp;
+‡The practice was discontinued after the Great Molasses System Freeze of 1847, when winter temperatures unexpectedly caused complete system failure and the creation of what historians describe as "the world's largest and stickiest construction delay."
+&nbsp;
+‡‡‡The perpetual stew of Guthram's Hall in medieval Iceland was maintained for eighteen continuous years using geothermal heat, ending only when someone added an ingredient that historians del`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding geothermal heat utilization in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEEP_EARTH_CONSTRUCTION_SAFETY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'deep_earth_construction_safety',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Deep Earth Construction Safety',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['geothermal_heat_utilization'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_deep_earth_construction_safety' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Deep Earth Construction Safety: A Comprehensive Analysis of Subsurface Engineering Protocols and the Prevention of Incidents We Would Rather Not Discuss</span>
+&nbsp;
+The fundamental principle of deep earth construction safety may be summarized in a single dictum that has echoed through the ages: "Do not dig too greedily, nor too deep."* This maxim, while seemingly straightforward, encompasses a vast body of technical knowledge concerning the structural, thermal, and occasionally metaphysical challenges encountered when one excavates beyond the critical threshold of 2,847 meters**—a depth at which, according to the International Subterranean Engineering Consortium, approximately 73.4% of "unusual phenomena" begin to manifest.† The practitioner must therefore approach deep earth construction with a combination of geological expertise, thermal management capability, and what the ancient Guild of Deep Delvers termed "a healthy respect for things that ought not be disturbed."†† The modern construction professional, equipped with geothermal heat utilization knowledge‡, stands at an advantage over their historical counterparts, though this advantage is somewhat offset by the contemporary tendency to actually use said knowledge rather than prudently leaving certain thermal vents alone.‡‡
+&nbsp;
+The practical applications of deep earth construction safety revolve around three interlocking systems: structural integrity maintenance, thermal management, and what the Dwarfish Engineering Codex euphemistically calls "contingency protocols."*** The structural considerations alone require constant vigilance, as rock behaves quite differently at depths where the pressure exceeds 200 megapascals††† and the ambient temperature suggests that one's ancestors made poor real estate decisions.‡‡‡ Load-bearing calculations must account for not merely the weight of overlying strata, but also thermal expansion****, lithospheric creep†††† and—according to 14.6% of field reports from the Deep Karst Mining Operations—phenomena that defy conventional physics.‡‡‡‡ The thermal management aspect draws heavily upon geothermal heat utilization principles, though practitioners quickly discover that "utilization" and "being utilized by" are separated by surprisingly subtle distinctions in valve positioning.★
+&nbsp;
+Modern understanding of deep earth construction safety emerged through a process that the Historical Archives of Preventable Disasters describes as "iterative learning through catastrophic failure."★★ The seminal work by Professor Steinhardt Grubentief, "So You've Breached the Mantle: A Retrospective,"★★★ catalogs precisely 847 distinct incident types, ranging from the merely inconvenient (sudden decompression events that redistribute one's tools across three geological strata) to the genuinely problematic (awakening of dormant thermal entities that take exception to drilling operations).††††† Contemporary best practices emphasize redundant safety systems, real-time monitoring of seventeen critical parameters‡‡‡‡‡, and maintaining an escape shaft that does not, under any circumstances, share a thermal gradient with the primary excavation.★★★★ The depth at which one must begin implementing these protocols is precisely calculated: it is the depth at which one first thinks, "Perhaps we should implement protocols."
+&nbsp;
+Historical development of the field can be traced through a series of increasingly stern warnings, beginning with the relatively mild "Caution: Hot Rocks" advisory of 1823 and culminating in the present-day "CEASE IMMEDIATELY: THERMAL BREACH IMMINENT—EVACUATE TO MINIMUM SAFE DISTANCE OF 3.7 KILOMETERS" protocols.†††††† The profession has, through hard-won experience, developed a comprehensive understanding of thermal behavior at extreme depths, pressure dynamics in confined spaces★★★★★, and the critical importance of never, under any circumstances, drilling on the anniversary of previous incidents.‡‡‡‡‡‡ Modern practitioners benefit from this accumulated wisdom, though the retention rate of these lessons correlates inversely with the profitability of the proposed excavation site—a relationship quantified by the Greed-Depth Coefficient††††††† at approximately 0.89.★★★★★★
+&nbsp;
+Safety considerations in deep earth construction ultimately reduce to a single question: "What is the worst that could happen?" The answer, according to the Encyclopaedia of Things We Wish We Hadn't Tried, ranges from localized collapse (manageable) through explosive decompression (regrettable) to events that require the redrawing of geological survey maps and the invention of new insurance categories.‡‡‡‡‡‡‡ Best practices therefore emphasize prevention over response, monitoring over assumption, and the maintenance of detailed incident logs that future generations might learn from our mistakes—or at least have something entertaining to read while their own questionable excavation projects proceed toward their inevitable conclusions.†††††††† The field continues to evolve, with each generation contributing new insights, refined techniques, and cautionary tales that begin with the words, "It seemed like a good idea at the time."★★★★★★★
+&nbsp;
+---
+&nbsp;
+*Attributed to various sources, including the Dwarven Safety Manual (Third Age), the Guild of Miners' Charter of 1634, and—somewhat anachronistically—J.R.R. Tolkien. The principle remains sound regardless of provenance, though the Dwarves insist they said it first and have the scars to prove it.
+&nbsp;
+**This figure represents the average depth at which conventional geology gives way to what the textbooks term "non-standard conditions." The decimal precision is maintained purely for the appearance of scientific rigor; the actual threshold varies by location, geological era, and whether anyone was paying attention during the initial survey.
+&nbsp;
+†The International Subterranean Engineering Consortium, based in Geneva in a building that notably has no basement, maintains exhaustive records of deep earth incidents. Their definition of "unusual phenomena" is admirably broad, encompassing everything from unexpected thermal vents to what the 1973 incident report describes only as "the thing with the tentacles." See also: Why We Don't Drill Near Zürich Anymore: A Retrospective (Consortium Press, 1974).
+&nbsp;
+††The Guild of Deep Delvers, founded in 1347 during the Great Mining Boom, disbanded in 1349 during the Somewhat Less Great Mining Disaster. Their charter, recovered from the collapsed Number Seven shaft, contained seventeen pages of safety protocols and one final addendum reading simply: "We should have listened to the charter." The Guild's motto, "Dig Deep, Die Well," was later revised by successor organizations to the slightly more optimistic "Dig Deep, Die Eventually, But Not Today If We Follow Protocols."
+&nbsp;
+‡Geothermal heat utilization, while a prerequisite for deep earth construction, is rather like understanding knife safety before attempting sword swallowing—technically related, but representing vastly different scales of consequence. The heat at 200 meters depth can warm your tea; the heat at 2,000 meters can turn you into tea.
+&nbsp;
+‡‡The Thermal Incident of 1887, when the Birmingham Deep Excavation Project successfully tapped a geothermal vent and slightly less successfully controlled it, led to what historians call "The Year of the Warm Fog" and engineers call "A Learning Experience." The project's chief engineer, Sir Reginald Dampworth, was last seen sprinting toward the Scottish border shouting something about retirement. His last communication to the Board simply read: "It was stable during the survey."
+&nbsp;
+***"Contingency protocols" is engineering parlance for "plans for when everything goes wrong." The Dwarfish Engineering Codex contains 47 pages of contingency protocols and 12 pages of everything else, which tells you something about Dwarfish priorities and/or Dwarfish historical experience.
+&nbsp;
+†††At 200 megapascals, rock exhibits what geologists call "plastic behavior"—not in the sense of credit cards, but in the sense that it flows like a very slow, very grumpy liquid. Tunnels constructed at this pressure must account for the fact that rock has opinions about where it would rather be, and these opinions are expressed through gradual-but-inexorable movement. The Deep Bosporus Tunnel, for instance, has been "settling" for 23 years and is now technically 15 centimeters east of its original location. The engineers insist this is "within acceptable parameters," though they refuse to define what those parameters are.
+&nbsp;
+‡‡‡The ancestral decision-making process that led humans to think "Yes, let us establish permanent residence at depths where the air requires pressurization" remains a source of scholarly debate. The Anthropological Society suggests economic necessity; the Psychological Association suggests questionable judgment; the Deep Miners' Union suggests that everyone shut up and let them work. All three agree that it seemed reasonable at the time.
+&nbsp;
+****Thermal expansion at extreme depths is non-trivial. A steel support beam at 800°C expands by approximately 1.2% of its original length. This seems minimal until one realizes that in a 500-meter tunnel, this translates to six meters of unexpecte`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding deep earth construction safety in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  SUBTERRANEAN_CITY_PLANNING,</span>
+<span class="cstat-no" title="statement not covered" >  UNDERGROUND_LIGHTING_SYSTEMS,</span>
+<span class="cstat-no" title="statement not covered" >  UNDERGROUND_AGRICULTURE_CHAMBERS,</span>
+<span class="cstat-no" title="statement not covered" >  GEOTHERMAL_HEAT_UTILIZATION,</span>
+<span class="cstat-no" title="statement not covered" >  DEEP_EARTH_CONSTRUCTION_SAFETY</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

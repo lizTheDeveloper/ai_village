@@ -42,9 +42,9 @@ export class CallMeetingBehavior extends BaseBehavior {
   readonly name = 'call_meeting' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+    const agent = entity.getComponent(ComponentType.Agent)!;
+    const position = entity.getComponent(ComponentType.Position)!;
+    const identity = entity.getComponent(ComponentType.Identity);
 
     // Check if we already have a meeting component
     const meeting = entity.getComponent<MeetingComponent>(ComponentType.Meeting);
@@ -136,10 +136,10 @@ export class AttendMeetingBehavior extends BaseBehavior {
   readonly name = 'attend_meeting' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+    const agent = entity.getComponent(ComponentType.Agent)!;
+    const position = entity.getComponent(ComponentType.Position)!;
+    const movement = entity.getComponent(ComponentType.Movement)!;
+    const identity = entity.getComponent(ComponentType.Identity);
 
     // Get meeting caller ID from behavior state
     const meetingCallerId = agent.behaviorState.meetingCallerId as string;

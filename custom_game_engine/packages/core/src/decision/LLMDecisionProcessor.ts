@@ -281,23 +281,11 @@ export interface LLMDecisionResult {
   thinking?: string;
   source: 'llm' | 'fallback';
 }
-/**
- * Custom LLM configuration for per-agent LLM settings
- */
-export interface CustomLLMConfig {
-  model?: string;
-  baseUrl?: string;
-  apiKey?: string;
-  customHeaders?: Record<string, string>;
-}
+// Import canonical LLM types
+import type { CustomLLMConfig, LLMDecisionQueue } from '../types/LLMTypes.js';
 
-/**
- * Interface for LLM decision queue
- */
-export interface LLMDecisionQueue {
-  getDecision(entityId: string): string | null;
-  requestDecision(entityId: string, prompt: string, customConfig?: CustomLLMConfig): Promise<string>;
-}
+// Re-export for backward compatibility with existing code
+export type { CustomLLMConfig, LLMDecisionQueue };
 /**
  * Interface for prompt builder
  */

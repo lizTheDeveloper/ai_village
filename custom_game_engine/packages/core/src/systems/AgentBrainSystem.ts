@@ -374,8 +374,30 @@ export class AgentBrainSystem extends BaseSystem {
       // Phase 3: Execution
       if (decisionResult.execute) {
         const p3 = performance.now();
-        this.behaviors.execute(decisionResult.behavior, impl, ctx.world);
+        const behaviorResult = this.behaviors.execute(decisionResult.behavior, impl, ctx.world);
         executionTime += performance.now() - p3;
+
+        // Phase 4: Handle behavior completion and transitions
+        if (behaviorResult.complete) {
+          // Emit completion event
+          ctx.world.eventBus.emit({
+            type: 'behavior:completed',
+            source: impl.id,
+            data: {
+              behavior: agent.behavior,
+              reason: behaviorResult.reason,
+              nextBehavior: behaviorResult.nextBehavior,
+            },
+          });
+
+          // Transition to next behavior or idle
+          const nextBehavior = behaviorResult.nextBehavior || 'idle';
+          impl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+            ...current,
+            behavior: nextBehavior,
+            behaviorState: behaviorResult.nextState || {},
+          }));
+        }
       }
     }
 

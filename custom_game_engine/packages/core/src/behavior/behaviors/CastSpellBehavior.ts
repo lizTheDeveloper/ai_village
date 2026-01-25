@@ -66,9 +66,9 @@ export class CastSpellBehavior extends BaseBehavior {
   }
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     const magic = entity.getComponent<MagicComponent>(ComponentType.Magic);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -344,7 +344,7 @@ export class CastSpellBehavior extends BaseBehavior {
     // Healing/buff spells: target self or injured allies
     if (effectId.includes('heal') || effectId.includes('buff') || effectId.includes('protect')) {
       // Target self if injured
-      const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+      const needs = entity.getComponent(ComponentType.Needs);
       if (needs && needs.health < 0.7) {
         return entity;
       }
@@ -364,8 +364,8 @@ export class CastSpellBehavior extends BaseBehavior {
         const allyImpl = ally as EntityImpl;
         if (allyImpl.id === entity.id) continue;
 
-        const allyPos = allyImpl.getComponent<PositionComponent>(ComponentType.Position);
-        const allyNeeds = allyImpl.getComponent<NeedsComponent>(ComponentType.Needs);
+        const allyPos = allyImpl.getComponent(ComponentType.Position);
+        const allyNeeds = allyImpl.getComponent(ComponentType.Needs);
 
         if (!allyPos || !allyNeeds) continue;
 
@@ -400,7 +400,7 @@ export class CastSpellBehavior extends BaseBehavior {
 
       for (const animal of animals) {
         const animalImpl = animal as EntityImpl;
-        const animalPos = animalImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const animalPos = animalImpl.getComponent(ComponentType.Position);
 
         if (!animalPos) continue;
 

@@ -5,7 +5,7 @@
 import {
   GameLoop,
   EventBusImpl,
-  WorldImpl,
+  World,
   SystemRegistry,
   diagnosticsHarness,
   wrapEntity,

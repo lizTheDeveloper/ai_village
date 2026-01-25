@@ -10,8 +10,6 @@ import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { SilverThreadComponent } from './SilverThreadComponent.js';
 import type { SoulIdentityComponent } from './SoulIdentityComponent.js';
-import type { PlotLinesComponent } from '../plot/PlotTypes.js';
-import type { SoulLinkComponent } from './SoulLinkComponent.js';
 import { recordSnapshotWaypoint } from './SilverThreadComponent.js';
 
 /**
@@ -52,9 +50,9 @@ export function recordSoulPositions(world: World, snapshot_id: string): Map<stri
     .executeEntities();
 
   for (const soulEntity of soulEntities) {
-    const identity = soulEntity.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-    const thread = soulEntity.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
-    const plotLines = soulEntity.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    const identity = soulEntity.getComponent(ComponentType.SoulIdentity);
+    const thread = soulEntity.getComponent(ComponentType.SilverThread);
+    const plotLines = soulEntity.getComponent(ComponentType.PlotLines);
 
     if (!identity || !thread) continue;
 
@@ -65,7 +63,7 @@ export function recordSoulPositions(world: World, snapshot_id: string): Map<stri
       .executeEntities();
 
     for (const agent of agents) {
-      const link = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
+      const link = agent.getComponent(ComponentType.SoulLink);
       if (link?.soul_id === soulEntity.id && link.is_primary_incarnation) {
         currentIncarnation = agent.id;
         break;
@@ -119,8 +117,8 @@ export function validateSoulPosition(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
-  const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-  const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+  const identity = soul.getComponent(ComponentType.SoulIdentity);
+  const thread = soul.getComponent(ComponentType.SilverThread);
 
   if (!identity) {
     errors.push('Missing SoulIdentity component');

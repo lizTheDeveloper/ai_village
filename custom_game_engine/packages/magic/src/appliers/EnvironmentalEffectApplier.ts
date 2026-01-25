@@ -322,8 +322,9 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
    */
   private getOrCreateEnvironmentEntity(world: World): Entity {
     // Look for existing environment entity (if query is available)
-    if (typeof (world as any).query === 'function') {
-      const existingEnv = world.query()
+    const worldWithQuery = world as unknown as { query?: () => { with: (type: string) => { executeEntities: () => Entity[] } } };
+    if (typeof worldWithQuery.query === 'function') {
+      const existingEnv = worldWithQuery.query()
         .with('environment')
         .executeEntities()[0];
 
@@ -389,7 +390,8 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
     world: World
   ): void {
     // Skip if world doesn't support query (mock world in tests)
-    if (typeof (world as any).query !== 'function') {
+    const worldWithQuery = world as unknown as { query?: () => { with: (type: string) => { with: (type: string) => { executeEntities: () => Entity[] } } } };
+    if (typeof worldWithQuery.query !== 'function') {
       return;
     }
 

@@ -75,7 +75,7 @@ export class PlantActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const actorPos = actor.getComponent(ComponentType.Position);
     if (!actorPos) {
       return {
         valid: false,
@@ -84,7 +84,7 @@ export class PlantActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
+    const inventory = actor.getComponent(ComponentType.Inventory);
     if (!inventory || !inventory.slots) {
       return {
         valid: false,

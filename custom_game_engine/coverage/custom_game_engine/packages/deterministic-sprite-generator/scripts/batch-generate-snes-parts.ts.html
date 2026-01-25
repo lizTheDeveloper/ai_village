@@ -1,0 +1,397 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/deterministic-sprite-generator/scripts/batch-generate-snes-parts.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/deterministic-sprite-generator/scripts</a> batch-generate-snes-parts.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/79</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/79</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/**<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+ * Batch generate SNES-style (16-bit) body parts using PixelLab
+ * Uses reference image for consistent style
+ */
+&nbsp;
+<span class="cstat-no" title="statement not covered" >const SNES_REFERENCE_ID = '762d156d-60dc-4822-915b-af55bc06fb49';</span>
+<span class="cstat-no" title="statement not covered" >const STYLE = '16-bit SNES era pixel art, RPG style like Chrono Trigger';</span>
+<span class="cstat-no" title="statement not covered" >const OUTPUT_DIR = 'assets/parts/snes';</span>
+&nbsp;
+interface PartSpec {
+  id: string;
+  category: 'head' | 'body' | 'hair' | 'accessory';
+  description: string;
+  width: number;
+  height: number;
+  tags: string[];
+}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// SNES Parts Library (64x64 to 64x96)</span>
+<span class="cstat-no" title="statement not covered" >const SNES_PARTS: PartSpec[] = [</span>
+<span class="cstat-no" title="statement not covered" >  // HEADS (8 variations)</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_round_pale', category: 'head', description: `${STYLE}, human head, round face, pale skin, front view, neutral, no hair`, width: 64, height: 64, tags: ['round', 'pale'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_round_tan', category: 'head', description: `${STYLE}, human head, round face, tan skin, front view, smiling, no hair`, width: 64, height: 64, tags: ['round', 'tan'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_round_dark', category: 'head', description: `${STYLE}, human head, round face, dark brown skin, front view, serious, no hair`, width: 64, height: 64, tags: ['round', 'dark'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_square_pale', category: 'head', description: `${STYLE}, human head, square jaw, pale skin, front view, stern, no hair`, width: 64, height: 64, tags: ['square', 'pale'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_square_tan', category: 'head', description: `${STYLE}, human head, square jaw, tan skin, front view, confident, no hair`, width: 64, height: 64, tags: ['square', 'tan'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_oval_pale', category: 'head', description: `${STYLE}, human head, oval face, pale skin, front view, gentle smile, no hair`, width: 64, height: 64, tags: ['oval', 'pale'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_oval_dark', category: 'head', description: `${STYLE}, human head, oval face, dark skin, front view, wise, no hair`, width: 64, height: 64, tags: ['oval', 'dark'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_angular_pale', category: 'head', description: `${STYLE}, human head, angular face, pale skin, front view, intense, no hair`, width: 64, height: 64, tags: ['angular', 'pale'] },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  // BODIES (5 variations)</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_athletic', category: 'body', description: `${STYLE}, human body, athletic muscular build, arms and legs, standing, no head`, width: 64, height: 96, tags: ['athletic'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_stocky', category: 'body', description: `${STYLE}, human body, stocky broad build, arms and legs, standing, no head`, width: 64, height: 96, tags: ['stocky'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_thin', category: 'body', description: `${STYLE}, human body, thin lanky build, arms and legs, standing, no head`, width: 64, height: 96, tags: ['thin'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_average', category: 'body', description: `${STYLE}, human body, average build, arms and legs, standing, no head`, width: 64, height: 96, tags: ['average'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_heavy', category: 'body', description: `${STYLE}, human body, heavy-set build, arms and legs, standing, no head`, width: 64, height: 96, tags: ['heavy'] },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  // HAIR (12 variations)</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_spiky_brown', category: 'hair', description: `${STYLE}, short spiky brown hair, anime style, top view`, width: 64, height: 64, tags: ['short', 'spiky', 'brown'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_spiky_blonde', category: 'hair', description: `${STYLE}, short spiky blonde hair, hero style, top view`, width: 64, height: 64, tags: ['short', 'spiky', 'blonde'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_short_black', category: 'hair', description: `${STYLE}, short neat black hair, professional cut, top view`, width: 64, height: 64, tags: ['short', 'neat', 'black'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_short_red', category: 'hair', description: `${STYLE}, short messy red hair, wild style, top view`, width: 64, height: 64, tags: ['short', 'messy', 'red'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_medium_wavy_red', category: 'hair', description: `${STYLE}, medium wavy red hair, flowing, top view`, width: 64, height: 72, tags: ['medium', 'wavy', 'red'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_medium_straight_brown', category: 'hair', description: `${STYLE}, medium straight brown hair with bangs, top view`, width: 64, height: 72, tags: ['medium', 'straight', 'brown'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_long_blonde', category: 'hair', description: `${STYLE}, long flowing blonde hair, princess style, top view`, width: 64, height: 80, tags: ['long', 'wavy', 'blonde'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_long_black', category: 'hair', description: `${STYLE}, long straight black hair, silky, top view`, width: 64, height: 80, tags: ['long', 'straight', 'black'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_long_curly_brown', category: 'hair', description: `${STYLE}, long curly brown hair, voluminous, top view`, width: 64, height: 80, tags: ['long', 'curly', 'brown'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_ponytail_blonde', category: 'hair', description: `${STYLE}, ponytail blonde hair, high and tight, top view`, width: 64, height: 72, tags: ['ponytail', 'blonde'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_ponytail_brown', category: 'hair', description: `${STYLE}, ponytail brown hair, casual, top view`, width: 64, height: 72, tags: ['ponytail', 'brown'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'hair_bald', category: 'hair', description: `${STYLE}, bald head, smooth skin, no hair, top view`, width: 64, height: 64, tags: ['bald'] },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  // ACCESSORIES (6 variations)</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'accessory_glasses_round', category: 'accessory', description: `${STYLE}, round eyeglasses, thin gold frames, front view`, width: 64, height: 64, tags: ['glasses', 'round'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'accessory_beard_short', category: 'accessory', description: `${STYLE}, short brown beard, neat goatee, front view`, width: 64, height: 64, tags: ['beard', 'short'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'accessory_beard_long', category: 'accessory', description: `${STYLE}, long grey wizard beard, flowing, front view`, width: 64, height: 80, tags: ['beard', 'long'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'accessory_hat_wizard', category: 'accessory', description: `${STYLE}, wizard hat, tall pointed purple with stars`, width: 64, height: 80, tags: ['hat', 'wizard'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'accessory_crown', category: 'accessory', description: `${STYLE}, gold crown, ornate with red jewels, royal`, width: 64, height: 64, tags: ['crown', 'royal'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'accessory_eyepatch', category: 'accessory', description: `${STYLE}, black eyepatch, pirate style, front view`, width: 64, height: 64, tags: ['eyepatch', 'pirate'] },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  // EXOTIC MONSTER BODIES (10 variations) - Mix with human heads for crazy hybrids!</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_tentacles', category: 'body', description: `${STYLE}, octopus tentacle body, multiple tentacles, slimy texture, standing pose`, width: 64, height: 96, tags: ['tentacles', 'aquatic', 'monster'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_dragon_wings', category: 'body', description: `${STYLE}, humanoid body with large dragon wings spread, scaly texture`, width: 80, height: 96, tags: ['wings', 'dragon', 'flying'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_furry_beast', category: 'body', description: `${STYLE}, werewolf furry body, thick brown fur, clawed arms and legs`, width: 64, height: 96, tags: ['furry', 'beast', 'wolf'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_slime', category: 'body', description: `${STYLE}, slime ooze body, translucent green gelatinous form, dripping`, width: 64, height: 96, tags: ['slime', 'ooze', 'liquid'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_scales_lizard', category: 'body', description: `${STYLE}, lizardfolk scaly body, green scales, reptilian arms and tail`, width: 64, height: 96, tags: ['scales', 'lizard', 'reptile'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_robot', category: 'body', description: `${STYLE}, robotic cyborg body, metal plating, mechanical joints, wires`, width: 64, height: 96, tags: ['robot', 'cyborg', 'metal'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_ethereal_ghost', category: 'body', description: `${STYLE}, ghostly ethereal body, translucent wispy form, floating`, width: 64, height: 96, tags: ['ghost', 'ethereal', 'spirit'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_insect_chitin', category: 'body', description: `${STYLE}, insectoid body, hard chitin exoskeleton, multiple arms`, width: 64, height: 96, tags: ['insect', 'chitin', 'bug'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_plant_vine', category: 'body', description: `${STYLE}, plant creature body, green vines and leaves, woody texture`, width: 64, height: 96, tags: ['plant', 'vine', 'nature'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'body_crystalline', category: 'body', description: `${STYLE}, crystal golem body, transparent faceted crystals, glowing`, width: 64, height: 96, tags: ['crystal', 'golem', 'mineral'] },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  // EXOTIC MONSTER HEADS (8 variations)</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_dragon', category: 'head', description: `${STYLE}, dragon head, reptilian with horns, green scales, fierce`, width: 64, height: 64, tags: ['dragon', 'scales', 'horns'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_demon', category: 'head', description: `${STYLE}, demon head, red skin with horns, glowing eyes, menacing`, width: 64, height: 64, tags: ['demon', 'horns', 'evil'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_skull', category: 'head', description: `${STYLE}, skeleton skull head, bone white, empty eye sockets`, width: 64, height: 64, tags: ['skull', 'undead', 'bone'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_cat', category: 'head', description: `${STYLE}, cat head, feline features with whiskers and ears, furry`, width: 64, height: 64, tags: ['cat', 'feline', 'furry'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_octopus', category: 'head', description: `${STYLE}, octopus head, tentacle face like Cthulhu, aquatic`, width: 64, height: 64, tags: ['octopus', 'tentacles', 'lovecraft'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_robot', category: 'head', description: `${STYLE}, robot head, metal with glowing visor, mechanical`, width: 64, height: 64, tags: ['robot', 'metal', 'visor'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_slime', category: 'head', description: `${STYLE}, slime head, gelatinous blob with eyes, translucent`, width: 64, height: 64, tags: ['slime', 'blob', 'eyes'] },</span>
+<span class="cstat-no" title="statement not covered" >  { id: 'head_bird', category: 'head', description: `${STYLE}, bird head, eagle-like with beak and feathers`, width: 64, height: 64, tags: ['bird', 'eagle', 'beak'] },</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`\n🎨 SNES Parts Generation Queue`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`Reference ID: ${SNES_REFERENCE_ID}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`Total parts: ${SNES_PARTS.length}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`Output: ${OUTPUT_DIR}/`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`\nBreakdown:`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`  Heads: ${SNES_PARTS.filter(p =&gt; p.category === 'head').length}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`  Bodies: ${SNES_PARTS.filter(p =&gt; p.category === 'body').length}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`  Hair: ${SNES_PARTS.filter(p =&gt; p.category === 'hair').length}`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`  Accessories: ${SNES_PARTS.filter(p =&gt; p.category === 'accessory').length}`);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`\n⏱️  Rate Limit: ~5 seconds between generations`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`Estimated time: ${Math.ceil(SNES_PARTS.length * 30 / 60)} minutes`);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`\n📋 Generation Instructions:`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`1. Use PixelLab MCP tools to generate each part`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`2. Use SNES reference as background_image for style matching`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`3. Download each generated PNG to ${OUTPUT_DIR}/`);</span>
+<span class="cstat-no" title="statement not covered" >console.log(`4. Update parts.ts to load from these files`);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.log(`\n🚀 Ready to generate!`);</span>
+&nbsp;
+export { SNES_PARTS, SNES_REFERENCE_ID, OUTPUT_DIR };
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../sorter.js"></script>
+        <script src="../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

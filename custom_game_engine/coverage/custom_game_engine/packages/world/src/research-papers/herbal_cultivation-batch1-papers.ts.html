@@ -1,0 +1,2146 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/herbal_cultivation-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> herbal_cultivation-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a>
+<a name='L677'></a><a href='#L677'>677</a>
+<a name='L678'></a><a href='#L678'>678</a>
+<a name='L679'></a><a href='#L679'>679</a>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a>
+<a name='L685'></a><a href='#L685'>685</a>
+<a name='L686'></a><a href='#L686'>686</a>
+<a name='L687'></a><a href='#L687'>687</a>
+<a name='L688'></a><a href='#L688'>688</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERB_GARDEN_PLANNING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herb_garden_planning',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herb Garden Planning',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herb_garden_planning' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Herb Garden Planning: A Foundational Treatise on the Deliberate Cultivation of Aromatic and Medicinal Flora</span>
+&nbsp;
+The cultivation of herbs represents one of humanity's earliest attempts to impose order upon the natural world, a practice dating back to the Before Times when ancient gardeners first realized that certain plants tasted better than others and some made the headaches go away*.  Modern herb garden planning has evolved from these humble beginnings into a sophisticated discipline combining horticultural science, spatial geometry, and an intimate understanding of why basil and rue absolutely refuse to coexist†.  The fundamental principle underlying all successful herb garden planning is deceptively simple: put the right plant in the right place at the right time, then accept that the slugs will have strong opinions about your choices**.
+&nbsp;
+The practical application of herb garden planning requires consideration of multiple factors, chief among them sunlight exposure, soil composition, water requirements, and the territorial ambitions of mint***.  The Botanical Institute of Greater Wurstberg recommends what they term the "Mediterranean Principle"—placing sun-loving herbs such as rosemary, thyme, and oregano in south-facing positions† while moisture-preferring herbs like parsley and chives occupy shadier, damper quarters††.  Companion planting, the ancient art of pairing mutually beneficial species, remains somewhat controversial††† despite its popularity among practitioners who swear that chamomile makes onions taste sweeter‡.  The vertical dimension must also be considered: taller herbs should be positioned where they will not shade their diminutive neighbors, unless one is deliberately attempting to create a microclimate‡‡, a technique that sounds sophisticated but mostly means "putting the tall thing behind the short thing."
+&nbsp;
+Safety considerations in herb garden planning are often overlooked until too late‡‡‡.  While herbs present fewer dangers than, say, carnivorous plants§ or the notoriously aggressive Giant Hogweed of the Northern Wastes§§, certain precautions prove essential.  Toxic plants such as foxglove should be clearly labeled and kept separate from culinary herbs§§§, a lesson learned tragically by the 1823 Potluck Society of Lower Brimstone*.  Children and pets must be protected from potentially harmful specimens**, and gardeners themselves should exercise caution when handling species known to cause photosensitivity or skin irritation†*.  The Guild of Practical Herbalism publishes an annual compendium of "Incidents We'd Rather Not Discuss in Detail"††* that makes for sobering reading, particularly the section on monkshood‡*.
+&nbsp;
+Historical development of herb garden planning reflects changing human priorities and the slow accumulation of botanical knowledge‡‡*.  Medieval monastery gardens followed strict symbolic layouts, with herbs arranged according to their spiritual properties§*, a practice that produced beautiful gardens but occasionally confused cooks seeking basil and finding only contemplative rows of wormwood§§*.  The Victorian era saw the rise of formal knot gardens, elaborate geometric designs that looked spectacular but proved nightmarish to maintain§§§*, particularly when one plant in the pattern grew faster than its neighbors*.  Modern approaches favor functional simplicity over symbolic complexity, though certain traditional principles—such as planting lavender near garden entrances and rosemary beside gates—persist for reasons that combine practicality, folklore, and the fact that they smell nice†**.
+&nbsp;
+In conclusion, successful herb garden planning emerges from understanding both horticultural fundamentals and the peculiar personalities of individual plant species‡**.  The novice gardener should begin modestly, perhaps with a simple selection of Mediterranean herbs in containers, before progressing to more ambitious in-ground installations§**.  Experience remains the finest teacher, supplemented by the cautionary tales of those who came before—tales that usually begin with "Well, I thought..." and end with "...so now we don't plant that there anymore"§§**.  The rewards of a well-planned herb garden extend beyond mere culinary or medicinal utility to include the deeper satisfaction of participating in a tradition stretching back to the dawn of agriculture, when the first humans decided that gathering wild plants was entirely too much walking***.
+&nbsp;
+---
+&nbsp;
+**FOOTNOTES**
+&nbsp;
+*The Mesopotamian Tablet of Growing Things (circa 2400 BCE) contains what scholars believe is the first written complaint about herb garden planning, specifically: "The mint has escaped again. May Inanna have mercy on my neighbor's vegetables."
+&nbsp;
+†This ancient enmity between basil and rue defies scientific explanation. The Royal Horticultural Society conducted trials in 1887 wherein basil and rue were planted at distances ranging from six inches to six feet apart. The basil died at all measured distances. When separated by a brick wall, both thrived. The Society's official conclusion was "Plants are capable of spite."
+&nbsp;
+**Slugs possess an uncanny ability to locate the most expensive herb seedlings. Studies by the Institute for Pest Psychology† suggest they may communicate this information chemically, though the alternate hypothesis—that they simply enjoy watching gardeners suffer—cannot be ruled out.
+&nbsp;
+†This institute closed in 1992 after its lead researcher went mad trying to interpret the "thoughts" of aphids. His final paper consisted entirely of the word "hungry" repeated for forty-seven pages.
+&nbsp;
+***Mint's reputation for aggressive expansion is well-documented. The Great Mint Incident of Yorkshire (1847) saw a single specimen of Mentha × piperita overtake three gardens, a churchyard, and part of a canal towpath in the span of four growing seasons††. The Containment Protocols now taught to beginning gardeners worldwide stem directly from this cautionary tale.
+&nbsp;
+††Historical records suggest the actual incident was somewhat less dramatic, involving only one garden and moderate encroachment into a neighbor's radish patch. However, the exaggerated version proved more effective at teaching the importance of root barriers, so the Gardeners' Guild officially adopted it in 1851.
+&nbsp;
+†The Mediterranean Principle sounds authoritative but actually refers to the fact that Mediterranean herbs come from the Mediterranean, where it is sunny and dry. The Institute has been criticized for stating the obvious, but they argue that someone needs to because people keep planting rosemary in peat bogs.
+&nbsp;
+††Moisture-preferring herbs will grow in drier conditions but become, in the words of noted herbalist Gretchen von Dillweed, "sulky and under-flavored." Von Dillweed's 1734 treatise "The Moods of Plants" was considered eccentric in its time but has since been vindicated by science†††.
+&nbsp;
+†††Sort of. Modern botany acknowledges that plants respond to environmental stress, which technically validates von Dillweed's observations while politely ignoring her claim that parsley could "sense the emotional state of the household."
+&nbsp;
+‡The onion-chamomile relationship has never been scientifically proven, yet gardeners continue to swear by it. The Blind Taste Test Trials of 1996 found no statistically significant difference between onions grown with and without chamomile neighbors, but participants reported that onions from chamomile-companioned beds "felt spiritually superior." The research team declined to investigate further.
+&nbsp;
+‡‡Microclimates within a garden can support plants that would otherwise struggle in the local climate. Creating them deliberately requires understanding sun angles, wind patterns, and water drainage, or alternatively, just putting things in different spots until something works. Both approaches have their advocates.
+&nbsp;
+‡‡‡The most common herb garden injury is not plant-related but rather involves garden tools, particularly the trowel‡. The second most common is back strain from bending over to weed. The third is what medical literature delicately terms "unexpected encounters with resident wildlife."
+&nbsp;
+‡The Emergency Room Gardening Registry reports that trowels account for approximately 3,247 injuries annually in the Greater Metropolitan Gardening District alone, usually involving either stepping on them (rake-style comedy physics apply to all pronged implements) or forgetting where one left them‡‡.
+&nbsp;
+‡‡‡The author speaks from personal experience. The trowel in question is still missing. It will probably turn up in spring.
+&nbsp;
+§Carnivorous plants present unique challenges in terms of feeding requirements and tend to make visitors nervous. The International Carnivorous Plant Society's unofficial motto—"They're More Afraid of You Than You Are of Them"—is technically true but not particularly comforting.
+&nbsp;
+§§Giant Hogweed (Heracleum mantegazzianum) causes severe photosensitive burns. The phrase "of the Northern Wastes" is pure invention for dramatic effect, though the plant's aggressive invasiveness makes it feel appropriately mythological§.
+&nbsp;
+§One expert has suggested that Giant Hogweed should be renamed "Stop Touching That, Seriously, We're Not Joking Weed" but the International Botanical Nomenclature Committee rejected this on procedural grounds.
+&nbsp;
+§§§The distinction between "toxic" and "medicinal" often comes down to dosage and preparation, but the herbs requiring such precision should be left`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herb garden planning in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOIL_FOR_MEDICINAL_PLANTS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soil_for_medicinal_plants',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Soil For Medicinal Plants',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['herb_garden_planning'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_soil_for_medicinal_plants' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Soil For Medicinal Plants: A Comprehensive Investigation Into Terrestrial Substrate Optimization for Therapeutic Flora</span>
+&nbsp;
+The cultivation of medicinal plants begins, as most things do, with dirt*. Yet this is no ordinary dirt—this is *purposeful* dirt, dirt with *intention*, dirt that has been the subject of approximately 4,237 scholarly treatises since the Babylonian Hanging Gardens Committee first convened to discuss "optimal drainage for therapeutic herbs**." The modern practitioner must understand that soil for medicinal plants operates on principles both ancient and exacting: the right balance of nutrients, drainage, pH, and what the medieval herbalists called "sympathetick earth humour†," which we now recognize as microbial activity but which sounds considerably less magical. The three pillars of medicinal plant soil—composition, drainage, and fertility—form what the Guild of Practical Herbalists refers to as "the triumvirate of not killing your expensive plants††."
+&nbsp;
+The practical composition of medicinal soil requires a delicate balance‡. Most medicinal plants, having evolved in conditions ranging from Mediterranean hillsides to Alpine meadows, prefer what soil scientists technically term "not too wet, not too dry, not too rich, and definitely not whatever is currently in your garden‡‡." The standard mixture consists of approximately 40% quality topsoil, 30% compost or well-rotted manure, and 30% drainage material such as sand or perlite‡‡‡—though these percentages may vary by up to 73.4% depending on which historical text you consult and how much wine the author had consumed§. Drainage proves particularly critical; more medicinal plants have been murdered by well-meaning enthusiasts with heavy clay soil and generous watering cans than were ever harvested by professional apothecaries during the entire Medieval period§§.
+&nbsp;
+The pH requirements present their own peculiar challenges***. Most medicinal herbs prefer slightly alkaline to neutral soil (pH 6.5-7.5), though this varies dramatically by species†††—lavender enjoys alkaline conditions reminiscent of its Mediterranean homeland, while chamomile tolerates slight acidity with the stoicism of a plant that has survived being stepped on by peasants for millennia. The Guild's official position paper, "On The Matter Of Soil Acidity And Why Your Comfrey Looks Miserable," runs to 847 pages and includes seventeen case studies of catastrophic pH miscalculation‡‡‡‡. Modern soil testing kits have made this process considerably less mystical than the traditional method of "plant it and pray§§§," though the latter approach maintains a certain romantic appeal among those who enjoy gardening as a form of gambling.
+&nbsp;
+Historical development of medicinal plant soil knowledge reads like a catalog of noble failures and occasional triumphs****. The Romans, with characteristic efficiency, developed soil amendment schedules that remained unmatched until the 19th century††††—though they unfortunately also believed that soil quality could be improved by adding ground-up statues of Mercury, which primarily improved the local lead content‡‡‡‡‡. Medieval monastery gardens represented the golden age of medicinal plant cultivation, with monks developing composting techniques so sophisticated they would not be fully understood until the invention of microbiology some six hundred years later§§§§. The Renaissance saw an explosion of herbalist treatises, many of which contained excellent advice buried under layers of astrological nonsense and recommendations to plant during "the ascending moon's third quarter while Jupiter transits Virgo*****."
+&nbsp;
+Modern understanding combines ancient wisdom with contemporary soil science, creating what the International Society of Herbal Substrate Studies calls "a workable compromise between tradition and not dying of entirely preventable plant diseases†††††." The current best practice involves testing soil composition, amending as needed based on specific plant requirements, maintaining proper drainage, and—crucially—resisting the temptation to "improve" things by adding every soil amendment advertised on the internet‡‡‡‡‡‡. The living soil approach, emphasizing microbial health and organic matter, has revolutionized medicinal plant cultivation while simultaneously making it sound like something from a particularly earnest fantasy novel§§§§§. Success in growing medicinal plants ultimately depends less on achieving perfect soil conditions and more on understanding that plants, like people, can adapt to less-than-ideal circumstances—they simply grow better when not forced to******.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*Approximately 2.4 billion tons of it annually, if we include all agricultural soil moved for medicinal plant cultivation worldwide. This statistic is maintained by the International Dirt Movement Census, an organization whose existence raises more questions than it answers.
+&nbsp;
+**The Committee's minutes were discovered in 1847, carved into clay tablets. Most entries concerned watering schedules, though one lengthy digression discussed whether the head gardener's wife was "carrying on" with a Phoenician trader. The hanging gardens themselves lasted approximately 400 years; the scandal lasted considerably longer.
+&nbsp;
+†Not to be confused with "unsympathetic earth humour," which is what you get when you use soil from a construction site. The medieval herbalists were quite specific about this distinction, though their explanation involved the four humours, planetary alignments, and a rather complicated diagram of a goat.
+&nbsp;
+††The Guild's motto, "Probatum Est Per Plantam Mortuam" (Proven By Dead Plant), reflects their commitment to learning from mistakes. Their headquarters in Lower Slumbering features a memorial garden containing 1,847 varieties of expired medicinal plants, each with a small plaque explaining what went wrong. The most common inscription: "Overwatered."
+&nbsp;
+‡And here we encounter the first great challenge of medicinal plant cultivation: that "delicate balance" is apparently calibrated differently in every book, article, and conversation with elderly gardeners who have been growing herbs since "before you were born, young person." The National Registry of Conflicting Gardening Advice receives approximately 10,000 submissions annually, each one contradicting at least three others.
+&nbsp;
+‡‡This technical definition was proposed by Dr. Millicent Rootworth of the Ankh-Morpork Institute of Herbological Studies*** in her groundbreaking 1973 paper, "Why Can't Anyone Just Say What They Mean?" The paper was rejected by seventeen journals for being "too practical."
+&nbsp;
+***Not to be confused with the Ankh-Morpork Institute of Herbological Studies And Alchemy, which was closed by the city watch in 1978 after an incident involving feverfew, brimstone, and what witnesses described as "a small but determined dragon." The distinction matters primarily to insurance companies.
+&nbsp;
+‡‡‡These percentages were established by the Council of Reasonable Soil Composition in 1891, following the Great Compost Debate of 1889-1890, which saw factions supporting anywhere from 5% to 95% compost in growing medium. The compromise satisfied no one, which the Council considered a mark of successful negotiation. Two members resigned in protest, one joined a monastery, and the chairman emigrated to Australia "to get away from all this dirt nonsense."
+&nbsp;
+§Professor Edmund Sedge-Marshall's 1623 treatise "On Soils For Healing Herbs" recommends 60% manure, which suggests either a typographical error or that the Professor had access to considerably different plants than the rest of humanity. His garden, by all accounts, smelled extraordinary. His neighbors' subsequent petition to the Crown resulted in Britain's first zoning laws.
+&nbsp;
+§§The Statistical Archive of Preventable Plant Deaths (SAPPD), maintained by the Guild since 1847, shows that waterlogged soil accounts for 34.7% of all medicinal plant mortality, followed by "forgot to water it at all" at 23.1%, and "planted in something that isn't actually soil" at 8.3%. The remaining percentage includes categories such as "eaten by rabbits," "dug up by dog," and the mysterious "spontaneous disappearance, possibly fairies."
+&nbsp;
+***The existence of the three-asterisk footnote represents what scholars call "the threshold of frivolity," beyond which lies only chaos and increasingly improbable anecdotes. We shall cross it with dignity.
+&nbsp;
+†††The Comprehensive Plant pH Preference Guide, published by the Royal Horticultural Society's Department of Pedantic Specificity, runs to 1,247 pages and lists pH preferences for 8,934 species of medicinal plants, each entry footnoted with exceptions, special cases, and accounts of that one garden in Shropshire where everything grows regardless of pH "because Mildred has a way with plants, she does." Mildred was interviewed for a follow-up study but proved frustratingly unable to explain her methods beyond "I just talk to them, dear."
+&nbsp;
+‡‡‡‡The seventeen case studies include the Incident at Pemberton Manor (1847), where a well-meaning gardener added so much lime to achieve alkaline soil that he essentially`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding soil for medicinal plants in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERB_SEED_SELECTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herb_seed_selection',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herb Seed Selection',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soil_for_medicinal_plants'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herb_seed_selection' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Herb Seed Selection: A Practitioner's Guide to Not Growing Entirely the Wrong Thing</span>
+&nbsp;
+The fundamental challenge of herb selection, as outlined by the esteemed botanist Erasmus Seedworthy* in his seminal work "One Does Not Simply Plant Things," lies in distinguishing between seeds that will produce the desired medicinal herb and seeds that will produce something entirely different, often vigorously so**. The novice gardener must understand that nature, in her infinite wisdom†, has arranged matters such that approximately 73.4% of all seed packets become mysteriously mislabeled between the point of harvest and the point of planting††, a phenomenon the Royal Horticultural Society refers to as "Botanical Surprise Syndrome" and refuses to discuss at social gatherings. The primary principle of herb seed selection involves careful examination of seed morphology†††, provenance‡, and—most critically—whether the seeds display any tendency to whisper when no one is looking‡‡.
+&nbsp;
+*Seedworthy (1823-1891) was eventually trampled by what he insisted to his dying breath was "a completely normal turnip." The turnip was later exhibited at the Great Exhibition of 1851 and required its own pavilion.
+&nbsp;
+**The Royal Botanical Gardens of Quirm maintain what they euphemistically call the "Oops Garden," containing specimens that were meant to be something else entirely. It covers seventeen acres and requires its own security detail. Visitors are advised not to make eye contact with the former lavender plants.
+&nbsp;
+†One questions the wisdom of a universe that made hemlock and parsley so remarkably similar. The Ancient Greeks certainly did, particularly after specific incidents at specific symposiums that we needn't detail here***.
+&nbsp;
+***The Symposium of Socrates the Younger (not to be confused with the more famous Socrates) ended with thirteen cases of mistaken identity, four hasty funerals that proved premature, and one very apologetic gardener. The phrase "But they looked so similar!" entered legal discourse that afternoon.
+&nbsp;
+††This figure was calculated by the Department of Agricultural Statistics after analyzing 14,847 complaints filed between 1856 and 1859. The Department has since been reorganized three times and now refuses to count anything that might grow unexpectedly****.
+&nbsp;
+****Including their own employees, following the Incident of 1862, where the Department's headquarters became spontaneously overgrown with what was supposed to be chamomile but turned out to be something that the Linnean Society still refuses to classify.
+&nbsp;
+†††Seed morphology encompasses size, shape, surface texture, and what the Ægyptian Herbal Codex calls "the fundamental seediness of the seed's disposition." Modern botanists pretend this isn't a scientifically valid observation, but they check it anyway.
+&nbsp;
+‡The seed's provenance—where it came from, who handled it, and whether it passed through any markets where vendors have "interesting" reputations—cannot be overstated. The Guild of Sensible Gardeners maintains a list of suppliers who are permitted to sell seeds without a waiver of liability. The list contains three names, and two of those are currently deceased‡‡‡.
+&nbsp;
+‡‡‡The deceased suppliers are actually considered more reliable, as their seeds have been in sealed containers for over a century and are therefore unlikely to have been tampered with by enthusiastic "improvers."
+&nbsp;
+‡‡There is a minority tradition, particularly strong among the Wandering Herbalists of the Northern Reaches, that holds that seeds should be consulted before planting. This is dismissed as superstition by most modern practitioners, though these same practitioners will admit, after several drinks, that they do listen very carefully when opening seed packets, just in case†.
+&nbsp;
+†Not to be confused with the Southern Tradition of actually talking TO seeds, which is considered entirely sensible and has been proven to improve germination rates by up to 23%††. The difference, as any competent practitioner knows, is between respectful conversation and unwanted eavesdropping.
+&nbsp;
+††These figures were compiled by Lady Ermengarde Greenthumb in her exhaustive study "On the Proven Benefits of Politeness in Agricultural Contexts" (1891). She spent seventeen years speaking encouragingly to experimental beds of basil. The control group, which received no verbal interaction, grew normally. The addressed group thrived magnificently and, in Year Fourteen, began growing in alphabetical order.
+&nbsp;
+Practical seed selection requires attention to multiple factors, beginning with visual inspection for signs of viability‡‡‡, followed by the float test*, and concluding with what the Monastery of St. Basilius calls "intuitive assessment"** but which most practitioners recognize as simply holding the seed packet and hoping quite hard. The recommended technique, as established by the International Congress of Herbalists in 1897†, involves examining no fewer than thirty individual seeds from any given batch††, checking for uniform color‡‡‡‡, appropriate size relative to species expectations†††, and the absence of any geometric patterns that shouldn't naturally occur‡‡. A properly selected seed should feel—and here we must venture into terminology that makes modern agricultural scientists uncomfortable—"ready."§
+&nbsp;
+‡‡‡These include structural integrity, appropriate coloration, and the absence of tiny teeth marks. The last item was added to the official checklist in 1843 following the Great Seed Vault Mystery, in which 40% of the Royal Seed Collection was found to have been nibbled by something that left marks too regular to be rodent activity but too small to be anything previously catalogued**.
+&nbsp;
+**The culprit was eventually identified as a species of seed weevil that had evolved, through exposure to concentrated magical botanical specimens, a taste for rare medicinal herbs and an alarming degree of organizational capacity. The weevils were relocated to a specialized containment facility where they are now, somewhat inexplicably, employed in quality control.
+&nbsp;
+*The float test, wherein seeds are placed in water to determine viability (viable seeds sink; non-viable seeds float), works for approximately 68.3% of species. For the remaining 31.7%, it either produces false results or causes the seeds to do something unexpected. The Herbalist's Guild keeps a locked register of species that should not be water-tested under any circumstances. The register is written in three languages, none of them currently spoken.
+&nbsp;
+**The monks of St. Basilius, who have maintained an unbroken tradition of herb cultivation since 824 CE, describe intuitive assessment as "knowing without knowing why you know." Modern practitioners have attempted to quantify this as pattern recognition based on years of experience. The monks smile patiently when this is explained to them and continue doing what they've always done, which works.
+&nbsp;
+†The Congress was held in Geneva and lasted six weeks, primarily because the delegates spent four weeks arguing about whether oregano and marjoram were sufficiently distinct to require separate protocols. They eventually agreed to disagree, established a sub-committee, and moved on. The sub-committee is still meeting.
+&nbsp;
+††This sample size was determined empirically after the Incident of the Seven Samples, in which a herbalist selected seven seeds, deemed them acceptable, planted them, and discovered that she had successfully sprouted seven different species, none of which were what the packet claimed. She documented this carefully before the plants consumed her documentation. And her greenhouse. And, briefly, her neighbor's cat, though the cat was later returned, somewhat altered.
+&nbsp;
+‡‡‡‡Color variation in seeds of the same species should fall within expected parameters. The University of Uppsala maintains a seed color reference chart with 847 documented variations of "brown." They are very proud of it. Visitors are not.
+&nbsp;
+†††Size expectations must be calibrated to species and local growing conditions. A properly sized feverfew seed measures approximately 0.8-1.0mm in length. A feverfew seed measuring 5mm should not be planted without consulting local authorities and possibly evacuating the immediate area.
+&nbsp;
+‡‡The geometric patterns that "shouldn't occur" include perfect squares, equilateral triangles, and anything resembling runic inscriptions. These patterns suggest either contamination from neighboring plots of more interesting plants or that someone has been practicing hybrid cultivation techniques that predate modern ethical guidelines by several centuries§§.
+&nbsp;
+§§The Ethics Committee of the Royal Botanical Society established guidelines for herb breeding in 1889, after reviewing historical records of medieval monastery gardens. The guidelines are sixty-seven pages long. Page one says "Don't." The remaining sixty-six pages detail, in increasingly alarmed language, why.
+&nbsp;
+§This concept, which appears in texts as early as the 13th century*, has recently been validated by quantum botanists** who suggest that seed viability exists in a superposition of states until observation collapses the probability field. Traditional herbalists find this both unnecessarily complicated and entirely obvious.
+&nbsp;
+*Particularly in the writings of Hildegard von Bingen, who described seeds as containing "the virtue of greenness" and "a certain preparedness of spirit." Modern translators argue endlessly about whether she was being metapho`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herb seed selection in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PERENNIAL_HERB_CULTIVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'perennial_herb_cultivation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Perennial Herb Cultivation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['herb_seed_selection'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_perennial_herb_cultivation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Perennial Herb Cultivation</span>
+&nbsp;
+The cultivation of perennial herbs represents one of humanity's earliest sustained relationships with the plant kingdom*, a partnership that predates written language and arguably contributed more to civilization than the invention of the wheel**. Unlike their annual cousins, who live fast and die young in a single growing season, perennial herbs return year after year with the stubborn persistence of a determined relative at family gatherings†. The fundamental principle underlying perennial herb cultivation is deceptively simple: provide the herb with conditions approximating its ancestral homeland, and it will reward you with decades of growth††. This involves understanding soil composition, sunlight requirements, water needs, and the critical factor that beginning gardeners invariably forget—drainage†††.
+&nbsp;
+The practical techniques of perennial herb cultivation have been refined over approximately 12,000 years‡, though the Mesopotamian Agricultural Collective would have you believe they invented everything‡‡. Planting depth remains crucial; too shallow and the herb becomes vulnerable to frost heaving‡‡‡, too deep and it suffocates with what the Guild of Sympathetic Botanists calls "an expression of profound disappointment"§. Division and propagation occur optimally in spring or fall§§, when the plant's energy reserves are neither fully committed to explosive growth nor desperately stockpiled for winter survival§§§. Mulching serves multiple purposes: moisture retention, temperature regulation, weed suppression, and providing a comfortable blanket under which beneficial insects can contemplate the meaning of their brief existences*. Companion planting, while sometimes dismissed as agricultural superstition**, has been demonstrated to reduce pest pressure by 34.7%†, though the mechanism remains debated††.
+&nbsp;
+Historical development of perennial herb cultivation reveals a pattern of trial, error, and occasional catastrophe‡. The Ancient Greeks understood that rosemary preferred Mediterranean conditions‡‡, the Medieval monks discovered that some herbs actively disliked their companions‡‡‡, and Victorian gardeners learned through bitter experience that mint§ requires aggressive containment strategies§§. The Doctrine of Signatures, while scientifically dubious, did lead medieval herbalists to plant things in logically grouped beds§§§, which inadvertently created favorable growing microclimates through what modern science recognizes as beneficial microbial exchange*. The transition from folklore to empirical understanding accelerated dramatically in the 18th century**, though some traditional wisdom proved accurate for reasons no one understood until the advent of soil chemistry†.
+&nbsp;
+Safety considerations extend beyond the obvious concerns about poisonous species††. Perennial herbs develop extensive root systems‡, and some—particularly the Umbelliferae family—produce photosensitizing compounds that can cause severe dermatitis when exposed to sunlight‡‡. The Royal Society for the Prevention of Gardening Accidents‡‡‡ maintains that more injuries result from improper tool usage than from the plants themselves§, though their statistics are complicated by incidents involving allegedly "safe" herbs like chamomile§§. Modern understanding emphasizes sustainable practices: avoiding synthetic pesticides that disrupt beneficial insect populations, using organic mulches that enrich rather than deplete soil§§§, and respecting the principle that a healthy plant in proper conditions resists pests and diseases far better than a stressed plant drowning in chemical interventions*.
+&nbsp;
+The contemporary herbalist thus inherits thousands of years of accumulated wisdom**, tempered by scientific understanding of plant physiology, soil ecology, and the complex relationships between insects, fungi, and roots that make a garden function as an integrated ecosystem†. Success requires patience††—perennial herbs may take two to three years to reach full production—and a willingness to accept that gardens, like life, resist complete control‡. The reward is a reliable supply of culinary and medicinal herbs that return faithfully each spring‡‡, asking only for reasonable care and the occasional firm discussion about boundary violations‡‡‡.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* Some scholars date the human-herb relationship to approximately 60,000 years ago, based on pollen analysis from Neanderthal burial sites. Whether this constitutes "cultivation" or merely "wishful gathering" remains hotly debated at conferences nobody wants to attend.
+&nbsp;
+\** The wheel, despite its impressive press coverage, cannot be made into tea, does not repel insects, and tastes terrible in soup. Its contributions to civilization may have been overstated by the International Wheel Marketing Board.
+&nbsp;
+† Specifically, the relative who insists on discussing politics at Thanksgiving despite everyone's pleading. Perennial herbs are similarly immune to hints.
+&nbsp;
+†† The record for continuous cultivation of a single thyme plant stands at 47 years, maintained by the Thorvaldson family of northern Sweden. They named it Gerald. Gerald died in 2003, was eulogized in the local newspaper, and had a bench dedicated to his memory. This is entirely reasonable behavior and we will hear no criticism of it.
+&nbsp;
+††† The Great Drainage Debate consumed the Victorian Horticultural Society for three decades, resulting in two schisms, one duel, and the formation of the Radical Free-Drainage Movement. Modern understanding suggests both sides were partially correct, a conclusion that would have infuriated everyone involved.
+&nbsp;
+‡ The actual figure depends on whether you count the proto-agricultural activities of nomadic peoples, which the Academic Council for Definitive Agricultural Dating refuses to do, citing "insufficient paperwork." They are not popular at parties.
+&nbsp;
+‡‡ The Mesopotamian Agricultural Collective's claim to have invented herb cultivation, irrigation, the plow, beer, and cilantro is undermined somewhat by their simultaneous claim to have invented the concept of invention itself. Their academic papers are circularly reasoned but impressively formatted.
+&nbsp;
+‡‡‡ Frost heaving, which sounds like something that happens after excessive holiday feasting, actually refers to the process by which freezing soil literally ejects plants upward through repeated freeze-thaw cycles. It is exactly as undignified as it sounds.
+&nbsp;
+§ The Guild of Sympathetic Botanists, founded in 1823, maintains that plants possess emotional states and should be addressed respectfully. While this seems eccentric, their members do achieve remarkable growing results, possibly because people who talk soothingly to plants also remember to water them consistently.
+&nbsp;
+§§ The precise timing of division relates to the plant's hormonal cycles, though explaining this to a root ball at 6 AM on a cold March morning feels somewhat academic.
+&nbsp;
+§§§ Winter survival for herbs involves complex biochemical changes, including the synthesis of specialized proteins that prevent ice crystal formation within cells. Plants that fail to produce adequate cryoprotectants experience what can only be described as an extremely bad day, followed by death.
+&nbsp;
+\* Insects contemplating existence under mulch likely consider questions like "Why is my lifespan seventeen days?" and "What is the purpose of having sixteen legs if I only ever walk in circles?" Philosophy is wasted on creatures with nervous systems simpler than a light switch, but one imagines they try their best.
+&nbsp;
+\** Particularly by the Rationalist Farming Association, whose members insist that if you cannot measure it with calipers and record it in triplicate, it does not exist. They produce impressive documentation and mediocre vegetables.
+&nbsp;
+† The study, conducted by the Institute for Unnecessarily Precise Agricultural Measurements, tracked 14,327 individual plants over six growing seasons. The fact that they measured pest pressure to the tenth of a percentage point suggests either admirable dedication or concerning obsession.
+&nbsp;
+†† Proponents cite electromagnetic field interactions, volatile organic compounds, and mycorrhizal network communication. Skeptics cite confirmation bias and coincidence. Both groups are extremely tedious at dinner parties.
+&nbsp;
+‡ The Disaster at Wormwood Abbey in 1487, wherein Brother Anselm's experimental herb garden achieved consciousness and had to be excommunicated. The incident is documented in marginalia but dismissed by modern historians as "obvious allegory." It was not allegory. Brother Anselm's journals remain sealed in the Vatican Archives under seventeen different classification protocols. There's a reason.
+&nbsp;
+‡‡ The ancient Greeks worshipped rosemary as sacred to Aphrodite, possibly because its flowers are blue (connected to the sea) or possibly because they, like many ancient peoples, made religious decisions while significantly intoxicated. Their cultivation techniques, however, were impeccable.
+&nbsp;
+‡‡‡ Medieval manuscripts reveal that monks discovered basil and rue should never share a bed. This is presented as mystical knowledge in texts like "The Herbal of Peculiar Wisdom," but is actually basic allelopathy—plants chemically warfare against neighbors they dislike. The monks anthropomorphized this as divine judgment, which at least made gardening more interesting.
+&nbsp;
+§ The Great Mint Escape of 1843, wherein ornamental mint planted in London's Kew Gardens spread to cover 3.7 acres before being contained through the deployment of underground metal barriers. Modern satellite imagery suggests the original plant's descendants occupy approximately 12% of greater London through sewer-base`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding perennial herb cultivation in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ANNUAL_HERB_CULTIVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'annual_herb_cultivation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Annual Herb Cultivation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['perennial_herb_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_annual_herb_cultivation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Annual Herb Cultivation: A Comprehensive Study of Ephemeral Botanical Companions</span>
+&nbsp;
+The cultivation of annual herbs represents a fundamental divergence from their perennial cousins*, requiring a complete reimagining of one's relationship with the garden†. Where perennial herbs demand patience and long-term planning‡, annuals offer the gardener what the Ancient Order of Thermodynamically-Challenged Agriculturalists termed "instant gratification with mandatory repetition"**—a philosophy that has sustained both herb gardens and therapy practices for millennia††. The annual herb, in its wisdom, completes its entire life cycle within a single growing season‡‡, thereby teaching humanity valuable lessons about mortality, renewal, and the importance of keeping detailed planting schedules***.
+&nbsp;
+The practical cultivation of annuals begins with seed selection, a process made unnecessarily complex by the fact that most herb seeds look remarkably similar to very small pebbles†††. One must prepare the soil to a depth of approximately 15.7 centimeters‡‡‡—the precise measurement determined by the Bureau of Arbitrary Agricultural Standards after the Great Basil Catastrophe of 1847****. Direct sowing versus transplanting remains a matter of heated debate††††, though both methods succeed admirably if one remembers to water them‡‡‡‡, a step which approximately 67.3% of beginning gardeners consider "optional for the first week"*****.
+&nbsp;
+Modern understanding of annual herb cultivation emphasizes succession planting†††††, the practice of sowing new seeds every two to three weeks to ensure continuous harvest‡‡‡‡‡. This technique was perfected by the legendary horticulturist Dame Petronella Seedsworth******, who maintained seventy-three separate basil plantings simultaneously and could predict the exact moment each would bolt to within 2.4 minutes††††††. The relationship between temperature, day length, and herb productivity follows patterns observed by ancient gardeners‡‡‡‡‡‡, though they expressed these relationships through interpretive dance rather than spreadsheets*******.
+&nbsp;
+Contemporary best practices mandate proper spacing********, adequate sunlight†††††††, and regular harvesting to prevent premature flowering‡‡‡‡‡‡‡—the botanical equivalent of a teenager deciding to drop out of school and join a band*********. The art lies in balancing the herb's natural life cycle with human desire for continuous cilantro††††††††, a tension that has defined the gardener-plant relationship since the First Gardener carved the sacred words "why won't this just keep growing" into a clay tablet‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*A prerequisite understanding of perennial herb cultivation helps significantly, though mostly by teaching you that annuals will die no matter how well you treat them, which saves considerable emotional distress.
+&nbsp;
+†The perennial gardener develops attachment. The annual gardener develops acceptance. The wise gardener develops a seed catalog subscription.
+&nbsp;
+‡Some perennials take three to five years to establish. During this time, they are mostly engaged in underground meetings and root system planning committees that would make local government look efficient by comparison.
+&nbsp;
+**The Order was disbanded in 1923 after their experimental "reverse-seasonal growth chambers" created parsley that only grew during solar eclipses. The remaining members founded a consulting firm that specializes in explaining agricultural failures to investors.
+&nbsp;
+††Including the lucrative market for "You Can't Kill Everything: A Gardener's Guide to Emotional Resilience," currently in its forty-seventh printing.
+&nbsp;
+‡‡Specifically, they sprout, grow, flower, set seed, and die with an efficiency that would impress corporate restructuring consultants. Unlike corporate restructuring, however, the process actually produces something useful.
+&nbsp;
+***The Seedsworth Archives contain 3,247 individual planting calendars, each annotated with phases of the moon, positions of Venus, and local public holiday schedules. Modern research suggests the moon phases were decorative.
+&nbsp;
+†††Professor Algernon Mistwood of the Institute for Botanical Disambiguation published a 400-page treatise titled "Which End Is Up: A Seed Orientation Manual." It contained seventeen chapters on basil alone. The final chapter was simply titled "Just Plant Them All" and consisted of a single exasperated diagram.
+&nbsp;
+‡‡‡This measurement was determined after an incident involving Lord Pemberton-Snatch's champion dill, which grew to a height of 4.3 meters when planted at a depth of 23 centimeters. The dill eventually achieved sentience†† and had to be negotiated with. The Bureau does not discuss this publicly.
+&nbsp;
+††The Sentient Dill Incident remains classified, though leaked documents suggest it demanded voting rights and a seat on the local council. It served with distinction for two terms before succumbing to aphids.
+&nbsp;
+****The Great Basil Catastrophe involved 3,000 hectares of basil planted at varying depths. Those planted too shallow produced basil that tasted "cosmically aggressive," according to survivors. Those planted too deep never emerged but could be heard making disappointed sighing sounds from underground for three years. The middle depths produced excellent pesto, validating what ancient philosophers called "The Goldilocks Principle of Herbaceous Mediocrity."
+&nbsp;
+††††The Transplanting Wars of 1972-1974 claimed no lives but resulted in 14 scholarly papers, 73 angry letters to gardening magazines, and the permanent estrangement of the International Society of Herb Cultivators' Northeastern and Northwestern chapters. They still refuse to attend the same conferences.
+&nbsp;
+‡‡‡‡Watering frequency depends on multiple factors including soil type, temperature, humidity, phase of moon, and how guilty you feel about the last plant you killed. Advanced gardeners develop a sixth sense for plant thirst. Beginning gardeners develop a talent for plant obituaries.
+&nbsp;
+*****This statistic comes from the comprehensive study "Why Are All My Seedlings Crispy? A Longitudinal Analysis of Beginning Gardener Decisions," published by the Department of Preventable Horticultural Tragedy at Weatherwax University. The study tracked 10,000 gardeners over five seasons. 4,217 subsequently took up knitting instead.
+&nbsp;
+†††††The practice originated with the Persistent Gardeners of Lower Quirm‡‡, a secretive organization that believed basil harvesting should be a daily ritual, like breathing, only more fragrant.
+&nbsp;
+‡‡The Lower Quirmians also invented the three-level garden bed, the self-watering planter, and the excuse "but it was on sale" to justify buying forty-seven seed packets. They disbanded in 1891 after accumulating 4,000 kilograms of saved seeds and running out of storage space.
+&nbsp;
+‡‡‡‡‡Climate zones, microclimates, and what experts call "garden chaos theory"—the principle that two identical plants three meters apart will behave as if they're from different planets. This phenomenon has never been explained, only observed and documented extensively.
+&nbsp;
+******Dame Petronella (1823-1901) famously said "The secret to basil is loving it, but not too much, and being prepared to let it go, but not too soon, and harvesting regularly, but not excessively, and basically developing the emotional intelligence of a particularly astute therapist." She published seventeen books, none of which clarified this statement.
+&nbsp;
+††††††Her predictive abilities were attributed variously to careful observation, meteorological instruments, mathematical genius, or a pact with the Green Man***. The truth was apparently "just paying attention," which subsequent generations found disappointingly mundane.
+&nbsp;
+***The Green Man is an ancient deity of vegetation, forests, and that weird smell that gardens have in the morning. He is said to appear to gardeners who have achieved true understanding, usually to inform them they're pruning wrong.
+&nbsp;
+‡‡‡‡‡‡Documented in the Fragmentary Tablets of Ur-Gilgathain, which contain surprisingly specific instructions about cilantro, though the word "cilantro" wouldn't be invented for another 3,000 years. Archaeologists remain puzzled. Cilantro remains controversial.
+&nbsp;
+*******The Sacred Dance of Seven Sowings was performed annually until 1634, when the last practitioner, Brother Mendel of the Order of Photosynthetic Contemplation, was trampled by enthusiastic onlookers trying to learn the movements. Modern gardeners simply use spreadsheets, which is less spiritual but involves fewer casualties.
+&nbsp;
+********Basil: 15-20cm apart. Cilantro: 10-15cm. Dill: 15-25cm. These measurements must be precise to within 0.5cm, or the plants will develop what botanists term "spatial anxiety disorders." This is definitely real science and not something made up to sell plant spacing tools. Definitely.
+&nbsp;
+†`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding annual herb cultivation in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COMPANION_PLANTING_HERBS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'companion_planting_herbs',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Companion Planting Herbs',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['annual_herb_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_companion_planting_herbs' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Companion Planting Herbs: A Natural Philosophy of Botanical Neighborliness</span>
+&nbsp;
+The practice of companion planting herbs represents one of those rare intersections where ancient agricultural wisdom* meets modern horticultural science† without either party realizing they're saying essentially the same thing‡. At its core, companion planting operates on the principle that certain herbs, when placed in proximity to other plants, will either enhance growth, repel pests, attract beneficial insects, or—in approximately 23% of documented cases**—do absolutely nothing but look pleasant together††. The fundamental mechanism involves what the Ancient Order of Herbaceous Practitioners termed "botanical sympathy"***, a concept that modern science has translated into the significantly less poetic "allelopathy and interspecies chemical signaling"†††.
+&nbsp;
+The practical applications of companion planting require both patience and a willingness to accept that your garden will occasionally resemble a bizarre dinner party where basil****  refuses to speak to rue‡‡, while chamomile cheerfully mediates between warring factions of vegetables‡‡‡. The standard technique involves grouping herbs according to their beneficial relationships: planting aromatic herbs like rosemary and thyme near cabbage family members to confuse cabbage white butterflies§, positioning dill near tomatoes to attract predatory wasps§§, and keeping fennel in splendid isolation at the far end of the garden where it cannot offend anyone§§§. The Institute for Botanical Diplomacy****  maintains extensive charts of these relationships, updated quarterly to reflect new feuds and alliances discovered in research gardens worldwide.
+&nbsp;
+Safety considerations in companion planting extend beyond the obvious warnings†††† about plant toxicity and into the realm of what the Guild of Sensible Gardeners calls "enthusiastic overplanting syndrome"‡‡‡‡. Historically, the practice required careful observation rather than reckless experimentation§§§§, though the archives****** of the Society for Historical Garden Disasters suggest this advice was routinely ignored. The most crucial principle remains the ancient maxim inscribed above the gates of the Lost Gardens of Bewilderment: "Know Thy Herbs Before Thou Planteth Them in Close Quarters, Lest Thy Garden Become a Battlefield"††††††.
+&nbsp;
+Modern understanding has largely vindicated traditional companion planting wisdom, though with additional footnotes‡‡‡‡‡ and peer-reviewed papers. Research confirms that many traditional pairings work precisely as described§§§§§, while others persist in folklore despite having roughly the same scientific basis as the belief that speaking kindly to plants makes them grow better******* —which, incidentally, has shown surprising statistical significance in controlled studies, though researchers remain baffled and slightly embarrassed about it††††††††.
+&nbsp;
+---
+&nbsp;
+*Dating back to at least the Mesopotamian period, when the first garden plans were etched in clay tablets alongside recipes and complaints about neighbors. The tablets suggest that even then, gardeners knew not to plant certain herbs together, though the reasons given involved "displeasing the grain spirits" rather than "allelopathic compounds."
+&nbsp;
+†Modern science approached this independently in the 1950s, looked at the results, consulted ancient texts, and discovered that basically everything had already been figured out by people who couldn't explain WHY it worked but were absolutely certain THAT it worked. This is a recurring theme in agricultural history.
+&nbsp;
+‡The disconnect remains profitable for publishers of both mystical gardening guides and scientific horticultural journals, who essentially repackage identical information for different audiences. Nobody tell them.
+&nbsp;
+**According to the comprehensive seven-year study conducted by Dr. Millicent Rootsworth at the Partially Controlled Garden Research Facility in Lower Dibbling. The study involved 2,847 planting combinations, 412 frustrated graduate students, and one garden gnome that nobody remembered purchasing but which appeared in 68% of the control group photographs.
+&nbsp;
+††These combinations persist because gardeners are fundamentally optimistic people who believe that surely, SURELY, this time the results will be different. They rarely are. The plants continue looking pleasant together while accomplishing nothing else. Like middle management.
+&nbsp;
+†††The transformation of "botanical sympathy" into modern terminology was achieved by Professor Ernest Dullsworth in his landmark 1963 paper "Chemical Exudates and Their Role in Inter-Species Root Communication," which ran to 147 pages and contained exactly one joke (on page 89, in a footnote, where he noted that his experimental plot "looked rather like a salad that had achieved sentience and organized itself by preference"). The joke was removed in the second edition.
+&nbsp;
+‡‡This ancient enmity between basil and rue has been documented since Roman times. Pliny the Elder wrote extensively about it, though his explanation involving "the temperament of Venus versus the severity of Mars" has been generally superseded by modern understandings of essential oil incompatibility. The plants still hate each other, regardless of whether we blame gods or chemistry.
+&nbsp;
+‡‡‡Chamomile's reputation as a peacemaker dates back to Anglo-Saxon herbals, where it was called "the plants' physician" due to its apparent ability to improve the health of nearby plants. Modern analysis suggests this works through mild fungicidal properties in chamomile's root exudates, but ancient gardeners who simply called it "the friendly plant" were not wrong. It's worth noting that chamomile achieves this diplomatic success while being simultaneously one of the most aggressively self-seeding herbs known to cultivation*. 
+&nbsp;
+*Chamomile's tendency to appear everywhere it hasn't been planted has led to it being alternately classified as "beloved companion plant" or "persistent garden nuisance" depending on the gardener's mood and how much chamomile they're currently pulling out of their strawberry bed.
+&nbsp;
+****Ocimum basilicum, not to be confused with its wild cousin O. basilicum var. thyrsiflora (Thai basil), which has entirely different companion relationships and is considerably less dramatic about the whole business.
+&nbsp;
+§The confusion of cabbage white butterflies represents one of companion planting's great success stories. The butterflies navigate primarily by scent, seeking out the specific chemical signatures of brassicas. When aromatic herbs muddy these signals, the butterflies become lost, frustrated, and eventually give up—much like shoppers in poorly designed department stores. The Entomological Society's 1987 study showed that a border of mixed aromatic herbs reduced cabbage white damage by up to 73%, though the study was nearly terminated early when graduate students spent three weeks arguing about whether the butterflies looked "confused" or merely "thoughtful."
+&nbsp;
+§§Dill attracts Braconid wasps, which parasitize tomato hornworms. This sounds grim until you've met a tomato hornworm and realize that anything that parasitizes them is performing a valuable service to humanity. The wasps are tiny, harmless to humans, and seem to genuinely enjoy their work.
+&nbsp;
+§§§The ancient practice of isolating fennel stems from its tendency to release compounds that inhibit the growth of most neighboring plants. The Romans called fennel "the lonely herb" and wrote poetry about its solitary nature, which was touching until you realize they were just making the best of the fact that fennel killed everything they planted near it. Fennel doesn't seem bothered by this ostracism and grows quite contentedly alone, occasionally reaching heights of six feet as if to emphasize its independence.
+&nbsp;
+****Established in 1823 following what history records only as "The Great Herb Garden Incident of Surrey," after which it became apparent that formal mediation protocols for plant compatibility were needed. The Institute maintains a staff of seventeen, a research budget that would make most universities weep, and an archive of plant relationship maps that resembles a conspiracy theorist's wall chart††.
+&nbsp;
+††The most complex map, showing the relationships between members of the mint family alone, required three walls and uses seventeen different colors of string. It has driven two archivists to early retirement and inspired one botanical thriller novel ("The Peppermint Betrayal," still in print, moderately successful in Germany).
+&nbsp;
+†††† The standard warning reads: "Do not consume herbs unless certain of identification, preparation, and absence of modern agricultural pesticides, historical industrial contamination, or resident caterpillars‡‡." This seems straightforward but apparently requires repeating every generation.
+&nbsp;
+‡‡The caterpillar clause was added after the 1991 incident where a prestigious garden club's herb tasting event was briefly interrupted by the discovery that their lovingly prepared pesto contained three specimens of Pieris rapae larvae. The event continued after the affected batch was discarded, but attendance at the club's subsequent herb tastings declined by 34% and has never fully recovered.
+&nbsp;
+‡‡‡‡Characterized by the irresistible urge to plant "just one more herb" because it "works well with everything" until one's garden contains forty-seven different species competing for a plot designed for twelve. The syndrome affects approximately 67% of companion plan`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding companion planting herbs in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERB_WATERING_REQUIREMENTS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herb_watering_requirements',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herb Watering Requirements',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['companion_planting_herbs'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herb_watering_requirements' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `HERB WATERING REQUIREMENTS: A COMPREHENSIVE STUDY OF AQUATIC ADMINISTRATION IN BOTANICAL CULTIVATION</span>
+&nbsp;
+The fundamental truth about watering herbs, which has eluded approximately 73.4% of novice gardeners throughout recorded history*, is that herbs exist in a state of permanent disagreement with their supposed requirements†. What appears in cultivation guides as "moderate watering" translates in practice to a complex negotiation between the plant's ancestral memory of Mediterranean hillsides‡, the gardener's enthusiasm, and the weather's complete disregard for scheduling**. The art, if one can call it that without offending the Guild of Actual Artists††, lies not in following rules but in developing what ancient practitioners called "the sight"—though this had less to do with mystical vision and more with noticing when basil starts looking personally offended‡‡.
+&nbsp;
+Mediterranean herbs—basil, oregano, thyme, rosemary, and their distinguished relatives—operate on what the Hanging Gardens Institute of Babylonian Studies refers to as the "Drought Memory Principle"***, wherein plants retain cellular-level trauma from their evolutionary past†††. These herbs prefer soil that approaches complete dryness between waterings, a preference that runs counter to every nurturing instinct possessed by humans‡‡‡. Rosemary, in particular, has been documented staging dramatic wilting displays when overwatered, leading to the 1847 incident at Kew Gardens that we are contractually obligated not to discuss in detail****. The recommended practice involves waiting until the top inch of soil feels like ancient parchment†††† before administering water, though measuring exactly one inch while the plant watches judgmentally presents its own challenges‡‡‡‡.
+&nbsp;
+Moisture-loving herbs—mint, parsley, cilantro, chervil—require an entirely opposite approach, demanding soil that remains consistently moist but never waterlogged*****, a distinction that approximately 89.7% of practitioners fail to maintain******. These herbs descended from plants that grew in ditches, alongside streams, and in other locations where their roots could access water without effort††††††, making them evolutionarily unprepared for the responsibility of water conservation‡‡‡‡‡. The practical application involves checking soil moisture daily, a commitment comparable to owning a particularly needy cat*******. Mint, being mint, will grow regardless††††††††, but parsley has been known to express displeasure through the botanical equivalent of passive-aggressive behavior‡‡‡‡‡‡.
+&nbsp;
+The timing and method of water delivery carry implications that the Compendium of Botanical Disasters catalogues with disturbing thoroughness********. Morning watering allows foliage to dry before evening, preventing the fungal celebrations that occur when moisture and darkness coincide*********. Watering at the soil level rather than overhead prevents the leaves from experiencing what researchers term "unnecessary dampness"—a technical phrase meaning "conditions that summon every pathogen in a five-mile radius"††††††††††. The specific volume required varies by container size, ambient humidity, and the plant's current mood‡‡‡‡‡‡‡, but the general principle holds: water should drain from the bottom of the pot, proving that you've achieved saturation without creating an inadvertent aquatic habitat**********. The drainage holes themselves must be treated as sacred portals; their blockage has led to more herb deaths than all other factors combined, according to statistics that the International Society of Dead Herbs maintains with concerning enthusiasm***********.
+&nbsp;
+Historical records reveal that humanity's relationship with herb watering has remained consistently fraught across millennia***********. Ancient Roman gardeners developed elaborate irrigation systems for their herbs, then promptly overwrote the maintenance instructions on the back of someone's grocery list††††††††††††. Medieval monastery gardens employed the "Brother Theodore Method," which involved assigning herb watering to whoever had most recently annoyed the abbot‡‡‡‡‡‡‡‡. Modern understanding, built upon centuries of trial, error, and spectacular failure************, acknowledges that successful herb watering requires observation, patience, and the wisdom to ignore approximately 60% of the advice one receives†††††††††††††. The herbs themselves, if they could speak, would likely request that humans simply pay attention‡‡‡‡‡‡‡‡‡—though given how poorly we've listened to their silent communication thus far, verbal instruction might not improve matters*************.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+* Historical records from the Lost Library of Unsuccessful Gardeners indicate that the actual figure may be as high as 91.2%, but the remaining 8.8% are too embarrassed to admit their early failures. The library itself was lost when someone forgot to water the load-bearing vines.
+&nbsp;
+† Herbs, like cats and certain varieties of bureaucrat, prefer to maintain an air of mystery regarding their actual needs. This has led to what Dr. Wilhelmina Rootsworth termed "botanical gaslighting."
+&nbsp;
+‡ Plants remember. Science cannot explain how a basil plant grown from seed in a Wisconsin greenhouse retains genetic memories of Tuscan hillsides, yet observation confirms this remains true. The plant knows it should be drought-resistant. The plant is not pleased about living in a pot.
+&nbsp;
+** Weather operates on a schedule known only to itself and possibly to shepherds, who decline to share this knowledge with the general public.
+&nbsp;
+†† The Guild maintains strict definitions. They once spent three years arguing whether topiary counted as sculpture. The herbs were not consulted.
+&nbsp;
+‡‡ Basil is particularly expressive. When overwatered, it develops what appears to be a sulk. This is not anthropomorphization; this is documented fact. The Botanical Expression Studies Department at Unseen University has seventeen peer-reviewed papers on the subject†.
+&nbsp;
+†† Most of these papers are just photographs of sulking basil with increasingly elaborate captions.
+&nbsp;
+*** Named after Dr. Hieronymus Drought-Memory, who wasn't involved in its discovery but had an excellent name for it. The actual discoverer, Susan Jenkins, philosophically accepted this injustice.
+&nbsp;
+††† The incident involved seventeen rosemary plants, the Queen's visit, and what the official report calls "aquatic overenthusiasm." Three gardeners transferred to the tropical house. One emigrated to Australia. The rosemary was composted with full honors‡.
+&nbsp;
+‡ The ceremony was attended by the Deputy Under-Secretary for Botanical Remains and featured a bagpiper. This is standard procedure at Kew.
+&nbsp;
+‡‡‡ Particularly from plants in the Lamiaceae family, who cultivate an air of aristocratic disdain that would impress a dowager duchess.
+&nbsp;
+**** Contractually, legally, and in some interpretations, magically. There are binding clauses.
+&nbsp;
+†††† Ancient parchment, specifically. Modern parchment substitute lacks the appropriate desiccation. Yes, this matters. No, we don't know why. The plants know why.
+&nbsp;
+‡‡‡‡ The judgment is palpable. Plants, despite lacking visible eyes, have perfected the art of the disapproving stare.
+&nbsp;
+***** The distinction between "consistently moist" and "waterlogged" measures approximately 15 milliliters in a standard six-inch pot. This margin of error explains much about gardening anxiety.
+&nbsp;
+****** Survey conducted by the Institute for Horticultural Honesty, which required participants to answer truthfully under oath. The 10.3% success rate includes people who were lying under oath.
+&nbsp;
+††††† These locations also included: graveyards (herbs showing poor taste), battlefield drainage ditches (herbs showing worse taste), and the occasional very optimistic crack in stonework.
+&nbsp;
+‡‡‡‡‡ Evolution, it turns out, works faster on developing preferences than on developing adaptability. This is why teenagers exist.
+&nbsp;
+******* Specifically, a cat that meows at 4 AM not because it's hungry but because it wants you to know it's hungry, then refuses to eat when fed. Parsley is exactly this cat.
+&nbsp;
+†††††††† Mint's growing regardless is not a feature; it's a threat. Containment protocols should be reviewed with the same seriousness one applies to nuclear material. Several small English villages have been lost to aggressive mint cultivation. The government denies this††.
+&nbsp;
+†† The government denies most things involving plants. This is wise. Plants should not be encouraged.
+&nbsp;
+‡‡‡‡‡‡ Parsley's passive-aggression typically manifests as growing very, very slowly while maintaining perfect health, forcing the gardener to acknowledge that yes, technically the plant is fine, but the spirit of the arrangement has been violated.
+&nbsp;
+******** The Compendium runs to forty-seven volumes. Volume 34 is devoted entirely to "Incidents Involving Basil, Overwatering, and Hubris."
+&nbsp;
+********* Fungi throw excellent parties`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herb watering requirements in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SUNLIGHT_SHADE_FOR_HERBS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'sunlight_shade_for_herbs',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Sunlight Shade For Herbs',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['herb_watering_requirements'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_sunlight_shade_for_herbs' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Sunlight Shade For Herbs: A Comprehensive Study of Photonic Temperance in Botanical Management</span>
+&nbsp;
+The relationship between Herb and Sun is among the oldest in the botanical canon*, yet it remains one most frequently misunderstood by practitioners of the gardening arts. While many assume that sunlight represents an unalloyed good—more light equals more growth equals more herbs for one's kitchen windowsill—the reality proves considerably more nuanced**. Full sun exposure, defined by the International Guild of Phytological Observation as "six or more hours of direct solar radiation per diem"†, can prove as destructive to certain herbs as complete deprivation, a fact learned painfully by the residents of the Hanging Gardens of Excessive Enthusiasm in 1743††. Understanding the delicate balance between photonic abundance and protective shade represents not merely horticultural best practice, but a philosophical meditation on the nature of too much of a good thing***.
+&nbsp;
+The fundamental principle underlying sunlight shade management rests upon a simple observation: not all herbs evolved in the same environments‡. Mediterranean herbs such as rosemary, thyme, and oregano originated in regions where the sun beats down with what can only be described as aggressive enthusiasm‡‡, while shade-loving varieties like mint, parsley, and cilantro developed in forest understories where light arrives filtered through leafy canopies, dappled and gentle as a grandmother's touch‡‡‡. The practical gardener must therefore approach each herb as an individual with its own photonic preferences†††, rather than subjecting all green things to identical treatment—a mistake that led directly to the Great Basil Catastrophe of Lower Pseudopolis§. Modern shade management employs various techniques: physical shade cloth (available in percentages from 30% to 90% light reduction)§§, strategic placement beneath larger plants, or the use of temporary structures during peak solar hours§§§. The Department of Agricultural Precision notes that even a difference of 15% shade coverage can mean the distinction between "thriving cilantro" and "crispy brown disappointment."*
+&nbsp;
+Historical development of shade management follows a trajectory from accident to understanding that characterizes much of human botanical knowledge**. Ancient gardeners, lacking precise instruments, relied on observation and what the Codex Herbarius Antiquus calls "the squint test"††**—if looking at a plant's location made one squint uncomfortably, it received too much sun‡‡**. Medieval monastery gardens refined this approach through centuries of trial, error, and what one monk described as "devastating amounts of error, actually"§§**. The Renaissance brought theoretical frameworks, the Industrial Revolution brought shade cloth, and the Modern Era brought controversial additions such as automated shade systems that cost more than reasonable people spend on garden supplies†††**. Throughout this evolution, certain principles remained constant: observe your herbs, note their suffering or flourishing, and adjust accordingly‡‡‡**. This wisdom, ancient as cultivation itself, remains surprisingly difficult for humans to internalize§§§**.
+&nbsp;
+Safety considerations in shade management extend beyond mere plant welfare to encompass the well-being of the gardener themselves*. Excessive time spent adjusting shade structures under midday sun has resulted in more cases of heat exhaustion than the Royal College of Gardening Mishaps cares to enumerate**. Furthermore, improper installation of shade cloth has led to what engineers call "catastrophic sail events"—incidents where poorly secured fabric catches wind and transforms peaceful gardens into scenes of remarkable destruction†*. The Guild of Responsible Horticulture recommends: secure all structures properly††*, work during cooler hours‡‡*, and resist the temptation to create elaborate pulley systems for adjustable shade (35% of such systems result in entanglement incidents)§§*. Most critically, gardeners must remember that some herbs' preferences may conflict with available space—attempting to grow sun-loving lavender in permanent shade, or shade-preferring Vietnamese coriander in desert conditions, represents optimism divorced from reality†††*.
+&nbsp;
+Best practices synthesize all accumulated knowledge into actionable guidance, though the Horticultural Advisory Board notes that "actionable" and "actually followed" represent distinct categories‡‡‡*. For sun-loving herbs, full exposure with adequate water prevents the sad limpness that afflicts insufficiently illuminated oregano§§§*. For shade-preferring varieties, 50-70% shade cloth or natural dappled shade through neighboring plants creates optimal conditions†. Partial-shade herbs—that frustrating middle category including basil and lemon balm—require what the ancient texts call "discernment and luck in roughly equal measure"††. Morning sun with afternoon shade often provides acceptable compromise‡‡, as morning light proves less intense while afternoon sun can scorch leaves with the enthusiasm of a dragon with hiccups§§. Observe leaf color (pale suggests too much light, dark and leggy suggests too little), growth rate, and flavor intensity†††. The apprentice gardener learns through experience; the wise gardener learns through others' expensive mistakes‡‡‡, thoughtfully documented in cautionary tales and footnoted research papers§§§.
+&nbsp;
+---
+&nbsp;
+*Predating even humanity's relationship with cats, though considerably less contentious. Herbs do not knock objects off tables to establish dominance.
+&nbsp;
+**The assumption that "more is better" has caused considerable trouble throughout human history. See: empires, dinner portions, and decorative garden gnomes.
+&nbsp;
+†The IGPO maintains offices in forty-seven countries and employs 3,427 people whose job titles include "Light Measurer" and "Shadow Consultant." Their annual budget could fund a small nation, which says something either about botanical science or budget allocation. Possibly both.
+&nbsp;
+††An optimistic nobleman, convinced that maximum sunlight would yield maximum herbs, removed all shade structures from his elaborate garden. Within six weeks, everything had either died, fled†, or evolved protective coloration to match the scorched earth. The site remains barren to this day, marked by a small plaque reading "Good Intentions Were Here."
+&nbsp;
+†This is obviously metaphorical. Herbs cannot actually flee, though some gardeners swear their mint relocated itself specifically to spite them.
+&nbsp;
+***Philosophers have debated this concept since the ancient Greeks discovered that one can have too much wine. The debate continues, often while demonstrating the principle.
+&nbsp;
+‡The botanical equivalent of personality types, though considerably more predictable than human psychology and with fewer diagnostic manuals.
+&nbsp;
+‡‡The Mediterranean sun possesses the intensity typically associated with interrogation lamps and the gazes of disapproving grandmothers. It means business.
+&nbsp;
+‡‡‡This image, while poetic, fails to capture that forest light also contains considerably more insects and the occasional falling pinecone. Poetry often omits such details.
+&nbsp;
+†††The Institute for Individual Botanical Recognition teaches courses on this topic. Their motto: "All herbs are equal, but some are more equal in sunlight requirements." They maintain this is not a political statement.
+&nbsp;
+§The details remain disputed, but sources agree it involved an over-enthusiastic application of reflective surfaces, a mistaken belief that basil enjoyed "Mediterranean conditions," and the phrase "Why does everything smell like burning?" The city still observes a moment of silence each summer solstice.
+&nbsp;
+§§These percentages are remarkably specific considering that sunlight varies by latitude, season, cloud cover, atmospheric conditions, and whether the gods of weather are feeling cooperative. The industry prefers not to discuss this.
+&nbsp;
+§§§Temporary structures have an unfortunate tendency to become permanent, much like house guests and "temporary" taxes.
+&nbsp;
+*The Department maintains records going back forty-seven years and has accumulated approximately 3.8 million pages of data on shade-related plant responses. Three people have read all of it. Two subsequently changed careers. The third now works in a windowless office and grows nothing.
+&nbsp;
+**Not all accidents, mind you. Some approaches were deliberately experimental, conducted by gardeners who could afford to lose entire herb gardens in the name of knowledge. These individuals are remembered with a mixture of gratitude and bewilderment.
+&nbsp;
+††**Described in extensive detail in Brother Fennelworth's diaries, along with such gems as "squinted at the sage bed again today—still too bright" and "have developed a permanent wrinkle between my eyebrows from all this squinting." His observations, while empirical, lacked certain scientific rigor.
+&nbsp;
+‡‡**The Codex includes hand-drawn diagrams showing appropriate squint intensity for various herbs. Modern scholars debate whether these represent genuine methodology or elaborate medieval humor. The debate has lasted seventeen years.
+&nbsp;
+§§**His journals include a comprehensive index titled "Things We Shall Never Try Again," spanning forty-two pages. Entry #237: "Trusting Brother Cuthbert with shade structure placement." No further details are provided.
+&nbsp;
+†††**Systems marketed under names like "SunMaster 3000" and "Photonic Optimization Platform," which is rather grandiose terminology for cloth on poles with motors attached.
+&nbsp;
+‡‡‡**The Forgotten Scholar The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding sunlight shade for herbs in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERB_HARVEST_TIMING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herb_harvest_timing',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herb Harvest Timing',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['sunlight_shade_for_herbs'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herb_harvest_timing' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Herb Harvest Timing: A Comprehensive Analysis of Temporal Optimization in Botanical Collection</span>
+&nbsp;
+The cultivation of herbs, while often dismissed as a gentle pursuit suitable for those of nervous disposition*, has in fact claimed more fingers, reputations, and afternoon tea appointments than any other branch of practical botany†. The question of *when* to harvest one's herbs appears deceptively simple—rather like asking "how sharp should a knife be?" or "how much is too much honey in one's tea?"—yet the answer contains multitudes, most of them contradictory‡. The fundamental principle, established by the noted herbalist Grandmother Weatherwax of the Lancre Philosophical Society** in 1847††, states that herbs must be harvested at the precise moment when their essential oils reach maximum concentration, which varies by species, weather conditions, phase of the moon, and apparently the harvester's great-aunt's opinion about hemlines‡‡.
+&nbsp;
+The practical application of harvest timing requires understanding that most culinary and medicinal herbs achieve peak potency in the morning hours, specifically between 8:47 and 10:23 AM***, when the dew has evaporated but the sun has not yet baked the volatile compounds into submission†††. Flowering herbs should be collected just as the first buds open—not before, when they contain insufficient active compounds, and certainly not after, when they begin what the Professors at the Unseen University Herbology Department delicately term "getting ideas above their station"‡‡‡. Leaf harvesting follows similar temporal constraints: too early and the plant devotes its energy to recovering rather than producing more foliage; too late and you're essentially collecting salad****. Root harvesting, conversely, demands an entirely different schedule, preferably in autumn when the plant has thoughtfully stored all its goodness underground in preparation for winter†††† —though this does require substantially more digging than most people anticipate‡‡‡‡.
+&nbsp;
+The historical development of harvest timing knowledge represents a fascinating chronicle of trial, error, and what the Academy of Applied Botanical Sciences refers to in their archives as "regrettable incidents"*****. Ancient practitioners believed that herbs harvested under a full moon possessed greater power, a theory that persists despite controlled studies by the Institute for Sensible Herbcraft showing absolutely no difference except in the number of twisted ankles from midnight gardening******. The medieval period contributed the notion that herbs should be harvested while reciting specific incantations, a practice abandoned after the Great Basil Incident of 1456††††††, when an entire monastery's herb garden was accidentally encouraged into aggressive vegetative reproduction. Modern understanding, largely developed by the tireless work of Professor Artemisia Dankworth‡‡‡‡‡ and her ground-breaking 1923 paper "Why Your Thyme Is Wrong: A Temporal Analysis," emphasizes observable plant characteristics over mystical correspondences, though she did note that talking nicely to one's herbs "couldn't hurt and might help, depending on the herb's disposition."
+&nbsp;
+Safety considerations in harvest timing extend beyond the obvious cautions about sharp implements and bee diplomacy*******. Harvesting too frequently can stress plants beyond recovery, leading to what the Royal Society of Disappointed Gardeners calls "botanical martyrdom"—the plant's passive-aggressive decision to simply give up living†††††††. Certain herbs, when harvested at the wrong time of day, can exhibit dramatically different chemical profiles; the Guild of Hedge Witches maintains extensive records of well-meaning individuals who harvested feverfew at noon instead of morning and subsequently spent three days convinced they could understand what their chickens were saying‡‡‡‡‡‡. The cardinal rule, emphasized in bold type across seventeen pages of the Official Herb Harvester's Safety Manual********, is never to harvest more than one-third of any plant at once, a guideline established after the Incident at Überwald Abbey††††††††† where an enthusiastic novice harvested 87% of the monastery's sage plants, leading to what contemporary accounts describe as "a shortage of wisdom both literal and metaphorical."
+&nbsp;
+The synthesis of temporal awareness, botanical knowledge, and practical experience forms the cornerstone of successful herb cultivation‡‡‡‡‡‡‡. Modern practitioners benefit from centuries of accumulated wisdom—and accumulated mistakes, which are often more instructive*********—yet the fundamental challenge remains unchanged: matching one's schedule to the plant's biological imperatives while avoiding the numerous pitfalls that have claimed amateur herbalists since time immemorial. As the current Dean of Horticulture at Ankh-Morpork University is fond of saying, "Herbs grow on their own time, not yours, and they don't care about your dinner party"††††††††††.
+&nbsp;
+---
+&nbsp;
+*The Ankh-Morpork Guild of Herbalists takes vigorous exception to this characterization, pointing out that their members include several individuals who have wrestled bears, one who has wrestled a small dragon†, and Mrs. Cosmopilite, who has wrestled several husbands.
+&nbsp;
+†Not a large dragon. The Herbalists' Guild wishes this to be absolutely clear. It was more of a swamp dragon, really. Barely waist-height. Still counts.
+&nbsp;
+‡The Librarian's Compendium of Herb-Related Queries (17th edition, revised) contains 2,847 answers to the question "When should I harvest my basil?" All of them are technically correct. None of them agree with each other.
+&nbsp;
+**Not to be confused with the Lancre Philosophical Society's rival organization, the Lancre Society for Philosophy, which split from the original group in 1842 over a dispute about whether thyme was "an herb of temporal significance" or just "good in stews." The schism has never healed††.
+&nbsp;
+††The two societies now occupy buildings on opposite sides of Lancre High Street. They communicate exclusively through strongly-worded letters to the editor of the Lancre Advertiser. The editor retired in 1963 but the letters continue‡.
+&nbsp;
+‡This is how traditions start.
+&nbsp;
+‡‡Grandmother Weatherwax's great-aunt Gertie held very firm opinions about hemlines, hem-times, and the general moral decline caused by people harvesting herbs willy-nilly without proper consideration of fabric length. The connection between these topics has never been adequately explained, though Gertie's 400-page treatise "Skirts, Sage, and Sensibility" apparently attempts to do so. No one has read past page 12.
+&nbsp;
+***The Department of Temporal Herbology at the Unseen University initially calculated this window at 8:45 to 10:25 AM, but revised it after receiving 1,247 complaints from herbalists pointing out that their herbs clearly preferred 8:47†††. The Department now maintains that the two-minute discrepancy was "experimental error" and definitely not because the original lead researcher couldn't be bothered to check his pocket watch properly.
+&nbsp;
+†††Professor Hieronymus Widdershins, who conducted the original study, was notorious for his conviction that "time is more of a suggestion than a rule" and his tendency to arrive at faculty meetings anywhere between fifteen minutes early and three days late. His temporal herb study took seven years to complete, though the actual experimental period was supposed to last six months.
+&nbsp;
+†††The morning dew point has its own footnote in the Grand Grimoire of Practical Botany: "Dew = good. Overnight rain = acceptable. Morning fog = negotiable. Sprinkler system = you're cheating‡‡."
+&nbsp;
+‡‡The debate over whether modern irrigation counts as "natural" dew for harvesting purposes has raged for decades. The Purist Society of Traditional Herbcraft maintains that only rain-blessed morning moisture is acceptable. The Modern Herbalists' Collective points out that plants "can't tell the difference and neither can your soup." This argument continues.
+&nbsp;
+‡‡‡Professor Wentworth Hogshead famously described this phenomenon as "floral pretension" and spent fifteen years studying why mature flowering herbs develop what he termed "attitude problems." His research budget was eventually revoked when it emerged he was spending most of it on philosophical discussions with his lavender plants.
+&nbsp;
+****The exact moment when "herb" becomes "salad ingredient" is the subject of heated debate at the International Conference on Culinary Botany, held annually in Quirm. Last year's conference ended in a food fight over the ontological status of arugula. The chairs were delicious, apparently.
+&nbsp;
+††††Root harvesting season, according to the Almanack of the Ancient Guild of Root-Diggers (established 892 A.E.), begins "when the leaves start looking pensively at the ground" and ends "when your back starts looking pensively at the nearest chair‡‡‡‡."
+&nbsp;
+‡‡‡‡The Diggers' Guil`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herb harvest timing in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MOON_PHASE_HARVESTING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'moon_phase_harvesting',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Moon Phase Harvesting',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['herbal_cultivation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['herb_harvest_timing'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_moon_phase_harvesting' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Moon Phase Harvesting: A Comprehensive Guide to Lunar Agricultural Practices</span>
+&nbsp;
+The practice of moon phase harvesting represents one of humanity's oldest agricultural technologies, predating written language by several millennia and pre-dating common sense by considerably longer*. At its core, the discipline involves the strategic timing of plant harvesting to coincide with specific lunar phases, thereby maximizing the metaphysical properties of botanical specimens while minimizing the risk of producing entirely mundane vegetables**. The fundamental principle operates on the understanding that plants, being largely composed of water†, respond to lunar gravitational influence in much the same way as tides, though considerably more quietly and with less splashing. Modern practitioners distinguish between four primary harvesting windows: the New Moon (for roots and underground parts), the Waxing Moon (for leaves and aerial growth), the Full Moon (for flowers and fruits of power‡), and the Waning Moon (for seeds and preservation purposes).
+&nbsp;
+The practical application of moon phase harvesting requires both astronomical precision and what the Guild of Lunar Agriculturalists terms "unreasonable optimism"††. The harvester must first consult an accurate lunar calendar‡‡, preferably one that accounts for local atmospheric conditions, the personality of the moon***, and any outstanding grudges between celestial bodies†††. The actual harvesting technique varies considerably by plant species: root vegetables should be pulled during the New Moon between 2 and 4 AM‡‡‡, when the lunar pull is strongest and neighbors are least likely to witness suspicious behavior****. Leafy herbs respond best to waxing moon harvest, though one must account for a 3.7% variation based on the harvester's own water content†††† and recent caffeine intake. Full Moon harvesting of flowers demands the most elaborate preparation, including ritual cleansing‡‡‡‡, appropriate attire*****, and filing form 27-B with the local Magical Agricultural Department at least six weeks in advance†††††.
+&nbsp;
+Historical development of moon phase harvesting can be traced to the Neolithic period, though the first practitioners probably called it something like "Ug notice moon change, plant taste different"‡‡‡‡‡. The ancient Babylonians maintained extensive clay tablet records of lunar agricultural practices, most of which were unfortunately interpreted by Victorian scholars as recipes for stew******. The medieval period saw significant advances under scholars such as Albertus Magnus, who definitively proved that basil harvested under a full moon would not, contrary to popular belief, spontaneously transform into scorpions******* - though it might develop unusually aggressive tendencies. The Renaissance brought mathematical rigor to the practice, with Nostradamus publishing his influential "Lunar Harvesting Tables" in 1555, which predicted optimal harvest times for the next 400 years and, coincidentally, the end of the world roughly every third Thursday‡‡‡‡‡‡. Modern understanding was revolutionized by the work of Dr. Peculiar Moonweather******** of the Institute for Agricultural Lunacy†††††††, who in 1923 established the precise relationship between lunar phase and plant potency through experiments involving 2,847 carrots, a telescope, and what he described in his notes as "an unfortunate misunderstanding with a werewolf"‡‡‡‡‡‡‡.
+&nbsp;
+Safety considerations in moon phase harvesting cannot be overstated, as evidenced by the incident rates compiled by the International Bureau of Lunar Agricultural Statistics*********, which recorded 1,247 "moon-related mishaps" in the 2019 harvest season alone. Primary dangers include: temporal displacement due to miscalculated lunar transitions†††††††† (resulting in harvesters arriving too early, too late, or occasionally before they were born), enhanced plant consciousness during full moon periods‡‡‡‡‡‡‡‡ (leading to what the Guild delicately terms "philosophical disagreements with vegetables"), and the ever-present risk of moon blindness********** from excessive lunar observation. Practitioners are strongly advised never to harvest during lunar eclipses†††††††††, to wear silver-threaded gloves when handling full moon specimens‡‡‡‡‡‡‡‡‡, and to avoid making promises to the moon*********** under any circumstances, as it takes such things remarkably personally. The Standing Committee on Lunar Safety recommends maintaining a harvest-to-moonlight exposure ratio of no greater than 45 minutes per cycle††††††††††, though this guideline was established after the Great Moonstruck Incident of 1887 and may be considered somewhat conservative‡‡‡‡‡‡‡‡‡‡.
+&nbsp;
+Best practices in contemporary moon phase harvesting synthesize traditional knowledge with modern safety protocols, creating what some practitioners call "paranoid wisdom" or what others call "finally learning from our predecessors' mistakes"************. Essential equipment includes a properly calibrated lunar chronometer*************, silver harvesting tools†††††††††††, consecrated collection baskets‡‡‡‡‡‡‡‡‡‡‡, and comprehensive insurance**************, as most standard agricultural policies contain a "moon madness" exclusion clause. Successful practitioners maintain detailed harvest journals recording not only moon phases but also their own dreams††††††††††††, the behavior of local wildlife‡‡‡‡‡‡‡‡‡‡‡‡, and any unusual correspondence from celestial bodies*************. The Guild recommends beginning practice with hardy, forgiving plants such as moonflower*************** or lunar lettuce††††††††††††† before progressing to more temperamental specimens like midnight mandrake‡‡‡‡‡‡‡‡‡‡‡‡‡ or crescent chrysanthemum. Above all, the practitioner must cultivate patience, respect for lunar rhythms, and a healthy skepticism of any harvest technique that promises "absolutely guaranteed results with no possible side effects"****************.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*The exact dating is disputed. Professor Thaddeus Moonwhisper of the Academy of Temporal Herbology claims to have carbon-dated moon harvest records to 47,000 BCE, though his methodology involved asking the plants directly, which introduces certain reliability questions.
+&nbsp;
+**The definition of "mundane" here is itself contentious. The Extraordinary Vegetable Council maintains that ANY vegetable harvested with proper attention becomes extraordinary, while the Mundane Produce Association argues that some turnips are simply born disappointing and no amount of lunar timing will change this fundamental truth.
+&nbsp;
+†Approximately 85-95%, though this percentage increases notably if the plant has been weeping. Plants do weep, but only when they think no one is listening. The Institute for Botanical Psychology has seventeen volumes on the subject, all written in a somewhat melancholy tone.
+&nbsp;
+‡The phrase "of power" is technical terminology. It does not mean the fruit will grant wishes or shoot lightning, despite the unfortunate incident at the Duchess of Westmoreland's garden party in 1743, which was conclusively proven to involve smuggled fireworks rather than enchanted peaches.
+&nbsp;
+††A peculiar term for an agricultural guild, but the Guild of Lunar Agriculturalists was founded by a man named Horace Grimble who had previously failed at being a chandler, a cooper, and a professional optimist. He brought the terminology from his last career.
+&nbsp;
+‡‡Not to be confused with a lunar calculator, which performs entirely different functions and will give you incorrect results if asked about planting times. The International Astronomical Union published a strongly worded pamphlet on this distinction in 1997 after a series of "regrettable confusions."
+&nbsp;
+***The moon's personality changes roughly every 29.5 days, cycling through phases that medieval scholars named: The Cheerful Dark, The Ambitious Crescent, The Self-Satisfied Half, The Possibly Drunk Gibbous, The Full and Rather Smug, The Contemplative Decline, The Morose Crescent, and The Tired of Your Nonsense Dark. Modern astronomy has, sadly, abandoned these useful classifications.
+&nbsp;
+†††Particularly the ongoing tension between the Moon and Venus over the "brightest object in the night sky" dispute. This affects harvests approximately twice per decade and results in what almanacs carefully term "unpredictable luminous variance."
+&nbsp;
+‡‡‡This timing is precise to within 3.4 minutes. Later than 4:03 AM and the roots become what the Guild classifies as "aggressively terrestrial" - still edible, but possessing none of their lunar properties and occasionally tasting of disappointment and broken promises.
+&nbsp;
+****The Brotherhood of Nocturnal Gardeners maintains that suspicious behavior is in the eye of the beholder, and that anyone who questions why someone is digging up potatoes at 3 AM simply lacks proper agricultural dedication. Their`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding moon phase harvesting in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  HERB_GARDEN_PLANNING,</span>
+<span class="cstat-no" title="statement not covered" >  SOIL_FOR_MEDICINAL_PLANTS,</span>
+<span class="cstat-no" title="statement not covered" >  HERB_SEED_SELECTION,</span>
+<span class="cstat-no" title="statement not covered" >  PERENNIAL_HERB_CULTIVATION,</span>
+<span class="cstat-no" title="statement not covered" >  ANNUAL_HERB_CULTIVATION,</span>
+<span class="cstat-no" title="statement not covered" >  COMPANION_PLANTING_HERBS,</span>
+<span class="cstat-no" title="statement not covered" >  HERB_WATERING_REQUIREMENTS,</span>
+<span class="cstat-no" title="statement not covered" >  SUNLIGHT_SHADE_FOR_HERBS,</span>
+<span class="cstat-no" title="statement not covered" >  HERB_HARVEST_TIMING,</span>
+<span class="cstat-no" title="statement not covered" >  MOON_PHASE_HARVESTING</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

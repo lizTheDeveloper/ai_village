@@ -1,0 +1,1948 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/advanced_cooking_techniques-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> advanced_cooking_techniques-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MAILLARD_REACTION_UNDERSTANDING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'maillard_reaction_understanding',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Maillard Reaction Understanding',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_maillard_reaction_understanding' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Maillard Reaction Understanding: A Foundational Inquiry into theAlchemy of Deliciousness</span>
+&nbsp;
+The Maillard reaction, named after the French chemist Louis-Camille Maillard who discovered it in 1912 while attempting to synthesize proteins*, represents one of the most profound transformations available to the culinary practitioner. At its essence, this reaction describes the chemical interaction between amino acids and reducing sugars when exposed to heat, typically beginning at temperatures above 140°C (284°F)†, resulting in the complex flavors and brown coloration that distinguish a perfectly seared steak from a disappointingly grey one‡. The process involves hundreds of different chemical compounds forming in a cascade of reactions**, which the ancient Mesopotamian cooks called "the browning of the gods"†† though they had no idea why it worked and simply attributed it to favorable winds. Modern understanding reveals this to be a non-enzymatic browning reaction‡‡, fundamentally different from caramelization*** despite producing superficially similar results, and responsible for approximately 87.3% of what makes food smell like it's worth eating according to the International Bureau of Olfactory Standards†††.
+&nbsp;
+The practical applications of Maillard reaction understanding span virtually every cooking technique involving heat above gentle steaming. Searing meat‡‡‡, toasting bread*, roasting coffee**, baking cookies†, and even the production of dark beer†† all depend upon controlled Maillard reactions to develop their characteristic flavors and aromas. The Guild of Professional Toasters‡ maintains that optimal bread coloration requires surface temperatures between 150-160°C maintained for 47.2 seconds**, though individual preferences vary by approximately ±12 seconds depending on whether one's ancestors hailed from regions favoring "golden" versus "mahogany" toast***. The key to mastery lies in understanding that the reaction requires three elements simultaneously: amino acids (from proteins), reducing sugars, and sufficient heat††, leading to the unfortunate incident at the Unseen University kitchens in 1883†††. Moisture content plays a critical regulatory role‡‡—the surface of food must be relatively dry for efficient browning, which explains why patting meat dry before searing produces superior results‡‡‡, and why the ancient practice of "salt-crusting" functioned so effectively despite its practitioners believing they were "imprisoning moisture demons"*.
+&nbsp;
+Safety considerations surrounding Maillard reactions primarily concern the distinction between desirable browning and undesirable burning**, a line that approximately 94.6% of home cooks cross at least three times annually according to smoke detector activation data†. The formation of acrylamide in overheated starchy foods represents a modern concern††, though the concentration required to match the carcinogenic exposure of a single 17th-century London street†† would require consuming roughly 400 kilograms of burnt toast daily‡. More immediate dangers include the pyrolysis of sugars into genuinely toxic compounds at temperatures exceeding 200°C‡‡, and the historical "Great Char Incident" of the Royal Bakery*** in which an over-enthusiastic apprentice confused "dark roast" with "obsidian"†††. The fundamental rule remains unchanged since the first proto-human discovered cooking: brown equals flavorful complexity; black equals regret and the replacement of cookware‡‡‡.
+&nbsp;
+Historical development of Maillard reaction understanding follows humanity's long relationship with controlled fire, beginning approximately 400,000 years ago when Homo erectus first noticed that dropped meat accidentally improved near flames*. For millennia, the process remained purely empirical—cooks knew that heat and time produced delicious results without comprehending the underlying chemistry**, leading to remarkably sophisticated techniques wrapped in thoroughly wrong explanations†. The breakthrough came when Maillard's investigations into protein synthesis unexpectedly revealed the reaction mechanism††, though practical culinary applications weren't systematically explored until the mid-20th century when molecular gastronomy emerged as a field‡. Modern understanding has progressed to the point where we can predict flavor compound formation based on amino acid profiles‡‡, manipulate pH to alter reaction pathways***, and even reverse-engineer the taste of "perfectly roasted" based on computational models†††—though paradoxically, this knowledge has made cooking more, not less, intimidating for the average practitioner‡‡‡, a phenomenon the philosopher-chef Brillat-Savarin predicted in his marginalia* but which everyone ignored until it was too late**.
+&nbsp;
+The trajectory of future Maillard research points toward increasing precision in flavor engineering, from the development of "reaction-optimized" ingredients† to time-temperature protocols that maximize specific desirable compounds while minimizing less pleasant ones††. The Council of Culinary Sciences‡ projects that within two decades, home cooking devices will automatically adjust heat profiles based on real-time molecular monitoring**, though this assumes the devices will be more reliable than the current generation of "smart" appliances which, according to user satisfaction surveys, are smart in approximately the same way that a reasonably clever brick is smart***. Nevertheless, the fundamental principle endures: understanding that the delicious brown crust on bread, the mahogany sear on steak, and the deep umami of roasted onions all arise from the same molecular dance between proteins and sugars grants the cook a kind of power†††—the power to consistently create deliciousness rather than accidentally stumbling into it approximately 60% of the time‡‡, which represents the average success rate of intuition-based cooking according to longitudinal studies conducted by people with evidently too much time and too many thermocouples‡‡‡.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*Maillard was actually investigating the synthesis of biological tissues and attempting to understand how amino acids might spontaneously form proteins, a goal he spectacularly failed to achieve. However, his failure proved more useful to humanity than success would have been, as it directly led to understanding why breakfast smells wonderful. This represents a 1:1 ratio of "intended discovery" to "actual discovery," making Maillard one of the most successful failures in scientific history. The French Academy of Accidental Excellence awarded him their highest honor posthumously in 1957, a gold medal depicting a man tripping into greatness.
+&nbsp;
+†The temperature threshold varies by specific amino acids and sugars involved—asparagine and glucose react enthusiastically at lower temperatures (around 120°C), while other combinations require significantly more heat to initiate the cascade. The Thermodynamic Society of Denmark maintains a 847-page database cataloguing every known amino acid-sugar pairing and their optimal reaction temperatures, cross-referenced with resulting flavor compounds. They update it quarterly. Nobody has read the entire document, including its authors, who stopped at page 203 and admitted defeat.
+&nbsp;
+‡The aesthetic and gustatory difference between properly browned and grey meat has started religious schisms, toppled governments, and caused at least one divorce in Sussex in 1998. The psychological literature identifies this as a fundamental human response, possibly evolved during the Pleistocene when the ability to distinguish "has undergone Maillard reaction" from "has not" provided significant survival advantages. Those who could tell the difference presumably survived winter more effectively, leading to modern humans having approximately 340 genes dedicated to detecting Maillard reaction products—more genetic material than we dedicate to detecting danger.
+&nbsp;
+**The most comprehensive analysis, conducted by the Institute of Unnecessary Precision in Basel, identified 1,247 distinct chemical compounds formed during the Maillard reaction in roasting coffee alone. Of these, approximately 940 contribute to aroma, 287 to taste (with significant overlap), and 3 do absolutely nothing except exist out of what can only be described as chemical spite. The lead researcher, Dr. Helena Kranzmeier, noted in her conclusion that "perhaps some questions are better left unasked" before requesting reassignment to a simpler field, like quantum chromodynamics.
+&nbsp;
+††Specifically, they called it "kās̆ussu ṭābtu," which translates roughly as "the pleasing transformation" or possibly "when food stops being disappointing." Ancient Mesopotamian culinary texts, carved into clay tablets discovered in Ur, contain detailed instructions for searing meats and baking breads that would be entirely recognizable to modern cooks, accompanied by prayers to Ninkasi (goddess of beer and broadly interpreted as also governing all fermentation and browning) asking her to "look favorably upon this lamb and darken its exterior without embittering its soul." Whether the prayers worked better than careful temperature control remains untested by modern double-blind studies, though the Mesopotamian Revivalist Cooking Movement in California claims a 73% success rate with prayer-assisted searing.
+&nbsp;
+‡‡Enzymatic browning, as occurs in cut apples or bruised bananas, involves entirely different chemistry—specifically, the enzyme polyphenol oxidase catalyzing the oxidation of phenolic compounds into melanins. This process requires no heat`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding maillard reaction understanding in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CARAMELIZATION_SCIENCE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'caramelization_science',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Caramelization Science',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['maillard_reaction_understanding'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_caramelization_science' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE PYROLYTIC TRANSMUTATION OF SACCHARIDES: </span>
+A TREATISE ON CARAMELIZATION SCIENCE
+&nbsp;
+The fundamental principle of caramelization rests upon a simple truth that has eluded approximately 73.4% of amateur practitioners*: sugar, when heated beyond its comfort zone†, undergoes a transformation both chemical and spiritual‡. Unlike its distant cousin, the Maillard reaction**, caramelization requires no protein accomplice—the sugar performs this feat of transmutation entirely alone††, breaking down into hundreds of flavor compounds through a process the Ancient Confectioners called "the Sweetening Dark"‡‡. The threshold temperature hovers around 338°F (170°C) for sucrose***, though this varies depending on which type of sugar one is interrogating with heat.
+&nbsp;
+The practical application of this knowledge separates the living from the hospitalized†. Successful caramelization requires three things: sugar, heat, and what the Monastery of Perpetual Stirring‡‡‡ calls "patient vigilance"****. The sugar must be heated evenly††††, either through the dry method (pure sugar in a pan)‡‡‡‡ or the wet method (sugar dissolved in water)****, each with its own theological implications†††††. The color progression from pale amber to deep mahogany occurs over mere minutes‡‡‡‡‡, during which the practitioner must maintain what Master Confectioner Hildegard von Sweetentooth described as "the stance of eternal readiness"******—one hand on the pan handle, one hand prepared to remove the vessel from heat, and ideally a third hand for stirring†††††††.
+&nbsp;
+The historical record reveals that humanity's relationship with caramelized sugar began, predictably, with accidents*. The earliest documented case of intentional caramelization comes from 15th century Europe‡‡‡‡‡‡, though the Ancient Mesopotamians almost certainly discovered it first and then forgot to write it down******. The Venetian Candy Riots of 1672******* demonstrated both the public's enthusiasm for caramel and the importance of temperature control, while the Great Caramel Incident of 1823******** established most of our modern safety protocols††††††††. Today's understanding combines chemistry with what can only be described as temporal combat***—the window between "not quite done" and "smoking ruin" typically measures 45 seconds‡‡‡‡‡‡‡.
+&nbsp;
+Contemporary practitioners must understand that caramelization produces not just color and flavor, but also acidity†††††††††. The breakdown of sugar molecules creates acids that balance the intense sweetness, resulting in the complex flavor profile that makes caramel infinitely superior to mere melted sugar****. This is why proper caramelization enhances everything from crème brûlée to roasted vegetables‡‡‡‡‡‡‡‡, transforming the mundane into what the Society of Elevated Sugars calls "edible alchemy"*****. The three stages of caramelization—light (toasted, nutty), medium (caramel-flavored), and dark (bitter, complex)——produce distinct flavor profiles††††††††††, each with its devotees and its heretics‡‡‡‡‡‡‡‡‡.
+&nbsp;
+FOOTNOTES:
+&nbsp;
+* According to the Institute for Culinary Disaster Documentation, which tracks such things with disturbing enthusiasm. The remaining 26.6% either learned through formal training or, more commonly, through what they call "the burnt sugar incident that we don't discuss at family gatherings."
+&nbsp;
+† Sugar's comfort zone, according to molecular gastronomist Dr. Penelope Sweetwise, is approximately room temperature, "at which it can sit undisturbed in the cupboard contemplating its crystalline existence."
+&nbsp;
+‡ The spiritual component has never been scientifically verified, but the Ancient Guild of Confectioners insisted upon it, and who are we to argue with people who worked with boiling sugar without thermometers?
+&nbsp;
+** See our earlier treatise, "On the Browning of Things That Should Not Be Brown: A Primer on the Maillard Reaction." The Maillard reaction requires amino acids and reducing sugars, making it fundamentally a team sport. Caramelization is more of a solo interpretive dance.
+&nbsp;
+†† This independence should not be mistaken for ease. Sugar's ability to caramelize alone is rather like a toddler's ability to dress themselves—technically possible, but requiring supervision.
+&nbsp;
+††† The full name translates from the original Latin as "the Brotherhood of Those Who Watch Pots and Also Sometimes Stir Them." They disbanded in 1847 after the Stirring Schism.
+&nbsp;
+‡‡ The original text, preserved in the Secret Library of Culinary Mistakes†, describes it as "that moment when sweetness looks into the abyss and the abyss develops complex flavor notes."
+&nbsp;
+† This library, maintained by the International Consortium of People Who Should Have Known Better, contains over 40,000 volumes of cooking disasters. It is not open to the public for insurance reasons.
+&nbsp;
+*** Other sugars caramelize at different temperatures. Fructose, the overachiever, begins at 230°F (110°C). Glucose waits until 320°F (160°C), being more patient and also more likely to crystallize just to spite you.
+&nbsp;
+† The difference between "living" and "hospitalized" in professional kitchens is often measured in seconds and inches—specifically, how many seconds you paid attention and how many inches of skin you still have.
+&nbsp;
+‡‡‡ The Monastery, located in the Swiss Alps until its unfortunate dissolution‡, produced the finest caramel in Europe and also the finest insurance claims.
+&nbsp;
+‡ The dissolution came about not through religious persecution but through what the final report called "structural integrity issues arising from accumulated caramel buildup." The monastery was essentially glued shut.
+&nbsp;
+**** The wet method involves adding water to the sugar, which delays caramelization but provides what confectioners call "insurance time"—those precious extra seconds before disaster strikes. The water must eventually evaporate, during which many practitioners become philosophical about the nature of patience.
+&nbsp;
+†††† Even heating proves challenging because sugar is an excellent insulator**. This is why professional kitchens employ what the Culinary Safety Board delicately terms "appropriate thermal management equipment" and everyone else calls "really heavy copper pans that cost more than a used car."
+&nbsp;
+** Sugar's insulating properties have been weaponized exactly three times in recorded history, most notably during the Pastry Chef Rebellion of 1789††, which history books conveniently ignore.
+&nbsp;
+†† Not to be confused with the more famous French Revolution occurring the same year. The Pastry Chef Rebellion involved fewer guillotines but significantly more burned sugar fortifications.
+&nbsp;
+‡‡‡‡ The dry method is favored by risk-takers, gambling enthusiasts, and people who enjoy what the Firefighters' Guild calls "keeping us employed." It involves putting plain sugar directly into a hot pan and hoping for the best.
+&nbsp;
+***** These implications are detailed in the 400-page document "Theological Considerations in Sugar Heating Methodologies," published by the Vatican's surprisingly active Culinary Division. The key debate centers on whether adding water constitutes "sugar's natural state" or "human interference in divine sweetness."
+&nbsp;
+††††† The color change happens because the sugar molecules are breaking down into smaller molecules†††, which absorb different wavelengths of light. This is beautiful chemistry explaining why your kitchen smells amazing right before everything goes horribly wrong.
+&nbsp;
+††† Approximately 100-120 different flavor compounds result from caramelization, each with names like "furanones," "maltol," and "diacetyl." These sound like members of a very specific superhero team.
+&nbsp;
+‡‡‡‡‡ The speed of color change increases exponentially with temperature, following what Dr. Hermann Burntsworth called "the Oh God Oh God It's Burning Curve." His papers remain influential, though his eyebrows never fully recovered.
+&nbsp;
+****** Master Hildegard, who ran the Königsberg Confectionery Academy from 1734 to 1756, also pioneered the three-handed training technique using her apprentices' hands as the third hand. This is no longer considered pedagogically sound.
+&nbsp;
+††††††† The third hand problem has been addressed through teamwork, mechanical stirrers, or what the Professional Confectioners Association calls "aggressive pan swirling while praying."
+&nbsp;
+* The most common accident involved leaving honey in the sun in a copper vessel‡‡‡‡, which led to caramelization and the immediate assumption that the gods were angry. This happened in every civilization independently, suggesting either parallel development`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding caramelization science in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const EMULSIFICATION_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'emulsification_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Emulsification Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['caramelization_science'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_emulsification_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Emulsification Techniques: A Comprehensive Study of Combining the Fundamentally Incompatible</span>
+&nbsp;
+The art of emulsification represents humanity's ongoing attempt to force together substances that, by all accounts, would rather be left alone.* At its most fundamental level, an emulsion is a suspension of one liquid within another—typically oil and water—maintained through vigorous agitation, the addition of an emulsifying agent, or sheer bloody-mindedness.† The process relies on reducing one liquid into microscopic droplets that are then evenly distributed throughout the other, held in suspension by molecules that possess the remarkable property of being equally comfortable (or uncomfortable) in both environments.‡ These amphiphilic molecules†† position themselves at the interface between the oil and water droplets, their hydrophilic ends attracted to water while their lipophilic ends prefer oil, thereby acting as molecular diplomats in what would otherwise be a complete breakdown of relationships.‡‡
+&nbsp;
+The practical applications of emulsification in cuisine are as numerous as they are delicious, ranging from the simple vinaigrette* to the complex mayonnaise**, with each requiring different techniques and levels of commitment.*** The basic methodology involves introducing the oil phase to the water phase in a slow, controlled manner while providing constant agitation—either through whisking, blending, or what the Guild of Culinary Sciences refers to as "aggressive encouragement."† A successful emulsion exhibits a glossy, homogeneous appearance, with no visible separation of the constituent liquids†, though maintaining this state requires understanding the delicate balance of ratios, temperatures, and the temperament of your ingredients.‡ Common emulsifying agents include egg yolks‡‡, mustard‡‡‡, honey§, and various gums and stabilizers that possess molecular structures conducive to bridge-building between otherwise hostile factions.§§
+&nbsp;
+Historical development of emulsification techniques reveals a progression from accidental discovery to deliberate science, though some would argue the accidents were more reliable.* The ancient Romans, according to the largely unverified accounts of Apicius the Elder†, created primitive emulsions through extended whisking**, while medieval European manuscripts contain warnings about "the separation of the sauce" that read more like prophecies of doom than cooking instructions.†† The modern understanding of emulsion chemistry emerged in the nineteenth century when Jean-Baptiste Dumas demonstrated that molecules could be forced into uncomfortable social situations through physical manipulation‡, a discovery that revolutionized both chemistry and French cuisine.‡‡ The invention of mechanical emulsifiers in the early twentieth century automated what had previously required either dedicated servants or remarkable upper arm strength‡‡‡, democratizing access to stable emulsions while simultaneously eliminating an entire category of domestic employment.§
+&nbsp;
+Safety considerations in emulsification extend beyond the obvious risks of repetitive strain injury from whisking* and include the proper handling of raw eggs†, the dangers of over-enthusiastic blending††, and the psychological impact of watching an emulsion break after twenty minutes of careful work.‡ Temperature control proves critical, as emulsions maintained at improper temperatures will separate with what witnesses describe as "malicious glee."‡‡ The ratio of oil to emulsifying agent must be carefully calculated—exceed the capacity of your emulsifier and the mixture will split faster than a philosophical debate about the nature of consciousness‡‡‡, leaving you with a puddle of recrimination and separated fats.§ Modern food safety guidelines also emphasize the importance of using pasteurized eggs in applications where the emulsion will not be subsequently heated§§, a recommendation born from numerous incidents that the International Bureau of Culinary Mishaps prefers not to discuss in detail.§§§
+&nbsp;
+Best practices in emulsification have been refined over centuries of trial, error, and the occasional catastrophic failure that becomes the subject of cautionary tales.* Begin with all ingredients at room temperature unless specifically instructed otherwise†, add the oil phase in a thin, steady stream while maintaining constant agitation††, and remember that patience is not merely a virtue but a strict requirement.‡ Should an emulsion begin to separate, immediate action is required: remove the broken emulsion, start fresh with a new egg yolk or tablespoon of water in a clean bowl, and slowly incorporate the broken mixture while pretending the first attempt never happened.‡‡ The Guild of Master Emulsifiers recommends practicing with inexpensive ingredients before attempting costly recipes‡‡‡, maintaining a philosophical attitude toward failure§, and keeping a backup plan that doesn't require emulsification at all.§§
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* Oil and water's mutual antipathy has been documented since at least the Bronze Age, when Sumerian cooks first noted that the two substances exhibited what modern chemists call "a fundamental incompatibility at the molecular level" and what kitchen staff call "being difficult on purpose."
+&nbsp;
+† The Viennese physicist Ernst Mach once calculated that the amount of human stubbornness required to maintain a temporary emulsion through willpower alone exceeded the energy output of a small steam engine. His paper was rejected for "insufficient scientific rigor" and "excessive pessimism."
+&nbsp;
+‡ The technical term is "amphiphilic" or "amphipathic," from the Greek meaning "loving both," though "tolerating both under duress" would be more accurate. Molecules don't love. They endure.
+&nbsp;
+†† Not to be confused with amphibious molecules, which do not exist outside of Dr. Thaddeus Brine's discredited 1887 paper "On the Aquatic Properties of Lipids."† His subsequent attempts to create swimming oil resulted in the Great Slick Incident of 1889, which rendered the Thames temporarily flammable and led to new regulations about "experimental condiments."
+&nbsp;
+††† See also: Carmichael's Law of Molecular Diplomacy, which states that any sufficiently stressed emulsifier will eventually say "sort it out yourselves" and leave the interface entirely.
+&nbsp;
+‡‡ A vinaigrette represents the simplest form of emulsion—what the Academy of Culinary Sciences classifies as a "temporary emulsion" or "optimistic mixture." Left undisturbed for more than thirty seconds, it will separate with such enthusiasm that some chefs swear they can hear it happening.
+&nbsp;
+\*\* Mayonnaise, by contrast, is classified as a "permanent emulsion," though this designation requires the footnote that nothing in the culinary world is truly permanent. The heat death of the universe will arrive before truly stable mayonnaise. Or possibly afterward. The math remains unclear.
+&nbsp;
+\*\*\* The degree of commitment required varies. A vinaigrette demands mere casual interest. Hollandaise requires focused attention. Aioli expects devotion bordering on obsession. According to the famous chef Auguste Leclerc‡, "Making béarnaise sauce is like conducting a symphony. Making it successfully is like conducting a symphony where all the musicians are actively trying to leave."
+&nbsp;
+‡‡‡ Leclerc disappeared in 1923 while attempting to create an emulsion stable enough to survive "the rigors of time itself." His kitchen was found intact, containing only a note reading "I have either succeeded beyond my wildest dreams or failed in a way I cannot yet comprehend" and a small ceramic pot containing what food scientists confirmed was, impossibly, a perfectly stable emulsion that has remained unchanged for over a century. The pot is now maintained by the Louvre under armed guard. The recipe died with him.
+&nbsp;
+† The Guild of Culinary Sciences, established in 1847 by François Duchamp after a particularly spectacular sauce failure during a dinner for the French Academy, maintains detailed records of every known emulsification attempt, success, and catastrophic separation event within its jurisdiction. Their motto, "Vigila ne Separetur" (Watch That It Doesn't Separate), appears on their coat of arms above a whisk and a broken sauce boat.
+&nbsp;
+‡ This appearance of homogeneity is technically an illusion maintained through constant molecular warfare at scales too small for human observation. Scanning electron microscopy reveals that emulsions exist in a state of what Dr. Helena Vasquez termed "aggressive equilibrium," where thousands of tiny droplets are held in place by emulsifier molecules with what she described in her notes as "grim determination."
+&nbsp;
+†† The first sign of emulsion failure is often a slight thinning of the mixture, followed by a barely perceptible graininess, and then—with shocking rapidity—complete separation into a pool of oil floating atop a watery mass that seems to mock all your efforts. The psychological impact of watching this occur has been compared to witnessing a soufflé collapse, though less dramatic and somehow more personally insulting.
+&nbsp;
+‡‡ Egg yolks contain lecithin, a phospholipid that functions as an excellent emulsifier due to its molecular structure. A single egg yolk can theoretically emulsify up to 24 liters of oil, though the Guild of Culinary Sciences strongly advises`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding emulsification techniques in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const REDUCTION_SAUCE_MAKING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'reduction_sauce_making',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Reduction Sauce Making',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['emulsification_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_reduction_sauce_making' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Reduction Sauce Making: A Comprehensive Investigation into the Ancient Art of Evaporation-Based Flavor Concentration</span>
+&nbsp;
+The fundamental principle underlying reduction sauce making is deceptively simple: apply heat to a liquid until sufficient water molecules have escaped into the atmosphere, thereby concentrating the remaining flavor compounds into a more potent and viscous form*. This process, which the Ancient Sumerians called "making the soup smaller but angrier"†, relies on the basic thermodynamic principle that water, when sufficiently encouraged by thermal energy, will abandon ship and leave behind whatever was dissolved or suspended in it‡. The modern practitioner must understand that reduction is not merely about volume decrease—though the International Culinary Measurement Board has established that a proper reduction should achieve between 43% and 67% volume loss**—but rather about the transformation of simple liquids into complex, glossy manifestations of concentrated desire††.
+&nbsp;
+The practical execution of sauce reduction requires attention to several critical variables, beginning with heat management and the selection of appropriate vessels*‡. A wide, shallow pan permits maximum surface area for evaporation, though one must be vigilant against what the renowned Chef Escoffier termed "the Moment of Betrayal," when a nearly-perfect reduction suddenly transforms into a burnt, sticky disaster‡‡. The cook must maintain a careful balance: too gentle a heat and the sauce will reduce at approximately the same rate as continental drift; too aggressive and one recreates the Great Reduction Incident of 1887***. Stirring frequency also matters considerably, with optimal results achieved through what the Brotherhood of the Wooden Spoon describes as "aggressive meditation"—stirring often enough to prevent burning, but not so constantly that you prevent proper evaporation†††.
+&nbsp;
+Temperature control represents perhaps the most crucial element of successful reduction, particularly when working with sauces containing dairy, alcohol, or the temperamental essence of tomatoes‡‡‡. The ideal reduction occurs at what classical texts describe as "the simmer of contemplation"—hot enough that small bubbles regularly break the surface, but not so vigorous as to create what looks like a miniature volcanic event in your saucepan*‡‡. Wine-based reductions present their own challenges, as the alcohol must be given adequate time to evaporate**‡, lest one create what the Court of Versailles awkwardly termed "the Sauce That Made the Ambassador Dance on the Table"†‡. Modern practitioners benefit from thermometers, though the Old Ways relied on what grandmother called "sticking your face over the pan until you feel personally attacked by the steam"‡‡‡‡.
+&nbsp;
+The historical development of reduction techniques reveals a fascinating progression from accident to art, with early practitioners discovering the method primarily through the time-honored culinary tradition of forgetting about things****. The earliest recorded deliberate reduction appears in a Babylonian tablet describing "the sauce that waited while I argued with my neighbor about his goat"††‡, suggesting that reduction was initially a fortuitous consequence of distraction rather than intention***‡. By the Medieval period, European monasteries had systematized the process, with Brother Anselm of Canterbury producing the seminal text "De Reductione Saucium" (On the Reduction of Sauces), which contained both practical instruction and warnings about the Sin of Insufficient Stirring‡‡‡‡‡. The French systematized what the monasteries had mystified, creating the classical mother sauces and their infinite reductions, though they steadfastly refused to acknowledge that they had essentially spent three centuries perfecting the art of boiling things until they got smaller*****.
+&nbsp;
+---
+&nbsp;
+*The precise physics involved would horrify a thermodynamicist, as we are essentially asking water molecules to kindly vacate the premises while flavor molecules remain behind like loyal servants. The mortality rate among water molecules during reduction is, statistically speaking, 100%.
+&nbsp;
+†Though translating ancient Sumerian cooking texts presents unique challenges, as their word for "reduce" is the same as their word for "punish," leading to some confusion about whether we're making sauce or conducting some form of liquid-based retribution.
+&nbsp;
+‡The Department of Abandoned Water Molecules at the University of Perpetual Humidity estimates that home cooking releases approximately 47 billion liters of water vapor annually, most of which immediately condenses on the one window you forgot to crack open.
+&nbsp;
+**This range was established after the Statistical Sauce Commission of 1923 spent eighteen months reducing various liquids while arguing about methodology. The 43% minimum was proposed by the French delegation; the 67% maximum by the notably impatient German contingent. The British delegation suggested measuring by "thickness sufficient to coat a spoon meaningfully," which was rejected as "insufficiently scientific and excessively British."
+&nbsp;
+††The Gastronomic Society of Ancient Wisdom maintains that every reduction carries within it the memory of when it was whole, and that properly trained palates can taste the ghost of the departed water. This is probably nonsense, but it sounds impressive at dinner parties.
+&nbsp;
+*‡The choice of pan is critical. Copper conducts heat beautifully but requires more maintenance than a temperamental racehorse. Stainless steel is practical but judgmental in its plainness. Cast iron will work but will also impart a faint taste of "metallic regret." The Guild of Pan Makers has published a 400-page treatise on this subject alone, which is 397 pages longer than necessary†.
+&nbsp;
+†Pan selection actually requires about three pages of genuine information. The rest of the treatise concerns historical disputes between coppersmiths and iron forgers, a section on pans allegedly used by various saints, and an unnecessarily detailed chapter on pans that were "cursed, probably"††.
+&nbsp;
+††Documentation of cursed cookware remains inconsistent. The Archive of Unfortunate Kitchen Implements in Prague houses seventeen pans with supposed curses, though empirical testing suggests most were simply poorly made and had nothing to do with ancient grudges or disappointed witches.
+&nbsp;
+‡‡Escoffier's actual writings on this subject are more diplomatic, but his private kitchen journals—recovered from a Paris apartment in 1967—reveal a man who had witnessed sauce betrayal more often than anyone should. One entry simply reads: "The veal reduction mocked me today. Tomorrow, revenge."
+&nbsp;
+***The Great Reduction Incident of 1887 began when Chef Auguste Belmont attempted to reduce 40 liters of beef stock in a kitchen with insufficient ventilation. The resulting concentration was so intense that it allegedly attracted every dog within a three-mile radius. The dogs were fine. The kitchen door was not. The Historical Society of Canine-Related Culinary Events commemorates this annually with a small plaque and a much larger sense of irony‡‡.
+&nbsp;
+‡‡The plaque reads: "Here, or near here, or possibly several streets over, dogs once gathered in unprecedented numbers due to one man's ambition and insufficient window-opening." The Society admits the location is approximate, as the original kitchen was demolished, rebuilt, demolished again, and is now a mobile phone shop.
+&nbsp;
+†††The Brotherhood of the Wooden Spoon, founded in 1342, maintains that the perfect stirring pattern resembles a figure-eight drawn by someone who has forgotten what a figure-eight looks like. Their initiation ceremony involves stirring a sauce for six hours while reciting the names of all the things one could burn if insufficiently attentive†‡‡.
+&nbsp;
+†‡‡This list includes but is not limited to: the sauce, the pan, the stovetop, the kitchen towel you left too close, your reputation, dinner, your relationship with whoever you promised dinner to, and "the fundamental trust between human and stove."
+&nbsp;
+‡‡‡Tomatoes, despite being fruits masquerading as vegetables, harbor deep acidic properties that can cause sauces to "break" (separate) or develop what the Italian Sauce Commission calls "an aggressive personality." Reduction of tomato-based sauces requires patience, love, and acceptance that the sauce may hate you personally.
+&nbsp;
+*‡‡The precise temperature varies by sauce type, but generally falls between 85°C and 95°C (185°F-205°F). This is hot enough to maintain gentle evaporation but not so hot as to create what the Technical Institute of Applied Heat describes as "chaos with bubbles." They have graphs showing the exact point where gentle reduction becomes chaos. The graphs are surprisingly aggressive.
+&nbsp;
+**‡Wine contains ethanol, which boils at 78°C (172°F), lower than water's 100°C (212°F). The common myth that alcohol completely evaporates during cooking has been debunked by the Laboratory for Disappointing Revelations, which found that even after 30 minutes of simmering, approximately 35% of the original alcohol remains. After two hours, it's still around 10%. After three hours, you've probably burned your sauce anyway, so the alcohol content is the least of your problems.
+&nbsp;
+†‡The incident occurre`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding reduction sauce making in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STOCK_BROTH_FUNDAMENTALS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stock_broth_fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stock Broth Fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['reduction_sauce_making'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stock_broth_fundamentals' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `STOCK BROTH FUNDAMENTALS: A TREATISE ON THE PRIMORDIAL SOUP</span>
+&nbsp;
+The preparation of stock broth represents one of humanity's earliest alchemical achievements, transforming bones, vegetables, and water into liquid gold through nothing more than heat and patience*. While modern practitioners often rush to more elaborate preparations†, the fundamental art of stock-making remains the bedrock upon which all civilized cuisine rests‡. Indeed, the Council of Gastronomic Standards has repeatedly emphasized that approximately 73.4% of culinary disasters can be traced back to inadequate stock preparation**. The process itself appears deceptively simple: one places ingredients in water, applies heat, and waits††. However, as the Archives of the Forgotten Kitchen Gods remind us, simplicity and ease are not synonymous—a distinction that has resulted in more kitchen fires than the Great Butter Incident of 1823†††.
+&nbsp;
+The practical application of stock-making requires an understanding of extraction principles that would do credit to any medieval herbalist or modern chemist alike‡‡. Collagen must be coerced from bones through sustained gentle heat—a minimum of four hours for chicken, eight for beef, and considerably longer for dragon‡‡‡, though the latter remains theoretical in most jurisdictions§. The vegetables serve not merely as flavor donors but as sacrificial offerings to the Pot****, their cellular structures breaking down to release sugars, aromatics, and that ineffable quality the Ancient Greeks called "umami" and everyone else calls "the good stuff"§§. Temperature control proves critical: 180-200°F (82-93°C) maintains the delicate balance between extraction and destruction§§§, a range first identified by the Thermodynamic Monks of Bavaria in their seminal work "Why Our Broth Is Better Than Yours: A Statistical Analysis"*****.
+&nbsp;
+Historical development of stock-making techniques reveals a pattern of periodic genius punctuated by spectacular failure†††††. The Romans perfected garum through fermentation‡‡‡‡, medieval monasteries developed clarification methods that bordered on sorcery‡‡‡‡‡, and the French systematized everything with their characteristic enthusiasm for taxonomy and their equally characteristic disdain for anyone doing it differently§§§§. Modern understanding has largely confirmed ancient wisdom: good stock cannot be rushed, shortcuts lead to disappointment*******, and the difference between stock and broth remains a subject of theological rather than practical significance††††††. The Institute of Liquid Studies at the University of Greater Gastronomy has published seventeen volumes on this distinction alone‡‡‡‡‡‡, though they remain at war with the Broth Brotherhood over footnote 47 in Volume 12.
+&nbsp;
+&nbsp;
+* The term "liquid gold" appears in approximately 89.7% of all writing about stock, according to the Statistical Survey of Culinary Clichés. This does not make it less true, merely less original.
+&nbsp;
+† Particularly those who have just completed their training in reduction sauce making and believe themselves ready to conquer the world. The mortality rate for hollandaise sauce among this demographic approaches 94.2%.
+&nbsp;
+‡ Metaphorically speaking. Literally speaking, the bedrock upon which cuisine rests is usually either granite countertops or, for the less fortunate, laminate that was installed in 1987 and really should have been replaced by now.
+&nbsp;
+** The remaining 26.6% are attributed to overconfidence, underestimation of chili peppers, and that one incident in Budapest we're not supposed to talk about. The Council's report spans 1,247 pages and includes three appendices on "What Were They Thinking?" that make for surprisingly entertaining reading.
+&nbsp;
+†† This is where things go wrong†. The waiting proves too much for most practitioners.
+&nbsp;
+††† An incident involving clarified butter, an experimental heating element, and what the subsequent inquiry determined was "an ill-advised wager regarding thermodynamic limits." Fourteen people survived, though three never trusted butter again. The Royal Society of Dairy Products officially denies any involvement, which historians universally accept as confirmation of their complete involvement.
+&nbsp;
+† People do not wait well. They poke. They stir unnecessarily. They increase the heat "just a little" to speed things along. The Register of Ruined Stocks, maintained by the Order of Patient Chefs, adds approximately 1,200 entries per day. These are only the documented cases.
+&nbsp;
+‡‡ The extraction process involves breaking down collagen into gelatin through hydrolysis—a process that sounds more violent than it is, though the bones might disagree if they could speak‡.
+&nbsp;
+‡‡‡ Dragon bones, being significantly denser than conventional livestock, require upwards of forty-eight hours of simmering. This remains entirely theoretical, as the last confirmed dragon stock was prepared in 1642 by Chef Hieronymus Blightsworth, whose recipe concluded with the unfortunate addendum: "Note: Dragon's relatives quite vengeful. Recommend posthumous publication." His wishes were respected.
+&nbsp;
+‡ Some magical traditions hold that bones DO speak during the stock-making process, communicating the secrets of their lives to those who listen carefully. The Society for Auditory Gastronomy has published extensively on this topic, though their findings are complicated by the fact that all their research was conducted after consuming experimental mushroom broths.
+&nbsp;
+§ Most jurisdictions, but not all. The Principality of Grimmelshausen technically permits dragon stock preparation, though the licensing requirements include seventeen character witnesses, a dragon-hunting permit, proof of fireproof kitchen facilities, and a substantial life insurance policy that no reputable company will underwrite.
+&nbsp;
+**** The anthropomorphization of cooking pots is more common than generally acknowledged. A survey by the Institute of Culinary Psychology found that 67% of professional chefs have named their stock pot, 34% speak to it regularly, and 12% believe it speaks back—a figure that rises to 89% after 2 AM during service.
+&nbsp;
+§§ The Japanese term "umami" was identified scientifically in 1908 by Kikunae Ikeda, though every grandmother in every culture has known about it since the dawn of time and called it various names including "that thing that makes food not taste sad."
+&nbsp;
+§§§ Below this temperature, extraction proceeds too slowly. Above it, proteins coagulate and fats emulsify, creating what the Institute of Failed Stocks has termed "grey sadness water" in their surprisingly poetic Classification of Disappointments, Volume III.
+&nbsp;
+***** The Thermodynamic Monks were eventually disbanded in 1847 following the Great Schism of the Simmer, wherein the Eastern Brotherhood advocated for 185°F while the Western faction held firmly to 195°F. The resulting theological warfare lasted three years and produced fourteen excommunications, seventy-two position papers, and one excellent stock recipe that both sides claimed credit for.
+&nbsp;
+††††† The Timeline of Stock Catastrophes, housed in the Culinary Archives at Le Cordon Historical Bleu, spans an entire wall. Highlights include the Boiled-Dry Incident of Constantinople (537 CE), the Great Viscosity Miscalculation of Yorkshire (1653), and the Pressure Cooker Explosion of 1922 that technically achieved stock in six minutes but also achieved significant property damage and three hospitalizations. The victims all made full recoveries but never trusted cooking equipment again.
+&nbsp;
+‡‡‡‡ A fermented fish sauce that Romans added to approximately everything with the enthusiasm of modern Americans approaching hot sauce. Archaeological evidence suggests they even added it to desserts‡, though this may represent either sophisticated palates or a civilization that had gone entirely off the rails.
+&nbsp;
+‡‡‡‡‡ The process involved egg whites, ground meat, and what the manuscripts describe as "three turns widdershins while invoking Saint Lawrence the Grilled"§. Modern practitioners have simplified this to just the egg whites, though some traditional establishments maintain that the results lack something indefinable—probably sanctity.
+&nbsp;
+‡ They did. The recipe tablets from Pompeii include "Dulcia Domestica" (date sweets) seasoned with garum. This either represents culinary sophistication beyond our modern understanding or proof that the volcano was actually providing a mercy killing.
+&nbsp;
+§ Saint Lawrence, martyred by being grilled alive in 258 CE, reportedly quipped to his executioners "Turn me over, I'm done on this side." The Catholic Church made him patron saint of cooks, presumably for his commitment to even heat distribution even under trying circumstances.
+&nbsp;
+§§§§ The French contribution to stock-making, while undeniably significant, comes packaged with the sort of rigid hierarchy that makes medieval feudalism look positively democratic. Their classification system includes fond blanc, fond brun, fumet, court-bouillon, estouffade, and approximately forty-seven other categories, each with specific protocols. Violation of these protocols is treated not as error but as moral failure.
+&nbsp;
+*******`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stock broth fundamentals in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MOTHER_SAUCES_FIVE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'mother_sauces_five',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Mother Sauces Five',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stock_broth_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_mother_sauces_five' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Mother Sauces Five: A Comprehensive Study of Foundational Sauce Theory in Classical Cuisine</span>
+&nbsp;
+The concept of the Five Mother Sauces* represents one of the most elegant organizational principles in culinary history, a framework so profoundly logical that one wonders how humanity survived the previous millennia of sauce-related chaos†. Codified by Auguste Escoffier in the early twentieth century**, these five fundamental preparations—Béchamel, Velouté, Espagnole, Hollandaise, and Tomato—serve as the foundation from which literally hundreds of derivative sauces may be constructed††. The system operates on the principle that mastery of these five techniques provides the cook with a complete vocabulary of sauce-making, much as knowing the alphabet theoretically enables one to write poetry†††, though in practice the results vary considerably‡.
+&nbsp;
+The practical execution of mother sauce preparation requires understanding both the fundamental techniques and the philosophical implications of what one is attempting to achieve‡‡. Béchamel, the milk-based sauce thickened with white roux, appears deceptively simple until one encounters the question of correct thickness‡‡‡—a measurement so dependent on context that the International Bureau of Sauce Standards§ eventually gave up trying to define it precisely and instead published a 847-page document describing various acceptable viscosities§§. Velouté, constructed from white stock and blonde roux, demands stocks of exceptional quality§§§, while Espagnole requires brown stock and brown roux in what can only be described as a commitment to chromatic consistency*. Hollandaise, that most temperamental of emulsions**, exists in a state of perpetual threat to break into its constituent parts, behaving less like a sauce and more like a barely-contained diplomatic incident between butter and egg yolk***. Tomato sauce, the fifth mother, joined the canon somewhat later†, having spent several centuries being regarded with deep suspicion by European cuisine††.
+&nbsp;
+The safety considerations surrounding mother sauce preparation extend beyond the obvious dangers of hot liquids and sharp implements to encompass the more subtle hazards of culinary hubris‡. The archives of Le Cordon Bleu contain incident reports dating back to 1895 that document what happens when cooks attempt to prepare all five mother sauces simultaneously‡‡—a practice now explicitly forbidden in seventeen countries and strongly discouraged in forty-two others‡‡‡. Temperature control represents perhaps the most critical safety concern§, particularly with Hollandaise, which must be maintained between 145°F and 165°F§§, a range so precise that early chefs developed an almost mystical sensitivity to thermal gradients§§§. The Béchamel Catastrophe of 1923* serves as an enduring reminder that one must never, under any circumstances, add cold milk to hot roux without whisking**, a lesson learned at considerable cost to both the kitchen and the structural integrity of the ceiling***.
+&nbsp;
+Historical development of the mother sauce system reveals a fascinating evolution from the medieval sauce taxonomy of the Grand Kitchens of Avignon† to Escoffier's elegant consolidation††. Prior to Escoffier, French cuisine recognized anywhere from three to three hundred "fundamental" sauces, depending on which chef one asked†††—a situation that led to the infamous Sauce Wars of 1872-1875‡, during which several prominent Parisian restaurants stopped speaking to each other entirely over disagreements about whether Allemande sauce deserved independent status‡‡. The brilliance of Escoffier's system lies not merely in its organizational clarity but in its pedagogical efficiency: a cook who truly understands these five preparations possesses the technical foundation to construct virtually any sauce in the classical repertoire‡‡‡, though this knowledge comes with the unfortunate side effect of making one insufferably confident at dinner parties§.
+&nbsp;
+Modern understanding of mother sauces has evolved beyond Escoffier's original framework while maintaining respect for its fundamental logic§§. Contemporary chefs recognize that the system represents not a rigid dogma but a flexible framework for understanding how fats, liquids, and thickening agents interact§§§—a realization that has led to the development of modern interpretations including foam sauces*, emulsified vinaigrettes**, and various molecular gastronomy preparations that Escoffier would probably have found either fascinating or deeply offensive***. The enduring relevance of mother sauce theory demonstrates that certain culinary principles transcend trends and fashion, existing in that rare category of knowledge that remains useful across centuries†, much like the ability to start a fire or the understanding that one should not eat things that glow in the dark††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The number five possesses considerable significance in culinary mysticism, though exactly why remains a subject of debate among food historians. The Guild of Hermetic Gastronomes maintains that five represents the perfect number of fundamental preparations, being equal to the number of fingers on one hand and therefore representing humanity's natural ability to grasp concepts. Their reasoning has been described as "creative" by the Journal of Culinary Logic.
+&nbsp;
+† Prior to Escoffier's codification, sauce preparation in European kitchens operated under what historians now call the "Chaotic Period," during which apprentice cooks were simply told to "make it taste good" and then punished when this vague instruction produced inconsistent results. The mortality rate among sauces during this period exceeded 73%.
+&nbsp;
+** Escoffier published his systematization in "Le Guide Culinaire" (1903), a work that achieved the rare distinction of being both immediately canonical and immediately controversial. Three established chefs challenged him to duels over his categorization decisions, though only one actually went through with it†. The duel was fought with whisks at dawn and ended when both parties became too tired to continue and went for breakfast instead.
+&nbsp;
+†† The debate over whether Hollandaise truly deserves mother sauce status continues to this day, with the Society for Sauce Orthodoxy publishing an annual "State of Hollandaise" report that tracks opposition sentiment. Current opposition stands at 12.7%, down from a high of 34% in 1957, a year marked by what is cryptically referred to in the Society's minutes as "the incident with the broken emulsion at the Sorbonne."
+&nbsp;
+††† William McGonagall, the famously terrible Scottish poet, actually did attempt to write an ode to Béchamel sauce in 1887. The poem has been lost to history, though fragments suggest it rhymed "white sauce" with "right course" and contained the memorable line "Oh, Béchamel, thou art as smooth as cream / More wonderful than any poet's dream." The original manuscript is said to have been used to line a baking tin.
+&nbsp;
+‡ Professor Heinrich von Sauceheim of the Munich Institute for Culinary Studies famously remarked in 1897 that "the preparation of mother sauces separates the cook from the chef much as the ability to walk upright separates humans from our evolutionary predecessors, though with considerably less time required." Von Sauceheim was known for his odd comparisons.
+&nbsp;
+‡‡ "Know your sauce" was the motto of the École de Cuisine Pratique in Lyon, at least until 1932 when it was changed to "Know your sauce, but more importantly, know when to stop" following what the school's records refer to only as "the regrettable velouté situation."
+&nbsp;
+‡‡‡ The question "How thick should Béchamel be?" has generated more heated debate than perhaps any other in classical cuisine. Master Chef Jean-Baptiste Mortimer published a treatise in 1891 titled "On the Proper Viscosity of White Sauce" that ran to 1,247 pages and included sixteen fold-out diagrams. He died before completing the planned second volume, "On the Proper Viscosity of White Sauce: The Revenge."
+&nbsp;
+§ The International Bureau of Sauce Standards, headquartered in Geneva, employs forty-seven full-time sauce assessors and maintains a climate-controlled vault containing reference samples of approved mother sauces. The samples are replaced every six hours for obvious reasons. The Bureau's annual budget exceeds that of twelve small countries, leading to persistent rumors that it serves as a front for something more sinister, though investigations have revealed only an organization genuinely, perhaps obsessively, committed to sauce standardization.
+&nbsp;
+§§ This document, officially titled "Béchamel: Thickness Parameters, Contextual Applications, and Accepted Regional Variations (Third Edition, Revised)," is available for purchase from the Bureau for 340 Swiss Francs. Only seven copies have ever been sold, three of them to the same increasingly frustrated chef in Brussels who kept ordering new editions hoping they would become less confusing. They did not.
+&nbsp;
+§§§ The phrase "stock of exceptional quality" does considerable heavy lifting here. What constitutes "exceptional" has filled volumes. The Velouté Council of 1908 attempted to define minimum standards an`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding mother sauces five in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COMPOUND_BUTTER_CREATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'compound_butter_creation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Compound Butter Creation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['mother_sauces_five'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_compound_butter_creation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Compound Butter Creation: A Treatise on the Alchemical Marriage of Fat and Flavor</span>
+&nbsp;
+The ancient art of compound butter—known to the Gauls as *beurre composé* and to the particularly stubborn Anglo-Saxons as "butter with bits in it"*—represents one of humanity's most elegant solutions to the fundamental culinary problem: how to make things taste better without actually having to cook them properly**. At its core, compound butter is simply softened butter mixed with various flavoring agents, then reformed and chilled, creating what the Guild of Hereditary Buttermongers refers to as "a delivery system for everything that makes life worth living."† The technique requires mastery of the five mother sauces as a prerequisite††, though the Buttermongers maintain this is merely to ensure practitioners understand the gravity of their work, not because there's any actual connection.‡
+&nbsp;
+The fundamental principle operates on sympathetic resonance between the butterfat molecules and whatever you're trying to cram into them‡‡. The butter must be brought to precisely 65°F (18.3°C)*, a temperature the ancient texts describe as "the warmth of a sleeping cat's belly" or "room temperature, assuming your room isn't ridiculous."*** This softening allows the butter's crystalline structure to temporarily relax its molecular bonds—a state the University of Unseen Edibles describes as "butter's brief moment of vulnerability"†††—permitting the introduction of herbs, garlic, citrus zest, or, in the unfortunate case of the Duchess of Westphalia's 1873 experiment, live bees.‡‡‡ The mixture is then beaten until homogeneous, rolled into a log using parchment paper or the traditional method of angry muttering, and refrigerated back into solidarity, carrying within it all the memories of its added flavors.**
+&nbsp;
+[Content continues with detailed technical and humorous footnotes...]
+&nbsp;
+---
+&nbsp;
+*The Anglo-Saxons actually had seventeen different words for butter, none of which anyone could agree on the pronunciation of, leading to the Great Butter Schism of 847 CE. This is why we have both "butter" and "margarine" today, though margarine is something else entirely and we don't discuss it in polite company.
+&nbsp;
+**A principle that has served humanity well since the invention of fire, and possibly before. Archaeological evidence suggests Neolithic humans may have been softening mammoth fat with wild garlic, though the evidence is, admittedly, quite greasy and hard to date accurately.
+&nbsp;
+†The Guild, founded in 1432 by Royal Charter, maintains that they are not a cult, despite their ceremonial robes, secret handshakes, and the annual Butter Benediction held at the spring equinox. Their motto, "In Cremo Veritas" (In Cream, Truth), adorns their headquarters in the Butter Quarter of Lyon.
+&nbsp;
+††This prerequisite was instituted after the Incident of 1891, when an apprentice attempted compound butter without understanding béchamel and somehow created a sentient sauce that plagued the kitchens of Paris for three weeks. The French Government officially denies this ever happened, which is, of course, exactly what they would say.
+&nbsp;
+‡The connection is actually philosophical rather than practical. As the Grand Buttermonger Emeritus, Sir Humphrey Creamsworth, wrote in 1756: "One must understand the mother before attempting to dress the child." This made sense to absolutely no one, but it sounded impressive enough that it stuck.
+&nbsp;
+‡‡This is, technically speaking, complete nonsense. Butter molecules don't care what you put in them. However, the principle was established by the scholar Brillat-Savarin's lesser-known cousin, Médiocre-Savarin, who published extensively on subjects he didn't understand but wrote about very confidently.
+&nbsp;
+*The precision here is crucial. At 64.8°F, the butter remains too firm and will create pockets of unmixed flavoring—a condition known as "flavor islands" or "disappointing bites." At 65.3°F, the butter begins to approach the dreaded "soft-but-not-spreadable" consistency that has ruined more breakfasts than any other substance known to science. The Bureau of Weights and Measures maintains a standard temperature butter in a hermetically sealed vault in Geneva, checked quarterly by a committee of three.
+&nbsp;
+***The Guild's official temperature guide includes such helpful measurements as "the warmth of a chicken who's had a slight shock," "that part of the bed you haven't rolled onto yet," and "autumn in the good way, not the sad way." These have proved surprisingly consistent across cultures and centuries.
+&nbsp;
+†††Published in their controversial paper "On the Psychological States of Dairy Products" (1923), which was largely dismissed by the scientific community until the discovery that butter's crystal structure does, indeed, change at different temperatures. The University then claimed they meant it metaphorically all along, which fooled precisely nobody.
+&nbsp;
+‡‡‡The Duchess was attempting to create "honey butter" by, in her words, "cutting out the middleman." The experiment resulted in three injuries, one destroyed kitchen, and butter that technically qualified as "active" rather than "compound." The bees, according to court records, were returned to their hive "thoroughly buttered but otherwise unharmed." The Duchess's subsequent cookbook, "Adventures in Ambitious Cuisine," sold six copies, five to libraries legally required to acquire it.
+&nbsp;
+**The concept of "memory" in butter is disputed. The Romantic Culinary Movement of the 1820s insisted that butter retained emotional impressions from its component ingredients, leading to theories about "happy cream" and "melancholic milk." Modern food science dismisses this as nonsense, though they cannot explain why butter made on Tuesdays always seems slightly disappointed.
+&nbsp;
+*Practical applications include the classic herb butter (parsley, chives, tarragon—the French Trinity*), garlic butter (for when you want friends to keep their distance), and anchovy butter (for when you want to be absolutely sure they do)**.
+&nbsp;
+*Not to be confused with the Cajun Trinity (onion, celery, bell pepper), the Italian Trinity (garlic, olive oil, tomatoes), or the Holy Trinity (which is a different thing entirely and has lawyers). The French are very particular about their trinities.
+&nbsp;
+**Anchovy butter was banned in three countries between 1891 and 1903, not for health reasons, but because diplomats using it at state dinners created what the Austro-Hungarian Empire termed "olfactory warfare." The ban was lifted when it was discovered the Emperor secretly loved it and had been stockpiling supplies in the palace cellars.
+&nbsp;
+†The Institute for Advanced Butter Studies (Cambridge) maintains that compound butter can be stored for up to three months in proper conditions, though they note that in practice, no compound butter has ever lasted that long in any household they've studied. The average lifespan of compound butter, once made, is 4.7 days, with most specimens meeting their end on toast or melting atop a steak.
+&nbsp;
+††"Broken" butter—where the fat separates from the solids—is considered aesthetically and morally reprehensible by the Guild, who maintain a "Wall of Shame" featuring photographs of the worst offenders. The current record holder is a 1967 specimen that achieved "complete molecular divorce," creating two entirely separate substances that refused to acknowledge each other's existence.
+&nbsp;
+‡‡‡The Rolling Incident of 1952, where an apprentice used too much pressure and created a compound butter log so dense it achieved structural integrity, is still discussed in hushed tones. The log was reportedly used as a doorstop for six months before anyone noticed it was supposed to be food.
+&nbsp;
+*The Butter Bell, invented by French peasants who clearly understood physics better than aristocrats understood food storage, uses a water seal to keep butter soft and fresh. The aristocracy dismissed it as "common" for three centuries before reluctantly admitting it worked better than their jewel-encrusted butter vaults.
+&nbsp;
+**This is not strictly true, but try convincing someone from Wisconsin otherwise. The Great Butter War of 1887 between Wisconsin and Vermont resulted in no casualties but considerable hurt feelings and some strongly worded letters to agricultural journals.
+&nbsp;
+†Though certain medieval scholars, particularly Thomas Aquinas in his lesser-known work "Summa Butterologica," argued that butter occupied a liminal space between solid and liquid, making it theologically suspect. The Church took no official position, being busy with other matters, like the number of angels that could dance on the head of a pin (the answer, for those curious, was eventually determined to be "twelve, but they need to take turns").
+&nbsp;
+The final consideration in compound butter creation is the ancient wisdom of knowing when to stop*. The temptation to continue adding ingredients—"just a bit more garlic," "perhaps some paprika," "what if we tried candied ginger?"—has le`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding compound butter creation in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TEMPERATURE_PRECISION_COOKING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'temperature_precision_cooking',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Temperature Precision Cooking',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['compound_butter_creation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_temperature_precision_cooking' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Temperature Precision Cooking: A Treatise on Thermal Exactitude and Edible Consequences</span>
+&nbsp;
+The advent of temperature precision cooking—known colloquially as "sous vide" to those who enjoy pronouncing French incorrectly*—represents one of humanity's most ambitious attempts to remove human judgment from the cooking process entirely**. This methodology, which involves the prolonged immersion of vacuum-sealed foodstuffs in water baths maintained at temperatures so precise that they would make a medieval thermometer weep†, emerged from the intersection of culinary ambition and an engineer's fundamental mistrust of intuition††. The basic principle operates on the understanding that proteins denature at specific temperatures†††, and that by maintaining food at exactly that temperature for an extended period‡, one can achieve edge-to-edge perfection without the traditional risks of overcooking, undercooking, or that peculiar grey band of disappointment that haunts conventionally prepared meats‡‡.
+&nbsp;
+The practical applications of this technique extend far beyond the preparation of exquisitely tender steaks‡‡‡, encompassing everything from custards that remain impossibly smooth§ to vegetables that retain structural integrity while achieving tenderness§§. The fundamental requirement is simple: a water bath, a heating element capable of maintaining temperatures within a single degree Celsius§§§, and the patience of a particularly determined tortoise*. Implementation requires the cook to first season and seal their ingredient within a vacuum bag**, then submerge it in the precisely controlled water bath for a duration that would seem excessive to anyone accustomed to conventional cooking times††. A 24-hour short rib is considered perfectly reasonable; a 72-hour version is not unheard of‡. The process concludes with a high-heat sear to develop the Maillard reaction†††—a step that early practitioners occasionally forgot with results that can only be described as "technically perfect but aesthetically disappointing"‡‡‡‡.
+&nbsp;
+Safety considerations in temperature precision cooking revolve primarily around the intersection of the "danger zone" and human impatience§. The Guild of Thermal Precisioners§§ maintains extensive documentation on the catastrophic failure modes of this technique, most of which involve either using insufficiently high temperatures for insufficiently long times§§§§, or the opposite error of using excessively high temperatures and transforming expensive cuts of meat into textures previously unknown to culinary science*. Proper pasteurization requires attention to both temperature and time**; a piece of chicken held at 60°C (140°F) for 2.5 hours is microbiologically equivalent to chicken cooked to 75°C (165°F) instantly††, though explaining this to dinner guests requires either considerable authority or remarkably trusting friends†††. The most critical safety consideration remains the prevention of anaerobic bacterial growth‡‡, which can occur when low-acid foods are held in vacuum-sealed environments at temperatures insufficient for pasteurization but ideal for the cultivation of organisms that would prefer you didn't survive dinner‡‡‡.
+&nbsp;
+Historical development of this technique traces back to the late 18th century when Benjamin Thompson, Count Rumford‡‡‡‡, accidentally discovered the principle while attempting to cook meat in a cannon§, though practical implementation awaited the development of precise temperature control equipment in the 1960s and 1970s§§. French and American researchers working independently—and with the characteristic lack of communication between culinary traditions that has enriched human history with so many duplicate discoveries§§§—developed sous vide techniques for industrial food preparation before the method was appropriated by high-end restaurants in the 1980s*. Modern understanding has been substantially advanced by the work of food scientists such as Dr. Douglas Baldwin**, whose mathematical models for time-temperature relationships have prevented countless cases of both food poisoning and overcooking††, though not always simultaneously†††. The democratization of the technique through affordable immersion circulators‡‡ has led to what historians will likely term "The Great Home Kitchen Temperature Obsession of the Early 21st Century"‡‡‡‡‡, characterized by dinner party conversations of unprecedented tedium§ and Instagram photographs of exceptional consistency§§.
+&nbsp;
+The integration of temperature precision cooking into the broader culinary repertoire requires not merely technical proficiency but also an understanding of when precision serves the dish and when it merely serves the ego§§§. The technique pairs particularly well with compound butter preparations*, allowing the precise cooking method to be crowned with the chaotic abandon of herb-studded dairy fat**. Modern practitioners must navigate between the Scylla of over-reliance on technology and the Charybdis of dismissing precision as mere novelty††, finding in the middle path that ancient culinary wisdom: that knowing the rules precisely allows you to break them intelligently†††, and that even the most sophisticated temperature control cannot compensate for poor ingredient selection or the fundamental human tendency to check the device every fifteen minutes to see if anything has happened yet‡.
+&nbsp;
+---
+&nbsp;
+*The correct pronunciation involves more nasal sounds than most English speakers possess phonemes for, leading to the Great Pronunciation Dispute of 1987 at Le Cordon Bleu, which was ultimately resolved by agreeing that everyone was wrong but some were less wrong than others.
+&nbsp;
+**Particularly the engineer's own. The inventor of the first sous vide device reportedly cooked everything this way for three years, including breakfast cereal, before his family staged an intervention. The intervention was itself sous vide, which didn't help.
+&nbsp;
+†If medieval thermometers had existed. They didn't. Medieval temperature measurement relied primarily on the phrases "too hot," "about right," and "well, that's the apprentice's fingers gone then."
+&nbsp;
+††This mistrust is well-founded. A study by the Institute for Culinary Precision and Disappointment found that when asked to identify medium-rare by touch, professional chefs agreed with each other only 43% of the time, and agreed with an actual thermometer only slightly more often than random chance would predict.
+&nbsp;
+†††Myosin, for instance, begins to denature at around 50°C (122°F), while actin remains stable until approximately 66°C (151°F). These temperatures were determined by Dr. Heinrich von Denaturingstein in 1973, who spent eighteen months cooking individual protein molecules and whose dedication to science is commemorated annually at the Laboratory Barbecue of Remembrance.
+&nbsp;
+‡Extended periods ranging from 45 minutes to 96 hours, depending on the food, the desired outcome, and the cook's willingness to explain to house guests why there's a bucket of water with a stick in it humming in the corner.
+&nbsp;
+‡‡This grey band, known scientifically as the "Zone of Culinary Regret," represents protein that has been heated above 70°C (158°F), causing excessive moisture loss and textural degradation. It is the sworn enemy of the Temperature Precisioner and appears in approximately 89.3% of steaks cooked by traditional methods, according to research conducted by people with far too much time and far too many thermometers.
+&nbsp;
+‡‡‡Including eggs cooked at 63°C (145°F) for 45 minutes, which achieve a consistency that baffles first-time observers and leads to what the Guild terms "Egg Existentialism"—a temporary crisis wherein the diner questions whether they truly understood eggs at all. See also: The Incident at the 2003 Culinary Exhibition, wherein a demonstration of 63°C eggs led to a minor philosophical movement.
+&nbsp;
+§The Custard Wars of the 1990s between traditionally-minded pastry chefs and temperature precision advocates resulted in no casualties but several very strongly worded letters to culinary journals. The precision advocates won largely because their custards didn't curdle, though traditional chefs maintain this is missing the point in a way that proves they never understood custard to begin with.
+&nbsp;
+§§Carrots cooked at 83°C (181°F) for one hour retain a texture somewhere between raw and cooked that the Institute for Vegetable Advancement describes as "structurally fascinating" and everyone else describes as "weird but not bad, actually."
+&nbsp;
+§§§The commonly available immersion circulators maintain temperatures within ±0.5°C, which is approximately 5000 times more precise than the average home cook's sense of "medium heat." This precision is necessary because the difference between perfect and ruined can be as little as 2-3 degrees Celsius, which is why our ancestors relied on cooking methods that were more forgiving and why they also ate more ruined dinners.
+&nbsp;
+*Or a particularly impatient hare. Tests conducted by the Academy of Comparative Patience ranked sous vide practitioners as more patient than investment bankers but less patient than people waiting for paint to dry, though this may be because paint drying does not culminate in dinner.
+&nbsp;
+**The vacuum sealing serves multiple purposes: preventing water from touching the food, preventing air from oxidizing the food, and making everything look vaguely medical in a way`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding temperature precision cooking in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOUS_VIDE_PRINCIPLES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'sous_vide_principles',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Sous Vide Principles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['temperature_precision_cooking'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_sous_vide_principles' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `SOUS VIDE PRINCIPLES: A Comprehensive Investigation into the Art of Cooking Things in Bags at Suspiciously Precise Temperatures</span>
+&nbsp;
+By Dr. Cornelius Bainbridge-Thermidor, Institute of Culinary Thermodynamics
+&nbsp;
+The fundamental principle of sous vide cooking rests upon a deceptively simple concept: by sealing food within an impermeable barrier* and submerging it in water heated to an exact, unwavering temperature**, one can achieve a level of doneness previously thought possible only through divine intervention or tremendous luck†. This method, which translates from the French as "under vacuum"††, operates on the revolutionary understanding that proteins denature at specific temperatures‡, and that maintaining such temperatures for extended periods allows heat to penetrate to the very center of foodstuffs without the exterior reaching catastrophic levels of doneness‡‡. The water bath serves as an intermediary, a thermal diplomat if you will***, preventing the food from experiencing the violent temperature fluctuations that characterize traditional cooking methods†††.
+&nbsp;
+The practical applications of sous vide extend far beyond the preparation of a perfect steak‡‡‡, though this remains the gateway drug§ through which most practitioners enter the field. Vegetables achieve textures unattainable through conventional methods§§, eggs can be cooked to seventeen distinct levels of doneness§§§, and even fruits surrender to sous vide's gentle persuasion¶. The technique requires three essential components: a precision heating device (known in the trade as an immersion circulator¶¶, though the name makes it sound rather more like medical equipment than it should), vacuum-sealed bags or their equivalent¶¶¶, and perhaps most critically, patience of a degree typically associated with medieval monks copying manuscripts**. The temperature ranges are surprisingly specific: 129°F produces a different result than 131°F††, and the difference between success and disappointment can be measured in mere degrees‡‡.
+&nbsp;
+Safety considerations in sous vide cooking occupy a peculiar intersection of food science and paranoia that has produced some of the most tedious yet essential literature in culinary history***. The primary concern revolves around the temperature danger zone†††, that thermal purgatory between 40°F and 140°F where bacteria reproduce with enthusiasm typically reserved for rabbits‡‡‡. Proper sous vide technique requires either cooking above this range or, if cooking within it, limiting the duration according to pasteurization tables that read like actuarial documents§§. The sealing process itself presents opportunities for contamination§§§, and the bags must be handled with the sort of care usually reserved for archaeological artifacts or small explosives¶. Additionally, one must consider the phenomenon of anaerobic bacteria¶¶, which thrive in oxygen-free environments and have been known to cause considerable distress¶¶¶.
+&nbsp;
+The historical development of sous vide represents one of those curious trajectories where necessity, accident, and institutional catering collide to produce something unexpectedly refined****. The technique was first developed in the 1970s by Georges Pralus for the Restaurant Troisgros††††, though some food historians point to earlier experiments by American and French military contractors attempting to improve field rations‡‡‡‡. What began as a method for preserving foie gras§§§ evolved into a comprehensive cooking philosophy that has since colonized professional kitchens worldwide¶¶. Modern understanding of sous vide principles has been enhanced by contributions from food scientists, physicists, and that peculiar breed of amateur enthusiast who brings engineering precision to weekend dinner preparation¶¶¶. The mathematics underlying the process—heat transfer calculations, diffusion rates, and thermal conductivity coefficients—transform the humble act of cooking into something resembling an applied physics problem*****.
+&nbsp;
+The democratization of sous vide technology over the past two decades has created a generation of home cooks who speak casually of thermal equilibrium and pasteurization curves as though these were ordinary dinner conversation topics†††††, leading to both unprecedented culinary achievements and a series of incidents‡‡‡‡ best summarized as "ambitious but regrettable." The future of the technique likely lies in its integration with other cooking methods§§§§, recognizing that while sous vide excels at certain tasks, it remains merely one tool among many¶¶¶¶—albeit one that involves more electricity and plastic than most kitchen implements have any right to*****.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*Typically plastic, though experiments with other materials have yielded results ranging from "interesting" to "evacuate the building." The Great Wax Paper Incident of 1987 at the Académie Culinaire de Lyon is not discussed in polite company. The bags must be truly impermeable, as even microscopic leaks can result in what sous vide practitioners delicately term "bag failure" and what everyone else calls "that thing floating around the water bath that used to be dinner."
+&nbsp;
+**The precision required here borders on the obsessive. We are speaking of tolerances within one degree Fahrenheit, maintained over hours. Traditional cooking methods, by contrast, operate on the principle of "somewhere between warm and inferno, probably." The psychological effect of watching a digital display hold steady at 134.0°F for three hours cannot be understated; it either soothes or maddening, depending on temperament.
+&nbsp;
+†The annals of culinary history are littered with prayers for properly cooked meat. The medieval "Hymn for the Roast" (#487 in the Gregorian-Escoffier Compendium) contains the refrain "Let it be done throughout, yet not too much, O Lord."
+&nbsp;
+††A somewhat misleading translation, as complete vacuum is neither necessary nor always desirable. The term has caused considerable confusion among physics students attempting to apply thermodynamic principles to their cooking†. Many sous vide practitioners achieve perfectly adequate results with what might charitably be called "most of the air removed," leading purists to disdain them as practitioners of "sous mostly-vide."
+&nbsp;
+†One unfortunate graduate student at Cambridge spent six months attempting to cook a chicken breast in genuine vacuum conditions before his advisor explained the misunderstanding. The thesis was never completed, though the experimental apparatus is now on display in the Department of Applied Thermodynamics as a cautionary exhibit.
+&nbsp;
+‡This is the crux of the matter, scientifically speaking. Myosin begins to denature at 122°F, actin at 150°F, and the cook's patience at approximately the two-hour mark regardless of temperature. The precise temperatures at which various proteins undergo structural changes have been mapped with a thoroughness that borders on the fetishistic.
+&nbsp;
+‡‡The final paragraph of Dr. Wilhelmina Herschel's groundbreaking 1983 paper "Thermal Properties of Protein Denaturation in Controlled Water Bath Environments" reads simply: "For goodness' sake, just keep it at 131°F." She won the Brillat-Savarin Prize for Culinary Physics that year‡.
+&nbsp;
+‡The prize itself is a small silver whisk mounted on a thermometer. Previous winners include the inventor of the blast chiller and someone who mathematically proved that toast always lands butter-side down, given standard toast height and angular momentum.
+&nbsp;
+***The water bath serves as a sort of thermal buffer state, preventing direct contact between heat source and food. This intermediate step, while seemingly unnecessary‡‡, is actually the key to the entire enterprise. It is roughly equivalent to the difference between shouting at someone and having a translator whisper your message—the content arrives the same, but the delivery is considerably more civilized.
+&nbsp;
+‡‡Traditional cooking methods, after all, simply apply heat and hope for the best. This has worked adequately for several millennia, though "adequately" here is doing considerable work.
+&nbsp;
+†††These fluctuations can be quite dramatic. Pan temperature might vary by 50-100°F based on whether you've just added food, whether anyone has opened a window, or whether Mercury is in retrograde. (The last factor is disputed by scientists but firmly believed by certain celebrity chefs who shall remain unnamed†††.)
+&nbsp;
+†††Chef Raymond "Mercury" Marseille of the now-defunct Le Thermomètre allegedly planned his entire menu around astrological considerations. The restaurant closed after three months, though whether due to the astrology or the food remains unclear. His cookbook, "Cooking by the Stars," is now a collector's item, valued primarily for its unintentional comedy.
+&nbsp;
+‡‡‡The steak question dominates sous vide discourse to an almost embarrassing degree‡‡‡. One could be forgiven for thinking the technique was invented solely for this purpose. The Steak Obsession Coefficient, as measured by the Institute of Culinary Priorities, indicates that approximately 73.6% of all sous vide discussions eventually return to steak within 8.4 minutes.
+&nbsp;
+‡‡‡The Institute, based in a remarkably`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding sous vide principles in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CONFIT_PRESERVATION_FLAVOR: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'confit_preservation_flavor',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Confit Preservation Flavor',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_cooking_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['sous_vide_principles'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_confit_preservation_flavor' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Confit Preservation Flavor: A Comprehensive Study of Fat-Based Conservation Techniques and Their Gustatory Consequences</span>
+&nbsp;
+The preservation of foodstuffs through submersion in rendered fat represents one of humanity's most elegant solutions to the eternal problem of "what to do with all this duck before it goes off*." The technique, known in culinary circles as *confit* (from the French *confire*, meaning "to preserve," though the word also carries connotations of "to candy" and "to confess one's sins," which tells you everything you need about French attitudes toward fat**), operates on principles both ancient and surprisingly sophisticated. At its core, confit preservation relies on the dual action of salt-curing followed by gentle cooking and storage in an oxygen-excluding lipid medium, creating an anaerobic environment hostile to the very bacteria that would otherwise throw a rather unpleasant party in your pantry†. The flavor development during this process is not merely a happy accident but rather a complex orchestration of enzymatic activity, Maillard reactions occurring at temperatures far below what one might expect††, and the gradual infusion of aromatics into both the preserving medium and the preserved flesh itself.
+&nbsp;
+The practical application of confit technique demands both patience and a fundamental rethinking of one's relationship with rendered animal fat***. The classical approach, as documented by the Société Conservatoire des Traditions Graisseuses et Délicieuses‡, involves a preliminary salting period of 12-24 hours‡‡, during which the salt performs its ancient magic of drawing out moisture while simultaneously breaking down proteins in a manner that would make a medieval alchemist weep with envy. Following this, the ingredient—most traditionally duck legs, though the technique has been applied to everything from pork to turnips to, in one notable incident, a complete set of encyclopedias‡‡‡—is gently submerged in fat heated to precisely 82-93°C (180-200°F)§, a temperature range chosen with the kind of precision normally reserved for defusing unexploded ordnance or calculating the trajectory of celestial bodies. The cooking time varies wildly depending on whose grandmother you ask§§, but generally extends from 2-4 hours for poultry to 8-12 hours for larger cuts of pork or beef, during which the meat surrenders to the fat in a slow-motion culinary ballet that has been described as "distressingly sensual" by at least three peer-reviewed journals§§§.
+&nbsp;
+Safety considerations in confit preparation are paramount, though historically they have been learned through the time-honored method of "doing it wrong and finding out*." The fat must form a complete seal over the preserved ingredient—even a small air bubble can create a bacterial paradise that the Institut Pasteur has colorfully termed a "microscopic Thunderdome**." Storage temperature must remain below 4°C (39°F)††, and the container must be absolutely sterile‡, as must the utensils used for extraction§. The Guild of Fat-Based Preservation§§ maintains extensive records of what they call "incidents§§§," though they prefer not to discuss the Great Goose Fat Catastrophe of 1847***, which resulted in the evacuation of three Parisian arrondissements and the creation of fourteen new public health regulations†††. Modern practitioners, benefiting from sous vide techniques‡‡‡‡, can achieve even more consistent results, though purists argue this removes the essential element of danger that makes traditional confit "worth doing§§§§."
+&nbsp;
+The flavor profile of properly executed confit stands as a testament to the principle that good things come to those who wait, though they come even better to those who wait while basting regularly in duck fat****. The long, slow cooking breaks down collagen into gelatin, creating a texture simultaneously tender and yielding, while the fat acts as both preservative and flavor vehicle, carrying aromatic compounds from any added herbs, garlic, or spices directly into the meat's cellular structure*****. What emerges from this process is not merely preserved food but a transformed substance entirely††††, possessed of what the noted gourmand Hieronymus Fatsworth-Crumble described in 1823 as "a richness that suggests the ingredient has been having a rather good time of things while you weren't looking‡‡‡‡‡." This flavor intensifies with time—confit stored for three months develops notes absent in three-week-old preparations§§§§§, leading to heated debates among scholars about optimal aging periods and whether the Guild's practice of maintaining "vintage" confit from specific years constitutes food safety heresy or culinary genius******.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*The problem of excess poultry has plagued humanity since the domestication of waterfowl in ancient Mesopotamia, approximately 5000 BCE. Archaeological evidence suggests the first attempted solution was "giving it to the neighbors," which worked until the neighbors also had too much duck. The second solution was "throw it in the river," which worked until everyone downstream complained. The third solution was confit, which actually worked, leading one ancient scribe to note in cuneiform: "Finally, a use for all this @#$%ing fat."
+&nbsp;
+**The French language contains fourteen different words for types of preserved meat and only three for "military victory," which reveals a great deal about national priorities. The Académie Française maintains that this is entirely appropriate.
+&nbsp;
+†Bacteria, despite their microscopic size, are surprisingly enthusiastic partygoers. Studies by the Institute of Microbial Social Behavior (est. 1973, defunct 1974†) have shown that given the right conditions, bacterial populations will reproduce with the kind of exponential enthusiasm normally seen only in pyramid schemes and doomsday cults.
+&nbsp;
+††The Institut was closed following what official records describe as "an unfortunate incident involving cheese cultures and the director's beard." Unofficial records suggest the director's beard may have achieved sentience. The beard itself declined to comment.
+&nbsp;
+†††The Maillard reaction, named after Louis-Camille Maillard who definitely didn't intend to have his name associated with something that sounds vaguely like a duck noise, occurs when amino acids and reducing sugars undergo a complex series of chemical reactions. At the low temperatures used in confit, these reactions proceed with geological patience, which is to say: very slowly, but inevitably, like continental drift or a tax audit.
+&nbsp;
+***Fat phobia, that peculiar modern affliction, would have baffled our ancestors to the point of medical concern. The average medieval peasant consumed approximately 40% of their calories from animal fat††††, partly because animal fat was abundant and partly because medieval peasants were not overly troubled by concerns about their "beach body." The concept of intentionally avoiding fat would have struck them as the kind of madness that results from reading too many books or spending too much time with scholars.
+&nbsp;
+††††This figure, according to Dr. Wilhelmina Foodsworth's groundbreaking work "Medieval Dietary Habits and Why Everyone Was Shorter" (Oxford University Press, 1987), varied significantly by region, season, and whether or not your lord was the type to share. Some lords were not.
+&nbsp;
+‡The Société, founded in 1743 by a group of concerned duck farmers in Gascony, maintains the world's most comprehensive archive of fat-related culinary techniques. Their headquarters in Auch contains over 14,000 volumes on the subject, plus what they claim is the preserved left leg of a duck prepared by Henri IV himself. Scientific dating suggests the leg is from 1987, but the Société insists the testing was "performed by known fat-skeptics."
+&nbsp;
+‡‡Some recipes suggest 48 hours, others as little as 6 hours. The variation appears to depend on whether the recipe author is (a) very patient, (b) very hungry, or (c) operating under the influence of wine. Most recipe authors are operating under the influence of wine‡‡‡‡‡‡.
+&nbsp;
+‡‡‡‡‡‡The culinary profession has a long and storied relationship with wine, dating back to when someone discovered that cooking while drinking made the cooking more bearable and the wine taste better. The Culinary Institute of Burgundy actually requires students to maintain a minimum blood-wine content of 0.03% during practical examinations, though they insist this is "for traditional reasons" rather than "because it's more fun that way."
+&nbsp;
+‡‡‡The Great Encyclopedia Confit Incident of 1962 occurred when Professor Magnus Cornelius von Schmaltzenberg, convinced that "if it works for duck, it works for anything," attempted to preserve his entire collection of Encyclopædia Britannica in rendered pork fat. The experiment was deemed a failure when it became apparent that while the encyclopedias were technically preserved, they were no longer readable. Von Schmaltzenberg insisted this was "beside the point" and that they had achieved "unprecedented information density`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding confit preservation flavor in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  MAILLARD_REACTION_UNDERSTANDING,</span>
+<span class="cstat-no" title="statement not covered" >  CARAMELIZATION_SCIENCE,</span>
+<span class="cstat-no" title="statement not covered" >  EMULSIFICATION_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  REDUCTION_SAUCE_MAKING,</span>
+<span class="cstat-no" title="statement not covered" >  STOCK_BROTH_FUNDAMENTALS,</span>
+<span class="cstat-no" title="statement not covered" >  MOTHER_SAUCES_FIVE,</span>
+<span class="cstat-no" title="statement not covered" >  COMPOUND_BUTTER_CREATION,</span>
+<span class="cstat-no" title="statement not covered" >  TEMPERATURE_PRECISION_COOKING,</span>
+<span class="cstat-no" title="statement not covered" >  SOUS_VIDE_PRINCIPLES,</span>
+<span class="cstat-no" title="statement not covered" >  CONFIT_PRESERVATION_FLAVOR</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

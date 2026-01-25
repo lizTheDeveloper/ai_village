@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:66fd5fd0",
+  "name": "Nova Terra",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769224852580",
+  "createdAt": 1769224852585,
+  "lastAccessedAt": 1769224852585,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769224852580",
+    "type": "magical"
+  }
+}

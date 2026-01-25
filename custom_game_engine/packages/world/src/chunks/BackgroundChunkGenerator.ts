@@ -1,4 +1,4 @@
-import type { World } from '@ai-village/core';
+import type { WorldMutator } from '@ai-village/core';
 import { THROTTLE } from '@ai-village/core';
 import type { ChunkManager } from './ChunkManager.js';
 import type { TerrainGenerator } from '../terrain/TerrainGenerator.js';
@@ -213,7 +213,7 @@ export class BackgroundChunkGenerator {
    * @param world - World instance for chunk generation and event emission
    * @param currentTick - Current game tick for throttling
    */
-  processQueue(world: World, currentTick: number): void {
+  processQueue(world: WorldMutator, currentTick: number): void {
     // Throttle: only process at configured interval
     if (currentTick - this.lastProcessTick < this.throttleInterval) {
       return;
@@ -443,7 +443,7 @@ export class BackgroundChunkGenerator {
    * @param world - World instance
    * @returns Current TPS or null if unavailable
    */
-  private getCurrentTPS(world: World): number | null {
+  private getCurrentTPS(world: WorldMutator): number | null {
     // TODO: Implement TPS access when performance monitoring API is available
     // Example:
     // if (world.performanceMonitor) {

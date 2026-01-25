@@ -37,11 +37,12 @@ interface QueuedAction {
 /** Type guard to check if component is an ActionQueue with methods */
 function isActionQueue(component: Component | undefined): component is ActionQueueWithMethods {
   if (!component) return false;
+  const comp = component as Record<string, unknown>;
   return (
-    typeof (component as any).isEmpty === 'function' &&
-    typeof (component as any).size === 'function' &&
-    typeof (component as any).peek === 'function' &&
-    Array.isArray((component as any).queue)
+    typeof comp.isEmpty === 'function' &&
+    typeof comp.size === 'function' &&
+    typeof comp.peek === 'function' &&
+    Array.isArray(comp.queue)
   );
 }
 import {

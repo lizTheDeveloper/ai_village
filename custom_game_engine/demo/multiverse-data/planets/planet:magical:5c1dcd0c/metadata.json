@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5c1dcd0c",
+  "name": "Nova Mundo",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769240418720",
+  "createdAt": 1769240418844,
+  "lastAccessedAt": 1769240418844,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769240418720",
+    "type": "magical"
+  }
+}

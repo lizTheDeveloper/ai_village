@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
-  WorldImpl,
+  World,
   EventBusImpl,
   StateMutatorSystem,
   PlantComponent,
@@ -61,7 +61,7 @@ function createMockSpeciesLookup(): (id: string) => PlantSpecies {
 }
 
 describe('PlantSystem', () => {
-  let world: WorldImpl;
+  let world: World;
   let system: PlantSystem;
   let stateMutator: StateMutatorSystem;
   let eventBus: EventBusImpl;

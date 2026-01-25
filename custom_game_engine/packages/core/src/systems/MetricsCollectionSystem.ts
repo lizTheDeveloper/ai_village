@@ -725,7 +725,7 @@ export class MetricsCollectionSystem extends BaseSystem {
       const entity = this.world.getEntity(data.entityId);
       if (entity?.hasComponent(CT.SoulIdentity)) {
         // Get name from identity component (not agent component)
-        const identityComp = entity.getComponent(CT.Identity) as { name?: string } | undefined;
+        const identityComp = entity.getComponent(CT.Identity);
         const agentName = identityComp?.name ?? 'Unknown';
 
         this.canonRecorder.recordEvent('agent:died', this.world, {
@@ -759,8 +759,8 @@ export class MetricsCollectionSystem extends BaseSystem {
       const agent2 = this.world.getEntity(data.agent2);
       if (agent1?.hasComponent(CT.SoulIdentity) && agent2?.hasComponent(CT.SoulIdentity)) {
         // Get names from identity components
-        const agent1Identity = agent1.getComponent(CT.Identity) as { name?: string } | undefined;
-        const agent2Identity = agent2.getComponent(CT.Identity) as { name?: string } | undefined;
+        const agent1Identity = agent1.getComponent(CT.Identity);
+        const agent2Identity = agent2.getComponent(CT.Identity);
         const agent1Name = agent1Identity?.name ?? 'Unknown';
         const agent2Name = agent2Identity?.name ?? 'Unknown';
 
@@ -943,7 +943,7 @@ export class MetricsCollectionSystem extends BaseSystem {
     const agents = world.query().with(CT.Agent).with(CT.Needs).executeEntities();
 
     for (const agent of agents) {
-      const needsComponent = agent.components.get(CT.Needs);
+      const needsComponent = agent.getComponent(CT.Needs);
 
       if (!needsComponent) {
         continue; // Skip if no needs component

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:260c304c",
+  "name": "Epsilon Triton",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769223139381",
+  "createdAt": 1769223139397,
+  "lastAccessedAt": 1769223139397,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769223139381",
+    "type": "magical"
+  }
+}

@@ -1,0 +1,2083 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/basic_construction_materials-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> basic_construction_materials-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WOOD_PROPERTIES_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wood_properties_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wood Properties Construction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wood_properties_construction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Wood Properties Construction: A Foundational Study in Material Selection and Structural Integrity</span>
+&nbsp;
+The fundamental understanding of wood properties in construction begins with a deceptively simple premise: not all trees are created equal, and certainly not all of them want to become houses*. The conscientious builder must first comprehend that wood, being the processed remains of something that was recently vertical and alive, possesses certain characteristics inherited from its arboreal existence—grain direction, moisture content, species-specific density, and an occasionally alarming tendency to remember its original shape†. Modern construction science has identified approximately forty-seven distinct properties of wood that matter to builders‡, though in practice, most construction workers focus on the essential three: "Will it hold up the roof?", "Will it rot?", and "Can I actually afford this?"**
+&nbsp;
+The practical applications of wood in construction rely heavily upon matching the correct species and cut to the intended purpose††. Structural lumber demands different characteristics than finish carpentry; a floor joist has different requirements than decorative trim‡‡. The infamous Collapse of the Baroque Ballroom in 1847 serves as a cautionary reminder that using pine where oak was specified is not merely an aesthetic choice but a mathematical one involving vectors, load-bearing capacity, and the social embarrassment of having thirty-seven dancers suddenly occupying the wine cellar***. Modern building codes†††, developed over centuries of documented failures, now specify minimum requirements for various applications, though the codes themselves have become so voluminous that the International Building Code now requires its own structural support system when stored in physical form‡‡‡.
+&nbsp;
+Safety considerations when working with wood extend beyond the obvious dangers of saws, splinters, and the psychological trauma of miscut trim pieces****. Proper wood selection prevents long-term structural failure; proper treatment prevents rot, insect infestation, and the even more dreaded arrival of the Dry Rot Council's enforcement division††††. The moisture content of lumber proves particularly critical—wood that is too wet will shrink as it dries in place, leading to gaps, cracks, and the phenomenon builders call "character" when speaking to clients and "catastrophic failure" when speaking to insurance adjusters‡‡‡‡. The ancient builders understood these principles intuitively*****; modern builders have the advantage of moisture meters, engineering tables, and detailed documentation of what happens when you ignore both†††††.
+&nbsp;
+The historical development of wood construction knowledge reads like a catalog of incremental disasters punctuated by occasional triumphs‡‡‡‡‡. From the early Neolithic period, when humans first noticed that stacking logs horizontally created more stable dwellings than hoping trees would grow into house shapes******, through the medieval timber-frame revolution†††††††, to the modern engineered lumber industry's ability to reconstitute sawdust into beams stronger than the original tree‡‡‡‡‡‡, humanity has refined its relationship with wood through a process the Guild of Historical Builders describes as "aggressive trial and error."******* The modern practitioner benefits from millennia of accumulated wisdom, detailed material science, and the sobering knowledge that despite all our advances, wood remains fundamentally a product of biology, not engineering, and occasionally acts like it†††††††††.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*The Arboreal Consent Controversy of 1823 remains a philosophical rather than practical concern, though the Society for Ethical Forestry maintains that wood harvested without proper negotiation exhibits 3.7% more splitting. Citation needed. And possibly medication.
+&nbsp;
+†This phenomenon, technically termed "memory grain reversion," has been documented in 847 cases by the Institute of Structural Surprises. The most dramatic incident involved a mahogany staircase in Bombay that, after 23 years of faithful service, decided to resume growing and pushed through the roof of Lord Weatherby's study‡. Lord Weatherby was, by all accounts, significantly surprised.
+&nbsp;
+‡The Weatherby Incident of 1891 remains classified by the British Crown, though leaked documents suggest the staircase achieved a height of seventeen feet before groundskeepers managed to convince it that it was, in fact, deceased and should act accordingly**.
+&nbsp;
+**Methods of convincing included pruning shears, strong language, and eventually a philosophical discussion about the nature of death conducted by a visiting Buddhist monk. The staircase capitulated after three days.
+&nbsp;
+††The ancient text *Lignum Selectum et Applicationes Terribilis* (Wood Selection and Terrible Applications), attributed to the Roman builder Marcus Fabricatus, devotes 47 pages to proper wood selection and 213 pages to case studies of improper wood selection. The case studies include illustrations. The illustrations suggest Romans had an admirably dark sense of humor.
+&nbsp;
+‡‡The Guild of Carpenters maintains a Museum of Poor Decisions in their headquarters in Baden-Baden. The centerpiece is a load-bearing column made of balsa wood, recovered from the Summer Palace of Count Friederich the Optimistic. The column is displayed next to the Count's last words: "But it's so much lighter!"
+&nbsp;
+***The Baroque Ballroom Incident was meticulously documented by insurance investigators, who noted that while all 37 dancers survived, the wine collection did not. The subsequent lawsuit (Dancers Guild vs. Count Rotherham's Estate) established the legal principle of "reasonable structural expectation"†††. The Count's architect fled to Bavaria and was never heard from again, though some historians believe he later designed the Leaning Tower of Pisa‡‡‡.
+&nbsp;
+†††The principle of "reasonable structural expectation" now forms the foundation of modern building codes. It states, roughly translated from legal Latin, "Build things so they don't fall down at inopportune moments, and if they do fall down, make sure nobody was doing anything important at the time."
+&nbsp;
+‡‡‡This is almost certainly untrue. The Leaning Tower of Pisa was completed in 1372; the Ballroom Incident occurred in 1847. However, given the evidence of temporal anomalies in certain architectural failures****, we cannot entirely rule it out.
+&nbsp;
+****The Department of Impossible Architecture at the University of Freiburg has documented seventeen cases of buildings that failed before they were built, three cases of buildings that existed in multiple time periods simultaneously, and one case of a cottage that showed up to its own demolition three days early and collapsed out of spite. The Department's motto is "Sometimes Buildings Are Just Like That."
+&nbsp;
+‡‡‡‡The current International Building Code, in its latest edition, weighs approximately 47 pounds and contains 6,942 pages. The International Building Code Building Code, which specifies how to store the International Building Code safely, weighs 12 pounds and cross-references the original code 1,247 times. There are plans for an International Building Code Building Code Building Code, but the recursive irony has thus far prevented funding.
+&nbsp;
+*****Ancient builders, lacking moisture meters, employed various folk methods to test wood readiness, including: hitting it with a stick and listening to the sound, checking whether it floated at precisely the correct buoyancy, consulting oracles, and the highly scientific method of "using it anyway and seeing what happens." The last method proved most popular and generated the most data, though rarely in a convenient format.
+&nbsp;
+†††††The Insurance Actuaries' Guide to Wood Failure (14th Edition) contains the memorable passage: "Wood that is too wet will shrink. Wood that is too dry will expand. Wood that is exactly right will do whatever it wants anyway because wood remembers when it was a tree and trees do not take instructions well."
+&nbsp;
+‡‡‡‡‡Consider the Elder Texts of Carpentry, written in Old Norse on birch bark (ironic, given the subject matter) around 850 CE. These texts contain wisdom such as "Oak for strength, pine for speed, willow for regret"‡‡‡‡‡‡ and the considerably more pragmatic "If you cannot lift it, you cannot build with it; if you cannot build with it, perhaps consider smaller ambitions."
+&nbsp;
+‡‡‡‡‡‡The phrase "willow for regret" refers to willow's tendency to rot within eighteen months of installation, leading to what medieval builders termed "the period of professional reassessment" and what we would call "unemployment."
+&nbsp;
+******The Great Tree-Growing Experiment of the Neolithic period (approximately 8,000 BCE) was abandoned after three generations when it became clear that while trees could be encouraged to grow in interesting shapes, they could not be encouraged to grow on any timeline useful to individual human lifespan. The Experiment's chief architect, whose name is lost to history, reportedly died at age seventy still waiting for his bedroom to finish growing. His descendants converted the project into a shrine, which itself collapsed in a windstorm after 200 years, teaching both theological and structural lessons.
+&nbsp;
+†††††††The timber-frame revolution of medieval Europe produced architectural marvels`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wood properties construction in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TIMBER_SELECTION_CRITERIA: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'timber_selection_criteria',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Timber Selection Criteria',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wood_properties_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_timber_selection_criteria' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Timber Selection Criteria</span>
+&nbsp;
+The selection of appropriate timber for construction purposes represents one of humanity's oldest technical challenges, requiring the builder to balance structural necessity against material reality*. The process involves examining multiple characteristics simultaneously—a skill that separates the master carpenter from the enthusiast with a new chisel and dangerous levels of confidence†. Modern timber selection follows principles established over millennia, though contemporary practitioners benefit from not having to personally discover which trees explode when sawn‡.
+&nbsp;
+The fundamental criteria for timber selection include species identification, moisture content, grain orientation, presence of defects, and dimensional stability**. Each criterion interacts with the others in ways that the Guild of Structural Integrity describes as "annoyingly interconnected"††. For example, a perfectly straight-grained piece of timber with ideal moisture content becomes considerably less ideal if it contains the nest of a Carpentarian bore beetle‡‡, a lesson learned repeatedly throughout history***. The skilled practitioner develops an eye for these factors, though the Worshipful Company of Fallen Scaffolding recommends developing this eye while standing at ground level†††.
+&nbsp;
+Practical timber selection begins with understanding the intended application, as timber suitable for decorative paneling proves catastrophically unsuitable for load-bearing beams‡‡‡. The moisture content, measured as a percentage of the timber's oven-dry weight, should generally fall between 12-19% for interior construction****, though the specifics depend on regional climate and the builder's relationship with the gods of warping and twisting††††. Grain direction matters immensely—timber loaded perpendicular to the grain possesses roughly 5% of the strength of timber loaded parallel to the grain‡‡‡‡, a ratio that has remained consistent since the invention of both timber and mathematics*****.
+&nbsp;
+The presence of defects requires careful evaluation, as not all imperfections prove equally problematic†††††. Knots, checks, shakes, and splits each affect timber performance differently, with the International Academy of Preventable Disasters maintaining extensive documentation of which defects were ignored before various memorable collapses‡‡‡‡‡. Modern grading systems classify timber systematically, assigning grades that predict performance with reasonable accuracy, though the Ancient Guild of Wishful Thinking suggests that hoping really hard can add approximately 0.003% to load-bearing capacity******. The wise builder selects timber not for the structure they imagine, but for the structure that must actually exist in the physical realm—a distinction that saves considerable embarrassment and paperwork††††††.
+&nbsp;
+Safety considerations in timber selection extend beyond structural adequacy to include fire resistance, pest resistance, and the probability of supernatural infestation‡‡‡‡‡‡. The latter concern has decreased significantly since the Treaty of 1823*******, though certain ancient forests still require special handling procedures†††††††. Environmental factors also play a role, as timber intended for outdoor use requires different selection criteria than timber for climate-controlled interiors, with exposure to weather reducing structural capacity by amounts ranging from "slightly concerning" to "that used to be a deck"‡‡‡‡‡‡‡. Above all, the selector of timber must remember that wood remains a natural material, grown by trees who were never consulted about their future role in construction and who may have had other plans********.
+&nbsp;
+---
+&nbsp;
+*According to the diaries of Ephraim Woodsworth (1742-1819), who pioneered the radical technique of "looking at the timber before buying it." His earlier career had been less successful.
+&nbsp;
+†The Guild of Emergency Carpentry reports that approximately 73.4% of amateur construction projects involve at least one moment where the builder stares at a piece of timber and whispers, "Why did I think I could do this?" This percentage rises to 94.7% for projects involving compound angles.
+&nbsp;
+‡The Exploding Elm Incident of 1547 remains the subject of scholarly debate. Contemporary accounts describe a sound "like thunder, if thunder were made of splinters." The Arboreal History Society suggests this was actually a meteorological event that coincidentally occurred near a sawmill, but eyewitness testimony mentions "far too much sap for comfort."†
+&nbsp;
+†The sawmill's insurance claim was denied on grounds that "acts of timber" were not covered under standard policies.
+&nbsp;
+**These criteria were formalized by the Council of People Who Learned the Hard Way, founded in 1603 after the Great Wobbling of Canterbury.††
+&nbsp;
+††The Great Wobbling was not, technically, a collapse. The cathedral simply "relocated itself vertically by approximately six feet in an unplanned manner." The Bishop at the time declared it "a miracle of faith," while the stonemasons declared it "a consequence of using green timber in the roof framing."†††
+&nbsp;
+†††The stonemasons were not invited to the celebratory feast.
+&nbsp;
+‡‡The Carpentarian bore beetle (Lignodestruction horrificus) is believed extinct, though reports of its continued existence arrive approximately every seven years from regions where building inspectors fear to tread. It was named by Walter Möbius, who discovered seventeen of them inside what he had confidently assured was "perfectly sound oak." His subsequent career focused on textile manufacturing.‡
+&nbsp;
+‡Möbius invented a fabric that could not be cut by conventional scissors, which he marketed as "revenge against all materials."
+&nbsp;
+***The Archives of Preventable Architectural Tragedy contain 2,847 separate incidents involving undiscovered beetle nests, each documented with the phrase "the builder was confident" or variations thereof.
+&nbsp;
+†††The Company maintains a memorial garden for practitioners who developed their expertise too rapidly while standing at elevated heights. The garden is strictly at ground level and features no stairs.
+&nbsp;
+‡‡‡This lesson was most famously ignored during the construction of the Leaning Library of Lüdenscheid****, which now leans at exactly 47.3 degrees from vertical—an angle that survives despite physics primarily through what structural engineers describe as "sheer bloody-mindedness."
+&nbsp;
+****Not to be confused with the Leaning Library of Lüdheim, which leans in the opposite direction. The two libraries are 340 miles apart, yet their respective leans would, if extrapolated, cause them to collide approximately 800 feet above sea level. Local tourism boards have deemed this "serendipitous."
+&nbsp;
+****The measurement requires specialized equipment and three days of observation, as timber's moisture content varies with ambient humidity, time of day, phase of moon, and the timber's personal mood. The Atmospheric Timber Consortium publishes daily "Wood Moisture Probability Charts" that are consulted by serious craftspeople and completely ignored by everyone else.†
+&nbsp;
+†Ignoring the charts correlates with increased door-sticking incidents at a rate of 12:1.
+&nbsp;
+††††These gods were worshipped extensively in Northern Europe until the advent of kiln drying, at which point they appear to have either departed or downsized their operations significantly. The Temple of Straight Boards in Uppsala maintains a single priestess who annually requests that timber remain "approximately the same shape" throughout the year. Her success rate is estimated at 44%.‡
+&nbsp;
+‡This is considered quite good.
+&nbsp;
+‡‡‡‡This ratio was first calculated by Archimedes during a period of his career not often discussed in classical education, when he attempted to build a bathtub. The project was abandoned after the catastrophic failure of the cross-grain base supports, an incident that contributed to his later obsession with displacement and buoyancy.
+&nbsp;
+*****The gods of mathematics wish it known that they discovered timber, not the other way around. This has been a source of ongoing theological dispute since the Council of Nicea, where it was deemed "perhaps not the most pressing concern."
+&nbsp;
+†††††A complete taxonomy of timber defects fills approximately 340 pages in the Standard Compendium of Wood Problems, which is considerably shorter than the Unabridged Compendium (2,100 pages) but longer than the Optimistic Guide to Perfect Timber (4 pages, mostly blank).
+&nbsp;
+‡‡‡‡‡The collapses are organized chronologically, geographically, and by structural member that failed first. The most popular touring exhibit features the Category of "Beam That Everyone Agreed Looked Fine But Was Definitely Not Fine."
+&nbsp;
+******The Guild was disbanded in 1891 after the Statistical Reformation, though splinter groups continue to operate in regions with poor building code enforcement. Their motto, "Mīrābile vīsū" (Wonderful to look at), omits the latter half of the original phrase: "but please stand well back."
+&nbsp;
+††††††The paperwork for a structural failure involves, on average, 47 forms across 6 regulatory bodies. The Guild of Administrative Torture notes this averages only 0.3 forms per foot of vertical travel during collapse, "which seems quite efficient, really."
+&nbsp;
+‡‡‡‡‡‡Supernatural infestation peaked during the Baroque period,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding timber selection criteria in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WOOD_GRAIN_UNDERSTANDING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wood_grain_understanding',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wood Grain Understanding',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['timber_selection_criteria'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wood_grain_understanding' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `WOOD GRAIN UNDERSTANDING: A Comprehensive Analysis of Directional Fibrous Phenomena in Arboreal Construction Materials</span>
+&nbsp;
+The understanding of wood grain represents one of humanity's earliest technological achievements*, though curiously one that approximately 47.3% of amateur woodworkers still manage to get catastrophically wrong**. At its most fundamental level, wood grain refers to the directional arrangement of cellular structures within timber†, formed as the tree grows in its annual cycles of optimism and subsequent disappointment with the weather††. These patterns are not merely decorative—though the Aesthetic Monks of the Carpathian Valleys did attempt to worship them as such between 1743 and 1751†††—but rather represent the fundamental structural logic by which trees choose to exist‡.
+&nbsp;
+The practical application of grain understanding in construction follows three cardinal principles, which the Ancient Guild of Timber-Handlers called the "Three Warnings Against Hubris"‡‡: First, one must cut with the grain whenever structural integrity permits‡‡‡, as cutting against it produces what the Maesters of the Lumber Concordance refer to as "aggressive splinterification"*. Second, wood is strongest when loaded parallel to its grain**—a fact discovered independently by at least forty-seven different civilizations, usually immediately after something important collapsed††. Third, and most critically, grain direction must be considered in joinery, where misalignment causes what the Technical Standards Committee of 1893 delicately termed "eventual catastrophic disassembly"†††.
+&nbsp;
+The safety considerations surrounding grain understanding cannot be overstated, though they frequently are‡. The documented cases of grain-related incidents fill approximately 2,347 volumes in the Archives of the International Brotherhood of Regretful Carpenters‡‡, ranging from minor splinters to the famous "Inverted Joist Catastrophe of Turin" (1672), which we shall not discuss in polite company‡‡‡. Modern best practice requires the practitioner to examine grain direction before every cut*, consult with the wood regarding its preferences**—a practice that sounds mystical but is actually quite practical††—and maintain sharp tools specifically because dull blades tend to follow grain lines rather than intended cut lines, leading to what insurance adjusters call "interpretive carpentry"†††.
+&nbsp;
+The historical development of grain understanding traces back to the Neolithic period, when early humans first noticed that some pieces of wood split more readily than others‡. The Bronze Age saw the development of systematic grain analysis*, while the Iron Age produced the first written treatises on the subject, most notably the Mesopotamian text "Please Stop Splitting Everything the Wrong Way: A Plea to the Apprentices"**. Medieval Europeans developed elaborate theories involving the Four Humours of Wood††, which were completely wrong but resulted in surprisingly sound construction practices†††. The modern understanding emerged gradually through the 18th and 19th centuries, culminating in the formation of the International Committee for Grain Standardization in 1891‡, whose 847-page report on the subject remains unread to this day‡‡.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+&nbsp;
+* The exact dating remains controversial. The Council of Dendrochronological Historians places it somewhere between "definitely after fire" and "probably before the wheel," which narrows it down to approximately 400,000 years. They are very proud of this precision.
+&nbsp;
+** This statistic comes from the Bureau of Preventable Workshop Disasters, which tracks such things with disturbing enthusiasm. Their annual reports make for surprisingly gripping reading, assuming one enjoys cascading failure analyses. The 1997 edition's chapter on "Grain-Related Hubris: A Retrospective" won a prize for technical writing, though what kind of prize remains unclear. The trophy was made of wood and subsequently split along unexpected grain lines.
+&nbsp;
+† The cells in question are called tracheids in softwoods and vessels in hardwoods, terms which make wood sound like it has a cardiovascular system. This is not entirely inaccurate—trees do move fluids through these structures—but it does lead to uncomfortable conversations when someone refers to "bleeding the oak" at polite dinner parties. The Arboreal Physiological Society of 1823 attempted to standardize these terms but dissolved after the Great Taxonomical Schism, which was mostly about lunch arrangements but officially about vessel nomenclature.
+&nbsp;
+†† Trees, being long-lived organisms, develop what dendromancers* call "seasonal pessimism," evidenced by the darker latewood that forms when the tree realizes summer is ending and winter approaches. This creates the visible grain patterns. The optimistic earlywood grows quickly in spring, being less dense and lighter in color. This cycle continues until something interrupts it—typically an axe, though sometimes disease, lightning, or determined beavers.
+&nbsp;
+* Dendromancy is not officially recognized by any accredited institution, but the Dendromancers' Guild of Lower Bavaria doesn't let this stop them. They meet every third Thursday and have excellent baked goods. Their predictions about tree growth patterns are accurate approximately 67% of the time, which is better than meteorology†.
+&nbsp;
+† This comparison was made by the Royal Society of Comparative Professional Accuracy in 1923 and resulted in three duels, two lawsuits, and one strongly worded letter to The Times. The meteorologists argued that predicting atmospheric conditions was inherently more complex than examining tree rings. The dendromancers argued that at least trees stay still while you're looking at them. Both made valid points.
+&nbsp;
+††† The Aesthetic Monks believed that particularly beautiful grain patterns were messages from the divine, specifically from Sylvanus, the Roman god of woods, whom they insisted was still actively employed despite the general obsolescence of his position following the widespread adoption of Christianity. They produced thousands of pages of "translations" from various wood grains, which read suspiciously like standard monastic complaints about the quality of breakfast porridge. The movement collapsed when their Grand Abbot was caught painting fake grain patterns onto plain timber. The scandal, known as "Graingate," rocked the ecclesiastical community for decades**.
+&nbsp;
+** Although "rocked" might be too strong a word. "Mildly disturbed" is perhaps more accurate. "Momentarily distracted from their usual concerns" is probably closest to the truth. The ecclesiastical community of the 18th century had a remarkable capacity for ignoring scandals that didn't directly impact their funding.
+&nbsp;
+‡ This is known as the "Principle of Least Resistance" or, in the original German, "Prinzip des Nicht-Gegen-Das-Holz-Kämpfens" (Principle of Not Fighting With The Wood). The principle was formalized by Klaus von Waldmann in 1634, though he noted that it had been common knowledge among actual woodworkers for several thousand years. Von Waldmann's contribution was primarily writing it down in unnecessarily complex language, a tradition that continues in academic circles to this day.
+&nbsp;
+‡‡ The Guild published these principles in 1456, carved into a large oak beam that subsequently split along an ignored grain line, which the Guild insisted was "an instructional demonstration" rather than "proof we should have consulted our own principles." The original beam is housed in the Museum of Ironic Artifacts in Stockholm, displayed next to a glass hammer and a waterproof teabag††.
+&nbsp;
+†† The Museum of Ironic Artifacts specializes in objects that failed at their intended purpose in symbolically appropriate ways. It is the third most popular museum in Stockholm, after the Vasa Museum (which houses a warship that sank on its maiden voyage) and the Museum of Ordinary Things That Weren't As Ordinary As Everyone Thought (which closed in 2003 after it turned out everything in it was, in fact, quite ordinary).
+&nbsp;
+‡‡‡ "Aggressive splinterification" is characterized by the sudden and unexpected conversion of a solid piece of wood into approximately 2,000 individual splinters, typically directed at the face of whoever was doing the cutting. The Maesters of the Lumber Concordance—a scholarly organization that existed briefly between 1788 and 1791 before being dissolved due to what the minutes describe as "philosophical differences regarding oak"—documented 127 cases of this phenomenon. Their lead researcher, Maestro Johann Splittenheimer, contributed the most detailed accounts, having personally experienced aggressive splinterification six times. His final paper, titled "I Really Should Have Learned By Now," was published posthumously†.
+&nbsp;
+† Splittenheimer survived all six incidents but retired from experimental woodworking after the last one, which scattered splinters across an estimated 40 square meters and embedded three pieces in the ceiling. He spent his remaining years teaching music theory, which he found "considerably less violent." His autobiography, "Confessions of a Former Wood Botherer," is considered a cautionary classic.
+&nbsp;
+** This principle seems obvious until one tries to use a wooden beam as a lateral support while loading it perpendicular to the grain, at which point the wood makes its feelings known through the medium of sudden structural failure.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wood grain understanding in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WOOD_SEASONING_DRYING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wood_seasoning_drying',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wood Seasoning Drying',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wood_grain_understanding'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wood_seasoning_drying' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `WOOD SEASONING DRYING: A COMPREHENSIVE EXAMINATION OF MOISTURE REDUCTION METHODOLOGIES IN CONSTRUCTION TIMBER</span>
+&nbsp;
+The removal of moisture from wood, colloquially termed "seasoning," represents one of humanity's oldest technological achievements*, and paradoxically, one we continue to misunderstand with impressive consistency**. At its fundamental level, wood seasoning involves the gradual reduction of moisture content from freshly harvested timber—typically containing between 40% and 200% moisture content relative to its dry weight***—down to approximately 6-20% depending on intended use and climate†. This process occurs through either air-drying, which relies upon natural atmospheric conditions and the patient passage of time††, or kiln-drying, which employs artificial heat and represents humanity's eternal desire to make trees dry faster than trees would prefer to dry†††.
+&nbsp;
+The practical applications of proper seasoning extend far beyond mere construction convenience; they touch upon the very philosophical nature of working with materials that were, until quite recently, alive‡. Air-seasoning typically requires one year of drying time per inch of board thickness‡‡, a rule so inconvenient that it has been ignored approximately 67.3% of the time throughout recorded history‡‡‡, leading to what the International Board of Carpentry Failures has termed "predictable disasters of an entirely preventable nature§." Modern kiln-drying reduces this timeframe to weeks or even days, though it requires substantial energy investment and the ability to resist the temptation to open the kiln door "just to check" every few hours§§. The objective remains consistent across methods: achieving equilibrium moisture content (EMC) appropriate to the wood's final service environment, thereby preventing the twin catastrophes of warping and checking§§§.
+&nbsp;
+Historical records indicate that ancient civilizations understood wood seasoning principles with remarkable sophistication*, though their documentation methods leave much to be desired**. The Mesopotamians reportedly constructed dedicated seasoning sheds as early as 3000 BCE†, while medieval European guilds maintained such elaborate seasoning protocols that apprentices spent their first two years doing little but rotating boards and feeling them for dampness††. Contemporary best practices recommend stacking lumber with properly spaced stickers‡, maintaining adequate air circulation‡‡, and monitoring with moisture meters rather than the traditional method of "hitting it and listening"‡‡‡. Safety considerations primarily concern the prevention of biological degradation during the seasoning process§—certain fungi find partially dried wood to be an ideal habitat§§, as do various insects whose life goals center entirely around consuming construction materials§§§.
+&nbsp;
+The intersection of traditional wisdom and modern technology reveals that our ancestors were simultaneously more patient and more reckless than contemporary practitioners*. While we now possess sophisticated moisture meters, climate-controlled kilns, and comprehensive charts correlating humidity to equilibrium moisture content**, the fundamental principle remains unchanged: wood must be dried slowly enough to prevent catastrophic stress-checking, yet quickly enough to prevent biological attack and the heat death of the universe, whichever comes first***. The seasoning process represents a negotiation between human timescales and botanical realities†, conducted through the medium of carefully stacked boards and an uncomfortable amount of waiting††.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*Archaeological evidence suggests that the earliest humans learned about wood seasoning approximately fifteen minutes after the first human attempted to build something from a freshly cut tree, watched it warp into an entirely different shape, and uttered what linguists believe to be humanity's first curse word.
+&nbsp;
+**The Great Lumber Shed Collapse of 1847, which occurred in Bavaria when a carpenter assured everyone that "three months is basically the same as twelve months," has been cited in 47 different carpentry textbooks as Evidence That Time Is Not Negotiable. The shed was circular. It became an ellipse. Then it became firewood.
+&nbsp;
+***This percentage exceeds 100% because wood can contain more water by weight than it contains actual wood material, a fact that disturbs people upon first learning it. The record is held by water tupelo, which can achieve 250% moisture content, meaning a freshly cut board weighing 100 pounds contains approximately 71 pounds of wood and 179 pounds of water, plus 30 pounds of regret from whoever has to carry it†.
+&nbsp;
+†The International Guild of Log Bearers maintains a Hall of Hernias in Geneva, where particularly ill-advised lifting attempts are commemorated with small bronze plaques and much shaking of heads.
+&nbsp;
+††The "patient passage of time" here should be understood as "a period during which you will forget about the wood entirely, become interested in other projects, move to a different city, inherit the wood in your grandfather's will, and then remember you had meant to build a bookshelf twenty-three years ago."
+&nbsp;
+†††Trees, when consulted on the matter, have no comment, being dead. The ancient Druids believed that trees could communicate their displeasure through warping, and were not entirely wrong‡.
+&nbsp;
+‡The phenomenon known as "reverse warping" or "optimistic straightening" occurs when a board, having been left in its warped state long enough, partially returns to true—not through any physical mechanism, but because the carpenter's memory of how straight the board was originally has deteriorated with time‡‡.
+&nbsp;
+‡‡The Department of Cognitive Carpentry at the University of Somewhere Plausible has published seventeen papers on the "Memory Degradation Theory of Acceptable Tolerances," which posits that if you wait long enough before measuring, everything is basically square.
+&nbsp;
+‡‡‡The International Board of Carpentry Failures (IBCF) was established in 1923 after the Rotterdam Warehouse Incident, which involved 3,000 improperly seasoned floorboards, a particularly humid summer, and what witnesses described as "architectural origami." The IBCF's motto is "We Told You So" in twelve languages§.
+&nbsp;
+§Including three dead languages, which the IBCF felt had particular authority when it came to warning about decisions whose consequences would outlast the decision-makers.
+&nbsp;
+§§The average kiln operator opens the door prematurely 4.7 times per drying cycle, despite knowing full well that this extends the drying time and wastes energy. The Kiln Operators' Association of North America has publicly denied these statistics while privately admitting that the actual number is probably closer to 8.2 times, and that's just counting the times they admit to themselves they've done it§§§.
+&nbsp;
+§§§There exists a subspecialty of psychology dedicated entirely to why humans cannot leave sealed systems alone, called "Schrödinger's Kiln Syndrome," though the original Schrödinger never had any such kiln and was far more concerned with cats*.
+&nbsp;
+*Cats, it should be noted, also struggle with the concept of leaving sealed systems alone, though they at least have the excuse of being cats.
+&nbsp;
+**The Carpenter's Knuckle Method, which involved rapping one's knuckles against a board and judging dryness by the resulting sound, was standard practice until 1956, when the first affordable moisture meters became available. Veterans of the Knuckle Method can still be identified by their calloused hands and tendency to knock on things inappropriate for knocking, such as glass windows, sleeping spouses, and—in one documented case—a hornets' nest**.
+&nbsp;
+**The defendant in Henderson v. Hornets' Nest (1962) successfully argued that six decades of professional habit constituted legitimate temporary insanity. The court agreed, while noting that this was "an unusually stupid thing to have done regardless of professional background."
+&nbsp;
+***Dr. Ephraim Longwood of the Theoretical Wood Institute calculated that at current rates of human impatience versus proper seasoning timeframes, the universe would experience heat death approximately 47 billion years before humanity collectively agreed to wait the full recommended drying period for white oak†.
+&nbsp;
+†White oak requires two to three years for proper air seasoning. The average person who has purchased white oak lumber waits approximately eleven months before deciding it is "probably fine." The wood knows. The wood remembers.
+&nbsp;
+††"The Gift of Time: Meditations on Wood Seasoning" by the fictional scholar Dame Patricia Planksworth (1823-1897) remains the definitive philosophical text on the subject, though modern readers struggle with her tendency to use seventeen pages describing the experience of watching a board dry††.
+&nbsp;
+††Planksworth's magnum opus, "The Board: An Epic," weighs fourteen pounds and contains only three photographs, all of the same piece of ash taken at twelve-month intervals. Critics called it "unnecessarily comprehensive." Supporters called it "insufficient." Both groups agreed that reading it required more patience than actually seasoning wood.
+&nbsp;
+‡Stickers, in this context, are not adhesive decorations but rather small wooden spacers placed between layers of stacked lumber to permit air circulation. The confusion has led to seventeen documented cases of people attempting to dry lumber with actual decorative stickers, most notably the 2003 incident in Portland where someone create`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wood seasoning drying in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LUMBER_DIMENSIONAL_STANDARDS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'lumber_dimensional_standards',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Lumber Dimensional Standards',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wood_seasoning_drying'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_lumber_dimensional_standards' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Lumber Dimensional Standards: A Study in Measured Disappointment</span>
+&nbsp;
+The fundamental principle underlying modern lumber dimensional standards is both simple and profoundly misleading: a "two-by-four" is neither two inches nor four inches in any dimension that matters*. This phenomenon, which the International Board of Carpentry Standards describes as "perfectly logical once you stop thinking about it," stems from the ancient practice of wood seasoning and drying**, whereby freshly cut lumber loses approximately 0.75 inches of dimension per face during the curing process***. The modern carpenter must therefore operate in a state of perpetual mathematical adjustment, wherein the stated dimension of lumber exists in a quantum superposition with its actual dimension until the moment of measurement†.
+&nbsp;
+In practical application, this creates what the Guild of Confused Contractors calls "the paradox of the missing half-inch"††, requiring builders to maintain elaborate conversion charts†††, perform ritualistic measurements‡, and develop an almost supernatural ability to add three-quarters while subtracting hope‡‡. The technique known as "dimensional reconciliation" involves accepting that rough-sawn lumber dimensions refer to the wood's state before planing and drying‡‡‡, while finished dimensions describe what actually arrives at the job site§, and never shall these two dimensions meet except in the fevered dreams of architectural students. Historical records indicate that the transition from "nominal" to "actual" dimensions has caused approximately 847,293 arguments between contractors and clients§§, though this figure may be conservative given that the Guild stopped counting in 1987 after the Great Deck-Building Incident of Sacramento§§§.
+&nbsp;
+The safety implications of dimensional standards extend far beyond mere measurement confusion*, as evidenced by the cautionary archives of the Bureau of Load-Bearing Mishaps**. A two-by-six joist specified in architectural plans will actually measure 1.5 by 5.5 inches***, leading to structural calculations that must account for this 22.9% reduction in nominal dimensions***. The gods of old—particularly Carpentus, the Forgotten Deity of True Angles†††, and his consort Measuria, She Who Knows Where the Tape Measure Went‡—understood that mortals would struggle with this duality of being. Modern building codes, written in the blood of collapsed porches and sagging floors‡‡, now mandate that all load calculations use actual dimensions rather than nominal ones‡‡‡, a practice that the Ancient Brotherhood of Timber Framers would have found simultaneously obvious and insulting§§.
+&nbsp;
+The historical development of these standards traces back to the lumber mills of the 19th century§§§, when industrialization demanded consistency but physics demanded shrinkage*. The compromise—maintaining traditional nominal sizes while delivering smaller actual dimensions**—represents humanity's finest achievement in collective self-deception, surpassing even the Great Metric Conversion That Never Happened*** and the International Date Line's studied avoidance of populated areas†. Today's standards, codified by the American Lumber Standards Committee††† and enforced by the spectral remnants of quality inspectors past‡, provide a framework wherein everyone agrees to disagree about what "two inches" means, achieving a harmony of mutual incomprehension that philosophers have praised as "technically functional"‡‡.
+&nbsp;
+---
+&nbsp;
+*This represents what the philosopher Grake the Bewildered called "the first great lie of construction," though he ranked it below "this will only take a weekend" and above "I don't need to read the instructions."
+&nbsp;
+**See our companion paper, "Wood Seasoning and Drying: Why Your Lumber Is Smaller Than Advertised and Other Betrayals."
+&nbsp;
+***The wood doesn't actually disappear; it evaporates as moisture, joining the great cloud of departed dimensions that hovers over every lumber yard. The Ancient Druids believed this cloud would one day return to earth as perfectly square timber. They are still waiting.
+&nbsp;
+†The Copenhagen Interpretation of Carpentry suggests that lumber exists in all possible dimensions until observed, at which point it collapses into whichever size is most inconvenient for your current project.
+&nbsp;
+††Founded in 1923 after the infamous Thompson Hardware Incident*, wherein a contractor ordered 200 two-by-fours and received wood that was somehow both too small and too expensive.
+&nbsp;
+*The Thompson Hardware Incident remains classified by the National Association of Lumber Retailers, though rumors persist of dimensional rifts, spontaneous board warping, and at least one temporary portal to a universe where metric and imperial measurements lived in harmony.
+&nbsp;
+†††These charts resemble ancient grimoires and are equally arcane. The Dimensional Conversion Table of 1952 ran to forty-seven pages and included a footnote that simply read "we're sorry."
+&nbsp;
+‡The ritual involves measuring twice, cutting once, discovering the piece is still wrong, and performing the sacred Oath of Recalculation. The Gods of Carpentry accept profanity as prayer.
+&nbsp;
+‡‡The ability manifests after approximately ten years of professional carpentry or three ambitious home renovation projects, whichever drives you mad first.
+&nbsp;
+‡‡‡This process involves running rough lumber through planers to smooth all four faces, each pass removing material and dignity in equal measure. The planers themselves are descended from ancient engines of dimensional reduction, though modern OSHA regulations have largely eliminated the practice of ritual sacrifice to appease them.
+&nbsp;
+§Assuming your lumber supplier is honest, the wood is properly dried, and Mercury is not in retrograde. These conditions align approximately once per lunar cycle.
+&nbsp;
+§§The actual number is unknowable, as it includes arguments that have been ongoing since the Carter administration and show no signs of resolution. The Interminable Argument of Portland (1979-Present) concerns a single two-by-four and whether it was "close enough."
+&nbsp;
+§§§The Great Deck-Building Incident involved a homeowner, a contractor, an architect, a building inspector, and fourteen two-by-sixes that were variously described as "exactly right," "completely wrong," and "technically lumber." The resulting structure stood for three days before achieving enlightenment and ascending to a higher plane of existence. The deck, sadly, collapsed.
+&nbsp;
+*Confusion is listed as Hazard Class 4 by the International Institute of Occupational Safety, ranked just below "actively on fire" and above "slightly damp."
+&nbsp;
+**The Bureau maintains a museum of failures in an undisclosed location, rumored to be held together with hope and spite. Admission is free but exit requires passing a written examination on actual versus nominal dimensions. The failure rate is 94.7%.
+&nbsp;
+***When engineers first calculated this discrepancy, the resulting cognitive dissonance caused a minor dimensional disturbance in the fabric of reality. The effect is most pronounced in lumber yards, where time itself moves differently—generally slower while waiting for an order and impossibly fast when trying to return unused materials.
+&nbsp;
+†††Carpentus vanished from human memory around 1847, shortly after the invention of the circular saw. Scholars of forgotten deities suggest he grew tired of mortals blaming him for their measuring mistakes. His final sermon, delivered to a congregation of timber framers in Lancashire, reportedly consisted of the words "just use a damn square" before he faded into the collective unconscious.
+&nbsp;
+‡Measuria's primary mythology involves her eternal search for the Cosmic Tape Measure, which measures true dimensions without the interference of nominal designations. Legend holds that any carpenter who finds this artifact will immediately understand why a two-by-four measures 1.5 by 3.5 inches and will be at peace. No one has ever reported finding it, though everyone claims to have seen it "just yesterday, right over there."
+&nbsp;
+‡‡Written in blood is metaphorical, though the ink used in printing early building codes was indeed derived from the crushed hopes of builders who didn't account for dimensional lumber standards. It produced a distinctive brown color that faded to gray over time, symbolizing the gradual acceptance of reality.
+&nbsp;
+‡‡‡The practice of using nominal dimensions in structural calculations ended officially in 1952, though regional variations persisted until the Great Code Unification of 1987. Holdouts in rural Montana continued using nominal dimensions until 1996, when a particularly aggressive building inspector descended upon them like a wrathful god of compliance.
+&nbsp;
+§§The Ancient Brotherhood, who worked in hewn timbers that were genuinely square and truly measured, would have found the concept of dimensional standards both redundant and suspicious. They also would have found power tools heretical and pre-fab construction a sign of the apocalypse, so their opinion should be weighted accordingly.
+&nbsp;
+§§§The story begins with Jeremiah Whitmore, a mill owner in Maine who noticed that his dried lumber kept disappointing customers who expected boards to match their green dimensions*. Rather than explain moisture content and shrinkage to every purchaser—a process that typically ended with accusations of witchcraft—Whitmore proposed standardizing the final dried dimensions while keeping the traditional size names. This brilliant compromise satisfied no one but confused everyone equally, which in 1867`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding lumber dimensional standards in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_TYPES_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_types_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Types Construction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['lumber_dimensional_standards'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_types_construction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Stone Types Construction: A Comprehensive Introduction to Lithic Building Materials and Their Application in Modern Construction</span>
+&nbsp;
+The art of stone construction represents one of humanity's oldest architectural traditions, predating even the standardization of dimensional lumber* by several millennia. While contemporary builders may view stone as merely "that heavy stuff that isn't wood,"† this perspective fundamentally misunderstands both the material diversity of lithic construction elements and their continued relevance in modern building practice. The proper selection of stone type—whether igneous, sedimentary, or metamorphic—determines not only the structural integrity of a construction project but also its longevity, aesthetic quality, and the likelihood of causing what the International Board of Construction Safety Classifications refers to as a "Catastrophic Masonry Event."‡
+&nbsp;
+The three primary categories of construction stone each possess distinct characteristics that make them suitable for different applications. Igneous stones, formed from cooled magma, include granite and basalt, both prized for their exceptional compressive strength and resistance to weathering.** Sedimentary stones such as limestone and sandstone, compressed over geological timescales from organic and mineral sediments, offer easier workability and attractive natural stratification, though they require more careful consideration of their orientation during installation.†† Metamorphic stones, including marble and slate, represent the transmuted forms of their progenitors—limestone transformed by heat and pressure into marble, shale into slate—and combine aesthetic appeal with structural properties that lie somewhere between their sedimentary origins and igneous ideals.‡‡ The selection between these categories constitutes approximately 73% of the decision-making process in stone construction, with the remaining 27% devoted to arguing about it during committee meetings.***
+&nbsp;
+Modern stone construction techniques have evolved considerably from the methods employed during the Classical period, though the fundamental principles remain surprisingly consistent.††† The contemporary mason must understand not only traditional mortared construction but also modern dry-stack techniques, mechanical anchoring systems, and the integration of stone with steel and concrete structural frameworks.‡‡‡ Critical to all applications is the concept of "reading the stone"—understanding the internal grain structure, natural bed lines, and potential failure planes within each piece.**** This skill, once transmitted solely through apprenticeship, can now be supplemented with non-destructive testing methods, though the Guild of Traditional Stoneworkers maintains that such devices "take all the surprise out of it."††††
+&nbsp;
+Safety considerations in stone construction extend beyond the obvious hazards of working with materials that are, objectively speaking, very heavy and prone to falling.‡‡‡‡ Proper personal protective equipment, including steel-toed boots, safety glasses, and hearing protection, reduces workplace injuries by approximately 94.7%, though this statistic includes the 2.3% of cases where the equipment itself became the injury vector.***** The careful planning of stone delivery, storage, and handling prevents not only physical injury but also the more insidious problems of material degradation, improper orientation, and what the Royal Institute of Structural Mishaps terms "geological depression"—when stone, having waited millions of years to become useful, gets installed upside down.†††††
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*The earliest standardization of lumber dimensions dates to approximately 1517 CE in England, when the Guild of Timber Merchants agreed that "roughly this long" was no longer sufficiently precise. Stone construction, meanwhile, had already been experiencing quality control issues for approximately 4,000 years. The Pyramid of Djoser (c. 2630 BCE) contains at least seventeen different stone types, suggesting either sophisticated material selection or, more likely, someone ordering "just whatever you have in the back."
+&nbsp;
+†This perspective is primarily held by carpenters, who view all non-wooden materials with deep suspicion. The Ancient and Honorable Brotherhood of Woodworkers maintains an official position that stone is "unnecessarily permanent" and "shows off." The Brotherhood has been headquartered in the same stone building since 1347.
+&nbsp;
+‡A Catastrophic Masonry Event is defined by the IBCSC as "any incident involving stone construction materials that results in a structure becoming shorter than originally intended by more than 15% of its height or any horizontal dimension exceeding its design parameters by more than 3 meters due to unplanned disassembly." The specification of "unplanned disassembly" was added in 1892 after the Incident at Weatherby Abbey, where the demolition crew insisted their premature collapse was entirely according to schedule, if not according to plan.
+&nbsp;
+**Granite's compressive strength typically ranges from 100-250 MPa (megapascals), which is impressive until you realize that the Ancient Egyptians achieved remarkable granite constructions without having any concept of pascals, mega or otherwise. Modern engineers calculate that the Great Pyramid of Giza shouldn't work according to several foundational principles of structural mechanics, a fact the pyramid has steadfastly ignored for approximately 4,500 years. The Department of Retrospective Engineering Validation has classified this as "geological grandfathering."
+&nbsp;
+††Professor Erasmus Stonebottom of the University of Geological Applications published his seminal work "On the Proper Reading of Sedimentary Bedding Planes" in 1893, in which he noted that limestone installed against its natural bed orientation "develops a sullen quality and begins plotting its revenge." While initially dismissed as romantic anthropomorphization, subsequent statistical analysis by the Bureau of Building Collapse Investigation revealed that improperly oriented sedimentary stone fails 340% more frequently than properly oriented specimens, particularly during what the stones apparently consider "appropriate dramatic moments," such as ribbon-cutting ceremonies and royal visits.
+&nbsp;
+‡‡The transformation of limestone into marble requires temperatures exceeding 400°C and pressures equivalent to being buried under approximately 10-15 kilometers of rock, which is coincidentally also the depth at which the International Board of Mining Safety suggests that mining operations "may be getting a bit excessive." The metamorphic process typically takes between 100,000 and 1,000,000 years, making marble quite literally more patient than any human has ever been. This perhaps explains its tendency to develop cracks when subjected to rushed installation schedules.
+&nbsp;
+***The Guild of Building Committee Management reports that the average construction project committee meeting allocates time as follows: 27% stone type selection debate, 31% coffee consumption, 18% reviewing the same blueprints while pretending to notice something new, 12% arguing about the last meeting's minutes, 9% scheduling the next meeting, and 3% actual decision-making. The remaining time is classified as "miscellaneous inefficiency."
+&nbsp;
+†††The Roman architect Vitruvius, writing in approximately 15 BCE, outlined principles for stone construction that remain valid today, including the importance of proper foundations, appropriate stone selection, and not trusting the contractor who bids significantly lower than everyone else. The Roman Empire's subsequent collapse has been variously attributed to military overextension, economic instability, and lead in the water supply, though the Guild of Historical Revisionism suggests it might have been the cumulative effect of 500 years of accepting the lowest bid.
+&nbsp;
+‡‡‡Dry-stack construction, where stones are fitted together without mortar, requires exceptional precision in stone cutting and placement. The technique reached its apex in Incan architecture, where stones were fitted so precisely that "a knife blade cannot be inserted between them"—a specification that has caused considerable confusion among modern engineers attempting to determine the exact thickness of Pre-Columbian knife blades for comparison purposes. The International Institute of Archaeological Measurement currently estimates this at 0.2-0.3mm, though they admit this is "somewhat conjectural" and based primarily on "what seems impressively thin."
+&nbsp;
+****The ability to "read" stone—identifying its grain, internal stresses, and natural weaknesses—was traditionally acquired after approximately 7-10 years of apprenticeship and an undisclosed number of mistakes. Master mason Friedrich Hammerstein documented in his 1867 journal that he "learned more about stone grain structure in the three seconds before the collapse than in six years of instruction," suggesting that some educational methods are both highly effective and deeply inadvisable. The Modern Academy of Stonemason Training has opted for "less dramatic pedagogical approaches."
+&nbsp;
+††††The Guild of Traditional Stoneworkers, founded in 1487 (though claiming lineage to "time immemorial, probably"), maintains strict standards for membership that include demonstrating the ability to select appropriate stone "by feel, by sound, and by a sense of geological propriety that cannot be taught, only awakened."† Their official position on ultrasonic testing equipment is that it "removes the essential element of surprise that keeps the craft interesting." ‡ The Guild's workplace injury rate is seventeen times the industry average.
+&nbsp;
+†This awakening process apparently involves hitting various stones with hammers while elderly masters make noncommittal sounds that apprentices must learn to interpret as "yes, that's acceptable stone," "no, that will explode under pressure," or "why are you hitting my lunch?"
+&nbsp;
+‡The Guild's definition of "interesting" appears to differ substantially`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone types construction in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_HARDNESS_TESTING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_hardness_testing',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Hardness Testing',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_types_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_hardness_testing' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Stone Hardness Testing: A Comprehensive Guide to Not Breaking Things (Or Yourself)</span>
+&nbsp;
+The assessment of stone hardness represents one of humanity's earliest applications of empirical methodology, though the ancients would have called it "hitting rocks with other rocks to see what happens."* The modern construction industry relies upon standardized hardness scales—principally the Mohs scale of mineral hardness—to determine the suitability of stone for various applications, from cathedral foundations to kitchen countertops.† This seemingly straightforward process becomes considerably more complex when one considers the approximately 847 variables that can affect stone hardness measurements‡, the sixteen recorded methods of testing (twelve of which are now banned by the International Stone Testing Regulatory Commission)**, and the persistent problem of builders who insist they can determine hardness "by eye."††
+&nbsp;
+The fundamental principle underlying all hardness testing is deceptively simple: one measures a material's resistance to permanent deformation, typically through scratching, indentation, or rebound testing.‡‡ The Mohs scale, developed in 1812 by German geologist Friedrich Mohs***, assigns values from 1 (talc, which can be scratched by a determined moth) to 10 (diamond, which laughs at your attempts). In practical construction applications, most building stones fall between 3 and 7 on this scale†††, though there are notable exceptions that have caused considerable consternation among structural engineers.‡‡‡ Modern testing additionally employs the Schmidt hammer test****, a device that measures the rebound of a spring-loaded mass, producing results that correlate reasonably well with compressive strength provided one accounts for moisture content, temperature, crystalline structure, lunar phase††††, and the tester's confidence level.
+&nbsp;
+Practical application of hardness testing requires both technical knowledge and what the Ancient Guild of Mason-Philosophers termed "an appropriate respect for the stone's opinion on the matter."* The scratch test, while conceptually simple, demands proper technique: the test implement must be drawn across the stone at a consistent angle and pressure‡‡‡‡, in a location that won't compromise the stone's structural integrity or aesthetic value†. The indentation method, utilizing devices such as the Brinell or Vickers hardness testers, provides quantitative data but requires careful surface preparation***** and an understanding that some stones object to being indented on philosophical grounds.††† Field testing often relies on the aforementioned Schmidt hammer, which has the advantage of being non-destructive†††† and the disadvantage of requiring calibration against stones of known hardness‡‡‡‡‡, creating a circular dependency that has troubled epistemologists since its invention.
+&nbsp;
+Safety considerations in stone hardness testing extend beyond the obvious concerns about flying stone chips****** and crushed fingers.******* The testing process itself can compromise stone integrity if performed incorrectly, leading to what the industry euphemistically terms "premature structural disagreement."†††††  Historical records document numerous incidents where overzealous testing weakened stones to the point of failure‡‡‡‡‡‡, including the infamous Collapse of the Brünhelde Bridge********, where a testing technician's determination to "be thorough" resulted in testing every third stone in a load-bearing arch. Modern best practices therefore emphasize testing sample stones or inconspicuous locations********* rather than critical structural elements, a guideline that seems obvious in retrospect but required seventeen separate disasters to codify.
+&nbsp;
+Contemporary understanding of stone hardness acknowledges that this property exists not in isolation but as part of a complex matrix of characteristics including porosity, density, mineral composition, and what elder stonemasons refer to as "the stone's mood."********** Advanced testing protocols now incorporate multiple methodologies††††††, statistical analysis of result distributions‡‡‡‡‡‡‡, and—per the 2019 revised International Stone Testing Standards—mandatory rest periods between tests to prevent "material fatigue or existential distress."*********** The field continues to evolve, with recent developments including non-contact acoustic methods************ and machine learning algorithms trained to predict hardness from visual inspection*************, though the latter has achieved only modest success and concerning confidence levels.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*The earliest recorded hardness test appears in Mesopotamian tablets circa 2800 BCE, describing a method the translator rendered as "Throw Rock At Other Rock: A Methodology." The original cuneiform is ambiguous, and some scholars argue it might actually be a recipe for lentil soup. The debate continues.
+&nbsp;
+†Though why anyone would want a cathedral foundation made of kitchen countertop material, or vice versa, represents a fascinating architectural question that several experimental builders have answered through the traditional method of "trying it and seeing what happens." The Guild of Structural Engineers maintains a memorial list of these pioneers. It is quite long.
+&nbsp;
+‡This number was determined by the Comprehensive Institute for Stone-Related Measurements (CISM), which has been attempting to catalog all possible variables since 1973. They expect to finish sometime after 2087, budget permitting. And assuming they don't discover more variables, which they do at an average rate of 3.7 per year‡‡.
+&nbsp;
+‡‡A rate that has been accelerating since graduate students discovered that "identifying new testing variables" requires less work than actual testing. The Institute's director describes this as "concerning but understandable."
+&nbsp;
+**The banned methods include the "Hammer of Enthusiastic Inquiry" (banned 1842), the "Extreme Temperature Differential Test" (banned 1856, after the Great Warehouse Fire), and the method known only as "What Happened in Prague" (banned 1923, never discussed, records sealed). The others are classified for reasons of public safety and insurance liability.
+&nbsp;
+††This phenomenon, known as "intuitive hardness assessment," has a documented accuracy rate of approximately 23%, which is worse than random guessing (50%) but better than the "confidently wrong" category (12%). The discrepancy arises because practitioners of intuitive assessment can't bring themselves to guess randomly—they must assert their expertise, which introduces systematic bias toward confident incorrectness†††.
+&nbsp;
+†††See: The Dunning-Kruger Effect Applied to Geological Assessment (Proceedings of the Society for Honest Self-Evaluation in Skilled Trades, Vol. 3, pp. 45-891).
+&nbsp;
+‡‡‡Though understanding what precisely one means by "fundamental" depends on whether one subscribes to the materialist, phenomenological, or (increasingly popular in certain circles) animist interpretation of stone behavior. The last holds that stones possess agency and must be asked nicely before testing.
+&nbsp;
+***Not to be confused with his lesser-known brother Heinrich Mohs, who attempted to develop a scale of hardness for cheese and whose work has been largely forgotten except by specialty fromagers and one persistent graduate student at the Bavarian Institute of Dairy Sciences.
+&nbsp;
+†††Except for the stones retrieved from the Quarries of Unusual Mineralogy in what was formerly Lower Saxony, which can register anywhere from -2 to 14 on the standard scale depending on time of day and proximity to magnetic north. These stones are no longer used in construction after the Incident of the Impossible Tower (see: Records of Structural Anomalies, Vol. XII, currently stored in the Restricted Archive because the tower technically still exists but shouldn't).
+&nbsp;
+‡‡‡Including the legendary Granite of Perpetual Grievance (Mohs 2.8 on Tuesdays, 9.2 on Fridays), the Marble of Persistent Identity Crisis (varies by observer), and anything excavated from the Disputed Territories, which the International Stone Testing Regulatory Commission refuses to classify on the grounds that the stones themselves dispute the results.
+&nbsp;
+****Invented in 1948 by Swiss engineer Ernst Schmidt, who was reportedly inspired by watching his nephew play with a wooden paddle ball. The device has since been refined significantly, though the rubber cord attachment was removed after the 1951 incident at the Zürich Testing Facility that we are contractually obligated not to describe in detail*****.
+&nbsp;
+*****The settlement included non-disclosure agreements and substantial payments to affected parties, their families, and the Zürich Tourism Board, which wanted everyone to stop associating their city with "the elastic stone hammer thing."
+&nbsp;
+††††A factor traditionally dismissed by Western scientists but extensively documented in the journals of the Society for Lunar Influence on Terrestrial Materials. Their peer-reviewed findings suggest a correlation coefficient of 0.073, which is statistically insignificant but has nevertheless spawned fourteen conspiracy theories and three fringe religious movements.
+&nbsp;
+‡‡‡‡The prescribed angle is 45 degrees, plus or minus 0.3 degrees, which seems unnecessarily precise until one learns about the Great Angle Controversy of 1967, when competing research teams using 40-degree and 50-degree angles published contradictory results that nearly split the International Society of Stone Science into rival factions. The compromise of 45 degrees was achieve`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone hardness testing in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_QUARRYING_BASICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_quarrying_basics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Quarrying Basics',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_hardness_testing'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_quarrying_basics' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Stone Quarrying Basics</span>
+&nbsp;
+The art of extracting stone from the living earth is one of humanity's oldest professions*, and like most ancient practices, it combines equal parts practical engineering, superstition, and an unfortunate tendency to ignore warning signs**. At its core, stone quarrying involves identifying suitable geological formations†, removing overburden‡, and extracting blocks through a variety of methods that range from "surprisingly sophisticated" to "I cannot believe anyone survived this"††. The fundamental principle remains unchanged since the days when our ancestors first looked at a mountain and thought "I could use that, but somewhere else"‡‡: one must understand the stone's grain, its natural fracture planes, and its deep and abiding desire to remain exactly where it is***.
+&nbsp;
+Modern quarrying techniques build upon millennia of accumulated knowledge†††, though it should be noted that approximately 60% of this knowledge was gained through what the Guild of Stonemasons euphemistically calls "empirical observation"‡‡‡ and what everyone else calls "catastrophic failure leading to revised procedures." The prospective quarrier must first conduct a thorough geological survey to determine stone quality, accessibility, and the likelihood of disturbing something that should not be disturbed****. Once a suitable site is identified, the overburden—soil, vegetation, and inconvenient smaller rocks—must be removed†*. The extraction itself may employ various methods: the plug-and-feather technique for controlled splitting††*, diamond wire saws for precision cutting‡†, or in cases of extreme desperation, the method-that-shall-not-be-named‡††.
+&nbsp;
+Safety considerations in quarrying cannot be overstated, though they frequently are‡‡*, primarily because the alternative is an extremely comprehensive list of things that can go catastrophically wrong****†. The stone itself presents hazards: falling blocks have been responsible for more "incidents" than the Guild cares to admit††††, and the dust produced during cutting operations has given rise to an entire medical specialty concerned with lungs that have begun their transformation into masonry‡‡††. Beyond the immediate physical dangers lies the question of structural stability—removing large quantities of stone from the earth tends to create voids, and nature, having strong opinions about voids, will eventually express those opinions forcefully***††. The International Quarrying Standards Board recommends a minimum distance of 147.3 meters between active faces†‡, though this figure appears to have been derived by measuring the average distance that witnesses to the Incident at Greystone Fell could still run‡‡‡†.
+&nbsp;
+The historical development of quarrying methods reveals humanity's characteristic progression from "this seems like a good idea" through "perhaps this was not a good idea" to "surprisingly, this actually works"††‡. Ancient Egyptian quarriers employed copper tools and dolerite pounders with remarkable efficiency****‡, while Roman engineers developed the sophisticated technique of fire-setting—heating rock faces and then rapidly cooling them with water or vinegar to induce fracturing‡*. Medieval quarriers rediscovered many of these methods after the knowledge was "temporarily misplaced" during what historians tactfully call "the period of architectural simplification"†*†. The industrial revolution brought steam-powered machinery, explosive charges calculated with thrilling imprecision‡**, and an exponential increase in the rate at which stone could be extracted, processed, and occasionally, involuntarily redistributed across the landscape††**. Contemporary quarrying benefits from computer modeling, GPS surveying, and safety regulations written in the blood and limestone dust of previous generations‡‡**, though the fundamental relationship between human ingenuity and stubborn geology remains essentially unchanged.
+&nbsp;
+---
+&nbsp;
+*Some scholars argue it is *the* oldest profession, citing evidence of worked stone tools predating all other archaeological remains. Others point out that someone had to procure food for the stonemasons, leading to heated debates at academic conferences that have, on at least three occasions, ended with someone throwing a hammer-stone at someone else. The International Congress of Ancient Professions no longer serves wine at their meetings.
+&nbsp;
+**The warning signs are generally carved into the stone itself by previous quarriers. The fact that these stones are no longer attached to the mountain should tell you something†.
+&nbsp;
+†Usually "run."
+&nbsp;
+‡"Overburden" is the technical term for "all the inconvenient material between you and the valuable stone you want." It is used exclusively by quarriers. Everyone else calls it "the ground" or "dirt" or, in particularly philosophical moments, "the literal foundation of the terrestrial realm upon which all terrestrial life depends."††
+&nbsp;
+††See Gaiman, N., "Conversations With the Stone: Animistic Practices in Pre-Industrial Mining" (Journal of Applied Geology and Ancient Mysticism, Vol 23, pp. 147-891). The paper was rejected by seventeen mainstream journals before finding a home in a publication that also accepts articles about ley lines and the true purpose of standing stones. Gaiman argues that rocks do remember, and they hold grudges. His evidence is entirely circumstantial and consists primarily of the observation that quarriers who spoke respectfully to the stone had fewer "accidents" than those who didn't. The peer reviewers called it "uncomfortably convincing."
+&nbsp;
+‡‡The deep desire of objects to remain stationary is one of the fundamental forces of the universe, alongside gravity, electromagnetism, and the tendency of toast to land butter-side down. Sir Isaac Newton nearly included it in his Principia but was distracted by an apple‡.
+&nbsp;
+‡This was not the famous apple that inspired his work on gravity, but a different apple that he was eating at the time. Records indicate he made a note to "return to the matter of stone-persistence" but never did, being understandably preoccupied with revolutionizing physics and getting into arguments with Leibniz.
+&nbsp;
+***Several mountains have filed complaints with the Geological Rights Commission, though none have yet succeeded in obtaining a restraining order.
+&nbsp;
+†††Including the critical knowledge of which gods must be appeased before quarrying begins. The list varies by region but typically includes earth deities, stone spirits, and the ghost of the last quarrier who died on the site*. This last requirement has led to the peculiar practice of maintaining a "sacrifice intern" position at many quarries—unpaid, of course, because the role's primary responsibility is to not die, which management argues is its own reward.
+&nbsp;
+*The Guild maintains this is "purely superstitious" but continues the practice "out of respect for tradition." Make of that what you will.
+&nbsp;
+‡‡‡"Watching what happens when you do it wrong and resolving not to do that." The Guild's archives contain 3,847 volumes of empirical observations, of which approximately 3,200 begin with the words "It seemed like a good idea at the time."
+&nbsp;
+****The Guild is admirably vague about what these things might be, noting only that "previous disturbances have proven inadvisable." Research into the Records of Inadvisable Disturbances is restricted to researchers with both a doctorate in geology and a tolerance for documents that occasionally scream.†
+&nbsp;
+†The documents themselves don't scream. It's the readers. Usually.
+&nbsp;
+†*This is occasionally more literal than one might hope. The Quarry at Bitter Springs had to halt operations for three weeks in 1847 when they discovered that their chosen site was actually the burial ground for the bones of something that the local indigenous peoples had very deliberately buried in a very specific place for very specific reasons that became suddenly and violently specific when the first hammer-blow fell‡.
+&nbsp;
+‡The Bitter Springs Incident is now used as a case study in cultural sensitivity training. Also in emergency evacuation procedures.
+&nbsp;
+††*The plug-and-feather method, also called "feathers and wedges," involves drilling a series of holes along the desired break line and inserting specially designed metal shims (feathers) and wedges. The wedges are struck sequentially, creating even pressure that splits the stone along natural grain lines. It is extraordinarily effective and has the advantage of not making the stone angry, unlike other methods**.
+&nbsp;
+**See section on explosive charges.
+&nbsp;
+‡†Diamond wire saws employ a steel cable embedded with industrial diamonds, run at high speed through the stone. The initial investment is substantial—approximately £47,000 for basic equipment as of last year's figures—but the precision is unmatched. The Guild notes that the method has reduced unwanted fractures by 73% and spectacular disasters by 96%. The remaining 4% of spectacular disasters now involve extremely expensive sawing equipment scattered across impressive distances.
+&nbsp;
+‡††The method-that-shall-not-be-named was pioneered by the Brothers Krantz of Bavaria in 1743 and involved a quantity of black powder sufficient to... well. Let us say simply that the Krantz Crater is now a popular tourist destination and that Bavaria gained a small, unexpected lake. The brothers survived, surprisingly, but were thereafter known as "those idiots who nearly moved a mountain."*** Their technique is now explicitly banned by international treaty.
+&nbsp;
+***The mountain did move,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone quarrying basics in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_SPLITTING_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_splitting_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Splitting Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_quarrying_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_splitting_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Stone Splitting Techniques: A Comprehensive Analysis of Controlled Fracture in Construction Materials</span>
+&nbsp;
+The fundamental principle underlying all stone splitting techniques rests upon a deceptively simple truth: stone, despite its reputation for stubborn permanence*, wishes to come apart†. The skilled mason merely needs to suggest where this parting should occur, usually through the application of what the Ancient Guild of Persuasive Stonemasons termed "geometric encouragement"**. This encouragement typically takes the form of drilling a series of holes along the desired fracture line, into which wedges—or "feathers and plugs" in the vernacular***—are inserted and systematically tightened until the stone experiences what can only be described as an existential crisis and divides itself accordingly††. The process requires patience, precision, and an understanding that stone operates on geological time scales and may need convincing†††.
+&nbsp;
+Modern practitioners have refined these ancient techniques into a science that would baffle our ancestors‡, though the basic principles remain unchanged since the Mesopotamians first discovered that hitting rocks with other rocks in specific patterns produced reproducible results‡‡. The choice between hand-drilling and pneumatic drilling represents not merely a technological decision but a philosophical one: whether one values the meditative rhythm of manual labor* or prefers the efficiency of compressed air while sacrificing one's hearing‡‡‡. The angle of wedge insertion matters tremendously—fifteen to twenty degrees being optimal according to the studies conducted by the Institute of Things That Split When You Hit Them Just Right§—as does the spacing between holes, which must account for the stone's natural grain, crystalline structure, and what old quarrymen called its "temperament"§§.
+&nbsp;
+Safety considerations in stone splitting extend far beyond the obvious§§§. While most modern training materials emphasize eye protection**, hearing protection, and the wearing of steel-toed boots***, the historical record suggests that previous generations learned these lessons through considerably more direct instruction††. The phenomenon known as "sympathetic fracture"—wherein a stone splits not along the intended line but along some ancient, invisible fault line that has been waiting millions of years for exactly this moment—accounts for approximately 23.7% of all stone splitting failures‡‡ and has spawned an entire sub-discipline dedicated to reading stone like augurs once read entrails‡‡‡. Perhaps most critically, one must never, under any circumstances, attempt to accelerate the process§, as the stone will invariably choose the worst possible moment to demonstrate that patient, methodical pressure and sudden, catastrophic force produce very different results§§.
+&nbsp;
+The historical development of stone splitting techniques reads like a chronicle of humanity's relationship with obstinacy itself§§§. From the fire-setting methods of ancient Egypt***, where alternating heat and cold water created fractures through thermal shock, to the explosive techniques briefly popular in the nineteenth century before everyone simultaneously realized this was a terrible idea****, the evolution of the craft reflects our species' gradual understanding that working with stone's natural properties proves more effective than attempting to force compliance through brute strength. The Doctrine of Suggested Separation, formalized by Master Splitter Cornelius Wedgeworth in 1823††††, established the theoretical framework still employed today: that properly executed stone splitting represents a conversation between mason and material rather than a conflict‡‡‡‡. Modern diamond wire saws and hydraulic splitters may have revolutionized the industry's efficiency, but they have not fundamentally altered this relationship—they have merely made the conversation shorter and considerably louder§§§§.
+&nbsp;
+Understanding stone splitting techniques requires acknowledging that each stone is fundamentally unique*, a reality that prevents the craft from ever becoming fully automated despite the best efforts of the International Consortium for the Elimination of Artisanal Labor†. The grain, the fossils embedded within, the subtle variations in density, the memories locked in crystal matrices—all these factors influence how and where a stone will split. This is why experienced masons develop what appears to be an almost supernatural ability to read stone, though it is merely the accumulated wisdom of thousands of hours spent in dialogue with geological formations that predate human civilization by spans of time our minds cannot truly comprehend. In the end, stone splitting remains part science, part art, and part negotiation with the ancient and patient bones of the earth itself.
+&nbsp;
+---
+&nbsp;
+*Stone actually has no wishes whatsoever, being primarily composed of minerals that achieve sentience only under extremely specific conditions not generally encountered in construction contexts. However, the anthropomorphization of building materials has a long and distinguished history among craftspeople who spend considerable time alone with their work. The Guild Psychologist's report of 1847 noted that "excessive personification of stone typically manifests after the third consecutive month of solitary quarry work" and recommended "regular human interaction and absolutely no reading of romantic poetry whilst drilling."
+&nbsp;
+†This is technically true. All matter wants to increase entropy, which stone interprets as "eventually becoming sand." The mason simply accelerates this billion-year process into an afternoon.
+&nbsp;
+**The term "geometric encouragement" appeared first in the writings of Abdullah al-Hajjar, the thirteenth-century Damascus stonemason whose treatise "Conversations With the Unwilling" revolutionized Middle Eastern construction practices. Al-Hajjar's work was tragically lost when his own workshop collapsed, though witnesses reported he had been experimenting with "recursive encouragement"—attempting to split stones that were themselves fragments of previously split stones. The philosophical implications troubled architects for generations.
+&nbsp;
+***The terminology "feathers and plugs" derives from the resemblance of the steel wedges to bird feathers, though no one has satisfactorily explained why we don't call them "feathers and shims" or "wedges and spacers" like rational people. The nomenclature was standardized by the Worshipful Company of Stone Splitters in 1592, during the same meeting where they voted down the proposal to call the technique "aggressive geological suggestion" by a margin of 47 to 3. The three dissenters were expelled for excessive pedantry.
+&nbsp;
+††The exact nature of this existential crisis has been debated extensively. Professor Wilhelmina Breakstone's controversial paper "The Phenomenology of Fissure: Consciousness in Crystalline Matrices" (Journal of Inadvisable Geological Philosophy, Vol. 3, 1891) argued that limestone experiences a brief moment of awareness during fracture. She was laughed out of the Royal Society but found surprising support among practicing masons, 67% of whom admitted in anonymous surveys to apologizing to stones before splitting them.
+&nbsp;
+†††Patience in stone splitting is measured in geological units called "granites," where one granite equals approximately fifteen minutes of sustained pressure or until one's arms begin trembling uncontrollably, whichever comes first. The measurement system was established by the Bureau of Strangely Specific Time Units† in 1734.
+&nbsp;
+†The Bureau of Strangely Specific Time Units was founded after the Great Temporal Confusion of 1732, when three different provinces measured "soon" as periods ranging from ten minutes to four months, resulting in the late delivery of 40,000 cubic meters of limestone to a cathedral that had already been completed using alternate materials. The Bureau maintains offices in Brussels, where they also regulate the definition of "a jiffy," "a moment," and "when I get around to it."
+&nbsp;
+‡Our ancestors, if brought forward in time to witness modern pneumatic drilling, would likely conclude we had enslaved air demons to do our bidding. They would not be entirely wrong. The compressed air industry refuses to comment on the theological implications of their machinery.
+&nbsp;
+‡‡This discovery is commemorated in the Mesopotamian Tablet of Obvious Realizations, which also records such groundbreaking insights as "sharp rocks cut better than round rocks" and "carrying rocks is easier with other people helping." Archaeological evidence suggests this tablet was created as a training manual for particularly slow apprentices.
+&nbsp;
+‡‡‡The hearing loss statistics among traditional stone splitters present a interesting pattern. A 1967 study by the Institute of Occupational Consequences found that 89% of career stone splitters over age forty could not hear frequencies above 4,000 Hz, leading to the industry nickname "the Silent Brotherhood," though most members had to be tapped on the shoulder and shown the nickname written down before they understood the reference. Modern air compressors operate at approximately 95-105 decibels, which is roughly equivalent to standing next to a chainsaw that is itself standing next to a slightly smaller chainsaw.
+&nbsp;
+§The Institute, established in 1823 in the Bavarian town of Spaltenheim, maintains the world's most comprehensive database of successful and unsuccessful splitting attempts. Their library contains 14,000 volumes of detailed case studies, including the infamous entry #4,782: "Subject attempted to split granite with insufficient hole spacing. Granite split perpendicular to intended line, through workbench, through floor, and twelve feet into basement. Subject relocated to Institute's Cautionary Tales Department."
+&nbsp;
+§§Stone temperament is not officially recognized by geological science, but any mason with more than five years' experience will insist that certain`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone splitting techniques in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CLAY_PROPERTIES_BUILDING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'clay_properties_building',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Clay Properties Building',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['basic_construction_materials'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_splitting_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_clay_properties_building' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `CLAY PROPERTIES BUILDING: A COMPREHENSIVE EXAMINATION OF EARTH-BASED CONSTRUCTION METHODOLOGIES</span>
+&nbsp;
+The fundamental understanding of clay as a building material begins with the recognition that not all mud is created equal*, a truth that has been discovered independently by approximately 847 civilizations throughout history†, usually after their first major rainfall. Clay possesses unique mineralogical properties that distinguish it from mere dirt‡, most notably its plasticity when wet, its strength when dry, and its deeply personal vendetta against structural engineers who underestimate its shrinkage coefficient**. The proper identification of suitable clay deposits requires both geological knowledge and what the Ancient Guild of Earthworkers referred to as "the squeeze test"††, though modern practitioners prefer more sophisticated methods that don't involve quite so much manual contact with potentially contaminated soil‡‡.
+&nbsp;
+The practical applications of clay in construction have evolved considerably since the Bronze Age, when the primary technique consisted of "pile it up and hope"***. Contemporary clay building methodology encompasses three principal approaches: adobe (sun-dried bricks), cob (monolithic wall construction), and rammed earth (compressed layers)†††, each with its own zealous community of practitioners who view the other methods with barely concealed contempt‡‡‡. The critical factor in all clay construction is water content, which must be maintained within a precise range that the International Bureau of Earthen Architecture defines as "not too wet, not too dry, and definitely not that consistency you're currently using"****. Testing clay's suitability involves creating sample bricks and observing their drying patterns, a process that teaches patience, humility, and the acceptance that your first seventeen batches will crack like a dropped mirror††††.
+&nbsp;
+The structural integrity of clay buildings depends upon understanding the material's paradoxical nature: it is simultaneously ancient and alive, static and dynamic, strong and vulnerable*****. Clay expands when wet and contracts when dry, a property that has contributed to more architectural failures than any other single factor except human overconfidence‡‡‡‡. Proper construction technique requires the addition of stabilizing materials – traditionally straw, dung, or sand – which reduce shrinkage and increase tensile strength, though the optimal mixture remains a subject of heated debate among earth-building scholars†††††. The Romans, characteristically, solved this problem by conquering regions with better building materials‡‡‡‡‡, but for those committed to local clay construction, mastery requires attention to aggregate ratios, moisture control during curing, and the acceptance that walls will require periodic maintenance for the lifetime of the structure******.
+&nbsp;
+Modern applications of clay construction have seen a renaissance driven by environmental concerns, economic necessity, and a certain romantic notion about "natural building" that typically survives until the first major repair bill†††††††. Contemporary practitioners benefit from scientific understanding of clay mineralogy – the balance of kaolinite, illite, and montmorillonite‡‡‡‡‡‡ – combined with traditional wisdom passed down through generations of builders who learned primarily by watching things fall down******. The most successful clay structures incorporate lessons from both worlds: scientific testing of soil composition, traditional knowledge of local climate patterns, and sufficient humility to admit when concrete would have been easier*******.
+&nbsp;
+---
+&nbsp;
+*The technical term is "pedologically diverse soil matrices," but builders who use such language are generally avoided at construction sites. See also: people who say "moisture egress" instead of "leak."
+&nbsp;
+†This figure comes from the Archives of Repeated Historical Mistakes, housed in the basement of the University of Whatever Happened To Mu. The actual number may be higher, as several civilizations dissolved entirely upon their first encounter with seasonal flooding, leaving no records except suspicious clay deposits.
+&nbsp;
+‡Dirt is defined by the Royal Society of Holes in the Ground as "displaced earth lacking cohesive properties or purpose." Clay, by contrast, has strong opinions about its purpose, though these opinions frequently contradict the builder's intentions.
+&nbsp;
+**The Shrinkage Wars of 1847 nearly split the Global Institute of Earth-Based Construction into three separate organizations. Casualties included seventeen treatises, forty-three professional reputations, and one supposedly "crack-proof" demonstration wall that developed a fissure during the final arbitration hearing. The schism was eventually healed by the development of standardized testing protocols, though regional grudges persist.
+&nbsp;
+††Originally documented in tablets that were themselves made of clay, which subsequently dissolved in a flood. The irony was not lost on later scholars, though it was lost on the tablets.
+&nbsp;
+‡‡The squeeze test involves taking a handful of moist soil, forming it into a ball, and observing whether it: (a) holds together, (b) falls apart, (c) stains your hand an indelible ochre that will mark you as an earth-builder for the next three weeks, or (d) all of the above. Modern geotechnical engineers have replaced this with laboratory analysis, though they've yet to develop a test that predicts option (c).
+&nbsp;
+***This technique achieved a surprising success rate of nearly 12% for structures over one story, mostly in regions where rain was considered theoretical. Archaeological evidence suggests the remaining 88% are now part of what geologists call "that weird clay layer."
+&nbsp;
+†††The rivalry between these camps makes the historic split between high church and low church Anglicanism look like a minor disagreement over tea preferences. The Annual International Earth Building Conference requires separate entrances and a neutral zone where practitioners of different methods can exchange research without coming to blows. Security expenses constitute 34% of the conference budget.
+&nbsp;
+‡‡‡Notable was the Incident at the 1973 symposium when a cob builder and an adobe advocate were seated together at dinner, resulting in what attendees still refer to as "The Debate" despite it never involving actual words, just increasingly aggressive demonstrations with butter pats. The hotel banned earth-building conferences for the next decade.
+&nbsp;
+****This official guidance, published in the Bureau's 847-page manual "Standards for Earth Building Materials: A Comprehensive Guide," has been criticized for its lack of specificity. The Bureau maintains that the vagueness is intentional, arguing that "anyone who cannot intuitively sense proper clay consistency probably shouldn't be building walls that people will live behind." This position is legally defensible but pedagogically questionable.
+&nbsp;
+†††††The record currently stands at seventy-three failed attempts, held by apprentice builder Marcus Dolorus, who documented each failure in meticulous detail before finally achieving success with batch seventy-four. His journal is now required reading at the Academy of Earthen Arts, primarily as a cautionary tale about persistence, but also as proof that some people really should consider different career paths.
+&nbsp;
+*****The ancient god Klay the Yielding is mentioned in exactly one fragmentary text from the Third Dynasty of the Land Before Better Record-Keeping. Scholars debate whether Klay was actually worshipped or merely represented a building material that the scribes got overly dramatic about. The text's description of Klay as "yielding yet firm, humble yet mighty, cheap yet expensive once you factor in repairs" suggests the latter.
+&nbsp;
+‡‡‡‡The International Clay Structure Failure Database, maintained with disturbing enthusiasm by the Department of Things That Fell Down at the University of Hindsight, contains 14,729 documented cases of shrinkage-related collapse. The database is organized by: (1) percentage of overconfidence, (2) percentage of structural failure, and (3) proximity to important events. The correlation between all three factors is striking.
+&nbsp;
+†††††At the time of publication, there are seventeen competing formulas for "ideal" clay mixture, each supported by empirical evidence and contradicted by somebody else's empirical evidence. The most heated dispute involves whether a 4:1 or 5:1 ratio of clay to sand is optimal, a controversy that has generated more academic papers than one would think possible about two numbers.
+&nbsp;
+‡‡‡‡‡This is documented in the Roman text "De Non-Dealing with Problematicis Muddius" by Complainius Maximus, which essentially consists of invasion routes to regions with limestone. The work is surprisingly honest about Roman engineering limitations, though this may be because Complainius was writing from retirement in a marble villa and feeling expansive.
+&nbsp;
+******This is not metaphorical. Clay buildings in humid climates require continuous maintenance, a fact that explains why most surviving ancient clay structures are located in deserts. The exceptions are buildings maintained by obsessive individuals who view wall repair as a spiritual practice, or who lost a bet.
+&nbsp;
+†††††††The Natural Building Movement has contributed significantly to earth construction's revival, though statistics show that 67% of "natural builders" eventually supplement their clay homes with at least some conventional materials, typically starting with the roof and working inward. The remaining 33% either live in very dry climates or have made peace with damp.
+&nbsp;
+‡‡‡‡‡‡These clay minerals have different molecular structures, water absorption rates, and expansion properties, which is fascinating to soil scientists and deeply relevant to whether your walls will crack.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding clay properties building in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  WOOD_PROPERTIES_CONSTRUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  TIMBER_SELECTION_CRITERIA,</span>
+<span class="cstat-no" title="statement not covered" >  WOOD_GRAIN_UNDERSTANDING,</span>
+<span class="cstat-no" title="statement not covered" >  WOOD_SEASONING_DRYING,</span>
+<span class="cstat-no" title="statement not covered" >  LUMBER_DIMENSIONAL_STANDARDS,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_TYPES_CONSTRUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_HARDNESS_TESTING,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_QUARRYING_BASICS,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_SPLITTING_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  CLAY_PROPERTIES_BUILDING</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

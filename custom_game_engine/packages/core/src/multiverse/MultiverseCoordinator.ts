@@ -165,7 +165,7 @@ export class MultiverseCoordinator {
 
     // Create a new world with a fresh event bus
     const forkEventBus = new EventBusImpl();
-    const forkWorld = new World(forkEventBus);
+    const forkWorld = new WorldImpl(forkEventBus);
 
     // Check if forking from a timeline snapshot
     if (options?.fromSnapshotId) {

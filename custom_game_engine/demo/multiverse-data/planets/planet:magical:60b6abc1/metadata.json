@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:60b6abc1",
+  "name": "Titan II",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769238699516",
+  "createdAt": 1769238699521,
+  "lastAccessedAt": 1769238699521,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769238699516",
+    "type": "magical"
+  }
+}

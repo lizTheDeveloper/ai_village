@@ -1,0 +1,2254 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/underground_construction-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> underground_construction-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a>
+<a name='L677'></a><a href='#L677'>677</a>
+<a name='L678'></a><a href='#L678'>678</a>
+<a name='L679'></a><a href='#L679'>679</a>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a>
+<a name='L685'></a><a href='#L685'>685</a>
+<a name='L686'></a><a href='#L686'>686</a>
+<a name='L687'></a><a href='#L687'>687</a>
+<a name='L688'></a><a href='#L688'>688</a>
+<a name='L689'></a><a href='#L689'>689</a>
+<a name='L690'></a><a href='#L690'>690</a>
+<a name='L691'></a><a href='#L691'>691</a>
+<a name='L692'></a><a href='#L692'>692</a>
+<a name='L693'></a><a href='#L693'>693</a>
+<a name='L694'></a><a href='#L694'>694</a>
+<a name='L695'></a><a href='#L695'>695</a>
+<a name='L696'></a><a href='#L696'>696</a>
+<a name='L697'></a><a href='#L697'>697</a>
+<a name='L698'></a><a href='#L698'>698</a>
+<a name='L699'></a><a href='#L699'>699</a>
+<a name='L700'></a><a href='#L700'>700</a>
+<a name='L701'></a><a href='#L701'>701</a>
+<a name='L702'></a><a href='#L702'>702</a>
+<a name='L703'></a><a href='#L703'>703</a>
+<a name='L704'></a><a href='#L704'>704</a>
+<a name='L705'></a><a href='#L705'>705</a>
+<a name='L706'></a><a href='#L706'>706</a>
+<a name='L707'></a><a href='#L707'>707</a>
+<a name='L708'></a><a href='#L708'>708</a>
+<a name='L709'></a><a href='#L709'>709</a>
+<a name='L710'></a><a href='#L710'>710</a>
+<a name='L711'></a><a href='#L711'>711</a>
+<a name='L712'></a><a href='#L712'>712</a>
+<a name='L713'></a><a href='#L713'>713</a>
+<a name='L714'></a><a href='#L714'>714</a>
+<a name='L715'></a><a href='#L715'>715</a>
+<a name='L716'></a><a href='#L716'>716</a>
+<a name='L717'></a><a href='#L717'>717</a>
+<a name='L718'></a><a href='#L718'>718</a>
+<a name='L719'></a><a href='#L719'>719</a>
+<a name='L720'></a><a href='#L720'>720</a>
+<a name='L721'></a><a href='#L721'>721</a>
+<a name='L722'></a><a href='#L722'>722</a>
+<a name='L723'></a><a href='#L723'>723</a>
+<a name='L724'></a><a href='#L724'>724</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TUNNEL_EXCAVATION_BASICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'tunnel_excavation_basics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Tunnel Excavation Basics',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_tunnel_excavation_basics' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Tunnel Excavation Basics: A Foundational Treatise on the Art of Making Holes That Don't Immediately Collapse</span>
+&nbsp;
+The fundamental principle of tunnel excavation is elegantly simple: one must remove material from the earth in such a manner that the remaining earth does not immediately rush in to fill the void you have just created*. This principle, while seemingly obvious to modern practitioners, took humanity approximately four thousand years to fully appreciate†, and even today accounts for roughly 73.4% of all catastrophic failures in amateur tunneling projects‡. The process begins with what the Ancient Guild of Earthmovers termed "the First Cut"**, a ceremonial breaking of ground that has, through centuries of bitter experience, evolved from a purely symbolic gesture into a carefully calculated engineering maneuver††.
+&nbsp;
+The practical application of tunnel excavation follows three essential phases: planning (during which one determines where the tunnel should go), digging (during which one creates the tunnel), and not-dying (during which one attempts to avoid the numerous methods by which tunnels attempt to kill their creators)***. Modern techniques favor the use of specialized boring machines†††, though traditional methods involving pickaxes, determination, and what the Dwarfish Engineering Compendium refers to as "constructive stubbornness" remain popular in certain circles‡‡. The choice of method depends largely on factors such as soil composition, desired tunnel diameter, available budget, and whether one has annoyed any deities recently‡‡‡.
+&nbsp;
+Safety considerations in tunnel excavation cannot be overstated, despite humanity's persistent attempts to do exactly that§. The earth, it must be understood, operates under no obligation to remain where you have left it§§, and possesses what Professor Ignatius Moleworth of the Subterranean Studies Institute described as "an almost vindictive eagerness to demonstrate gravity's constant vigilance"§§§. Support structures must be installed with religious devotion¶—indeed, several ancient cultures made no distinction between their gods of architecture and their gods of survival, which shows admirable practicality¶¶. The ratio of "successful tunnel" to "sudden cave-in" has improved dramatically from the early days of 1:4 to the modern standard of approximately 247:1, though this statistic carefully excludes incidents categorized as "ambitious," "inadvisable," or "demonstrating fundamental misunderstanding of physics"¶¶¶.
+&nbsp;
+The historical development of tunnel excavation reads like a lengthy cautionary tale punctuated by occasional triumphs and frequent disasters#. The earliest recorded tunnel, excavated in Mesopotamia around 2180 BCE, extended for approximately forty cubits before teaching its creators several harsh lessons about water tables##. Medieval tunnel engineers, lacking modern equipment but possessing abundant optimism, developed the "dig and pray" method, which was exactly as reliable as it sounds###. The Renaissance brought mathematical precision to the art, though this precision was frequently undermined by what contemporary accounts describe as "the earth's stubborn refusal to behave mathematically"◊. It was not until the Industrial Revolution that tunnel excavation evolved from a hazardous form of optimistic gambling into merely a dangerous professional occupation◊◊, a transformation the International Society of Underground Construction celebrates annually with speeches, awards, and the lighting of commemorative candles for those who were not as fortunate◊◊◊.
+&nbsp;
+Modern understanding recognizes tunnel excavation as both an art and a science, requiring equal measures of engineering knowledge, practical experience, and what old-time tunnelers called "rock sense"—an intuitive understanding of how stone and soil will behave when disturbed×. Contemporary projects employ geological surveys, computer modeling, and structural analysis to predict conditions with 78.3% accuracy××, though the remaining 21.7% continues to provide employment for emergency response teams and valuable material for engineering case studies typically titled "What Not to Do"×××. The field continues to evolve, with each generation of engineers learning from the successes and, more importantly, the spectacular failures of their predecessors÷, ensuring that the same mistakes are made in new and interesting ways rather than simply repeated÷÷.
+&nbsp;
+---
+&nbsp;
+*The ancient Sumerian word for "tunnel" translates literally as "temporary hole," which suggests they understood the fundamental challenge rather better than many modern practitioners.
+&nbsp;
+†The Historical Society of Subterranean Endeavors maintains that this figure is actually closer to six thousand years if one counts all the collapses that nobody survived to document, which seems only fair.
+&nbsp;
+‡Statistics compiled by the Bureau of Underground Safety and Terminology (BUST), which has been tracking tunnel-related incidents since 1847. Their motto, "We Count So You Don't Have To," appears on memorial plaques throughout their headquarters in Zurich.
+&nbsp;
+**Not to be confused with "The First Cut is the Deepest," which is a different matter entirely and pertains to romantic disappointments rather than geological disruption, though the emotional impact may be comparable when one's tunnel collapses†.
+&nbsp;
+††The distinction between "ceremonial" and "structural" breaking of ground was formalized in 1672 following the Incident at Bremen, where the ceremonial groundbreaking was conducted with such enthusiasm that it triggered a collapse before actual excavation had begun. The mayor's ceremonial shovel is preserved in the Museum of Premature Disasters.
+&nbsp;
+†Which the Guild of Tunnelers insists should be pronounced "tunnels" because they find it funnier that way, though this practice has caused endless confusion in technical literature‡.
+&nbsp;
+‡The proper pronunciation of "tunnel" versus "tunnel" (when spoken aloud) has been the subject of heated debate at the International Conference of Subterranean Linguistics for the past forty-three years, with no resolution in sight. Fights have broken out. It's all rather embarrassing.
+&nbsp;
+***The Third Phase is actually listed first in most historical texts, as it was the primary concern of early tunnel engineers. The First and Second Phases were added later, once survival rates improved enough that people could think beyond immediate self-preservation.
+&nbsp;
+†††These machines were invented by Marc Isambard Brunel in 1825, after he observed shipworms boring through timber and thought, "I could make that bigger and more expensive." He was correct on both counts.
+&nbsp;
+‡‡The Dwarfish Engineering Compendium, volume 47, chapter 12, subsection 9-d: "On the Virtue of Simply Refusing to Let Rock Have the Last Word." Dwarfish engineering manuals are notorious for their philosophical digressions, which often run longer than the actual technical content.
+&nbsp;
+‡‡‡This last factor is rarely mentioned in academic texts but appears with surprising frequency in the private journals of professional excavators. The Goddess of Inconvenient Collapses is particularly noted for her attention to detail and what ancient priests described as "unfortunate timing"§.
+&nbsp;
+§Records from the Temple of Structural Integrity suggest that offerings of "firmly packed earth" and "well-placed support beams" were considered more effective than traditional sacrifices, though both were attempted with equal fervor.
+&nbsp;
+§§A fact that catches approximately 3,000 people by surprise every year, according to the Global Tunnel Incident Database, which tracks what it diplomatically terms "learning opportunities."
+&nbsp;
+§§§Professor Moleworth disappeared in 1903 under circumstances officially described as "sudden and instructive." His last words, "I don't think we need another support beam here," are carved above the entrance to the Society's training facility as a cautionary epitaph.
+&nbsp;
+¶The Architectural Brotherhood of Saint Columba, patron saint of Things That Don't Fall Down, requires novice tunnel engineers to spend six months installing support structures before they are permitted to remove any earth whatsoever. This policy was instituted after what records simply call "The Year of Unfortunate Enthusiasm" (1634).
+&nbsp;
+¶¶The ancient god Upholdus was typically depicted holding the ceiling of a tunnel with his shoulders while looking deeply tired, which perfectly captures the essential spirit of structural support.
+&nbsp;
+¶¶¶These categories were established by the Federal Excavation Standards Board in 1952 and now encompass roughly fourteen percent of all tunnel projects, a figure that has remained remarkably consistent despite improvements in technology. Hope, it seems, springs eternal.
+&nbsp;
+#The Historical Society possesses 847 volumes dedicated to tunnel excavation disasters, compared to just 23 volumes celebrating successes. Volume 424, "The Leipzig Overconfidence Event of 1789," is particularly harrowing and contains a footnote that itself requires a footnote##.
+&nbsp;
+##The original footnote reads: "At this point, the engineers realized water flows downhill." The meta-footnote adds: "This realization came approximately fourteen minutes too late, which is close to the all-time record for 'belatedly obvious revelations' in tunnel engineering."
+&nbsp;
+###Success rate: approximately 1 in 7, which was considered quite good at the time. Medieval engineering standards were, by necessity, extremely forgiving◊.
+&nbsp;
+◊The medieval Guild of Subterranean Craft`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding tunnel excavation basics in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ROCK_STABILITY_ANALYSIS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rock_stability_analysis',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Rock Stability Analysis',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['tunnel_excavation_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_rock_stability_analysis' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Rock Stability Analysis</span>
+&nbsp;
+The fundamental question of rock stability—that is, whether a given geological formation will remain where you left it or suddenly decide to become significantly closer to your current position*—has occupied the minds of engineers, miners, and occasionally very surprised pedestrians since the first human looked at a cliff and thought, "I should build something under that."† The science of rock stability analysis emerged from the gradual recognition that rocks, despite their appearance of solid permanence, are actually engaged in a slow-motion argument with gravity, and gravity has a perfect win record‡. Modern practitioners employ a combination of geological survey, mathematical modeling, and what the Royal Institute of Applied Pessimism calls "looking at it and getting a bad feeling."‡‡
+&nbsp;
+The practical application of rock stability analysis involves calculating factors such as joint orientation, weathering patterns, groundwater pressure, and the Rock Mass Rating (RMR), which on a scale of 0 to 100 attempts to quantify how likely your rock is to remain rock-shaped rather than becoming a rock avalanche†††. Techniques include discontinuity mapping, where one catalogs every crack, fissure, and suspicious-looking shadow**, stereographic projection analysis††, and the increasingly popular method of having the oldest person on site tell you whether the rock "looks funny."‡‡‡ The Guild of Subsurface Engineers maintains that 73.6% of catastrophic failures were preceded by someone saying "it's probably fine," followed by someone else not arguing hard enough***.
+&nbsp;
+Safety considerations in rock stability work cannot be overstated, though many have tried†††. Best practices include never standing directly beneath questionable overhangs, maintaining proper support systems, conducting regular monitoring, and keeping careful records of which geological formations appear to be holding grudges‡‡‡‡. The modern understanding synthesizes ancient empirical knowledge—such as the Dwarven principle of "tap it first"****—with contemporary engineering analysis, creating a discipline that is one-third mathematics, one-third geology, and one-third trying not to think about the weight of everything above you.
+&nbsp;
+---
+&nbsp;
+*The technical term for this phenomenon is "rapid unplanned rock redistribution," though most practitioners favor the more direct "oh gods run."
+&nbsp;
+†Archaeological evidence suggests our ancestors were better at this than given credit for. The Cave of Unfortunate Architectural Choices in the Disputed Territories contains several layers of habitation, each built progressively further from the back wall, suggesting a learning curve measured in ceiling collapses.
+&nbsp;
+‡Gravity's record stands at approximately 13.8 billion years undefeated, according to Professor Horace Pembleton's "Treatise on Forces That Cannot Be Reasoned With" (University of Perpetual Concern Press, 1847). The book's appendix lists various historical attempts to negotiate with gravity, none successful.
+&nbsp;
+‡‡This methodology is formally recognized in the Institute's Manual of Engineering Intuition, Chapter 7: "When Calculations and Dread Disagree, Trust Dread." The Institute was founded after the Incident at Happenstance Bridge, which we're told was very structurally sound right up until it became very structurally distributed across the river valley.
+&nbsp;
+†††The RMR system, developed by Z.T. Bieniawski in 1973, replaced earlier systems such as the "Optimistic/Pessimistic/Run" scale and the Monks of St. Fissure's "Divine Providence Rating," which proved less reliable after the Incident of the Suspicious Ceiling‡. Modern engineers praise its quantitative approach, though site supervisors note that workers still respond more vigorously to "that's a 23 out of 100" when you add "which means the mountain wants us dead."
+&nbsp;
+‡The Monks had rated the ceiling as "Under God's Protection." God apparently had other commitments that afternoon. The monastery was rebuilt 200 meters to the left.
+&nbsp;
+**Discontinuity mapping requires identifying every potential plane of weakness in the rock mass. The Gnomish School of Exhaustive Cataloging once produced a map so detailed it weighed more than the rock formation it described and had to be stored in a separate mountain††.
+&nbsp;
+††The Archive Mountain, as it became known, now requires its own stability analysis. The irony is not lost on anyone except the archivists, who are too busy cataloging the irony to notice it.
+&nbsp;
+†††The International Society of Underground Safety (ISUS) recommends reading their guidelines at least three times, or until you develop a healthy respect for roof bolts, whichever comes first. Their mascot is a cartoon rock with a frowny face, which members insist isn't anthropomorphization but rather "listening to what the geology is telling you."
+&nbsp;
+‡‡‡This technique, formally termed "Experiential Geological Assessment," has a documented success rate of 64.7% when performed by individuals with at least 30 years of experience, and 23.2% when performed by anyone who "used to do some DIY."***** The Guild maintains an annual ceremony honoring The People Who Were Right But Couldn't Prove It In Time.
+&nbsp;
+*****The DIY figure drops to 8.3% if they mention having "a pretty good feel for these things" and approaches 0% if they follow this with "it's not rocket science."
+&nbsp;
+***This statistic is from the Guild's Annual Compendium of Preventable Disasters (2023 edition), which runs to 847 pages and is legally required reading in seventeen jurisdictions. The introduction notes that "probably fine" has preceded more workplace incidents than any other phrase, narrowly beating "hold my beer" and "what's the worst that could happen?"
+&nbsp;
+†††They have been overstated. In 1883, Chief Engineer Mortimer Blackwood wrote a 2,400-page safety manual for the Grimsdyke Quarry that weighed 34 pounds. It fell off a shelf onto an inspector's foot, resulting in the quarry's first recorded safety incident in three years. The current edition is available in digital format only‡‡‡‡.
+&nbsp;
+‡‡‡‡Though the Guild notes that 12% of users still try to drop their tablets on their feet, suggesting some accidents are destiny rather than negligence†††††.
+&nbsp;
+†††††This philosophical position is strongly disputed by the Temple of Preventable Outcomes, whose high priestess maintains that "destiny is just poor planning with better publicity."
+&nbsp;
+‡‡‡‡Rocks holding grudges is considered superstitious nonsense by the Academy of Rational Geology, though notably, the Academy relocated three times between 1923 and 1931 due to what they termed "coincidental structural failures" and what everyone else termed "the mountain was angry."****** The current Academy building is constructed on a flat plain, far from any geological features that might develop opinions.
+&nbsp;
+******The mountain in question, Mount Stubborn, is now home to the Counter-Academy of Empirical Geology, whose motto is "The Rock Knows." They have experienced zero structural failures in ninety-two years of operation, though they do perform monthly "appeasement surveys" that look suspiciously like offerings of quality concrete mix and respectful survey work.
+&nbsp;
+****The Dwarven Codes of Deep Engineering, Volume XII: "Of Rocks That Look Shifty," emphasizes percussion testing. The traditional chant translates roughly as "tap three times, listen four, trust your ears or be no more." Dwarven safety records are exemplary, though they refuse to share detailed statistics, claiming surface-dwellers "wouldn't understand the context."†††††† Human engineers who have worked with Dwarven teams report that the tapping method appears to work, though they suspect the success has more to do with the Dwarves' intimate knowledge of rock behavior accumulated over several thousand years than any acoustic properties of tapping.
+&nbsp;
+††††††The context includes approximately 8,000 years of living underground and what the Dwarves call "cultural memory" and what anthropologists call "really, really not wanting to repeat the mistakes of the Old Kingdom, about which we are told only 'never dig too deep into soft stone after heavy rain,' and frankly that's enough."`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Rock stability analysis is the systematic evaluation of geological formations to predict and prevent failure modes in construction contexts, employing quantitative assessment systems, field surveys, and monitoring techniques to ensure that rocks remain stationary relative to the people working beneath them. This paper examines the fundamental principles, practical applications, and safety considerations of stability analysis, noting that the field successfully combines rigorous engineering with the ancient wisdom of not standing under things that look like they might fall.',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TUNNEL_SUPPORT_SYSTEMS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'tunnel_support_systems',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Tunnel Support Systems',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rock_stability_analysis'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_tunnel_support_systems' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `TUNNEL SUPPORT SYSTEMS: A COMPREHENSIVE GUIDE TO NOT BEING CRUSHED BY SEVERAL THOUSAND TONNES OF ROCK</span>
+&nbsp;
+The fundamental principle of tunnel support systems rests upon a singular, elegant truth: rocks wish to fall*, and it is our sacred duty to prevent them from doing so**. Unlike the optimistic miners of the Pre-Enlightenment period, who believed that rocks possessed a natural affection for ceiling-hood†, modern engineering recognizes that gravity is both relentless and largely unsympathetic to human schedules. The development of systematic tunnel support represents humanity's ongoing argument with geology, conducted through the medium of steel, concrete, and increasingly desperate prayers to any available deities††. Rock masses, left to their own devices, will invariably seek their natural resting state‡—which is, unfortunately, precisely where you are standing.
+&nbsp;
+The practical application of tunnel support systems involves a delicate dance between what is structurally necessary and what the project budget will actually tolerate‡‡. Primary support methods include rock bolts (which are neither rocks nor bolts in the traditional sense‡‡‡), steel ribs, shotcrete§, and the time-honored technique of "hoping really hard that nothing happens during your shift." The New Austrian Tunneling Method§§, despite its name suggesting alpine excellence, was actually developed by a committee that met in seven different countries§§§ and relies heavily on observational techniques—essentially, watching the tunnel very carefully for signs that it is about to express strong geological opinions*. Modern practitioners employ a sequential excavation process**, wherein you dig a bit, support a bit, and occasionally pause to wonder if that creaking sound is normal††.
+&nbsp;
+Historical development of tunnel support systems provides a sobering catalog of what not to do, preserved for posterity by those who survived to write about it†††. The Ancient Romans, blessed with both ambition and a concerning lack of health and safety regulations, pioneered techniques that we now classify under "effective but inadvisable"‡‡. The Industrial Revolution brought systematic approaches, detailed engineering calculations, and the revolutionary concept that workers might prefer not to be buried alive‡‡‡‡. The twentieth century introduced steel arch supports, rock bolting§, and the gradual realization that perhaps one should calculate loads before installation rather than after collapse§§. Contemporary practice combines finite element analysis with centuries of empirical knowledge, creating a hybrid approach the ancients would have recognized as "magic with mathematics"*.
+&nbsp;
+Safety considerations in tunnel support systems operate on the principle that geology is patient, implacable, and capable of holding grudges across geological time**. Best practices include systematic geological mapping††, regular monitoring of convergence measurements†††, and maintaining a healthy respect for rock masses that have waited millions of years for an opportunity to demonstrate gravity‡‡. The International Tunneling Association maintains that 73.4% of tunnel failures could be prevented if humans simply listened to the rocks‡‡‡, though this statistic relies heavily on a very liberal interpretation of "listening"§§. Modern support systems must account for water pressure§§§, seismic activity*, time-dependent deformation**, and the unsettling tendency of rock masses to behave differently on Mondays†††.
+&nbsp;
+The synthesis of support system selection requires understanding the complex interplay between rock mass classification systems‡‡‡‡, excavation method§, support response curves§§, and the fundamental acknowledgment that we are, at best, temporary visitors in the rock's domain§§§. Design methodologies range from empirical approaches based on centuries of trial and (mostly) error* to sophisticated numerical modeling that produces remarkably precise predictions about approximately when everything will go wrong**. The goal remains constant across all methods: to create a stable opening in material that would very much prefer to remain un-opened, using principles that the rocks themselves regard with profound skepticism††.
+&nbsp;
+&nbsp;
+*This is not anthropomorphization. The rocks genuinely wish to fall. They have been planning it since the Carboniferous Period.
+&nbsp;
+**According to the Guild of Subterranean Engineers, this duty has been sacred since at least the Third Age of Digging, though the definition of "sacred" may vary by jurisdiction and insurance coverage.
+&nbsp;
+†The Great Collapse of 1687 thoroughly disproved this theory, along with several prominent mining theorists who had been standing underneath their hypothesis at the time.
+&nbsp;
+††These deities are surprisingly specific. The ancient Tunnel God Dubnos has been accepting offerings since before humans invented the arch, though his response rate has declined since the invention of steel supports†.
+&nbsp;
+†According to fragmentary texts found in the Mythic Archives of Underground Leicester, Dubnos requires tribute in the form of abandoned tools and periodic minor collapses to "maintain cosmic balance." The practice of leaving offerings has been modernized to include safety manuals and expired sandwiches.
+&nbsp;
+‡Usually about six inches below where your head was.
+&nbsp;
+‡‡The 1998 Survey of European Tunneling Projects found that 89.7% of initial support designs were "revised downward due to financial realities," while 100% of project managers expressed confidence that this would be "probably fine." It was fine 87.3% of the time. The other 12.7% of the time provided valuable learning opportunities‡.
+&nbsp;
+‡Primarily for subsequent projects, as the current project had learned everything it was going to learn.
+&nbsp;
+‡‡‡Rock bolts are steel rods inserted into pre-drilled holes and secured with grout or mechanical anchors. They function by creating a zone of reinforced rock around the tunnel, or as one Victorian engineer described it, "convincing the rocks to hold hands like proper gentlemen rather than falling about like drunken sailors"§.
+&nbsp;
+§Sir Reginald Undermountain-Smith, whose 1876 treatise "On the Friendly Encouragement of Geological Cooperation" was largely ignored by both the engineering community and, more critically, by the rocks.
+&nbsp;
+§§Shotcrete is concrete sprayed at high velocity onto rock surfaces, invented simultaneously by three different engineers who were all very tired of things falling on them. The resulting patent dispute lasted longer than most tunnels.
+&nbsp;
+§§§Including Austria (twice), Germany, Switzerland, a train station in Belgium, a very productive meeting in a ski lift, a hotel bar in Norway, and, inexplicably, a conference room in Tanzania. The method works regardless of where you discuss it, though the Tanzanian delegation maintains their contribution was essential.
+&nbsp;
+*The creaking is never normal. It is, however, frequently inevitable.
+&nbsp;
+**This process dates back to the Zigmund Sequence, named after Architect Zigmund the Cautious of Upper Bavaria, who pioneered the technique in 1432 and died of old age rather than tunnel collapse—a notable achievement for the period††.
+&nbsp;
+††Zigmund's contemporary, Bruno the Brave, pioneered the alternative "dig everything at once" method and lasted six weeks. His tomb bears the inscription "He Was Very Fast," which contemporaries insist was intended as praise.
+&nbsp;
+†††The most comprehensive collection exists in the Library of Structural Regrets, located thirty feet below the British Institution of Civil Engineers. It can only be accessed by those who have personally experienced at least one "oh no" moment in their tunneling career, which is to say, everyone‡‡.
+&nbsp;
+‡‡The Library's charter specifically excludes those who claim never to have made a mistake, as they are either liars or had excellent graduate students to blame.
+&nbsp;
+‡‡The Roman technique of "get slaves to hold up the ceiling until we install something permanent" was remarkably effective from an engineering standpoint, though it performed poorly by modern metrics such as "worker satisfaction" and "basic human decency." The technique is no longer taught in accredited programs, though certain budget-conscious contractors have been observed gazing wistfully at Roman engineering texts‡‡‡.
+&nbsp;
+‡‡‡The practice is monitored by the International Labour Organization, which maintains a surprisingly thick file on "Things We Thought We Didn't Need to Explicitly Forbid Anymore But Apparently Do."
+&nbsp;
+‡‡‡‡The Industrial Revolution also brought us the concept of "calculated risk," which replaced the previous system of "unexamined terror" and marked a significant improvement in record-keeping if not necessarily in safety.
+&nbsp;
+§Rock bolting was invented in the 1920s by engineers who were tired of steel arches and wanted to make the rocks themselves do the work. The rocks have yet to forgive this presumption.
+&nbsp;
+§§The most famous case being the Haswell Tunnel Incident of 1923, where calculations performed after the collapse demonstrated that the support system had been inadequate by approximately 400%. The engineer responsible for the post-collapse calculations noted that this was "much easier to compute when you can measure the actual failure mode directly," a comment that did not endear him to survivors.
+&nbsp;
+*Often attributed to Professor Emeritus Stone-Whisperer from the University of Deep Geology, whose controversial paper "Rocks Have Feelings Too: A Phenomenological Approach to Load Distribution" was`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding tunnel support systems in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TIMBER_SHORING_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'timber_shoring_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Timber Shoring Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['tunnel_support_systems'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_timber_shoring_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Timber Shoring Techniques: A Practical Guide to Preventing the Sky from Falling (On You)</span>
+&nbsp;
+The art of timber shoring represents humanity's persistent belief that wood, when properly arranged, can convince gravity to reconsider its options*. At its most fundamental level, timber shoring involves the strategic placement of wooden members—typically beams, posts, and wedges—to support unstable structures during excavation, renovation, or the awkward period after someone removes a load-bearing wall without consulting an engineer†. The technique operates on principles that would seem intuitive to anyone who has ever propped up a sagging bookshelf, yet the International Bureau of Construction Incidents estimates that approximately 73.6% of shoring failures involve someone saying "that should hold it" moments before it demonstrably doesn't‡.
+&nbsp;
+Modern timber shoring employs three primary configurations: raking shores, flying shores, and dead shores**, each named with the sort of grim optimism that characterizes the construction industry††. Raking shores lean at an angle against a wall, transferring loads to the ground through what physicists call "the same principle that keeps drunk people from falling over when they lean against things"‡‡. Flying shores span horizontally between two structures, creating what the Moers-Ankh Manual of Improbable Engineering describes as "a wooden handshake between buildings that don't particularly like each other"***. Dead shores, despite their ominous nomenclature†††, simply support loads vertically and have the lowest mortality rate of any shoring technique‡‡‡, though the Guild of Nomenclature Revision has been trying to rename them "Upright Load-Transfer Assemblies" for three decades with limited success****.
+&nbsp;
+The practical execution of timber shoring demands attention to detail that borders on the obsessive††††. Each timber must be precisely cut, sized, and positioned‡‡‡‡, with wedges driven at calculated intervals to ensure even load distribution*****. The ancient Mesopotamian Tablet of Things We Learned the Hard Way†††††, discovered beneath a collapsed grain warehouse, contains seventeen separate warnings about checking timber for rot before installing it as structural support‡‡‡‡‡, suggesting this particular lesson required multiple demonstrations before achieving consensus******. Modern practitioners must also account for factors their predecessors never considered: the compressive strength of various timber species†††††††, the effects of moisture on load-bearing capacity‡‡‡‡‡‡, and the probability that someone will use the shoring as an impromptu ladder despite explicit instructions not to********. The Department of Preventable Calamities maintains that proper timber shoring, when executed with due diligence, can support structures indefinitely—or at least until someone decides to remove "just one piece" to see what happens†††††††††.
+&nbsp;
+Safety considerations in timber shoring represent less a checklist and more a philosophical commitment to remaining un-crushed*********. The essential rule, as articulated by Dame Weatherwax's Principle of Applied Common Sense‡‡‡‡‡‡‡, states: "If you must ask whether the shoring is strong enough, it isn't"**********. Historical records contain numerous cautionary tales, including the Incident of '87††††††††††, the Great Berlin Miscalculation of 1923‡‡‡‡‡‡‡‡, and the event that caused the city of Ankh-Morpork to legally classify "temporary" as "anything less than fifty years"***********. Modern standards require not only proper installation but also daily inspection††††††††††††, documented load calculations‡‡‡‡‡‡‡‡‡, and what the British Standards Institute calls "an appropriate level of paranoia"************. The timber must be checked for splits, checks, shakes, wane, and approximately forty-seven other defects, each with its own technical definition and each capable of transforming "adequate support" into "expensive lawsuit"†††††††††††††.
+&nbsp;
+---
+&nbsp;
+**FOOTNOTES:**
+&nbsp;
+*The Pratchett Institute for Gravitational Resistance notes that gravity has never once reconsidered, but remains diplomatically silent on this point to avoid discouraging students.
+&nbsp;
+†According to the Archive of Regrettable Decisions, the phrase "it's not load-bearing" ranks third in last words spoken before structural failure, just behind "watch this" and "the engineer was probably exaggerating."
+&nbsp;
+‡The remaining 26.4% involve people who were certain it would hold, which is somehow worse. The Bureau does not collect data on their facial expressions immediately before collapse, as this is considered unnecessarily cruel to researchers.
+&nbsp;
+**The nomenclature suggests that construction workers throughout history have possessed either a dark sense of humor or a concerning lack of imagination. Evidence supports both theories.
+&nbsp;
+††Flying shores do not actually fly, disappointing generations of apprentices. The Disappointed Apprentices' Support Group meets every third Thursday.
+&nbsp;
+‡‡Professor Wobble of the University of Precarious Structures spent fifteen years studying this phenomenon before being permanently banned from academic conferences for demonstrating it in person.
+&nbsp;
+***The Manual, weighing approximately forty-two pounds†, contains this and 1,847 other metaphors, none of which have improved anyone's understanding of engineering principles but all of which sound impressive at dinner parties.
+&nbsp;
+†Exactly forty-two pounds. The Moers-Ankh Guild of Technical Writers considers this "cosmically appropriate" but refuses to explain why.
+&nbsp;
+†††The term dates from the 1700s when the Worshipful Company of Carpenters decided that "vertical shores" sounded insufficiently dramatic. Death rates among shore installers that year suggest the new name was considered motivational.
+&nbsp;
+‡‡‡Dead shores account for only 3.2% of shoring-related fatalities, primarily because gravity operates in their favor rather than against it. The other 96.8% involve variations of "I thought it was braced."
+&nbsp;
+****The Guild's proposal includes a 127-page justification and a budget of £2.3 million for new signage. The proposal has been under review since 1994.
+&nbsp;
+††††The Obsessive Detail Society awarded its Golden Caliper to timber shoring in perpetuity after determining that practitioners checked measurements an average of 4.7 times per cut, which the Society deemed "acceptable but could be higher."
+&nbsp;
+‡‡‡‡The ancient architect Imhotep‡, when asked about timber tolerances, reportedly said "the width of a hair." His student asked "which hair?" Imhotep promoted him immediately.
+&nbsp;
+‡Not the famous one. A different Imhotep who was very particular about timber and frequently confused for his more famous namesake, to his eternal irritation.
+&nbsp;
+*****Wedges must be driven "firmly but not enthusiastically," according to the Manual of Measured Force. The manual does not define "enthusiastically," leading to the formation of the Committee for Enthusiasm Quantification, which has been meeting since 1973 without reaching consensus.
+&nbsp;
+†††††The tablet, now housed in the British Museum's Basement of Things We'd Rather Not Think About, spends six full sections on rotted timber alone, suggesting the lesson was particularly expensive.
+&nbsp;
+‡‡‡‡‡The seventeenth warning is simply "SERIOUSLY THOUGH" carved in letters three inches high, implying the previous sixteen attempts at communication had been insufficient.
+&nbsp;
+******The Mesopotamian Builders' Guild eventually made "checking timber for rot" the oath of membership, recited while standing under a previously collapsed structure for emphasis.
+&nbsp;
+†††††††Douglas fir can support approximately 7,000 pounds per square inch in compression before failing. Southern pine manages about 6,650 psi. Oak achieves 6,000 psi. Balsa wood, despite fervent belief by one memorable contractor‡‡, manages considerably less.
+&nbsp;
+‡‡The contractor's name is preserved in the International Registry of Bad Ideas under case file "But It's Still Wood, Isn't It?" alongside his remarkably optimistic load calculations.
+&nbsp;
+‡‡‡‡‡‡Wet timber can lose up to 50% of its strength. The Guild of Damp Basements discovered this in 1856 through what they now call "aggressive field testing" and what everyone else calls "Tuesday."
+&nbsp;
+********The Department tracks ladder-related shoring failures separately. The category was created in 1967 and has required its own filing cabinet since 1982.
+&nbsp;
+†††††††††This person's identity is never recorded, as they are typically fleeing the scene at considerable velocity when the structure fails.
+&nbsp;
+*********The Society for Un-Crushedness (founded 1842, currently 127 members, all still un-crushed) considers this the foundation of all construction safety philosophy.
+&nbsp;
+‡‡‡‡‡‡‡Dame Weatherwax was not actually involve`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding timber shoring techniques in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ROCK_BOLT_INSTALLATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rock_bolt_installation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Rock Bolt Installation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['timber_shoring_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_rock_bolt_installation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Rock Bolt Installation: A Comprehensive Examination of Anchoring Techniques in Modern Construction</span>
+&nbsp;
+The fundamental principle of rock bolt installation rests upon a concept so elegant in its simplicity that it was reportedly dismissed as "too obvious to be useful" by the Consolidated Association of Mining Engineers in 1847*. A rock bolt is, in essence, a steel reinforcement element installed into rock to create a composite structure that is stronger than the sum of its parts**. The bolt works by creating a zone of compression in the surrounding rock mass, counteracting the natural tendency of fractured rock to separate and fall upon the heads of those standing beneath it***. This compression is achieved through the application of tension to the bolt, typically ranging from 80 to 250 kilonewtons, though the Svalbard Incident of 1923 demonstrated that "more tension" is not always synonymous with "better outcomes"†.
+&nbsp;
+The installation process itself requires a methodical approach that has evolved considerably since the days when dwarfish engineers would simply hammer iron spikes into cave ceilings and hope for the best††. Modern practice begins with drilling a hole of appropriate diameter—typically 32 to 51 millimeters—into the rock face†††, followed by insertion of the bolt assembly, which may be grouted, mechanically anchored, or friction-stabilized depending on the geological conditions‡. The grouting process, while appearing straightforward, demands precise attention to the water-cement ratio, pumping pressure, and curing time‡‡. Those who have attempted to "speed things along" by applying load before the grout has properly cured have contributed significantly to the cautionary tale archive maintained by the International Federation of Tunnel Engineers‡‡‡, a collection that now occupies seventeen filing cabinets and requires its own curator§.
+&nbsp;
+Safety considerations in rock bolt installation cannot be overstated, though many have tried, often while standing directly beneath unstable rock faces§§. Personal protective equipment includes hard hats rated for falling rock (not falling tools, which require a different standard entirely), safety glasses capable of withstanding both rock dust and the occasional ricochet of a dropped wrench, and steel-toed boots that provide psychological comfort more than actual protection against a collapsing tunnel ceiling§§§. The drilling operation itself presents multiple hazards: the drill steel may bind and whip violently¶, silica dust accumulates at concentrations that would impress even the most dedicated collectors of atmospheric particulates¶¶, and the hydraulic systems operate at pressures sufficient to inject oil directly through human skin¶¶¶. The Guild of Rock Bolt Installers maintains a comprehensive database of installation failures, cross-referenced by cause, severity, and whether the responsible party survived to learn from the experience**.
+&nbsp;
+Historical development of rock bolt technology traces back to mining operations in the Alps during the late 19th century, though the ancient Mörkstollen civilization had apparently developed a rudimentary version using bronze spikes and a paste made from volcanic ash and squid ink***. The modern era began in earnest with the introduction of mechanical anchors in the 1950s, followed by resin-grouted systems in the 1960s†††, and the current proliferation of self-drilling hollow bolts that serve simultaneously as drill bit, bolt, and grout injection tube‡‡‡‡. Recent innovations include corrosion-resistant materials for permanent installations, inflatable anchors for temporary support§§§§, and monitoring systems that can detect bolt tension degradation before catastrophic failure occurs¶¶¶¶, though the definition of "before" remains subject to vigorous debate among survivors*****.
+&nbsp;
+Contemporary best practice mandates regular inspection of installed bolts, typically using a calibrated torque wrench to verify that tensile loads remain within specification†††††. Pull-out testing, while destructive to the tested bolt, provides invaluable data about the installation quality and should be performed on a statistically significant sample‡‡‡‡‡—generally 2-5% of total bolts installed, or until the budget runs out, whichever comes first§§§§§. Pattern design varies with rock conditions but typically follows a grid spacing of 1.0 to 2.5 meters¶¶¶¶¶, with closer spacing in areas of poor ground quality or where engineers wish to convey the impression of taking things very seriously indeed******.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+\* The Association's official minutes record the vote as 47-3 against pursuing rock bolt research, with one abstention from a member who was apparently too busy enjoying the tea service to form an opinion. The three dissenting votes came from junior engineers who were subsequently assigned to survey abandoned mine shafts in Wales as punishment for their "excessive enthusiasm for novelty."
+&nbsp;
+\*\* This composite action works on the same principle as a well-made sandwich, wherein the individual components achieve structural integrity through compression and strategic placement. Unlike sandwiches, however, rock bolts are not improved by the addition of mustard, as demonstrated in the Condiment Confusion of 1967 when a newly graduated engineer mistook a grout mixing bucket for his lunch container.
+&nbsp;
+\*\*\* The natural frequency at which rocks detach from tunnel ceilings follows a statistical distribution that would be fascinating if it weren't so lethal. The International Tunneling Association publishes annual reports on this phenomenon, written in the diplomatic language that organizations use when discussing member fatalities.
+&nbsp;
+† Swedish authorities remain notably reluctant to discuss the Svalbard Incident in detail, though leaked documents suggest it involved an overenthusiastic application of tensioning equipment, six kilometers of evacuated tunnels, and a rock bolt that achieved low orbit. The bolt was never recovered, leading to persistent rumors among arctic researchers that it now orbits Earth as an unusual piece of space debris, visible through telescopes as a tumbling steel rod that reflects sunlight at irregular intervals.
+&nbsp;
+†† Dwarfish engineering manuals from this period, primarily preserved in the archives of Königsberg‡‡‡‡‡‡, display a refreshing confidence in the structural integrity of "really quite sturdy hammering." Mortality rates among early practitioners suggest this confidence was somewhat misplaced.
+&nbsp;
+‡‡‡‡‡‡ Specifically, the Königsberg Museum of Underground Construction Failures, which maintains the world's largest collection of bent drill bits, fractured rock bolts, and small memorial plaques. The museum's gift shop offers remarkably tasteful refrigerator magnets.
+&nbsp;
+††† The diameter must account for both the bolt size and the surrounding annulus of grout or resin, a mathematical relationship that continues to confound approximately 12% of field engineers despite multiple training seminars and an explanatory children's book commissioned by the British Tunneling Society in 2003.
+&nbsp;
+‡ Friction-stabilized bolts work on the principle that sufficient pressure applied over a large surface area can prevent movement. This is the same principle that prevents heavily laden furniture from sliding across floors, and shares the same weakness: insufficient friction coefficient results in dramatic and sudden relocation. The city of Prague maintains detailed records of one such relocation event in its municipal tunnel system, though they classify them as "entertainment" rather than "engineering documentation."
+&nbsp;
+‡‡ The water-cement ratio of 0.4 to 0.5 by weight represents a balance between pumpability and strength that was discovered through extensive trial and error, mostly error. Early experimenters who favored ratios outside this range contributed valuable data about grout that was either too thick to pump or too thin to support anything except theoretical discussions.
+&nbsp;
+‡‡‡ The archive includes one particularly poignant video from a Chilean copper mine, wherein a quality control engineer can be heard stating "I'm sure it's fine" approximately forty seconds before his hard hat becomes a closer participant in the rock face than he had intended. He survived with minor injuries and a severely adjusted attitude toward curing times.
+&nbsp;
+§ The curator, Dr. Helena Grubenstein, holds a doctorate in Applied Catastrophe Studies and has written extensively about the psychological profiles of engineers who ignore warning signs. Her seminal work, "The Optimism Bias in Underground Construction: A Posthumous Analysis," remains required reading at several engineering schools, though students report finding it "uncomfortably specific" and "harder to sleep after reading."
+&nbsp;
+§§ The practice of understating safety requirements has a long and distinguished history in construction, dating back to the ancient Mesopotamian codes which specified that architects whose buildings collapsed should be buried in the rubble "for no more than three days, unless circumstances warrant extension of the period." Modern insurance actuaries have noted that understatement remains inversely correlated with survival rates.
+&nbsp;
+§§§ The boots serve primarily to prevent stubbed toes and provide a false sense of security when standing beneath multi-ton rock masses held in place by what is essentially an elaborate version of a wall anchor. The psychological benefit should not be underestimated, as stressed engineers perform calculations more accurately than terrified ones, though both groups have approximately the same survival rate in catastrophic failure scenarios.
+&nbsp;
+¶`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding rock bolt installation in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TUNNEL_VENTILATION_SYSTEMS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'tunnel_ventilation_systems',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Tunnel Ventilation Systems',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rock_bolt_installation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_tunnel_ventilation_systems' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Tunnel Ventilation Systems: A Practical Guide to Not Suffocating Underground</span>
+&nbsp;
+The fundamental principle of tunnel ventilation is deceptively simple: air must go in, and air must come out*. This seemingly obvious observation has, throughout history, required an astonishing amount of engineering expertise, mathematical calculation, and occasional divine intervention† to implement correctly. Modern tunnel ventilation systems operate on the principle of controlled airflow, utilizing either longitudinal ventilation (wherein air flows along the tunnel's length), transverse ventilation (where air is introduced and extracted at regular intervals), or semi-transverse systems‡, which represent the engineering equivalent of hedging one's bets. The volumetric flow rate required depends on tunnel length, cross-sectional area, anticipated traffic load, and the phase of the moon**.
+&nbsp;
+The practical implementation of tunnel ventilation begins with calculating the required air velocity, typically between 2-10 meters per second for road tunnels††, though this varies significantly based on whether one is ventilating a railway tunnel, a mining operation, or the infamous Bore of Perpetual Regret‡‡. Modern systems employ jet fans, axial fans, or semi-transverse systems with supply and exhaust ducts***, with the selection depending on tunnel geometry, local regulations, and budget constraints†††. Construction-phase ventilation presents unique challenges, as the tunnel itself is incomplete and workers require fresh air while simultaneously creating dust, diesel exhaust, and what the International Guild of Underground Workers euphemistically terms "biological aerosols"‡‡‡. Ducted ventilation systems with auxiliary fans remain the gold standard during construction, though the positioning of these ducts requires considerable forethought§.
+&nbsp;
+Safety considerations in tunnel ventilation cannot be overstated, as history abundantly demonstrates through a litany of cautionary incidents§§. The primary concerns include carbon monoxide accumulation, dust control, temperature regulation, and smoke management in the event of fire§§§. The Memorial Day Tunnel Disaster of 1949 in New York demonstrated with brutal clarity that inadequate ventilation transforms a tunnel into a horizontal chimney*. Modern safety protocols require continuous air quality monitoring, emergency ventilation modes capable of reversing airflow direction within minutes, and redundant systems that account for Murphy's Law†. The critical velocity concept—the minimum airflow velocity required to prevent smoke backlayering during a fire—represents one of the more mathematically elegant solutions to a problem that is, at its core, absolutely terrifying‡.
+&nbsp;
+* And preferably not in the same location, though the Department of Subterranean Affairs reports that approximately 3.7% of early tunnel ventilation designs failed to account for this distinction, resulting in what engineers term "a vigorous circular breathing situation." See also: The Great Circular Breathing Incident of 1823, wherein the entire workforce of the Thames Tunnel became extraordinarily dizzy.
+&nbsp;
+† The Cathedral of Underground Saints maintains records of 847 separate prayers specifically dedicated to tunnel ventilation, dating back to the first recorded mining operation. Saint Petronius of Bologna, patron saint of fresh air in enclosed spaces, is invoked with surprising frequency even in our secular age.
+&nbsp;
+‡ Semi-transverse systems involve either supply or exhaust ducts, but not both. This represents the engineering profession's acknowledgment that perfection is expensive and compromise is cheaper. The Society of Pragmatic Engineers† has elevated this to a foundational principle.
+&nbsp;
+†† Unless you're in the Ventilation Neutral Zone of Central Switzerland, where local regulations require that air velocity be "sufficient but not excessive," a legal definition that has generated approximately 40,000 pages of case law and three separate academic journals dedicated exclusively to parsing it.
+&nbsp;
+** This is not actually true, though the Guild of Lunar Engineers has been lobbying since 1967 to make it so. They argue, with impressive charts and minimal evidence, that gravitational variations affect air density in measurable ways. The rest of the engineering community largely ignores them, except at conferences where they provide entertainment.†
+&nbsp;
+††† The Bore of Perpetual Regret, located beneath the Disputed Territories of Lower Saxony, requires ventilation calculations that account for the peculiar property of the local limestone to absorb oxygen at a rate 14% higher than standard rock. This was discovered only after the tunnel was completed, resulting in what historians call "an awkward renegotiation of the original contract."‡
+&nbsp;
+*** Jet fans create thrust by accelerating air, similar to miniature aircraft engines mounted to the tunnel ceiling. They are remarkably effective and produce a noise level that the manufacturer describes as "stimulating" and workers describe as "that infernal howling that haunts our dreams." The Department of Occupational Hearing Loss maintains that this constitutes a technical distinction.
+&nbsp;
+††† In the infamous case of the Meridian Tunnel Project (2003-2007), budget constraints led to the installation of ventilation fans rated for a tunnel 40% shorter than the actual construction. The resulting airflow patterns created what meteorologists would recognize as a localized weather system, complete with predictable afternoon breezes and, on one memorable occasion, a small cloud formation at the 2.3-kilometer mark.
+&nbsp;
+‡‡‡ This term encompasses methane from biological sources, which is produced at a rate that correlates directly with the quality of food provided in the workers' canteen. The Guild of Tunnel Nutritionists† has published extensively on this relationship, though their recommendations are rarely implemented due to cost concerns.
+&nbsp;
+† Founded in 1891 after the Magnificent Folly of Excessive Perfectionism nearly bankrupted the construction of the Alpine Certainty Tunnel. Their motto, "Good Enough Is Good Enough," is carved above their headquarters entrance, albeit in rather plain lettering.
+&nbsp;
+†† The Guild of Lunar Engineers' annual conference regularly devolves into heated arguments with the Society of Flat Earth Engineering, though both groups agree that mainstream engineering is too dogmatic. This represents a rare moment of unity.
+&nbsp;
+‡ The limestone in question, technically classified as Berengia hyperoxygenica, was formed during a period when atmospheric oxygen levels were substantially higher. The rock, in a geological sense, remembers this and attempts to restore equilibrium. Professor Heinrich von Suffocatinghaus published his doctoral thesis on this phenomenon in 1998, titled "When Stone Breathes: A Cautionary Tale in Three Parts (Plus Appendices of Regret)."
+&nbsp;
+§ The positioning of ventilation ducts during construction follows what Master Ventilator Jeremiah Gasping called "the rule of slightly more forward than you'd think." This imprecise guidance has been refined into ISO Standard 34.7.2, which specifies duct placement within 15 meters of the tunnel face, though this varies based on the presence of geological features, worker complaints, and whether the site engineer is having a good day.
+&nbsp;
+§§ The Archives of Preventable Underground Disasters occupy seventeen floors of the International Tunnel Safety Bureau's headquarters in Geneva. The reading room requires written permission to access, a note from one's physician confirming cardiac fitness, and a signed acknowledgment that certain case studies may induce nightmares. The archivist, Ms. Dolores Grimsworth, has not smiled since 1994.
+&nbsp;
+§§§ The temperature in underground construction sites can reach what workers call "the bronze age of sweat," typically 35-40°C without adequate ventilation. The Ancient Guild of Climate Controllers‡ maintains that modern engineers have lost the wisdom of the old ways, specifically citing the ventilation designs of the Egyptian pyramid builders, who achieved remarkable air circulation through means that remain, technically speaking, mysterious and possibly magical.
+&nbsp;
+* The Memorial Day Tunnel Disaster involved a carbon monoxide buildup that affected 66 people, resulting in fundamental changes to tunnel ventilation standards worldwide. The International Coalition for Not Repeating That Please was formed six months later and continues to this day to ensure that "toxic air accumulation awareness" remains at the forefront of tunnel engineering education.
+&nbsp;
+† Murphy's Law, as every engineer knows, states that anything that can go wrong will go wrong, at the worst possible moment, probably just after the warranty expires. The corollary specific to tunnel ventilation, Murphy's Underground Addendum, specifies that fan failures will occur during periods of maximum traffic, minimum atmospheric pressure, and maximum potential for embarrassing the consulting firm responsible. This law has been verified experimentally more times than any researcher would prefer.
+&nbsp;
+‡ The critical velocity equation, developed independently by researchers in the 1960s, requires calculating the flame Froude number and accounting for tunnel hydraulic diameter, which sounds impressive at conferences but essentially boils down to "make the air go fast enough that smoke doesn't flow backward and kill everyone." Dr. Thomas Ashford of the Institute for Stating the Obvious received tenure for this observation.
+&nbsp;
+‡ The Ancient Guild of Climate Controllers traces its lineage back to the first human who realized that caves needed airflow. Their current headquarters is, ironically, in a building notorious for poor ventilation. The symbolism is lost on absolutely no one, yet they refuse to relocate on the grounds that "the current arrangement builds character`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding tunnel ventilation systems in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const UNDERGROUND_WATER_MANAGEMENT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'underground_water_management',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Underground Water Management',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['tunnel_ventilation_systems'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_underground_water_management' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Underground Water Management</span>
+&nbsp;
+The fundamental principle of underground water management in construction may be summarized thus: water, being considerably older than humanity* and substantially less interested in our architectural ambitions**, will invariably attempt to occupy any space we excavate†. This creates what the Ancient Guild of Undermasons refer to as "the Eternal Disagreement"—a philosophical conflict between the human desire to keep holes dry and water's inexorable determination to fill them‡. Modern practitioners have developed an arsenal of techniques ranging from the elegantly simple (drilling holes for water to leave through) to the bewilderingly complex (creating entire underground rivers that didn't exist before), though the success rate remains what the International Brotherhood of Dampness Prevention describes as "optimistically variable"††.
+&nbsp;
+The practical application of these principles requires an understanding of hydrostatic pressure, which increases at a rate of approximately 0.433 pounds per square inch per foot of depth***, or as the medieval water-workers put it, "deeper means wetter and angrier"‡‡. Dewatering systems—pumps, wells, and drainage networks—must be designed with the understanding that water possesses what can only be described as tactical cunning†††. The De Aqua Subterranea treatise of 1447 documents seventeen separate incidents where water "outflanked" inadequately planned drainage systems‡‡‡, a term that should not be possible for a liquid but nonetheless appears entirely accurate§. Contemporary methods include sump pumps§§, wellpoint systems§§§, and deep wells*, each selected based on soil permeability**, anticipated flow rates***, and whether the project engineer has previously angered any water spirits†.
+&nbsp;
+Historical development of underground water management reads less like a chronicle of steady progress and more like a series of increasingly elaborate arguments with geology††. The Romans, whose engineering prowess remains legendary, maintained extensive records of their tunnel-building enterprises, including a remarkable account from the construction of the Aqua Claudia where workers discovered that removing water from one location merely caused it to appear in three others, as though following some malicious conservation law‡‡. Medieval engineers developed the "Prayer and Pump" method, which was exactly what it sounds like§, while the Industrial Revolution introduced steam-powered pumping systems that could move truly staggering volumes of water§§, provided they didn't explode§§§, which they did with distressing regularity*. The modern era has added electric pumps, monitoring systems, and computer modeling, though these merely allow us to predict our failures with greater precision**.
+&nbsp;
+Safety considerations in underground water management cannot be overstated, though they frequently are***. The sudden ingress of water into an excavation†† creates what safety engineers call an "extremely suboptimal working environment"‡‡‡—a euphemism ranking alongside "rapid unscheduled disassembly" and "energetic material redistribution"§. Workers must be trained to recognize the warning signs: increasing dampness§§, unusual seepage patterns§§§, and the sound of water moving where no water should be*, which veterans describe as ranging from "gently unsettling" to "theologically troubling"**. The Prevention of Underground Drowning Act of 1891*** mandates that all excavations below the water table must maintain pumping capacity at 150% of anticipated flow†††, a figure that sounds generous until one learns it was originally 250% before being reduced following lobbying by the Association of Optimistic Contractors‡‡‡‡.
+&nbsp;
+The integration of underground water management with other construction systems, particularly ventilation§, represents the pinnacle of subterranean engineering coordination§§. Water and air, being fluids of different densities but similar obstinacy§§§, must be managed in concert to prevent what the Technical Manual on Underground Environmental Control describes as "fluid chaos scenarios"*. Modern construction projects employ hydrogeologists**, drainage specialists***, and what can only be described as "water whisperers"††—individuals who claim to sense underground water through methods the scientific community politely describes as "not yet fully understood"‡‡. Whether through ancient wisdom or modern technology‡‡‡, the goal remains unchanged: to maintain a philosophical disagreement with water that, while never truly won, can at least be sustained long enough to complete construction§§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* Water predates humanity by approximately 4 billion years, give or take a Tuesday. It has been holding its own against mountains for quite some time and is not impressed by our holes.
+&nbsp;
+\*\* A sentiment water shares with most geological features, weather patterns, and house cats.
+&nbsp;
+† The International Institute of Underground Engineering maintains that this is not technically anthropomorphism, as water genuinely does attempt this. Their evidence includes seventeen thousand documented cases and one researcher's nervous breakdown.
+&nbsp;
+‡ Also known as "The Dampness Wars," though this name was rejected by the official historical record for being "too honest." The Guild of Undermasons has been fighting this war since 3200 BCE, when the first ambitious Sumerian decided to dig below the water table. Contemporary accounts suggest this went poorly.
+&nbsp;
+†† This is a polite institution. Their internal documentation describes it as "a coin flip performed with a weighted coin provided by water."
+&nbsp;
+\*\*\* This precise figure results from thousands of years of measurement and one particularly pedantic engineer in 1873 who insisted on calculating it to seven decimal places. His colleagues found this annoying but couldn't dispute the mathematics.
+&nbsp;
+‡‡ This poetic formulation was surprisingly accurate. Modern hydrogeology confirms that deeper water is indeed under greater pressure and, if water could have emotional states, would be justifiably irritated.
+&nbsp;
+††† The De Aqua Subterranea is, remarkably, a real 1447 treatise, though the "seventeen incidents" are poetically elaborated. The actual text describes water behavior in terms that translate roughly to "malicious" and "possessed of forethought," which medieval scholars apparently considered appropriate scientific language.
+&nbsp;
+‡‡‡ Modern fluid dynamics suggests that water doesn't actually possess tactical awareness, but after the Incident at the Barcelona Metro Extension in 1967‡‡‡†, several engineers retired early rather than continue arguing this point.
+&nbsp;
+‡‡‡† The Barcelona Incident involved water apparently waiting until the most expensive equipment had been moved into the tunnel before finding a new path through "impossible" geology. Official reports called it "statistically unlikely." Workers called it "personal."
+&nbsp;
+§ Sump pumps, which remove water from the lowest point of an excavation, are named after the "sump"—a technical term meaning "hole where water collects while looking smug."
+&nbsp;
+§§ The British Subterranean Engineering Society maintains records showing that 73.8% of sump pump failures occur at 2:17 AM on weekends. Water's apparent awareness of human work schedules remains "unexplained."
+&nbsp;
+§§§ Wellpoint systems involve creating numerous small wells around an excavation perimeter. The technique works beautifully until it doesn't, at which point it becomes several dozen fountains celebrating your failure.
+&nbsp;
+\* Deep wells can lower water tables by drawing down surrounding aquifers, a technique the ancient Egyptians used and modern engineers have expanded upon by adding electricity, thereby creating more ways for things to go wrong.
+&nbsp;
+\*\* Soil permeability measures how easily water flows through soil. Clay has low permeability; gravel has high permeability. Discovering you've estimated wrong has consequences measured in pumping costs and existential despair.
+&nbsp;
+\*\*\* Flow rates are calculated using Darcy's Law, named after Henry Darcy, who in 1856 spent considerable time thinking about water moving through sand. His friends thought this odd, but he had the last laugh when it became foundational to modern hydrogeology. He died in 1858, possibly from thinking too hard about sand.
+&nbsp;
+† The role of spiritual considerations in water management is disputed. However, the Society of Rational Engineers notes that 64% of their members have, at some point, made offerings to various deities while waiting for a pump to restart. This is officially classified as "stress relief" rather than "propitiation of aqueous entities."
+&nbsp;
+†† The British Museum houses tablets describing the Romans' growing frustration with water during the construction of various underground projects. One engineer carved, roughly translated, "WATER IS A BASTARD" into a support timber. The timber was discovered in 1923, preserved by the very water it complained about. Irony, it seems, crosses temporal boundaries.
+&nbsp;
+‡‡ This phenomenon is known as "hydraulic connectivity" in technical literature and "water's revenge" in practical conversation. The Aqua Claudia workers ultimately developed a system of interconnected drains that successfully managed the water, though records suggest it took twelve years longer than planned and three times the budget.
+&nbsp;
+§ Documentation from the Abbey of Saint-Germain-des-Prés describes this method in detail: "First, one prays to Saint Barbara, patron of miners an`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding underground water management in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MINE_SHAFT_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'mine_shaft_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Mine Shaft Construction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['underground_water_management'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_mine_shaft_construction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Mine Shaft Construction: A Vertical Journey Through Time, Rock, and Regrettable Decisions</span>
+&nbsp;
+Mine shaft construction represents one of humanity's most ambitious endeavors to argue with gravity while simultaneously testing the proposition that "down" is merely a suggestion*. The fundamental principle involves creating a stable vertical or inclined passage through geological strata†, typically while ignoring the substrate's strongly-worded protests. Modern understanding recognizes three essential phases: preliminary assessment (wherein optimistic engineers examine rock samples)‡, active excavation (wherein pessimistic engineers examine their life choices)**, and structural reinforcement (wherein realistic engineers examine their insurance policies)††. The successful shaft requires consideration of load-bearing capacity, water management‡‡, ventilation requirements***, and the unfortunate tendency of the earth to close any holes humans presume to make in it.
+&nbsp;
+Historical development of shaft construction techniques traces back to the early Bronze Age, when our ancestors discovered that digging straight down was marginally more efficient than digging at angles†††, though significantly more likely to result in what the Ancient Mesopotamian Guild of Excavators termed "accelerated geological reunification"‡‡‡. Medieval practitioners introduced timber support systems after the Incident of 1347****—which the Bavarian Mining Commission still refuses to discuss in detail††††—and the Renaissance brought mathematical approaches to shaft geometry‡‡‡‡. The Industrial Revolution contributed mechanized hoisting systems, explosives*****, and a 340% increase in the phrase "seemed like a good idea at the time"†††††. Contemporary methods integrate geological surveying, computer modeling, and a healthy respect for any rock formation locally known as "The Widow-Maker"‡‡‡‡‡.
+&nbsp;
+Practical construction begins with the sinking phase, wherein workers excavate downward in carefully measured increments******, installing temporary support structures at intervals precisely calculated to prevent what engineers euphemistically call "premature collapse events"******. The shaft's cross-sectional geometry must accommodate hoisting equipment, ventilation ducting, emergency egress routes, and the psychological need for workers to not feel they're descending into a geological throat attempting to swallow them†††††††. Wall treatment varies by substrate: competent rock may require minimal intervention‡‡‡‡‡‡, while fractured or water-bearing formations demand extensive lining systems******** that transform simple holes into complex underground architecture. The installation of permanent support—concrete, steel, or composite systems*******—must account for ground pressure, seismic activity, and the documented phenomenon wherein earth apparently takes personal offense at being hollowed out.
+&nbsp;
+Safety considerations occupy seventeen volumes of the International Mine Shaft Construction Standards*********, which can be summarized as "assume everything wants to kill you and plan accordingly"††††††††. Water ingress represents the primary hazard‡‡‡‡‡‡‡, as underground water flows follow principles that appear designed by a malevolent deity with a sense of irony**********. Adequate ventilation prevents accumulation of toxic gases†††††††††, particularly the ones that can't be detected until workers start reporting visits from their deceased ancestors‡‡‡‡‡‡‡‡. Ground stability monitoring employs sophisticated instruments to detect minute movements that presage major collapses, giving workers anywhere from adequate warning to just enough time to compose brief, pointed final thoughts***********. Modern practice mandates redundant safety systems, emergency protocols, and the acceptance that despite all precautions, shafts will occasionally do unexpected things††††††††††, usually at 3 AM on a holiday weekend.
+&nbsp;
+The synthesis of historical wisdom and contemporary engineering produces structures capable of reaching depths exceeding four kilometers‡‡‡‡‡‡‡‡‡, descending through geological epochs************ with temperature and pressure conditions that would have convinced our ancestors they'd tunneled directly to the underworld's administrative offices. Success requires equal parts geological understanding, structural engineering, and philosophical acceptance that one is essentially creating controlled violations of the earth's integrity. The properly constructed shaft stands as testament to human persistence in pursuing resources regardless of their depth*************—and to our species' admirable refusal to take "you probably shouldn't dig there" as a final answer.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*A proposition challenged by every dropped tool, stumbling worker, and insufficiently secured timber beam in mining history. Gravity has won approximately 100% of these arguments, though humans persist in filing appeals.
+&nbsp;
+†The rock rarely appreciates being described as "strata" and prefers "solid, unmolested geological formations that were doing perfectly fine before you showed up."
+&nbsp;
+‡This phase characterized by statements such as "the rock looks quite stable" and "I don't see any major fault lines" that will be recalled with bitter irony during Phase Two.
+&nbsp;
+**The life choice most frequently questioned being "Why didn't I become a surface-based engineer like Mother wanted?"
+&nbsp;
+††The Consolidated Insurance Concern of Zürich maintains a special "Downward Excavation" department whose actuaries have access to counseling services.
+&nbsp;
+‡‡See prerequisite paper on underground water management, though it should be noted that understanding water management theory and preventing your shaft from becoming an impromptu well are disappointingly different skills. The Society for Applied Hydrogeology estimates that 67.3% of all shaft construction delays stem from water appearing in places where it has absolutely no business being†.
+&nbsp;
+†A figure that rises to 89.7% if you include water appearing in places where it technically could be but really shouldn't have managed to reach. Water, it seems, views engineering calculations as suggestions rather than limitations.
+&nbsp;
+†††Though the Sumerian Engineering Tablets suggest several ill-fated attempts at spiral shafts, helical descents, and one ambitious project involving "forty-seven discrete angles of declination" that the tablets describe only as "an educational experience"‡.
+&nbsp;
+‡Educational in the sense that everyone learned not to do that again. The supervising engineer's name was struck from all records, though locals apparently referred to the site as "The Folly of Ashur-Uncomfortable-Questions" for three generations.
+&nbsp;
+***The term "accelerated geological reunification" being considerably more pleasant than "catastrophic collapse that compressed seven workers into a vertical space previously occupied by one worker." Medieval mining records employed extensive euphemism to avoid upsetting investors****.
+&nbsp;
+****Investors being notably sensitive about mortality rates, profit margins, and the phrase "most of the crew made it out."
+&nbsp;
+****The Bavarian Mining Commission's 1347 files contain only a single entry reading "Shaft Seven: No." followed by 37 signatures and what appears to be a crude drawing of a person running away from a hole in the ground. Subsequent entries refer to it only as "The Lesson"******.
+&nbsp;
+******Modern historians believe this incident involved improper shaft spacing causing sympathetic collapse across multiple excavations, though the Commission's official position remains "Don't ask."
+&nbsp;
+‡‡‡‡Renaissance shaft geometry incorporated golden ratios, classical proportions, and the somewhat optimistic belief that aesthetically pleasing shafts would be less likely to collapse. The Florentine School of Mine Architecture lasted six months before practical experience reasserted itself.
+&nbsp;
+*****The introduction of explosives reduced excavation time by 73% and increased the entertainment value of mining reports by roughly 340%. The Royal Society's Proceedings from 1867 include phrases like "unexpectedly vigorous detonation" and "debris field exceeding original projections"*******.
+&nbsp;
+*******The debris field in question exceeding projections by landing in an adjacent county. This led to the Explosives Safety Act of 1868, whose preamble begins "Whereas it has become evident that not everyone should have access to dynamite..."
+&nbsp;
+†††††Modern scholars at the University of Applied Hindsight have published extensively on historical mining incidents, though their work consists primarily of reading old reports and writing "obviously" in the margins.
+&nbsp;
+‡‡‡‡‡Any geological formation with a colloquial name should be treated with suspicion. Features called "The Gobbler," "Satan's Gravel Pit," or "Old Collapsey" earned these names through vigorous demonstration of their characteristics. The International Registry of Geologically Concerning Locations contains 12,847 entries********.
+&nbsp;
+********A number that increases by approximately 40-60 entries annually as new formations earn colorful designations. The Registry's motto: "Names were given for reasons; reasons were usually fatal."
+&nbsp;
+******The increments being measured in "lifts" typically ranging from 1.5 to 3 meters, small enough to manage but large enough to make meaningful progress. The measurement unit itself derives from Old English "lyft," meaning "amount one can dig before questioning one's sanity."
+&nbsp;
+******So named because they happen before anyone wanted them to, as opposed to the mythical "scheduled collapse events" that exist only in engineering textbooks and fever dreams. The Association of Structural Engineers maintains that collapses can be predicted; the Association of Actual Miners maintains they can only be survived†††††`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding mine shaft construction in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const UNDERGROUND_CHAMBER_EXCAVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'underground_chamber_excavation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Underground Chamber Excavation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['mine_shaft_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_underground_chamber_excavation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Underground Chamber Excavation: A Comprehensive Study of Subterranean Void Creation in Modern Construction Practice</span>
+&nbsp;
+The creation of underground chambers represents one of humanity's most ambitious attempts to argue with geology*, a discipline that has occupied minds from the ancient Dwarven Architectural Collective† to the rather unfortunately named Institute for Digging Holes in the Ground Really Well‡. The fundamental principle underlying all chamber excavation is deceptively simple: one removes earth from where one wishes it not to be, and places it where one does wish it to be, a process that sounds considerably easier than it proves in practice**. The Bureau of Subterranean Statistics estimates that approximately 73.4% of all underground chamber projects involve at least one moment where the project engineer stands in a partially collapsed tunnel, holding a shovel, and wonders where precisely their career choices went wrong††.
+&nbsp;
+Modern excavation techniques have evolved considerably from the "dig until something interesting happens" methodology†† favored by our ancestors. The contemporary excavator must consider soil composition‡‡, water table dynamics***, groundwater interference††† (which is different from water table dynamics in ways that will be made clear approximately never), structural load distribution‡‡‡, and the increasingly important question of "what was already down there before we started digging§. Survey work precedes all chamber excavation, though the relationship between theoretical survey data and actual underground conditions remains what engineers politely term "aspirational§§. The Practical Guide to Not Being Crushed by Your Own Ambition, published by the Guild of Surveyors Who Learned the Hard Way§§§, recommends measuring twice and digging once, though statistics suggest the actual ratio is closer to measuring once, digging seventeen times, and then consulting the original survey to see where it all went wrong.
+&nbsp;
+Support systems constitute the difference between "an underground chamber" and "a large hole that briefly existed before becoming a smaller hole filled with what used to be the surface"*. Timber supports, steel frameworks, and concrete reinforcement each serve distinct purposes¶, though all share the common characteristic of being substantially more expensive than the client initially budgeted for¶¶. The Ancient Brotherhood of Load-Bearing Wall Enthusiasts¶¶¶ established the fundamental principle that everything underground wishes to become less underground, and does so with a determination that borders on the personal#. Modern techniques employ mathematical models to calculate precisely how much support a given chamber requires, followed by doubling that amount after consulting with anyone who has actually excavated an underground chamber##.
+&nbsp;
+Safety considerations in underground chamber excavation extend beyond the obvious "try not to let the ceiling collapse" advice###, though this remains surprisingly good advice that bears repeating. Ventilation systems must account for the accumulation of gases that are variously toxic, explosive, or merely unpleasant‡, while lighting must illuminate both where workers are going and where they should definitely avoid going‡‡. The International Registry of Underground Incidents‡‡‡ maintains files on approximately 12,847 distinct ways that underground excavation has gone unexpectedly wrong, a number that increases by roughly forty-three per year despite improvements in technology§. Emergency egress routes prove particularly crucial, as the ancient Miners' Wisdom states: "You can't spend your wages if you're still in the tunnel§§."
+&nbsp;
+The historical evolution of chamber excavation reflects humanity's gradually increasing understanding that perhaps we should plan these things before starting§§§. Early attempts at chamber creation operated on what scholars call the "exploratory collapse method¶," wherein one dug until something went wrong, then studied what went wrong, then incorporated that knowledge into the next attempt. The famous Double-Depth Disaster of 1847¶¶, which involved both a primary collapse and a rescue tunnel collapse, led directly to the establishment of the First Rule of Underground Work: always have a plan that doesn't involve hoping geology will cooperate out of courtesy¶¶¶. Modern excavation practice combines ancient wisdom# with contemporary engineering## to create chambers that remain chambers for their intended lifespan, rather than becoming inadvertent demonstrations of gravitational theory###.
+&nbsp;
+---
+&nbsp;
+*Geology, being approximately 4.5 billion years old, rarely loses these arguments. The earth has had considerable practice at being earth, whereas humans have only recently begun attempting to rearrange it.
+&nbsp;
+†Founded in the Third Age of the Mountains, or possibly last Tuesday depending on which calendar one consults. Dwarven historical records prove challenging to verify, as they were stored underground and therefore subject to the very problems their authors sought to prevent.
+&nbsp;
+‡The Institute changed its name in 1923 to the "Centre for Advanced Subterranean Engineering" after several decades of ridicule. The ridicule continued, suggesting the problem was not primarily nomenclatural.
+&nbsp;
+**The practical ratio of "earth successfully relocated" to "earth that fell back into the hole" ranges from 1:1 for beginners to approximately 3:1 for experts, assuming optimal conditions and no unexpected underground springs.
+&nbsp;
+††This figure rises to 94.2% when one includes projects where the engineer has this realization but doesn't admit it to anyone else.
+&nbsp;
+†††A methodology that produced remarkably detailed maps of which caves already existed, generally through the process of accidentally excavating into them. The resulting documentation proved invaluable, though the documentation process itself proved extremely valuable in the negative sense.
+&nbsp;
+‡‡Soil composition determines whether one is digging through cooperative sand, uncooperative clay, or actively hostile bedrock. The soil does not care about your project timeline.
+&nbsp;
+***Water tables have the awkward characteristic of being exactly where you need to dig, always. This is not coincidence; water has been seeping into underground spaces for considerably longer than humans have been creating them.
+&nbsp;
+†††The author once observed a heated debate between a hydrologist and a structural engineer regarding whether the water destroying their tunnel was "groundwater" or "an underground stream." The water, indifferent to taxonomy, continued destroying the tunnel throughout the discussion.
+&nbsp;
+‡‡‡Including the additional loads imposed by the project manager standing at the edge of the excavation and worrying visibly about structural loads.
+&nbsp;
+§This question has historically been answered by: unmarked wells, ancient foundations, previous tunnels that everyone forgot about, geological formations that shouldn't be there according to surveys, extremely large rocks, extremely small rocks that were actually part of extremely large rocks, and in one memorable incident, an underground river that had not previously been an underground river but became one when someone dug into it.
+&nbsp;
+§§The Guild's motto, "Measure Twice, Dig Once, Run Often," reflects the unfortunate reality that accurate surface measurements often translate to "approximately correct, give or take several meters of solid rock that the survey said wasn't there."
+&nbsp;
+§§§Now in its forty-seventh edition, following forty-six previous editions that were lost when the Guild's underground archive experienced what the final report termed "predictable structural failure given inadequate support systems."
+&nbsp;
+*The time between these states varies from seconds to years, with the average being "exactly long enough for someone to walk underneath it."
+&nbsp;
+¶Timber supports are traditional, affordable, and subject to rot†. Steel supports are modern, expensive, and subject to corrosion. Concrete supports are permanent, extremely expensive, and subject to cracking. All three are subject to being inadequate if one miscalculated the load requirements.
+&nbsp;
+†Rot occurs at a rate precisely calibrated to happen the day before your next scheduled inspection, assuming you have scheduled inspections, which you should have scheduled inspections, please schedule inspections.
+&nbsp;
+¶¶The Budgetary Surprise Multiplication Factor for underground projects stands at roughly 1.7, meaning a project initially costed at 100,000 ducats will eventually cost 170,000 ducats, plus additional costs for addressing why it cost 170,000 ducats.
+&nbsp;
+¶¶¶A religious order dating to the 13th century, when the distinction between religious architecture and practical construction was considerably blurrier. Their founding principle, "That Which is Built Below Must be Held from Below," seems obvious in retrospect but proved revolutionary at the time.
+&nbsp;
+#The Venerable Master Deepdelve, in his treatise "Conversations with Stone," described bedrock as having "opinions about load distribution" and noted that these opinions typically involved "being somewhere else." Modern engineers phrase this more mathematically but mean substantially the same thing.
+&nbsp;
+##These models achieve accuracy rates approaching 45%, which sounds poor until one considers that guessing achieves accuracy rates of approximately 12%. The remaining discrepancy between modeled and actual requirements is termed "the Underground Surprise Factor."
+&nbsp;
+###The Second Rule of Underground Excavation, according to the Guild of People Who Learned the First Rule the Hard Way, states: "No, seriously, try very hard not to let the ceiling collapse."
+&nbsp;
+‡Carbon monoxide lacks the courtesy to smell bad before killing you. Methane compensates by being both toxic and explosive, which at least provides variety. Hydrogen sulfide smells distinctly of rotten eggs, giving you time to realize you should have improved the ventilation before entering.
+&nbsp;
+‡‡The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding underground chamber excavation in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CAVERN_STABILIZATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'cavern_stabilization',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Cavern Stabilization',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['underground_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['underground_chamber_excavation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_cavern_stabilization' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Cavern Stabilization: A Comprehensive Study of Not Letting Large Holes Fall On Your Head</span>
+&nbsp;
+The stabilization of caverns represents one of humanity's oldest conflicts with gravity*, a force which, contrary to popular belief, does not care about your engineering degree or your confidence level†. The fundamental principle underlying all cavern stabilization is elegantly simple: prevent the ceiling from becoming the floor, and prevent the floor from becoming an even lower floor‡. However, as the Undermountain College of Architectural Persistence notes in their 847-page treatise "Why Is There Rubble In My Shoes?", the gap between principle and practice is approximately the size of the cavern you're trying to stabilize**.
+&nbsp;
+The practical applications of cavern stabilization have evolved considerably since the Bronze Age, when the primary technique was "hoping really hard" followed by "running very fast"††. Modern practitioners employ a sophisticated array of methods including rock bolting‡‡, shotcrete application***, mesh reinforcement†††, and the strategic placement of support pillars at intervals calculated by the Valdermann Equation‡‡‡, which takes into account rock composition, overburden pressure, water infiltration, and the phase of the moon****. The Cathedral of Saint Petra the Unburied stands as testament to proper stabilization technique, having survived 600 years without significant collapse†††††—a record surpassed only by its architect's reputation for paranoia.
+&nbsp;
+Safety considerations in cavern stabilization cannot be overstated, though the Association of People Who Learned This The Hard Way certainly tries‡‡‡‡. The pre-stabilization survey must account for geological composition*, rock jointing patterns**, fracture density***, water presence****, existing stress patterns†, and what the late Professor Helmut Steinbrecher called "the rock's general mood"††. Warning signs of imminent failure include audible cracking‡‡, visible movement of previously stable surfaces†††, dust falling from the ceiling‡‡‡, small rocks falling from the ceiling††††, large rocks falling from the ceiling‡‡‡‡, and the sudden absence of the optimistic junior engineer who said it would "probably be fine"*****.
+&nbsp;
+The historical development of stabilization techniques reads like a chronicle of incremental improvements purchased with catastrophic failures. The ancient Khazari people discovered arch construction after the Great Flattening of Year 742†††††, while the principle of load distribution was formalized following the Incident at Deepholm‡‡‡‡‡, about which we shall not speak in detail out of respect for the approximately 40% of participants who survived to file complaints******. Modern understanding synthesizes centuries of painful empirical data with contemporary materials science, resulting in survival rates that the ancients would have considered suspiciously high*******—though the International Board of Cavern Standards maintains that a 99.4% non-collapse rate still represents "room for improvement."
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*Gravity, according to the physicist Sir Theodore Downsworth, is "relentlessly consistent in its malevolence." Downsworth spent his career studying falling objects and died, ironically, in bed at age 89, having successfully avoided falling objects his entire professional life. His final words were reportedly "I won."
+&nbsp;
+†The University of Undermountain no longer accepts "but I got a First in Geological Engineering" as an excuse for improper cavern assessment. This policy was implemented after the Incident of '87, which technically occurred in 1887, 1987, and regrettably, 2087 (time travel was involved; don't ask).
+&nbsp;
+‡The Dwarven Proverb Archive contains 847 sayings about floors and ceilings, of which 843 end with someone dying. The remaining four end with someone wishing they had died.
+&nbsp;
+**The gap is also occasionally filled with the optimistic engineer who said it would be fine. Memorial services are held quarterly.
+&nbsp;
+††This technique, known as the "Anticipatory Evacuation Method," boasted a survival rate of approximately 60% among practitioners and 0% among those who stayed to observe. The Ancient Society of Civil Engineers marked this period as "suboptimal."
+&nbsp;
+‡‡Rock bolting involves drilling into the surrounding rock and inserting steel bolts, a process that sounds simple until you consider that you're essentially stitching together a ceiling made of stone while standing directly beneath it†. The bolts are typically 1-3 meters in length, though Master Engineer Torval Ironhold famously used a 47-meter bolt in the Deepshaft Expansion Project, explaining afterward that he "wasn't taking any chances" and also "had a lot of bolt left over."
+&nbsp;
+†See footnote **.
+&nbsp;
+‡‡‡The Valdermann Equation (V = (ρgh × sin(θ) × C) / (E × √π × M)) has been described as "probably right" by 67% of surveying engineers and "suspiciously complicated" by the remaining 33%. Vladimir Valdermann defended his equation until his death, which occurred when a cavern ceiling collapsed on him, though this was officially ruled "unrelated to the equation's accuracy" by the Board of Inquiry, which Valdermann had chaired.
+&nbsp;
+***Shotcrete, or sprayed concrete, was invented by the Tyrolean engineer Carl Akeley in 1907, who was trying to create something else entirely—a tendency that characterizes roughly 40% of engineering breakthroughs††. The technique involves spraying concrete at high velocity onto rock surfaces, creating a protective layer. Application thickness varies from 5-30 centimeters, or as the Underground Construction Guild puts it, "enough to stop the rocks, not enough to bankrupt the client."
+&nbsp;
+††The other 60% of engineering breakthroughs come from engineers specifically trying to prevent previous engineering failures, creating a self-sustaining cycle of innovation that the Society of Historical Engineers calls "job security."
+&nbsp;
+†††Mesh reinforcement, typically welded wire mesh or chain-link, prevents small rock fragments from becoming deadly projectiles. The standard specification calls for mesh with 5-10cm spacing, though the nervous engineer may opt for 2cm spacing, leading to what's known in the industry as "the colander approach"‡. Mesh installation records show a direct correlation between engineer experience and mesh density: new engineers use twice as much mesh as necessary; experienced engineers use exactly enough; very experienced engineers use slightly more than exactly enough and sleep better at night.
+&nbsp;
+‡Named after the Deepvale Incident of 1923, where Engineer Patricia Holloway used mesh so fine that it prevented even dust from falling, creating what she described in her report as "a rather nice indoor rain system" that persisted for three months.
+&nbsp;
+‡‡‡Support pillars, whether natural (rock left unexcavated) or artificial (constructed columns), must be sized according to the Pillar Strength Theorem, which states that pillar width should be no less than 0.4 times the cavern span for competent rock, and "considerably more than that" for rock that appears "crumbly, damp, or generally untrustworthy"††.
+&nbsp;
+††This technical terminology appears in the official engineering standards of the Kingdom of Undermountain, whose chief engineer, Brondek Stonefoot, was renowned for his ability to assess rock quality by staring at it judgmentally for exactly 37 seconds. His assessment categories were "Good Rock," "Adequate Rock," "Concerning Rock," and "Run."
+&nbsp;
+****The phase of the moon's inclusion in the Valdermann Equation has been controversial. Critics point out that the moon has no mechanical effect on cavern stability. Supporters note that the full moon is when inspectors tend to visit, and caverns collapse more frequently when someone is watching. This is called the Observational Collapse Principle‡‡‡.
+&nbsp;
+‡‡‡Not to be confused with Quantum Collapse Principle, though both result in engineers drinking heavily afterward.
+&nbsp;
+†††††The Cathedral actually did experience a partial collapse in Year 412 of its existence, but this is not discussed in official literature because it would undermine the narrative. Approximately 3.7% of the north transept relocated itself suddenly downward. The Cathedral's Board of Trustees officially declared this "a planned modification" and gave the architect's great-great-grandson an award.
+&nbsp;
+‡‡‡‡The Association maintains offices in 47 countries and holds an annual conference called "Lessons We Should Not Have Needed To Learn." Attendance has been growing by 7% annually, a statistic the Association finds "troubling but unsurprising." Their motto, "Post Ruina, Sapientia" (After Collapse, Wisdom), is carved above the entrance to their headquarters, which is notably above-ground.
+&nbsp;
+*****The Steinbrecher Mood Assessment Scale ranks rock from 1 (Stable and Content) to 10 (Contemplating Violence). Stein`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding cavern stabilization in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  TUNNEL_EXCAVATION_BASICS,</span>
+<span class="cstat-no" title="statement not covered" >  ROCK_STABILITY_ANALYSIS,</span>
+<span class="cstat-no" title="statement not covered" >  TUNNEL_SUPPORT_SYSTEMS,</span>
+<span class="cstat-no" title="statement not covered" >  TIMBER_SHORING_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  ROCK_BOLT_INSTALLATION,</span>
+<span class="cstat-no" title="statement not covered" >  TUNNEL_VENTILATION_SYSTEMS,</span>
+<span class="cstat-no" title="statement not covered" >  UNDERGROUND_WATER_MANAGEMENT,</span>
+<span class="cstat-no" title="statement not covered" >  MINE_SHAFT_CONSTRUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  UNDERGROUND_CHAMBER_EXCAVATION,</span>
+<span class="cstat-no" title="statement not covered" >  CAVERN_STABILIZATION</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

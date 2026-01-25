@@ -12,7 +12,7 @@
 
 import type { Entity } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
-import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Strip all thinking tags (complete and incomplete) from text
@@ -63,7 +63,7 @@ export function extractCleanContent(corruptedText: string): string | undefined {
  * Returns true if cleaning was performed
  */
 export function cleanSoulData(soul: Entity): boolean {
-  const soulIdentity = soul.getComponent('soul_identity') as SoulIdentityComponent | undefined;
+  const soulIdentity = soul.getComponent(ComponentType.SoulIdentity);
 
   if (!soulIdentity) {
     return false;
@@ -78,14 +78,14 @@ export function cleanSoulData(soul: Entity): boolean {
 
     if (cleanedPurpose) {
       soulIdentity.purpose = cleanedPurpose;
-      console.log(`[SoulDataCleaner] Cleaned purpose for soul ${soulIdentity.soulName}`);
+      console.log(`[SoulDataCleaner] Cleaned purpose for soul ${soulIdentity.true_name}`);
       console.log(`  Before: ${originalPurpose.substring(0, 100)}...`);
       console.log(`  After: ${cleanedPurpose}`);
       wasCleaned = true;
     } else {
       // Purpose was entirely thinking content - set a fallback
       soulIdentity.purpose = `To find their place in the world`;
-      console.warn(`[SoulDataCleaner] Soul ${soulIdentity.soulName} purpose was entirely thinking content, set fallback`);
+      console.warn(`[SoulDataCleaner] Soul ${soulIdentity.true_name} purpose was entirely thinking content, set fallback`);
       wasCleaned = true;
     }
   }
@@ -97,14 +97,14 @@ export function cleanSoulData(soul: Entity): boolean {
 
     if (cleanedDestiny) {
       soulIdentity.destiny = cleanedDestiny;
-      console.log(`[SoulDataCleaner] Cleaned destiny for soul ${soulIdentity.soulName}`);
+      console.log(`[SoulDataCleaner] Cleaned destiny for soul ${soulIdentity.true_name}`);
       console.log(`  Before: ${originalDestiny.substring(0, 100)}...`);
       console.log(`  After: ${cleanedDestiny}`);
       wasCleaned = true;
     } else {
       // Destiny was entirely thinking content - remove it (destiny is optional)
       soulIdentity.destiny = undefined;
-      console.warn(`[SoulDataCleaner] Soul ${soulIdentity.soulName} destiny was entirely thinking content, removed`);
+      console.warn(`[SoulDataCleaner] Soul ${soulIdentity.true_name} destiny was entirely thinking content, removed`);
       wasCleaned = true;
     }
   }
@@ -118,7 +118,7 @@ export function cleanSoulData(soul: Entity): boolean {
  */
 export function cleanAllSoulsInWorld(world: World): number {
   const souls = world.query()
-    .with('soul_identity')
+    .with(ComponentType.SoulIdentity)
     .executeEntities();
 
   let cleanedCount = 0;
@@ -149,7 +149,7 @@ export function scanForCorruptedSouls(world: World): Array<{
   destinyCorrupted: boolean;
 }> {
   const souls = world.query()
-    .with('soul_identity')
+    .with(ComponentType.SoulIdentity)
     .executeEntities();
 
   const corrupted: Array<{
@@ -160,7 +160,7 @@ export function scanForCorruptedSouls(world: World): Array<{
   }> = [];
 
   for (const soul of souls) {
-    const soulIdentity = soul.getComponent('soul_identity') as SoulIdentityComponent | undefined;
+    const soulIdentity = soul.getComponent(ComponentType.SoulIdentity);
 
     if (!soulIdentity) continue;
 
@@ -170,7 +170,7 @@ export function scanForCorruptedSouls(world: World): Array<{
     if (purposeCorrupted || destinyCorrupted) {
       corrupted.push({
         soulId: soul.id,
-        soulName: soulIdentity.soulName,
+        soulName: soulIdentity.true_name,
         purposeCorrupted,
         destinyCorrupted,
       });

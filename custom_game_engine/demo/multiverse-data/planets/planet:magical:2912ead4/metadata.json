@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2912ead4",
+  "name": "Alpha Proteus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769231404514",
+  "createdAt": 1769231404675,
+  "lastAccessedAt": 1769231404675,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769231404514",
+    "type": "magical"
+  }
+}

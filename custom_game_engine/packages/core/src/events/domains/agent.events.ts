@@ -259,6 +259,11 @@ export interface AgentEvents {
     reason?: string;
     layer?: string; // Which LLM layer made this decision (autonomic, talker, executor)
   };
+  'behavior:completed': {
+    behavior: string;
+    reason?: string;
+    nextBehavior?: string;
+  };
   'behavior:goal_achieved': {
     agentId: EntityId;
     behavior: string;

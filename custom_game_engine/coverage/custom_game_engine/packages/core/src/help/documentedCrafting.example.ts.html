@@ -1,0 +1,1567 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/core/src/help/documentedCrafting.example.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/core/src/help</a> documentedCrafting.example.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/316</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/316</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/**<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+ * Example: Crafting System with Embedded Documentation
+ *
+ * Documentation for crafting, recipes, quality, skills, and the deep
+ * satisfaction of making things with your hands (or watching villagers do it).
+ *
+ * Uses the blended writing voices from WRITER_GUIDELINES.md.
+ */
+&nbsp;
+import { defineItem as _defineItem } from '../items/ItemDefinition.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// CRAFTING SYSTEM OVERVIEW</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CRAFTING_SYSTEM_HELP = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'crafting_system',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'Transform raw materials into useful items through skill and patience',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Making things is older than language. Before humans had words for "axe" or "bread" or "unnecessarily decorative pottery," they had the understanding that this rock plus that stick equals tool, this grain plus that fire equals food, this clay plus these hands equals... well, usually a lopsided bowl, but the *intent* was magnificent.</span>
+&nbsp;
+The crafting system codifies this ancient knowledge into something manageable, which is either a wonderful service to civilization or a profound missing of the point, depending on your philosophy regarding the industrialization of artisanship.* Either way, it works like this:
+&nbsp;
+You have materials. You have a recipe—knowledge of how materials combine into product. You have skills—experience turning theory into practice. You have time—because nothing good was ever made instantly, except possibly lightning, and even that requires specific atmospheric conditions. Put these together at an appropriate workstation (or your bare hands, for simple tasks) and eventually—after appropriate waiting, during which you contemplate the nature of creation and also whether you measured the ingredients correctly—you produce an item.
+&nbsp;
+The item's quality depends on your skill level, your familiarity with this specific recipe, how well your various skills synergize, and random chance, because even master crafters have off days when the clay won't center or the metal won't flow or the bread mysteriously develops sentience and lodges formal complaints.** Quality ranges from "poor" (functional but embarrassing) to "legendary" (so good it might be magic, or is magic, boundary's unclear), affecting both practical utility and economic value.
+&nbsp;
+The Crafting Guild*** tracks approximately 247 distinct recipes across seven categories: Tools, Weapons, Food, Materials, Buildings, Decorations, and Miscellaneous (which is where they filed "self-stirring spoon" and "anxiety-inducing mirror" and nobody's had the courage to audit that category in decades). Some recipes require specialized stations—can't smelt iron in your hands, much as you might want to try—others need specific skill levels, a few demand research unlocks, and one particularly ambitious recipe requires "divine intervention (optional but recommended)."
+&nbsp;
+Crafting is fundamentally satisfying. Taking disparate materials and creating something greater than their sum is the closest most mortals get to feeling divine. The first time you craft something—anything—and it *works*, and you made it, and it didn't exist before but does now because of you... that feeling never entirely fades. Even when you're crafting your thousandth iron ingot and the romance has been replaced by routine, there's still the quiet satisfaction of competence, of knowing how things fit together, of being useful.
+&nbsp;
+*The Philosopher-Smiths have been arguing about this for six centuries. The debate generates enough heat to power several forges.
+&nbsp;
+**This only happened once. The bread was named Gerald and demanded voting rights. The incident is not discussed.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >***Not to be confused with the Craft Guild (knitting, basketry), the Crafty Guild (rogues, tricksters), or the Guild of Craft (philosophers who think about making things rather than making them).`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'systems',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'crafting',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['crafting', 'recipes', 'skills', 'quality', 'production'],</span>
+<span class="cstat-no" title="statement not covered" >  mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >    values: {</span>
+<span class="cstat-no" title="statement not covered" >      maxQueueSize: 10,</span>
+<span class="cstat-no" title="statement not covered" >      qualityRange: '0-100',</span>
+<span class="cstat-no" title="statement not covered" >      skillLevels: '0-5',</span>
+<span class="cstat-no" title="statement not covered" >      categories: 7,</span>
+<span class="cstat-no" title="statement not covered" >      totalRecipes: '247+',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    formulas: {</span>
+<span class="cstat-no" title="statement not covered" >      craftingQuality: '(baseMultiplier * 100) + familiarityBonus + (synergyBonus * 100) + randomVariance',</span>
+<span class="cstat-no" title="statement not covered" >      baseMultiplier: '0.7 + (skillLevel * 0.1)',</span>
+<span class="cstat-no" title="statement not covered" >      familiarityBonus: '0-20 (logarithmic with practice)',</span>
+<span class="cstat-no" title="statement not covered" >      synergyBonus: '0-0.35 (sum of active synergies)',</span>
+<span class="cstat-no" title="statement not covered" >      randomVariance: '±10%',</span>
+<span class="cstat-no" title="statement not covered" >      priceMultiplier: '0.5 + (quality/100) * 1.5',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    conditions: {</span>
+<span class="cstat-no" title="statement not covered" >      'Requires materials': 'All ingredients must be available',</span>
+<span class="cstat-no" title="statement not covered" >      'Station may be required': 'Complex recipes need specialized workstations',</span>
+<span class="cstat-no" title="statement not covered" >      'Skills can be requirement': 'Some recipes locked behind skill levels',</span>
+<span class="cstat-no" title="statement not covered" >      'Time investment': 'Crafting takes real time, not instant',</span>
+<span class="cstat-no" title="statement not covered" >      'Quality varies': 'Output quality depends on skill and chance',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    dependencies: ['materials', 'recipe_knowledge', 'skill_level', 'workstation_access'],</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  tips: [</span>
+<span class="cstat-no" title="statement not covered" >    'Specialize early—master one craft before dabbling in others',</span>
+<span class="cstat-no" title="statement not covered" >    'Quality improves with familiarity—your 100th sword will be better than your first',</span>
+<span class="cstat-no" title="statement not covered" >    'Synergies matter—related skills boost each other\'s quality output',</span>
+<span class="cstat-no" title="statement not covered" >    'Keep a crafting queue—batch similar items for efficiency',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  warnings: [</span>
+<span class="cstat-no" title="statement not covered" >    'Failed crafts consume materials—there is no refund for incompetence',</span>
+<span class="cstat-no" title="statement not covered" >    'Quality cannot be improved after crafting—make it right the first time',</span>
+<span class="cstat-no" title="statement not covered" >    'Legendary items are rare (96-100 quality)—don\'t expect them consistently',</span>
+<span class="cstat-no" title="statement not covered" >    'Some recipes are deeply inefficient—the economic value may not justify the time investment',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  examples: [</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The First Craft',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'You\'ve gathered wood. You\'ve learned the "Wooden Spear" recipe. The instructions seem clear: pointy stick, basically. How hard can it be? Turns out: surprisingly hard. Your first attempt wobbles, the point is off-center, the balance is wrong. Quality: 23 (Poor). It works—you can technically stab things—but you\'re not proud. You try again. And again. By the tenth spear, your hands know the motions, the wood speaks differently, the balance comes naturally. Quality: 68 (Fine). You\'ve learned. This is what crafting teaches: failure, iteration, eventual mastery. The wobble spear sits in your inventory, too embarrassing to use but too meaningful to discard. Your first craft. Your worst craft. The one that started everything.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Masterwork',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Smithing level 5. "Iron Longsword" familiarity: 89 crafts. Synergies active: Metalworking, Weapon Design, Heat Management. You\'ve made this sword so many times you could do it asleep. But today something\'s different. The metal flows perfectly. The hammer falls true. The quench is exactly right. You pull the blade from the final polish and it *sings*—not metaphorically, actually makes a clear ringing tone when you test the flex. Quality: 97 (Legendary). You stare at it, shocked. You\'ve been trying for legendary for months, and it finally happened, and now you don\'t know if you can replicate whatever you did right. This is the curse and gift of crafting: you can master the process, but you can never fully control the outcome. The legendary sword will sell for triple price. You\'ll probably keep it. Some things are too perfect to let go.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'skill_system',</span>
+<span class="cstat-no" title="statement not covered" >    'quality_tiers',</span>
+<span class="cstat-no" title="statement not covered" >    'recipe_discovery',</span>
+<span class="cstat-no" title="statement not covered" >    'crafting_stations',</span>
+<span class="cstat-no" title="statement not covered" >    'material_gathering',</span>
+<span class="cstat-no" title="statement not covered" >    'economic_trading',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// QUALITY SYSTEM</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const QUALITY_SYSTEM_HELP = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'quality_system',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'How skill, familiarity, and luck determine crafted item excellence',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Quality is a number from 0 to 100 that represents how well something was made, which sounds simple until you remember that "well made" encompasses dimensions like functionality, durability, aesthetics, philosophical coherence, and whether it sparks joy when held.*</span>
+&nbsp;
+The quality tiers map onto the 0-100 scale with ranges that have been carefully calibrated by the Standards Bureau, debated by craftspeople, ignored by merchants, and generally accepted by everyone:
+- **Poor (0-30)**: Functional but flawed. It works, barely, with caveats. The economic and emotional value is low but non-zero because at least you tried.
+- **Normal (31-60)**: Adequate. Does the job. Won't impress anyone but won't embarrass you either. The vast middle where most crafting lives.
+- **Fine (61-85)**: Above average. Noticeably well-made. People compliment it. You feel modest pride. This is where competence becomes craft.
+- **Masterwork (86-95)**: Exceptional. Professional grade. Might last generations. Sells for premium prices. This is what dedication produces.
+- **Legendary (96-100)**: Perfection. So rare it's practically mythical. Museums want it. Your name gets attached to it. "The Miller's Axe of Unbreakable Edge." You'll tell this story forever.
+&nbsp;
+Quality emerges from a formula** that combines:
+1. **Skill level** (0-5): Your base competence. Unskilled crafters produce poor items. Masters produce fine-to-masterwork consistently. The math is: 0.7 + (skillLevel * 0.1), giving a multiplier from 0.7 (unskilled) to 1.2 (master).
+2. **Familiarity bonus** (0-20 quality points): Practice with this specific recipe. Logarithmic increase—early crafts teach a lot, later crafts refine gradually. Your first sword: +0. Your hundredth: +18. The ceiling exists to represent that even masters keep learning, just slower.
+3. **Synergy bonus** (0-35 quality points): Related skills helping each other. A blacksmith with Metalworking, Weapon Design, and Heat Management gets bonuses from all three when making swords. Skills synergize when they share context.
+4. **Random variance** (±10%): Because perfection isn't deterministic. The metal might have a flaw. Your hand might slip. The gods might be watching and feeling generous or petty. Adds uncertainty and keeps crafting interesting even at high skill.
+&nbsp;
+The formula, lovingly maintained by the Mathematics Guild:
+\`quality = (baseMultiplier × 100) + familiarityBonus + (synergyBonus × 100) + (randomVariance × 100)\`
+Then clamped to 0-100 because negative quality and quality-over-100 are philosophically troubling concepts that the Bureau refuses to address.
+&nbsp;
+Quality affects two main things:
+- **Functionality**: A fine sword cuts better than a poor sword. A masterwork healing potion heals more. The mechanical benefits scale with quality in ways specific to item type.
+- **Value**: Price multiplier ranges from 0.5× (poor) to 2.0× (legendary). A 100-quality iron sword sells for quadruple the price of a 0-quality one, assuming you can find someone with enough coin and appreciation.
+&nbsp;
+Importantly: **Quality is determined at crafting time and cannot be changed.** You can't polish a poor sword into legendary. You can repair it, but the quality remains. This is both realistic (you can't fundamentally change what something is) and slightly tragic (that masterwork you crafted at skill level 3 and got lucky? Still just level-3 quality ceiling). Some things can only be made better by making them again, from scratch, with better skill.
+&nbsp;
+*The Philosopher-Craftsmen argue that quality is an inherent property of objects. The Craftsmen-Philosophers argue it's a perception projected by observers. The Craftsmen-Craftsmen don't care and keep making things.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >**The formula has been revised seventeen times. Each revision sparked three academic papers and at least one bar fight.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'systems',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'crafting',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['quality', 'skills', 'crafting', 'mechanics', 'value'],</span>
+<span class="cstat-no" title="statement not covered" >  mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >    values: {</span>
+<span class="cstat-no" title="statement not covered" >      qualityTiers: 5,</span>
+<span class="cstat-no" title="statement not covered" >      poorRange: '0-30',</span>
+<span class="cstat-no" title="statement not covered" >      normalRange: '31-60',</span>
+<span class="cstat-no" title="statement not covered" >      fineRange: '61-85',</span>
+<span class="cstat-no" title="statement not covered" >      masterworkRange: '86-95',</span>
+<span class="cstat-no" title="statement not covered" >      legendaryRange: '96-100',</span>
+<span class="cstat-no" title="statement not covered" >      skillMultiplierMin: 0.7,</span>
+<span class="cstat-no" title="statement not covered" >      skillMultiplierMax: 1.2,</span>
+<span class="cstat-no" title="statement not covered" >      familiarityMax: 20,</span>
+<span class="cstat-no" title="statement not covered" >      synergyMax: 0.35,</span>
+<span class="cstat-no" title="statement not covered" >      varianceDefault: 0.1,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    formulas: {</span>
+<span class="cstat-no" title="statement not covered" >      quality: '(baseMultiplier * 100) + familiarityBonus + (synergyBonus * 100) + (randomVariance * 100)',</span>
+<span class="cstat-no" title="statement not covered" >      baseMultiplier: '0.7 + (skillLevel * 0.1)',</span>
+<span class="cstat-no" title="statement not covered" >      priceMultiplier: '0.5 + (quality / 100) * 1.5',</span>
+<span class="cstat-no" title="statement not covered" >      familiarityGrowth: 'log10(craftCount + 1) * maxBonus',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    conditions: {</span>
+<span class="cstat-no" title="statement not covered" >      'Determined at craft time': 'Quality set when item is created',</span>
+<span class="cstat-no" title="statement not covered" >      'Cannot be improved': 'Quality is permanent—repairing doesn\'t increase it',</span>
+<span class="cstat-no" title="statement not covered" >      'Skill ceiling exists': 'Low skill = low maximum possible quality',</span>
+<span class="cstat-no" title="statement not covered" >      'Randomness persists': 'Even masters occasionally produce poor items',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  tips: [</span>
+<span class="cstat-no" title="statement not covered" >    'Legendary items require skill 5 + high familiarity + good luck—expect 1-5% of crafts',</span>
+<span class="cstat-no" title="statement not covered" >    'Quality variance means batching—make 10 swords, keep the best, sell the rest',</span>
+<span class="cstat-no" title="statement not covered" >    'Track familiarity per recipe—specialization &gt; generalization for quality',</span>
+<span class="cstat-no" title="statement not covered" >    'Synergies compound—four related skills can add +35 quality points',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  warnings: [</span>
+<span class="cstat-no" title="statement not covered" >    'Familiarity resets if you forget the recipe (don\'t delete your spellbook equivalents)',</span>
+<span class="cstat-no" title="statement not covered" >    'Quality 95 vs 96 is the difference between Masterwork and Legendary (huge value jump)',</span>
+<span class="cstat-no" title="statement not covered" >    'Random variance can turn an expected Masterwork into Normal—always craft with margin',</span>
+<span class="cstat-no" title="statement not covered" >    'Price multiplier is quadratic-ish—legendary items sell for WAY more than poor ones',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  examples: [</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Learning Curve',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Smithing level 1. No familiarity. No synergies. Formula: (0.8 × 100) + 0 + 0 + variance = 80 ± 10 = 70-90 quality. You craft ten iron swords. Results: 73, 68, 82, 71, 77, 84, 69, 75, 80, 86. One reached Masterwork by sheer luck. Most are Fine. None are Poor because your base multiplier is decent. This is early crafting: inconsistent but promising. Six months later: level 3, familiarity +12, one synergy (+0.10). New formula: (1.0 × 100) + 12 + 10 + variance = 122 ± 10, clamped to 100 ± 10 = 90-100. You craft ten more swords. Results: 94, 97, 91, 95, 98, 93, 96, 92, 99, 95. Seven Legendary, three Masterwork. This is mastery: consistent excellence, occasional perfection.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Tragic Heirloom',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Your grandmother was a legendary potter. At skill level 5 with a lifetime of familiarity, she crafted a vase: quality 98, Legendary tier. It survived her, survived the war, survived three generations. Then you, inheriting her workshop and ambitions, attempted to repair a small crack. The repair worked—functionality restored to 100%—but the quality remains 98. Which is legendary, yes, but it\'s also permanently capped there. You could craft a new vase now, at your skill level 4, familiarity 0, and *maybe* hit quality 85 (Masterwork) with extraordinary luck. But you could never replicate her 98. Some quality is unrepeatable. The vase sits in the place of honor, its hairline repair invisible, its perfection preserved and forever just out of your reach. You\'re learning to be okay with that. Quality isn\'t just about the numbers. It\'s about the story of who made it, when, and why.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'skill_progression',</span>
+<span class="cstat-no" title="statement not covered" >    'familiarity_system',</span>
+<span class="cstat-no" title="statement not covered" >    'skill_synergies',</span>
+<span class="cstat-no" title="statement not covered" >    'economic_value',</span>
+<span class="cstat-no" title="statement not covered" >    'item_repair',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// CRAFTING STATIONS</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CRAFTING_STATIONS_HELP = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'crafting_stations',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'Specialized workshops that enable advanced recipes',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Some things you can make with your bare hands: wooden spears, fiber rope, arguably bread if you're desperate and the definition is loose. Other things emphatically require infrastructure: smelted iron (unless you're a lava elemental), precision alchemy (unless you enjoy explosions), enchanted artifacts (unless you want cursed artifacts, which form naturally when you try enchanting without proper facilities and adequate safety runes).</span>
+&nbsp;
+Crafting stations are the middle ground between "I found a sharp rock" and "I have industrialized this entire process into a factory." They're specialized workspaces with the tools, facilities, and (ideally) safety margins necessary for complex recipes. The game recognizes seven primary station types, though this number increases to "too many" if you count the experimental stations the Innovation Guild keeps building and occasionally having to condemn.
+&nbsp;
+**Basic Stations:**
+- **Crafting Table**: The universal workspace. Flat surface, organized tools, good lighting, minimal fire hazard. Enables most basic recipes that need more precision than hand-crafting but less specialization than advanced work. Required for anything with "assembly" in the process description.
+- **Furnace**: Very hot box. Fundamental technology that unlocked civilization, according to historians, or doomed civilization, according to philosophers who preferred the pre-metallurgy era.* Melts ore into ingots, fires clay into pottery, occasionally achieves sentience (glitch, being patched). Required for smelting operations.
+- **Forge**: Specialized hot box for metalworking. Different from furnace in important ways that blacksmiths will explain at length and volume. Enables weapon and armor smithing, tool forging, and the production of metal components for complex recipes.
+&nbsp;
+**Advanced Stations:**
+- **Alchemy Station**: Precision glassware, controlled heat, ingredient storage, and extensive safety protocols that everyone ignores until the first explosion. Enables potion brewing, material refinement, and the transformation of substances into other substances (results may vary). Required for anything labeled "alchemy" or "definitely not poison."
+- **Enchanter's Workshop**: Where magic meets manufacturing. Rune-scribed floors, mana-conductive materials, possibly sentient tools that offer unhelpful advice.** Required for artifact creation, enchantment, and spell-imbuing. High initial cost, high operational complexity, high chance of something becoming aware.
+- **Carpentry Shop**: Advanced woodworking. Better tools than crafting table, specialized equipment for joinery, actual ventilation for sawdust. Enables furniture, complex wooden structures, and items with "fine" in the description.
+&nbsp;
+**Specialized Stations:**
+- **Smithy**: The big brother of the forge. Multiple workstations, organized materials, apprentice-compliant safety standards. Enables mass production of metal goods, complex smithing projects, and the employment of assistants (mechanically just faster crafting, narratively a sign you've Made It).
+&nbsp;
+Each station type unlocks specific recipes. The recipe list shows station requirements clearly: if it says "Requires: Forge" and you only have a crafting table, you're not making that sword, no matter how determined you feel or how many skill points you have. This is both realistic (try smelting iron on a wood table—it won't work and the table will have opinions) and slightly frustrating (gatekeeping recipes behind infrastructure costs) but ultimately necessary for progression pacing.
+&nbsp;
+Stations have build costs in materials and sometimes skill requirements. A basic crafting table needs wood and basic carpentry. An enchanter's workshop needs rare materials, advanced construction, probably a permit from the Thaumaturgical Safety Board (processing time: 3-6 months, expediting not possible, clerical errors frequent). The progression is intentional: you work your way up from simple tools to complex infrastructure, each station opening new crafting possibilities, each new possibility requiring resources that justify the investment.
+&nbsp;
+Some recipes allow multiple stations—"bread" can be made at a campfire or an oven, with quality differences. Others are station-exclusive—you're not enchanting anything without the proper workspace, safety runes, and probably insurance. The system is flexible where it can be and rigid where physics, magic, or basic safety requires.
+&nbsp;
+*The Anti-Metallurgy Movement meets monthly and makes all their tools from stone. The meetings are poorly attended and the tools keep breaking.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >**The advice is bad but the tools mean well.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'systems',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'crafting',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['stations', 'workshops', 'buildings', 'crafting', 'infrastructure'],</span>
+<span class="cstat-no" title="statement not covered" >  mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >    values: {</span>
+<span class="cstat-no" title="statement not covered" >      stationTypes: 7,</span>
+<span class="cstat-no" title="statement not covered" >      basicStations: 3,</span>
+<span class="cstat-no" title="statement not covered" >      advancedStations: 3,</span>
+<span class="cstat-no" title="statement not covered" >      specializedStations: 1,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    formulas: {</span>
+<span class="cstat-no" title="statement not covered" >      stationBonus: 'Some stations provide quality or speed bonuses',</span>
+<span class="cstat-no" title="statement not covered" >      specialization: 'Station type determines recipe availability',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    conditions: {</span>
+<span class="cstat-no" title="statement not covered" >      'Required for complex recipes': 'Many recipes cannot be crafted without stations',</span>
+<span class="cstat-no" title="statement not covered" >      'Must be built first': 'Stations require construction before use',</span>
+<span class="cstat-no" title="statement not covered" >      'Location matters': 'Stations must be placed in valid locations',</span>
+<span class="cstat-no" title="statement not covered" >      'Durability exists': 'Stations can wear out and need maintenance',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  tips: [</span>
+<span class="cstat-no" title="statement not covered" >    'Build stations near material storage—hauling ingredients is time-consuming',</span>
+<span class="cstat-no" title="statement not covered" >    'Crafting table first, then furnace—this unlocks most early-game progression',</span>
+<span class="cstat-no" title="statement not covered" >    'Alchemy station is expensive but necessary for potions and advanced materials',</span>
+<span class="cstat-no" title="statement not covered" >    'Group similar stations together for workflow efficiency (smithy near forge near furnace)',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  warnings: [</span>
+<span class="cstat-no" title="statement not covered" >    'Stations cannot be moved easily—choose placement carefully',</span>
+<span class="cstat-no" title="statement not covered" >    'Building the wrong station first wastes resources—plan your tech progression',</span>
+<span class="cstat-no" title="statement not covered" >    'Unattended forges/furnaces can cause fires (mechanically not implemented yet, but philosophically concerning)',</span>
+<span class="cstat-no" title="statement not covered" >    'Enchanter\'s workshop has prerequisites—don\'t try to rush it',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  examples: [</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The First Workshop',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'You\'ve been crafting by hand—wooden spears, fiber rope, dignity-free survival. But you found a "Crafting Table" recipe and you have just enough wood. The table takes an hour to build, mostly because you keep second-guessing the joinery (it\'s your first furniture; you want it right). When it\'s done, sitting in your shelter, you access the crafting menu and suddenly there are thirty new recipes. Simple things, mostly—better tools, basic furniture, organized storage—but they were impossible before and possible now. The table isn\'t magic. It\'s just a flat surface with organization. But that\'s enough. Civilization is infrastructure, apparently, and you just built your first piece. Next up: a furnace. Then weapons better than sharpened sticks. Then maybe a bed that isn\'t just a pile of grass. Progress, one crafting station at a time.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Enchanter\'s Folly',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'You spent three months gathering materials for the enchanter\'s workshop. Rare woods, mana crystals, runic silver, an instruction manual with seventeen footnotes per page. The build took two weeks and most of your savings. When it was done, glowing faintly with latent magic, you felt proud. Then you tried to use it and discovered: you don\'t know any enchanting recipes. They require research. The research requires materials. The materials require an alchemy station you haven\'t built yet. You built a 500-gold workshop for a crafting path you can\'t access for another month minimum. This is a learning experience about planning and prerequisites. Expensive learning. The workshop sits unused, humming gently, occasionally offering unsolicited advice about your life choices (definitely a feature, not a bug). You\'ll use it eventually. When you do, it\'ll be worth it. Probably.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'building_construction',</span>
+<span class="cstat-no" title="statement not covered" >    'recipe_unlocks',</span>
+<span class="cstat-no" title="statement not covered" >    'resource_gathering',</span>
+<span class="cstat-no" title="statement not covered" >    'tech_progression',</span>
+<span class="cstat-no" title="statement not covered" >    'workspace_organization',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// SKILL PROGRESSION AND MASTERY</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SKILL_PROGRESSION_HELP = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'skill_progression',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'How practice transforms incompetence into mastery',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Skill levels run from 0 (never tried this) to 5 (legendary master), which sounds straightforward until you realize each level represents exponentially more practice than the last. Getting from 0 to 1 might take a week of focused effort. Getting from 4 to 5 can take years. The math is designed to reward specialization over generalization, because being mediocre at everything is less useful than being excellent at something specific.</span>
+&nbsp;
+The progression path for any craft skill follows a curve that's been empirically validated by the Skills Research Bureau:*
+&nbsp;
+**Level 0 → 1 (Novice)**: You've learned the basics. You know what tools do, approximately. Your creations are poor quality (15-35) but functional. Time investment: 50-100 practice attempts. You're enthusiastic, mistake-prone, and learning faster than you'll ever learn again. Enjoy this phase—it's brief.
+&nbsp;
+**Level 1 → 2 (Apprentice)**: Competence emerges. Your hands know motions without conscious thought. Quality improves to normal range (40-65). You can teach basics to others, which is how you realize how much you still don't know. Time investment: 200-400 attempts. This is where most people plateau, because competence feels like mastery until you meet actual masters.
+&nbsp;
+**Level 2 → 3 (Journeyman)**: You're professionally capable. Fine quality (60-80) becomes consistent. You develop personal techniques, preferences, opinions about tools and materials. Time investment: 600-1000 attempts. This is the working professional tier—reliable, productive, skilled but not yet art.
+&nbsp;
+**Level 3 → 4 (Expert)**: Masterwork quality (75-90) is achievable. You understand not just how but why techniques work. You can improvise, adapt, diagnose problems by sight/sound/feel. Time investment: 1500-2500 attempts. Most craftspeople cap here. Not because they can't improve, but because the effort required for level 5 exceeds what reasonable people invest in single skills.
+&nbsp;
+**Level 4 → 5 (Master)**: Legendary quality (85-100) becomes possible. You don't follow the recipe—you understand the principles underlying the recipe and can adjust for conditions, materials, desired outcomes. Teaching at this level is different: you're transmitting philosophy, not just technique. Time investment: 3000+ attempts. This is obsession made productive. Most people see one or two level-5 crafters in their lifetime. Nobody reaches level 5 casually.
+&nbsp;
+The skill system also tracks **familiarity** per recipe: every time you make a specific item, you get slightly better at making that specific item, separate from your general skill. This is the 0-20 quality bonus mentioned in other entries. The logarithmic growth means: first craft of a new item, +0 bonus. Tenth craft, +10. Fiftieth craft, +15. Hundredth craft, +18. The curve flattens because mastery is achievable but perfection is asymptotic.
+&nbsp;
+**Skill synergies** add another layer: related skills boost each other's quality output. A blacksmith with Smithing-4, Metalworking-3, and Heat Management-2 gets compound bonuses when making swords. Each synergy might add +5-10 quality points, and they stack, meaning specialized crafters with deep skill trees can produce better work than generalists with higher individual skill levels.
+&nbsp;
+The system rewards dedication, punishes dilettantism, and creates natural specialization where different people excel at different crafts. This is both realistic (mastery requires focus) and game-mechanically necessary (prevents min-maxing everything). Choose your crafts carefully. You have time to master maybe three in a lifetime, if you're dedicated and lucky.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >*Founded in the Year of Three Broken Anvils, after a particularly contentious debate about whether pottery should have its own skill or fall under "general crafting." The debate lasted nine years and produced 847 pages of documentation. Pottery got its own skill.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'systems',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'skills',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['skills', 'progression', 'mastery', 'practice', 'specialization'],</span>
+<span class="cstat-no" title="statement not covered" >  mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >    values: {</span>
+<span class="cstat-no" title="statement not covered" >      levelRange: '0-5',</span>
+<span class="cstat-no" title="statement not covered" >      level0to1: '50-100 attempts',</span>
+<span class="cstat-no" title="statement not covered" >      level1to2: '200-400 attempts',</span>
+<span class="cstat-no" title="statement not covered" >      level2to3: '600-1000 attempts',</span>
+<span class="cstat-no" title="statement not covered" >      level3to4: '1500-2500 attempts',</span>
+<span class="cstat-no" title="statement not covered" >      level4to5: '3000+ attempts',</span>
+<span class="cstat-no" title="statement not covered" >      familiarityMax: 20,</span>
+<span class="cstat-no" title="statement not covered" >      synergyBonus: '5-10 per related skill',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    formulas: {</span>
+<span class="cstat-no" title="statement not covered" >      qualityMultiplier: '0.7 + (skillLevel * 0.1)',</span>
+<span class="cstat-no" title="statement not covered" >      familiarityBonus: 'log10(craftCount + 1) * 20',</span>
+<span class="cstat-no" title="statement not covered" >      synergyBonus: 'relatedSkills.sum(skill =&gt; skill.level * 0.05)',</span>
+<span class="cstat-no" title="statement not covered" >      xpGain: 'baseXP * (1 + difficultyModifier)',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    conditions: {</span>
+<span class="cstat-no" title="statement not covered" >      'Practice required': 'Skills don\'t increase automatically',</span>
+<span class="cstat-no" title="statement not covered" >      'Specialization rewarded': 'Synergies favor focused skill trees',</span>
+<span class="cstat-no" title="statement not covered" >      'Diminishing returns': 'Higher levels require exponentially more practice',</span>
+<span class="cstat-no" title="statement not covered" >      'Familiarity is recipe-specific': 'Each item has separate familiarity tracking',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  tips: [</span>
+<span class="cstat-no" title="statement not covered" >    'Focus on 2-3 skills maximum—mastery &gt; breadth',</span>
+<span class="cstat-no" title="statement not covered" >    'Build synergy trees: choose related skills for compound bonuses',</span>
+<span class="cstat-no" title="statement not covered" >    'Familiarity compounds with skill—master a few recipes rather than dabbling in many',</span>
+<span class="cstat-no" title="statement not covered" >    'Level 3 is the professional tier; level 4+ is optional unless you\'re min-maxing',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  warnings: [</span>
+<span class="cstat-no" title="statement not covered" >    'Skill progression slows dramatically after level 3—be prepared for grind',</span>
+<span class="cstat-no" title="statement not covered" >    'Neglected skills don\'t decay but familiarity does (controversial mechanic, being debated)',</span>
+<span class="cstat-no" title="statement not covered" >    'Synergies only apply when skills are related—check skill tree connections',</span>
+<span class="cstat-no" title="statement not covered" >    'Teaching others gives minimal XP—mastery comes from personal practice',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  examples: [</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Smith Who Specialized',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Kara focused exclusively on weapons: Smithing-5, Weapon Design-4, Metalworking-4, Heat Management-3. Total skill points: 16, spread across four related crafts. Her swords? Quality 90-98 consistently, legendary tier, sought by nobles and heroes. Her friend Marcus went broader: Smithing-3, Carpentry-3, Masonry-2, Cooking-2, Alchemy-2. Total points: 12, spread across unrelated skills. He could do everything adequately. She could do one thing perfectly. The economic value differential was approximately "Kara retired wealthy at forty, Marcus worked until he died at sixty-seven."',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Journey to Master',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Day 1: Pottery level 0. First bowl: quality 18, lopsided, leaks. Disappointing but expected. Week 1: Level 1. Bowls hold water now. Quality 35-50. Progress. Month 3: Level 2. Quality 55-70. Selling basic pottery, breaking even. Year 1: Level 3. Quality 70-85. Professional potter, small reputation. Year 3: Level 4. Quality 80-92. Regional fame, apprentices asking to train. Year 7: Level 5, finally. Quality 90-100. The bowl she makes that morning is perfect—balanced, elegant, so refined it makes her earlier masterwork pieces look like practice attempts. She cries. Seven years for this moment. Worth it? She makes another bowl. Quality 98. Then another. Quality 96. She\'s not crying anymore. She\'s laughing. This is mastery: consistency in excellence, joy in the process, knowledge that she can do this forever and still find new subtleties to explore.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'crafting_system',</span>
+<span class="cstat-no" title="statement not covered" >    'quality_system',</span>
+<span class="cstat-no" title="statement not covered" >    'skill_synergies',</span>
+<span class="cstat-no" title="statement not covered" >    'familiarity_mechanics',</span>
+<span class="cstat-no" title="statement not covered" >    'specialization_benefits',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// EXAMPLE RECIPES</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOCUMENTED_IRON_SWORD_RECIPE = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'iron_sword_recipe',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'Standard weapon crafting recipe demonstrating quality variation',</span>
+<span class="cstat-no" title="statement not covered" >  description: `The iron sword is the hello-world of weapon crafting: simple enough for a level-2 smith to attempt, complex enough that mastery shows in the results. Every blacksmith makes hundreds of these. The first wobbles. The hundredth sings when you swing it. The difference is skill, familiarity, and approximately 1,200 hours of practice.</span>
+&nbsp;
+**Recipe Details:**
+- **Ingredients**: 2x iron_ingot, 1x leather_strip (for grip), 1x wood_pommel
+- **Station**: Forge (required—you cannot hand-craft a sword, please stop trying)
+- **Time**: 2 hours base (modified by skill)
+- **Skill Requirements**: Smithing level 2 minimum
+- **XP Gain**: 50 smithing XP per craft
+&nbsp;
+**Quality Variations by Skill:**
+- **Level 2 smith** (base multiplier 0.9): Output quality 70-95, mostly Fine tier. Serviceable weapons, decent value.
+- **Level 3 smith** (base multiplier 1.0): Output quality 80-100, Fine to Masterwork. Professional grade, reliable.
+- **Level 5 smith** (base multiplier 1.2) + familiarity +18 + synergies +20: Output quality 95-100, consistently Legendary. Museum pieces, legendary status, "The Sword of the Northern Smith" tier.
+&nbsp;
+**Economic Reality:**
+- Poor quality (20): Worth 40 gold (base 200 × 0.2 multiplier). Nobody wants this.
+- Normal quality (50): Worth 100 gold. Standard merchant stock.
+- Fine quality (75): Worth 175 gold. Quality blade, good seller.
+- Masterwork quality (90): Worth 290 gold. Premium weapon.
+- Legendary quality (98): Worth 390 gold. Collector's item, possible heirloom.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >The iron sword is also a teaching tool: simple enough that mistakes are survivable, complex enough that technique matters. If you can't make a good sword, you can't make good anything metal. It's the crucible test (pun intended) of smithing competence.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'recipes',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'weapons',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['smithing', 'weapons', 'iron', 'forge', 'standard'],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'smithing_skill',</span>
+<span class="cstat-no" title="statement not covered" >    'quality_variation',</span>
+<span class="cstat-no" title="statement not covered" >    'weapon_crafting',</span>
+<span class="cstat-no" title="statement not covered" >    'forge_station',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOCUMENTED_HEALING_POTION_RECIPE = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'healing_potion_recipe',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'Alchemical recipe with quality-dependent healing output',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Brewing a healing potion is chemistry pretending to be magic, or magic pretending to be chemistry—the Alchemist's Guild and Wizard's Academy have been arguing about this for six centuries and both sides have compelling evidence that mainly proves the distinction doesn't matter as much as they think it does.</span>
+&nbsp;
+**Recipe Details:**
+- **Ingredients**: 3x red_herb, 1x mana_crystal, 1x pure_water, 1x glass_vial
+- **Station**: Alchemy Station (required—kitchen chemistry ends badly)
+- **Time**: 30 minutes base
+- **Skill Requirements**: Alchemy level 2 minimum
+- **XP Gain**: 35 alchemy XP per craft
+&nbsp;
+**Quality affects healing output:**
+- Poor quality (30): Heals 30 HP. Tastes terrible, works reluctantly, better than nothing.
+- Normal quality (50): Heals 50 HP. Standard merchant potion.
+- Fine quality (75): Heals 65 HP. Professional grade, reliable.
+- Masterwork quality (90): Heals 80 HP. Premium healing, sought by adventurers.
+- Legendary quality (98): Heals 95 HP. Near-instant recovery, might be actual magic.
+&nbsp;
+**The Brewing Process** (as taught by the Guild):
+1. Grind herbs to precise consistency (too fine: dissolves wrong; too coarse: inefficient extraction)
+2. Extract essence in heated pure water (temperature critical—too hot destroys potency, too cold extracts poorly)
+3. Integrate mana crystal energy (timing sensitive—too early: unstable, too late: inert)
+4. Bottle while still aligned (magical window: 30 seconds, no longer)
+&nbsp;
+Each step affects quality. Master alchemists can salvage bad ingredients. Novices waste good ingredients. The potion knows the difference—not sentient, just chemistry being finicky about process.
+&nbsp;
+**Common Failure Modes:**
+- Herbs oxidized: Potion turns brown, healing reduced 50%
+- Temperature too high: Mana crystal cracks, potion inert
+- Bottling too slow: Magic dissipates, you get expensive colored water
+- Wrong water source: Impurities interfere, results unpredictable (usually bad)
+&nbsp;
+<span class="cstat-no" title="statement not covered" >The healing potion is the alchemy equivalent of the iron sword: standard, essential, deceptively simple. Every alchemist brews thousands. The first explodes (safely, usually). The thousandth is flawless. The journey between is what separates dilettantes from professionals.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'recipes',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'potions',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['alchemy', 'healing', 'potions', 'consumables', 'magical'],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'alchemy_skill',</span>
+<span class="cstat-no" title="statement not covered" >    'quality_healing_scaling',</span>
+<span class="cstat-no" title="statement not covered" >    'potion_crafting',</span>
+<span class="cstat-no" title="statement not covered" >    'alchemy_station',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOCUMENTED_BREAD_RECIPE = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'bread_recipe',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'Basic food recipe showing hand-crafting vs station differences',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Bread is civilization. Not metaphorically—literally. The moment humans figured out "grain + water + fire = preserved calories," we stopped being nomadic hunter-gatherers and became agricultural societies with surplus time for inventing writing, mathematics, and unnecessarily complicated bread recipes.*</span>
+&nbsp;
+**Basic Recipe (Hand-Crafted):**
+- **Ingredients**: 2x wheat_flour, 1x water, 1x salt (optional but recommended)
+- **Station**: None (can be hand-crafted) OR Campfire OR Oven
+- **Time**: 1 hour hand-crafted, 30 min campfire, 15 min oven
+- **Skill Requirements**: Cooking level 0 (anyone can attempt)
+- **XP Gain**: 10 cooking XP
+&nbsp;
+**Station Quality Bonuses:**
+- Hand-crafted: Base quality only (35-60), dense, inconsistent, technically edible
+- Campfire: +10 quality, better heat control, still rustic
+- Oven: +20 quality, even heating, professional results
+&nbsp;
+**Quality affects nutrition:**
+- Poor bread (25): Restores 5 hunger, might cause indigestion, better than starvation
+- Normal bread (50): Restores 10 hunger, standard food
+- Fine bread (75): Restores 15 hunger, actually pleasant to eat
+- Masterwork bread (90): Restores 20 hunger, artisanal quality, people compliment it
+&nbsp;
+**The Bread Spectrum:**
+From "I mixed grain paste and put it near fire" to "This crusty artisanal sourdough with rosemary infusion is a religious experience" is the same basic recipe, differentiated entirely by skill, technique, and access to proper equipment. Bread teaches humility: everyone can make it, few make it well, mastery reveals itself in something as simple as "flour + water."
+&nbsp;
+There are 847 documented bread recipes in the Culinary Archives. All are variations on the same basic theme. The Bread Historians insist this demonstrates human creativity. The Bread Minimalists insist this demonstrates humans overthinking simple things. Both groups make excellent bread, which proves something, though nobody agrees what.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >*The Bread Historians have documented this. The Grain Farmers dispute the timeline but agree with the sentiment.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'recipes',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'food',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['cooking', 'bread', 'food', 'basic', 'hand-craftable'],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'cooking_skill',</span>
+<span class="cstat-no" title="statement not covered" >    'food_quality',</span>
+<span class="cstat-no" title="statement not covered" >    'station_bonuses',</span>
+<span class="cstat-no" title="statement not covered" >    'basic_crafting',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

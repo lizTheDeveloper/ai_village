@@ -46,9 +46,9 @@ export class SeekFoodBehavior extends BaseBehavior {
   readonly name = 'seek_food' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
-    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const inventory = entity.getComponent(ComponentType.Inventory);
+    const needs = entity.getComponent(ComponentType.Needs);
 
     // If no inventory or needs, can't eat
     if (!inventory || !needs || !agent) {
@@ -79,7 +79,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     const plantResult = this.tryEatFromNearbyPlant(entity, world);
     if (plantResult?.success) {
       // Check if still hungry
-      const updatedNeeds = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+      const updatedNeeds = entity.getComponent(ComponentType.Needs);
       if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
         return { complete: true, reason: 'Hunger satisfied from plant' };
       }
@@ -91,7 +91,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     const storageResult = this.tryEatFromNearbyStorage(entity, world);
     if (storageResult?.success) {
       // Check if still hungry
-      const updatedNeeds = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+      const updatedNeeds = entity.getComponent(ComponentType.Needs);
       if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
         return { complete: true, reason: 'Hunger satisfied from storage' };
       }
@@ -109,8 +109,8 @@ export class SeekFoodBehavior extends BaseBehavior {
     }
 
     // No food sources found nearby - try spatial memory for remembered food locations
-    const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
-    const agentPosition = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const spatialMemory = entity.getComponent(ComponentType.SpatialMemory);
+    const agentPosition = entity.getComponent(ComponentType.Position);
     if (spatialMemory && agentPosition) {
       // Try both resource_location and plant_location types (food can be either)
       const resourceMemories = getSpatialMemoriesByType(spatialMemory, 'resource_location');
@@ -141,7 +141,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     // No food found and no memories - wander to explore for food
     // Instead of switching to 'wander' behavior (which gets overridden by autonomic system),
     // wander directly as part of seeking food (exploring to find food)
-    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
+    const movement = entity.getComponent(ComponentType.Movement);
     if (movement && agentPosition) {
       // Get or initialize wander angle
       let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
@@ -184,7 +184,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     entity: EntityImpl,
     world: World
   ): { type: 'plant' | 'storage'; entity: Entity; position: { x: number; y: number }; distance: number } | null {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     if (!position) return null;
 
     const MAX_CHUNK_RINGS = 3; // Search current + 3 rings = 7x7 chunks max
@@ -232,7 +232,7 @@ export class SeekFoodBehavior extends BaseBehavior {
         if (!entityObj) continue;
 
         const entityImpl = entityObj as EntityImpl;
-        const entityPos = entityImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const entityPos = entityImpl.getComponent(ComponentType.Position);
         if (!entityPos) continue;
 
         // Calculate distance for scoring
@@ -256,8 +256,8 @@ export class SeekFoodBehavior extends BaseBehavior {
         }
 
         // Check if it's a storage building with food
-        const building = entityImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const inventory = entityImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+        const building = entityImpl.getComponent(ComponentType.Building);
+        const inventory = entityImpl.getComponent(ComponentType.Inventory);
         if (building && inventory) {
           const isStorage = building.buildingType === BuildingType.StorageChest ||
                            building.buildingType === BuildingType.StorageBox;
@@ -389,7 +389,7 @@ export class SeekFoodBehavior extends BaseBehavior {
    * Performance: Uses ChunkSpatialQuery when available
    */
   private tryEatFromNearbyStorage(entity: EntityImpl, world: World): InteractionResult | null {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     if (!position) return null;
 
     const nearbyDistance = 3; // Must be within 3 tiles of storage
@@ -403,8 +403,8 @@ export class SeekFoodBehavior extends BaseBehavior {
 
       for (const { entity: buildingEntity } of buildingsInRadius) {
         const buildingImpl = buildingEntity as EntityImpl;
-        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const buildingInventory = buildingImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+        const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+        const buildingInventory = buildingImpl.getComponent(ComponentType.Inventory);
 
         if (!buildingComp || !buildingInventory) continue;
 
@@ -439,9 +439,9 @@ export class SeekFoodBehavior extends BaseBehavior {
 
     for (const buildingEntity of buildingEntities) {
       const buildingImpl = buildingEntity as EntityImpl;
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingInventory = buildingImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+      const buildingPos = buildingImpl.getComponent(ComponentType.Position);
+      const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+      const buildingInventory = buildingImpl.getComponent(ComponentType.Inventory);
 
       if (!buildingPos || !buildingComp || !buildingInventory) continue;
 
@@ -481,7 +481,7 @@ export class SeekFoodBehavior extends BaseBehavior {
    * Performance: Uses ChunkSpatialQuery when available
    */
   private tryEatFromNearbyPlant(entity: EntityImpl, world: World): InteractionResult | null {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     if (!position) return null;
 
     const nearbyDistance = 2; // Must be within 2 tiles of plant
@@ -521,7 +521,7 @@ export class SeekFoodBehavior extends BaseBehavior {
 
     for (const plantEntity of plantEntities) {
       const plantImpl = plantEntity as EntityImpl;
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const plantPos = plantImpl.getComponent(ComponentType.Position);
       const plantComp = plantImpl.getComponent(ComponentType.Plant);
 
       if (!plantPos || !plantComp || !isPlantComponent(plantComp)) continue;

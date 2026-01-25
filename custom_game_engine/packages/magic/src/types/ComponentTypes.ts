@@ -5,6 +5,8 @@
  * by magic effect appliers. These types help avoid `as any` casts.
  */
 
+import type { Component } from '@ai-village/core';
+
 // ============================================================================
 // Position & Movement
 // ============================================================================
@@ -228,7 +230,7 @@ export interface RewindRequest {
 // Active Effects
 // ============================================================================
 
-export interface ActiveEffectsComponent {
+export interface ActiveEffectsComponent extends Component {
   type: 'active_effects';
   effects: any[];
   suppressed?: boolean;

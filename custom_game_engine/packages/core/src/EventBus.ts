@@ -22,9 +22,11 @@ export class EventBus {
 
   /**
    * Subscribe to an event (alias for on())
+   * @returns Unsubscribe function
    */
-  subscribe(eventType: string, handler: EventHandler): void {
+  subscribe(eventType: string, handler: EventHandler): () => void {
     this.on(eventType, handler);
+    return () => this.off(eventType, handler);
   }
 
   /**

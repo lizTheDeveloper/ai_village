@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6b8a3674",
+  "name": "Alpha Titan",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769245833489",
+  "createdAt": 1769245833523,
+  "lastAccessedAt": 1769245833523,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769245833489",
+    "type": "magical"
+  }
+}

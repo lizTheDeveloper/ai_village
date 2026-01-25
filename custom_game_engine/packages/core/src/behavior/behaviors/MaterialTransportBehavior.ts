@@ -66,8 +66,8 @@ export class MaterialTransportBehavior extends BaseBehavior {
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = getPosition(entity);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     if (!position || !agent || !inventory) {
       return { complete: true, reason: 'Missing required components' };
@@ -367,8 +367,8 @@ export class MaterialTransportBehavior extends BaseBehavior {
       if (storage.id === agent.id) continue;
 
       const storageImpl = storage as EntityImpl;
-      const inv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
-      const pos = storageImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const inv = storageImpl.getComponent(ComponentType.Inventory);
+      const pos = storageImpl.getComponent(ComponentType.Position);
 
       if (!inv || !pos) continue;
 
@@ -410,8 +410,8 @@ export class MaterialTransportBehavior extends BaseBehavior {
     if (!storageEntity) return false;
 
     const storageImpl = storageEntity as EntityImpl;
-    const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
-    const agentInv = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const storageInv = storageImpl.getComponent(ComponentType.Inventory);
+    const agentInv = agent.getComponent(ComponentType.Inventory);
 
     if (!storageInv || !agentInv) return false;
 

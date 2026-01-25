@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:69cdff27",
+  "name": "Nereid",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769246230484",
+  "createdAt": 1769246230491,
+  "lastAccessedAt": 1769246230491,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769246230484",
+    "type": "magical"
+  }
+}

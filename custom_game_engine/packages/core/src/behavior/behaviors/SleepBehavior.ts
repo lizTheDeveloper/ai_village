@@ -35,7 +35,7 @@ export class SeekSleepBehavior extends BaseBehavior {
     // Disable steering system
     this.disableSteering(entity);
 
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const position = entity.getComponent(ComponentType.Position);
     const circadian = getCircadian(entity);
     const agent = getAgent(entity);
 
@@ -82,7 +82,7 @@ export class SeekSleepBehavior extends BaseBehavior {
     }
 
     if (sleepLocation) {
-      const bedPos = (sleepLocation as EntityImpl).getComponent<PositionComponent>(ComponentType.Position)!;
+      const bedPos = (sleepLocation as EntityImpl).getComponent(ComponentType.Position)!;
 
       // Move toward bed (with arrival slowdown)
       const distance = this.moveToward(entity, bedPos);
@@ -210,7 +210,7 @@ export class SeekSleepBehavior extends BaseBehavior {
   }
 
   private startSleeping(entity: EntityImpl, world: World, location: Entity | null): void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const position = entity.getComponent(ComponentType.Position)!;
     const quality = this.calculateSleepQuality(location);
     const agent = getAgent(entity);
 

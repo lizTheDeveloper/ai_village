@@ -1,0 +1,1069 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/alchemy-fundamentals-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> alchemy-fundamentals-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/89</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/89</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FOUR_ELEMENTS_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'four_elements_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Earth, Air, Fire, Water: The Foundation of Alchemical Thought',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['alchemy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 8, arcane: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'elemental_analysis' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `EARTH, AIR, FIRE, WATER: THE FOUNDATION OF ALCHEMICAL THOUGHT</span>
+&nbsp;
+The classical theory of the four elements, first proposed by Empedocles of Acragas* and later refined by Aristotle**, remains the cornerstone of alchemical understanding despite being, strictly speaking, completely incorrect†. According to this elegant system, all matter in the universe consists of combinations of four fundamental substances—Earth, Air, Fire, and Water—each defined by two qualities: Hot or Cold, and Wet or Dry‡. Fire manifests as Hot and Dry, Water as Cold and Wet, Air as Hot and Wet, and Earth as Cold and Dry‡‡. This arrangement, while scientifically inaccurate, provides a remarkably useful framework for understanding alchemical transformations, much as a completely wrong map can still get you somewhere if everyone else is using the same wrong map†††.
+&nbsp;
+The identification of dominant elements in a substance follows straightforward observational principles***. Does it burn readily? Fire predominates. Does it flow and seek its own level? Water holds sway. Does it remain unchanged when heated and resist dissolution? Earth is ascendant. Does it vanish into nothingness when released from containment? Air dominates††. The skilled alchemist develops an intuitive sense for these qualities, though this intuition is developed primarily through the repeated failure of early experiments‡‡‡. The Collegium of Elemental Studies in Prague maintains that approximately 73.4% of all beginning alchemists correctly identify the dominant element in a substance on their first attempt, while the remaining 26.6% set something on fire they shouldn't have****.
+&nbsp;
+The practical application of four-element theory extends beyond mere classification into the realm of transmutation and combination††††. By understanding which elements predominate in a substance, the alchemist can predict how it will interact with others—Hot and Dry substances naturally oppose Cold and Wet ones, while Hot and Wet substances act as mediators between Fire and Water*****. This opposition and harmony creates the basis for all alchemical work, from the mundane preparation of medicinal tinctures to the considerably less mundane attempts to create gold from lead†††††. The ancient Alexandrian alchemist Maria the Jewess famously stated, "One becomes two, two becomes three, and out of the third comes the one as the fourth,"‡‡‡‡ which scholars have interpreted variously as profound wisdom, complete nonsense, or possibly a recipe for bread******.
+&nbsp;
+Why, then, does this theory persist when modern understanding has revealed matter to be composed of atoms, which are themselves composed of smaller particles, which may in turn be composed of even smaller particles in a rather disconcerting infinite regress?†††††† The answer lies in utility rather than truth‡‡‡‡‡. The four-element theory provides a conceptual framework that allows practitioners to organize observations, predict outcomes, and communicate findings across cultures and centuries*******. It is, in essence, a useful fiction—much like the Mercator projection, which makes Greenland appear larger than Africa but allows sailors to plot straight courses, or the belief that getting enough sleep will make you less tired††††††††. The modern alchemist employs four-element theory as a starting point, a common language, and a reminder that sometimes the universe can be understood through patterns even when the patterns themselves are not literally true‡‡‡‡‡‡.
+&nbsp;
+The cautionary tale of Theophrastus von Brennstoff serves as an eternal warning to those who confuse useful model with absolute reality*********. Von Brennstoff, convinced that pure elemental Fire could be isolated by removing all traces of the other three elements, spent seventeen years attempting to create a flame that contained no Water (moisture), no Earth (ash), and no Air (smoke)††††††††††. His laboratory exploded on March 3rd, 1672, leaving behind only a scorch mark in the shape of the alchemical symbol for hubris**********. Yet even in failure, von Brennstoff contributed to alchemical knowledge: his meticulous notes proved that pure elements cannot exist in isolation, that theory must bend to practice, and that neighbors will complain if you detonate your laboratory during dinner time‡‡‡‡‡‡‡. The four elements remain, therefore, both the foundation and the limitation of alchemical thought—a beginning point that acknowledges its own inadequacy, which is rather more than most theories can claim†††††††††††.
+&nbsp;
+---
+&nbsp;
+*Empedocles (c. 494-434 BCE) proposed the four elements after observing that everything seemed to be made of stuff, and there appeared to be about four main types of stuff. This was considered revolutionary thinking at the time, which tells you something about the state of ancient Greek philosophy before Empedocles came along. He later died by throwing himself into Mount Etna, either to prove he was immortal or because he'd grown tired of people asking him to explain his theory at dinner parties. The volcano ejected one of his bronze sandals, suggesting that even the elements themselves found his approach excessive.
+&nbsp;
+**Aristotle added the crucial detail of the qualities (Hot, Cold, Wet, Dry), because apparently just having four elements wasn't complicated enough. He also added a fifth element, Aether, for celestial bodies, but alchemists largely ignore this because it's difficult to obtain samples from the moon for experimental purposes.
+&nbsp;
+†The degree of incorrectness is a matter of some debate. The Metaphysical Accuracy Commission of Vienna rates it as "Wrong, but Productive" on their seven-point scale of theoretical validity, placing it somewhere between Phlogiston Theory and Humoral Medicine†.
+&nbsp;
+††The Commission's scale runs from "Completely Right" (currently unoccupied) through "Wrong, but Productive," "Wrong and Useless," "Wrong and Dangerous," down to "Wrong in Ways We're Still Discovering." Phlogiston Theory holds the distinction of rising from "Wrong and Useless" to "Wrong, but Productive" after it was discovered that being completely backward about something was still useful for predicting how things would behave if you reversed all your assumptions.
+&nbsp;
+‡This creates what philosophers call a "binary opposition matrix," and what everyone else calls "a square with labels." The elegance lies in its simplicity: only four possible combinations of two binary qualities. Of course, this elegance comes at the cost of accuracy, much like describing all human emotion as combinations of Happy/Sad and Angry/Calm would be simple but inadequate for explaining why anyone cries at weddings‡.
+&nbsp;
+‡‡Though try explaining to your weeping aunt that she's experiencing a Cold-Wet emotional state and see how that goes.
+&nbsp;
+‡‡‡The truly pedantic will note that this arrangement means each element shares one quality with two others and opposes two others, creating a perfect system of balance and opposition. Fire and Air share Hotness. Water and Earth share Coldness. Fire and Earth share Dryness. Water and Air share Wetness. This symmetry delighted medieval scholars enormously, which explains why they spent so much time drawing diagrams when they could have been doing experiments.
+&nbsp;
+†††The Guild of Cartographers has long maintained that there is no such thing as a "wrong map," only "maps with alternative relationships to ground truth." This position became untenable after the Great Navigation Incident of 1523, when seventeen ships sailed confidently into the Mountains of Bohemia while searching for the Spice Islands††††.
+&nbsp;
+††††The incident was made worse by the fact that the cartographer responsible had labeled the mountains as "Definitely Not Mountains, Probably Sea." Twelve of the seventeen ships' captains refused to admit they had made an error and attempted to continue sailing uphill. The Bohemian Mountaineering Guild reports that pieces of these ships can still be found at various altitudes, serving as hostels for confused hikers.
+&nbsp;
+***The word "straightforward" is doing considerable work in this sentence. What seems straightforward to an experienced alchemist often involves years of training, several minor burns, and at least one incident that requires explaining to the local fire brigade†††††.
+&nbsp;
+†††††The Pyromantic Safety Board keeps detailed records of all fire-brigade-requiring incidents, organized by cause, severity, and plausibility of the explanation provided. "I was trying to determine if my aqua fortis was Hot-Dry or Hot-Wet" ranks surprisingly low on the plausibility scale, below "I sneezed while holding the burner" but above "I thought the mercury wanted friends."
+&nbsp;
+††This last quality makes Air particularly troublesome for beginners, as it's difficult to maintain confidence that you're successfully identifying something that has just vanished. The distinguished alchemist Paracelsus noted that "Air is the element that most resembles having nothing at all, except it occasionally moves things around to prove it exists"‡‡‡‡.
+&nbsp;
+‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The classical four elements as the basis of all matter',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DISSOLUTION_BASICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'dissolution_basics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Breaking Things Down: The Art of Dissolution',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['alchemy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['four_elements_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, chemistry: 6 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'basic_dissolution' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `BREAKING THINGS DOWN: THE ART OF DISSOLUTION</span>
+A Practical Guide for the Aspiring Alchemist
+By the Guild of Solvent Studies and Accidental Dispersions
+&nbsp;
+The fundamental principle of dissolution, as first properly documented by the Ancient School of Taking Things Apart to See What Happens*, represents one of alchemy's most essential—and deceptively simple—operations. At its heart lies a truth so obvious that it took humanity approximately four thousand years to articulate it properly†: substances dissolve other substances based on similarity of character. Water, being of a polar and sociable nature‡, readily embraces salts and sugars into solution, separating their crystalline bonds with the enthusiasm of a matchmaker at a village dance. The apprentice who understands this principle—that ionic and polar substances seek water's company while shunning oils—has grasped more than most practitioners learned in their first decade of study**.
+&nbsp;
+The second great category of solvents comprises the alcohols††, those remarkable substances that bridge the gap between water's gregarious polarity and oil's reclusive non-polarity. Ethanol, in particular, demonstrates an almost diplomatic ability to dissolve resins, essential oils, and various organic compounds that would rather perish than associate with water‡‡. This property has made alcohol indispensable in tincture-making, though one must exercise considerable caution***: the line between "dissolving the medicinal resin" and "accidentally creating something that tastes like concentrated regret" is thinner than most textbooks acknowledge. The principle of "like dissolves like" reveals itself most clearly here—alcohol's dual nature allows it to fraternize with both camps, making it invaluable for extractions that would otherwise require arcane intervention†††.
+&nbsp;
+The third and most dramatic category involves the mineral acids‡‡‡, those powerful substances that can reduce metals and minerals to their constituent parts with spectacular efficiency. Aqua fortis§ dissolves silver with barely a whisper of protest from the metal; aqua regia§§ can overcome even gold's legendary resistance to corrosion. These are not solvents for the careless or the hurried; they demand respect, proper ventilation, and a laboratory that one doesn't mind potentially redecorating§§§. The acids work by attacking the metallic or mineral bonds directly, often releasing substantial heat and occasionally gases that previous generations of alchemists described variously as "regrettable," "memorable," and "surprisingly orange."
+&nbsp;
+Understanding which solvent addresses which substance represents the difference between elegant dissolution and expensive disaster. The apprentice must learn to read the signs: does the substance feel greasy or waxy? Consider alcohol or heated oils¶. Does it form crystals or powder that might be ionic? Water beckons¶¶. Does it resist all gentle persuasion and mock your efforts? The acids wait in their bottles, patient as ancient gods¶¶¶, ready to reduce the recalcitrant to solution. This knowledge, combined with proper safety protocols‖ and a healthy respect for previous practitioners' mistakes‖‖, forms the foundation upon which all further alchemical work must rest.
+&nbsp;
+---
+&nbsp;
+*The School was disbanded in 437 A.M. (After Mergenthal) following what historians delicately term "the incident with the royal treasury and the aqua regia." The king was reportedly quite attached to his gold reserves and expressed his displeasure through traditional means: specifically, declaring the entire faculty wanted for "aggressive curiosity" and "excessive empiricism."
+&nbsp;
+†Though the Alexandrian alchemist Kleomenes the Demonstrative came remarkably close in 180 B.M., his work was lost when his laboratory dissolved itself during an experiment he'd titled "Everything Into Everything: A Practical Test." Only his shopping list survived, which included the ominous entry: "More sand. All the sand. Cannot have too much sand for what I'm planning."
+&nbsp;
+‡Water molecules possess what the Guild of Solvent Studies technically describes as "a tedious tendency to form hydrogen bonds with anything remotely willing." This gives them a +2.1 Debye dipole moment and the personality of someone who brings homemade cookies to every gathering whether invited or not.
+&nbsp;
+**The Monastery of Perpetual Dissolution maintains records indicating that Brother Ambrose spent eleven years attempting to dissolve sugar in oil before a visiting scholar informed him that water existed. He reportedly stared at his oil-covered sugar crystals for seventeen minutes before retiring to contemplate his life choices. The monastery now includes "basic solvent selection" in its first-week curriculum.
+&nbsp;
+††The term "alcohol" derives from the Arabic al-kuḥl, originally referring to a fine powder used as eye makeup, which seems entirely unrelated until one considers that both the powder and the liquid have the capacity to make one's vision substantially worse if misapplied. The Etymological Society of Akkad refuses to comment on this coincidence.
+&nbsp;
+‡‡Professor Hendrikson's "Treatise on Alcoholic Dissolution" (Age of Enlightened Solvents, Vol. 3) contains the field's most extensive study of this phenomenon, spanning 847 pages. Approximately 600 of those pages describe things that dissolved when they shouldn't have, including two lab benches, a graduate assistant's shoes, and—mysteriously—a portrait of the university dean that had been hanging in an entirely different building. The final 247 pages are a heartfelt apology.
+&nbsp;
+***The Guild maintains a "Wall of Caution" displaying 3,247 different tinctures that technically worked but resulted in what the Guild archivists label "recreational regret" or "medicinal malaise." Each bottle is accompanied by a small placard describing its effects. Popular entries include "The One That Made Colors Too Loud" and "Instant Retrospection (Unpleasant)."
+&nbsp;
+†††This is sometimes called the "Amphoteric Advantage," though calling it an "advantage" seems generous when one considers the seventeen distinct ways alcohol can complicate an extraction that was supposed to be simple. The Journal of Things That Seemed Like Good Ideas publishes a quarterly supplement devoted entirely to alcohol-related miscalculations.
+&nbsp;
+‡‡‡The discovery of mineral acids represents one of humanity's most impressive achievements in controlled destruction. Prior to their isolation, dissolving metals required either extreme patience, divine intervention, or what the ancient texts euphemistically called "aggressive negotation with hammers."
+&nbsp;
+§Nitric acid, for those keeping score. The name "aqua fortis" (strong water) was given by medieval alchemists who had a magnificent talent for understatement. It's rather like calling a dragon "a warm lizard" or a hurricane "a bit of a breeze." The acid, to its credit, never complains about the nomenclature.
+&nbsp;
+§§A mixture of hydrochloric and nitric acids in a 3:1 ratio, capable of dissolving gold and platinum. The name means "royal water," bestowed by alchemists who believed that only a royal solvent could dissolve the noblest of metals. The acids themselves are indifferent to this poetic reasoning and will dissolve peasant metals just as enthusiastically given the opportunity.
+&nbsp;
+§§§The University of Rhandol's Department of Aggressive Chemistry goes through approximately 2.3 laboratory rooms per academic year. They have a standing contract with the university's maintenance division and a bulk discount with local glassware suppliers. The department chair, Dr. Kallista Thorne, maintains that this is "well within acceptable parameters" and "better than last decade."
+&nbsp;
+¶Heated oils require their own dissertation on safety protocols. The Guild of Controlled Temperatures lost fourteen members before establishing the First Rule of Heated Oil: "If you can't remember when you lit it, it's too hot." This was followed by the Second Rule: "If you have to ask whether it's too hot, refer to the First Rule." There is no Third Rule; anyone who needed one generally didn't survive to suggest it.
+&nbsp;
+¶¶Though one must account for temperature†. Cold water and hot water are, for dissolution purposes, effectively different solvents. This seems obvious in hindsight, but the Compendium of Obvious Things We Nonetheless Had to Learn lists "temperature affects solubility" as discovery #73, suggesting that seventy-two other obvious things also required experimental confirmation.
+&nbsp;
+†Temperature's role in dissolution cannot be overstated. The Khemerian alchemist Rashid al-Halil demonstrated this in 892 A.M. by dissolving progressively larger amounts of salt in progressively hotter water until he accidentally created a solution so supersaturated that it crystallized instantly upon cooling, encasing his stirring rod in a solid block of salt. The rod remains on display at the Museum of Educational Mistakes in Damascus, labeled "Enthusiasm Exceeded by Supersaturation: A Cautionary Tale."
+&nbsp;
+¶¶¶Acids are older than human understanding of them—volcanic vents have been producing sulfuric aci`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on How to break down substances into their component parts using solvents',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DISTILLATION_PROCESS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'distillation_process',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Separating the Pure from the Impure: The Art of Distillation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['alchemy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['dissolution_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 12, chemistry: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'building', buildingId: 'alembic' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'distillation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `SEPARATING THE PURE FROM THE IMPURE: THE ART OF DISTILLATION</span>
+&nbsp;
+The fundamental principle of distillation rests upon a truth so obvious that generations of alchemists managed to miss it entirely*: different substances boil at different temperatures**. This simple observation, when combined with an apparatus of appropriate design†, allows the practitioner to separate mixed liquids into their constituent parts, provided one has patience, steady hands, and a healthy respect for the explosive properties of heated vapors††. The alembic—that most elegant and dangerous of alchemical vessels—consists of three primary components: the cucurbit or boiling vessel, the alembic head with its gracefully curved condensing tube‡, and the receiving flask, which must be positioned such that one can flee rapidly in the event of catastrophic failure‡‡.
+&nbsp;
+Water, as every schoolchild knows, boils at precisely one hundred degrees Centigrade at sea level***, while ethanol (the alcohol that makes one's uncle interesting at family gatherings) boils at a mere seventy-eight degrees†††. This twenty-two degree difference‡‡‡ represents the entire foundation upon which the distillation of spirits has been built, along with approximately forty percent of the world's bad decisions§. The practical application of this principle involves heating wine or fermented wash slowly and carefully, collecting the vapors that emerge first—these being richest in alcohol—while discarding the later fractions that contain mostly water and regret§§. The astute student will note that this process can theoretically continue until one has separated pure alcohol from pure water, a notion that has led to more explosions than any other single misunderstanding in alchemical history§§§.
+&nbsp;
+Yet here we encounter what Master Empiricus the Slightly Singed termed "the cruel joke of thermodynamics"*†: no matter how many times you distill wine, you cannot achieve pure alcohol**†. The reason involves complex interactions between water and ethanol molecules that cause them to form what the ancients called "inseparable friendships" and what modern alchemists call an azeotrope†††. At best, through repeated distillation, one achieves roughly ninety-six percent alcohol by volume‡†, after which point the mixture stubbornly refuses to separate further, no matter how much heat is applied or how loudly one shouts at it‡‡†.
+&nbsp;
+The Guild of Master Distillers maintains extensive records of common disasters§†, and the wise student would do well to memorize them. Explosions typically occur when: (1) the apparatus is sealed too tightly, causing pressure to build until something gives way, usually the most expensive piece§§†; (2) the heat source is too vigorous, causing the liquid to boil violently rather than gently simmer; (3) the distilland contains solid matter that causes bumping and irregular boiling***†; or (4) the operator becomes distracted by the hypnotic drip of condensate and fails to notice that the receiving flask has filled and the precious distillate is now pooling on the floor††††. Additionally, one must never—and the Guild cannot stress this enough—never distill methanol-containing mixtures without proper training, as the resulting product can cause blindness, death, or worse, embarrassment at professional gatherings‡‡‡†.
+&nbsp;
+The successful distiller develops a relationship with their apparatus that borders on the mystical§‡. One learns to judge temperature by the smell of the vapors**‡, to detect impurities by the color of the distillate††‡, and to know when to switch receiving flasks by a subtle change in the taste of the air‡‡‡. These skills cannot be taught from books alone; they must be earned through practice, observation, and the occasional small fire that serves to focus the attention wonderfully.
+&nbsp;
+&nbsp;
+*The earliest recorded distillation apparatus dates to the third century CE in Alexandria, where it was used to create perfumes and, more importantly, substances that made the creation of perfumes more bearable. The inventor, one Zosimos of Panopolis, described the process in texts so deliberately obscure that scholars still debate whether he was protecting sacred knowledge or simply couldn't write very well.
+&nbsp;
+**According to the Department of Preventable Catastrophes at the Unseen University, approximately 73.4% of all beginning alchemists attempt distillation before understanding this principle, resulting in apparatus failure, mysterious odors, and what the department terms "educational scarring."
+&nbsp;
+†The word "alembic" derives from the Arabic al-anbiq, itself from the Greek ambix, meaning "cup" or "beaker," which seems rather like calling the Great Pyramid of Giza "that big pointy thing." The Arabs, who perfected the art of distillation while Europe was still trying to remember how to make decent pottery, showed considerably more sophistication in their apparatus design than their naming conventions suggested†.
+&nbsp;
+††In the year 847 CE, the Baghdad House of Wisdom experienced what records describe as "the incident we do not speak of but which involved seventeen alembics, a Tuesday afternoon, and the complete repainting of the eastern wing." The exact details remain sealed in the archives, accompanied by a note reading, "Trust us, you don't want to know."
+&nbsp;
+‡The curve of this tube is critical. Too sharp, and vapors condense prematurely. Too gentle, and they don't condense at all. The optimal angle is 17.3 degrees from horizontal‡, a figure that Master Angulus spent forty years deriving and which most practical distillers ignore entirely in favor of "whatever looks about right."
+&nbsp;
+‡‡The famous "Fire Drill of 1453" at the Krakow Academy of Applied Alchemy consisted of a single instruction: "Save yourself, not the apparatus." This followed the "Incident of the Sticky Floor," which we shall not detail here, except to note that the eastern laboratory remained unusable for three years and still smells faintly of cherries‡‡.
+&nbsp;
+‡‡Some say the smell is actually almonds. The debate continues.
+&nbsp;
+***At higher altitudes, water boils at lower temperatures, a fact that has confused mountain-dwelling alchemists since time immemorial. The Monastery of St. Bunsen the Burner, located at 3,200 meters in the Alps, maintains that all alchemical texts are wrong, having failed to realize that all alchemical texts were written at sea level by people who didn't climb mountains unnecessarily.
+&nbsp;
+†††Named for the Arab alchemist al-Kuhul, who discovered it and subsequently discovered that discovering it led to considerable local demand for more discoveries of similar nature. His later works show a marked decline in scientific rigor but a notable increase in sales figures.
+&nbsp;
+‡‡‡This difference has been described as "the width of disaster" by the Guild's insurance underwriters, who note that more accidents occur in this twenty-two degree window than in all other temperature ranges combined. The Guild's annual premium reflects this truth with mathematical precision and emotional vindictiveness.
+&nbsp;
+§The remaining sixty percent is attributable to bad decisions made while already affected by the products of previous distillations, creating a recursive loop that philosophers have termed "the wheel of poor judgment."
+&nbsp;
+§§In the opinion of the ancient Sumerian goddess Ninkasi, who presided over brewing and distillation, these later fractions were suitable only for "watering gardens, cleaning floors, and humbling the proud."§§
+&nbsp;
+§§§A small shrine in the basement of the Royal Society of Alchemists commemorates the seven hundred and thirty-two practitioners who learned this lesson the hard way between 1611 and 1613, a period known as "The Years of Loud Noises."
+&nbsp;
+*†Master Empiricus survived seventeen laboratory explosions before retiring to write his treatise "On Knowing When to Stop." He died peacefully in bed at age ninety, though some say the smell of singed eyebrows never entirely left him**†.
+&nbsp;
+**†His ghost reportedly haunts the Library of Practical Wisdom, where it is seen nodding approvingly at students who read safety protocols and sighing heavily at those who skip ahead to the "exciting bits."
+&nbsp;
+†††This azeotrope occurs at 95.6% alcohol and 4.4% water by volume, figures that are precise enough to be scientific and annoying enough to frustrate every perfectionist who encounters them. The molecules of water and ethanol, when mixed, form hydrogen bonds that even heat cannot break, like old friends who refuse to leave a party no matter how obvious the hints.
+&nbsp;
+‡†To achieve higher concentrations, one must employ desiccants, molecular sieves, or other methods that the Guild considers "advanced" and "not for students who still think 'flashpoint' is a type of pen."
+&nbsp;
+‡‡†The Guild archives contain seventeen recorded instances of apprentices attempting to argue with thermodynamics. Thermodynamics remains undefeated.
+&nbsp;
+§†`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Using heat to separate substances by boiling point',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CALCINATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'calcination',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Reduction by Fire: The Process of Calcination',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['alchemy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['four_elements_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 14, fire_magic: 6 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'calcination' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `REDUCTION BY FIRE: THE PROCESS OF CALCINATION</span>
+&nbsp;
+The ancient art of calcination, from the Latin *calcinare* meaning "to burn to ashes," represents humanity's earliest and most enthusiastic engagement with the transformative properties of fire*. At its essence, calcination involves the application of sustained heat to a substance until all volatile components have been driven off, leaving behind only the fixed, purified essence—what the elder alchemists termed the *corpus incorruptibilis*†. This process, seemingly simple in description, has spawned approximately 1,247 years of accumulated cautionary tales‡, a figure which increases by roughly three incidents per decade as each new generation of practitioners discovers that "sustained heat" and "careful monitoring" are not, as commonly believed, optional suggestions.
+&nbsp;
+The fundamental principle underlying calcination rests upon the separation of the volatile from the fixed, the corruptible from the eternal**. When a substance is subjected to temperatures ranging from 300 to 1,000 degrees Celsius††—depending on the material in question and how urgently one wishes to see results‡‡—the impurities within begin to burn away, releasing themselves as smoke, vapor, or in some documented cases, small ethereal manifestations of regret***. What remains is the calx, the purified ash that represents the true nature of the substance, stripped of all that was transient and false. The process bears striking resemblance to philosophical purification, a parallel not lost on the medieval alchemists, who frequently subjected themselves to similar processes†††, though generally with less successful outcomes.
+&nbsp;
+Temperature control emerges as the critical variable separating the successful calcination from the regrettable incident‡‡‡. Too little heat, and the volatile components remain stubbornly attached to the fixed matter, resulting in what the Guild of Pyromantic Studies tactfully terms "incomplete reduction"****. Too much heat, and one achieves what is technically classified as "complete reduction to constituent atoms," which, while philosophically interesting, produces results of limited practical utility††††. The skilled practitioner learns to read the subtle signs: the color of the flame, the smell of the smoke‡‡‡‡, the increasingly urgent quality of any noises emanating from the crucible*****.
+&nbsp;
+Of particular note are the transformations undergone by metals during calcination, producing oxides of such varied and luminous hues that several prominent noble houses have been bankrupted attempting to reproduce them in textile dyes†††††. Lead, that most philosophically significant of base metals‡‡‡‡‡, demonstrates the principle with particular eloquence: heated to approximately 400 degrees Celsius in the presence of air, it transforms into litharge, a yellow powder sacred to the followers of the Solar Path******. Continue the heating, or calcine litharge itself, and one obtains minium—red lead—a substance so vibrant it appears to contain its own internal fire†††††††. These transformations are not mere changes of color but fundamental alterations of nature, the lead having passed through its own purgatorial flame to emerge reborn‡‡‡‡‡‡.
+&nbsp;
+The practical applications of calcination extend far beyond the philosophical, touching upon medicine, metallurgy, and the production of pigments that have graced everything from illuminated manuscripts to the face of the Empress Theodora********. Yet the true gift of calcination lies not in its products but in its lesson: that purification requires fire, that transformation demands the sacrifice of the superfluous, and that most laboratory accidents could be prevented by simply not adding "just a little more heat to see what happens"†††††††††.
+&nbsp;
+---
+&nbsp;
+*The relationship between humanity and fire remains one of history's great codependent partnerships. Fire provides heat, light, and the ability to transform matter. Humanity provides fuel, oxygen, and a seemingly inexhaustible supply of things that probably shouldn't be burned but might look interesting if we tried.
+&nbsp;
+†Though the term actually translates more accurately as "the body that doesn't rot anymore," which is less poetic but more technically precise. The alchemists were great believers in making things sound more impressive than they were, a tradition maintained today by academic publishing.
+&nbsp;
+‡According to the Archives of the Salamander's Regret in Ankh-Morpork, which maintains meticulous records of every alchemical mishap since the incident of 1123 CE, when Brother Ignatius discovered that "calcining" and "conflagrating" were not, in fact, synonyms**. The Archives occupy seventeen buildings and require a staff of forty-three scribes working in shifts.
+&nbsp;
+**Brother Ignatius survived, though he lost his eyebrows, his workshop, and his reputation. He later founded the School of Cautious Combustion, whose motto—"Rather Slow Than Scattered"—appears on approximately sixty percent of alchemical safety pamphlets to this day††.
+&nbsp;
+††The temperature range represents a compromise position established by the Council of Thermometric Agreement in 1687, held in Geneva after a particularly contentious debate between the High Heat Faction and the Moderate Temperature Society led to what historians call "The Unfortunate Demonstration." The Council also standardized the practice of keeping buckets of sand nearby, a regulation that has saved approximately 12,000 workshops from total destruction‡‡.
+&nbsp;
+‡‡Though it should be noted that this figure only accounts for workshops that actually kept the sand buckets within reach, were sober enough to remember they existed, and correctly identified sand as the appropriate extinguishing medium for their particular conflagration. The success rate, accounting for human nature, drops to approximately forty-three percent***.
+&nbsp;
+***The ethereal manifestations remain poorly documented, as practitioners who witness them are typically too distracted by urgent matters—such as the rapid expansion of their calcination vessel—to take notes. Professor Hemplewit's Brief Taxonomy of Regretful Vapors (1823) remains the definitive text, though it ends mid-sentence, which scholars find ominous****.
+&nbsp;
+****The Guild prefers this euphemism to alternatives such as "still obviously wet," "disappointingly chunky," or "that's just a soggy mess, isn't it?" Professional terminology maintains dignity even in failure.
+&nbsp;
+†††The medieval alchemist Hermann the Perspiring attempted to purify his soul through literal calcination in 1289, reasoning that if the process worked for lead, it should work for humans. The experiment was cut short by his apprentice, who possessed both common sense and a working knowledge of buckets††††. Hermann later wrote extensively about metaphorical purification instead.
+&nbsp;
+‡‡‡The Guild's incident report forms contain a checkbox for "operator added excessive heat out of impatience," which is checked in approximately seventy-eight percent of all submitted reports. The second most common checkbox—"operator added excessive heat to impress visiting dignitary"—accounts for another twelve percent‡‡‡‡.
+&nbsp;
+****Though the Guild's official terminology has evolved over time. Early records use phrases like "catastrophic volatilization," "unscheduled plasma state," and in one memorable case from 1456, "the wrath of an angry God, or possibly just too much charcoal"†††††.
+&nbsp;
+††††The boundary between "calcined" and "vaporized" proves remarkably easy to cross, yet surprisingly difficult to uncross. Several attempts have been made to recalcine vaporized substances, but collecting sufficient vapor tends to require either divine intervention or a very large net‡‡‡‡‡.
+&nbsp;
+‡‡‡‡The smell provides crucial diagnostic information. Sweet smells typically indicate sugar-based compounds departing. Acrid smells suggest something nitrogen-bearing is leaving with extreme prejudice. The smell of burning hair indicates one should probably step back from the furnace, and the smell of cinnamon indicates either the calcination of exotic spices or that someone has accidentally calcined the monastery's pantry again, an incident that occurred with surprising regularity in the 14th century******.
+&nbsp;
+*****These noises range from gentle hissing (acceptable) to sharp cracking (concerning) to the sound of reality briefly negotiating with the vessel regarding its continued existence (evacuate immediately). The Glassweavers' Guild publishes an annual pamphlet, Concerning Noises and Their Implications, running to 400 pages in its most recent edition†††††††.
+&nbsp;
+†††††The House of Vermillion spent its entire fortune between 1634 and 1641 attempting to create a fabric dye matching the color of calcined mercury. They succeeded in producing approximately three yards of cloth before running out of both mercury and funds. The cloth now resides in the Museum of Expensive Mistakes in Basel, behind glass marked "DO NOT TOUCH - STILL TOXIC"‡‡‡‡‡‡.
+&nbsp;
+‡‡‡‡‡Lead's philosophical significance stems from its association with Saturn, the slow-moving planet of time, decay, and contemplation. That it also happens to`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Heating substances to dryness to remove volatile components',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MERCURY_SULFUR_SALT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'mercury_sulfur_salt',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Tria Prima: Mercury, Sulfur, and Salt as Universal Principles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['alchemy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['four_elements_theory', 'dissolution_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 16, arcane: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { alchemy: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'tria_prima_analysis' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `THE TRIA PRIMA: MERCURY, SULFUR, AND SALT AS UNIVERSAL PRINCIPLES</span>
+&nbsp;
+The alchemical tradition, having progressed beyond* the somewhat pedestrian notion that everything consists merely of earth, air, fire, and water, recognized a deeper truth: that these elemental manifestations themselves arise from three more fundamental principles. These Tria Prima—Mercury, Sulfur, and Salt—represent not the common substances found in market stalls† but rather the philosophical essences that underpin all material transformation. Mercury embodies the principle of fluidity and volatility, the swift-moving spirit that cannot be grasped‡; Sulfur represents combustibility and activity, the fiery soul that drives change§; and Salt manifests as fixity and structure, the crystalline body that anchors existence**. The interplay of these three principles, in their infinite permutations and proportions, gives rise to the vast diversity of substances observed in nature††.
+&nbsp;
+The practical alchemist must understand that every substance contains all three principles in varying degrees‡‡, much as a painter might mix three primary colors to create any hue imaginable§§. A piece of iron, for instance, possesses considerable Salt (fixity and body), some Sulfur (as evidenced by its rust***), and a modicum of Mercury (though one must work quite hard to observe this†††). Lead, by contrast, contains an excess of Salt and a deficiency of Sulfur, which explains both its density and its stubborn refusal to catch fire‡‡‡, properties that have caused considerable frustration among those attempting to warm their laboratories in winter§§§. The wise practitioner learns to perceive these hidden proportions through careful observation****, meditation†††† , and—following the Incident at Regensburg‡‡‡‡—the wearing of appropriate protective eyewear§§§§.
+&nbsp;
+The relationship between the Tria Prima proves more complex than simple mixture*****, for these principles interpenetrate and modify one another in ways that the Guild of Theoretical Alchemists has attempted to map for the past three centuries†††††. Mercury without Salt becomes a formless chaos‡‡‡‡‡; Salt without Mercury becomes sterile immobility§§§§§; Sulfur without either becomes—according to the fragmentary records recovered from the Monastery of St. Combustus******—something one absolutely must not allow to manifest******. The successful transmutation of base metals into gold requires not merely the addition of missing principles††††††, as naive practitioners might assume, but rather a profound reorganization of the relationships between them‡‡‡‡‡‡, a process that has historically proven challenging§§§§§§.
+&nbsp;
+---
+&nbsp;
+*The old four-element theory retains some utility for describing gross phenomena, much as one might describe a symphony as "loud" or "pleasant" without addressing its underlying musical structure. The Elemental Purists' Society continues to insist that Mercury, Sulfur, and Salt are merely "fancy names for complicated mixtures," a position they maintain with admirable stubbornness despite mounting evidence to the contrary.
+&nbsp;
+†Though I must note that the market vendors of Prague do sell a substance they call "Philosopher's Salt," which is actually just very expensive table salt with glitter mixed in. The Committee for the Prevention of Alchemical Fraud has issued seventeen cease-and-desist orders to the same merchant, who simply changes his stall's location each week. He is currently doing quite well near the Old Town Square.
+&nbsp;
+‡The ancient Egyptians understood this, which is why they depicted the god Thoth—associated with alchemical wisdom—with the head of an ibis, a bird known for its mercurial temperament and tendency to steal shiny objects. This proves more relevant than modern scholars typically acknowledge.
+&nbsp;
+§Not to be confused with the brimstone found in volcanic regions, though the confusion is understandable†. The philosophical Sulfur underlies the common sulfur's properties, much as the number three underlies the existence of three apples, if you squint at the metaphysics correctly.
+&nbsp;
+†A confusion that led to the Vesuvius Expedition of 1623, wherein a group of alchemists attempted to extract pure philosophical Sulfur directly from the volcano. The expedition returned with significantly fewer members than it departed with, though it did produce an excellent monograph on burns of the third degree and beyond.
+&nbsp;
+**The term "Salt" unfortunately suggests the seasoning found on dinner tables, leading to the perennial problem of novice alchemists tasting their experimental products. The Guild now requires all members to sign a waiver acknowledging they have read and understood the pamphlet "Why You Must Not Lick the Crucible: A Comprehensive History of Regret."
+&nbsp;
+††This insight dates to Paracelsus‡, though he expressed it in characteristically bombastic fashion, claiming to have received it in a dream from an angel who was "remarkably well-versed in chemistry for a celestial being."
+&nbsp;
+‡Paracelsus, born Philippus Aureolus Theophrastus Bombastus von Hohenheim§, who really should have kept at least one of those excellent middle names instead of adopting a pseudonym.
+&nbsp;
+§His mother reportedly called him "Bomby" as a child, a nickname that fails to appear in any official biographical records but which one feels must surely be true. The University of Basel maintains a registry of All Things Paracelsus, which currently occupies seventeen rooms and employs a staff of six full-time archivists, none of whom have been able to confirm or deny the Bomby question.
+&nbsp;
+‡‡This proves somewhat counterintuitive to students accustomed to thinking in terms of discrete substances. The Master Alchemist Theodosius the Bewildered spent forty years attempting to isolate pure Mercury, pure Sulfur, and pure Salt, achieving nothing but an impressive collection of glassware§ and a reputation for muttering "But where does it go?" at dinner parties.
+&nbsp;
+§The Theodosius Collection now resides in the Museum of Aspirational Alchemy in Vienna**, where it serves as both a tourist attraction and a cautionary tale. His notebooks reveal that he got remarkably close on three separate occasions but ruined the experiments by sneezing at critical moments.
+&nbsp;
+**Admission: 3 florins. 2 florins for students, though you must show your Guild membership card, as the museum caught several merchants attempting to enter on forged credentials†. Children under twelve admitted free, though parental supervision is strongly advised after the Incident with the Interactive Displays.
+&nbsp;
+†The forgers' defense—that they were merely "engaging in the alchemical principle of transmuting copper coins into gold-level experiences"—did not persuade the magistrate.
+&nbsp;
+***Though the rust itself is not pure Sulfur but rather a manifestation of Sulfur's activity working upon the Salt of iron in the presence of watery Mercury. The precise ratios involved were calculated by the mathematician-alchemist Cristobel de Numeris†† over the course of thirteen years, producing a formula so complex that it requires three pages of notation and has been successfully replicated by exactly four people, two of whom went mad in the attempt.
+&nbsp;
+††De Numeris, who insisted on expressing all alchemical relationships as precisely calculated ratios, once spent six months weighing samples of air from different altitudes to determine if Mercury varied with elevation. His conclusion—a qualified "perhaps"—did not justify the expense of the hot air balloon required for the upper-atmosphere samples‡‡.
+&nbsp;
+‡‡The University of Salamanca's Department of Applied Alchemy still has not forgiven him for the loss of their balloon, which drifted into French airspace and was impounded as a potential espionage device. The diplomatic incident took nine months to resolve and resulted in three separate treaties, one of which accidentally granted France territorial rights to a small Portuguese village that nobody realized was included in the negotiations until 1847.
+&nbsp;
+†††The mercurial nature of iron was first proposed by the Bavarian alchemist Klaus von Eisengeist, who demonstrated it by heating iron until it became "somewhat fluid," which we now understand as melting. His contemporaries found this unconvincing, possibly because von Eisengeist's definition of "somewhat" proved rather flexible§§.
+&nbsp;
+§§He once described a catastrophic laboratory explosion as "somewhat noisy" and a complete loss of eyebrows as "somewhat inconvenient." His autobiography, "Somewhat: A Life in Relative Terms," remains unpublished, primarily because the manuscript was lost in what von Eisengeist termed "a somewhat significant fire."
+&nbsp;
+‡‡‡The fixity of lead has made it the subject of more failed transmutation attempts than any other metal, with the notable exception of tin***. The accumulated failures have been meticulously recorded by the Office of Alchemical Statistics††††, which publishes an annual report that makes for remarkably depressing reading.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The three fundamental principles that govern alchemical transformation',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  FOUR_ELEMENTS_THEORY,</span>
+<span class="cstat-no" title="statement not covered" >  DISSOLUTION_BASICS,</span>
+<span class="cstat-no" title="statement not covered" >  DISTILLATION_PROCESS,</span>
+<span class="cstat-no" title="statement not covered" >  CALCINATION,</span>
+<span class="cstat-no" title="statement not covered" >  MERCURY_SULFUR_SALT</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

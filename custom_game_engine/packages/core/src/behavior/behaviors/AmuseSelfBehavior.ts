@@ -27,7 +27,7 @@ export class AmuseSelfBehavior extends BaseBehavior {
 
     // Initialize amusement type based on personality
     if (!state.amusementType) {
-      const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
+      const personality = entity.getComponent(ComponentType.Personality);
       const amusementType = this.selectAmusementType(personality);
       this.updateState(entity, {
         amusementType,
@@ -165,7 +165,7 @@ export function amuseSelfBehaviorWithContext(ctx: import('../BehaviorContext.js'
   // Initialize amusement type based on personality
   let amusementType = ctx.getState<string>('amusementType');
   if (!amusementType) {
-    const personality = ctx.getComponent<PersonalityComponent>(ComponentType.Personality);
+    const personality = ctx.getComponent(ComponentType.Personality) as PersonalityComponent | undefined;
     amusementType = selectAmusementType(personality);
     ctx.updateState({
       amusementType,

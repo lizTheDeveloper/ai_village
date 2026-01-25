@@ -1,0 +1,2104 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/advanced_construction_techniques-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> advanced_construction_techniques-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BUILDING_PLANNING_LAYOUT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'building_planning_layout',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Building Planning Layout',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_building_planning_layout' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Building Planning Layout: A Foundational Survey of Spatial Organization in Construction</span>
+&nbsp;
+The art of building planning layout, which the ancient Mesopotamians referred to as "not just drawing rectangles and hoping,"* represents humanity's eternal struggle against the fundamental forces of geometry, gravity, and the persistent belief that walls should meet at corners.** At its most basic level, building planning layout involves determining where things go before you build them†, a concept that seems obvious in retrospect but took humanity approximately four thousand years to consistently implement.†† The modern practitioner must balance numerous considerations: the flow of human traffic, the placement of load-bearing elements, the integration of utilities‡, and the ancient architectural principle known as "making sure the bathroom doesn't end up in the middle of the living room."‡‡
+&nbsp;
+The practical application of building planning layout begins with what the Guild of Reasonable Architects calls the "Phase of Asking Questions Before Walls Exist."*** This involves creating drawings—traditionally on paper, though the Old Gods used cave walls and regret—that show where walls, doors, windows, and other architectural elements will be placed.††† The process follows a deceptively simple workflow: measure the available space, determine the required rooms, arrange them in a configuration that doesn't violate the laws of physics or good taste‡‡‡, and then explain to the client why their idea of putting the kitchen on the second floor directly above the master bedroom is, while creative, inadvisable.§ Modern practitioners employ tools such as graph paper, computer-aided design software, and an extensive vocabulary of polite phrases meaning "that won't work."§§
+&nbsp;
+Safety considerations in building planning layout extend far beyond the obvious "walls should not fall down" mandate.§§§ The International Council of Buildings That Stay Standing recommends maintaining clear egress paths*, ensuring adequate structural support for all elements**, and never, under any circumstances, attempting to save space by making load-bearing walls "optional."*** Historical records from the Guild of Slightly Concerning Architecture document numerous incidents where insufficient planning led to outcomes ranging from "mildly inconvenient" to "required evacuation of three city blocks."†††† The famous Codex of Architectural Regrets†‡ maintains that 73.4% of construction disasters could have been prevented by spending an additional 12 minutes on the planning phase, though this statistic may be influenced by the Codex's notorious pessimism.‡†
+&nbsp;
+The historical development of building planning layout traces back to the Bronze Age‡‡, when the first architects discovered that randomly placing walls resulted in structures that were "technically buildings" but "practically labyrinths."‡‡‡ The Babylonians contributed the revolutionary concept of "rooms that serve specific purposes," while the Romans added "those rooms should probably connect to each other somehow."§§ Medieval architects introduced the radical innovation of planning where the support columns would go before building the roof,§§§ a practice that the Council of Towers That Remained Upright considers "the single greatest advancement in construction history," narrowly beating out "mortar."*† The Renaissance saw the development of proportional systems, mathematical principles, and the understanding that symmetry makes buildings look intentional rather than accidental.**† Modern building planning incorporates centuries of accumulated wisdom, building codes that are thicker than most walls,††‡ and the hard-won knowledge that "we'll figure it out during construction" is a sentence spoken before regret.‡‡†
+&nbsp;
+Contemporary building planning layout represents a synthesis of ancient wisdom and modern technology, though the fundamental challenges remain unchanged: making spaces that are functional, safe, aesthetically pleasing, and don't require sacrificing either the budget or one's sanity to the Old Gods of Construction.§†§ The aspiring practitioner would do well to remember the First Maxim of the Builders' Lodge: "A plan is not merely lines on paper; it is a promise to future generations that this structure will not become a cautionary tale."†§† With proper training, adequate planning time, and a healthy respect for both geometry and gravity, even the novice can create layouts that fulfill the basic architectural dream: a building where everything is where it should be, and nothing is where it shouldn't.‡§‡
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The exact translation is disputed. The Sumerian Tablet of Building-Related Complaints suggests it might actually mean "please, for the love of the gods, think before you build," but context is everything.
+&nbsp;
+\** Corner-meeting remains a contentious issue in certain avant-garde architectural circles, where "deconstructionist geometry" is considered either groundbreaking or a violation of several natural laws, depending on who you ask.
+&nbsp;
+† This principle is formally known as "Pre-emptive Spatial Determination" by the Academy of Terms That Sound Impressive, or more commonly as "planning" by everyone else.
+&nbsp;
+†† The Great Pyramid of Giza demonstrates that ancient Egyptians had mastered this concept. The Leaning Tower of Pisa demonstrates that medieval Italians had not, though they have since claimed it was intentional. The Guild of Architectural Face-Saving considers this "a bold stance."
+&nbsp;
+††† One particularly enthusiastic group of Bronze Age builders in what is now Bulgaria apparently operated on the "build first, think later" principle. Archaeological evidence suggests they thought much later. Possibly while standing in the ruins.
+&nbsp;
+‡ Utilities include water, electricity, and what the Ancient Guild of Essential Services calls "the mysterious pipes that nobody understands but everyone agrees are important." Modern archaeologists are still determining what some Roman pipes were actually for.
+&nbsp;
+‡‡ The Incident of 1873, where a London architect placed a water closet directly above the main dining hall, is still referenced in Building Codes as Example 47-B: "What Not To Do, Ever." The architect's name has been stricken from records, though his neighbors remembered him vividly.
+&nbsp;
+‡‡‡ Good taste is subjective, but the Council of Buildings That Don't Make People Cry maintains a list of principles, including "toilets should not be visible from the street" and "ballrooms are traditionally not located in basements with 5-foot ceilings."
+&nbsp;
+*** Formally established in 1823 after the Disaster of Premature Construction, where an entire housing development in Manchester was built before anyone confirmed where the property boundaries actually were. The resulting legal battle lasted 40 years and spawned three new branches of contract law.
+&nbsp;
+§ The Kitchen Above Bedroom configuration achieved brief popularity in 1890s Paris among avant-garde architects who believed that "waking to the smell of breakfast cooking" was romantic. The romance faded quickly when residents discovered this also meant "waking to the sound of dropped pots at 6 AM" and "occasional plumbing leaks." Only one such building survives, now operating as a museum called "The House of Regrettable Innovations."
+&nbsp;
+§§ This vocabulary is taught in the second year of architecture school, in a course officially called "Client Relations" but unofficially known as "Saying No Without Saying No." Advanced students learn phrases such as "interesting concept," "technically possible," and the devastating "we can explore that option," which experienced clients correctly interpret as "absolutely not, and I'm being paid to be nice about it."
+&nbsp;
+§§§ The wall-falling mandate is actually codified in the International Building Code, Section 1.1: "Walls must remain in their designated position under normal circumstances and gravity." The inclusion of this apparently obvious rule followed the Copenhagen Incident of 1891, where an architect claimed his collapsing walls were "performance art."
+&nbsp;
+*† Clear egress paths must be maintained at all times. The Guild of Firefighters Who Have Seen Things has strong opinions about this, which they express annually at the Conference of Please Learn From Others' Mistakes. Their mascot is a small crying building.
+&nbsp;
+**† Adequate structural support is defined as "enough to hold the weight of everything above it plus a safety margin." The safety margin was established after the Great Structural Optimism Period of 1840-1860, when engineers believed they had "mastered physics" and could "trim unnecessary support elements for aesthetic purposes." The resulting recalculation led to what historians call the Great Humbling.
+&nbsp;
+***† The Optional Load-Bearing Wall Theory was briefly popular among a small sect of architects in 1920s Berlin who believed that walls were "limiting" and that "pure space" was superior. Their buildings were indeed pure space after the first winter, though not in the way intended.
+&nbsp;
+†††† The three-city-block evacuation occurred in Prague in 1756, when a architect's floor plan accidentally created a structure with "non-Euclidean internal geometry," though modern scholars suspect this was actually just very poor drafting that somehow passed inspection. The building was eventually demolished, though workers reported difficulty determining which direction was "out."
+&nbsp;
+‡† The Codex of Architectural Regrets is a 3,000-page illuminated manuscript maintained by the Monastery of Structural Contrition in the Swiss Alps. It began as a simple list of mistakes in 1`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding building planning layout in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SITE_PREPARATION_LEVELING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'site_preparation_leveling',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Site Preparation Leveling',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['building_planning_layout'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_site_preparation_leveling' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Site Preparation Leveling: A Foundation for Not Falling Over</span>
+&nbsp;
+The fundamental principle of site preparation leveling, as understood since the First Great Tower Incident of Ur*, is deceptively simple: buildings prefer to stand on level ground rather than slide downhill into neighboring properties†. This seemingly obvious observation took humanity approximately three thousand years to codify into formal practice**, largely because the alternative provided such excellent entertainment for onlookers***. The modern practitioner must understand that leveling is not merely about making things flat—it is about making things *appropriately* flat, a distinction that has saved countless contractors from the embarrassment of creating perfectly level buildings on 45-degree slopes††.
+&nbsp;
+The practical application of site leveling involves three primary techniques: cut, fill, and the time-honored tradition of pretending the problem doesn't exist until someone else notices†††. The cut-and-fill method, standardized by the Royal Society of People Who Don't Want Their Buildings to Fall Down‡, requires precise measurements using instruments that have evolved from "a piece of string and hope" to "a laser and slightly less hope"‡‡. Modern surveying equipment can detect variations of up to 0.001 inches, which is approximately 0.00001% of the accuracy with which most contractors will actually level the site‡‡‡. The process typically begins with establishing a benchmark§, followed by calculating the amount of earth to be moved, and concludes with the realization that someone has misread the plans and everything is precisely three feet too low§§.
+&nbsp;
+Safety considerations in site leveling cannot be overstated, though they frequently are§§§. The primary hazards include: unstable slopes that become more unstable when you dig them*, trenches that fill with water at exactly 3:47 AM**, improperly compacted fill that settles at the worst possible moment***, and the ever-present danger of discovering that your site was previously a burial ground, toxic waste dump, or—worst of all—both†. The Health and Safety Executive of Greater Ankh-Morpork†† recommends maintaining a safety factor of 2.5 when calculating slope stability, which is coincidentally the same ratio of "times people said it would be fine" to "times it was definitely not fine"†††. Modern best practices include proper drainage installation‡, soil testing by qualified geotechnicians who have promised to stop using "seems okay to me" as a technical classification‡‡, and the revolutionary concept of reading the soil report before beginning excavation‡‡‡.
+&nbsp;
+The historical development of leveling techniques mirrors humanity's gradual acceptance that gravity exists and has opinions about architecture§. Ancient civilizations approached the problem with varying degrees of success: the Egyptians achieved remarkable precision through methods involving water channels and prayer§§, the Romans simply built everything strong enough that a slight tilt wouldn't matter§§§, and the Leaning Tower of Pisa Committee pioneered the "feature, not a bug" approach to inadequate site preparation*. Medieval builders developed the revolutionary technique of starting with a level foundation and then checking if it was still level before proceeding**, a practice so radical that it took until approximately 1347 to become standard***. The Enlightenment brought mathematical precision to leveling calculations†, though this was offset by the discovery that mathematics and actual dirt frequently disagreed about fundamental principles††. Modern electronic leveling instruments have automated much of the process, reducing human error by approximately 94.7% while simultaneously creating entirely new categories of error related to battery life, calibration drift, and the tendency of expensive equipment to fall into holes†††.
+&nbsp;
+Contemporary understanding recognizes that site leveling exists at the intersection of geology, engineering, economics, and fortune-telling‡. The successful practitioner must balance the ideal level (flat) against the practical level (what the budget allows) and the actual level (what the ground decides to do after you've spent all the money)‡‡. Climate change has introduced new variables into leveling calculations, as sites that were stable for generations now develop opinions about drainage that would make a philosophy professor proud‡‡‡. The future of site leveling likely involves increased automation§, better predictive modeling§§, and the eventual acceptance that some sites simply do not wish to be level and should be left to pursue their natural inclination toward chaos§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The First Great Tower Incident of Ur (circa 2100 BCE) involved a ziggurat that, due to inadequate site preparation, developed a pronounced lean over its first decade. The builders' solution—constructing the upper levels at an angle to compensate—created what archaeologists now describe as "the world's first intentionally crooked building." The tower stood for three years before sliding gracefully into the Euphrates River during a ceremonial banquet. No minutes from the subsequent inquiry survive, though several clay tablets expressing strongly worded opinions about "those idiots with the shovels" have been recovered.
+&nbsp;
+†The legal precedent of "downhill property rights" was established in the famous case of *Weatherby v. The Laws of Physics* (1634), in which Lord Weatherby attempted to sue Isaac Newton (who had not yet been born) for inventing gravity. The case was dismissed, but not before Weatherby's estate—and several of his buildings—had slid into his neighbor's sheep pasture. The sheep were reportedly philosophical about the whole affair.
+&nbsp;
+**The Codex Levelus, compiled by the Guild of People Who Have Learned from Mistakes (Usually Other People's), took 287 years to complete and weighs approximately 67 pounds. It contains 1,247 case studies of insufficient leveling, categorized by type of failure, degree of embarrassment, and number of lawsuits resulting. Chapter 47, "The Pisa Problem," runs to 143 pages and includes seventeen illustrations of what not to do, all of which had been done at least once.
+&nbsp;
+***The "Festival of Falling Buildings" was a popular entertainment in medieval Genoa until the Church banned it in 1432, partly on moral grounds but mostly because the buildings sometimes fell on the audience. Contemporary accounts suggest attendance was highest during the rainy season, when the combination of saturated soil and poor foundations produced the most dramatic results. The last festival resulted in three buildings, two bridges, and a chicken coop sliding into the harbor, along with several vendors and one confused cardinal.
+&nbsp;
+††The Institute of Slope Management maintains that the steepest angle at which a building can be constructed without special provisions is 15 degrees, though this figure is disputed by the School of Optimistic Engineering, which insists the number is "probably higher, maybe, we haven't actually checked." The two institutions have maintained a vigorous academic feud since the Incident of '87, when an experimental structure built on a 30-degree slope lasted almost eight minutes.
+&nbsp;
+†††The third technique, officially known as "willful ignorance," remains statistically the most popular despite its poor success rate. The Association of Construction Accident Investigators estimates that approximately 43% of leveling problems stem from contractors who believed that "it looks pretty flat from here" constituted adequate site analysis. A further 31% result from "it'll probably be fine," 18% from "we're already over budget," and 8% from what the Association delicately terms "the influence of optimism-enhancing substances."
+&nbsp;
+‡Founded in 1823 after the Collapse of Winchester Square (wherein an entire residential block simultaneously discovered it had been built on improperly compacted fill), the Royal Society has since prevented an estimated 14,739 building failures through its rigorous standards for site preparation. They celebrated their bicentennial by publishing a revised edition of their guidelines that added 247 new ways buildings can fall down if you don't level properly. The ceremony was held at ground level, naturally.
+&nbsp;
+‡‡The evolution of leveling instruments represents humanity's long journey from "eyeballing it" to "expensive equipment that tells you you should have eyeballed it differently." The Dumpy Level, invented in 1832 and named for reasons lost to history† was accurate to within one inch per hundred feet, which was considered miraculous at the time. Modern laser levels achieve accuracy of 1/16 inch at 100 feet, though their primary function appears to be making the client feel they're getting their money's worth.
+&nbsp;
+†Despite extensive research, no one can definitively explain why a precision leveling instrument was named "Dumpy." The most credible theory suggests it was named after its inventor, Chester Dumpy, though this is undermined by the fact that no Chester Dumpy appears in any historical records. Alternative theories include: it was originally "Lumpy" but misheard, it described the shape, or—most likely—Victorian engineers simply had a peculiar sense of humor about nomenclature. The same era gave us the "Wye Level" and "Tilting Level," neither of which are any less confusing.
+&nbsp;
+‡‡‡This statistical mismatch has been the subject of extensive study by the Bureau of Why Things Never Match the Manual. Their 2019 report`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding site preparation leveling in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DRAINAGE_WATER_MANAGEMENT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'drainage_water_management',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Drainage Water Management',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['site_preparation_leveling'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_drainage_water_management' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Drainage Water Management: A Comprehensive Guide to Not Drowning Your Construction Site</span>
+&nbsp;
+The fundamental principle of drainage water management in construction may be summarized thusly: water, given sufficient opportunity and the slightest inclination, will find its way to wherever you least want it to be*. This observation, first formally documented by the ancient Mesopotamian architect Gilga-mesh-it-up in approximately 2800 BCE†, remains as relevant today as when he first noticed his foundation trench had become an impromptu swimming pool‡. The modern practitioner must therefore approach drainage with the solemnity of one who understands that water possesses both infinite patience and an apparently malicious sense of humor**. Indeed, the successful management of drainage water requires understanding three core principles: water flows downhill†† (usually), water accumulates in low points‡‡ (always), and water will exploit any weakness in your drainage system with the efficiency of a guild of particularly determined dwarves mining for gold†††.
+&nbsp;
+In practical application, drainage water management involves a hierarchy of interventions, each more elaborate than the last, rather like the increasingly desperate attempts of a homeowner to prevent their basement from flooding during a rainstorm‡‡‡. The first line of defense consists of proper site grading, wherein the construction site is shaped such that water naturally flows away from foundations, structures, and areas where human beings might wish to work without developing webbed feet*. Surface drainage systems—including swales*, ditches**, and channels††—direct water along predetermined paths†‡, while subsurface drainage systems employ perforated pipes†* wrapped in geotextile fabric†** to intercept groundwater before it can cause mischief‡*. The Bureau of Construction Hydrology estimates that approximately 67.3% of all construction delays can be traced to inadequate drainage planning‡**, a statistic that becomes considerably more alarming when one considers that this figure has remained virtually unchanged since 1873, despite advances in technology, understanding, and the invention of the rubber boot.
+&nbsp;
+The safety considerations surrounding drainage water management cannot be overstated, particularly given the unfortunate historical record*‡. Standing water on construction sites presents hazards ranging from the merely inconvenient (muddy boots, slippery surfaces, the spontaneous generation of mosquitoes capable of carrying off small dogs) to the genuinely catastrophic**‡. The modern construction manager must remain vigilant against the Three Great Perils of Poor Drainage: undermined foundations that settle like disappointed soufflés, waterlogged soil that loses bearing capacity with all the structural integrity of warm pudding, and the dreaded Recursive Flooding Incident††‡, wherein attempts to drain water from one location merely cause it to flood another, requiring drainage that causes flooding elsewhere, and so on unto madness‡‡*. Current best practice, as outlined in the International Standards for Not Making the Same Mistakes Our Ancestors Made (Revised Edition, Volume XVII), dictates that drainage plans should be drawn up before excavation begins†††*, reviewed by someone who understands that water flows downhill‡***,  and implemented by workers who have been thoroughly briefed on why "it'll probably be fine" is not an acceptable drainage strategy****.
+&nbsp;
+Modern understanding of drainage water management has evolved considerably from the ancient practice of "dig a ditch and hope for the best"***, though this remains surprisingly popular among certain contractors who shall remain nameless†. Contemporary approaches integrate knowledge from hydrology, soil science, and that peculiar branch of applied pessimism that assumes everything that can go wrong with water will go wrong, simultaneously, at 3 AM during an inspection††**. Computer modeling now allows engineers to predict water behavior with startling accuracy‡‡**, though the water itself rarely bothers to read these predictions and frequently does something entirely unexpected†††**. The field has been revolutionized by innovations such as French drains‡‡‡* (which are neither particularly French nor drains in the traditional sense), retention ponds*†† (decorative lakes with delusions of functionality), and the Storm Water Management System†††* (a series of increasingly desperate measures to prevent rain from remembering that it owns the place).
+&nbsp;
+---
+&nbsp;
+*Water's apparent sentience in this regard has been the subject of considerable debate among the Fellows of the Royal Society for Argumentative Sciences. Professor Dampwood-Finch's famous treatise, "On the Malevolent Properties of H₂O in Construction Contexts," argues that water doesn't actually possess intent but behaves in ways indistinguishable from deliberate sabotage, which she claims is philosophically equivalent. Her critics point out this is like saying a tiger doesn't mean to eat you, it just happens to find you delicious, which is cold comfort to the eaten.
+&nbsp;
+†Gilga-mesh-it-up's original clay tablets on the subject were lost when his archive flooded. The irony was not lost on his contemporaries, who found it hilarious. The recovered fragments contain increasingly desperate notes in the margins, progressing from "water entering from east" to "WATER EVERYWHERE" to what appears to be simply "AAAAAAA."
+&nbsp;
+‡His solution—building a series of smaller foundation trenches that were also swimming pools—led to the brief but memorable Sumerian fashion for aquatic construction that ended abruptly when someone pointed out that buildings work better when they're not underwater. See also: Atlantis (unconfirmed).
+&nbsp;
+**The Drainage Water Observer's Handbook (43rd Edition) contains a sobering chapter titled "Things Water Has Done That We Thought Were Impossible Until They Happened," which is now longer than the rest of the handbook combined. Recent additions include: flowing uphill (three documented cases, all during important inspections), disappearing entirely for six days before returning with no explanation, and the incident in Stockholm where water reportedly changed color to match the project manager's face.
+&nbsp;
+††Except in certain locations in the Himalayas, the Australian Outback, and, inexplicably, a three-block radius around the University of Wetstone's Department of Hydraulic Engineering, where water has been observed to flow in directions best described as "experimental" or "aggressively wrong."
+&nbsp;
+‡‡The phenomenon of Low Point Accumulation was first formally studied by Dame Henrietta Puddleworth-Marsh in 1843, after her estate's carefully planned garden party was transformed into what witnesses described as "rather more of a swimming gala than intended." Her subsequent research, conducted while wearing increasingly elaborate waterproofing, established the Puddleworth Principle: "Given infinite time, all water in a bounded system will congregate in precisely the spot you most needed to keep dry." This has since been refined to the Puddleworth-Sump Corollary: "It won't take infinite time; it'll take about twenty minutes."
+&nbsp;
+†††Dwarven mining operations, it should be noted, never suffer from drainage problems. This is because dwarves consider "drainage" to mean "channeling water to exactly where we want it, pressurizing it, and using it to power mills, clean ore, fill moats around treasure chambers, and make beer." Human construction workers asked why they cannot simply "do it like the dwarves" typically respond with hand gestures indicating this suggestion is physically impossible, socially unacceptable, or both.
+&nbsp;
+‡‡‡The Great Retention Pond Incident of 1987, wherein the city of Middleton's new civic center construction site accumulated so much water that local children began using it for swimming lessons, leading to the site being temporarily redesignated as a recreational facility. The construction company's insurance provider reportedly sent a letter consisting entirely of the word "NO" repeated for three pages.
+&nbsp;
+*The recommended slope for surface drainage is typically 2% (one inch of fall per four feet of distance), though the Guild of Perpetually Optimistic Contractors insists that "basically flat" is close enough. Statistical analysis by the Institute for Learning from Others' Mistakes shows that sites graded to "basically flat" spend an average of 340% more time dealing with water issues, measured in both hours and screaming.
+&nbsp;
+**Swales, despite the name, have nothing to do with swallowing water, being the nautical term, or that thing your Uncle Derek does when he's had too much to drink at weddings. They are, in fact, gentle depressions designed to convey water while also allowing it to infiltrate the soil, performing two functions simultaneously in a display of efficiency that would impress the ancient gods of task management, had such deities existed†.
+&nbsp;
+†According to Professor Erasmus Weathervane-Smythe of the University of Comparative Mythology and Practical Drainage, at least seventeen ancient cultures worshipped deities of efficient workflow, though most were forgotten after they insisted their followers maintain proper filing systems and submit prayers in triplicate. The Babylonian god Effi-Ka'at was particularly strict about this, which may explain his temple's mysterious abandonment around 1200 BCE. Archaeologists found the ruins empty except for a note reading "Gone to`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding drainage water management in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SCAFFOLD_CONSTRUCTION_SAFETY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'scaffold_construction_safety',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Scaffold Construction Safety',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['drainage_water_management'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_scaffold_construction_safety' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Scaffold Construction Safety: A Comprehensive Guide to Not Falling Off Things That Fall Apart</span>
+&nbsp;
+The fundamental principle of scaffold construction safety may be summarized thus: the scaffold must remain more interested in standing up than in falling down*. This seemingly obvious statement has, throughout history, proven remarkably difficult to implement in practice**. The ancient Discworld architect Bloody Stupid Johnson famously declared that "gravity is merely a suggestion"†, a philosophy that influenced scaffold design for approximately three weeks before the Great Collapse of 1789‡, after which the Ankh-Morpork Guild of Scaffolders instituted what they termed "reality-based construction practices"††.
+&nbsp;
+Modern scaffold safety begins with the Three Immutable Laws‡‡, which state: first, that all scaffold components must be capable of supporting 4.37 times the intended load§; second, that gravity operates with approximately 98.6% reliability§§; and third, that the probability of someone attempting to stand on the least stable part of any scaffold approaches unity as time progresses***. The application of these laws requires understanding both the physical properties of materials and the psychological properties of construction workers†††, the latter being far less predictable than the former‡‡‡. Load distribution must account not merely for static weight but for what the Department of Improbable Events calls "creative load interpretation"§§§—the tendency of workers to assume that if one person can safely stand somewhere, three people carrying heavy objects definitely can****.
+&nbsp;
+The practical construction of scaffolds involves a delicate balance between following regulations and accepting that the universe actively conspires against vertical structures††††. Base plates must be positioned on ground that the International Institute of Things That Stay Still (IITSTS) classifies as "Stability Rating 7 or higher"‡‡‡‡, though what constitutes proper ground has been debated since the Festival of Unfortunate Architectural Decisions in 1823§§§§. Diagonal bracing serves to remind the scaffold that it exists in three dimensions*****, while guard rails exist primarily to be leaned against at precisely the moment someone forgets they exist†††††. The spacing of planks follows the ancient principle discovered by the god Hephaestus: "Gaps between planks should be smaller than feet, but larger than hope"‡‡‡‡‡.
+&nbsp;
+Safety considerations extend beyond mere structural integrity to encompass what Professor Hieronymus Sternwinkle of the Zamonian Academy of Applied Gravity termed "temporal stability factors"§§§§§. A scaffold is only as safe as its most recent inspection******, which explains why the Guild mandates daily inspections by persons who have "a working relationship with reality"††††††. Weather conditions must be monitored with the kind of attention usually reserved for prophecies‡‡‡‡‡‡, as wind has an unfortunate tendency to remind scaffolds that they are, essentially, very tall sails§§§§§§. The phenomenon known as "scaffold creep"******* —wherein a perfectly stable structure slowly becomes an art installation titled "Defying Physics"—requires constant vigilance and the sort of paranoia typically associated with conspiracy theorists†††††††.
+&nbsp;
+The historical development of scaffold safety reads like a chronicle of expensive lessons learned the hard way‡‡‡‡‡‡‡. Before the establishment of modern safety standards, scaffold construction was guided by what historians call "optimistic engineering"§§§§§§§, a practice that assumed the best of all possible worlds in defiance of all available evidence********. The transformation to evidence-based practices began after the Incident of 1856†††††††††, when the entire scaffolding for the Cathedral of Perpetual Construction collapsed during a demonstration intended to prove its safety‡‡‡‡‡‡‡‡. Today's standards reflect accumulated wisdom purchased at the price of gravity's tuition fees§§§§§§§§, which are always paid in full and never offer refunds*********.
+&nbsp;
+---
+&nbsp;
+*The scaffold's opinion on this matter is rarely consulted, which may explain why it so often expresses itself through sudden structural failure.
+&nbsp;
+**The International Database of Scaffolding Failures (IDSF) contains 47,823 entries dating back to 2300 BCE, when the pharaoh's chief architect learned that "because I said so" is not a sufficient replacement for mathematics†.
+&nbsp;
+†Bloody Stupid Johnson once built a scaffold that existed in seventeen dimensions, three of which were new to physics. It fell over in all of them simultaneously.
+&nbsp;
+‡Not to be confused with the Other Great Collapse of 1789, which involved the French aristocracy rather than scaffolding, though both shared a fundamental misunderstanding of support structures.
+&nbsp;
+††These practices included such revolutionary concepts as "checking if things are actually attached" and "not assuming that hope is load-bearing."
+&nbsp;
+‡‡Often called the Laws of Spite, as they appear designed primarily to inconvenience project managers trying to save money.
+&nbsp;
+§This figure represents the "Coefficient of Inevitable Murphy" (4.0) multiplied by the "Adjustment for Human Creativity" (1.0925), as calculated by the Committee for Anticipating Terrible Decisions‡.
+&nbsp;
+‡The Committee meets annually in a building without scaffolding, for obvious reasons.
+&nbsp;
+§§The remaining 1.4% accounts for extremely local gravity fluctuations, divine intervention, and Tuesdays.
+&nbsp;
+***The Guild of Mathematicians has proven this theorem seventeen times, using different methods each time, but contractors continue to act surprised when it manifests.
+&nbsp;
+†††The Zamonian Institute for Worker Psychology maintains that construction workers possess a sixth sense for finding the one spot on any scaffold that the engineer specifically said not to stand on§.
+&nbsp;
+§This sense operates with 99.7% accuracy, suggesting it may be the most reliable aspect of scaffold safety measurement.
+&nbsp;
+‡‡‡Materials science is relatively straightforward: steel behaves like steel, wood like wood. Human science is less so: humans behave like humans, which is to say unpredictably and with excessive confidence††.
+&nbsp;
+††See the paper "Why Everyone Thinks They're Good at Estimating Load Capacity Despite All Evidence to the Contrary" (Journal of Optimistic Engineering, Vol. 47).
+&nbsp;
+§§§This phenomenon, first documented by the philosopher Douglas of House Adams, describes how humans possess an almost supernatural ability to misinterpret safety margins as personal challenges‡‡.
+&nbsp;
+‡‡The equation is: Perceived Safety Margin = Actual Safety Margin × (Confidence ÷ Experience), which explains why the most dangerous scaffolds are those used by people who have "done this a thousand times."
+&nbsp;
+****The record for "most people standing on a scaffold designed for one" is held by the Hublandish Construction Company at the Festival of 1847, with thirteen individuals, two dogs, and a piano§§. The scaffold held for approximately four seconds, which the company's director called "a moral victory"†††.
+&nbsp;
+§§Why there was a piano remains unexplained. The Festival of 1847 was not known for its musical events.
+&nbsp;
+†††The insurance company called it "exhibit A."
+&nbsp;
+††††The universe's grudge against vertical structures dates back to the Tower of Babel incident‡‡‡, after which gravity reportedly developed what theologians call "a taste for hubris."
+&nbsp;
+‡‡‡Both the religious and the historical accounts agree on one thing: it fell down. They differ on whether God pushed it or if it was just really bad scaffolding.
+&nbsp;
+‡‡‡‡The IITSTS scale runs from 1 ("technically still matter") to 10 ("probably won't move even if you ask nicely"). Most construction sites achieve a 6 ("stable unless it's Thursday")§§§.
+&nbsp;
+§§§The Thursday Exception remains poorly understood but extensively documented.
+&nbsp;
+§§§§During this festival, held in the principality of Lower Überwald, seventeen different definitions of "solid ground" were proposed. Only three of them involved actual solidity****. The festival ended prematurely when the debate stage, built on "philosophically solid ground," sank seventeen feet into a bog†††††.
+&nbsp;
+****The others included "ground that looks solid," "ground that feels solid when you poke it," and "ground that everyone agrees to pretend is solid."
+&nbsp;
+†††††The stage was later recovered and is now displayed at the Museum of Confidence Exceeding Competence.
+&nbsp;
+*****This principle, known as Pythagoras's Revenge, states that right angles exist whether you acknowledge them or not, and scaffolds that ignore them will be reminded forcefully.
+&nbsp;
+†††††The phenomenon of "rail betrayal" occurs when a worker forgets that guard rails are suggestions to gravity, not commands‡‡‡‡.
+&nbsp;
+‡‡‡‡Gravity, being a fundamental force of nature, does not take suggestions well. It particularly dislikes being told what to do by temporary`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding scaffold construction safety in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PULLEY_LIFTING_SYSTEMS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'pulley_lifting_systems',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Pulley Lifting Systems',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['scaffold_construction_safety'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_pulley_lifting_systems' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Pulley Lifting Systems: A Comprehensive Analysis of Mechanical Advantage in Vertical Construction Operations</span>
+&nbsp;
+The pulley, that most fundamental of simple machines, represents humanity's earliest successful attempt to argue with gravity and occasionally win*. At its core, a pulley system exploits the principle of mechanical advantage, whereby the application of force over a greater distance reduces the immediate force required to lift a given mass**. In construction contexts, this translates to the deeply satisfying ability to lift objects that would otherwise require either multiple workers or the kind of leverage that ends with someone in the emergency ward explaining why they thought a crowbar and optimism would suffice***. The basic fixed pulley changes only the direction of force—pulling down to lift up—while movable pulleys and compound systems actually reduce the force required, at the cost of pulling more rope through the system†. This exchange of force for distance remains one of the universe's few genuinely fair bargains, though the Guild of Applied Leverage maintains that entropy always gets its cut††.
+&nbsp;
+Modern construction employs pulley systems ranging from the elegantly simple to the magnificently complex‡, each designed for specific load capacities and operational contexts. Single fixed pulleys serve admirably for redirecting force and are favored for their mechanical simplicity and the reduced likelihood that a worker will inadvertently create what the Occupational Safety records classify as "a situation"‡‡. Compound pulley systems, incorporating multiple wheels and rope segments, provide mechanical advantages of 2:1, 3:1, 4:1, or higher, though experienced contractors note that advantages beyond 6:1 begin suffering from friction losses that make theoretical calculations and actual performance diverge in ways that would deeply satisfy anyone who enjoys watching physics textbooks meet reality‡‡‡. The critical consideration remains matching the pulley system to the load: a calculation that sounds straightforward until one factors in dynamic loading, rope stretch, weather conditions, and what the Guild of Irritated Engineers terms "human creativity in finding new ways to exceed weight limits"§.
+&nbsp;
+Historical development of pulley technology stretches back to antiquity§§, though documentation becomes notably sparse during what historians call "the experimental periods," when various civilizations discovered through enthusiastic trial and tragic error the importance of rope strength, anchor points, and not standing directly beneath suspended loads§§§. The ancient Babylonians apparently understood compound pulley systems, though their records suggest they understood them slightly less well than they thought they did¶. Medieval construction saw significant advances in load-bearing capacity, primarily driven by the construction of increasingly ambitious cathedrals and the corresponding requirement to lift increasingly ambitious stones to increasingly improbable heights¶¶. The Renaissance brought mathematical formalization of mechanical advantage, allowing builders to calculate required forces with precision, though this precision proved most useful in determining exactly how much additional rope they should have purchased¶¶¶.
+&nbsp;
+Safety considerations in pulley lifting systems extend far beyond the obvious injunction against standing beneath suspended loads#, encompassing rope inspection protocols, pulley wheel maintenance, anchor point evaluation, and the critical assessment of whether the person operating the system has "that look" that suggests they're about to do something memorable##. The International Consortium for Construction Safety recommends daily rope inspection, weekly pulley lubrication, monthly anchor testing, and constant vigilance against what they delicately term "operational improvisation"###. Load ratings must account for dynamic forces during lifting, which typically exceed static weight by factors ranging from 1.2 to 1.5 depending on lifting speed and operator temperament‡†. Rope condition proves particularly critical, as natural fiber ropes degrade in ways that aren't always visible until they're demonstrating their degradation in the most educational manner possible‡††. Modern synthetic ropes provide superior strength and longevity, though they introduce new failure modes that the Guild of Rope Manufacturers describes as "innovative" and safety inspectors describe using considerably stronger language‡‡†.
+&nbsp;
+The practical implementation of pulley systems requires not merely theoretical knowledge but the kind of earned wisdom that comes from observing systems succeed, fail, and occasionally fail so spectacularly that they warrant their own cautionary tales in training manuals†‡. Proper anchoring remains paramount—a pulley system is only as secure as its weakest attachment point, a principle the construction industry rediscovers approximately once per quarter with varying degrees of property damage†‡†. Modern construction sites typically employ certified rigging professionals who have demonstrated both competence in pulley mechanics and the good judgment to refuse unreasonable requests from project managers who believe that physics is more of a suggestion than a law†‡‡. The future of pulley systems in construction likely involves increased integration with electronic monitoring, automated safety systems, and devices designed to prevent operators from exceeding rated capacities, though the history of safety devices suggests that human ingenuity in circumventing protective measures remains one of our species' most reliable traits§‡.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The score, for those keeping track, currently stands at Gravity: ∞, Humanity: Several Hundred Thousand, which sounds impressive until you calculate the percentages.
+&nbsp;
+**Physics textbooks present this with elegant equations. Construction workers present this by pointing at a rope and saying "pull here," which achieves the same educational outcome with considerably less algebra.
+&nbsp;
+***The Guild of Emergency Medical Responders maintains a wall of particularly creative injury reports. The pulley-related section is surprisingly small compared to the ladder section, which occupies an entire wing. This speaks well of pulleys and poorly of ladders, human judgment, or quite possibly both.
+&nbsp;
+†This principle causes endless confusion among novices who feel cheated that they must pull, for example, four meters of rope to lift an object one meter. The universe, being neither kind nor unkind but merely indifferent, offers no refunds on this transaction. One particularly vocal apprentice in 1847 wrote a lengthy letter of complaint to the Royal Society explaining that he felt this arrangement was fundamentally unfair. The Royal Society's response does not survive, but one imagines it was sympathetic while being fundamentally unhelpful.
+&nbsp;
+††The Guild's official position, stated in their founding charter of 1623, is that "all work requires work, and anyone who claims otherwise is selling something, probably a perpetual motion machine." The charter continues for another forty pages in this vein, becoming progressively more irritated with con artists, fraudsters, and what they term "enthusiastic optimists with insufficient education in thermodynamics." The final page is simply the word "NO" written in letters six inches high.
+&nbsp;
+‡The city of Hogswatch-on-Umber once commissioned a pulley system so complex it required three certified operators, seventeen pages of documentation, and a small shrine to the gods of mechanical advantage. It was used once, successfully lifted a modest stone block, and was then quietly simplified after everyone involved agreed that some victories are more trouble than they're worth. The original system now resides in the Museum of Excessive Engineering, where it serves as a warning about the dangers of letting engineers make decisions without adult supervision†††.
+&nbsp;
+†††The Museum's curator notes that the collection has grown alarmingly large in recent decades, suggesting either that engineering education has improved (allowing people to recognize excessive engineering) or that engineering ambition has outpaced engineering wisdom. The curator suspects the latter but maintains diplomatic silence on the matter, as several museum donors are engineers with sensitive feelings about their past projects.
+&nbsp;
+‡‡The Occupational Safety Administration's official definition of "a situation" spans fourteen pages and includes subsections for "Predicament," "Incident," "Event Requiring Extensive Paperwork," and the dreaded "Occurrence That Shall Not Be Repeated Under Any Circumstances." The last category accounts for 73% of all pulley-related reports, suggesting either that most pulley problems are genuinely unique or that report writers have grown weary of finding new terminology for "someone did something obviously inadvisable."
+&nbsp;
+‡‡‡This divergence manifests most dramatically in the face of the operator who has just calculated that a 6:1 mechanical advantage should make their lift effortless, only to discover that friction, rope weight, and the general unwillingness of the physical universe to match theoretical predictions has rendered their beautiful calculation largely decorative. The Brotherhood of Disappointed Engineers maintains a support group for individuals processing this revelation. Meetings are held monthly and feature remarkably little mathematical discussion.
+&nbsp;
+§The Guild maintains that any system can be misused given sufficient creativity and insufficient supervision. Their annual report for 1876 included the memorable line: "If a safety device can be bypassed, it will be. If it cannot be bypassed, someone will find a way anyway and then write to us explaining their methodology in great detail, as if we should be proud." The Guild was not proud.
+&nbsp;
+§§Archimedes famously claimed he could move the Earth with a lever and fulcrum, an assertion that demonstrated either remarkable confidence in mechanical principles or remarkable unfamiliarity with the practical problems of finding a suitable fulcrum location§†. His work with pulleys was considerably more grounded, both literally and figuratively, though historians note he spent surprisingly little time discussing rope strength in his surviving texts.
+&nbsp;
+§†The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding pulley lifting systems in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CRANE_BASIC_MECHANICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'crane_basic_mechanics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Crane Basic Mechanics',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['pulley_lifting_systems'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_crane_basic_mechanics' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Crane Basic Mechanics: A Comprehensive Introduction to Vertical Persuasion</span>
+&nbsp;
+The crane, that magnificent monument to humanity's eternal dissatisfaction with things being on the ground*, represents perhaps the most dramatic escalation of the simple pulley system since someone first thought "yes, but what if we made it BIGGER?"† The fundamental principle remains elegantly straightforward: a crane is essentially a lever‡ mounted on something that hopefully won't tip over**, combined with pulleys that multiply force†† and a hook that holds things‡‡, all orchestrated by an operator who has made certain Life Choices***. The mechanical advantage of a crane system derives from the classical relationship between load, effort, and the distance from the fulcrum†††, though in practice this elegant physics is often complicated by wind‡‡‡, gravity's persistent enthusiasm§, and the Construction Site Uncertainty Principle§§.
+&nbsp;
+The practical application of crane mechanics requires understanding three critical elements: the jib§§§ (the arm that reaches out optimistically toward whatever needs lifting), the counterweight* (that massive block of concrete that prevents the whole apparatus from performing an unscheduled forward somersault), and the slewing mechanism** (which allows the crane to rotate, ideally in a controlled fashion). Modern tower cranes can lift loads exceeding 20 metric tonnes to heights of 80 meters or more††, though operators are strongly encouraged not to think too hard about these numbers while actually doing so‡‡. The load chart‡‡‡ serves as the crane's sacred text§, providing the precise weight limits at various radii and heights, which must be consulted with the reverence one might reserve for prophecies that could prevent catastrophic failure§§.
+&nbsp;
+Historical development of crane mechanics reveals humanity's long relationship with getting heavy things up high§§§. The ancient Greeks employed the *trispastos*** (three-pulley crane) and *pentaspastos*††† (five-pulley crane), achieving mechanical advantages of 3:1 and 5:1 respectively, which seemed quite impressive until medieval cathedral builders decided to add treadwheels‡‡‡ powered by monks§ walking in circles for hours at a time§§. The Industrial Revolution introduced steam-powered cranes§§§, then the early 20th century brought internal combustion engines and the realization that if you wanted to build skyscrapers, you needed cranes that could basically build themselves upward* as the building rose, a concept that still makes engineers slightly nervous**. Modern hydraulic and electric systems have eliminated much of the steam-related explosions††, though they've introduced entirely new categories of things that can go wrong‡‡.
+&nbsp;
+Safety considerations in crane operations cannot be overstated, which is why we're going to state them quite a lot‡‡‡. The three most critical rules are: never exceed the rated load capacity§ (not even by "just a little bit"), always account for wind loading§§ (wind is surprisingly strong and has opinions about your crane), and maintain proper ground conditions§§§ (soft soil plus heavy crane equals sudden subsidence education program). The catastrophic failure mode of a crane typically involves rapid unplanned disassembly*, which sounds more pleasant than it is**, resulting in what the National Institute of Heavy Things Going Wrong†† refers to as "an unscheduled gravity demonstration." Modern cranes include numerous safety devices including load moment indicators‡‡, anti-two-block systems‡‡‡, and increasingly desperate warning alarms§, though the most important safety device remains the operator's judgment§§ and willingness to say "absolutely not"§§§.
+&nbsp;
+The mathematics underlying crane stability deserves special attention, particularly the relationship between the load moment* and the resisting moment**. The load moment (weight multiplied by horizontal distance from the mast) must never exceed the resisting moment (counterweight multiplied by its distance from the mast, plus the crane's self-weight contribution)††, or you will discover experimentally why the phrase "tipping moment" has such visceral meaning‡‡. Professional crane operators develop an almost supernatural sense‡‡‡ for these forces, able to feel through the controls when something isn't quite right§, much like experienced sailors can sense an approaching storm or how cats know when you're planning to take them to the vet§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* According to the Institute of Unnecessarily Elevated Objects, approximately 73.6% of all things lifted by cranes could theoretically remain on the ground, but where's the fun in that?
+&nbsp;
+† The historical record suggests this thought occurred simultaneously to several ancient engineers around 515 BCE, resulting in what scholars call the "Competitive Lifting Era," which ended badly for at least three city-states.
+&nbsp;
+‡ Specifically a second-class lever, where the load sits between the fulcrum and the effort, though explaining this to most crane operators results in glazed expressions and muttering about "just tell me the weight and where it needs to go."
+&nbsp;
+\*\* The stability calculation involves what Professor Ermintrude Wobblethwaite of the Sto Helit Academy of Engineering calls "aggressive wishful thinking supported by mathematics."
+&nbsp;
+†† The pulley multiplication works through what physicists describe as "making physics do the work instead of your back," which is the entire point of civilization really.
+&nbsp;
+‡‡ The hook, while appearing simple, has been the subject of 1,247 engineering papers, 89 doctoral theses, and one interpretive dance performance at the University of Quirm.
+&nbsp;
+\*\*\* According to the Guild of Crane Operators' psychological survey, 67.3% of operators report having had the dream where they're back in school taking an exam, except the exam is "don't drop the thing" and they're naked, and the thing is an extremely expensive yacht.
+&nbsp;
+††† The fulcrum in a crane is typically the slewing bearing, where the rotating superstructure meets the tower. This bearing contains hundreds of precisely machined balls or rollers, each one a potential point of failure that keeps maintenance engineers awake at night†.
+&nbsp;
+† The Guild of Bearing Manufacturers maintains a secret database of bearing failures, ranked by "spectacular-ness." The top three incidents are classified, but reportedly involve a giraffe, a wedding cake, and a member of Parliament, though not necessarily in that order.
+&nbsp;
+‡‡‡ Wind speed of just 40 km/h can reduce a crane's lifting capacity by up to 30%, which is why crane operators develop a personal relationship with weather forecasting services, occasionally involving burnt offerings to the gods of meteorology‡.
+&nbsp;
+‡ The Meteorological Pantheon includes Gustus the Unpredictable, Shearwind the Sideways Blower, and Doldruma the Suspiciously Calm, according to ancient crane operator traditions that definitely exist and aren't being made up as we go along.
+&nbsp;
+§ Gravity maintains an enthusiasm rating of 9.81 m/s² at sea level, though it's been measured as slightly more enthusiastic in areas where crane accidents are more common, suggesting either gravitational variation or observation bias.
+&nbsp;
+§§ First formulated by Dr. Havelock Uncertainty in his 1967 paper "You Think You Know Where Everything Is Until You Start Moving It," this principle states that the actual position of building materials becomes quantum-superposed once a construction schedule is introduced.
+&nbsp;
+§§§ From the French *gibe*, meaning "to mock," as the jib appears to mock gravity by extending horizontally while supporting tremendous loads. Early English engineers misheard this as "jib" and now we're stuck with it††.
+&nbsp;
+†† The International Committee for Engineering Terms That Make Sense tried to rename it the "Primary Cantilever Load Arm" in 1982, but the committee was disbanded after the Secretary died of boredom mid-meeting.
+&nbsp;
+\* The counterweight must be heavy enough to prevent tipping but not so heavy that the crane tips backward, a principle known as "Goldilocks Engineering." The Guild of Counterweight Calculators lost seventeen members before they got this right‡.
+&nbsp;
+‡ The infamous Counterweight Incident of 1873 in Vienna involved a miscalculation, a runaway crane spinning like a compass needle, and the Chancellor's summer house, which was technically in the way. The mathematician responsible fled to Bolivia.
+&nbsp;
+\*\* The slewing mechanism allows 360-degree rotation, though certain angles are traditionally avoided in haunted construction sites, which according to the Bureau of Paranormal Building Practices represents approximately 4% of all sites§.
+&nbsp;
+§ This percentage rises to 31% in sites built over former cemeteries, ancient temples, or anywhere in Edinburgh.
+&nbsp;
+†† Though this seems impressive, it pales in comparison to the legendary Crane of Babel, which according to apocryphal accounts could lift 200 tonnes to infinite height, until the gods got nervous about the implications‡.
+&nbsp;
+‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding crane basic mechanics in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CONCRETE_FORMWORK: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'concrete_formwork',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Concrete Formwork',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['crane_basic_mechanics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_concrete_formwork' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Concrete Formwork: A Study in Temporary Architecture and Permanent Consequences</span>
+&nbsp;
+The art of concrete formwork—that is, the temporary structures that hold liquid concrete in place until it achieves its desired shape and sufficient strength—represents one of construction's most paradoxical disciplines: building something well so that it can be properly destroyed later*. At its essence, formwork (or "shuttering," as it was known in the days when carpenters were permitted to name things†) consists of panels, frames, and bracing systems designed to contain concrete during the curing process, typically constructed from timber, steel, aluminum, or various synthetic materials that the industry has developed in its ongoing quest to make concrete behave‡. The fundamental principle remains elegantly simple: create a vessel of the desired shape, fill it with concrete, wait for chemistry to occur**, then remove the vessel to reveal the structure within††.
+&nbsp;
+The practical applications of formwork extend from the mundane to the monumentally ambitious, encompassing everything from simple foundation walls to complex curved surfaces that would make ancient geometers weep with either joy or despair‡‡. Modern formwork systems have evolved into sophisticated assemblies involving adjustable panels, climbing systems for tall structures, and flying formwork for repetitive floor construction***—technologies that allow builders to create shapes previously relegated to the realm of theoretical mathematics and fever dreams†††. The selection of appropriate formwork depends on numerous factors: the complexity of the desired shape, the surface finish required, the number of reuses anticipated, and the budget available‡‡‡—with these four variables rarely achieving harmony without extensive negotiation and occasional shouting****.
+&nbsp;
+Safety considerations in formwork operations cannot be overstated, particularly given the industry's extensive archives of incidents that began with the phrase "it seemed stable enough†††"†. Formwork must withstand not only the considerable weight of wet concrete (approximately 150 pounds per cubic foot, though it feels heavier at 3 AM‡‡‡‡) but also the dynamic loads imposed during placement, the pressure exerted by the fluid concrete, and the architectural ambitions that inevitably exceed the engineer's calculations*****. Proper bracing, adequate ties, appropriate release agents, and correctly timed removal all constitute critical elements of formwork practice, along with the often-overlooked principle of "not removing supports while people are standing under the thing they're supporting"—a lesson learned repeatedly throughout construction history†††††.
+&nbsp;
+The historical development of formwork parallels humanity's relationship with concrete itself, from the Romans' ingenious use of timber forms for their architectural achievements****** to the medieval period's unfortunate gap in concrete knowledge‡‡‡‡‡ to the industrial revolution's rediscovery and systematization of concrete construction techniques. The twentieth century witnessed an acceleration in formwork innovation, driven by taller buildings, more complex shapes, and the construction industry's perpetual race against time and budget******†. Modern formwork represents the culmination of centuries of incremental improvements, occasional disasters, and the insights of engineers who learned from both—though predominantly from the disasters, as these tend to be more memorable and better documented††††††.
+&nbsp;
+Contemporary formwork practice exists at the intersection of engineering precision and construction pragmatism, where theoretical calculations meet the reality of weather, site conditions, and the eternal optimism of project schedules‡‡‡‡‡‡. The field continues to evolve with developments in materials science, computer modeling, and the gradual acceptance that some shapes, while theoretically possible, remain inadvisable*******. Understanding formwork principles proves essential for anyone engaged in concrete construction, as the quality of the formwork directly determines the quality of the finished structure—a relationship so fundamental that the industry has spent over a century attempting to explain it to people who insist that the formwork "isn't even part of the final building"††††††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The Pratchett Institute for Paradoxical Construction Studies maintains that formwork represents the purest expression of construction philosophy: investing significant effort into something specifically designed to be discarded. Their motto, "Build to Destroy," has caused considerable confusion at fundraising events.
+&nbsp;
+†Before 1847, when the International Conference on Construction Terminology (Brussels) standardized the term "formwork," various regional terms included "concrete boxes," "cement jails," "the wooden bits," and—in one notably poetic Welsh valley—"yr ymgais olaf" (the final attempt).
+&nbsp;
+‡Concrete, left to its own devices, behaves less like a construction material and more like an extraordinarily heavy liquid determined to find gaps in formwork that manufacturers swear don't exist. The Fluid Dynamics Research Center at the University of Munich has calculated that concrete can detect openings approximately 47% smaller than theoretically possible.
+&nbsp;
+**The curing process technically involves hydration reactions where cement particles bond with water molecules to form a crystalline matrix. In practice, it involves staring at concrete and wondering if it's ready yet, a tradition dating back to Roman construction sites where apprentices were stationed to "watch the concrete" for shifts lasting up to sixteen hours††.
+&nbsp;
+††These apprentices, known as "vigiles caementum," were considered to have achieved enlightenment if they could distinguish between concrete that was ready for formwork removal and concrete that would collapse spectacularly upon form removal. Historical records suggest the enlightenment rate hovered around 23%.
+&nbsp;
+‡‡The Guggenheim Museum in Bilbao caused seventy-three formwork engineers to simultaneously reach for tranquilizers when they first saw the designs. The formwork required for its curved titanium-clad surfaces involved geometries that three separate firms claimed were "technically impossible" before eventually building them anyway‡.
+&nbsp;
+‡Three firms declined the project entirely, citing their desire to remain employed in the construction industry.
+&nbsp;
+***Flying formwork earned its name not from its aerial capabilities but from its tendency to "fly" across construction sites when improperly secured during high winds—an incident that occurred with disturbing regularity until the 1985 amendments to formwork standards, following what became known as the Chicago Panel Migration Event****.
+&nbsp;
+****Eleven formwork panels achieved an altitude of approximately forty feet and traveled over three city blocks before landing on the mayor's limousine during a site inspection. The mayor was unharmed but developed a noted skepticism toward construction projects.
+&nbsp;
+†††The complete phrase "it seemed stable enough at the time, considering" has become so associated with formwork failures that the Society of Structural Engineers now offers workshops titled "Things Not to Say Before a Collapse."
+&nbsp;
+‡‡‡Never. These four variables never achieve harmony. The Society for Construction Management reports that projects achieving balance between shape complexity, finish quality, reuse rate, and budget occur at a frequency of 0.003%—roughly equal to the probability of finding a parking space directly in front of the building supply store.
+&nbsp;
+**The archives include 847 incidents cataloged under "premature form removal," a phrase that sounds far less catastrophic than it actually is. The Formwork Safety Division maintains these records in a secure facility, accessible only to engineers who have signed waivers acknowledging that the content may cause nightmares.
+&nbsp;
+††††The weight feels heavier at 3 AM because it is heavier at 3 AM. Concrete's perceived weight increases proportionally with the lateness of the hour and inversely with the amount of coffee available. This relationship, known as Murphy's Concrete Constant, has been verified across 147 construction sites worldwide‡‡‡.
+&nbsp;
+‡‡‡The research was conducted by the Institute for Practical Construction Physics, whose motto "Testing What Everyone Already Knows" has proven surprisingly valuable to the industry.
+&nbsp;
+‡‡‡‡Approximately 23% of formwork failures can be traced to the moment when an engineer's calculations were overruled by an architect's vision, a contractor's deadline, or a superintendent's confidence. The remaining 77% involve some combination of all three, plus weather.
+&nbsp;
+*****The principle of "not removing supports while people are standing under them" was formally codified in 1923 following the Detroit Incident, about which the less said the better. The Occupational Safety Historical Society maintains sealed records, marked only with the note "See Appendix Q: Why We Have Rules."
+&nbsp;
+†††††The ancient Romans used timber formwork so effectively that modern engineers occasionally propose "just doing it the Roman way" during difficult projects. This suggestion is immediately followed by someone pointing out that Roman construction schedules measured in decades and slave labor is no longer considered an acceptable project resource******.
+&nbsp;
+******Though Roman concrete structures have lasted over two millennia while modern parking garages begin deteriorating within thirty years, leading to uncomfortable questions at engineering conferences.
+&nbsp;
+‡‡‡‡‡The medieval period (roughly 476-1453 CE) witnessed a near-complete loss of concrete technology in Western Europe, resulting in several centuries of buildings that were magnificent but required significantly more stone cutting. Historians believe the knowledge was lost when the last Roman engineers failed to write anything down, assuming someone else would handle the documentation†††††.
+&nbsp;
+†††††This assumption—that someone else will handle the`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding concrete formwork in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RAMMED_EARTH_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'rammed_earth_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Rammed Earth Construction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['concrete_formwork'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_rammed_earth_construction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `RAMMED EARTH CONSTRUCTION: A COMPREHENSIVE TREATISE ON THE ANCIENT ART OF HITTING DIRT REALLY, REALLY HARD</span>
+&nbsp;
+The fundamental principle of rammed earth construction rests upon a deceptively simple concept: that soil, when compressed with sufficient enthusiasm* and enclosed within temporary formwork**, becomes as solid and durable as stone†. This process, which archaeologists have traced back to approximately 8000 BCE††, involves layering dampened earth mixture into forms and compacting each layer through repeated percussion until the material achieves a density of roughly 2.2 times its loose state†††. The resulting wall, once the formwork is removed, presents a monolithic structure of surprising strength—provided one has not made any of the seventeen most common errors‡ documented by the International Consortium of Earthen Architecture‡‡.
+&nbsp;
+The practical execution of rammed earth construction demands attention to three critical variables: soil composition, moisture content, and compaction energy‡‡‡. The ideal soil mixture comprises approximately 70% sand and gravel, 30% clay, and precisely 0% optimism about completing the project on schedule*. Modern practitioners typically employ pneumatic tampers** delivering 2,400 to 3,600 impacts per hour, though traditionalists argue—with some validity—that the rhythmic meditation of hand-tamping produces walls of superior character***. The formwork itself must withstand lateral pressures exceeding 8 kN/m², which explains why the Guild of Form-Builders maintains such comprehensive insurance policies† and why their annual meetings are held in establishments serving particularly strong beverages††.
+&nbsp;
+Historical analysis reveals that rammed earth construction has survived not despite its limitations but because of humanity's remarkable ability to ignore warning signs until something collapses†††. The technique flourished along the Silk Road‡, in the Great Wall of China's less-famous sections‡‡, and throughout medieval Europe wherever stone proved inconveniently expensive or heavy‡‡‡. Contemporary applications range from residential construction in Australia* to luxury eco-resorts** where guests pay premium rates to sleep inside what is, technically, a very sophisticated dirt pile***. The thermal mass properties of rammed earth—typically 2.5 MJ/m³K—make these walls exceptionally effective at moderating indoor temperatures†, though this advantage becomes less impressive when one has accidentally included the wrong type of clay and the wall begins to weep‡.
+&nbsp;
+Modern safety protocols for rammed earth construction stem directly from the 1847 Incident at Montpellier††, which established that formwork must be inspected before each pour†††, that tamping equipment should never be operated by anyone who has consumed more than 0.3 liters of wine‡, and that the phrase "it'll probably hold" should trigger immediate work stoppage‡‡. The structural engineer must verify that the bearing capacity of the foundation exceeds 150 kPa‡‡‡, that the wall's height-to-thickness ratio remains below 10:1*, and that nobody has secretly substituted beach sand for proper aggregate**, a substitution that occurs with alarming frequency*** according to the Forensic Earth Construction Database†.
+&nbsp;
+The integration of rammed earth with contemporary building systems presents challenges that would have baffled our ancestors and continue to baffle approximately 67% of modern contractors††. Embedding utilities requires pre-planning that seems excessive until one attempts to chisel through a properly compacted wall†††, at which point the wisdom of advance preparation becomes painfully obvious‡. The interface between rammed earth and conventional roofing systems demands careful detailing to prevent water infiltration‡‡, which remains the single greatest threat to earthen construction and the reason why the Ancient Guild of Roof Thatchers and Earth Wallers dissolved in 1523 after a legendary dispute‡‡‡. Success in rammed earth construction ultimately requires respect for the material's limitations*, understanding of its considerable strengths**, and acceptance that one's hands will never be truly clean again***.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*The precise definition of "sufficient enthusiasm" has been debated since the Third Symposium on Earthen Architecture in 1976, where Dr. Heinrich Stampfer famously demonstrated that enthusiasm alone, without proper technique, produces walls that enthusiastically fall over. The symposium ended early.
+&nbsp;
+**Knowledge of concrete formwork proves essential here, as rammed earth forms must withstand similar pressures while remaining perfectly plumb. The International Building Code requires forms to deviate no more than 6mm per 3 meters, which seems quite reasonable until one has actually attempted it†.
+&nbsp;
+†The Guild of Form-Builders recorded 347 instances in 2019 alone of forms that were "pretty close to plumb" resulting in walls that were "distinctly resembling the Tower of Pisa." Insurance claims totaled £2.3 million.
+&nbsp;
+††This date comes from archaeological evidence at Tell es-Sultan, where ancient builders demonstrated that humans have been hitting dirt with sticks for approximately 10,000 years. The technique has not fundamentally changed, though the sticks have become significantly more expensive.
+&nbsp;
+†††The Consortium, based in Grenoble, maintains a database of construction errors that would be hilarious if they weren't occasionally fatal. Error #7 ("adding too much water because it seemed dry") accounts for 23% of all failures. Error #12 ("assuming all dirt is basically the same") accounts for another 31%. The remaining errors are too embarrassing to discuss in polite company.
+&nbsp;
+‡The seventeen errors include, but are not limited to: using topsoil instead of subsoil, ignoring the moisture content, ramming while intoxicated, ramming while distracted by attractive passersby, insufficient ramming, excessive ramming (yes, this is possible), and the infamous Error #11, which the Consortium has classified as "we're not entirely sure what they were thinking."
+&nbsp;
+‡‡The Guild's insurance policies are underwritten by Lloyd's of London, who approached the task with the same enthusiasm typically reserved for insuring experimental aircraft. The premium calculations involve seventeen variables, including local rainfall, contractor experience, and a subjective "likelihood of stubbornness" rating.
+&nbsp;
+‡‡‡Pneumatic tampers have revolutionized the field, reducing construction time by 73% while increasing noise complaints by 400%. The Guild of Traditional Hand-Tampers views them with deep suspicion and maintains that walls built with pneumatic tools lack "soul," though they cannot precisely define what soul is or how one measures its presence in a wall.
+&nbsp;
+*The addition of this percentage is required by the Professional Standards Board after the 2003 Project in Devon, where the contractor assured everyone it would take "maybe three months." The project completed in 2007. The contractor aged visibly.
+&nbsp;
+**The rhythmic meditation of hand-tamping has been compared to walking meditation by practitioners of both disciplines. The key difference is that walking meditation rarely results in blisters, repetitive strain injury, or the sudden realization that one has committed to hitting dirt with a stick for the next six weeks†.
+&nbsp;
+†These beverages are necessary because form-builders must regularly explain to architects why their beautiful curved designs will require forms that cost more than the rest of the building combined. The architects rarely take this news well.
+&nbsp;
+††The Society of Master Builders has documented 1,247 cases of walls that "seemed fine until they weren't." The time between "fine" and "weren't" averages 3.7 years, though outliers range from six hours to two centuries. The Society's official position is that this uncertainty is "part of the charm."
+&nbsp;
+†††This survival is testament to either the technique's fundamental soundness or humanity's short memory. The Historical Society for Earthen Construction suggests both factors play a role, noting that people generally remember successful buildings and forget failed ones, except when the failed ones land on someone important.
+&nbsp;
+‡The Silk Road cities of Central Asia contain rammed earth structures that have stood for over a thousand years, which would be more impressive if we knew how many fell down in the meantime. Archaeological evidence suggests "quite a lot," but the archaeologists admit this is technically classified as "a guess, albeit an educated one."
+&nbsp;
+‡‡These sections of the Great Wall are less famous precisely because they were made of rammed earth rather than stone, leading to what historians delicately term "compositional differences in longevity." Several sections have achieved the consistency of "firm hill" rather than "wall."
+&nbsp;
+‡‡‡The medieval European builders who chose rammed earth over stone generally fell into two categories: the financially pragmatic and the geographically desperate. A third category—the optimistically delusional—also existed but their work has not survived to be studied.
+&nbsp;
+*Australia has embraced rammed earth construction with characteristic enthusiasm, possibly because Australians have extensive experience with things that are simultaneously beautiful and potentially dangerous. The Australian Rammed Earth Society maintains that modern techniques have eliminated most risks, though they still recommend checking walls for resident spiders before leaning against them.
+&nbsp;
+**These eco-resorts charge rates exceeding £`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding rammed earth construction in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COB_BUILDING_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'cob_building_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Cob Building Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['rammed_earth_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_cob_building_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Cob Building Techniques</span>
+&nbsp;
+The art of cob building—that ancient practice of stacking mud with the confidence of someone who has definitely thought this through*—represents one of humanity's most enduring relationships with the earth itself. At its essence, cob construction involves mixing subsoil, water, and fibrous material (traditionally straw) into a malleable substance that can be sculpted directly onto walls without the need for formwork**, a technique that predates the invention of the spirit level by approximately four thousand years†. The word "cob" derives from the Old English for "lump," which the Historical Nomenclature Society has noted was "refreshingly honest about what you're actually doing"††. Unlike rammed earth, which requires forceful compaction within temporary forms, cob building is fundamentally an additive process‡—one places lumps of prepared material atop previous lumps, compressing them with one's hands, feet, or traditional implements, until a wall emerges from what was previously just an ambitious pile of mud‡‡.
+&nbsp;
+The practical execution of cob building requires understanding the precise ratio of clay to sand to fiber, a formula that varies by region, season, and the philosophical disposition of the builder***. The clay content must be sufficient to bind the mixture (typically 5-30% depending on clay quality) while the sand provides structural stability and reduces cracking†††. Straw or other fibrous materials—the Guild of Traditional Builders maintains records of 347 different fiber types used historically‡‡‡—act as tensile reinforcement, preventing catastrophic failure and providing what structural engineers reluctantly admit is "surprisingly adequate performance"§. The building process itself follows a rhythm: prepare mix, form cobs (lumps roughly the size of a loaf of bread§§), place them on the wall with a twisting motion to ensure adhesion, compress thoroughly, and repeat. Each lift of cob—typically 18-24 inches—must dry sufficiently before adding the next layer, leading to construction timelines measured in weeks or months rather than days***§. Window and door openings are formed by building around temporary frames, while sculptural possibilities are limited only by structural physics and the builder's nerve§§§.
+&nbsp;
+Safety considerations in cob building extend beyond the obvious warnings about gravity and moisture*†. While the materials themselves are non-toxic—indeed, they are literally dirt—the physical labor involved should not be underestimated by those whose previous construction experience consists primarily of watching renovation television†*. Mixing cob traditionally involves stomping it with bare feet, a process that sounds romantic until hour three‡*. Walls must be protected from rising damp through adequate foundations (typically stone or other water-resistant material raised at least six inches above grade), and from rain during construction with temporary covering§*. The structural limitations of cob must be respected: wall thickness should be proportional to height (a minimum of 18 inches at the base for single-story structures, increasing for taller buildings), and load-bearing considerations require walls to be substantially thicker than frame construction would demand**†. The International Association of Earth Builders has compiled an extensive list of "learning experiences"—their euphemism for structural failures—most of which involve either insufficient drying time, inadequate foundations, or what they term "excessive architectural ambition"††*.
+&nbsp;
+Modern understanding of cob building has been enhanced by research into its thermal properties, durability, and structural behavior, though much of this research merely confirms what builders in Yemen, Devon, and New Zealand have known for centuries‡‡*. Contemporary building codes in many jurisdictions have begun recognizing cob as a legitimate construction method, requiring specific engineering calculations that make the ancient builders—who constructed without benefit of finite element analysis—seem rather more impressive in retrospect§§*. The resurgence of interest in natural building has spawned numerous training programs, though the ratio of workshop attendees to actual cob buildings completed remains a subject of some delicacy among instructors***†. What remains constant across millennia is the fundamental appeal of building with one's hands using materials literally beneath one's feet, creating structures that are fireproof, highly insulating, and capable of lasting centuries if protected from water—the single greatest enemy of all earthen construction, as many discovered too late‡†.
+&nbsp;
+---
+&nbsp;
+*The confidence is generally inversely proportional to structural engineering knowledge. The Department of Retrospective Building Analysis at Mudstone University has documented precisely 1,247 cases where someone said "how hard could it be?" immediately before learning exactly how hard it could be.
+&nbsp;
+**Forms being those wooden frameworks that one builds and then removes, representing what the philosopher Grext the Practical called "building something so you can build something else by removing the first thing you built." Grext was not invited to many dinner parties.
+&nbsp;
+†And indeed predates the invention of the concept of "level" by an additional thousand years. Early cob walls tended to lean in whichever direction seemed appropriate at the time. Some still stand, having reached an accommodation with gravity that physicists describe as "disturbing."
+&nbsp;
+††The Society disbanded in 1847 following what minutes describe only as "the incident with the nomenclature of nomenclature." Their final act was to name themselves "The Former Society for Historical Nomenclature," which somehow made things worse.
+&nbsp;
+‡As opposed to subtractive processes like carving, or destructive processes like most of recorded history.
+&nbsp;
+‡‡Traditional implements include wooden paddles, smooth stones, hands, feet, foreheads (disputed*), and in the case of the village of Lower Squelching, trained pigs†. The pig method was discontinued after the animals developed strong opinions about architectural design.
+&nbsp;
+*The Forehead Method appears in exactly one manuscript from 13th century Somerset, and scholars remain divided on whether it represents an actual technique or a very elaborate joke at the expense of an unpopular mason.
+&nbsp;
+†This is not made up by the author of this paper, but by someone considerably more creative in 1743.
+&nbsp;
+***The late Professor Willoughby Silt maintained that the proper ratio could only be determined by "feel," which was unhelpful to his students but did result in remarkably good walls. His published paper "The Epistemology of Squishing" remains controversial.
+&nbsp;
+†††Including but not limited to: wheat straw, rice straw, barley straw, hemp fiber, flax, horsehair, cattail leaves, seaweed (coastal regions only), and according to one dubious account from Cornwall, the hair of spurned lovers‡. The effectiveness of this last material remains unverified.
+&nbsp;
+‡The Cornish Historical Society insists this account is "metaphorical," though they cannot explain why several buildings tested positive for human keratin proteins. The matter is not discussed at Society meetings.
+&nbsp;
+‡‡‡The Guild maintains its headquarters in a cob building in Devon that has stood since 1542, which they consider better evidence of cob's viability than any amount of engineering analysis. The building leans fourteen degrees from true vertical, which the Guild describes as "character."
+&nbsp;
+§This grudging admission appears in a footnote within a footnote of the 2,847-page "Structural Engineering Assessment of Traditional Building Methods," and is generally cited as the only interesting part of that document.
+&nbsp;
+§§The Guild of Approximate Measurements has long maintained that "roughly the size of a loaf of bread" is perfectly adequate for construction specifications, which explains much about traditional architecture. Modern building codes disagree, requiring specific dimensions that vary by jurisdiction in ways that suggest codes were written by people who have never actually built anything.
+&nbsp;
+***§The Construction Velocity Institute has calculated that cob building proceeds at an average rate of 0.000003 miles per hour, making it "possibly slower than erosion, and definitely slower than watching erosion." Their research grant was not renewed.
+&nbsp;
+§§§"Nerve" here defined as the point where structural common sense meets artistic vision, usually in the region of windows shaped like hearts or benches that spiral in defiance of load-bearing principles. The Structural Failure Archive contains 47 photographs labeled simply "seemed like a good idea at the time."
+&nbsp;
+*†The National Registry of Building Accidents lists "being crushed by falling cob" surprisingly far down the list, well below "ladder misadventure" and "hammer-related dignity loss." Cob tends to fail slowly, providing ample time for philosophical reflection on one's choices.
+&nbsp;
+†*A study by the Institute of Overconfident Renovators found that 83.7% of people who undertake cob building after watching a two-hour documentary sustain at least minor injuries in the first week, rising to 94.2% for those who begin by saying "this looks easy." The statistics on pride-related injuries are kept separately.
+&nbsp;
+‡*Hour three being when one transitions from "this is fun and primal!" through "my feet hurt" to "I have made a terrible mistake but am too invested to stop now." The Psychological Journal of Traditional Building has an entire issue devoted to this progression.
+&nbsp;
+§*The International Association's publication "Things That Seemed Fine At The Time: A Comprehensive History`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding cob building techniques in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WATTLE_DAUB_WALLS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wattle_daub_walls',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wattle Daub Walls',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_construction_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['cob_building_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wattle_daub_walls' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Wattle Daub Walls: An Examination of Interwoven Construction Methodology and Its Persistent Refusal to Fall Down When Common Sense Suggests It Should</span>
+&nbsp;
+The fundamental principle of wattle and daub construction rests upon a deceptively simple premise: that flexible wooden strips (wattles), when woven between upright stakes in a manner reminiscent of basketry*, can provide sufficient structural integrity to support a coating of daub—a mixture of clay, sand, straw, and animal dung†—which will then harden into a wall capable of withstanding the elements for periods ranging from "surprisingly long" to "longer than most modern construction, actually"††. This technique, which has been independently discovered by cultures across the globe‡, operates on principles that modern materials science has only recently begun to properly appreciate‡‡, though our ancestors knew them well enough to build dwellings that have outlasted three banking systems, two religions, and at least one architectural fashion that insisted everything should be made of glass‡‡‡.
+&nbsp;
+The practical application of wattle and daub requires first the establishment of a sturdy wooden framework*, typically of oak, ash, or whatever tree happened to be nearby and looked sufficiently load-bearing**. The wattles—split hazel rods, willow withies, or similar flexible materials—are then woven horizontally between vertical stakes in a pattern that the Basketweavers' Guild of Ankh-Morpork† describes as "under-over-under-over, unless you're feeling fancy, in which case under-over-over-under, but don't blame us when it collapses"††. The daub is applied by hand†††, packed firmly into the woven framework‡, and left to cure for a period that varies depending on humidity, temperature, and how urgently the inhabitants need a roof over their heads‡‡. Historical records indicate that the optimal daubing technique involves a throwing motion§, though the Institute for Traditional Building Methods§§ strongly recommends against competitive daubing contests§§§, citing the Incident of 1743.
+&nbsp;
+Modern understanding of wattle and daub has been greatly enhanced by materials science research*, which has confirmed what builders knew intuitively: the tensile strength of woven wattles combined with the compressive strength of daub creates a composite material surprisingly resistant to both structural loads and the passage of time†. However, safety considerations remain paramount. The Guild of Concerned Builders†† advises that all wattle and daub construction should be approached with appropriate respect for the materials, awareness of one's limitations, and a good supply of bandages‡‡. Common hazards include splinters from aggressive wattle-weaving*, structural miscalculations leading to "interesting geometric experiments in wall stability"**, and the ever-present risk of daub-related indignities††.
+&nbsp;
+The historical development of wattle and daub spans millennia, with archaeological evidence suggesting its use as far back as the Neolithic period‡, though the Ancient Guild of People Who Put Mud on Sticks† maintains records claiming considerably earlier origins, including what they insist is a wattle and daub shelter built by the first humans to realize that standing in the rain was unpleasant††. The technique spread across Europe, Asia, and the Americas, each culture adding its own refinements: the Anglo-Saxons preferred their daub with added lime‡‡, the Japanese developed a variant using bamboo wattles and rice-straw daub‡‡‡, and the Germans created fachwerk, which is essentially wattle and daub that went to university§. Modern practitioners have rediscovered these ancient methods, often after expensive experiments with materials that turned out to be less durable than mud§§, leading to what the International Journal of Building Materials Irony calls "the Great Humbling of Contemporary Architecture"§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The resemblance to basketry is not coincidental. In fact, the earliest wattle and daub structures were probably constructed by basketweavers who suddenly realized their skills were applicable to buildings. The Worshipful Company of Basketweavers disputes this, claiming that building construction was invented by rogue basketweavers who were expelled from the guild for "thinking too big."
+&nbsp;
+†The precise ratio of these ingredients varies by region, availability, and how much one's neighbors are willing to contribute. The traditional English recipe calls for clay from the subsoil, sand from wherever one can find it, straw from the previous harvest, and cow dung in quantities that suggest someone had strong opinions about the matter. See also: The Malodorous Mixing of 1607*†.
+&nbsp;
+*†An unfortunate incident in Wiltshire wherein an overenthusiastic dauber used fresh dung rather than aged dung, resulting in a cottage that was technically watertight but uninhabitable until the spring of 1609.
+&nbsp;
+††Some wattle and daub structures in England have been continuously inhabited for over 700 years, which is approximately 695 years longer than the average modern homeowner expects to stay in one place. The Persistent Housing Stability Study of 2019 notes that medieval builders appear to have been more optimistic about human settlement patterns than contemporary developers, or possibly just better at mixing daub.
+&nbsp;
+‡The Independent Discovery Phenomenon, as catalogued by the Society for Things People Figure Out Everywhere†, includes fire, agriculture, fermentation, and the realization that if you weave sticks together and pack mud around them, you get a wall. This last discovery has been documented in roughly 847 cultures, plus or minus three‡†.
+&nbsp;
+†The Society's headquarters are themselves made of wattle and daub, which the Society considers either deeply ironic or perfectly appropriate, depending on whom you ask. Their records are stored in a separate stone building, suggesting a certain pragmatism about the archival properties of mud.
+&nbsp;
+‡†The margin of error exists because three cultures claim to have invented wattle and daub but cannot provide evidence due to the fact that their records were kept in wattle and daub buildings that have since returned to earth. The Archives of Cyclical Irony consider this "exquisitely fitting."
+&nbsp;
+‡‡Modern materials science papers with titles like "Tensile and Compressive Properties of Historic Composite Mud-Organic Matrix Systems" essentially conclude that our ancestors were not, in fact, idiots. This research cost approximately £2.3 million in grant funding. The knowledge cost our ancestors approximately nothing, though they did have to live in the walls while figuring it out.
+&nbsp;
+‡‡‡The Council of Architectural Historians notes that glass-based architectural movements typically last between 40 and 60 years before everyone remembers that glass has certain disadvantages, such as transparency, fragility, and an aggressive approach to solar heating. Wattle and daub has outlasted seven such movements and shows no signs of caring about architectural trends.
+&nbsp;
+*The term "sturdy" here is relative. Medieval builders considered a framework sturdy if it stood upright and looked reasonably confident about its structural purpose. Modern building codes are somewhat more specific, requiring calculations, certifications, and at least three different inspectors, all of whom must be convinced that the framework is not harboring secret plans to collapse**†.
+&nbsp;
+**†This concern is not entirely unfounded. The Catalogue of Sudden Structural Disappointments, maintained by the Guild of Building Inspectors, lists 1,847 cases of frameworks that appeared structworthy but turned out to harbor what the Guild delicately terms "deferred gravitational commitments."
+&nbsp;
+**The definition of "nearby" varied considerably. The medieval builder's concept of "nearby" could include trees up to five miles distant, particularly if the tree in question was very good and the builder was very determined. The Forestry Rights and Wrongs of 1351 were largely written in response to builders with expansive definitions of "nearby."
+&nbsp;
+†The Basketweavers' Guild of Ankh-Morpork is not to be confused with the Ankh-Morpork Guild of Basketweavers, who split from the original guild in 1782 over a heated dispute regarding whether willow should be soaked for six hours or eight. Both guilds now maintain that the other's weaving techniques are fundamentally flawed, though outside observers cannot detect any meaningful difference in the resulting baskets or walls.
+&nbsp;
+††This recommendation appears on page 847 of their manual, immediately following seventeen pages of detailed diagrams showing the various ways in which "feeling fancy" has historically led to structural failures. The diagrams are surprisingly thorough and contain what appear to be splash patterns.
+&nbsp;
+†††The use of hands for daubing is traditional, practical, and according to the Sensory Applications in Historical Building Techniques Symposium, "the only way to truly understand the material." However, several historical sources suggest that daubing by hand fell out of favor among the nobility by the 14th century, leading to the development of daubing tools and, eventually, to walls that looked neat but lacked what artisans called "authentic mu`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wattle daub walls in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  BUILDING_PLANNING_LAYOUT,</span>
+<span class="cstat-no" title="statement not covered" >  SITE_PREPARATION_LEVELING,</span>
+<span class="cstat-no" title="statement not covered" >  DRAINAGE_WATER_MANAGEMENT,</span>
+<span class="cstat-no" title="statement not covered" >  SCAFFOLD_CONSTRUCTION_SAFETY,</span>
+<span class="cstat-no" title="statement not covered" >  PULLEY_LIFTING_SYSTEMS,</span>
+<span class="cstat-no" title="statement not covered" >  CRANE_BASIC_MECHANICS,</span>
+<span class="cstat-no" title="statement not covered" >  CONCRETE_FORMWORK,</span>
+<span class="cstat-no" title="statement not covered" >  RAMMED_EARTH_CONSTRUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  COB_BUILDING_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  WATTLE_DAUB_WALLS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

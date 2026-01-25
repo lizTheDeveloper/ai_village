@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:63b547bb",
+  "name": "Ariel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769229183192",
+  "createdAt": 1769229183233,
+  "lastAccessedAt": 1769229183233,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769229183192",
+    "type": "magical"
+  }
+}

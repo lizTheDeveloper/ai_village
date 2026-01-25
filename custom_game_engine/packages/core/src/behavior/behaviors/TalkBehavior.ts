@@ -150,9 +150,9 @@ export class TalkBehavior extends BaseBehavior {
     // NOTE: We do NOT disable steering - agents will stay near conversation center via "arrive" behavior
 
     const relationship = entity.getComponent<RelationshipComponent>(ComponentType.Relationship);
-    const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    const spatialMemory = entity.getComponent(ComponentType.SpatialMemory);
     // SocialMemoryComponent is now lazy-initialized on first social interaction
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     // Check if we need to start a new conversation
     // This happens when 'talk' behavior is selected via priority-based decision
@@ -170,7 +170,7 @@ export class TalkBehavior extends BaseBehavior {
 
       // Resolve 'nearest' to actual agent ID
       if (targetPartnerId === 'nearest') {
-        const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+        const position = entity.getComponent(ComponentType.Position);
         if (position) {
           const nearbyAgents = world
             .query()
@@ -189,7 +189,7 @@ export class TalkBehavior extends BaseBehavior {
             let closest = nearbyAgents[0];
             let closestDist = Infinity;
             for (const other of nearbyAgents) {
-              const otherPos = (other as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+              const otherPos = (other as EntityImpl).getComponent(ComponentType.Position);
               if (!otherPos) continue;
               const dist = Math.hypot(otherPos.x - position.x, otherPos.y - position.y);
               if (dist < closestDist) {
@@ -215,8 +215,8 @@ export class TalkBehavior extends BaseBehavior {
         // Only start if partner is available (not already talking to someone else)
         if (!isInConversation(partnerConversation)) {
           // Calculate conversation center (midpoint between the two agents) for spatial stickiness
-          const myPos = entity.getComponent<PositionComponent>(ComponentType.Position);
-          const partnerPos = partnerImpl.getComponent<PositionComponent>(ComponentType.Position);
+          const myPos = entity.getComponent(ComponentType.Position);
+          const partnerPos = partnerImpl.getComponent(ComponentType.Position);
 
           let centerX: number | undefined;
           let centerY: number | undefined;
@@ -336,7 +336,7 @@ export class TalkBehavior extends BaseBehavior {
     // Update social memory (record this interaction for both parties)
     // Lazy-initialize SocialMemoryComponent on first social interaction
     const activePartnerImpl = activePartner as EntityImpl;
-    const partnerIdentity = activePartnerImpl.getComponent<IdentityComponent>(ComponentType.Identity);
+    const partnerIdentity = activePartnerImpl.getComponent(ComponentType.Identity);
     const partnerName = partnerIdentity?.name || 'someone';
 
     const lazySocialMemory = ensureSocialMemoryComponent(entity);
@@ -350,7 +350,7 @@ export class TalkBehavior extends BaseBehavior {
     });
 
     // Also record for partner
-    const myIdentity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+    const myIdentity = entity.getComponent(ComponentType.Identity);
     const myName = myIdentity?.name || 'someone';
 
     const partnerLazySocialMemory = ensureSocialMemoryComponent(activePartnerImpl);
@@ -474,7 +474,7 @@ export class TalkBehavior extends BaseBehavior {
     if (!sharedMemory) return;
 
     // Add this memory to partner's spatial memory
-    const partnerSpatialMemory = partner.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    const partnerSpatialMemory = partner.getComponent(ComponentType.SpatialMemory);
 
     if (partnerSpatialMemory) {
       addSpatialMemory(
@@ -537,7 +537,7 @@ export class TalkBehavior extends BaseBehavior {
     const featureType = sharedLandmark.metadata.featureType || 'place';
 
     // Add this named landmark to partner's spatial memory
-    const partnerSpatialMemory = partner.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    const partnerSpatialMemory = partner.getComponent(ComponentType.SpatialMemory);
 
     if (partnerSpatialMemory) {
       addSpatialMemory(
@@ -557,7 +557,7 @@ export class TalkBehavior extends BaseBehavior {
 
       // Add to partner's episodic memory
       const partnerMemory = partner.getComponent<MemoryComponent>(ComponentType.Memory);
-      const myIdentity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
+      const myIdentity = entity.getComponent(ComponentType.Identity);
       const myName = myIdentity?.name || 'someone';
 
       // Type guard: check if partnerMemory has addMemory method

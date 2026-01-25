@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:275d9a19",
+  "name": "Theia VIII",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769231303418",
+  "createdAt": 1769231303438,
+  "lastAccessedAt": 1769231303438,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769231303418",
+    "type": "magical"
+  }
+}

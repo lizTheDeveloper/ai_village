@@ -62,8 +62,8 @@ export class TillBehavior extends BaseBehavior {
   readonly name = 'till' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     // Stop moving while deciding where to till
     this.stopMovement(entity);
@@ -181,8 +181,8 @@ export class PlantBehavior extends BaseBehavior {
   readonly name = 'plant' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     // Stop moving while deciding where to plant
     this.stopMovement(entity);
@@ -315,7 +315,7 @@ export class PlantBehavior extends BaseBehavior {
 
       for (const { entity: plantEntity } of plantsNearby) {
         const plantImpl = plantEntity as EntityImpl;
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const plantPos = plantImpl.getComponent(ComponentType.Position);
         if (plantPos && Math.floor(plantPos.x) === x && Math.floor(plantPos.y) === y) {
           return true;
         }
@@ -327,7 +327,7 @@ export class PlantBehavior extends BaseBehavior {
     const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const plantPos = plantImpl.getComponent(ComponentType.Position);
       if (plantPos && Math.floor(plantPos.x) === x && Math.floor(plantPos.y) === y) {
         return true;
       }
@@ -408,7 +408,7 @@ export class WaterBehavior extends BaseBehavior {
   readonly name = 'water' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const position = entity.getComponent(ComponentType.Position)!;
 
     // Stop moving while deciding what to water
     this.stopMovement(entity);
@@ -493,7 +493,7 @@ export class WaterBehavior extends BaseBehavior {
       for (const { entity: plantEntity, distance } of plantsInRadius) {
         const plantImpl = plantEntity as EntityImpl;
         const plant = plantImpl.getComponent<any>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const plantPos = plantImpl.getComponent(ComponentType.Position);
 
         if (!plant || !plantPos) continue;
 
@@ -530,7 +530,7 @@ export class WaterBehavior extends BaseBehavior {
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
       const plant = plantImpl.getComponent<any>(ComponentType.Plant);
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const plantPos = plantImpl.getComponent(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
 
@@ -577,8 +577,8 @@ export class HarvestBehavior extends BaseBehavior {
   readonly name = 'harvest' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     // Stop moving while deciding what to harvest
     this.stopMovement(entity);
@@ -663,7 +663,7 @@ export class HarvestBehavior extends BaseBehavior {
       for (const { entity: plantEntity, distance } of plantsInRadius) {
         const plantImpl = plantEntity as EntityImpl;
         const plant = plantImpl.getComponent<any>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const plantPos = plantImpl.getComponent(ComponentType.Position);
 
         if (!plant || !plantPos) continue;
 
@@ -691,7 +691,7 @@ export class HarvestBehavior extends BaseBehavior {
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
       const plant = plantImpl.getComponent<any>(ComponentType.Plant);
-      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const plantPos = plantImpl.getComponent(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
 
@@ -827,7 +827,7 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
       hydration?: number;
     }
     const plant = plantImpl.getComponent(ComponentType.Plant) as PlantWithHydration | undefined;
-    const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+    const plantPos = plantImpl.getComponent(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
     if (plant.stage === 'dead' || plant.stage === 'decay') continue;
@@ -918,7 +918,7 @@ export function harvestBehaviorWithContext(ctx: import('../BehaviorContext.js').
       speciesId: string;
     }
     const plant = plantImpl.getComponent(ComponentType.Plant) as PlantWithHarvest | undefined;
-    const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+    const plantPos = plantImpl.getComponent(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
     if (!HARVESTABLE_STAGES.includes(plant.stage || '')) continue;

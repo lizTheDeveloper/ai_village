@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:34ff74c4",
+  "name": "Epsilon Oberon",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769244748191",
+  "createdAt": 1769244748195,
+  "lastAccessedAt": 1769244748195,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769244748191",
+    "type": "magical"
+  }
+}

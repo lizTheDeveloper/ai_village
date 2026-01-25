@@ -13,6 +13,10 @@ export class BuildingRenderer {
   // Dimensional building state (per-building)
   private dimensionalState: Map<string, { currentWSlice: number; currentVPhase: number; collapsedUState: number }> = new Map();
 
+  // PERF: Cache formatted building type labels to avoid string operations per frame
+  // Building types are static, so this is a permanent cache
+  private static _labelCache: Map<string, string> = new Map();
+
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
   }
@@ -63,11 +67,15 @@ export class BuildingRenderer {
     this.ctx.font = `${fontSize}px monospace`;
     this.ctx.textAlign = 'center';
 
-    // Format building type for display
-    const label = buildingType
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    // Format building type for display (cached for performance)
+    let label = BuildingRenderer._labelCache.get(buildingType);
+    if (!label) {
+      label = buildingType
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      BuildingRenderer._labelCache.set(buildingType, label);
+    }
 
     // Position label above the sprite
     const labelY = screenY - (isUnderConstruction ? 20 : 8) * zoom;

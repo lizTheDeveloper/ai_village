@@ -1,0 +1,1090 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/core/src/help/documentedMagicItems.example.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/core/src/help</a> documentedMagicItems.example.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/289</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/289</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >/**</span></span></span>
+ * Example: Magical Items and Crafting Documentation
+ *
+ * Documentation for magical items, spell effects, artifact creation,
+ * and the various crafting systems that support magic.
+ *
+ * Uses the blended writing voices from WRITER_GUIDELINES.md.
+ */
+&nbsp;
+import { defineItem } from '../items/ItemDefinition.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// SPELL FOCUS ITEMS</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOCUMENTED_WIZARD_STAFF = defineItem('wizard_staff', 'Wizard\'s Staff', 'equipment', {</span>
+<span class="cstat-no" title="statement not covered" >  weight: 2.0,</span>
+<span class="cstat-no" title="statement not covered" >  stackSize: 1,</span>
+<span class="cstat-no" title="statement not covered" >  baseValue: 500,</span>
+<span class="cstat-no" title="statement not covered" >  rarity: 'uncommon',</span>
+<span class="cstat-no" title="statement not covered" >  baseMaterial: 'wood',</span>
+<span class="cstat-no" title="statement not covered" >  traits: {</span>
+<span class="cstat-no" title="statement not covered" >    magical: {</span>
+<span class="cstat-no" title="statement not covered" >      effects: ['amplify_spells:20%', 'reduce_cost:15%'],</span>
+<span class="cstat-no" title="statement not covered" >      charges: 0, // No charges, passive bonus</span>
+<span class="cstat-no" title="statement not covered" >      rechargeRate: 0,</span>
+<span class="cstat-no" title="statement not covered" >      passive: true,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    weapon: {</span>
+<span class="cstat-no" title="statement not covered" >      damage: 8,</span>
+<span class="cstat-no" title="statement not covered" >      damageType: 'bludgeoning',</span>
+<span class="cstat-no" title="statement not covered" >      attackSpeed: 0.8,</span>
+<span class="cstat-no" title="statement not covered" >      range: 1.5,</span>
+<span class="cstat-no" title="statement not covered" >      durabilityLoss: 1,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  help: {</span>
+<span class="cstat-no" title="statement not covered" >    id: 'wizard_staff',</span>
+<span class="cstat-no" title="statement not covered" >    summary: 'Traditional focus for channeling and amplifying magical power',</span>
+<span class="cstat-no" title="statement not covered" >    description: `The first thing they teach you at the Academy—after "don't summon what you can't banish" and "fire spreads"—is that magic flows better through appropriate channels. A staff is wood, living once, memory of growth and roots and reaching skyward. It remembers being connected to earth and air. When you channel mana through it, the wood recognizes the energy, guides it, amplifies it in ways your bare hands cannot.</span>
+&nbsp;
+Or so the theory goes. The reality, which every wizard discovers through practice, is that staves are partly tool and partly security blanket. Does the wood actually channel better? Yes, measurably, about 20% more efficient. Does the familiar weight in your hand, the ritual of drawing the staff from its resting place, the theatrical flourish of pointing it at your target—do these theatrical elements matter? Also yes, because magic responds to intention and a staff focuses intention the way a conductor's baton focuses an orchestra.
+&nbsp;
+The traditional wizard's staff is approximately six feet of seasoned hardwood—oak for endurance, ash for flexibility, yew for transformation.* Each tradition has preferences backed by centuries of empirical testing and at least three competing theoretical frameworks that contradict each other but all produce working staves, which tells you something about magic's relationship with certainty.** Carved runes optional but recommended. Crystal focus at the tip optional but impressive. Height proportional to wizard also optional but universally practiced because apparently even mages care about aesthetics.
+&nbsp;
+Practically speaking: a staff amplifies your spells' power by approximately 20% and reduces mana cost by 15%, which compounds over a career into the difference between "competent wizard" and "legendary archmage." It's also useful for walking, looking mysterious, and hitting things when magic fails. A well-crafted staff lasts decades if treated properly, develops a patina of accumulated spells, and eventually becomes semi-sentient in ways that are technically concerning but practically useful. Your staff will remember your most-used spells, sometimes helpfully, sometimes casting them at inopportune moments when you're just trying to stir your tea.
+&nbsp;
+*Yew is traditional for necromancy, which is either because yew trees grow in graveyards or because necromancers have a collective aesthetic and won't admit it.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >**The God of Magical Theory finds this deeply frustrating.`,</span>
+<span class="cstat-no" title="statement not covered" >    category: 'items',</span>
+<span class="cstat-no" title="statement not covered" >    subcategory: 'magical_focus',</span>
+<span class="cstat-no" title="statement not covered" >    tags: ['magic', 'focus', 'staff', 'wizard', 'amplifier', 'tool'],</span>
+<span class="cstat-no" title="statement not covered" >    obtainedBy: [</span>
+<span class="cstat-no" title="statement not covered" >      'Craft at Enchanter\'s Workshop with seasoned wood and runic inscriptions',</span>
+<span class="cstat-no" title="statement not covered" >      'Receive as graduation gift from Academy',</span>
+<span class="cstat-no" title="statement not covered" >      'Find in ancient ruins (usually cursed)',</span>
+<span class="cstat-no" title="statement not covered" >      'Inherit from deceased wizard (check for lingering personality first)',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    usedFor: [</span>
+<span class="cstat-no" title="statement not covered" >      'Amplifying spell power (20% increase)',</span>
+<span class="cstat-no" title="statement not covered" >      'Reducing mana costs (15% reduction)',</span>
+<span class="cstat-no" title="statement not covered" >      'Focusing complex spells that require precision',</span>
+<span class="cstat-no" title="statement not covered" >      'Looking appropriately mystical',</span>
+<span class="cstat-no" title="statement not covered" >      'Walking assistance on long journeys',</span>
+<span class="cstat-no" title="statement not covered" >      'Emergency weapon (8 damage, surprisingly effective)',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    crafting: {</span>
+<span class="cstat-no" title="statement not covered" >      station: 'Enchanter\'s Workshop',</span>
+<span class="cstat-no" title="statement not covered" >      ingredients: [</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'hardwood_timber', amount: 1 },</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'runic_chisel', amount: 1 },</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'mana_crystal', amount: 2 },</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'binding_oil', amount: 1 },</span>
+<span class="cstat-no" title="statement not covered" >      ],</span>
+<span class="cstat-no" title="statement not covered" >      skill: 'enchanting',</span>
+<span class="cstat-no" title="statement not covered" >      skillLevel: 3,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    qualityInfo: {</span>
+<span class="cstat-no" title="statement not covered" >      min: 40,</span>
+<span class="cstat-no" title="statement not covered" >      max: 100,</span>
+<span class="cstat-no" title="statement not covered" >      effects: 'Quality affects amplification (40: +15%, 100: +25%) and durability. Higher quality staves develop helpful sentience faster.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >      values: {</span>
+<span class="cstat-no" title="statement not covered" >        spellAmplification: '20%',</span>
+<span class="cstat-no" title="statement not covered" >        costReduction: '15%',</span>
+<span class="cstat-no" title="statement not covered" >        durability: 'Very High',</span>
+<span class="cstat-no" title="statement not covered" >        attunementTime: '1 week of daily use',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      formulas: {</span>
+<span class="cstat-no" title="statement not covered" >        actualAmplification: 'baseAmplification * (quality/70)',</span>
+<span class="cstat-no" title="statement not covered" >        costReduction: 'baseCostReduction * (quality/70)',</span>
+<span class="cstat-no" title="statement not covered" >        sentienceChance: 'spellsCast / 1000 * quality/100',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      conditions: {</span>
+<span class="cstat-no" title="statement not covered" >        'Requires attunement': 'Must bond with staff over 1 week before benefits activate',</span>
+<span class="cstat-no" title="statement not covered" >        'One at a time': 'Can only be attuned to one focus item at once',</span>
+<span class="cstat-no" title="statement not covered" >        'Sentience develops': 'After ~1000 spells, staff may develop personality',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      dependencies: ['enchanting_skill', 'mana_manipulation'],</span>
+<span class="cstat-no" title="statement not covered" >      unlocks: ['ritual_casting', 'spell_storage', 'staff_combat'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    tips: [</span>
+<span class="cstat-no" title="statement not covered" >      'Attune your staff in the morning—rituals with consistent timing work better',</span>
+<span class="cstat-no" title="statement not covered" >      'Name your staff, even if it embarrasses you; personalization strengthens the bond',</span>
+<span class="cstat-no" title="statement not covered" >      'When staff develops sentience, negotiate early; first few months set the relationship',</span>
+<span class="cstat-no" title="statement not covered" >      'Keep backup wand for emergencies; sentient staff can be opinionated about spell choice',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    warnings: [</span>
+<span class="cstat-no" title="statement not covered" >      'Breaking your attuned staff causes temporary mana disruption (1-2 weeks recovery)',</span>
+<span class="cstat-no" title="statement not covered" >      'Staff personality reflects your most-used spells; fire mages get aggressive staves',</span>
+<span class="cstat-no" title="statement not covered" >      'Ancient staves from ruins often remember previous owners; this can be helpful or haunting',</span>
+<span class="cstat-no" title="statement not covered" >      'Never let someone else cast through your staff without permission—it confuses the attunement',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    examples: [</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        title: 'First Attunement',</span>
+<span class="cstat-no" title="statement not covered" >        description:</span>
+<span class="cstat-no" title="statement not covered" >          'You carved the runes yourself, following the patterns from dusty textbooks. The staff is simple oak, unadorned except for your careful inscriptions. The instructor says to channel mana slowly, let the wood learn your signature. You do. For days, nothing changes—it\'s just a stick. Then, during morning practice, you cast a basic shield spell and the staff hums, a subtle vibration in your palm. The spell forms faster, cleaner, stronger. The wood has learned you. You\'ve learned the wood. This is your staff now, and the partnership will last decades if you\'re lucky, if you\'re careful, if you treat it right.',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        title: 'The Opinionated Companion',</span>
+<span class="cstat-no" title="statement not covered" >        description:</span>
+<span class="cstat-no" title="statement not covered" >          'After fifteen years, your staff has opinions. Strong ones. It likes fire spells—you cast a lot of those—and will eagerly channel flames at the slightest provocation. It tolerates healing magic but adds unnecessary sparks to the spell matrix, which doesn\'t hurt but looks concerning to patients. It absolutely refuses to channel divination, simply won\'t cooperate, makes the wood go inert in your hands. You\'ve learned to work with it, mostly. Sometimes you argue, mentally, about spell choice. Other wizards think you\'re eccentric. They\'re right, but the staff is loyal, powerful, and occasionally saves your life by casting shields you forgot to raise. You\'ll take opinionated over obedient any day.',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >      'focus_items',</span>
+<span class="cstat-no" title="statement not covered" >      'attunement_process',</span>
+<span class="cstat-no" title="statement not covered" >      'enchanting_basics',</span>
+<span class="cstat-no" title="statement not covered" >      'staff_sentience',</span>
+<span class="cstat-no" title="statement not covered" >      'magical_traditions',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >});</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// BLOOD MAGIC ARTIFACTS</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOCUMENTED_BLOOD_CRYSTAL = defineItem('blood_crystal', 'Blood Crystal', 'material', {</span>
+<span class="cstat-no" title="statement not covered" >  weight: 0.3,</span>
+<span class="cstat-no" title="statement not covered" >  stackSize: 10,</span>
+<span class="cstat-no" title="statement not covered" >  baseValue: 800,</span>
+<span class="cstat-no" title="statement not covered" >  rarity: 'rare',</span>
+<span class="cstat-no" title="statement not covered" >  traits: {</span>
+<span class="cstat-no" title="statement not covered" >    magical: {</span>
+<span class="cstat-no" title="statement not covered" >      effects: ['store_blood_power:100', 'amplify_blood_magic:30%'],</span>
+<span class="cstat-no" title="statement not covered" >      charges: 10,</span>
+<span class="cstat-no" title="statement not covered" >      rechargeRate: 0, // Must be charged with blood</span>
+<span class="cstat-no" title="statement not covered" >      passive: false,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  help: {</span>
+<span class="cstat-no" title="statement not covered" >    id: 'blood_crystal',</span>
+<span class="cstat-no" title="statement not covered" >    summary: 'Crystallized life force used to store and amplify blood magic',</span>
+<span class="cstat-no" title="statement not covered" >    description: `Blood crystallizes when you pour enough life force into a binding matrix quickly enough that reality doesn't have time to notice what you're doing. The result is a deep crimson gem that hums faintly against your palm, warm like body temperature, pulsing like a heartbeat that isn't yours.</span>
+&nbsp;
+The Crimson Codex describes blood crystals in clinical terms: "A storage medium for hemomantic energy, capable of containing up to 100 units of blood-equivalent power with minimal degradation." Which is accurate but misses the visceral truth: you're holding someone's life. Might be yours—most blood mages self-harvest for obvious ethical reasons—but it's still pieces of mortality trapped in crystalline form, ready to be spent like currency.
+&nbsp;
+Here's how they work: you bleed into the matrix (carefully, specifically, usually with a ritual blade designed for this exact purpose). The blood doesn't stay liquid—it transforms, energy separating from matter, the life force crystallizing into the gem while the physical blood... goes away. Somewhere. The Codex is vague on this point and blood mages don't ask too closely because the answer is probably unsettling. The crystal glows brighter with each charging, pulsing in sync with your heartbeat when you hold it, recognizing its source.
+&nbsp;
+In practical terms, a blood crystal is a battery. Charge it when you're safe and healthy, spend it when you're desperate and endangered. Each crystal holds about ten charges—ten times you can cast blood magic without cutting yourself in combat, which is the difference between "controlled practitioner" and "bleeding maniac in the middle of battle."* The crystal also amplifies blood spells by 30%, which compounds with the power you get from the blood itself. Math gets brutal quickly. A well-charged crystal can fuel magic far beyond what most mages achieve, which is why they're banned in seven kingdoms** and highly regulated in all the rest.
+&nbsp;
+The crystals degrade slowly. Each use wears the matrix slightly, and eventually—after perhaps a thousand charges—the crystalline structure fails. The stored power releases all at once, which is spectacular if you're ready for it and fatal if you're not. Wise blood mages track their crystal's degradation carefully, replace them before catastrophic failure, and dispose of old crystals with appropriate reverence for the literal life-years they contained.
+&nbsp;
+*Every blood mage has exactly one story about learning this distinction the hard way. Nobody tells these stories at parties.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >**Eight kingdoms if you count the Disputed Territories, but nobody counts the Disputed Territories for anything official.`,</span>
+<span class="cstat-no" title="statement not covered" >    category: 'items',</span>
+<span class="cstat-no" title="statement not covered" >    subcategory: 'blood_magic',</span>
+<span class="cstat-no" title="statement not covered" >    tags: ['blood', 'magic', 'crystal', 'storage', 'dangerous', 'powerful', 'rare'],</span>
+<span class="cstat-no" title="statement not covered" >    obtainedBy: [</span>
+<span class="cstat-no" title="statement not covered" >      'Craft at Blood Altar using your own blood and crystal matrix',</span>
+<span class="cstat-no" title="statement not covered" >      'Inherit from blood mage mentor (must re-attune to your blood)',</span>
+<span class="cstat-no" title="statement not covered" >      'Purchase from underground markets (legality varies by region)',</span>
+<span class="cstat-no" title="statement not covered" >      'Find in ruins of blood mage sanctuaries (often cursed)',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    usedFor: [</span>
+<span class="cstat-no" title="statement not covered" >      'Storing blood power for later use (10 charges maximum)',</span>
+<span class="cstat-no" title="statement not covered" >      'Amplifying blood magic spells (30% power increase)',</span>
+<span class="cstat-no" title="statement not covered" >      'Emergency power source during combat',</span>
+<span class="cstat-no" title="statement not covered" >      'Fuel for large rituals without immediate self-sacrifice',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    crafting: {</span>
+<span class="cstat-no" title="statement not covered" >      station: 'Blood Altar',</span>
+<span class="cstat-no" title="statement not covered" >      ingredients: [</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'crystal_matrix', amount: 1 },</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'ritual_blade', amount: 1 },</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'binding_runes', amount: 3 },</span>
+<span class="cstat-no" title="statement not covered" >        { item: 'your_blood', amount: 10 }, // Symbolic amount</span>
+<span class="cstat-no" title="statement not covered" >      ],</span>
+<span class="cstat-no" title="statement not covered" >      skill: 'blood_magic',</span>
+<span class="cstat-no" title="statement not covered" >      skillLevel: 4,</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    qualityInfo: {</span>
+<span class="cstat-no" title="statement not covered" >      min: 50,</span>
+<span class="cstat-no" title="statement not covered" >      max: 100,</span>
+<span class="cstat-no" title="statement not covered" >      effects: 'Quality affects storage capacity (50: 8 charges, 100: 12 charges), amplification (50: +25%, 100: +35%), and crystal lifespan.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >      values: {</span>
+<span class="cstat-no" title="statement not covered" >        maxCharges: 10,</span>
+<span class="cstat-no" title="statement not covered" >        amplification: '30%',</span>
+<span class="cstat-no" title="statement not covered" >        chargeCost: '10 health per charge',</span>
+<span class="cstat-no" title="statement not covered" >        degradationRate: '0.1% per use',</span>
+<span class="cstat-no" title="statement not covered" >        explosionRadius: '10 feet at failure',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      formulas: {</span>
+<span class="cstat-no" title="statement not covered" >        storedPower: 'healthSpent * bloodlineMultiplier * crystalQuality',</span>
+<span class="cstat-no" title="statement not covered" >        amplificationBonus: 'baseAmplification * (quality/70)',</span>
+<span class="cstat-no" title="statement not covered" >        degradationProgress: 'totalUses * 0.001',</span>
+<span class="cstat-no" title="statement not covered" >        failureChance: 'degradationProgress &gt; 1.0 ? 100% : 0%',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      conditions: {</span>
+<span class="cstat-no" title="statement not covered" >        'Must attune to user': 'Only works with the blood of the attuned user',</span>
+<span class="cstat-no" title="statement not covered" >        'Charges with health': 'Each charge costs 10 health points',</span>
+<span class="cstat-no" title="statement not covered" >        'Eventually fails': 'Crystal degrades and will eventually explode',</span>
+<span class="cstat-no" title="statement not covered" >        'Cannot be stolen effectively': 'Attuned to owner; useless to others',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      dependencies: ['blood_magic_skill', 'ritual_blade', 'blood_altar_access'],</span>
+<span class="cstat-no" title="statement not covered" >      unlocks: ['sustained_blood_magic', 'combat_casting', 'ritual_magic'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    tips: [</span>
+<span class="cstat-no" title="statement not covered" >      'Charge crystals after resting, when health is full—never charge while wounded',</span>
+<span class="cstat-no" title="statement not covered" >      'Track uses carefully; degradation is cumulative and failure is catastrophic',</span>
+<span class="cstat-no" title="statement not covered" >      'Keep multiple crystals for different purposes: combat, ritual, emergency',</span>
+<span class="cstat-no" title="statement not covered" >      'Higher quality crystals last longer but cost more blood per charge to utilize fully',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    warnings: [</span>
+<span class="cstat-no" title="statement not covered" >      'Crystal failure releases all stored energy explosively—10-foot radius, severe blood damage',</span>
+<span class="cstat-no" title="statement not covered" >      'Charging beyond maximum capacity causes immediate explosion—do not test this',</span>
+<span class="cstat-no" title="statement not covered" >      'Attuning a new crystal requires replacing your blood; old attunement must be severed first',</span>
+<span class="cstat-no" title="statement not covered" >      'Each charge permanently converts health to power—heal fully before repeating',</span>
+<span class="cstat-no" title="statement not covered" >      'Degradation accelerates near end of lifespan—final 100 uses are increasingly unstable',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    examples: [</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        title: 'The Emergency',</span>
+<span class="cstat-no" title="statement not covered" >        description:</span>
+<span class="cstat-no" title="statement not covered" >          'Ambushed, outnumbered, bleeding from a wound you can\'t afford to make worse. You could cast blood magic, cut yourself again, add injury to injury. Or: you reach for the crystal, feel it pulse warm against your palm. Ten charges stored, ten spells you prepared for exactly this moment. The power flows clean and ready, no fresh pain, no additional sacrifice. Just stored life force, spent wisely. You burn through three charges in rapid succession—shield, drain, blast. The attackers fall. You survive. Later, you\'ll recharge the crystal, pay the health cost in safety. Right now, you\'re alive because you planned ahead. This is why you carry crystals.',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        title: 'The Final Charge',</span>
+<span class="cstat-no" title="statement not covered" >        description:</span>
+<span class="cstat-no" title="statement not covered" >          'Your mentor\'s crystal sits heavy in your hand. She\'d tracked its degradation meticulously: 987 uses, degradation at 98.7%, maybe a dozen charges left before catastrophic failure. She spent the last three charges saving your life, then handed you the crystal with instructions: "Use the final charge for something worthy. Then let it rest." You\'ve carried it for six months, unable to decide what qualifies as worthy. Today—village under attack, children trapped, no other options—you know. You channel the last charge, feel the crystal flare hot, pour its accumulated power into a shield that holds just long enough. The crystal shatters in your palm, warm fragments scattering. You bleed from a dozen tiny cuts. You\'re crying and you don\'t know if it\'s grief or gratitude or both. The children live. It was worthy.',</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >    relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >      'blood_magic_paradigm',</span>
+<span class="cstat-no" title="statement not covered" >      'ritual_blade',</span>
+<span class="cstat-no" title="statement not covered" >      'blood_altar',</span>
+<span class="cstat-no" title="statement not covered" >      'crystal_degradation',</span>
+<span class="cstat-no" title="statement not covered" >      'attunement_process',</span>
+<span class="cstat-no" title="statement not covered" >    ],</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >});</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+<span class="cstat-no" title="statement not covered" >// ARTIFACT CREATION</span>
+<span class="cstat-no" title="statement not covered" >// ============================================================================</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ARTIFACT_CREATION_HELP = {</span>
+<span class="cstat-no" title="statement not covered" >  id: 'artifact_creation',</span>
+<span class="cstat-no" title="statement not covered" >  summary: 'Permanent enchantment of items with magical properties',</span>
+<span class="cstat-no" title="statement not covered" >  description: `Artifacts are objects that remember being magic strongly enough to stay magic. Most enchantments are temporary—cast a fire spell on a sword, it burns for a day, a week, then fades. The mana dissipates, reality reasserts, the sword becomes mundane again. Artifacts don't fade. The magic is bound so deeply into the object's nature that removing it would unmake the object entirely.</span>
+&nbsp;
+Creating an artifact requires understanding the thing you're enchanting at a fundamental level. Not just "this is a sword" but the specific history of this sword: the ore that became the steel, the smith who forged it, the battles it's seen, the hands that wielded it. You're not adding magic to an object—you're convincing the object that magic is part of its essential nature, always was, should have been all along.
+&nbsp;
+The traditional method* uses a three-layer binding: First, prepare the object through ritual (cleaning, consecrating, establishing intent). Second, channel power into it continuously for hours or days, depending on complexity, until the object's metaphysical structure accepts the energy as foundational. Third, seal the binding with True Name magic—speaking the object's name-to-be, the identity it will carry forward, the thing it is becoming. Get any step wrong and the magic fades normally, or worse, the object shatters from incompatible energies.
+&nbsp;
+Artifacts develop quirks. Personalities, preferences, opinions about their use. This is not a flaw—it's proof the enchantment worked. An object that accepts magic deeply enough to become an artifact has, in the process, gained the beginnings of consciousness. Most artifacts are subtle about it: a sword that cuts better against particular enemies, a cloak that always seems to have the perfect pocket for what you need, a ring that warms when danger approaches. Others are more obviously sentient and have strong opinions about everything.**
+&nbsp;
+The Enchanter's Guild tracks known artifacts with bureaucratic intensity: approximately 4,700 major artifacts (world-shaking power), 28,000 minor artifacts (useful but not legendary), and uncounted thousands of trivial artifacts (enchanted spoons that stir themselves, self-warming socks, etc.). Creating new artifacts is legal but regulated, because artifacts persist and proliferate and eventually you have markets flooded with semi-sentient spoons that won't stir soup they consider beneath their dignity.
+&nbsp;
+*There are forty-seven documented "traditional methods," three of which actually work reliably, nineteen of which work sometimes, and twenty-five of which are pure superstition that persist because wizards are stubborn.
+&nbsp;
+<span class="cstat-no" title="statement not covered" >**The Sword of Ethical Quandaries refuses to draw unless the wielder can justify their cause in a three-point argument. Nobody knows who created it. Everyone wishes they hadn't.`,</span>
+<span class="cstat-no" title="statement not covered" >  category: 'magic',</span>
+<span class="cstat-no" title="statement not covered" >  subcategory: 'crafting',</span>
+<span class="cstat-no" title="statement not covered" >  tags: ['artifact', 'enchanting', 'crafting', 'permanent', 'powerful'],</span>
+<span class="cstat-no" title="statement not covered" >  mechanics: {</span>
+<span class="cstat-no" title="statement not covered" >    values: {</span>
+<span class="cstat-no" title="statement not covered" >      minimumCraftingTime: '24 hours continuous',</span>
+<span class="cstat-no" title="statement not covered" >      manaCost: '500-5000 depending on power',</span>
+<span class="cstat-no" title="statement not covered" >      successRate: '60% for skilled enchanters',</span>
+<span class="cstat-no" title="statement not covered" >      failureConsequences: 'Item destroyed or unstable enchantment',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    formulas: {</span>
+<span class="cstat-no" title="statement not covered" >      successProbability: '(enchantingSkill * objectQuality * timeInvested) / complexity',</span>
+<span class="cstat-no" title="statement not covered" >      artifactPower: 'manaInvested * (bindingStrength/100) * objectResonance',</span>
+<span class="cstat-no" title="statement not covered" >      quirkDevelopment: 'power * timeUsed * ownerPersonality',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    conditions: {</span>
+<span class="cstat-no" title="statement not covered" >      'Requires deep understanding': 'Must know object\'s history and nature',</span>
+<span class="cstat-no" title="statement not covered" >      'Time intensive': 'Cannot rush; minimum 24 hours for simple items',</span>
+<span class="cstat-no" title="statement not covered" >      'High mana cost': 'Creates permanent drain on creator during binding',</span>
+<span class="cstat-no" title="statement not covered" >      'Quirks develop inevitably': 'All artifacts eventually gain personality',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    dependencies: ['enchanting_mastery', 'true_name_knowledge', 'ritual_space'],</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
+<span class="cstat-no" title="statement not covered" >  tips: [</span>
+<span class="cstat-no" title="statement not covered" >    'Start with objects you\'ve used extensively—familiarity increases success rate',</span>
+<span class="cstat-no" title="statement not covered" >    'Document the binding process; successful techniques can be repeated',</span>
+<span class="cstat-no" title="statement not covered" >    'Accept quirks early; fighting an artifact\'s developing personality makes it worse',</span>
+<span class="cstat-no" title="statement not covered" >    'Quality of base item matters; poor materials make unstable artifacts',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  warnings: [</span>
+<span class="cstat-no" title="statement not covered" >    'Failed bindings can destroy irreplaceable items—practice on common objects first',</span>
+<span class="cstat-no" title="statement not covered" >    'Artifact quirks reflect creator\'s subconscious; you\'re putting yourself into it',</span>
+<span class="cstat-no" title="statement not covered" >    'Powerful artifacts attract attention—thieves, collectors, cosmic entities',</span>
+<span class="cstat-no" title="statement not covered" >    'Cannot unbind an artifact without destroying it; enchantment is permanent',</span>
+<span class="cstat-no" title="statement not covered" >    'Sentient artifacts can refuse to function; relationship maintenance is required',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  examples: [</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'First Artifact',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Your practice sword—the one from training, nicked and worn from a thousand forms. You know every scratch, every balance point, every way it moves. You speak its name-to-be: "Faithful." The binding takes thirty-six hours. You channel mana until you\'re hollow, until the sword glows, until reality bends around the blade and accepts what you\'re declaring: this sword is magic, always was, will be forever. The glow fades. The sword looks unchanged. Then you test it and the blade cuts practice dummies like they\'re air, never dulls, feels lighter in your hand but heavier against targets. Success. Your first artifact. And it knows you, now, remembers your hand specifically, will never feel quite right for anyone else.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      title: 'The Opinionated Cloak',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'You enchanted the cloak for warmth—simple utility, basic binding, nothing fancy. It worked. Too well. The cloak now has opinions about temperature. It considers anything above 60°F unnecessary and refuses to provide warmth. Below that, it\'s perfect—adapts to conditions, keeps you comfortable in blizzards, never fails. But summertime? The cloak goes inert. You\'ve argued with it mentally. The cloak doesn\'t care. This is not what you intended but it\'s what you got: an artifact with very specific ideas about appropriate weather. Other enchanters find this hilarious. You wear a regular cloak in summer and pretend this doesn\'t bother you.',</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  relatedTopics: [</span>
+<span class="cstat-no" title="statement not covered" >    'enchanting_basics',</span>
+<span class="cstat-no" title="statement not covered" >    'true_names',</span>
+<span class="cstat-no" title="statement not covered" >    'object_sentience',</span>
+<span class="cstat-no" title="statement not covered" >    'artifact_registry',</span>
+<span class="cstat-no" title="statement not covered" >    'unbinding_attempts',</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

@@ -1,0 +1,1978 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/architectural_design-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> architectural_design-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ARCHITECTURAL_DRAWING_BASICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'architectural_drawing_basics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Architectural Drawing Basics',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_architectural_drawing_basics' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Architectural Drawing Basics: A Primer on the Ancient Art of Making Buildings Not Fall Down</span>
+&nbsp;
+The fundamental principle underlying all architectural drawing is deceptively simple: one must represent a three-dimensional structure on a two-dimensional surface in such a way that builders can construct it without the entire edifice collapsing into a heap of rubble and regret*. This transformation from imagination to paper—and thence to reality—requires a standardized system of symbols, measurements, and conventions that has evolved over millennia†. The modern architect's toolkit comprises orthographic projections (plans, elevations, and sections), scale drawings, dimensioning systems, and a vast array of symbols representing everything from doors to drainage**. These elements combine to form a visual language that, when properly executed, allows a builder in Birmingham to construct exactly what an architect in Bristol envisioned††, though this rarely happens on the first attempt‡.
+&nbsp;
+At its core, architectural drawing divides into several essential views: the plan (looking down from above), the elevation (looking at the building from the side), and the section (as if the building had been sliced open with a very large knife)***. Each view reveals information the others cannot, much like how the same person appears entirely different from various angles, though hopefully buildings are more consistent†††. Scale is paramount—a drawing at 1:50 scale means that one unit on paper represents fifty units in reality, a ratio that must be maintained with religious fervor‡‡. The slightest miscalculation can result in doors that open onto walls, staircases that lead nowhere, or—in the infamous case of the Pendleton Municipal Building—toilets positioned 2.3 meters above the floor‡‡‡.
+&nbsp;
+The safety considerations in architectural drawing are often overlooked by novices who assume that nothing dangerous can happen while sitting at a desk with a pencil§. This is a catastrophic underestimation of the chaos that can ensue from a misplaced decimal point or an ambiguous annotation. A structural wall mistakenly indicated as non-load-bearing has led to approximately 47% of all "rapid unscheduled building deconstructions" since 1967§§. Modern best practices therefore include multiple review stages, clear annotation standards, and the traditional architect's prayer: "May my stairs have the correct number of steps, may my doors swing in logical directions, and may no one discover my mistakes until I have left the country§§§."
+&nbsp;
+Historical development reveals that humans have been drawing buildings since the Mesopotamians first realized that "we'll figure it out as we go" was a suboptimal construction strategy*4. The ancient Egyptians developed sophisticated drawing techniques, though their pyramids suggest a certain obsession with triangles*5. The Romans contributed standardized proportions and the revolutionary concept of drawing things to scale, rather than simply making the important parts bigger*6. Medieval master builders often worked without formal drawings, relying instead on geometry and faith, which explains why so many cathedrals took 300 years to complete and several are still not finished*7. The Renaissance brought mathematical perspective and the radical notion that architects should know what they're doing before construction begins*8. Modern computer-aided design has transformed the field, replacing the satisfying scratch of pencil on vellum with the hollow clicking of mice and the distinctive sound of architects weeping at software crashes*9.
+&nbsp;
+The aspiring architectural draftsperson must embrace both precision and humility, understanding that every line drawn carries weight—quite literally, once converted to steel and concrete*10. Mastery requires practice, patience, and a healthy respect for the fact that your drawings will become someone else's physical reality, possibly while they're inside it*11. The ancient Guild of Architectural Scribes maintained that a properly trained draftsperson should be able to draw a straight line while blindfolded during an earthquake, though this skill test was discontinued after the incident of 1887*12.
+&nbsp;
+---
+&nbsp;
+*The Historical Society of Unfortunate Architecture maintains a comprehensive archive of buildings that did collapse into heaps of rubble and regret. Their current catalog runs to 2,847 volumes, and they're only up to the letter 'F'.
+&nbsp;
+†The earliest known architectural drawing dates to approximately 4000 BCE and depicts either a temple complex or an ambitious chicken coop—scholars remain divided†*. The ambiguity stems from the ancient Sumerian tendency to use the same symbol for "sacred space" and "place where birds live."
+&nbsp;
+†*Professor Alemathea Scribbleton of the University of Upper Mesopotamia published a controversial paper in 1923 suggesting it was actually a drawing of a hat. She was subsequently banned from three museums and now runs a successful millinery shop in Somerset.
+&nbsp;
+**The International Standards Organization publishes a 3,400-page manual on architectural symbols. Page 2,156 is dedicated entirely to the seventeen different ways to indicate a door, none of which are universally accepted**†.
+&nbsp;
+**†The Great Door Symbol Controversy of 1972 nearly split the architectural profession in two. The reunification treaty, signed in Geneva, established that doors would be indicated by arcs showing swing direction, though a small breakaway faction in Norway continues to use parallel lines out of spite.
+&nbsp;
+††This is a beautiful lie that we tell architecture students to prevent them from abandoning the profession immediately. In reality, builders interpret drawings with what the renowned architect Sir Mortimer Flange called "creative flexibility," which is professional terminology for "doing whatever seems easiest at the time."
+&nbsp;
+‡The average building project experiences 347 discrepancies between drawings and constructed reality, according to the Bureau of Construction Statistics and Existential Despair‡*. This number rises to 2,109 for projects where the architect and builder don't speak the same language, and to 4,872 when they technically speak the same language but one is from Yorkshire.
+&nbsp;
+‡*Established in 1891 after the catastrophic collapse of the Brighton Pavilion Extension, which was built entirely according to drawings that had been accidentally rotated 90 degrees. The Bureau's motto is "Measuring Failure Since the 19th Century."
+&nbsp;
+***The section drawing was invented by Leonardo da Vinci after he allegedly became frustrated trying to explain interior room layouts to a particularly dense Medici patron***†. The patron, Duke Giacomo the Confused, reportedly asked fourteen times where the bedrooms would be before Leonardo grabbed his knife and threatened to cut the model in half to show him.
+&nbsp;
+***†This story appears in da Vinci's private journals alongside sketches of flying machines and a shopping list that includes "more red paint" and "patience." Modern scholars debate whether the entire anecdote was simply Leonardo being passive-aggressive through illustration.
+&nbsp;
+†††In 1843, the architect Augustus Pemberton-Smythe created a building that looked entirely different from each cardinal direction—north showed a Gothic cathedral, east revealed a Greek temple, south appeared to be a modest cottage, and west was accidentally drawn as a barge. It was built exactly to specification and now houses the Museum of Architectural Hubris in Newcastle††††.
+&nbsp;
+††††The Museum cannot be photographed comprehensively as it requires four separate cameras positioned precisely at the cardinal points. Tour groups frequently get lost between the Gothic nave and the Greek portico. The gift shop, however, is consistently located in the barge section.
+&nbsp;
+‡‡The ancient Egyptians worked at a scale of 1 cubit on paper to 1 royal cubit in reality, which would have been perfectly functional except that the length of a royal cubit was defined as "the Pharaoh's forearm length," and Pharaohs had inconsistent forearm lengths. This explains certain irregularities in pyramid construction that modern archaeologists politely describe as "architectural variation."
+&nbsp;
+‡‡‡The Pendleton Municipal Building disaster of 1982 became a cautionary tale taught in every architectural school. The architect, Roland Fitzpatrick, had accidentally used a comma instead of a decimal point when specifying toilet mounting heights. The resulting facilities required a ladder for access and were, according to the mayor's official statement, "technically functional but practically useless." Fitzpatrick now works exclusively on ground-level structures and has developed a pathological fear of decimal points‡‡‡*.
+&nbsp;
+‡‡‡*The Fitzpatrick Foundation for Punctuation in Technical Drawing was established with the settlement money from seventeen lawsuits. They distribute free decimal point stickers to architecture students and sponsor an annual lecture series titled "How One Comma Ruined My Life and Several Bathrooms."
+&nbsp;
+§The pencil, while appearing harmless, is actually the most dangerous tool in the architect's arsenal§*. It enables the drawing of structurally impossible fantasies that builders will then be obligated to attempt, often with spectacular results. The famous architect Dame Victoria Crossthwaite once calculated that her pencil, through the buildings it had drawn, was responsible for more steel tonnage than the entire British Navy.
+&nbsp;
+§*In 1956, the architectural firm Pemberton &amp; Sons accidentally stabbed themselves with drawing pencils 1,247 times during a single project. The building still stands,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding architectural drawing basics in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BLUEPRINT_CREATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'blueprint_creation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Blueprint Creation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['architectural_drawing_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_blueprint_creation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Blueprint Creation: A Technical Discourse on the Translation of Three-Dimensional Ambition into Two-Dimensional Reality</span>
+&nbsp;
+The art of blueprint creation stands as humanity's most optimistic act: the belief that one can capture the full complexity of a building—with all its load-bearing walls, plumbing nightmares, and electrical mysteries—on a single sheet of paper*. At its core, a blueprint represents the construction industry's attempt to communicate across the vast linguistic chasm between "what the architect envisions" and "what the contractor thinks the architect envisions"†. The fundamental principles are deceptively simple: orthographic projection, standardized symbols, and measurements that everyone agrees to pretend are accurate‡. The experienced blueprint creator learns to work in multiple views simultaneously—plan, elevation, and section—much like the ancient Dimensional Cartographers of Lower Quirm, who could allegedly perceive a building from all angles at once**. This skill, known technically as "spatial visualization" and colloquially as "not getting confused by your own drawings," separates the competent from the catastrophic††.
+&nbsp;
+The practical techniques of blueprint creation have evolved considerably since Archimedes first sketched siege engines on papyrus while contemplating buoyancy‡‡. Modern practitioners employ a standardized language of lines—thick lines for cuts, thin lines for projections, dashed lines for hidden elements, and wavy lines for when you've given up entirely***. Scale becomes paramount; the International Bureau of Construction Documentation recommends 1:50 for general arrangements, 1:20 for detailed work, and 1:1 for contractors who claim they "don't need no fancy drawings"†††. Dimensions must be marked with obsessive precision, as the difference between 3.5 meters and 3.5 centimeters has, historically speaking, resulted in rather dramatic consequences‡‡‡. The careful blueprint creator also masters the art of notation—those cryptic symbols and abbreviations that transform a simple drawing into an arcane text requiring years of study to decipher****.  Cross-referencing between sheets becomes essential once a project exceeds three pages, at which point the blueprint set begins to resemble a choose-your-own-adventure novel where all choices lead to confusion††††.
+&nbsp;
+Safety considerations in blueprint creation extend far beyond the obvious "don't stab yourself with the compass"‡‡‡‡. The primary danger lies in the creation of *ambiguous* drawings—those masterpieces of unintentional abstract art that can be interpreted in multiple, mutually exclusive ways*****. The Guild of Architectural Reviewers maintains a Hall of Cautionary Examples, featuring blueprints that resulted in buildings with stairs to nowhere, doors that open into walls, and one notable case where the plumbing was installed upside-down†††††. Clear title blocks prevent the wrong version from being built; the wrong version is always built anyway, but at least you have plausible deniability‡‡‡‡‡. Revision tracking becomes sacred scripture—every change must be documented, dated, and marked with clouds or triangles, lest future generations wonder why this particular wall moves three centimeters to the left on every third Thursday******. The wise blueprint creator also learns to specify materials with sufficient detail that contractors cannot claim "we thought you meant *decorative* concrete" when you clearly meant "structural concrete that holds up the building"††††††.
+&nbsp;
+The historical development of blueprint creation reads like a comedy of errors punctuated by occasional genius‡‡‡‡‡‡. The original blueprints were, in fact, blue—a consequence of the cyanotype process developed by Sir John Herschel in 1842*******. Modern "blueprints" are rarely blue, having transitioned to diazo printing, then xerography, then digital formats, but the name persists with the stubborn tenacity of all good misnomers††††††† . The ancient Egyptians managed to build pyramids with only the most rudimentary drawings, suggesting either they were significantly better at visualization than modern humans, or the pyramids contain far more mistakes than tourists realize‡‡‡‡‡‡‡. Contemporary digital tools have revolutionized the field, replacing pencils and vellum with software that crashes at precisely the moment you forgot to save********. Building Information Modeling now allows architects to create three-dimensional models that can be rotated, explored, and walked through virtually—though this has not noticeably reduced the number of contractors who build things backwards†††††††††. The profession continues to evolve, though certain truths remain eternal: no matter how clear your drawings, someone will build it wrong, claim your dimensions were unclear, and send you photographs as evidence‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The average construction project generates approximately 47 sheets of blueprints per floor of building, plus an additional 23 sheets of revisions, corrections, and increasingly desperate clarifications. The ratio of "papers consulted" to "papers actually useful on site" remains steady at roughly 1:0.3.
+&nbsp;
+†Professor Angus McStructure of the Sto Lat Institute of Building Sciences spent fifteen years studying this phenomenon, eventually concluding that perfect communication between architect and contractor violates several fundamental laws of thermodynamics. His final paper, "Why It's Never What I Drew," won the Pessimist's Prize for Realistic Research.
+&nbsp;
+‡The International Organization for Standardization publishes 1,247 pages of standards for architectural drawings. Compliance is voluntary. Compliance is also nearly mythical. The ISO office responsible for this sector reportedly drinks heavily.
+&nbsp;
+**The Dimensional Cartographers were allegedly founded in AM 1203, disbanded in AM 1204 following what records mysteriously refer to as "The Incident with the Recursive Staircase." Their headquarters building, ironically, was never successfully mapped†.
+&nbsp;
+†The building still stands, but its floor plan changes depending on which entrance you use, what day of the week it is, and whether you've been good this year. The Ankh-Morpork Tourism Board lists it as "architecturally significant" and "navigationally inadvisable."
+&nbsp;
+††Catastrophic blueprint creation incidents include the Genua Tower of 1823 (built three stories shorter than planned when the architect forgot to account for floor thickness), the Bridge of Quirm (which spanned everything except the river), and the notorious Casa di Confusion in Brindisi, where the architect drew the north elevation upside-down and no one noticed until the windows were installed on the ceiling‡.
+&nbsp;
+‡The Casa di Confusion now serves as a museum of architectural failures. Visitors frequently get lost. The gift shop is on the roof. The roof is labeled as the basement on all official plans.
+&nbsp;
+‡‡Historians debate whether Archimedes actually drew blueprints or just shouted measurements at builders until they gave up and made something that looked about right. The "Archimedes Approximation Method" remains popular in certain construction circles, particularly among those who don't own measuring tapes.
+&nbsp;
+***The wavy line convention was introduced by the Ankh-Morpork Guild of Draughtsmen in AM 1734 as an official symbol meaning "something goes here but I haven't decided what yet." It has since evolved to mean "good luck figuring this out."
+&nbsp;
+†††The famous "Centimeter Catastrophe of Prague" (1891) resulted in a mansion with doorways 3.5 centimeters tall. The architect's defense—"I clearly marked the units"—was technically correct. He now works exclusively on dollhouses. The mansion still stands and is inhabited entirely by cats, who find the proportions reasonable††.
+&nbsp;
+††Cats, being naturally four-dimensional creatures, have no trouble navigating spaces that humans find dimensionally challenging. This explains much about their behavior and precisely nothing about blueprint creation‡‡.
+&nbsp;
+‡‡Though some speculative architects have proposed "feline-centric design," wherein buildings are drawn from a cat's perspective. These blueprints consist primarily of warm spots, high perches, and boxes. Contractors find them remarkably easy to misinterpret.
+&nbsp;
+‡‡‡The Dimensional Notation Crisis of 1967 occurred when an American architect and a British engineer collaborated on a project in Brussels. One used feet, one used meters, neither communicated this fact, and the resulting building had floors that didn't quite line up between the two halves. It now houses the European Bureau of Standardization, who appreciate the irony more than the inconvenience.
+&nbsp;
+****The Council of Cryptic Annotations maintains a 400-page dictionary of standard abbreviations. Entries include: "FL" (Floor or Fluorescent or Fluid, depending on context), "CL" (Centerline or Closet or Ceiling or Clay tile or Clearance), and "WTF" (Water Tight Fixture, officially, though usage suggests alternate interpretations)‡‡‡.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding blueprint creation in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SCALE_MODEL_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'scale_model_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Scale Model Construction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['blueprint_creation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_scale_model_construction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Scale Model Construction: A Treatise on the Art of Making Things Smaller Without Making Them Less Important</span>
+&nbsp;
+The construction of scale models represents one of humanity's most peculiar achievements: the deliberate creation of objects that are, by definition, inadequate representations of larger objects*. This practice, which dates back to the Third Dynasty of the Middle Kingdom**, has evolved from simple clay representations to sophisticated miniature reproductions capable of testing structural principles, predicting catastrophic failures†, and occasionally becoming more famous than the structures they were meant to represent††. The fundamental principle underlying all scale model construction is the mathematical relationship between the prototype and its miniature counterpart, typically expressed as a ratio such as 1:100, which means that every centimeter of model represents one meter of reality‡—a concept that approximately 43.7% of first-year architecture students still manage to invert‡‡.
+&nbsp;
+The practical applications of scale modeling in construction are numerous and occasionally surprising. Engineers employ scale models to test wind resistance, structural load distribution, and the effects of seismic activity***, though the Guild of Civil Engineers† recommends against testing actual earthquakes on models after the Incident of 1847††††. Modern practitioners must master several critical techniques: the selection of appropriate materials that maintain proportional strength characteristics‡‡‡, the accurate translation of blueprints§ into three-dimensional form, and the patient acceptance that one will spend approximately seventeen times longer building the model than originally estimated§§. The choice of scale itself requires careful consideration—a 1:50 scale model of a skyscraper results in a manageable desk ornament, while a 1:50 scale model of a garden shed results in something small enough to misplace§§§, as the architect Henrietta Smallbridge discovered to her considerable embarrassment***.
+&nbsp;
+Safety considerations in scale model construction demand serious attention, despite the apparently innocuous nature of miniature building****. The primary hazards include exposure to adhesives††††, repetitive strain injuries from precision work‡‡‡‡, and the psychological effects of perfectionism§§§§. The International Association of Model Constructors maintains that 89.3% of all model-related injuries occur during the final 5% of construction, when impatience peaks and caution diminishes*****. Historical precedents suggest that inadequate ventilation when working with certain materials can lead to what the Ancient Guild of Miniaturists referred to as "the seeing of tiny people who offer unsolicited construction advice"†††††—a condition modern medicine recognizes as simple chemical intoxication‡‡‡‡‡ but which has led to some surprisingly innovative architectural designs§§§§§.
+&nbsp;
+The historical development of scale model construction reveals much about human nature and our relationship with the built environment. The earliest known scale models were discovered in the tomb of the Pharaoh Khufu-not-the-famous-one******, consisting of small clay representations of granaries that proved more durable than the granaries themselves—an irony not lost on subsequent generations of Egyptian tax collectors. During the Renaissance, the practice became formalized when the Venetian Brotherhood of Architectural Reducers†††††† established the first comprehensive guidelines for proportional reduction‡‡‡‡‡‡, though their insistence that all models be constructed of materials blessed by at least three different saints limited their practical utility§§§§§§. Modern understanding of scale models has been revolutionized by the advent of digital fabrication technologies, which have made it possible to create models with precision previously achievable only through the employment of extremely patient monks*******, though purists insist that hand-construction maintains a connection to the ancient craft that 3D printing cannot replicate††††††††.
+&nbsp;
+Contemporary practitioners stand at the intersection of ancient tradition and modern technology, wielding both time-honored craft techniques and computational design tools. The successful model builder must cultivate patience‡‡‡‡‡‡‡, precision§§§§§§§, and the philosophical acceptance that no model, however carefully constructed, will ever fully capture the essence of the intended structure—a limitation that applies equally to small cardboard representations of houses and to the mathematical models by which we attempt to understand the universe itself. As the legendary model maker Casimir Thumbwright observed in his final work before his mysterious disappearance*********, "We build small things to understand large things, and in doing so, learn mainly about ourselves and our capacity for self-delusion."
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The philosopher Dietrich von Kleinwald proposed in 1673 that scale models represent humanity's attempt to exert godlike control over creation by making things small enough to hold in one's hands. His treatise "On the Peculiar Satisfaction of Tiny Doors" was well-received until he became obsessed with building increasingly small models and was last seen attempting to construct a 1:1,000,000 scale model of the Alps using only breadcrumbs.
+&nbsp;
+\** Archaeological evidence suggests these were scale models of grain storage facilities, though the distinguished Egyptologist Sir Reginald Dustworthy insisted they were actually early examples of abstract art until radiocarbon dating proved they predated abstract art by several thousand years. Sir Reginald spent his retirement writing angry letters to journals.
+&nbsp;
+† The most spectacular example being the 1:20 scale model of the proposed Tiberius Bridge in Rome, which collapsed during its demonstration to city officials—exactly as the actual bridge would have done had it been constructed according to the original plans. The engineer responsible received both praise for the accuracy of his model and a severe reprimand for embarrassing the architect in public. The architect later attempted to build the bridge anyway, resulting in the disaster known to history as "The Incident We Don't Talk About at Imperial Engineering Conferences."
+&nbsp;
+†† The 1:100 scale model of the Crystal Palace, constructed for the 1851 Great Exhibition, attracted more visitors than many of the full-sized exhibits and sparked a brief craze for "meta-exhibitions" featuring models of other exhibitions. This reached its absurd zenith with the 1853 Exposition of Exposition Models, which consisted entirely of models of previous exhibitions and attracted exactly seventeen visitors, three of whom were journalists contractually obligated to attend.
+&nbsp;
+‡ This seemingly simple concept has nevertheless generated over 2,347 published papers debating the philosophical implications of scale, the most notable being Professor Amanda Metrics's controversial treatise "Why Isn't 1:1 a Model of Itself?: A Study in Tautological Architecture," which was simultaneously nominated for the prestigious Vitruvius Medal and the Golden Compass Award for Most Pointlessly Recursive Academic Work.
+&nbsp;
+‡‡ The Imperial College of London maintains a small museum dedicated entirely to incorrectly calculated scale models, including a 1:0.5 model (twice as large as the original), a 1:π model (which made sense to the mathematician who created it but to nobody else), and the infamous "Backwards Cathedral" which was constructed as a perfect 1:100 model except that the builder confused meters with feet, resulting in a model that was larger than intended by a factor of approximately 3.28, or as the project report delicately phrased it, "significantly more substantial than anticipated."
+&nbsp;
+‡‡‡ The principle of maintaining proportional strength requires that materials be selected not merely for their appearance but for their structural properties at reduced scale. This is why competent model builders do not construct models of steel bridges from actual steel at 1:100 scale—the resulting models would support loads vastly exceeding their proportional design requirements. The Counter-Intuitive Properties Institute† documented a 1:200 scale model of a suspension bridge that, due to the disproportionate strength of its scaled-down steel cables, could theoretically support the weight of the full-sized bridge it was meant to represent, though they were unable to test this hypothesis as the full-sized bridge had never been built, having been rejected as structurally unsound.
+&nbsp;
+† Not to be confused with the Institute of Counter-Intuitive Properties, which studies entirely different phenomena and is locked in a bitter feud with its nominally similar counterpart over the question of which organization has the more confusing name.
+&nbsp;
+\*\*\* The Incident of 1847 involved the noted structural engineer Wilhelm Schüttler, who believed that subjecting a scale model to a scaled-down earthquake would provide useful data. He constructed an elaborate mechanical system to shake his 1:50 scale model and then, with characteristic German thoroughness, calculated that a scaled earthquake would require 1/50th the duration and 1/50th the intensity. His calculations were mathematically correct but physically meaningless—the model was destroyed in 0.4 seconds, and Schüttler was left with a pile of toothpicks and the understanding that some things do not scale linearly. He spent the remainder of his career working on lighthouse construction, which he found "reassuringly stable."
+&nbsp;
+†††† This is the same incident that led to the establishment of the Earthquake Testing Safety Protocols†, which now occupy 347`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding scale model construction in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PROPORTION_SYMMETRY_PRINCIPLES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'proportion_symmetry_principles',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Proportion Symmetry Principles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['scale_model_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_proportion_symmetry_principles' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Proportion Symmetry Principles in Construction</span>
+&nbsp;
+The pursuit of perfect symmetry in construction has plagued humanity since the first cave-dweller looked at their lopsided dwelling and thought, "Well, this simply won't do."* The principles of proportion symmetry represent humanity's attempt to impose mathematical order upon a universe that, frankly, has other priorities.** At its core, proportion symmetry demands that structures maintain balanced relationships between their parts—that is, if one side measures precisely 42.7 centimeters, the corresponding side should also measure precisely 42.7 centimeters, and not, as frequently occurs in amateur construction, "close enough."*** These principles extend beyond mere bilateral symmetry into the realm of radial symmetry†, golden ratios††, and the deeply mysterious world of what the Ancient Guild of Proportionists called "the Mathematics of Not Falling Down."†††
+&nbsp;
+The practical application of proportion symmetry begins with the fundamental tool of measurement‡, though the definition of "fundamental" has varied considerably throughout history.‡‡ Modern practitioners employ lasers, digital levels, and computer-assisted design software, while their ancestors made do with string, eyeballing it, and what the 15th-century master builder Hieronymus the Mostly-Accurate described as "a good feeling in the thumbs."‡‡‡ The three-four-five rule remains the cornerstone of creating right angles§, a principle discovered independently by at least seven different civilizations, none of whom thought to patent it.§§ When constructing symmetrical structures, one must account for cumulative error—that is, each measurement's tiny imperfection compounds upon the last until your "perfectly symmetrical" cathedral has a tower that leans seventeen degrees to the left and cannot be opened during high winds.§§§
+&nbsp;
+Safety considerations in proportion symmetry cannot be overstated, particularly when working at heights or with materials that have strong opinions about remaining stationary.‖ The International Bureau of Construction Safety maintains that 73.4% of all symmetry-related accidents occur because someone assumed the other side matched without checking‖‖, leading to the now-famous Incident of 1873, about which we shall speak no further.‖‖‖ Always measure twice, cut once—or as the more pessimistic craftspeople say, measure thrice, cut once, measure again, cut a second time to fix the first cut, give up, order pizza.¶ The use of safety equipment while verifying symmetry is paramount, as determining whether a structure is perfectly proportioned often requires standing back at distances that put one in the path of traffic, falling masonry, or extremely judgmental architects.¶¶
+&nbsp;
+The historical development of proportion symmetry reveals humanity's long struggle with the concept of "the same but over there."¶¶¶ The ancient Egyptians achieved remarkable symmetry in their pyramids through methods that scholars debate to this day—was it alien technology, forgotten mathematical genius, or simply an obsessive-compulsive pharaoh with unlimited slave labor?# The Greeks elevated proportion to an art form with the Golden Ratio, that magical number phi (approximately 1.618033988749895...) which appears in nature, architecture, and the precise point at which people stop listening to mathematicians at parties.## The Renaissance brought us Vitruvian principles###, which Leonardo da Vinci illustrated with his famous drawing of a man with too many arms—a cautionary tale about symmetry taken too far, or possibly just Renaissance-era enthusiasm.#### Modern understanding benefits from computer modeling that can predict symmetrical outcomes with 99.7% accuracy†, though this hasn't stopped humans from making things crooked through sheer determination and inadequate coffee consumption.††
+&nbsp;
+In conclusion, the principles of proportion symmetry in construction serve as both practical necessity and philosophical challenge—a reminder that while the universe tends toward entropy, we can at least make our buildings fail symmetrically.††† The journey from "eyeballing it" to laser-guided precision represents not merely technological advancement, but humanity's eternal quest to make things that don't look obviously wrong from a distance.‡ Whether constructing a garden shed or a skyscraper, these principles remain constant: measure accurately, check repeatedly, and remember that true symmetry exists only in textbooks and the fevered dreams of mathematics professors.‡‡
+&nbsp;
+---
+&nbsp;
+*The earliest known complaint about architectural asymmetry was discovered in cave paintings in Lascaux-Adjacent, dated to approximately 15,000 BCE. The pictographs clearly show one caveperson gesturing angrily at another, with what anthropologists interpret as the proto-Indo-European equivalent of "I specifically said SYMMETRICAL."
+&nbsp;
+**The universe, for its part, has made its position clear through the existence of spiral galaxies, asymmetrical snowflakes (a myth that they're all symmetrical, by the way), and cats, which despite having bilateral symmetry, refuse to acknowledge it when walking across freshly dried concrete.
+&nbsp;
+***The "close enough" philosophy of construction has been responsible for more structural failures than any other single factor, narrowly beating out "it'll probably be fine" and "we can fix that later." The Society for Precise Measurement has documented 2,847 instances where "close enough" resulted in doors that wouldn't close, windows that wouldn't open, and one memorable case where an entire building was built 23 degrees off-axis from its intended orientation. The builders, when questioned, insisted they'd "just made it more interesting."
+&nbsp;
+†Radial symmetry, where elements radiate from a central point like the spokes of a wheel or the arms of a starfish, presents unique challenges in construction. The Great Rotunda Disaster of 1634 occurred when architect Balthasar von Rundhaus miscounted his radial segments, resulting in a twelve-sided structure where thirteen had been planned. The missing segment was discovered two years later, fully constructed, in his workshop. He claimed he "got confused."
+&nbsp;
+††The Golden Ratio appears with suspicious frequency in classical architecture, leading some scholars to suggest it was less "discovered in nature" and more "architects really liked that specific number and kept using it." The Counter-Society of Architectural Honesty has published seventeen papers arguing that phi's ubiquity is simply confirmation bias, but nobody invites them to conferences anymore.
+&nbsp;
+†††The Ancient Guild of Proportionists was disbanded in 1247 CE following the Symmetry Wars*, a conflict so petty and yet so mathematically rigorous that it's still taught in advanced courses on "Professional Feuds Throughout History." Their rival organization, the League of Acceptable Tolerance, won by default when the Proportionists' headquarters collapsed—ironically, due to poor proportion management.
+&nbsp;
+*Not to be confused with the Simulation Wars, the Similarity Wars, or the Great Mimicry Conflict of 1492.
+&nbsp;
+‡Measurement tools have evolved considerably since the Babylonians first decided that a "cubit" should be "the length of a forearm, presumably a standardized one, though whose forearm was never actually specified, leading to what historians now call the Cubit Crisis of 2100 BCE."
+&nbsp;
+‡‡The Elizabethan Era saw the introduction of the "rod, pole, or perch," which were apparently three different names for the same measurement, suggesting that even the English didn't know what they were doing. This was further complicated by the "chain," the "link," and the "furlong," which modern metrologists study primarily to understand why Britain took so long to adopt the metric system.
+&nbsp;
+‡‡‡Hieronymus the Mostly-Accurate (1421-1487) was famous for buildings that were "accurate within a thumb's width," which unfortunately varied depending on whose thumb was doing the measuring. His greatest work, the Cathedral of St. Somewhat, stands three degrees off true vertical, though guidebooks charitably describe it as "characterful." His lesser-known brother, Hieronymus the Completely Inaccurate, was not allowed near measuring implements after the Chapel Incident*.
+&nbsp;
+*We don't discuss the Chapel Incident. Even the records discussing why we don't discuss it have been redacted.
+&nbsp;
+§The three-four-five rule states that a triangle with sides of 3, 4, and 5 units will always contain a right angle. This is one of those mathematical truths that ancient peoples discovered without understanding why it worked, much like how you can make bread without understanding gluten protein matrices. The Pythagoreans got rather excited about this and built an entire mystical philosophy around it, which seems like an overreaction, but different times, different priorities.
+&nbsp;
+§§The Mesopotamians discovered it around 2000 BCE, the Egyptians by 1800 BCE, the Chinese by 1100 BCE, the Indians by 800 BCE, and the Greeks made it famous around 500 BCE by naming it after Pythagoras, who may not have discovered it but had excellent PR. The remaining two civilizations are the Atlanteans (unverified) and the Mole People of Lower Thuringia (`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding proportion symmetry principles in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GOLDEN_RATIO_ARCHITECTURE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'golden_ratio_architecture',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Golden Ratio Architecture',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['proportion_symmetry_principles'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_golden_ratio_architecture' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Golden Ratio Architecture</span>
+&nbsp;
+The golden ratio, that peculiar mathematical constant of approximately 1.618*, has haunted architects since the ancient Mesopotamians first discovered that some rectangles simply felt more "right" than others†. Modern practitioners of golden ratio architecture employ this principle to create structures that please the eye in ways that cannot quite be explained‡, leading to buildings that feel harmonious without observers necessarily understanding why**. The application of phi (φ) to architectural design involves dividing spaces, proportioning facades, and arranging elements according to this mystical ratio, though one must be careful not to become so enamored with mathematical perfection that one forgets to include practical features such as doors††.
+&nbsp;
+The fundamental technique involves creating a golden rectangle—a shape whose sides relate in the ratio of 1:1.618—and then subdividing it recursively to generate increasingly smaller golden rectangles***, a process that can theoretically continue until you reach rectangles visible only to particularly mathematically-inclined insects†††. In practice, architects apply these proportions to everything from window placement to room dimensions to the relationship between a building's height and width‡‡. The Grand Architect's Guild of Lower Hingsthorpe maintains that approximately 73.4% of buildings that "just feel good" accidentally conform to golden ratio proportions§, though this statistic should be taken with several grains of salt, possibly arranged in a golden spiral§§.
+&nbsp;
+Historical application of the golden ratio presents certain complications when one examines the actual evidence***. The Parthenon, often cited as a prime example, was supposedly designed with golden ratio proportions, though recent measurements by the Institute for Inconvenient Architectural Truths suggest the ancient Greeks were actually just very good at eyeballing things††††. Medieval cathedral builders employed the ratio extensively, or so they claimed in their guild records, which unfortunately spent three centuries in a damp basement and now mostly document which ratios attracted the most interesting varieties of mold‡‡‡. The Renaissance saw a resurgence of golden ratio enthusiasm, particularly after Luca Pacioli published his treatise "De Divina Proportione," which Brother Marcus the Scribe described as "exceptionally difficult to illuminate, what with all those spirals§§§."
+&nbsp;
+Modern construction safety standards require certain deviations from pure golden ratio ideology****. The Building Safety Commission's Incident Report #1618 details what happened when the architect Hieronymus Goldenfeld insisted that a staircase's rise and run must conform exactly to phi, resulting in steps that were mathematically perfect but physiologically treacherous*****. Contemporary best practice suggests applying the golden ratio to aesthetic elements while maintaining actually functional proportions for things like doorways†††††, ceiling heights‡‡‡‡, and the distance between the ground and any floor one expects people not to fall through§§§§. The ratio works splendidly for determining facade divisions, interior design elements, and the proportions of architectural details, provided one remembers that humans remain stubbornly non-mathematical in their dimensions*****.
+&nbsp;
+The enduring appeal of golden ratio architecture stems from something older than measurement******, some echo of pattern that humans recognized before they had words for mathematics†††††††. Whether this represents a genuine aesthetic universal or simply a very old confirmation bias remains a matter of debate at the Annual Conference of Architectural Philosophy, where discussions typically become so abstract that attendees forget where they parked‡‡‡‡‡. What remains indisputable is that buildings proportioned according to phi possess a certain indefinable quality—though cynics note that this quality might simply be "having been designed by someone who cared about proportions at all" rather than anything specifically mystical about 1.618§§§§§.
+&nbsp;
+---
+&nbsp;
+*Also known as phi (φ), or "that number that makes mathematicians get a faraway look in their eyes." The golden ratio appears throughout nature, from nautilus shells to the arrangement of sunflower seeds to the perfect spiral of a lazy river in an abandoned water park, though that last one may be coincidental.
+&nbsp;
+†This discovery allegedly occurred when the architect Ur-Nammu of Akkad presented two rectangular tablets to the king—one golden, one not. The king reportedly kept staring at the golden rectangle and couldn't say why, which is how Ur-Nammu avoided execution for late delivery. This story cannot be verified as all the tablets were later used to patch a wall during a siege.
+&nbsp;
+‡The Department of Aesthetic Philosophy at the University of Lesser Swindon conducted a seventeen-year study attempting to quantify this feeling, producing a 400-page report that concluded: "Yes, it does feel nicer, doesn't it?"
+&nbsp;
+**The famous Incident of the Doorless Manor in 1723 serves as a cautionary tale. Lord Pemberton-Smythe became so obsessed with achieving perfect golden proportions that his architect's final plans contained exquisite mathematical relationships between every structural element but somehow omitted practical access to seventeen rooms††. The building still stands, though it functions primarily as a monument to the importance of proofreading.
+&nbsp;
+††Subsequent modifications required the installation of doors, which rather ruined the pure golden ratio of the south facade. Lord Pemberton-Smythe never recovered from the aesthetic disappointment and spent his remaining years in a golden-proportioned hermitage, accessed, ironically, through a decidedly non-golden doorway.
+&nbsp;
+***This subdivision creates the famous golden spiral, which will be familiar to anyone who has ever watched a potter's wheel get slightly out of control and kept spinning anyway because it "looked kind of cool"‡.
+&nbsp;
+‡The potter in question was subsequently elected to the Royal Academy of Accidentally Profound Artists.
+&nbsp;
+†††The Microscopic Beetle of Upper Silesia (Coleoptera geometrica) is rumored to construct burrows following golden ratio proportions, though this remains controversial as the beetles refuse to fill out the survey forms‡‡.
+&nbsp;
+‡‡The forms themselves are golden rectangles, which researchers acknowledge may be part of the problem.
+&nbsp;
+§This statistic was calculated by measuring 2,847 buildings that people described as "nice" or "pleasant to look at" and determining what percentage happened to contain golden ratio relationships in at least one dimension. The study's methodology has been criticized for including such relationships as "the ratio between the building's width and the distance to the nearest bakery§§."
+&nbsp;
+§§In 43% of cases, this turned out to be approximately 1.618 times the building's width. Researchers concluded that people either unconsciously prefer bakeries at golden ratio distances or that bakery owners possess an intuitive grasp of spatial harmony. A third possibility—pure coincidence—was dismissed as "too boring to publish."
+&nbsp;
+***The Historical Measurement Society faces the perpetual problem that ancient peoples were frustratingly imprecise in their record-keeping, generally describing dimensions as "about so high" with accompanying hand gestures that have not survived into the archaeological record.
+&nbsp;
+††††The Society's comprehensive remeasurement of the Parthenon, accounting for centuries of weathering, earthquakes, and the Elgin Marbles incident, concluded that the golden ratio appears in approximately 1.618 places‡‡‡, which is either deeply significant or a statistical inevitability when you measure enough things.
+&nbsp;
+‡‡‡This joke appears in the Society's official report, suggesting that after three years of measuring ancient ruins, one's sense of humor develops in concerning directions.
+&nbsp;
+§§§The illuminated manuscript of "De Divina Proportione" took Brother Marcus seven years to complete. His marginal notes progressively deteriorate from professional commentary to complaints about spiral-induced vertigo and, toward the end, what appear to be existential questions about whether God truly cared about the ratio of one's arm to one's forearm§§§§.
+&nbsp;
+§§§§Anatomical studies suggest the human body contains numerous approximations of the golden ratio, though precision varies considerably. Leonardo da Vinci's Vitruvian Man attempted to document these relationships, though modern measurements indicate Leonardo may have been "rounding enthusiastically" in several places*****.
+&nbsp;
+****The Commission maintains extensive archives of well-intentioned but disastrous applications of mathematical purity to practical construction. These archives are stored in a building whose dimensions carefully avoid any interesting mathematical relationships whatsoever, just to be safe.
+&nbsp;
+*****Hieronymus Goldenfeld's staircase functioned perfectly according to mathematical principles but required users to have legs of specific, somewhat uncommon proportions. The seventeen injuries†††† documented before its replacement included three sprained ankles, two cases of motion sickness, and one visiting mathematician who became so entranced by the perfect geometry that he forgot to actually climb and simply stood calculating for three hours.
+&nbsp;
+††††The mathematician, Professor Alastair Widdershins, later published a paper about his experience titled "On the Hypnotic Properties of Perfect Proportion, and Why Staircases Should Not Have Them."
+&nbsp;
+†††††The Golden Door Debacle of 1889 occurred when architect Felicity Ratiophile`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding golden ratio architecture in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const AESTHETIC_THEORY_BUILDINGS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'aesthetic_theory_buildings',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Aesthetic Theory Buildings',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['golden_ratio_architecture'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_aesthetic_theory_buildings' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Aesthetic Theory Buildings: A Comprehensive Study in Construction Principles</span>
+&nbsp;
+The construction of Aesthetic Theory Buildings represents one of humanity's most ambitious attempts to make buildings that are not merely functional, but also philosophically coherent*. Unlike their pragmatic cousins—warehouses, parking garages, and the infamous Brutalist period†—Aesthetic Theory Buildings seek to embody abstract principles of beauty in their very foundations, beams, and occasionally ill-advised cantilevers‡. The field emerged from the natural intersection of architecture and philosophy, shortly after the realization that the Golden Ratio could be applied to more than just ancient Greek columns and uncomfortable modern furniture**.
+&nbsp;
+The fundamental principle underlying Aesthetic Theory Buildings is the concept of "sympathetic resonance between form and meaning"††, which posits that a building's physical structure should harmonize with its intended purpose in ways that transcend mere utility. A library, for instance, should not simply house books but should embody the very essence of accumulated knowledge‡‡—preferably without the structural instability that plagued the Library of Categorical Imperatives in 1847***. This requires architects to master not only engineering principles but also philosophical frameworks, leading to the establishment of specialized programs at institutions like the Kant-Gaudi Institute of Load-Bearing Aesthetics†††. The practical application involves extensive use of proportional systems, material symbolism, and what the profession refers to as "intentional spatial poetry"‡‡‡, though contractors typically call it "the expensive bit with the weird angles"****.
+&nbsp;
+Modern practitioners must navigate three critical domains: structural integrity, aesthetic coherence, and what the International Building Code reluctantly categorizes as "philosophical compliance"*****. The ratio of "beautiful but standing" to "beautiful but collapsed" has improved dramatically since the nineteenth century, when approximately 40% of Aesthetic Theory Buildings failed within their first decade†††††. Contemporary safety standards require that any building claiming to embody abstract principles must first embody the considerably less abstract principle of not falling on people‡‡‡‡. The development of computer modeling has revolutionized the field, allowing architects to test whether their vision of "capturing the ineffable nature of melancholy in structural steel" will actually support a roof******. Historical incidents, such as the infamous Collapse of Pure Reason******* or the Tilting Palazzo of Platonic Ideals, serve as cautionary reminders that beauty without engineering is merely expensive rubble.
+&nbsp;
+The historical development of Aesthetic Theory Buildings traces back to the post-Enlightenment period, when architects first attempted to systematically codify beauty rather than simply copying whatever the Greeks did†††††††. Early practitioners like Hieronymus von Schönbau believed buildings could achieve perfection through mathematical purity alone, leading to structures so geometrically precise they were nearly impossible to inhabit‡‡‡‡‡. The field matured considerably after the Great Aesthetic Crisis of 1889, when three major philosophical movements each claimed their building style represented absolute truth, resulting in what architectural historians call "the ugliest city block ever conceived"********. Modern understanding acknowledges that aesthetic theory in construction must balance competing principles—a building can be beautiful, meaningful, structurally sound, and within budget, though achieving all four simultaneously remains as rare as finding a contractor who returns phone calls†††††††††.
+&nbsp;
+The future of Aesthetic Theory Buildings lies in the integration of sustainable practices with philosophical principles, creating structures that embody not just timeless beauty but also temporal responsibility‡‡‡‡‡‡. Recent innovations include the development of "semantically loaded materials"*********, biodegradable buildings that literally return to earth as a meditation on impermanence**********, and the controversial "quantum aesthetic" approach that suggests buildings can embody multiple contradictory philosophies simultaneously***********. The field continues to evolve, driven by architects who believe that our constructed environment should elevate the human spirit while also, crucially, providing adequate fire exits and meeting disability access requirements************.
+&nbsp;
+---
+&nbsp;
+*The exact moment this became a serious field of study is disputed. The Zürich School dates it to 1834, while the Vienna Circle insists it began in 1791, and the Prague Underground Architects maintain it has always existed and we only recently became aware of it. All three schools refuse to attend the same conferences.
+&nbsp;
+†Brutalism, despite its harsh reputation, was technically an aesthetic theory. The theory was "what if concrete was EVERYWHERE?" It proved startlingly effective at answering this question. See also: every university built between 1955 and 1985.
+&nbsp;
+‡The cantilever remains architecture's greatest expression of optimism over gravity. Statistics from the Association of Structural Engineers indicate that 78.3% of cantilevers are designed correctly, 15.2% are overbuilt "just to be safe," and 6.5% represent what they call "incidents waiting to happen." The Association maintains a betting pool.
+&nbsp;
+**The Fibonacci Furniture Incident of 1952 resulted in chairs that were mathematically perfect but "surprisingly hostile to the human posterior," according to hospital records. The designer, Dr. Ernst Proportione, maintained his vision was correct and humans were simply the wrong shape. He was eventually proved right when the chairs were sold as modern art installations, where people were not expected to actually sit on them.
+&nbsp;
+***The Library of Categorical Imperatives was designed by noted philosopher-architect Immanuel Bauhaus† (no relation to the design movement, despite what he claimed at parties). He insisted that every support column should represent a different moral absolute. The building stood for three years before critics noted that his ethical framework had some "structural inconsistencies," which manifested as literal cracks in the foundation. The collapse occurred during a lecture on solid foundations in moral reasoning, which contemporary accounts describe as "tragically ironic" and "exceptionally dusty."
+&nbsp;
+†Not to be confused with Immanuel Kant, though Bauhaus encouraged the confusion and once showed up to a philosophy conference wearing Kant's actual coat, which he had purchased from a museum guard.
+&nbsp;
+††First articulated by Professor Wilhelmina Resonanz of the Prague School of Harmonic Construction, who proved you could make a building "sing" if you got the proportions exactly right†. Unfortunately, the building she designed to demonstrate this principle sang constantly, in B-flat, at roughly 75 decibels. Residents developed what medical literature calls "aesthetic psychosis" after three months. The building was eventually converted into a contemporary art museum, where the constant droning was reinterpreted as a bold statement about modern existence.
+&nbsp;
+†The acoustics were technically perfect. Just perfectly terrible for human habitation.
+&nbsp;
+‡‡This is harder than it sounds. Early attempts to make libraries "embody accumulated knowledge" resulted in buildings that were tall (representing the heights of human achievement), heavy (representing the weight of learning), and structurally unsound (representing the fragile nature of truth, though this was unintentional). The Guild of Librarians eventually issued guidelines: "A library should look wise, not collapse enthusiastically."
+&nbsp;
+***Designed by Friedrich von Necessity, who believed that categorical imperatives required categorical support structures. Each wing was dedicated to a different absolute moral principle. The south wing (representing "always tell the truth") collapsed first, which philosophers found philosophically troubling but contractors found entirely predictable. Von Necessity's response—"The truth cannot be supported by lies, therefore I used no redundant supports"—did not help his manslaughter trial.
+&nbsp;
+†††The Kant-Gaudi Institute maintains the world's only combined philosophy and engineering department. Students must pass both "Critique of Pure Reason" and "Critique of Pure Concrete" to graduate. The building itself was designed to embody Kantian principles of universal beauty while incorporating Gaudí's organic curves, resulting in what architectural critics call "philosophically coherent but visually confusing." First-year students typically get lost for an average of 3.7 hours during orientation.
+&nbsp;
+‡‡‡Spatial poetry involves arranging rooms, corridors, and structural elements to create meaning beyond mere function. A well-designed spatial poem can make visitors feel contemplative, inspired, or (in less successful attempts) mildly nauseated and confused about where the exits are. The International Fire Safety Commission maintains that spatial poetry is fine as long as it doesn't rhyme people into a corner with no emergency egress.
+&nbsp;
+****Contractors have their own terminology for architectural ambitions. "The expensive bit with the weird angles" is relatively tame. Other terms include "the part where physics applies differently," "the feature that requires custom everything," and the dreaded "oh, I see what you're trying to do there," which typically precedes a 40% budget increase. The National Association of Contractors publishes an annual translation guide between Architect and Reality.
+&nbsp;
+*****Philosophical compliance was added to building codes in 1923 after the incident at the House of Absolute Beauty‡, which was so committed to aesthetic purity it rejected fire exits as "disrupting the visual flow." The resulting regulations require that any building making philosophical claims must also make practical sense. Inspectors now`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding aesthetic theory buildings in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FUNCTION_FORM_INTEGRATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'function_form_integration',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Function Form Integration',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['aesthetic_theory_buildings'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_function_form_integration' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `FUNCTION FORM INTEGRATION</span>
+A Treatise on the Marriage of Purpose and Beauty in the Built Environment
+&nbsp;
+The principle of function form integration represents the fundamental understanding that a structure's purpose and its aesthetic expression are not merely compatible, but ideally inseparable*. This concept, which the Ancient Builders understood instinctively before the unfortunate Schism of Practicality and Beauty in 1547†, suggests that the most elegant solutions in construction arise when every functional element contributes to the visual harmony of the whole, and conversely, when every aesthetic choice serves a practical purpose**. The flying buttress of Gothic cathedrals remains the canonical example: a structural necessity that became an iconic symbol of soaring aspiration, proving that engineering constraints can birth transcendent beauty when approached with sufficient imagination†††.
+&nbsp;
+In practice, achieving function form integration requires the constructor to think simultaneously in multiple dimensions***, a skill that approximately 78.3% of practitioners initially find causes minor temporal disorientation‡. The technique demands that one consider load-bearing requirements, material properties, aesthetic proportions, and user experience as a single unified problem rather than sequential challenges to be solved independently‡‡. Master Builder Veridian Stonewhisper described the sensation as "similar to playing four instruments simultaneously while also conducting the orchestra and occasionally being the orchestra†††," a statement that initially seemed hyperbolic until the incident at the Conservatory of Integrated Design‡‡‡.
+&nbsp;
+The safety considerations cannot be overstated, particularly given the documented tendency of practitioners to become so absorbed in achieving perfect integration that they forget fundamental structural principles****. The Guild of Builders maintains a memorial wall listing the 412 known cases of "aesthetic overreach" where the pursuit of visual harmony led to computational errors in load distribution†. The cautionary tale of the Perfectly Proportioned Bridge of Amberville remains required reading: every measurement aligned with golden ratio principles, every joint expressed the structure's forces with crystalline clarity, and the entire span collapsed seven minutes after completion because someone forgot to account for the weight of the bridge itself*****. Modern best practice therefore recommends beginning with structural soundness and allowing aesthetic integration to emerge from honest expression of forces, rather than imposing aesthetic systems that may conflict with physical reality‡†.
+&nbsp;
+The historical development of function form integration traces back to civilizations that predated the written word, when builders worked from a unified understanding that has since been somewhat lost to specialization******. The rediscovery of these principles in the nineteenth century by the Functionalist Movement represented less an innovation than a remembering, though they complicated matters by insisting that function must always be primary‡‡†. Contemporary understanding synthesizes these various threads: function and form exist in a dialectical relationship, each informing and elevating the other, neither fully subordinate nor fully dominant*******. The successful practitioner learns to dance this delicate balance, understanding that a column can be simultaneously load-bearing, space-defining, and beautiful—that these are not separate qualities but different aspects of the same unified reality‡‡‡†.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*Though it must be noted that "ideally inseparable" is one of those phrases that sounds profound in academic writing but causes considerable anxiety among actual builders who must separate things constantly for maintenance purposes. The Plumbers' Guild has lodged 47 formal complaints about integrated pipe systems that look magnificent but require demolishing three walls to fix a single leak.
+&nbsp;
+†The Schism of Practicality and Beauty occurred during a heated debate at the Grand Council of Builders when architect Thomasius Prettyman insisted that all buildings should be "useful before beautiful," while sculptor Beatrice Goldenhands countered that they should be "beautiful before useful." The argument escalated until they split the profession into two separate guilds, who spent the next two centuries building deliberately ugly functional buildings and magnificent non-functional sculptures respectively. This period is known as the "Grey Age" or "Impractical Ornament Era" depending on which historical text one consults††.
+&nbsp;
+††Most historians now agree both names are accurate, which is why they call it the "Grey Age of Impractical Ornaments" on Tuesdays and Thursdays.
+&nbsp;
+**The flying buttress was actually invented by accident when Master Builder Geoffrey le Desperate ran out of interior space for supports and had to stick them outside. He claimed it was "deliberate innovation" and everyone believed him because it looked so magnificently intentional. This is recorded in his private journals, discovered in 1873, alongside sketches labeled "PANIC SOLUTION - DO NOT LET ANYONE KNOW†††."
+&nbsp;
+†††His descendants tried to buy and burn these journals. The Society for Honest Architectural History purchased them instead and displays them in a fireproof case.
+&nbsp;
+***The Council for Dimensional Thinking Research has determined that approximately 83.7% of practitioners experience what they term "cognitive architectural fusion," where one temporarily perceives building elements as existing in a state of quantum superposition between function and form. The remaining 16.3% were lying on the survey to sound more interesting‡.
+&nbsp;
+‡The Council's survey methodology has been questioned, particularly their practice of conducting interviews while respondents were actively balancing on scaffolding sixty feet above ground. "They answer very honestly when they're focused on not falling," explained Chief Researcher Martin Dropsworth, who has never worked at height himself.
+&nbsp;
+‡‡This tendency toward sequential thinking is not the practitioner's fault but rather a consequence of how construction is traditionally taught. The Royal Academy of Building Arts maintained separate departments for Structure, Aesthetics, and Function until 1923, housed in three buildings that were not architecturally integrated and in fact could not be due to a zoning dispute. Students had to run between buildings, which at least provided excellent physical conditioning.
+&nbsp;
+†††Master Builder Stonewhisper was known for her metaphors, though this one caused considerable confusion until it was discovered she was synesthetic and could actually hear buildings as musical compositions. This explained her earlier statement that the Market Hall of Turnwise "sounds like bassoons arguing with cellos in the key of limestone."
+&nbsp;
+‡‡‡The Conservatory of Integrated Design practiced what they preached by designing their own building as a perfect integration of function and form. During the grand opening ceremony, as Dean Architectural Harmonious was explaining how every element served both structural and aesthetic purposes, the building began to resonate at its natural frequency due to the synchronized applause of 400 attendees. The resulting sympathetic vibration caused the perfectly integrated ornamental support columns to oscillate at precisely their resonant frequency‡‡‡†. No one was injured, but the entire faculty had to spend six months in a temporary building that was deliberately ugly and over-engineered, which they described as "architecturally traumatic."
+&nbsp;
+‡‡‡†The columns were designed to appear delicate while being structurally sound, achieving this through precise calculations that, unfortunately, created elements that were slightly too responsive to certain frequency ranges. The official report concluded: "Perfect integration of form and function must also integrate boring safety margins."
+&nbsp;
+****The phenomenon of "aesthetic absorption" is well documented. In 1887, architect Patricia Goldsmith became so focused on ensuring her window arrangements created a perfect Fibonacci sequence that she spent three weeks on this alone, during which time no one noticed she'd specified windows made entirely of stained glass for a lighthouse. The building was completed before anyone realized the fundamental issue. It served as an extremely beautiful nautical hazard for six months before being retrofitted, and now stands as a monument to the importance of occasionally stepping back from aesthetic perfection to remember basic functional requirements†.
+&nbsp;
+†The lighthouse, renamed the "Tower of Prismatic Warning," is now a popular tourist attraction. Ships navigate by specifically avoiding its location, which technically means it still functions as a navigational aid, though not as originally intended.
+&nbsp;
+*****The Bridge of Amberville incident is required study material for all students of integrated design. The investigation revealed that lead architect Morris Proportia had become so obsessed with achieving perfect mathematical relationships in every dimension that he'd filled seventeen notebooks with golden ratio calculations but had somehow never included weight calculations beyond "proportionate to the aesthetic load††." When asked what "aesthetic load" meant, he replied, "the visual weight necessary to balance the composition." When pressed on whether this had any relationship to actual physical weight, he became confused and had to sit down. The bridge's collapse was at least aesthetically pleasing, described by witnesses as "remarkably symmetrical†††."
+&nbsp;
+††This term appears nowhere else in architectural or engineering literature. Proportia seems to have invented it himself, possibly during a fever.
+&nbsp;
+†††The collapse was captured in a famous painting by Rosalind Witnessful, who had been positioned to document the bridge's grand opening. She pivoted smoothly from "Triumphant Inauguration" to "Aesthetically Pleasing Structural Failure" without even changing her composition. The painting hangs in the Museum of Instructive Mistakes, next to a scale model of what the bridge looked like for those seven glorious minutes.
+&nbsp;
+‡†The Guild of Builders' memorial wall is itself an exercise in function form integration, serving simultaneously as`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding function form integration in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SPACE_PLANNING_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'space_planning_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Space Planning Theory',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['function_form_integration'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_space_planning_theory' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Space Planning Theory</span>
+&nbsp;
+The fundamental principle of Space Planning Theory, as first articulated by the Mesopotamian architect-priests*, holds that space is not merely the absence of walls but rather a positive entity that must be negotiated with, persuaded, and occasionally bribed†. Modern practitioners understand that successful space planning requires balancing three primary considerations: how humans will move through the space‡, how the space will make them feel**, and how to prevent the space from developing ideas of its own††. The International Guild of Space Planners maintains that 73.4% of all architectural failures can be traced to insufficient consultation with the space itself***, a statistic they refuse to explain further.
+&nbsp;
+The practical application of space planning begins with what the ancient Chinese called "wu wei" or "not putting the toilet next to the kitchen"‡‡. Load-bearing walls must be identified and respected†††, circulation patterns must be established that account for human stubbornness‡‡‡, and adequate clearances must be maintained between all elements****, even those that historically get along well. The Guild's handbook specifies minimum distances down to the millimeter*, though experienced planners know these are merely suggestions to the universe, which has its own opinions about such things**. Modern space planning software can calculate optimal layouts with 94.7% accuracy†, but cannot account for the 5.3% of space that operates according to non-Euclidean principles††† discovered during the Great Reorganization of 1847‡.
+&nbsp;
+Contemporary space planning requires understanding both the mechanical†† and emotional‡‡ aspects of spatial relationships. Zones must be defined not just by function but by temporal flow****, with consideration given to how spaces transform throughout the day*****, and proper attention paid to liminal areas where spaces transition from one purpose to another******. The Scandinavian School of Space Planning emphasizes the concept of "lagom"††††—not too much space, not too little—though their calculations differ from the German "genau richtig" by approximately 0.3 cubic meters per occupant‡‡‡‡, leading to the Incident of Stockholm*****. It is worth noting that the ancient Library of Alexandria's space planning was so effective that scholars still cannot agree on how it actually fit together******, suggesting either remarkable genius or the employment of dimensions that have since become unfashionable†††††.
+&nbsp;
+---
+&nbsp;
+*The Mesopotamian architect-priests, who built the first ziggurats, developed their theories while attempting to create buildings tall enough to "have a stern word with the gods about the flooding situation." Their space planning principles were literally written in stone, which later generations found inconvenient when trying to update them. See also: The Eternal Maintenance Problem of Ancient Monuments.
+&nbsp;
+†Bribery in this context refers to the practice of leaving small offerings in corners during construction, a tradition maintained by most builders even today, though they now call it "allowance for settlement" in official documents.
+&nbsp;
+‡The University of Applied Circulation Studies in Frankfurt maintains a complete database of every way humans have historically refused to use spaces as intended. It occupies seventeen buildings and grows by three filing cabinets per day. The irony of their own space planning is noted but not discussed at faculty meetings.
+&nbsp;
+**There exists a scale of emotional responses to spaces, ranging from "cozy" through "imposing" all the way to "existentially troubling." The Guild recommends staying in the first two-thirds of the scale. Unfortunately, the scale itself is subjective, leading to the Incident of the Toronto Public Library Washrooms of 1973, about which we do not speak.
+&nbsp;
+††Space with ideas of its own is not, technically, in the official documentation, but any practitioner who has worked on a renovation will attest that some spaces actively resist change. The Parisian apartment that fought back against seven different redesigns between 1962 and 1969 is now a protected historical site, though whether this was the space's goal all along remains a matter of heated debate.
+&nbsp;
+†††By which the ancient Chinese meant exactly that. The Tao Te Ching of Architecture, chapter 47, verse 2. The original text continues for another three thousand words explaining why this is obvious, which suggests it was not, in fact, obvious.
+&nbsp;
+‡‡‡Human stubbornness was formally quantified by the Royal Institute of Behavioral Architecture in 1934 as "the tendency of building occupants to use spaces in whatever manner is most inconvenient to the architect's vision, regardless of signage, flow design, or physical barriers." The measurement unit, one "perverse," equals the force required to make one person walk fifteen meters around an obstacle instead of six meters through a clearly marked "Do Not Enter" zone. Average humans exert 3.7 perverses daily.
+&nbsp;
+****Particularly furniture items, which can develop territorial disputes if placed too close together. The Munich Conference on Spatial Harmony (1889) established minimum clearances after a notable incident involving two wardrobes and a ottoman that shall not be detailed here.
+&nbsp;
+*The Guild's handbook is 2,847 pages long, weighs 4.3 kilograms, and has injured more people than any structure designed using its principles. It is printed on paper specifically chosen to be difficult to update, ensuring consistency across editions, which the editors claim is a feature, not a bug.
+&nbsp;
+**The universe's opinions are generally expressed through mysterious settling, inexplicable drafts, and the tendency for specifically one cabinet door to never quite close properly no matter what you do. Advanced space planners learn to listen to these subtle hints before they become unsubtle structural failures.
+&nbsp;
+†The accuracy rate was calculated by Professor Helmut Schneider of the Technical University of Munich by comparing planned layouts to actual human usage patterns over a six-month period. The 5.3% error margin increased to 23.7% when accounting for "what people actually did vs. what they told surveyors they did."
+&nbsp;
+†††Non-Euclidean principles in architecture are rarely discussed in polite company, mainly because explaining them requires either advanced mathematics or hallucinogenic substances, and preferably both. The phenomenon was first documented when renovation of the Edinburgh City Chambers revealed that the building contained eleven more rooms on the inside than geometrically possible. The architect, William Stark, maintained this was intentional until his death, at which point his notes revealed it absolutely was not.
+&nbsp;
+‡The Great Reorganization of 1847 attempted to standardize space planning principles across Europe. It lasted six weeks before collapsing due to irreconcilable differences about what constituted an "acceptable walking distance to a window." The French delegation walked out on day twelve. The British delegation claimed they had been in a different building the entire time, which turned out to be technically true due to a surveying error.
+&nbsp;
+††Mechanical aspects include load bearing capacity, ventilation requirements, and the structural integrity needed to prevent what the Guild tactfully calls "unplanned topological alterations."
+&nbsp;
+‡‡Emotional aspects are more complex. The Journal of Affective Architecture has published 847 papers on how ceiling height affects human mood, and they still cannot agree whether twelve feet is "liberating" or "anxiety-inducing." The answer appears to be "yes."
+&nbsp;
+****Temporal flow refers to how spaces change usage throughout the day. The kitchen that is a breakfast hub, afternoon mail-sorting station, and evening homework-helping center requires different planning than one used only for biannual elaborate dinners. The Guild estimates 89% of residential space planning failures stem from assuming spaces will maintain consistent usage patterns, which they absolutely will not.
+&nbsp;
+*****Some spaces transform so effectively throughout the day that occupants report feeling they live in different buildings at different times. The Netherlands Institute for Temporal Architecture studies this phenomenon, though their building itself is only accessible between 2 and 4 PM on alternate Thursdays, which may be a result of their own research or a very committed joke.
+&nbsp;
+******Liminal areas are spaces between spaces—hallways, landings, thresholds. The ancient Romans considered these sacred to the god Janus, who watched over transitions. Modern planners just call them "circulation space" and charge less for them, which may explain why they often feel like architectural afterthoughts. Some theorists believe this disrespect for threshold spaces is why hallways are where most household arguments occur, though correlation is not causation, except when it is.
+&nbsp;
+††††The Swedish concept of "lagom" translates roughly to "just the right amount," though Swedes will tell you it cannot be truly translated, which is the most Swedish thing possible. In space planning, it manifests as spaces that are neither cramped nor wasteful, achieving an equilibrium that other cultures find either admirable or infuriating, depending on their relationship with ambiguity.
+&nbsp;
+‡‡‡‡This 0.3 cubic meter difference led to a seventeen-year dispute between the Scandinavian and German schools of architecture, culminating in a conference in Brussels where both sides presented detailed mathematical proofs. The Belgian hosts, who use the "ça va" principle of "it'll probably work out," found the entire debate baffling an`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding space planning theory in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ROOM_LAYOUT_OPTIMIZATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'room_layout_optimization',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Room Layout Optimization',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['space_planning_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_room_layout_optimization' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ROOM LAYOUT OPTIMIZATION: A COMPREHENSIVE TREATISE ON THE ARCANE ART OF MAKING SPACES THAT DON'T MAKE PEOPLE WANT TO WEEP</span>
+&nbsp;
+Room layout optimization represents the convergence of ancient spatial wisdom and modern frustration management, wherein one attempts to arrange physical spaces in such a manner that inhabitants may traverse them without experiencing existential despair or stubbed toes*. The fundamental principles, as established by the Mesopotamian Guild of Room-Makers in approximately 2800 BCE†, dictate that rooms should ideally contain: (a) sufficient space for their intended purpose, (b) doorways positioned where people might reasonably expect to find them‡, and (c) no obvious portals to darker dimensions**. Contemporary practitioners utilize sophisticated tools including graph paper, expensive software that crashes at critical moments††, and the time-honored technique of standing in empty rooms making vague hand gestures while muttering "yes, yes, this could work"†††.
+&nbsp;
+The practical applications of room layout optimization extend far beyond mere furniture arrangement, touching upon the profound question of why humans insist on putting washing machines in kitchens when literally anywhere else would make more sense‡‡. Load-bearing walls present particular challenges, as they cannot simply be removed because they "harsh the vibe," despite what seventeen percent of renovation shows would have viewers believe‡‡‡. Modern optimization techniques account for traffic flow patterns§, the mysterious phenomenon where certain corners accumulate items that nobody remembers placing there§§, and the critical consideration of whether one can open the refrigerator door without blocking access to the sink§§§. The mathematics involved can be expressed through what Professor Clarence Weatherby termed "the Equation of Perpetual Compromise," which states that the optimal room layout equals the sum of all desired features minus the square root of available budget, divided by the number of people who have strong opinions about it***. 
+&nbsp;
+Safety considerations in room layout optimization cannot be overstated, particularly after the Incident of the Cascading Armoires in Düsseldorf (1847)†††† and the more recent Hartford Hallway Disaster‡‡‡‡. The International Building Code, which runs to approximately 10,847 pages§§§§ and contains subsections written by what can only be described as the ghosts of vengeful bureaucrats*****, specifies minimum clearances, egress requirements, and the precise angle at which cabinet doors may swing before achieving sentience. Particular attention must be paid to emergency exits, which should be both clearly marked and not blocked by that exercise equipment you promised yourself you would use†††††. The Guild of Layout Optimizers maintains a database of 14,293 ways people have managed to trap themselves in bathrooms through poor door-swing planning‡‡‡‡‡, a number that increases by approximately twelve incidents per week§§§§§.
+&nbsp;
+Historical development of room layout optimization can be traced through various architectural movements, from the "Rooms Upon Rooms" philosophy of the Medieval period******, through the "Everything Must Be White and Angular" phase of Modernism††††††, to the contemporary "Open Concept Until Everyone Remembers Why Walls Exist" era. The ancient Pythagoreans believed that rooms with dimensions following the Golden Ratio would promote harmony and well-being; subsequent studies have proven this to be largely irrelevant when your roommate leaves dishes in that harmonic space‡‡‡‡‡‡. Notable developments include the invention of the hallway in 1203 CE§§§§§§, which solved the problem of having to walk through everyone's bedrooms but created the new problem of having corridors that serve no purpose except accumulating coats. The work of Le Corbusier, who famously declared that "a house is a machine for living in," revolutionized modern architecture while simultaneously ensuring that subsequent generations would have to explain to their grandparents why their homes looked like appliances*******.
+&nbsp;
+Modern understanding synthesizes these historical approaches with contemporary needs, acknowledging that optimal room layout must account for both timeless principles and the very modern requirement that one have somewhere to put the WiFi router where it doesn't look terrible†††††††. Computer-aided design has revolutionized the field, allowing architects to make mistakes much faster and in three dimensions‡‡‡‡‡‡‡, while virtual reality enables clients to experience their future disappointment before construction even begins§§§§§§§. The integration of smart home technology introduces new considerations, as rooms must now accommodate devices that occasionally wake up at 3 AM and order seventeen pounds of cat food despite the household having no cats********. Ultimately, successful room layout optimization requires balancing the mathematical precision of spatial planning with the chaotic unpredictability of human behavior, achieving what the philosopher Bernard Crickhollow termed "acceptable compromise with physical reality"††††††††.
+&nbsp;
+&nbsp;
+FOOTNOTES
+&nbsp;
+* The Toe-Stubbing Index remains the most reliable metric for assessing room layout quality, according to the 2019 International Conference on Domestic Injury Prevention. Rooms scoring above 4.2 stubs per month are considered criminally negligent in twelve jurisdictions.
+&nbsp;
+† The Mesopotamian Guild kept meticulous clay tablet records of their work, most of which translate to "Client kept changing their mind about where the altar should go" and "Had to redo entire palace because king's mother visited and declared it 'gloomy.'" These tablets, housed in the British Museum's "Documents of Eternal Contractor Frustration" collection, make remarkably familiar reading even 4,800 years later‡§.
+&nbsp;
+‡§ One tablet, translated by Dr. Henrietta Foss of Cambridge, contains a complaint about a client who wanted "more light but also more privacy, more space but also cozier, more impressive but also humble." Dr. Foss notes this is "literally verbatim what my sister said about her kitchen renovation last year."
+&nbsp;
+‡ The Doorway Expectation Principle was formally codified after the Palace of Unusual Entrances in Constantinople confused so many visitors that the Byzantine Emperor issued a decree in 537 CE requiring "doors where doors should obviously be." The palace architect, whose name has been stricken from all records, had placed doorways based on "aesthetic energy flows" rather than "where people might actually want to walk."
+&nbsp;
+** The Dimensional Portal Exclusion Clause was added to building codes after the unfortunate events in Providence, Rhode Island (1928), about which we shall say no more except that the house in question was subsequently filled with concrete and designated a Superfund site†††. The specific architectural elements that contributed to the incident remain classified, though historians note an unusual preponderance of non-Euclidean angles.
+&nbsp;
+††† Some say you can still hear the chanting on moonless nights, though the current homeowner insists it's just the pipes.
+&nbsp;
+†† The software industry carefully cultivates this behavior to justify annual subscription fees. Version 47.3 of RoomPlannerPro crashes 3.2% more frequently than version 47.2, but the loading screen is prettier‡‡§.
+&nbsp;
+‡‡§ This represents what industry analysts call "the prettier loading screen paradigm," wherein user satisfaction correlates inversely with actual functionality but directly with the number of pleasant blues in the interface.
+&nbsp;
+††† This technique, known formally as "Spatial Improvisation Through Vague Gesticulation," is taught in no architecture schools yet practiced by 94% of all architects. The accompanying muttering follows a standard pattern: "Hmm, yes" (thoughtful, 67%), "This could work" (uncertain, 24%), and "Oh god, what have I done" (whispered, 9%).
+&nbsp;
+‡‡ This particular mystery has baffled architectural anthropologists for decades. Dr. Werner Schmidt's controversial paper "The Kitchen Laundry Paradigm: A Study in Collective Madness" (Journal of Inexplicable Design Choices, Vol. 34) suggests it originated during post-war housing shortages and persisted through sheer stubbornness. The paper was rejected by four journals before publication, primarily for its use of the phrase "utterly bonkers" in an academic context§§§§.
+&nbsp;
+§§§§ The Journal of Inexplicable Design Choices operates under a different standard than most academic publications. Their motto, "Vires in Veritate et Desperatione" (Strength in Truth and Desperation), reflects their commitment to publishing papers that other journals deem "too honest."
+&nbsp;
+‡‡‡ The Guild of Structural Engineers maintains a 24-hour hotline specifically for this issue. They report receiving approximately 847 calls per day beginning with "So I was watching this show..." The guild's response has been standardized to: "No. Absolutely not. Call a professional. We're begging you." Success rate: 23%.
+&nbsp;
+§ Traffic flow analysis employs heat-mapping technology to track movement patterns, revealing that humans, despite millennia of evolution`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding room layout optimization in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const NATURAL_LIGHTING_DESIGN: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'natural_lighting_design',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Natural Lighting Design',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['architectural_design'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['room_layout_optimization'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_natural_lighting_design' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Natural Lighting Design</span>
+&nbsp;
+The fundamental principle of natural lighting design in construction is deceptively simple: allow light from the sun to enter a building in such a way that occupants can see without artificial illumination while not being cooked alive or driven mad by glare*.  This has proven significantly more challenging than one might expect, as evidenced by the 3,847 documented cases of what the Institute of Architectural Remediation** refers to as "aggressive solar incidents" in the past decade alone. The core challenge lies in understanding that sunlight, despite being free, abundant, and (in most locations) reliably available†, possesses certain characteristics that make it difficult to work with—primarily its tendency to move throughout the day††, its variable intensity depending on weather conditions, and its complete absence at night†††.
+&nbsp;
+Modern natural lighting design builds upon principles first articulated by the ancient Solarian architects‡, who understood that the relationship between aperture, orientation, and occupant comfort follows mathematical principles that can be predicted, measured, and then completely ignored by property developers‡‡. The key variables include window placement (measured in degrees from solar north), glazing properties (measured in percentage of light transmission versus percentage of Mediterranean heat‡‡‡), and the precise angle of overhangs or shading devices§. Contemporary practitioners utilize sophisticated software to model these factors, producing beautiful visualizations that predict exactly how much natural light will enter a space, though these predictions maintain only a 73% correlation with reality§§, due primarily to what the Daylight Modeling Association calls "unanticipated obstruction phenomena"§§§.
+&nbsp;
+Practical application of natural lighting principles requires careful consideration of building orientation, window sizing, and the strategic use of reflective surfaces* to bounce light into spaces that cannot receive direct illumination**. The optimal window-to-floor-area ratio varies by climate zone††, but generally falls between 15% and 25%†††—though this assumes the windows will be cleaned at least twice annually‡‡, which field studies suggest occurs in only 31% of commercial buildings‡‡‡. Light shelves§§, clerestory windows§§§, and skylights***provide additional opportunities to introduce natural light deep into building interiors, though each comes with its own set of challenges†††† that the Guild of Fenestration Specialists‡‡‡‡ has catalogued extensively.
+&nbsp;
+---
+&nbsp;
+*The balance between these two extremes has been termed the "Goldilocks Zone of Glazing" by Professor Hieronymus Catchlight of the University of Illumination Studies. Buildings that err too far in either direction become either cave-like dungeons or well-lit ovens. The famous Mellbrook Office Tower of 1997 achieved both simultaneously through an unfortunate combination of north-facing offices and south-facing glass atriums, creating what survivors described as "thermal inequality of an almost philosophical dimension."
+&nbsp;
+**Founded in 1952 after the catastrophic failure of the All-Glass Pavilion of Rotterdam, which focused sunlight so effectively that it melted a visiting dignitary's shoes during the opening ceremony. The Institute maintains a Museum of Preventable Architectural Decisions, which is surprisingly well-attended.
+&nbsp;
+†Except in Seattle, Bergen, and the entire nation of Britain during winter months, where sunlight is considered more of a theoretical concept than a practical resource.
+&nbsp;
+††This apparently came as a surprise to the architects of the Goldstein Gallery in Phoenix, Arizona, where the morning light installation pieces were rendered completely invisible by afternoon due to the sun's inconsiderate movement across the sky. The architect's defense that "the sun should stay where I designed it to be" was not accepted by the review board.
+&nbsp;
+†††Leading to what historians call the "Night Problem," which has plagued natural lighting designers since approximately 10,000 BCE. Despite millennia of research, no solution has yet been found.
+&nbsp;
+‡A civilization that may or may not have existed, but whose architectural principles are referenced in at least fourteen academic papers, making them effectively real by the standards of architectural academia. They supposedly built the Temple of Eternal Noon, which maintained perfect natural lighting at all hours through a system of mirrors so complex that it required a priesthood of forty trained light-tenders to maintain it*. The temple was destroyed in what records describe only as "an unfortunate convergence of angles during the summer solstice."
+&nbsp;
+*The descendants of these light-tenders still gather annually to discuss mirror-based illumination strategies, though their meetings have been moved indoors after the Incident of 2003, about which we shall say no more.
+&nbsp;
+‡‡The average property developer approaches natural lighting with the philosophy that "windows are expensive" and "people can buy lamps." This has led to the construction of buildings that the Architectural Ethics Board describes as "technically legal but morally questionable" from a daylighting perspective.
+&nbsp;
+‡‡‡The Mediterranean heat is measured in units called "Santorini factors," with one Santorini factor being defined as the amount of solar heat gain that makes a room feel "authentically Greek" and two Santorini factors being the amount that makes it feel "like the inside of a terracotta oven where they've forgotten about you."
+&nbsp;
+§Overhangs must be precisely calculated based on the sun's angle at different times of year, which varies by latitude. The Formula of Shading Geometry is taught in all reputable architectural schools and promptly forgotten by approximately 68% of graduates, who then rely on what the profession calls "eyeballing it."
+&nbsp;
+§§The remaining 27% discrepancy is attributed to factors including: trees growing taller than anticipated (12%), neighboring buildings being constructed after the original daylight modeling was completed (8%), atmospheric conditions differing from the standard model atmosphere (4%), and what researchers term "general ontological uncertainty of predicted future states" (3%).
+&nbsp;
+§§§This includes trees (mentioned above), neighboring buildings (also mentioned above), birds that persist in building nests in architecturally inconvenient locations (2.3%), and in one documented case, a hot air balloon that became semi-permanently stationed outside the building due to a dispute between the balloon operator and local aviation authorities.
+&nbsp;
+*Reflective surfaces include mirrors, polished metal panels, and white painted ceilings. They do not include the highly reflective chrome surfaces specified by the architect of the Blinding Tower of Melbourne*, which created what pedestrians described as "weaponized sunlight" at street level each afternoon between 2 and 4 PM.
+&nbsp;
+*Now fitted with anti-reflective coating after the class-action lawsuit of 2009. The tower is still locally referred to as "The Death Ray," though this is considered unfair by building management, as no one actually died—they were merely temporarily blinded while operating motor vehicles.
+&nbsp;
+**The ancient art of bouncing light, or "photometric deflection" as it's known in technical literature, was perfected by the mysterious Order of the Bent Beam†, who could illuminate a windowless chamber using only a single candle and seventeen carefully positioned mirrors. Their techniques were lost when their headquarters tragically demonstrated the fire hazard of having seventeen mirrors, one candle, and extensive hanging tapestries in close proximity.
+&nbsp;
+†Not to be confused with the Order of the Bent Beam (Reformed), who use eighteen mirrors, or the Schismatic Order of the Bent Beam, who insist that mirrors are spiritually corrupt and natural lighting should only be reflected by polished copper plates blessed during the autumn equinox.
+&nbsp;
+††Climate zones are classified by the International Daylight Zoning Commission into categories ranging from "Perpetually Overcast" (Zone 1) to "Aggressively Sunny" (Zone 9). Zone 9 includes areas where natural lighting design primarily consists of "keeping the sun out" rather than "letting the sun in." The Commission's headquarters are diplomatically located in Zone 5 ("Moderate with Occasional Clouds").
+&nbsp;
+†††These percentages were calculated by the exhaustive (and exhausting) study of Dr. Wilhelmina Brightness-Ratios, who measured window-to-floor ratios in 4,000 buildings across 40 countries. Her 800-page treatise, "Aperture Ratios and Their Relationship to Occupant Satisfaction, Adjusted for Cultural Preferences and Coffee Consumption," is required reading in exactly two universities and optional reading in none.
+&nbsp;
+‡‡The average commercial building window accumulates approximately 2.3 grams of grime per square meter per month, reducing light transmission by 0.8% monthly. Over a decade without cleaning, this results in windows that transmit only 17% of their original light, creating what building occupants describe as "working in a aquarium that someone forgot to clean," though this is unfair to aquariums, which are typically cleaned more regularly.
+&nbsp;
+‡‡‡The 31% figure comes from the Global Window Maintenance Survey of 2019, which found that most building managers consider window cleaning "someone else's job," though they cannot specify whose. The survey also found that 14% of building managers were un`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding natural lighting design in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  ARCHITECTURAL_DRAWING_BASICS,</span>
+<span class="cstat-no" title="statement not covered" >  BLUEPRINT_CREATION,</span>
+<span class="cstat-no" title="statement not covered" >  SCALE_MODEL_CONSTRUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  PROPORTION_SYMMETRY_PRINCIPLES,</span>
+<span class="cstat-no" title="statement not covered" >  GOLDEN_RATIO_ARCHITECTURE,</span>
+<span class="cstat-no" title="statement not covered" >  AESTHETIC_THEORY_BUILDINGS,</span>
+<span class="cstat-no" title="statement not covered" >  FUNCTION_FORM_INTEGRATION,</span>
+<span class="cstat-no" title="statement not covered" >  SPACE_PLANNING_THEORY,</span>
+<span class="cstat-no" title="statement not covered" >  ROOM_LAYOUT_OPTIMIZATION,</span>
+<span class="cstat-no" title="statement not covered" >  NATURAL_LIGHTING_DESIGN</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

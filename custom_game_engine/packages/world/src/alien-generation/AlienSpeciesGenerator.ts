@@ -636,8 +636,9 @@ Return ONLY valid JSON:
     const locomotion = LOCOMOTION_METHODS[traits.locomotion];
     const sensory = SENSORY_SYSTEMS[traits.sensorySystem];
 
-    // Generate unique ID
-    const id = `alien_${naming.scientificName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+    // Generate unique ID - handle missing scientificName gracefully
+    const scientificNameForId = naming.scientificName || naming.commonName || 'unknown_species';
+    const id = `alien_${scientificNameForId.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
 
     // Determine danger level
     const dangerLevel = constraints.dangerLevel ?? this.calculateDangerLevel(traits);

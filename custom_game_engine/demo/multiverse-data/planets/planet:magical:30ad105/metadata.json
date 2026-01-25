@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:30ad105",
+  "name": "Triton Three",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769243596866",
+  "createdAt": 1769243596878,
+  "lastAccessedAt": 1769243596878,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769243596866",
+    "type": "magical"
+  }
+}

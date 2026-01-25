@@ -100,9 +100,9 @@ export class BuildBehavior extends BaseBehavior {
   readonly name = 'build' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const agent = entity.getComponent(ComponentType.Agent)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     // Stop moving while building
     this.stopMovement(entity);
@@ -129,7 +129,7 @@ export class BuildBehavior extends BaseBehavior {
       const storageBuildings = world.query().with(ComponentType.Building).executeEntities();
       let storageCount = 0;
       for (const b of storageBuildings) {
-        const bc = (b as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+        const bc = (b as EntityImpl).getComponent(ComponentType.Building);
         if (bc?.buildingType === BT.StorageChest || bc?.buildingType === 'storage-box') {
           storageCount++;
         }
@@ -168,7 +168,7 @@ export class BuildBehavior extends BaseBehavior {
         for (const { entity: building, distance } of nearbyBuildings) {
           // Cast required: ChunkSpatialQuery returns Entity, but we need EntityImpl for component access
           const buildingImpl = building as EntityImpl;
-          const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+          const buildingComp = buildingImpl.getComponent(ComponentType.Building);
 
           if (buildingComp?.buildingType === BT.Campfire) {
             // Campfire already exists nearby - use that instead of building a new one
@@ -193,8 +193,8 @@ export class BuildBehavior extends BaseBehavior {
         for (const building of nearbyBuildings) {
           // Cast required: World.query returns Entity, but we need EntityImpl for component access
           const buildingImpl = building as EntityImpl;
-          const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-          const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+          const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+          const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
           if (buildingComp?.buildingType === BT.Campfire && buildingPos) {
             const dx = position.x - buildingPos.x;
@@ -389,7 +389,7 @@ export class BuildBehavior extends BaseBehavior {
     for (const building of buildings) {
       if (building.id === buildingId) {
         // Cast required: World.query returns Entity, but we need EntityImpl for component access
-        const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+        const buildingComp = (building as EntityImpl).getComponent(ComponentType.Building);
 
         if (buildingComp?.isComplete) {
           // Construction complete!
@@ -516,7 +516,7 @@ export class BuildBehavior extends BaseBehavior {
     world: World,
     blueprintId: string
   ): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const position = entity.getComponent(ComponentType.Position)!;
 
     // Get blueprint from tile-based registry
     const blueprintRegistry = getTileBasedBlueprintRegistry();
@@ -597,8 +597,8 @@ export class BuildBehavior extends BaseBehavior {
     for (const storage of storageBuildings) {
       // Cast required: World.query returns Entity, but we need EntityImpl for component access
       const storageImpl = storage as EntityImpl;
-      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+      const building = storageImpl.getComponent(ComponentType.Building);
+      const storageInv = storageImpl.getComponent(ComponentType.Inventory);
 
       if (!building || !storageInv || !building.isComplete) continue;
 
@@ -660,7 +660,7 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
     // Cast required: Entity interface doesn't expose component access methods
     const buildingImpl = buildingEntity as EntityImpl;
-    const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+    const buildingComp = buildingImpl.getComponent(ComponentType.Building);
 
     if (buildingComp?.isComplete) {
       ctx.emit({
@@ -687,7 +687,7 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     let storageCount = 0;
     for (const { entity: building } of allBuildings) {
       const buildingImpl = building as EntityImpl;
-      const bc = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const bc = buildingImpl.getComponent(ComponentType.Building);
       if (bc?.buildingType === BT.StorageChest || bc?.buildingType === 'storage-box') {
         storageCount++;
       }
@@ -721,7 +721,7 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     for (const { entity: building } of nearbyBuildings) {
       // Cast required: Entity interface doesn't expose component access methods
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const buildingComp = buildingImpl.getComponent(ComponentType.Building);
 
       if (buildingComp?.buildingType === BT.Campfire) {
         ctx.emit({

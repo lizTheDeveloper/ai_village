@@ -67,7 +67,7 @@ export class TillActionHandler implements ActionHandler {
       return TILL_DURATION_BY_HAND;
     }
 
-    const inventoryComp = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
+    const inventoryComp = actor.getComponent(ComponentType.Inventory);
     if (!inventoryComp || !inventoryComp.slots) {
       // No inventory, use hands
       return TILL_DURATION_BY_HAND;
@@ -92,7 +92,7 @@ export class TillActionHandler implements ActionHandler {
     }
 
     // Apply skill efficiency bonus
-    const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
+    const skillsComp = actor.getComponent(ComponentType.Skills);
     if (skillsComp) {
       const farmingLevel = skillsComp.levels.farming;
       const skillBonus = getEfficiencyBonus(farmingLevel); // 0-25%
@@ -137,7 +137,7 @@ export class TillActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const actorPos = actor.getComponent(ComponentType.Position);
     if (!actorPos) {
       return {
         valid: false,

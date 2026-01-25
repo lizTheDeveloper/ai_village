@@ -1,0 +1,1111 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/metallurgy-smelting-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> metallurgy-smelting-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/88</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/88</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ORE_IDENTIFICATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'ore_identification',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Rocks That Aren\'t Just Rocks: Identifying Metal-Bearing Ores',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'metallurgy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['metallurgy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { metallurgy: 8, geology: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'ore_identification' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ROCKS THAT AREN'T JUST ROCKS: IDENTIFYING METAL-BEARING ORES</span>
+&nbsp;
+The fundamental challenge facing the aspiring metallurgist is distinguishing between rocks that contain useful metal and rocks that are merely enthusiastic about existing*. This distinction, while appearing trivial to the experienced practitioner, has historically consumed more human effort than the actual extraction of metal itself†, leading to what the Ancient Guild of Disappointed Prospectors termed "the Great Sorting"‡. The identification of metal-bearing ores relies primarily upon three observable characteristics: color, luster, and weight**, though the order in which one discovers these properties varies significantly based on whether one drops the rock on one's foot††.
+&nbsp;
+Visual identification begins with color, that most treacherous of indicators. Iron oxide presents as red, brown, or black‡‡, creating the unfortunate impression that any rock of these hues might contain iron***. Copper-bearing ores typically display green or blue coloration due to weathering†††, which explains why generations of novice prospectors have attempted to smelt grass‡‡‡. The luster of a freshly broken surface provides superior diagnostic value: metallic luster suggests metal-bearing ore, while vitreous (glassy) or dull luster typically indicates the rock is merely practicing to be ore and has not yet achieved its potential****. Weight serves as the final arbiter—metal-bearing ores possess notably higher density than common rock†††††, a property best discovered through careful measurement rather than the traditional method of "dropping it on various surfaces to see what happens"‡‡‡‡.
+&nbsp;
+The streak test represents humanity's finest achievement in applied violence to geological samples*****. By scraping the specimen across unglazed porcelain, one observes the color of the powdered mineral††††††, which proves far more reliable than surface color‡‡‡‡‡. Hematite, despite its varied exterior colors, consistently produces a red-brown streak******. Magnetite yields a black streak, distinguishing it from similar-appearing rocks that are simply black for decorative purposes†††††††. The Field Manual of the Reasonable Prospector‡‡‡‡‡‡ recommends carrying multiple streak plates, as the enthusiasm of novice prospectors tends to wear through ceramic with alarming speed.
+&nbsp;
+Common ores fall into convenient categories that nonetheless confuse everyone constantly*******. Iron oxides (hematite and magnetite) constitute the most abundant metal ores, appearing wherever ancient seas deposited iron and subsequently forgot about it********. Copper carbonates (malachite and azurite) form through the patient oxidation of copper deposits††††††††, creating the magnificent blues and greens that have caused more false excitement than actual mining‡‡‡‡‡‡‡. Tin deposits, typically occurring as cassiterite, present a dark brown to black appearance and sufficient weight to confirm that yes, this rock is remarkably heavy*********. The identification of these ores in the field requires observing their occurrence in context—a skill the Institute of Applied Geological Common Sense describes as "looking at where the rock was when you found it, not just where it is now that you're holding it"††††††††††.
+&nbsp;
+The greatest peril in ore identification remains the persistent human conviction that shiny rocks must be valuable**********. Mica schist sparkles magnificently in sunlight‡‡‡‡‡‡‡‡, yet contains no metal whatsoever. Pyrite earned the nickname "fool's gold" through rigorous field testing by actual fools***********. The Bureau of Disappointed Mining Ventures estimates that 67.3% of amateur prospecting expeditions end in the discovery that quartz crystals, while beautiful, do not smelt into anything useful††††††††††††. True ore identification requires the synthesis of multiple observations: the right color AND the right luster AND the right weight AND the right streak AND the right geological context‡‡‡‡‡‡‡‡‡. Fortunately, rocks do not actively attempt to deceive************, they merely exist in confusing ways.
+&nbsp;
+---
+&nbsp;
+*The enthusiasm of rocks for existing cannot be overstated. Some rocks have been existing enthusiastically for over four billion years, which suggests either remarkable dedication or a lack of better options.
+&nbsp;
+†The Department of Metallurgical History calculated that during the Bronze Age, humanity spent approximately 847 times more effort identifying potential ore than actually processing confirmed ore. This ratio has improved to only 34:1 in modern times, which the Department considers "acceptable progress."
+&nbsp;
+‡The Great Sorting (approximately 3200 BCE) represents the period when humans finally accepted that not every rock they picked up was useful. Archaeological evidence suggests this realization occurred very, very slowly.
+&nbsp;
+**In the seminal work "Things Fall Down: A Study of Weight-Based Identification" by Professor Thaddeus Heavystone, the author notes that humans discovered weight as a property of ore through a series of preventable accidents spanning several centuries††.
+&nbsp;
+††The Guild of Injured Prospectors maintains the Foot Memorial Archive, documenting 12,847 distinct incidents of "ore-related pedal trauma" between 1650 and 1847. The Archive recently went digital, allowing researchers to search by "type of foot injury" and "mistaken identity of dropped rock."
+&nbsp;
+‡‡Black iron oxide is particularly confusing, as it appears identical to rocks that are black for entirely social reasons—they simply enjoy the aesthetic. Distinguishing between "black because iron" and "black because basalt" requires additional testing‡‡‡.
+&nbsp;
+***The Incident of the Enthusiastic Bavarian (1653) involved a prospector who attempted to establish an iron mine based entirely on finding a red rock. The resulting enterprise employed seventeen people for three months before anyone performed a streak test. The rock was jasper. The prospector was embarrassed.
+&nbsp;
+†††The green copper stains on rocks have a particular quality that the ancient Sumerians described as "the color of hope turning to copper." This was considered poetry until it was discovered to be an accurate chemical description.
+&nbsp;
+‡‡‡The Grass Smelting Incident of Lower Saxony (1432) is not discussed in polite metallurgical circles. Suffice it to say that grass, while green, does not contain copper, and attempting to smelt it produces only smoke, confusion, and the ire of local shepherds.
+&nbsp;
+****This phrase appears in the Tome of Patient Rocks, discovered in a cave in Anatolia and dating to approximately 6000 BCE. The text suggests that rocks aspire to eventually become ore, though geological consensus holds that rocks do not, in fact, have aspirations****.
+&nbsp;
+*****The streak test was invented by the monk Brother Edmund of Canterbury in 1247 CE, who described it as "taking out one's frustrations on rocks in a scientifically valid manner."
+&nbsp;
+††††††According to the Archives of Ceramic Destruction, maintained by the Guild of Porcelain Workers, approximately 340,000 streak plates are destroyed annually worldwide by overly enthusiastic scraping. The Guild considers this "acceptable wastage" but has requested that prospectors "please scrape gently, for the love of all that is breakable."
+&nbsp;
+‡‡‡‡‡The color of the streak often differs dramatically from the color of the rock itself, leading to what Dr. Millicent Hardstone termed "the crisis of expectation." In her famous experiment, she showed novice prospectors a shiny black rock (hematite) and asked them to predict the streak color. 94% guessed "black." The actual answer (red-brown) caused what she described as "visible cognitive discomfort."
+&nbsp;
+******Hematite derives its name from the Greek "haima" (blood), because ancient Greeks were apparently quite dramatic about the color red-brown. The name has proven disconcertingly accurate, as more than one novice prospector has performed an unintentional streak test using their own knuckles.
+&nbsp;
+†††††††Magnetite's black streak serves as a reliable identifier, though the rock's magnetic properties provide an even more entertaining identification method. Simply dangle one's compass nearby and observe it having what can only be described as "an episode"†††††††.
+&nbsp;
+‡‡‡‡‡‡Published by the Reasonable Prospector's Society of Sheffield in 1789, this manual remains in print despite containing the now-controversial chapter "Why You Should Not Taste Rocks To Identify Them." The controversy stems not from the advice itself, which is sound, but from the detailed descriptions of what various rocks taste like, suggesting the author possessed comprehensive firsthand knowledge.
+&nbsp;
+*******The Ancient Categories of Confusion, as established by Mesopotamian metallurgists circa 3500 BCE, divided ores into "the ones that work," "the ones that don't work," and "the ones that work but we're not sure why." Modern classification has`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on How to recognize ores and distinguish them from common rock',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FURNACE_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'furnace_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Building Heat: The Construction of Smelting Furnaces',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'metallurgy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['metallurgy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['ore_identification'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { metallurgy: 12, construction: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'building', buildingId: 'basic_furnace' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Building Heat: The Construction of Smelting Furnaces</span>
+&nbsp;
+The construction of a smelting furnace represents one of humanity's earliest attempts to convince inanimate matter to become temporarily quite animate indeed*. The fundamental principle remains elegantly simple: contain extreme heat within walls that refuse to melt before the ore does†. This requires understanding not merely the properties of fire, but the peculiar and often treacherous characteristics of materials that can withstand temperatures at which most sensible substances prefer to become liquid‡.
+&nbsp;
+The basic furnace structure demands clay and stone of particular composition**, preferably obtained from sources that have already demonstrated remarkable heat resistance††. Clay walls must be constructed in layers‡‡, each dried thoroughly before the next is applied***, with particular attention paid to the interior chamber where temperatures will routinely exceed those encountered in any natural phenomenon save volcanism and certain ill-advised wedding feasts†††. The bellows system‡‡‡—that ingenious device for making fire breathe†††† like something alive—must be positioned to deliver a continuous stream of air to the charcoal bed§, for oxygen is both fire's beloved companion and its demanding mistress§§.
+&nbsp;
+Charcoal proves superior to wood for achieving metal-melting temperatures by virtue of its nearly pure carbon content and its remarkable ability to burn without producing the excessive smoke and volatile compounds that plague the use of raw timber§§§. The preparation of charcoal itself represents an art form****—one involving careful oxygen deprivation and temperatures that would alarm the uninitiated††††. Once achieved, however, a properly stoked charcoal furnace can reach temperatures sufficient to melt copper, bronze, and with sufficient persuasion, even iron‡‡‡‡.
+&nbsp;
+Insulation techniques separate the merely adequate furnace from the exemplary one§§§§. The strategic application of clay mixtures*****††††† incorporating various additives‡‡‡‡‡—sand, crushed pottery sherds, and occasionally less conventional materials§§§§§—creates thermal barriers that trap heat within the smelting chamber rather than allowing it to dissipate into the surrounding atmosphere where it serves no useful purpose whatsoever******. The dome or cone shape of traditional furnace designs follows not from aesthetic preference but from the ancient understanding that heat rises and should be encouraged to linger rather than immediately depart for less confining regions††††††.
+&nbsp;
+---
+&nbsp;
+*As documented in Professor Hieronymous Bellweather's seminal work, "Getting Rocks Quite Cross: A History of Metallurgical Persuasion." Professor Bellweather lost three fingers, two toes, and a considerable portion of his left eyebrow to his research, but maintained that it was "absolutely worth it for Science." His students were notably less convinced.
+&nbsp;
+†The melting point of copper sits at approximately 1,084.62°C (1,984.32°F), while iron requires the substantially more ambitious temperature of 1,538°C (2,800.4°F). Clay, if properly selected, refuses to melt until approximately 1,600°C, though it often begins to exhibit what the Guild of Furnace Builders describes as "concerning behavior" around 1,400°C. This behavior includes, but is not limited to: glowing, sagging, and occasionally making small crackling sounds that experienced builders have learned to interpret as either "I'm fine, carry on" or "evacuate immediately."
+&nbsp;
+‡The Late Lamentable Incident at Ghoorstone's Smeltery (circa 783) provides an object lesson in what occurs when one attempts to build a furnace from limestone‡†. Limestone, it transpires, does not merely melt at high temperatures—it transforms into quicklime and carbon dioxide in what witnesses described as "rather spectacular" fashion. The subsequent reaction when water was thrown on the "emergency" (standard procedure at the time) produced temperatures that melted the metal tools used to disassemble the wreckage. Three buildings and a considerable quantity of copper were lost. Ghoorstone himself survived but was never quite the same afterward, spending his remaining years muttering about "the breathing stone" and refusing to come within fifty yards of anything resembling a kiln.
+&nbsp;
+‡†Modern geologists note that limestone consists primarily of calcium carbonate, which decomposes enthusiastically at around 825°C—well below smelting temperatures. The ancient builders of Ghoorstone's era did not have access to this knowledge, operating instead on the principle of "it's a rock, rocks are strong, therefore this should work." This represents what scholars of historical metallurgy call "optimistic mineralogy."
+&nbsp;
+**The Krakhovian clay deposits, discovered in what is now disputed territory between three kingdoms who all claim hereditary rights based on marriages that may or may not have actually occurred, remain the gold standard for furnace construction. The clay possesses an alumina content of approximately 42.7% and a silica content of 51.3%, creating a ceramic that can withstand repeated heating to extreme temperatures without cracking, spalling, or developing what the more poetic metallurgists call "structural doubts." Wars have been fought over these deposits. Three of them. Well, two and a half if you don't count the War of Unfortunate Misunderstanding, which technically began over a disputed cow but escalated when someone mentioned the clay.
+&nbsp;
+††The traditional test involves heating a sample to "cherry red" intensity and then dousing it with cold water‡††. Clay that survives this thermal shock without fragmenting is deemed suitable. Clay that explodes is not. The Guild maintains a memorial wall to those who tested the boundaries of "how cold" and "how fast" in the dousing process.
+&nbsp;
+‡††"Cherry red" represents approximately 815°C to 900°C, though this measurement relies heavily on the observer's familiarity with cherries, local cherry coloration variations, and whether said observer has been staring at furnaces long enough to have developed what the Guild medics call "chromatic recalibration syndrome"—a condition wherein the afflicted begins to describe everything in terms of heat colors and occasionally claims that their breakfast porridge is "approaching a nice orange glow."
+&nbsp;
+‡‡The principle of layered construction was discovered by the ancient Dordrovians, who initially attempted to build entire furnaces in a single day§†. The resulting cracks appeared within hours as moisture within the clay layers created steam that sought exit with considerable determination. Modern builders allow 3-7 days of drying per layer, depending on thickness, ambient humidity, and how urgently the patron requires their metal. Rushing this process leads to what insurance adjusters in the Guild classify as "preventable disasters," a category that accounts for approximately 67.3% of all furnace-related insurance claims.
+&nbsp;
+§†The Dordrovian Single-Day Furnace Festival of 1147 resulted in seventeen damaged furnaces, zero successful smelts, and the introduction of the Dordrovian saying "Patience in layers, profit in metals; haste in building, rubble in heaps." The festival is no longer held, though the commemorative tankards remain collectible items.
+&nbsp;
+***Approximately 2-4 inches per layer represents the optimal thickness, as determined by the exhaustive and occasionally explosive experiments conducted by Dame Petronella Ashworth at the Royal Academy of Hot Things§§†. Thinner layers dry faster but provide insufficient insulation; thicker layers take longer to dry and develop internal stresses that manifest as cracks at precisely the wrong moment—typically when the furnace reaches peak temperature and is filled with molten metal.
+&nbsp;
+§§†The Royal Academy of Hot Things (known officially as the Institute for Advanced Pyrotechnical Research) maintains facilities in three locations, only one of which is currently habitable. The other two are "undergoing extended renovation" following incidents that the Academy prefers not to discuss in detail, though court records indicate insurance claims mentioning "unexpected liquefaction," "structural enthusiasm," and "the regrettable phoenix situation."
+&nbsp;
+†††The wedding of Lord Castavere and Lady Morganna in 892 featured what was described in contemporary accounts as "a feast of most ambitious temperatures." The head chef, attempting to impress both families with a spectacular flaming dessert service, neglected to account for the interaction between the brandy-soaked confections, the low timber ceilings, and the tapestries depicting the family's military victories. The resulting fire exceeded furnace temperatures by a considerable margin and led to three new building codes, two revised fire safety regulations, and one very hastily renegotiated marriage contract. The couple remained married for forty-three years and reportedly never again allowed open flames at dinner parties.
+&nbsp;
+‡‡‡The bellows system, that masterwork of leather, wood, and increasingly desperate pumping§§‡, operates on the principle that fire, given sufficient oxygen, will burn hotter and more enthusiastically than fire left to fend for itself. A typical smelting furnace requires continuous air supply at a rate of approximately 15-20 liters per second,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on How to build furnaces capable of reaching metal-melting temperatures',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const IRON_SMELTING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'iron_smelting',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'From Red Rock to Iron: The Smelting Process',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'metallurgy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['metallurgy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['ore_identification', 'furnace_construction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { metallurgy: 15, chemistry: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'item', itemId: 'iron_ingot' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# From Red Rock to Iron: The Smelting Process</span>
+&nbsp;
+The transformation of iron ore into metallic iron represents one of humanity's most profound alchemical achievements*, though calling it "alchemy" tends to irritate both metallurgists and actual alchemists† for different reasons. At its heart, the process involves a deceptively simple chemical reaction: iron oxide combined with carbon at temperatures between 1,200 and 1,500 degrees Celsius‡ produces iron and carbon dioxide. What appears straightforward on parchment becomes considerably more complex when one introduces the variables of actual reality**, where the ore contains impurities††, the carbon comes from charcoal that was made by someone's cousin who "knows about fire"‡‡, and the temperature control depends on three apprentices who keep arguing about whose turn it is to work the bellows***.
+&nbsp;
+The introduction of flux—typically limestone—serves to separate the non-metallic impurities (collectively termed "slag") from the desired iron†††. The flux combines with silicates and other contaminants to form a liquid slag that floats atop the denser molten iron‡‡‡, allowing for their separation****. This represents one of those elegant solutions that took humanity approximately three thousand years to discover††††, suggesting that our ancestors were either remarkably patient or remarkably stubborn*****. The Guild of Metallurgists‡‡‡‡ maintains that both qualities remain essential to the profession, along with a high tolerance for singed eyebrows and the philosophical acceptance that some batches will simply need to be melted down and tried again******.
+&nbsp;
+The most common failure mode in early iron production was excessive carbon absorption, resulting in cast iron that was brittle rather than workable†††††. Iron absorbs carbon enthusiastically from the surrounding charcoal‡‡‡‡‡, and the difference between "enough carbon to strengthen the iron" and "so much carbon it shatters like pottery" is frustratingly narrow*******. Master Ironwright Torquil of Lancre famously noted that "the iron knows when you're confident, and that's when it betrays you"††††††, a statement that initially sounds like mystical nonsense until one has personally experienced the phenomenon‡‡‡‡‡‡. The control of carbon content separates serviceable iron from excellent iron, and excellent iron from expensive shrapnel********.
+&nbsp;
+---
+&nbsp;
+*The term "alchemical" is used here in its historical sense, meaning "any process involving fire that we don't fully understand yet." Modern alchemists have rebranded to "hermetic philosophers" and insist they were never about the metalwork anyway.
+&nbsp;
+†Metallurgists object because the process is entirely chemical and reproducible. Alchemists object because it doesn't involve nearly enough mercury or cryptic symbolism. A 1,247 conference in Ankh-Morpork attempting to resolve this dispute ended when someone's demonstration furnace achieved an unplanned thermite reaction. No one was seriously injured, but the conference hall's roof was never quite the same.
+&nbsp;
+‡The precision of this temperature range is somewhat academic when your thermometer is "can you still hold your hand near it, or has all the hair burned off?" The Guild of Precision Measurement takes a dim view of such methodology, but the Guild of Precision Measurement wasn't founded until after iron tools made their precision instruments possible, creating a causality loop that philosophers still argue about in taverns.
+&nbsp;
+**Reality has an unfortunate tendency to include variables such as humidity, ambient temperature, the phase of the moon†, whether anyone sneezed into the charcoal pile††, and the cumulative bad luck generated by that incident with the priest last Tuesday†††.
+&nbsp;
+†No, the phase of the moon doesn't actually affect iron smelting. But try telling that to three generations of ironworkers who swear it does. The empirical method struggles when practitioners refuse to conduct experiments during the "wrong" moon phase.
+&nbsp;
+††This happened at the Forge of Broken Dreams in Pseudopolis, 1,389. The resulting iron was technically sound but smelled faintly of mint for reasons no one could explain. The batch was sold at a discount to a merchant who marketed it as "enchanted hygienic iron" and made a fortune.
+&nbsp;
+†††The priest blessed a rival forge and cursed theirs. Or possibly it was the other way around. Either way, the iron from that week kept trying to point north, which is only useful if you're making compasses, which they weren't.
+&nbsp;
+‡‡Knowing "about fire" is not the same as knowing "about controlled combustion in a reducing atmosphere," but this distinction is rarely appreciated until the charcoal burns too hot, too cold, or achieves the theoretically impossible state of both simultaneously. The Charcoal Burners' Collective maintains that their product is always consistent; the ironworkers maintain detailed records suggesting otherwise‡.
+&nbsp;
+‡The longest-running feud in metallurgical history is not between competing forges but between the ironworkers and charcoal burners. It has lasted approximately 3,000 years and shows no signs of resolution. The annual joint feast is famous for its uncomfortable silences and pointed comments about "quality control."
+&nbsp;
+***The bellows argument is a time-honored tradition predating the iron age itself. Archaeological evidence suggests that bronze age bellows operators had the exact same dispute‡‡. Some anthropologists theorize that the bellows argument may be an essential component of the smelting process, as forges that resolved it amicably showed a 23% decrease in successful smelts. The relationship between interpersonal conflict and metallurgical success remains poorly understood.
+&nbsp;
+‡‡A clay tablet from Mesopotamia, dated to approximately 2,800 BCE, contains what appears to be a work roster with angry cuneiform marks next to several names. Scholars translate the general sentiment as "it's definitely Enkidu's turn, he's been 'sick' for three days."
+&nbsp;
+††The ore contains iron, yes, but also sulfur (bad), phosphorus (bad), silica (bad), various other metals (sometimes bad, sometimes interesting), and occasionally small rocks that someone missed during sorting (always bad). One documented case from the Ramtops involved an ore sample that contained 15% iron, 30% rock, 20% silica, and 35% what the assayer described as "angry dirt"†. The iron extracted from this batch was successfully used to make a shovel, which seemed appropriate.
+&nbsp;
+†"Angry dirt" is not a recognized mineralogical term, but the assayer stood by his description. When questioned, he explained that the dirt had "a hostile aspect" and "seemed resentful about the testing process." He was later found to have been inhaling furnace fumes without proper ventilation, which explained several things.
+&nbsp;
+†††The word "slag" has been in use for so long that no one remembers why it's called that. The Etymological Society of Quirm has three competing theories, none of which are printable in polite company. The slag itself doesn't care what it's called; it remains stubbornly determined to contaminate perfectly good iron if given the slightest opportunity††.
+&nbsp;
+††In 1,156, a forge master in Sto Lat decided that slag separation was "probably optional" and could be skipped to save time. The resulting iron was 40% slag by weight and could be used for absolutely nothing except possibly ballast, if one needed ballast that crumbled when looked at firmly. The forge master's name is preserved in metallurgical textbooks as a cautionary tale, specifically in the chapter titled "Why We Have Procedures."
+&nbsp;
+‡‡‡This works because of density differences, which sounds simple until you realize that you're trying to judge density while staring into a crucible that's bright enough to cause permanent retinal damage. The traditional method involves sacrificing a stirring rod into the molten metal and observing how it behaves, a process that's one part science and three parts divination‡‡. Modern forges use temperature monitoring and timing, which is less mystical but also less likely to result in accidentally summoning something†††.
+&nbsp;
+‡‡The Guild of Metallurgists officially denies that any metallurgical process involves divination. The Guild of Diviners maintains detailed records of metallurgists consulting them. Both Guilds agree that whatever happens in the forge stays in the forge, especially if it involves interpreting patterns in slag formation.
+&nbsp;
+†††The Incident of 1,203 is never discussed directly, but the reason all forge apprentices must now take a course in "protective circles and their proper application" can be traced back to a forge in Genua where someone got creative with flux mixtures. Whatever emerged from the crucible that day was described as "geometrically unlikely" and "aggressively hot." It was eventually persuaded to depart through the roof using a method that the witnesses agreed to classify as "experimental metallurgy" rather than anything else.
+&nbsp;
+****The actual`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The chemical process of extracting iron from ore using heat and carbon',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COPPER_TIN_BRONZE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'copper_tin_bronze',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Fortuitous Mixture: Discovering Bronze',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'metallurgy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['metallurgy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['iron_smelting'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { metallurgy: 14, chemistry: 6 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'item', itemId: 'bronze_ingot' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `THE FORTUITOUS MIXTURE: DISCOVERING BRONZE</span>
+&nbsp;
+On the surface, the discovery of bronze appears to be a straightforward tale of metallurgical advancement*. Copper, while useful for decorative purposes and soft implements that bend rather satisfyingly when applied to anything harder than butter†, proved inadequate for serious tools and weapons. The ancients required something that would not embarrass them mid-battle or mid-carpentry‡. Through what the Institute of Happy Accidents and Productive Mistakes§ terms "beneficial incompetence," some anonymous metalworker—likely attempting to make something else entirely**—mixed tin with copper in roughly a 1:9 ratio and created an alloy approximately 3.7 times harder than pure copper††. This mixture, which we now call bronze with the casual confidence of people who didn't have to discover it themselves, melts at the considerably accommodating temperature of 950°C‡‡, making it far more practical to work with than iron's rather demanding 1,538°C§§.
+&nbsp;
+The typical composition of bronze holds to a remarkably consistent ratio: approximately 90% copper to 10% tin***, though the ancient metallurgists of Ur were apparently terrible at fractions and produced batches ranging from 5% to 43% tin content†††, resulting in alloys that ranged from "adequately hard" to "somehow softer than the original copper" to "surprisingly brittle" to "possibly sentient"‡‡‡. Modern metallurgists, armed with precision scales and the hard-won knowledge of several thousand years of mistakes, maintain this ratio with an accuracy of ±0.3%§§§, though the Guild of Traditional Metalworkers****argues this precision removes the element of surprise that made ancient metallurgy so exciting††††.
+&nbsp;
+The discovery of bronze marked such a significant advancement in human civilization that we named an entire age after it‡‡‡‡—a honor we have not extended to later discoveries such as "The Plastic Age" or "The Age of Regrettable Architectural Choices"§§§§. Bronze's superiority over copper manifested in every application: weapons that remained weapons after hitting things*****, tools that performed their designated functions more than once****††, and decorative items that looked impressively expensive while being substantially cheaper than gold‡‡‡‡‡. The Bronze Age, spanning approximately 3,300 BCE to 1,200 BCE in the Near East (dates vary by region and how one defines "proper bronze usage" versus "enthusiastic experimentation"§§§§§), represented humanity's first successful venture into alloy metallurgy, though the Tin Trade Routes that emerged suggest it was also humanity's first experience with resource-dependent supply chains and the particular anxieties they generate******†.
+&nbsp;
+Archaeological evidence indicates that the discovery of bronze was likely made independently by multiple cultures****‡‡, as the probability of only one person in all of human history accidentally mixing two metals and noticing the improvement strains credibility†††‡‡‡. The technology spread with remarkable speed—by historical standards—taking only several centuries to traverse from the Caucasus to China§§§§§§, compared to the smartphone, which achieved similar geographic penetration in approximately thirteen months*******. What remains particularly noteworthy is that bronze maintained its position as the premier material for tools and weapons for nearly two millennia††††††, an impressive run that puts modern technology's six-month obsolescence cycle to shame‡‡‡‡‡‡.
+&nbsp;
+The practical implications of bronze's discovery extended beyond mere metallurgy into the realms of warfare, agriculture, and art§§§§§§§. Bronze plowshares allowed for more effective farming********, bronze swords allowed for more effective dispute resolution*********††††††, and bronze sculptures allowed for more effective displays of wealth and taste‡‡‡‡‡‡‡. The material's workability—significantly easier than iron due to its lower melting point—meant that even relatively small communities could establish foundries§§§§§§§§, democratizing metalwork to an extent that the Copper Priests found deeply troubling**********. This accessibility, combined with bronze's durability, meant that objects from the Bronze Age survive in surprising abundance††††††††, unlike artifacts from the later Wicker Age‡‡‡‡‡‡‡‡, which do not.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*The Institute maintains that approximately 73% of all major discoveries are accidents, 18% are the result of someone deliberately ignoring instructions, and 9% are rounding errors in their statistics.
+&nbsp;
+†Pure copper has a Mohs hardness of 3, placing it firmly in the category of "decorative" rather than "functional." For comparison, human fingernails rank 2.5, which explains several unfortunate incidents at the First Annual Copper Weapons Tournament of 3,200 BCE. No one was seriously injured, but everyone was seriously embarrassed.
+&nbsp;
+‡The Annals of Embarrassing Military Defeats contains seventeen chapters dedicated to the Pre-Bronze period, including the memorable Battle of Soft Swords (circa 3,400 BCE), which reportedly ended with both armies sitting down for a meal together after their weapons proved incapable of causing anything more serious than bruises and dented pride.
+&nbsp;
+§Founded in 2,847 BCE by accident, when the Academy of Deliberate Discovery accidentally discovered nothing for seventeen consecutive years.
+&nbsp;
+**The prevailing theory is that someone was attempting to make copper more decorative by adding shiny tin, or possibly trying to stretch their copper supply during a shortage. The Copper-Stretching Hypothesis remains controversial, primarily because it suggests our ancestors were cheap, which offends the descendants of several prominent Bronze Age dynasties.
+&nbsp;
+††This measurement used the Advanced Hardness Scale developed by the scholar-smith Gregorius the Practical, who rated materials on a scale from "butter, sort of" to "will destroy your tools and possibly your will to live." Bronze rated a solid "adequately aggressive," while pure copper managed only "optimistically soft."
+&nbsp;
+‡‡The actual temperature varies by exact composition, but 950°C is cited by the Bureau of Convenient Numbers as "close enough for historical purposes and significantly easier to remember than 947.3°C."
+&nbsp;
+§§Iron's melting point has been described as "unnecessarily hostile" by the Association of Metalworkers With Limited Fuel Supplies. The Iron Age happened anyway, but people complained about it considerably more.
+&nbsp;
+***The exact ratio was likely discovered through extensive trial and error, a period historians refer to as "The Great Tin Wasting" (approximately 3,500-3,300 BCE). Slag heaps from this period reveal that ancient metallurgists tested ratios including 1:1 (too brittle), 1:99 (pointless), and on one memorable occasion, 0:100 (just tin).
+&nbsp;
+†††The Ur Metallurgical Disaster of 2,680 BCE produced a batch of bronze that was later described in cuneiform tablets as "crunchy," which is not a desirable quality in metal.
+&nbsp;
+‡‡‡The "possibly sentient" bronze was the result of a 73% tin, 27% copper mixture by the apprentice metalworker Lugal-Mistakes. The resulting alloy reportedly hummed at frequencies that made observers uncomfortable and was eventually buried in an unmarked location. The coordinates remain lost, which is probably for the best.
+&nbsp;
+§§§This precision would have astounded ancient metallurgists, who measured tin content by methods such as "about this much" and "probably enough" and "stop, no, too much, oh no."
+&nbsp;
+****The Guild maintains that modern metallurgy has lost its soul by removing the element of danger. Their workshops have a 43% higher injury rate than precision facilities, which they cite as evidence of superior authenticity.
+&nbsp;
+††††The Guild's annual festival, "Bronze or Bust," celebrates failed alloys with surprising enthusiasm. The highlight is the Display of Terrible Mistakes, featuring alloys that failed in spectacular or embarrassing ways.
+&nbsp;
+‡‡‡‡Other ages named after materials include the Stone Age and Iron Age. The Brass Age (1,843-1,847 CE) was brief and largely ceremonial, existing only in the records of the Very Specific Historical Society.
+&nbsp;
+§§§§The Age of Regrettable Architectural Choices (1960-1989 CE) is acknowledged by the International Society of Historians Who Have Opinions About Buildings but remains unofficial.
+&nbsp;
+*****Contrast this with copper weapons, which performed admirably as weapons right up until they contacted something they were intended to damage, at which point they became "modern art."
+&nbsp;
+****††The Single-Use Tool Period (3,800-3,300 BCE) was characterized by magnificent inefficiency and considerable frustration. Archaeological sites from this era contain suspiciously high quantities of bent copper implements and clay tablets that appear to be complaints.
+&nbsp;
+‡‡‡‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The discovery that copper and tin create a superior alloy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SLAG_SEPARATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'slag_separation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Removing Impurities: The Art of Slag Management',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'metallurgy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['metallurgy_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['iron_smelting'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { metallurgy: 16, chemistry: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { metallurgy: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'efficient_smelting' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `REMOVING IMPURITIES: THE ART OF SLAG MANAGEMENT</span>
+&nbsp;
+The fundamental challenge of metallurgy has always been the separation of that which is wanted from that which decidedly is not. In the crucible of the furnace, pure metal and impure slag exist in an uneasy cohabitation*, a marriage that must be annulled with precision and care. The ancient practitioners understood this delicate balance†, though their understanding was often gained through methods that the modern Guild of Smelters prefers not to discuss in polite company‡.
+&nbsp;
+The introduction of flux materials—limestone, sand, and borax**—represents humanity's first systematic attempt to convince impurities to leave of their own accord††. These substances, when added to the molten mass, engage in a complex chemical courtship with the unwanted elements‡‡, forming a new compound of lower density that floats atop the pure metal with the determined buoyancy of a cork in a bathtub***. The ratio of flux to ore must be calculated with precision: too little and the slag remains obstinately mixed with the metal; too much and one finds oneself with an furnace full of very expensive glass†††.
+&nbsp;
+The act of tapping the furnace—that is, releasing the molten metal through carefully positioned holes‡‡‡—requires the timing of a conductor and the courage of a man who has made peace with his eyebrows****. The upper tap releases the lighter slag; the lower tap, the heavier metal††††. This seems straightforward until one considers that the temperature involved is sufficient to make rock run like water and that the consequences of opening the wrong tap at the wrong time are both immediate and memorable‡‡‡‡.
+&nbsp;
+Even after separation, the slag retains value*****. The reprocessing of slag for residual metal content is not mere thrift but necessity†††††, a second chance at recovering what was lost in the first smelting‡‡‡‡‡. The Slag-Pickers Guild maintains that up to seven percent of the metal can remain trapped in the waste******; the Metallurgists Counter-Guild insists the figure is closer to three percent††††††; both agree that anyone who throws away slag without inspection is either very wealthy or very foolish‡‡‡‡‡‡, and possibly both*******.
+&nbsp;
+&nbsp;
+* The metaphor is more apt than one might think. Just as in certain marriages, the separation process is violent, expensive, and produces a great deal of heat.
+&nbsp;
+† Primarily through the expedient method of "trying things and seeing what happened." The Historical Records of Accidents Involving Molten Materials runs to forty-three volumes, and that's just covering the period from 1247 to 1249.
+&nbsp;
+‡ The incident at the Ankh-Morpork School of Practical Metallurgy in 1734 is referred to only as "The Regrettable Thursday" and all records were sealed by order of the Guild.
+&nbsp;
+** The term "borax" derives from the ancient Bukharan word "būrah," meaning "white" or possibly "that which makes things work better, we're not entirely sure why."† Throughout history, approximately 67% of metallurgical advances have been made by people adding random white powders to furnaces and noting the results. The survival rate of these pioneers was significantly lower, estimated at 34%.
+&nbsp;
+*** This is a precise technical measurement acknowledged by the International Bureau of Weights and Measures, though they wish people would stop submitting corks and bathtubs for calibration.
+&nbsp;
+†† In the lost city of Samarhind-Below-The-Sands‡, metallurgists discovered that singing to the flux improved separation. Modern analysis suggests the vibrations may have had some effect; contemporary accounts suggest the smelters were simply drunk.
+&nbsp;
+‡ Not to be confused with Samarhind-Above-The-Sands, which is above the sands, or Samarhind-Sort-Of-Near-The-Sands, which was built by people with poor directional skills.
+&nbsp;
+†† One might argue they are forming a relationship based on mutual chemical attraction, which is more than can be said for many arranged marriages of the period.
+&nbsp;
+††† This occurred at the Fortunate Valley Smelting Works in 1612. The glass was quite beautiful and sold for more than the intended metal would have been worth. The smelter in question pivoted to glassmaking and became wealthy, which annoyed the Guild of Proper Smelters considerably.
+&nbsp;
+‡‡ The science of flux chemistry was first systematized by the scholar Albertus Pragmaticus in his treatise "De Separatio Metallorum" (On the Separation of Metals), though he is better remembered for his follow-up work "De Separatio Digitorium" (On the Separation of Fingers), written while recovering from a tapping accident.
+&nbsp;
+‡‡‡ Modern furnaces have as many as seven taps at different heights**, allowing for the separation of multiple layers of slag and metal. Ancient furnaces had one tap, which explains both their simplicity and the shorter life expectancy of ancient smelters.
+&nbsp;
+**** Eyebrows grow back. Faces are more problematic. The Guild of Smelters has long maintained that facial hair is structurally unsound near furnaces, but this advice is routinely ignored by members who value their magnificent beards over their continued possession of those beards.
+&nbsp;
+***** A conservative estimate. The more ambitious smelter-architects of the Kingdom of Brass-and-Gold once designed a furnace with twenty-three taps arranged in a spiral pattern. It worked exactly once, producing metal of extraordinary purity and a light show visible from three valleys away. Nobody survived to replicate the design, and the site is now a pilgrimage destination for metallurgists who want to feel better about their own mistakes.
+&nbsp;
+†††† This process was first described in detail by the Dwarvish master-smelter Grundir Slagsplitter, whose family name tells you everything you need to know about his primary area of expertise††.
+&nbsp;
+‡‡‡‡ The Historical Society for the Prevention of Unnecessary Enthusiasm in Furnace Operation maintains a detailed archive of "memorable" tapping errors. The most-cited incident involved the Mercantile Smelting Company of Überwald, whose apprentice opened the wrong tap in 1588 and inadvertently created the kingdom's first metal-paved courtyard. The courtyard exists to this day. The apprentice exists only in cautionary tales.
+&nbsp;
+‡‡‡‡‡ Slag is not merely waste; it is waste that remembers what it used to be‡, and given the right encouragement (more flux, more heat, more hope) can be convinced to reveal its hidden treasures.
+&nbsp;
+****** The Slag-Pickers Guild is an ancient and honorable institution††† whose members wear distinctive grey robes and maintain that they are not, technically, picking through garbage. They are "engaging in secondary metallurgical resource recovery," which sounds much better at parties.
+&nbsp;
+******* Including his great-grandson, Grundir Slagreuniter, who pioneered the reprocessing methods now standard throughout the industry. The Slagsplitter family reunion‡‡ involves a lot of arguments about the most efficient furnace temperatures.
+&nbsp;
+†††† Their statistical methodology is considered suspect by the University of Empirical Measurement‡‡‡, primarily because it involves weighing slag samples by "feeling their heft" and estimating metal content by "giving them a good look."
+&nbsp;
+††††† The Counter-Guild was formed in 1456 specifically to contradict the claims of the Metallurgists Guild. Their motto is "Well, Actually," and they are not invited to many conferences.
+&nbsp;
+‡‡‡‡‡ There is a third option: ignorant. The Three-Way Treaty of Prague (1689) between the Slag-Pickers Guild, the Metallurgists Guild, and the University of Things That Should Not Have Been Thrown Away established that anyone caught disposing of unprocessed slag shall be required to attend a minimum of forty hours of lectures on resource management. This is considered a fate worse than many alternatives.
+&nbsp;
+‡‡‡‡‡‡ Ancient Mesopotamian slag heaps have been successfully reprocessed using modern techniques, yielding metal that was last molten when the Epic of Gilgamesh was contemporary fiction. The metal was used to create a commemorative plaque reading "We Were Always Better At This Than You Thought," which was installed at the Museum of Metallurgical Hubris.
+&nbsp;
+******** By contrast, the Slag-Pickers Guild invested their funds wisely and now own seventeen percent of the kingdom's mining operations. The metallurgists maintain dignified silence on this topic.
+&nbsp;
+†† Dwarvish surnames are remarkably literal. The family Slagsplitter has been splitting slag for nine generations`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Techniques for separating waste material from pure metal',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  ORE_IDENTIFICATION,</span>
+<span class="cstat-no" title="statement not covered" >  FURNACE_CONSTRUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  IRON_SMELTING,</span>
+<span class="cstat-no" title="statement not covered" >  COPPER_TIN_BRONZE,</span>
+<span class="cstat-no" title="statement not covered" >  SLAG_SEPARATION</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

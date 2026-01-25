@@ -1,0 +1,4150 @@
+/**
+ * LiveEntityAPI - Handles live entity queries from the metrics dashboard
+ *
+ * Provides real-time entity data including:
+ * - List of all agents with basic info
+ * - Detailed entity state (components, inventory, etc.)
+ * - Live LLM prompt generation using StructuredPromptBuilder
+ */
+
+import type { World } from '@ai-village/core';
+import type { Entity } from '@ai-village/core';
+import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
+import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/core';
+// TODO: Re-export these from core or import directly from source files
+// import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
+import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
+import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
+
+/**
+ * Interface for the prompt builder (from @ai-village/llm)
+ */
+export interface PromptBuilder {
+  buildPrompt(agent: Entity, world: World): string;
+}
+
+/**
+ * Entity summary for the entities list
+ */
+export interface EntitySummary {
+  id: string;
+  name: string;
+  type: 'agent' | 'animal' | 'building' | 'plant' | 'resource' | 'other';
+  position?: { x: number; y: number };
+  behavior?: string;
+}
+
+/**
+ * Detailed entity data
+ */
+export interface EntityDetails {
+  id: string;
+  name?: string;
+  components: Record<string, unknown>;
+}
+
+/**
+ * LiveEntityAPI connects the game's World to the metrics dashboard
+ */
+/**
+ * Interface for the LLM scheduler (from @ai-village/llm)
+ */
+export interface LLMScheduler {
+  getMetricsWithAverages(): unknown;
+}
+
+/**
+ * Extended World interface with runtime properties
+ */
+interface WorldWithRuntimeProps extends World {
+  speedMultiplier?: number;
+  paused?: boolean;
+}
+
+/**
+ * Extended World interface with mutator methods
+ */
+interface WorldWithMutator extends World {
+  addComponent(entityId: string, component: unknown): void;
+}
+
+/**
+ * Common component interfaces for type safety
+ */
+interface IdentityComponent {
+  type: 'identity';
+  name?: string;
+}
+
+interface PositionComponent {
+  type: 'position';
+  x?: number;
+  y?: number;
+}
+
+interface AgentComponent {
+  type: 'agent';
+  currentBehavior?: string;
+  behavior?: string;
+  name?: string;
+  generation?: number;
+  birthTick?: number;
+  customLLM?: unknown;
+}
+
+interface SkillsComponent {
+  type: 'skills';
+  levels?: Record<string, number>;
+}
+
+interface NeedsComponent {
+  type: 'needs';
+  [key: string]: unknown;
+}
+
+interface InventoryComponent {
+  type: 'inventory';
+  items?: Array<{ resourceType?: string; quantity?: number }>;
+}
+
+interface PlantComponent {
+  type: 'plant';
+  species?: string;
+  age?: number;
+  health?: number;
+  growthStage?: string;
+  waterLevel?: number;
+  [key: string]: unknown;
+}
+
+interface RenderableComponent {
+  type: 'renderable';
+  sprite?: string;
+  [key: string]: unknown;
+}
+
+interface NavyComponent {
+  type: 'navy';
+  ownerEmpireId?: string;
+  [key: string]: unknown;
+}
+
+interface FederationComponent {
+  type: 'federation_governance';
+  federationName?: string;
+  memberEmpires?: string[];
+  [key: string]: unknown;
+}
+
+interface GalacticCouncilComponent {
+  type: 'galactic_council';
+  councilName?: string;
+  memberEmpires?: string[];
+  [key: string]: unknown;
+}
+
+interface ShippingLaneComponent {
+  type: 'shipping_lane';
+  laneName?: string;
+  [key: string]: unknown;
+}
+
+interface ConflictComponent {
+  type: 'conflict';
+  version: 1;
+  conflictType: 'hunting' | 'agent_combat';
+  [key: string]: unknown;
+}
+
+/**
+ * Nation component interface
+ */
+interface NationComponent {
+  type: 'nation';
+  nationName?: string;
+  governmentType?: string;
+  economy?: {
+    population?: number;
+    gdp?: number;
+  };
+}
+
+/**
+ * Fleet component interface
+ */
+interface FleetComponent {
+  type: 'fleet';
+  fleetName?: string;
+  admiralId?: string;
+  squadronIds?: string[];
+  stats?: {
+    totalShips?: number;
+    combatStrength?: number;
+  };
+  navigation?: {
+    targetPosition?: { x: number; y: number };
+    status?: string;
+  };
+}
+
+/**
+ * Squadron component interface
+ */
+interface SquadronComponent {
+  type: 'squadron';
+  squadronName?: string;
+  commanderId?: string;
+  shipIds?: string[];
+  stats?: {
+    totalShips?: number;
+    combatStrength?: number;
+  };
+}
+
+/**
+ * Empire component interface
+ */
+interface EmpireComponent {
+  type: 'empire';
+  empireName?: string;
+  diplomacy?: {
+    relations?: Map<string, unknown>;
+  };
+}
+
+/**
+ * Megastructure component interface
+ */
+interface MegastructureComponent {
+  type: 'megastructure';
+  currentTask?: string;
+  taskProgress?: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Extended Entity interface with mutable addComponent
+ */
+interface MutableEntity extends Entity {
+  addComponent(component: unknown): void;
+}
+
+/**
+ * Universe properties that may exist on World at runtime
+ */
+interface UniverseProps {
+  universeId?: { id: string; name: string; createdAt: number };
+  divineConfig?: {
+    name?: string;
+    description?: string;
+    coreParams?: {
+      divinePresence?: number;
+      divineReliability?: number;
+      mortalSignificance?: number;
+      maxActiveDeities?: number;
+    };
+  };
+  getMagicSystemState?: () => {
+    getAllParadigms?: () => unknown[];
+  };
+  forkMetadata?: {
+    parentUniverseId?: string;
+    forkTick?: number;
+    forkReason?: string;
+  };
+}
+
+/**
+ * Terrain access properties that may exist on World at runtime
+ */
+interface TerrainProps {
+  getTileAt?: (x: number, y: number) => unknown;
+  getChunkManager?: () => unknown;
+}
+
+/**
+ * Tile data interface
+ */
+interface TileData {
+  terrain?: string;
+  elevation?: number;
+  biome?: string;
+  wall?: { material?: string };
+}
+
+/**
+ * Magic component interface
+ */
+interface MagicComponent {
+  type: 'magic';
+  magicUser?: boolean;
+  homeParadigmId?: string;
+  knownParadigmIds?: string[];
+  activeParadigmId?: string;
+  knownSpells?: unknown[];
+  totalSpellsCast?: number;
+  totalMishaps?: number;
+  manaPools?: Array<{
+    source: string;
+    current: number;
+    maximum: number;
+    locked: number;
+    regenRate: number;
+  }>;
+  resourcePools?: Record<string, {
+    type: string;
+    current: number;
+    maximum: number;
+    locked: number;
+  }>;
+  casting?: boolean;
+  activeEffects?: string[];
+  techniqueProficiency?: Record<string, number>;
+  formProficiency?: Record<string, number>;
+  paradigmState?: Record<string, unknown>;
+  corruption?: number;
+  attentionLevel?: number;
+  favorLevel?: number;
+  addictionLevel?: number;
+  primarySource?: string;
+}
+
+/**
+ * Deity component interface
+ */
+interface DeityComponentData {
+  type: 'deity';
+  identity?: {
+    primaryName?: string;
+    domain?: string;
+  };
+  belief?: {
+    currentBelief?: number;
+    beliefPerTick?: number;
+    totalBeliefEarned?: number;
+    totalBeliefSpent?: number;
+  };
+  believers?: Set<string> | { size?: number };
+  sacredSites?: Set<string> | { size?: number };
+  controller?: string;
+  prayerQueue?: unknown[];
+}
+
+/**
+ * Spiritual component interface
+ */
+interface SpiritualComponent {
+  type: 'spiritual';
+  totalPrayers?: number;
+  answeredPrayers?: number;
+  believedDeity?: string;
+}
+
+/**
+ * Research state component interface
+ */
+interface ResearchStateComponent {
+  type: 'research_state';
+  completed?: Set<string>;
+  inProgress?: Map<string, {
+    researchId: string;
+    totalRequired: number;
+    currentProgress: number;
+    assignedAgents: string[];
+    startedAt: number;
+    researchers?: string[];
+    insights?: Array<{ agentId: string; contribution: number }>;
+  }>;
+}
+
+/**
+ * Type guard functions for safe type checking
+ */
+function hasUniverseProps(world: World): world is World & UniverseProps {
+  return true; // All properties are optional, so any World could have them
+}
+
+function hasTerrain(world: World): world is World & TerrainProps {
+  return 'getTileAt' in world && typeof world.getTileAt === 'function';
+}
+
+function isMagicComponent(component: unknown): component is MagicComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'magic';
+}
+
+function isDeityComponent(component: unknown): component is DeityComponentData {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'deity';
+}
+
+function isSpiritualComponent(component: unknown): component is SpiritualComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'spiritual';
+}
+
+function isResearchStateComponent(component: unknown): component is ResearchStateComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'research_state';
+}
+
+function isTileData(data: unknown): data is TileData {
+  if (!data || typeof data !== 'object') return false;
+  return true; // TileData has all optional properties, so any object could be valid
+}
+
+function isAgentComponent(component: unknown): component is AgentComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'agent';
+}
+
+function isSkillsComponent(component: unknown): component is SkillsComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'skills';
+}
+
+function isIdentityComponent(component: unknown): component is IdentityComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'identity';
+}
+
+function isPositionComponent(component: unknown): component is PositionComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'position';
+}
+
+function isNeedsComponent(component: unknown): component is NeedsComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'needs';
+}
+
+function isInventoryComponent(component: unknown): component is InventoryComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'inventory';
+}
+
+function isPlantComponent(component: unknown): component is PlantComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'plant';
+}
+
+function isRenderableComponent(component: unknown): component is RenderableComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'renderable';
+}
+
+function isNationComponent(component: unknown): component is NationComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'nation';
+}
+
+function isFleetComponent(component: unknown): component is FleetComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'fleet';
+}
+
+function isSquadronComponent(component: unknown): component is SquadronComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'squadron';
+}
+
+function isEmpireComponent(component: unknown): component is EmpireComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'empire';
+}
+
+function isMegastructureComponent(component: unknown): component is MegastructureComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'megastructure';
+}
+
+function isNavyComponent(component: unknown): component is NavyComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'navy';
+}
+
+function hasRuntimeProps(world: World): world is WorldWithRuntimeProps {
+  return true; // All properties are optional
+}
+
+function hasMutator(world: World): world is WorldWithMutator {
+  return 'addComponent' in world && typeof (world as WorldWithMutator).addComponent === 'function';
+}
+
+function isMutableEntity(entity: Entity): entity is MutableEntity {
+  return 'addComponent' in entity && typeof (entity as MutableEntity).addComponent === 'function';
+}
+
+/**
+ * Interface for SaveLoadService (from @ai-village/core)
+ */
+export interface SaveLoadServiceInterface {
+  listSaves(): Promise<Array<{ key: string; name?: string; tick?: number; timestamp?: number }>>;
+  save(world: World, options: { name?: string; description?: string }): Promise<void>;
+  load(key: string, world: World): Promise<{ success: boolean; error?: string }>;
+}
+
+/**
+ * Interface for BackgroundUniverseManager (from @ai-village/core)
+ */
+export interface BackgroundUniverseManagerInterface {
+  getAllBackgroundUniverses(): ReadonlyMap<string, {
+    id: string;
+    name?: string;
+    type: string;
+    createdAtTick: bigint;
+    currentTick: bigint;
+    population: number;
+    isPaused: boolean;
+    lastActivity?: string;
+  }>;
+  getBackgroundUniverse(id: string): unknown | undefined;
+  getStats(): { totalSpawned: number; activeCount: number; invasionsTriggered: number };
+}
+
+export class LiveEntityAPI {
+  private world: World;
+  private promptBuilder: PromptBuilder | null = null;
+  private talkerPromptBuilder: PromptBuilder | null = null;
+  private executorPromptBuilder: PromptBuilder | null = null;
+  private agentDebugManager: AgentDebugManager | null = null;
+  private scheduler: LLMScheduler | null = null;
+  private saveLoadService: SaveLoadServiceInterface | null = null;
+  private backgroundUniverseManager: BackgroundUniverseManagerInterface | null = null;
+
+  constructor(world: World) {
+    this.world = world;
+  }
+
+  /**
+   * Set the prompt builder for generating LLM prompts (legacy/original)
+   */
+  setPromptBuilder(builder: PromptBuilder): void {
+    this.promptBuilder = builder;
+  }
+
+  /**
+   * Set the Talker prompt builder (Layer 2: conversation, goals, social)
+   */
+  setTalkerPromptBuilder(builder: PromptBuilder): void {
+    this.talkerPromptBuilder = builder;
+  }
+
+  /**
+   * Set the Executor prompt builder (Layer 3: strategic planning, tasks)
+   */
+  setExecutorPromptBuilder(builder: PromptBuilder): void {
+    this.executorPromptBuilder = builder;
+  }
+
+  /**
+   * Set the agent debug manager for deep logging
+   */
+  setAgentDebugManager(manager: AgentDebugManager): void {
+    this.agentDebugManager = manager;
+  }
+
+  /**
+   * Set the LLM scheduler for metrics queries
+   */
+  setScheduler(scheduler: LLMScheduler): void {
+    this.scheduler = scheduler;
+  }
+
+  /**
+   * Set the save/load service for timeline management
+   */
+  setSaveLoadService(service: SaveLoadServiceInterface): void {
+    this.saveLoadService = service;
+  }
+
+  /**
+   * Set the background universe manager for multiverse queries
+   */
+  setBackgroundUniverseManager(manager: BackgroundUniverseManagerInterface): void {
+    this.backgroundUniverseManager = manager;
+  }
+
+  /**
+   * Attach to a MetricsStreamClient to handle queries and actions
+   */
+  attach(client: MetricsStreamClient): void {
+    client.setQueryHandler(this.handleQuery.bind(this));
+    client.setActionHandler(this.handleAction.bind(this));
+  }
+
+  /**
+   * Handle incoming queries
+   */
+  async handleQuery(query: QueryRequest): Promise<QueryResponse> {
+    switch (query.queryType) {
+      case 'entities':
+        return this.handleEntitiesQuery(query);
+      case 'entity':
+        return this.handleEntityQuery(query);
+      case 'entity_prompt':
+        return this.handleEntityPromptQuery(query);
+      case 'talker_prompt':
+        return this.handleTalkerPromptQuery(query);
+      case 'executor_prompt':
+        return this.handleExecutorPromptQuery(query);
+      case 'universe':
+        return this.handleUniverseQuery(query);
+      case 'magic':
+        return this.handleMagicQuery(query);
+      case 'divinity':
+        return this.handleDivinityQuery(query);
+      case 'pending_approvals':
+        return this.handlePendingApprovalsQuery(query);
+      case 'research':
+        return this.handleResearchQuery(query);
+      case 'plants':
+        return this.handlePlantsQuery(query);
+      case 'terrain':
+        return this.handleTerrainQuery(query);
+      case 'scheduler':
+        return this.handleSchedulerQuery(query);
+      // Grand Strategy queries
+      case 'empires':
+        return this.handleEmpiresQuery(query);
+      case 'nations':
+        return this.handleNationsQuery(query);
+      case 'federations':
+        return this.handleFederationsQuery(query);
+      case 'galactic_councils':
+        return this.handleGalacticCouncilsQuery(query);
+      case 'navies':
+        return this.handleNaviesQuery(query);
+      case 'fleets':
+        return this.handleFleetsQuery(query);
+      case 'squadrons':
+        return this.handleSquadronsQuery(query);
+      case 'megastructures':
+        return this.handleMegastructuresQuery(query);
+      case 'trade_networks':
+        return this.handleTradeNetworksQuery(query);
+      // Timeline/Multiverse queries
+      case 'timelines':
+        return this.handleTimelinesQuery(query);
+      case 'timeline_saves':
+        return this.handleTimelineSavesQuery(query);
+      case 'background_universes':
+        return this.handleBackgroundUniversesQuery(query);
+      case 'background_universe':
+        return this.handleBackgroundUniverseQuery(query);
+      default:
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: `Unknown query type: ${query.queryType}`,
+        };
+    }
+  }
+
+  /**
+   * Handle incoming actions
+   */
+  async handleAction(action: ActionRequest): Promise<ActionResponse> {
+    switch (action.action) {
+      case 'set-llm-config':
+        return this.handleSetLLMConfig(action);
+      case 'approve-creation':
+        return this.handleApproveCreation(action);
+      case 'reject-creation':
+        return this.handleRejectCreation(action);
+      case 'set-skill':
+        return this.handleSetSkill(action);
+      case 'spawn-entity':
+        return this.handleSpawnEntity(action);
+      case 'spawn-agent':
+        return this.handleSpawnAgent(action);
+      case 'teleport':
+        return this.handleTeleport(action);
+      case 'set-need':
+        return this.handleSetNeed(action);
+      case 'give-item':
+        return this.handleGiveItem(action);
+      case 'trigger-behavior':
+        return this.handleTriggerBehavior(action);
+      case 'set-speed':
+        return this.handleSetSpeed(action);
+      case 'pause':
+        return this.handlePause(action);
+      case 'grant-spell':
+        return this.handleGrantSpell(action);
+      case 'add-belief':
+        return this.handleAddBelief(action);
+      case 'create-deity':
+        return this.handleCreateDeity(action);
+      case 'spawn-city':
+        return await this.handleSpawnCity(action);
+      case 'list-city-templates':
+        return this.handleListCityTemplates(action);
+      case 'debug-start-logging':
+        return this.handleDebugStartLogging(action);
+      case 'debug-stop-logging':
+        return this.handleDebugStopLogging(action);
+      case 'debug-list-agents':
+        return this.handleDebugListAgents(action);
+      case 'debug-get-logs':
+        return this.handleDebugGetLogs(action);
+      case 'debug-analyze':
+        return this.handleDebugAnalyze(action);
+      case 'debug-list-log-files':
+        return this.handleDebugListLogFiles(action);
+      case 'find-agent-by-name':
+        return this.handleFindAgentByName(action);
+      case 'trigger-hunt':
+        return this.handleTriggerHunt(action);
+      case 'trigger-combat':
+        return this.handleTriggerCombat(action);
+      // Grand Strategy actions
+      case 'diplomatic-action':
+        return this.handleDiplomaticAction(action);
+      case 'move-fleet':
+        return this.handleMoveFleet(action);
+      case 'megastructure-task':
+        return this.handleMegastructureTask(action);
+      // Timeline/Multiverse actions
+      case 'save-timeline':
+        return await this.handleSaveTimeline(action);
+      case 'load-timeline':
+        return await this.handleLoadTimeline(action);
+      case 'pause-background-universe':
+        return this.handlePauseBackgroundUniverse(action);
+      case 'resume-background-universe':
+        return this.handleResumeBackgroundUniverse(action);
+      default:
+        return {
+          requestId: action.requestId,
+          success: false,
+          error: `Unknown action: ${action.action}`,
+        };
+    }
+  }
+
+  /**
+   * Handle set-llm-config action
+   */
+  private handleSetLLMConfig(action: ActionRequest): ActionResponse {
+    const { agentId, config } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const agentComp = entity.components.get('agent');
+    if (!agentComp || !isAgentComponent(agentComp)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} is not an agent`,
+      };
+    }
+    const agent = agentComp;
+
+    // Set or clear the custom LLM config
+    if (config === null || config === undefined) {
+      agent.customLLM = undefined;
+    } else {
+      agent.customLLM = config;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, config: agent.customLLM },
+    };
+  }
+
+  /**
+   * Handle set-skill action
+   */
+  private handleSetSkill(action: ActionRequest): ActionResponse {
+    const { agentId, skill, level } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!skill || typeof skill !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid skill parameter',
+      };
+    }
+
+    if (typeof level !== 'number' || level < 0 || level > 5 || !Number.isInteger(level)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Level must be an integer between 0 and 5',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const skillsComp = entity.components.get('skills');
+    if (!skillsComp || !isSkillsComponent(skillsComp)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have skills component`,
+      };
+    }
+    const skills = skillsComp;
+
+    if (!skills.levels) {
+      skills.levels = {};
+    }
+
+    // Set the skill level
+    skills.levels[skill] = level;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, skill, level },
+    };
+  }
+
+  /**
+   * Spawn an entity (building, animal, etc.) at the specified location
+   */
+  private handleSpawnEntity(action: ActionRequest): ActionResponse {
+    const { type, x, y } = action.params;
+
+    if (!type || typeof type !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid type parameter',
+      };
+    }
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    // Create the entity
+    const entity = this.world.createEntity();
+    const entityId = entity.id;
+
+    // Set position via component (assuming PositionComponent exists)
+    // TODO: Add proper position component initialization
+
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Failed to spawn entity of type: ${type}`,
+      };
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { entityId, type, x, y },
+    };
+  }
+
+  /**
+   * Spawn an NPC city with buildings and AI-driven agents
+   */
+  private async handleSpawnCity(action: ActionRequest): Promise<ActionResponse> {
+    const { template, x, y, name, agentCount, useLLM } = action.params;
+
+    if (!template || typeof template !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid template parameter',
+      };
+    }
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    // TODO: Re-enable once spawnCity is exported from core
+    // const config: CitySpawnConfig = {
+    //   template: template as any,
+    //   x,
+    //   y,
+    //   name: typeof name === 'string' ? name : undefined,
+    //   agentCount: typeof agentCount === 'number' ? agentCount : undefined,
+    //   useLLM: typeof useLLM === 'boolean' ? useLLM : true,
+    // };
+
+    // try {
+    //   const cityInfo = await spawnCity(this.world, config);
+
+    //   return {
+    //     requestId: action.requestId,
+    //     success: true,
+    //     data: cityInfo,
+    //   };
+    // } catch (error) {
+    return {
+      requestId: action.requestId,
+      success: false,
+      error: 'City spawning temporarily disabled during refactor',
+    };
+    // }
+  }
+
+  /**
+   * List available city templates
+   */
+  private handleListCityTemplates(action: ActionRequest): ActionResponse {
+    // TODO: Re-enable once getCityTemplates is exported from core
+    // const templates = getCityTemplates();
+
+    return {
+      requestId: action.requestId,
+      success: false,
+      error: 'City templates listing temporarily disabled during refactor',
+    };
+  }
+
+  /**
+   * Spawn an agent at the specified location
+   */
+  private handleSpawnAgent(action: ActionRequest): ActionResponse {
+    const { name, x, y, useLLM, speed, believedDeity } = action.params;
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    const agentSpeed = typeof speed === 'number' ? speed : 2.0;
+    const shouldUseLLM = typeof useLLM === 'boolean' ? useLLM : false;
+    const options = believedDeity && typeof believedDeity === 'string' ? { believedDeity } : undefined;
+
+    try {
+      const agentId = shouldUseLLM
+        ? createLLMAgent(this.world, x, y, agentSpeed, undefined, options)
+        : createWanderingAgent(this.world, x, y, agentSpeed, options);
+
+      // Optionally set the agent's name if provided
+      if (name && typeof name === 'string') {
+        const entity = this.world.getEntity(agentId);
+        if (entity) {
+          const identity = entity.components.get('identity') as { name?: string } | undefined;
+          if (identity) {
+            identity.name = name;
+          }
+        }
+      }
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: { agentId, x, y, useLLM: shouldUseLLM },
+      };
+    } catch (error) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to spawn agent',
+      };
+    }
+  }
+
+  /**
+   * Teleport an agent to a new location
+   */
+  private handleTeleport(action: ActionRequest): ActionResponse {
+    const { agentId, x, y } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+    if (!position) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have a position component`,
+      };
+    }
+
+    // Update position
+    position.x = x;
+    position.y = y;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, x, y },
+    };
+  }
+
+  /**
+   * Set an agent's need value
+   */
+  private handleSetNeed(action: ActionRequest): ActionResponse {
+    const { agentId, need, value } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!need || typeof need !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid need parameter',
+      };
+    }
+
+    if (typeof value !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid value parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const needs = entity.components.get('needs') as Record<string, unknown> | undefined;
+    if (!needs) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have needs component`,
+      };
+    }
+
+    // Validate need type
+    const validNeeds = ['hunger', 'energy', 'health', 'thirst'];
+    if (!validNeeds.includes(need)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Invalid need type. Must be one of: ${validNeeds.join(', ')}`,
+      };
+    }
+
+    // Clamp value to 0-1 range (needs are 0-1 scale)
+    const clampedValue = Math.max(0, Math.min(1, value));
+
+    // Set the need value
+    needs[need] = clampedValue;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, need, value: clampedValue },
+    };
+  }
+
+  /**
+   * Give an item to an agent's inventory
+   */
+  private handleGiveItem(action: ActionRequest): ActionResponse {
+    const { agentId, itemType, amount } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!itemType || typeof itemType !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid itemType parameter',
+      };
+    }
+
+    const itemAmount = typeof amount === 'number' ? amount : 1;
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const inventory = entity.components.get('inventory') as {
+      slots: Array<{ itemId: string; quantity: number } | null>;
+      maxSlots: number;
+    } | undefined;
+
+    if (!inventory) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have inventory component`,
+      };
+    }
+
+    // Find existing stack or empty slot
+    let slotIndex = -1;
+    for (let i = 0; i < inventory.slots.length; i++) {
+      const slot = inventory.slots[i];
+      if (slot && slot.itemId === itemType) {
+        // Found existing stack
+        slotIndex = i;
+        break;
+      } else if (!slot && slotIndex === -1) {
+        // Found empty slot
+        slotIndex = i;
+      }
+    }
+
+    if (slotIndex === -1) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Inventory is full',
+      };
+    }
+
+    // Add to inventory
+    if (inventory.slots[slotIndex]) {
+      inventory.slots[slotIndex]!.quantity += itemAmount;
+    } else {
+      inventory.slots[slotIndex] = { itemId: itemType, quantity: itemAmount };
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, itemType, amount: itemAmount },
+    };
+  }
+
+  /**
+   * Trigger a specific behavior on an agent
+   */
+  private handleTriggerBehavior(action: ActionRequest): ActionResponse {
+    const { agentId, behavior } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!behavior || typeof behavior !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid behavior parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const agent = entity.components.get('agent') as { currentBehavior?: string } | undefined;
+    if (!agent) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} is not an agent`,
+      };
+    }
+
+    // Set the behavior
+    agent.currentBehavior = behavior;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, behavior },
+    };
+  }
+
+  /**
+   * Set game speed multiplier
+   */
+  private handleSetSpeed(action: ActionRequest): ActionResponse {
+    const { speed } = action.params;
+
+    if (typeof speed !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid speed parameter',
+      };
+    }
+
+    if (speed < 0.1 || speed > 10) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Speed must be between 0.1 and 10.0',
+      };
+    }
+
+    // Access speed multiplier on world (if exists)
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    if (worldWithRuntime.speedMultiplier !== undefined) {
+      worldWithRuntime.speedMultiplier = speed;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { speed },
+    };
+  }
+
+  /**
+   * Pause or resume the game
+   */
+  private handlePause(action: ActionRequest): ActionResponse {
+    const { paused } = action.params;
+
+    if (typeof paused !== 'boolean') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid paused parameter (must be boolean)',
+      };
+    }
+
+    // Access paused state on world (if exists)
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    if (worldWithRuntime.paused !== undefined) {
+      worldWithRuntime.paused = paused;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { paused },
+    };
+  }
+
+  /**
+   * Grant a spell to an agent
+   */
+  private handleGrantSpell(action: ActionRequest): ActionResponse {
+    const { agentId, spellId } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!spellId || typeof spellId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid spellId parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const magic = entity.components.get('magic') as {
+      knownSpells?: Array<{ spellId: string }>;
+    } | undefined;
+
+    if (!magic) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have magic component`,
+      };
+    }
+
+    if (!magic.knownSpells) {
+      magic.knownSpells = [];
+    }
+
+    // Check if already known
+    if (magic.knownSpells.some((s) => s.spellId === spellId)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent already knows spell: ${spellId}`,
+      };
+    }
+
+    // Add spell
+    magic.knownSpells.push({ spellId });
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, spellId },
+    };
+  }
+
+  /**
+   * Add belief points to a deity
+   */
+  private handleAddBelief(action: ActionRequest): ActionResponse {
+    const { deityId, amount } = action.params;
+
+    if (!deityId || typeof deityId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid deityId parameter',
+      };
+    }
+
+    if (typeof amount !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid amount parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(deityId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${deityId}`,
+      };
+    }
+
+    const deity = entity.components.get('deity') as {
+      belief?: { currentBelief?: number; totalBeliefEarned?: number };
+    } | undefined;
+
+    if (!deity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${deityId} is not a deity`,
+      };
+    }
+
+    if (!deity.belief) {
+      deity.belief = { currentBelief: 0, totalBeliefEarned: 0 };
+    }
+
+    // Add belief
+    const currentBefore = deity.belief.currentBelief || 0;
+    deity.belief.currentBelief = currentBefore + amount;
+    deity.belief.totalBeliefEarned = (deity.belief.totalBeliefEarned || 0) + amount;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        deityId,
+        amount,
+        newTotal: deity.belief.currentBelief,
+      },
+    };
+  }
+
+  /**
+   * Create a new deity entity
+   */
+  private handleCreateDeity(action: ActionRequest): ActionResponse {
+    const { name, controller } = action.params;
+
+    if (!name || typeof name !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid name parameter',
+      };
+    }
+
+    const deityController = (controller === 'player' || controller === 'ai' || controller === 'dormant')
+      ? controller
+      : 'dormant';
+
+    try {
+      // Create deity entity
+      const deityEntity = this.world.createEntity();
+      const deityComponent = new DeityComponent(name, deityController);
+      // Use WorldMutator's addComponent since Entity interface is read-only
+      const worldMutator = this.world as WorldWithMutator;
+      worldMutator.addComponent(deityEntity.id, deityComponent);
+
+      // Add identity component for chat system and UI display
+      const identityComponent = createIdentityComponent(name, 'deity');
+      worldMutator.addComponent(deityEntity.id, identityComponent);
+
+      // Add tags component for chat room membership (Divine Realm requires 'deity' tag)
+      const tagsComponent = createTagsComponent('deity');
+      worldMutator.addComponent(deityEntity.id, tagsComponent);
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: {
+          deityId: deityEntity.id,
+          name,
+          controller: deityController,
+        },
+      };
+    } catch (error) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to create deity',
+      };
+    }
+  }
+
+  /**
+   * Get list of all agents
+   */
+  private handleEntitiesQuery(query: QueryRequest): QueryResponse {
+    const entities: EntitySummary[] = [];
+
+    for (const entity of this.world.entities.values()) {
+      const summary = this.getEntitySummary(entity);
+      if (summary.type === 'agent') {
+        entities.push(summary);
+      }
+    }
+
+    return {
+      requestId: query.requestId,
+      success: true,
+      data: { entities },
+    };
+  }
+
+  /**
+   * Get list of all plants with their visual metadata for 3D rendering
+   */
+  private handlePlantsQuery(query: QueryRequest): QueryResponse {
+    const plants: Array<{
+      id: string;
+      plantType: string;
+      stage: string;
+      position: { x: number; y: number };
+      spriteId: string;
+      sizeMultiplier: number;
+      alpha: number;
+    }> = [];
+
+    for (const entity of this.world.entities.values()) {
+      if (!entity.components.has('plant')) continue;
+
+      const plant = entity.components.get('plant') as {
+        plantType?: string;
+        stage?: string;
+      } | undefined;
+
+      const position = entity.components.get('position') as {
+        x?: number;
+        y?: number;
+      } | undefined;
+
+      const renderable = entity.components.get('renderable') as {
+        spriteId?: string;
+        sizeMultiplier?: number;
+        alpha?: number;
+      } | undefined;
+
+      // Skip plants without position or renderable
+      if (!position || !renderable) continue;
+
+      plants.push({
+        id: entity.id,
+        plantType: plant?.plantType || 'unknown',
+        stage: plant?.stage || 'mature',
+        position: {
+          x: position.x ?? 0,
+          y: position.y ?? 0,
+        },
+        spriteId: renderable.spriteId || 'plant_default',
+        sizeMultiplier: renderable.sizeMultiplier ?? 1.0,
+        alpha: renderable.alpha ?? 1.0,
+      });
+    }
+
+    return {
+      requestId: query.requestId,
+      success: true,
+      data: { plants, count: plants.length },
+    };
+  }
+
+  /**
+   * Get detailed entity state
+   */
+  private handleEntityQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    const details = this.getEntityDetails(entity);
+    return {
+      requestId: query.requestId,
+      success: true,
+      data: details,
+    };
+  }
+
+  /**
+   * Get live LLM prompt for an entity
+   */
+  private handleEntityPromptQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    if (!this.promptBuilder) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'PromptBuilder not configured',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    // Check if this is an agent
+    if (!entity.components.has('agent')) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity ${query.entityId} is not an agent`,
+      };
+    }
+
+    try {
+      const prompt = this.promptBuilder.buildPrompt(entity, this.world);
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { prompt },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to build prompt',
+      };
+    }
+  }
+
+  /**
+   * Handle Talker prompt query (Layer 2: conversation, goals, social)
+   */
+  private handleTalkerPromptQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    if (!this.talkerPromptBuilder) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'TalkerPromptBuilder not configured',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    // Check if this is an agent
+    if (!entity.components.has('agent')) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity ${query.entityId} is not an agent`,
+      };
+    }
+
+    try {
+      const prompt = this.talkerPromptBuilder.buildPrompt(entity, this.world);
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { prompt, layer: 'talker' },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to build Talker prompt',
+      };
+    }
+  }
+
+  /**
+   * Handle Executor prompt query (Layer 3: strategic planning, tasks)
+   */
+  private handleExecutorPromptQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    if (!this.executorPromptBuilder) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'ExecutorPromptBuilder not configured',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    // Check if this is an agent
+    if (!entity.components.has('agent')) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity ${query.entityId} is not an agent`,
+      };
+    }
+
+    try {
+      const prompt = this.executorPromptBuilder.buildPrompt(entity, this.world);
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { prompt, layer: 'executor' },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to build Executor prompt',
+      };
+    }
+  }
+
+  /**
+   * Get a summary of an entity
+   */
+  private getEntitySummary(entity: Entity): EntitySummary {
+    const id = entity.id;
+
+    // Get name from identity component
+    const identity = entity.components.get('identity') as { name?: string } | undefined;
+    const name = identity?.name || id;
+
+    // Determine type
+    let type: EntitySummary['type'] = 'other';
+    if (entity.components.has('agent')) {
+      type = 'agent';
+    } else if (entity.components.has('animal')) {
+      type = 'animal';
+    } else if (entity.components.has('building')) {
+      type = 'building';
+    } else if (entity.components.has('plant')) {
+      type = 'plant';
+    } else if (entity.components.has('resource')) {
+      type = 'resource';
+    }
+
+    // Get position
+    const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+    const pos = position ? { x: position.x ?? 0, y: position.y ?? 0 } : undefined;
+
+    // Get current behavior
+    const agent = entity.components.get('agent') as { currentBehavior?: string } | undefined;
+    const behavior = agent?.currentBehavior;
+
+    return { id, name, type, position: pos, behavior };
+  }
+
+  /**
+   * Get detailed entity data
+   */
+  private getEntityDetails(entity: Entity): EntityDetails {
+    const id = entity.id;
+    const identity = entity.components.get('identity') as { name?: string } | undefined;
+    const name = identity?.name;
+
+    // Serialize all components
+    const components: Record<string, unknown> = {};
+    for (const [key, value] of entity.components.entries()) {
+      components[key] = this.serializeComponent(value);
+    }
+
+    return { id, name, components };
+  }
+
+  /**
+   * Serialize a component for JSON transport
+   */
+  private serializeComponent(component: unknown): unknown {
+    if (component === null || component === undefined) {
+      return component;
+    }
+
+    if (typeof component !== 'object') {
+      return component;
+    }
+
+    // Handle arrays
+    if (Array.isArray(component)) {
+      return component.map(item => this.serializeComponent(item));
+    }
+
+    // Handle Maps
+    if (component instanceof Map) {
+      const obj: Record<string, unknown> = {};
+      for (const [k, v] of component.entries()) {
+        obj[String(k)] = this.serializeComponent(v);
+      }
+      return obj;
+    }
+
+    // Handle Sets
+    if (component instanceof Set) {
+      return Array.from(component).map(item => this.serializeComponent(item));
+    }
+
+    // Handle plain objects
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(component as Record<string, unknown>)) {
+      // Skip functions
+      if (typeof value === 'function') continue;
+      result[key] = this.serializeComponent(value);
+    }
+    return result;
+  }
+
+  /**
+   * Get universe information (dimensions, physical laws, etc.)
+   */
+  private handleUniverseQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Check if universe config is available (Phase 27+)
+      if (!hasUniverseProps(this.world)) {
+        throw new Error('World does not have universe properties');
+      }
+
+      const universeId = this.world.universeId;
+      const divineConfig = this.world.divineConfig;
+
+      // Count active magic paradigms
+      const magicManager = this.world.getMagicSystemState?.();
+      const paradigmCount = magicManager?.getAllParadigms?.()?.length || 0;
+
+      // Count deities
+      let deityCount = 0;
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('deity')) {
+          deityCount++;
+        }
+      }
+
+      const universeInfo = {
+        // Basic universe properties
+        spatialDimensions: 2, // Current 2D implementation
+        hasTime: true,
+        temporalFlow: 'linear',
+
+        // Identity (if configured)
+        id: universeId?.id || 'default',
+        name: universeId?.name || 'Unnamed Universe',
+        createdAt: universeId?.createdAt,
+
+        // Magic & Divinity presence
+        magicSystemsAvailable: paradigmCount,
+        hasMagic: paradigmCount > 0,
+        hasDivinity: deityCount > 0,
+        activeDeities: deityCount,
+
+        // Divine configuration (if Phase I/II implemented)
+        divineProfile: divineConfig ? {
+          name: divineConfig.name || 'Default',
+          description: divineConfig.description || 'Standard divine mechanics',
+          divinePresence: divineConfig.coreParams?.divinePresence,
+          divineReliability: divineConfig.coreParams?.divineReliability,
+          mortalSignificance: divineConfig.coreParams?.mortalSignificance,
+          maxActiveDeities: divineConfig.coreParams?.maxActiveDeities,
+        } : undefined,
+
+        // Physical laws
+        physics: {
+          dimensions: 2,
+          euclidean: true,
+          causality: 'deterministic',
+        },
+      };
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: universeInfo,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query universe info',
+      };
+    }
+  }
+
+  /**
+   * Get magic system information (enabled paradigms, active systems, etc.)
+   */
+  private handleMagicQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Count magic users and collect statistics
+      const magicUsers: Array<{
+        id: string;
+        name: string;
+        paradigms: string[];
+        activeParadigm?: string;
+        primarySource?: string;
+        spellsKnown: number;
+        totalSpellsCast: number;
+        manaInfo: Array<{
+          source: string;
+          current: number;
+          max: number;
+          locked: number;
+          regenRate: number;
+          available: number;
+        }>;
+        resourcePools: Array<{
+          type: string;
+          current: number;
+          max: number;
+          locked: number;
+        }>;
+        casting: boolean;
+        activeEffects: string[];
+        sustainedEffectCount: number;
+        topTechniques: Array<{ technique: string; proficiency: number }>;
+        topForms: Array<{ form: string; proficiency: number }>;
+        paradigmState: Record<string, unknown>;
+        corruption?: number;
+        attentionLevel?: number;
+        favorLevel?: number;
+        addictionLevel?: number;
+      }> = [];
+
+      const paradigmUsage = new Map<string, number>();
+      let totalMagicUsers = 0;
+      let totalSpellsCast = 0;
+      let totalSpellsKnown = 0;
+      let totalMishaps = 0;
+      let currentlyCasting = 0;
+      let totalSustainedEffects = 0;
+      let totalCorruption = 0;
+      let corruptedCount = 0;
+      let totalAttention = 0;
+      let attentionCount = 0;
+      let totalAddiction = 0;
+      let addictedCount = 0;
+
+      // Scan all entities for magic components
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('magic')) {
+          const magicComp = entity.components.get('magic');
+          if (!isMagicComponent(magicComp)) {
+            throw new Error(`Entity ${entity.id} has invalid magic component`);
+          }
+
+          if (!magicComp.magicUser) continue;
+          const magic = magicComp;
+
+          totalMagicUsers++;
+          totalSpellsCast += magic.totalSpellsCast || 0;
+          totalMishaps += magic.totalMishaps || 0;
+          const spellsKnown = magic.knownSpells?.length || 0;
+          totalSpellsKnown += spellsKnown;
+
+          if (magic.casting) {
+            currentlyCasting++;
+          }
+
+          // Track sustained effects
+          const sustainedCount = magic.activeEffects?.length || 0;
+          totalSustainedEffects += sustainedCount;
+
+          // Track corruption
+          if (magic.corruption !== undefined && magic.corruption > 0) {
+            totalCorruption += magic.corruption;
+            corruptedCount++;
+          }
+
+          // Track attention
+          if (magic.attentionLevel !== undefined && magic.attentionLevel > 0) {
+            totalAttention += magic.attentionLevel;
+            attentionCount++;
+          }
+
+          // Track addiction
+          if (magic.addictionLevel !== undefined && magic.addictionLevel > 0) {
+            totalAddiction += magic.addictionLevel;
+            addictedCount++;
+          }
+
+          // Track paradigm usage
+          const paradigms = magic.knownParadigmIds || [];
+          for (const paradigmId of paradigms) {
+            paradigmUsage.set(paradigmId, (paradigmUsage.get(paradigmId) || 0) + 1);
+          }
+
+          // Get entity name
+          const identity = entity.components.get('identity') as { name?: string } | undefined;
+          const name = identity?.name || entity.id;
+
+          // Collect mana pool info
+          const manaInfo = (magic.manaPools || []).map(pool => ({
+            source: pool.source,
+            current: pool.current,
+            max: pool.maximum,
+            locked: pool.locked,
+            regenRate: pool.regenRate,
+            available: Math.max(0, pool.current - pool.locked),
+          }));
+
+          // Collect resource pools (non-mana)
+          const resourcePools: Array<{
+            type: string;
+            current: number;
+            max: number;
+            locked: number;
+          }> = [];
+
+          if (magic.resourcePools) {
+            for (const [type, pool] of Object.entries(magic.resourcePools)) {
+              resourcePools.push({
+                type,
+                current: pool.current,
+                max: pool.maximum,
+                locked: pool.locked,
+              });
+            }
+          }
+
+          // Extract paradigm-specific state
+          const paradigmSpecificState: Record<string, unknown> = {};
+          if (magic.paradigmState) {
+            for (const [paradigmId, state] of Object.entries(magic.paradigmState)) {
+              paradigmSpecificState[paradigmId] = state;
+            }
+          }
+
+          // Build proficiency summaries
+          const techniques = magic.techniqueProficiency || {};
+          const forms = magic.formProficiency || {};
+
+          // Top techniques (>0 proficiency)
+          const topTechniques = Object.entries(techniques)
+            .filter(([_, prof]) => prof > 0)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([tech, prof]) => ({ technique: tech, proficiency: prof }));
+
+          // Top forms (>0 proficiency)
+          const topForms = Object.entries(forms)
+            .filter(([_, prof]) => prof > 0)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([form, prof]) => ({ form, proficiency: prof }));
+
+          magicUsers.push({
+            id: entity.id,
+            name,
+            paradigms,
+            activeParadigm: magic.activeParadigmId,
+            primarySource: magic.primarySource,
+            spellsKnown,
+            totalSpellsCast: magic.totalSpellsCast || 0,
+            manaInfo,
+            resourcePools,
+            casting: magic.casting || false,
+            activeEffects: magic.activeEffects || [],
+            sustainedEffectCount: magic.activeEffects?.length || 0,
+            topTechniques,
+            topForms,
+            paradigmState: paradigmSpecificState,
+            // Consequence tracking
+            corruption: magic.corruption,
+            attentionLevel: magic.attentionLevel,
+            favorLevel: magic.favorLevel,
+            addictionLevel: magic.addictionLevel,
+          });
+        }
+      }
+
+      // Build paradigm summary
+      const paradigms: Array<{
+        id: string;
+        userCount: number;
+      }> = [];
+
+      for (const [paradigmId, count] of paradigmUsage.entries()) {
+        paradigms.push({
+          id: paradigmId,
+          userCount: count,
+        });
+      }
+
+      // Sort by user count descending
+      paradigms.sort((a, b) => b.userCount - a.userCount);
+
+      const magicInfo = {
+        // Overall statistics
+        totalMagicUsers,
+        totalSpellsCast,
+        totalSpellsKnown,
+        totalMishaps,
+        currentlyCasting,
+        mishapRate: totalSpellsCast > 0 ? totalMishaps / totalSpellsCast : 0,
+
+        // Sustained effects
+        totalSustainedEffects,
+        averageSustainedEffects: totalMagicUsers > 0 ? totalSustainedEffects / totalMagicUsers : 0,
+
+        // Consequence tracking
+        corruptionStats: {
+          corruptedUsers: corruptedCount,
+          averageCorruption: corruptedCount > 0 ? totalCorruption / corruptedCount : 0,
+          totalCorruption,
+        },
+        attentionStats: {
+          usersWithAttention: attentionCount,
+          averageAttention: attentionCount > 0 ? totalAttention / attentionCount : 0,
+          totalAttention,
+        },
+        addictionStats: {
+          addictedUsers: addictedCount,
+          averageAddiction: addictedCount > 0 ? totalAddiction / addictedCount : 0,
+          totalAddiction,
+        },
+
+        // Paradigm usage (only show paradigms with users)
+        paradigms,
+        paradigmCount: paradigms.length,
+
+        // Individual magic users (for debugging)
+        magicUsers: magicUsers.slice(0, 10), // Limit to top 10 for performance
+      };
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: magicInfo,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query magic info',
+      };
+    }
+  }
+
+  /**
+   * Get divinity information (gods, belief, pantheons, etc.)
+   */
+  private handleDivinityQuery(query: QueryRequest): QueryResponse {
+    try {
+      const deities: Array<{
+        id: string;
+        name: string;
+        domain?: string;
+        currentBelief: number;
+        beliefPerTick: number;
+        totalBeliefEarned: number;
+        totalBeliefSpent: number;
+        believerCount: number;
+        sacredSites: number;
+        controller: string;
+        unansweredPrayers: number;
+      }> = [];
+
+      let totalBeliefGenerated = 0;
+      let totalBelieverCount = 0;
+      let totalPrayers = 0;
+      let totalAnsweredPrayers = 0;
+
+      // Find all deity entities
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('deity')) {
+          const deityCompRaw = entity.components.get('deity');
+          if (!isDeityComponent(deityCompRaw)) {
+            throw new Error(`Entity ${entity.id} has invalid deity component`);
+          }
+          const deityComp = deityCompRaw;
+
+          const identity = deityComp.identity || {};
+          const belief = deityComp.belief || {};
+          const believersSet = deityComp.believers;
+          const sacredSitesSet = deityComp.sacredSites;
+
+          const believerCount = believersSet instanceof Set ? believersSet.size : (believersSet?.size || 0);
+          const sacredSiteCount = sacredSitesSet instanceof Set ? sacredSitesSet.size : (sacredSitesSet?.size || 0);
+          const prayerQueueLength = Array.isArray(deityComp.prayerQueue) ? deityComp.prayerQueue.length : 0;
+
+          const currentBelief = belief.currentBelief || 0;
+          const totalEarned = belief.totalBeliefEarned || 0;
+
+          totalBeliefGenerated += totalEarned;
+          totalBelieverCount += believerCount;
+
+          deities.push({
+            id: entity.id,
+            name: identity.primaryName || 'The Nameless',
+            domain: identity.domain,
+            currentBelief,
+            beliefPerTick: belief.beliefPerTick || 0,
+            totalBeliefEarned: totalEarned,
+            totalBeliefSpent: belief.totalBeliefSpent || 0,
+            believerCount,
+            sacredSites: sacredSiteCount,
+            controller: deityComp.controller || 'dormant',
+            unansweredPrayers: prayerQueueLength,
+          });
+        }
+      }
+
+      // Count believers with spiritual component
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('spiritual')) {
+          const spiritualComp = entity.components.get('spiritual');
+          if (!isSpiritualComponent(spiritualComp)) {
+            throw new Error(`Entity ${entity.id} has invalid spiritual component`);
+          }
+
+          if (spiritualComp.believedDeity) {
+            totalPrayers += spiritualComp.totalPrayers || 0;
+            totalAnsweredPrayers += spiritualComp.answeredPrayers || 0;
+          }
+        }
+      }
+
+      const divinityInfo = {
+        deities,
+        totalDeities: deities.length,
+        totalBeliefGenerated,
+        totalBelieverCount,
+        totalPrayers,
+        totalAnsweredPrayers,
+        prayerAnswerRate: totalPrayers > 0 ? (totalAnsweredPrayers / totalPrayers) : 0,
+      };
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: divinityInfo,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query divinity info',
+      };
+    }
+  }
+
+  /**
+   * Get research information (discovered papers, in-progress, completed)
+   */
+  private handleResearchQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Get world entity with research state
+      const worldEntity = this.world.query().with('time').executeEntities()[0];
+      if (!worldEntity) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'World entity not found',
+        };
+      }
+
+      const researchStateRaw = worldEntity.components.get('research_state');
+
+      if (!researchStateRaw) {
+        return {
+          requestId: query.requestId,
+          success: true,
+          data: {
+            totalDiscovered: 0,
+            completed: [],
+            inProgress: [],
+          },
+        };
+      }
+
+      if (!isResearchStateComponent(researchStateRaw)) {
+        throw new Error('World entity has invalid research_state component');
+      }
+
+      const researchState = researchStateRaw;
+
+      // Get completed papers
+      const completedPapers = Array.from(researchState.completed || []);
+
+      // Get in-progress papers
+      const inProgressPapers = Array.from(researchState.inProgress || []).map(([paperId, progress]) => ({
+        paperId,
+        progress: Math.round(progress.currentProgress * 100), // Convert to percentage
+        totalRequired: progress.totalRequired,
+        assignedAgents: progress.assignedAgents || [],
+        researchers: progress.researchers || [],
+        insights: progress.insights || [],
+        startedAt: progress.startedAt,
+      }));
+
+      const researchInfo = {
+        totalDiscovered: completedPapers.length + inProgressPapers.length,
+        completed: completedPapers,
+        completedCount: completedPapers.length,
+        inProgress: inProgressPapers,
+        inProgressCount: inProgressPapers.length,
+      };
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: researchInfo,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query research info',
+      };
+    }
+  }
+
+  /**
+   * Get LLM scheduler metrics
+   */
+  private handleSchedulerQuery(query: QueryRequest): QueryResponse {
+    try {
+      if (!this.scheduler) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'LLM scheduler not available (not initialized or not using scheduled decision processor)',
+        };
+      }
+
+      const metrics = this.scheduler.getMetricsWithAverages();
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: metrics,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query scheduler metrics',
+      };
+    }
+  }
+
+  /**
+   * Get pending creations awaiting divine approval
+   */
+  private handlePendingApprovalsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const pending = pendingApprovalRegistry.getAll();
+
+      const creations = pending.map(creation => ({
+        id: creation.id,
+        creationType: creation.creationType,
+        // Recipe-specific
+        itemName: creation.item?.displayName,
+        itemCategory: creation.item?.category,
+        recipeType: creation.recipeType,
+        // Technology-specific
+        technologyName: creation.technology?.name,
+        researchField: creation.researchField,
+        // Effect-specific
+        spellName: creation.spell?.name,
+        paradigmId: creation.paradigmId,
+        discoveryType: creation.discoveryType,
+        // Common
+        creatorId: creation.creatorId,
+        creatorName: creation.creatorName,
+        creationMessage: creation.creationMessage,
+        creativityScore: creation.creativityScore,
+        ingredients: creation.ingredients.map(i => ({
+          itemId: i.itemId,
+          quantity: i.quantity,
+        })),
+        createdAt: creation.createdAt,
+        giftRecipient: creation.giftRecipient,
+      }));
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          count: creations.length,
+          creations,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query pending approvals',
+      };
+    }
+  }
+
+  /**
+   * Approve a pending creation
+   */
+  private handleApproveCreation(action: ActionRequest): ActionResponse {
+    const { creationId } = action.params;
+
+    if (!creationId || typeof creationId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid creationId parameter',
+      };
+    }
+
+    const result = pendingApprovalRegistry.approve(creationId);
+
+    if (!result.success) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: result.error || 'Failed to approve creation',
+      };
+    }
+
+    // Build response data based on creation type
+    const creation = result.creation;
+    const responseData: Record<string, unknown> = {
+      approved: true,
+      creationType: creation?.creationType,
+    };
+
+    if (creation?.creationType === 'recipe') {
+      responseData.itemName = creation.item?.displayName;
+      responseData.recipeId = creation.recipe?.id;
+    } else if (creation?.creationType === 'technology') {
+      responseData.technologyName = creation.technology?.name;
+      responseData.researchField = creation.researchField;
+    } else if (creation?.creationType === 'effect') {
+      responseData.spellName = creation.spell?.name;
+      responseData.paradigmId = creation.paradigmId;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: responseData,
+    };
+  }
+
+  /**
+   * Reject a pending creation
+   */
+  private handleRejectCreation(action: ActionRequest): ActionResponse {
+    const { creationId } = action.params;
+
+    if (!creationId || typeof creationId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid creationId parameter',
+      };
+    }
+
+    const result = pendingApprovalRegistry.reject(creationId);
+
+    if (!result.success) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: result.error || 'Failed to reject creation',
+      };
+    }
+
+    // Build response data based on creation type
+    const creation = result.creation;
+    const responseData: Record<string, unknown> = {
+      rejected: true,
+      creationType: creation?.creationType,
+    };
+
+    if (creation?.creationType === 'recipe') {
+      responseData.itemName = creation.item?.displayName;
+    } else if (creation?.creationType === 'technology') {
+      responseData.technologyName = creation.technology?.name;
+    } else if (creation?.creationType === 'effect') {
+      responseData.spellName = creation.spell?.name;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: responseData,
+    };
+  }
+
+  /**
+   * Get terrain data for 3D visualization
+   * Returns tile data for a rectangular area around given coordinates
+   */
+  private handleTerrainQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Parse query params - default to getting terrain around entity positions
+      const params = query.entityId ? JSON.parse(query.entityId) : {};
+      const centerX = typeof params.x === 'number' ? params.x : 0;
+      const centerY = typeof params.y === 'number' ? params.y : 0;
+      const radius = typeof params.radius === 'number' ? Math.min(params.radius, 100) : 50;
+
+      // Access chunk manager via world
+      if (!hasTerrain(this.world)) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'World does not support tile access',
+        };
+      }
+
+      if (!this.world.getTileAt) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'World does not support tile access',
+        };
+      }
+
+      // Collect terrain data for the area
+      const tiles: Array<{
+        x: number;
+        y: number;
+        terrain: string;
+        elevation: number;
+        biome?: string;
+        wall?: { material: string };
+      }> = [];
+
+      const minX = Math.floor(centerX - radius);
+      const maxX = Math.ceil(centerX + radius);
+      const minY = Math.floor(centerY - radius);
+      const maxY = Math.ceil(centerY + radius);
+
+      for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+          const tile = this.world.getTileAt(x, y);
+
+          if (tile) {
+            tiles.push({
+              x,
+              y,
+              terrain: tile.terrain || 'grass',
+              elevation: tile.elevation || 0,
+              biome: tile.biome,
+              wall: tile.wall ? { material: tile.wall.material || 'stone' } : undefined,
+            });
+          }
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          centerX,
+          centerY,
+          radius,
+          tileCount: tiles.length,
+          tiles,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query terrain',
+      };
+    }
+  }
+
+  /**
+   * Handle debug-start-logging action
+   */
+  private handleDebugStartLogging(action: ActionRequest): ActionResponse {
+    if (!this.agentDebugManager) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Agent debug manager not initialized',
+      };
+    }
+
+    const { agentId } = action.params;
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent ${agentId} not found`,
+      };
+    }
+
+    const identity = entity.getComponent('identity') as IdentityComponent | undefined;
+    const agentName = identity?.name || 'Unknown';
+
+    this.agentDebugManager.startLogging(agentId, agentName);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        message: `Started deep logging for agent ${agentName} (${agentId})`,
+        agentId,
+        agentName,
+      },
+    };
+  }
+
+  /**
+   * Handle debug-stop-logging action
+   */
+  private handleDebugStopLogging(action: ActionRequest): ActionResponse {
+    if (!this.agentDebugManager) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Agent debug manager not initialized',
+      };
+    }
+
+    const { agentId } = action.params;
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    this.agentDebugManager.stopLogging(agentId);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        message: `Stopped deep logging for agent ${agentId}`,
+        agentId,
+      },
+    };
+  }
+
+  /**
+   * Handle debug-list-agents action
+   */
+  private handleDebugListAgents(action: ActionRequest): ActionResponse {
+    if (!this.agentDebugManager) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Agent debug manager not initialized',
+      };
+    }
+
+    const trackedAgents = this.agentDebugManager.getTrackedAgents();
+
+    // Get agent names for each tracked ID
+    const agentsWithNames = trackedAgents.map(agentId => {
+      const entity = this.world.getEntity(agentId);
+      const identity = entity?.getComponent('identity') as IdentityComponent | undefined;
+      return {
+        id: agentId,
+        name: identity?.name || 'Unknown',
+      };
+    });
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        count: trackedAgents.length,
+        agents: agentsWithNames,
+      },
+    };
+  }
+
+  /**
+   * Get log entries for an agent
+   */
+  private handleDebugGetLogs(action: ActionRequest): ActionResponse {
+    if (!this.agentDebugManager) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Agent debug manager not initialized',
+      };
+    }
+
+    const agentIdOrName = action.params.agentIdOrName as string | undefined;
+    const limit = action.params.limit as number | undefined;
+
+    if (!agentIdOrName) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing agentIdOrName parameter',
+      };
+    }
+
+    const entries = this.agentDebugManager.getRecentEntries(agentIdOrName, limit || 100);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        count: entries.length,
+        entries,
+      },
+    };
+  }
+
+  /**
+   * Analyze agent behavior from logs
+   */
+  private handleDebugAnalyze(action: ActionRequest): ActionResponse {
+    if (!this.agentDebugManager) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Agent debug manager not initialized',
+      };
+    }
+
+    const agentIdOrName = action.params.agentIdOrName as string | undefined;
+
+    if (!agentIdOrName) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing agentIdOrName parameter',
+      };
+    }
+
+    const analysis = this.agentDebugManager.analyzeAgent(agentIdOrName);
+
+    // Convert Map to object for JSON serialization
+    const behaviorsObj: Record<string, number> = {};
+    for (const [behavior, count] of analysis.behaviors) {
+      behaviorsObj[behavior] = count;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        totalEntries: analysis.totalEntries,
+        maxDistanceFromHome: analysis.maxDistanceFromHome,
+        avgDistanceFromHome: analysis.avgDistanceFromHome,
+        behaviorChanges: analysis.behaviorChanges,
+        behaviors: behaviorsObj,
+        recentThoughts: analysis.recentThoughts,
+        currentPosition: analysis.currentPosition,
+        currentTarget: analysis.currentTarget,
+      },
+    };
+  }
+
+  /**
+   * List all available log files
+   */
+  private handleDebugListLogFiles(action: ActionRequest): ActionResponse {
+    if (!this.agentDebugManager) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Agent debug manager not initialized',
+      };
+    }
+
+    const files = this.agentDebugManager.listLogFiles();
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        count: files.length,
+        files,
+      },
+    };
+  }
+
+  /**
+   * Find agent by name and return ID
+   */
+  private handleFindAgentByName(action: ActionRequest): ActionResponse {
+    const name = action.params.name as string | undefined;
+
+    if (!name) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing name parameter',
+      };
+    }
+
+    const agents = this.world
+      .query()
+      .with('agent')
+      .with('identity')
+      .executeEntities();
+
+    const normalizedSearch = name.toLowerCase();
+    const matches = agents.filter((entity) => {
+      const identity = entity.getComponent('identity') as IdentityComponent | undefined;
+      return identity?.name?.toLowerCase().includes(normalizedSearch);
+    });
+
+    const results = matches.map((entity) => {
+      const identity = entity.getComponent('identity') as IdentityComponent | undefined;
+      const position = entity.getComponent('position') as PositionComponent | undefined;
+      const agent = entity.getComponent('agent') as AgentComponent | undefined;
+
+      return {
+        id: entity.id,
+        name: identity?.name || 'Unknown',
+        position: position ? { x: position.x, y: position.y } : null,
+        behavior: agent?.behavior || 'unknown',
+      };
+    });
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        count: results.length,
+        agents: results,
+      },
+    };
+  }
+
+  /**
+   * Handle trigger-hunt action (dev action for testing hunting)
+   */
+  private handleTriggerHunt(action: ActionRequest): ActionResponse {
+    const { agentId, animalId } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!animalId || typeof animalId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid animalId parameter',
+      };
+    }
+
+    // Get hunter entity
+    const hunter = this.world.getEntity(agentId);
+    if (!hunter) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent not found: ${agentId}`,
+      };
+    }
+
+    // Verify it's an agent
+    if (!hunter.hasComponent('agent')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} is not an agent`,
+      };
+    }
+
+    // Get target animal
+    const animal = this.world.getEntity(animalId);
+    if (!animal) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Animal not found: ${animalId}`,
+      };
+    }
+
+    // Verify it's an animal
+    if (!animal.hasComponent('animal')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${animalId} is not an animal`,
+      };
+    }
+
+    // Check if hunter has combat_stats
+    if (!hunter.hasComponent('combat_stats')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent ${agentId} missing combat_stats component - cannot hunt`,
+      };
+    }
+
+    // Check if already in conflict
+    if (hunter.hasComponent('conflict')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent ${agentId} is already in a conflict`,
+      };
+    }
+
+    // Import createConflictComponent (needs to be at top of file but adding inline for now)
+    // Create conflict component with hunting type
+    const conflict = {
+      type: 'conflict' as const,
+      version: 1 as const,
+      conflictType: 'hunting' as const,
+      target: animalId,
+      state: 'initiated',
+      startTime: this.world.tick,
+    };
+
+    (hunter as MutableEntity).addComponent(conflict);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        hunterId: agentId,
+        targetId: animalId,
+        message: 'Hunt initiated',
+      },
+    };
+  }
+
+  /**
+   * Handle trigger-combat action (dev action for testing combat)
+   */
+  private handleTriggerCombat(action: ActionRequest): ActionResponse {
+    const { attackerId, defenderId, cause = 'honor_duel', lethal = false } = action.params;
+
+    if (!attackerId || typeof attackerId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid attackerId parameter',
+      };
+    }
+
+    if (!defenderId || typeof defenderId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid defenderId parameter',
+      };
+    }
+
+    // Get attacker entity
+    const attacker = this.world.getEntity(attackerId);
+    if (!attacker) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Attacker not found: ${attackerId}`,
+      };
+    }
+
+    // Verify it's an agent
+    if (!attacker.hasComponent('agent')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${attackerId} is not an agent`,
+      };
+    }
+
+    // Get defender entity
+    const defender = this.world.getEntity(defenderId);
+    if (!defender) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Defender not found: ${defenderId}`,
+      };
+    }
+
+    // Verify it's an agent
+    if (!defender.hasComponent('agent')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${defenderId} is not an agent`,
+      };
+    }
+
+    // Check if attacker has combat_stats
+    if (!attacker.hasComponent('combat_stats')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Attacker ${attackerId} missing combat_stats component - cannot fight`,
+      };
+    }
+
+    // Check if defender has combat_stats
+    if (!defender.hasComponent('combat_stats')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Defender ${defenderId} missing combat_stats component - cannot fight`,
+      };
+    }
+
+    // Check if already in conflict
+    if (attacker.hasComponent('conflict')) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Attacker ${attackerId} is already in a conflict`,
+      };
+    }
+
+    // Create conflict component
+    const conflict = {
+      type: 'conflict' as const,
+      version: 1 as const,
+      conflictType: 'agent_combat' as const,
+      target: defenderId,
+      state: 'initiated',
+      startTime: this.world.tick,
+      cause: cause as string,
+      lethal: lethal as boolean,
+      surprise: false,
+    };
+
+    (attacker as MutableEntity).addComponent(conflict);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        attackerId,
+        defenderId,
+        cause,
+        lethal,
+        message: 'Combat initiated',
+      },
+    };
+  }
+
+  // ===========================================================================
+  // GRAND STRATEGY QUERY HANDLERS
+  // ===========================================================================
+
+  /**
+   * Get all empires
+   */
+  private handleEmpiresQuery(query: QueryRequest): QueryResponse {
+    try {
+      const empires: Array<{
+        id: string;
+        name: string;
+        governmentType: string;
+        nationCount: number;
+        totalPopulation: number;
+        gdp: number;
+        treasury: number;
+        navyCount: number;
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('empire')) {
+          const empire = entity.components.get('empire') as {
+            empireName?: string;
+            governmentType?: string;
+            territory?: { nations?: string[]; totalPopulation?: number };
+            nationRecords?: Array<{ nationId: string }>;
+            economy?: { gdp?: number; imperialTreasury?: number };
+          };
+
+          const navyCount = this.countNaviesForEmpire(entity.id);
+
+          empires.push({
+            id: entity.id,
+            name: empire.empireName || 'Unknown Empire',
+            governmentType: empire.governmentType || 'unknown',
+            nationCount: empire.nationRecords?.length || empire.territory?.nations?.length || 0,
+            totalPopulation: empire.territory?.totalPopulation || 0,
+            gdp: empire.economy?.gdp || 0,
+            treasury: empire.economy?.imperialTreasury || 0,
+            navyCount,
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: empires.length, empires },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query empires',
+      };
+    }
+  }
+
+  /**
+   * Get all nations
+   */
+  private handleNationsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const nations: Array<{
+        id: string;
+        name: string;
+        governmentType: string;
+        population: number;
+        gdp: number;
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('nation')) {
+          const nation = entity.components.get('nation') as NationComponent;
+
+          nations.push({
+            id: entity.id,
+            name: nation.nationName || 'Unknown Nation',
+            governmentType: nation.governmentType || 'unknown',
+            population: nation.economy?.population || 0,
+            gdp: nation.economy?.gdp || 0,
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: nations.length, nations },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query nations',
+      };
+    }
+  }
+
+  /**
+   * Get all federations
+   */
+  private handleFederationsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const federations: Array<{
+        id: string;
+        name: string;
+        governanceType: string;
+        memberCount: number;
+        memberEmpireIds: string[];
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('federation_governance')) {
+          const fed = entity.components.get('federation_governance') as {
+            federationName?: string;
+            governanceType?: string;
+            memberEmpireIds?: string[];
+            memberCount?: number;
+          };
+
+          federations.push({
+            id: entity.id,
+            name: fed.federationName || 'Unknown Federation',
+            governanceType: fed.governanceType || 'unknown',
+            memberCount: fed.memberCount || fed.memberEmpireIds?.length || 0,
+            memberEmpireIds: fed.memberEmpireIds || [],
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: federations.length, federations },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query federations',
+      };
+    }
+  }
+
+  /**
+   * Get all galactic councils
+   */
+  private handleGalacticCouncilsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const councils: Array<{
+        id: string;
+        name: string;
+        governanceType: string;
+        memberCount: number;
+        memberFederationIds: string[];
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('galactic_council')) {
+          const council = entity.components.get('galactic_council') as {
+            councilName?: string;
+            governanceType?: string;
+            memberFederationIds?: string[];
+            memberCount?: number;
+          };
+
+          councils.push({
+            id: entity.id,
+            name: council.councilName || 'Unknown Council',
+            governanceType: council.governanceType || 'unknown',
+            memberCount: council.memberCount || council.memberFederationIds?.length || 0,
+            memberFederationIds: council.memberFederationIds || [],
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: councils.length, councils },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query galactic councils',
+      };
+    }
+  }
+
+  /**
+   * Get all navies
+   */
+  private handleNaviesQuery(query: QueryRequest): QueryResponse {
+    try {
+      const navies: Array<{
+        id: string;
+        name: string;
+        empireId: string;
+        totalShips: number;
+        totalCrew: number;
+        budget: number;
+        armadaIds: string[];
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('navy')) {
+          const navy = entity.components.get('navy') as {
+            navyName?: string;
+            ownerEmpireId?: string;
+            budget?: number;
+            assets?: {
+              armadaIds?: string[];
+              totalShips?: number;
+              totalCrew?: number;
+            };
+          };
+
+          navies.push({
+            id: entity.id,
+            name: navy.navyName || 'Unknown Navy',
+            empireId: navy.ownerEmpireId || '',
+            totalShips: navy.assets?.totalShips || 0,
+            totalCrew: navy.assets?.totalCrew || 0,
+            budget: navy.budget || 0,
+            armadaIds: navy.assets?.armadaIds || [],
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: navies.length, navies },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query navies',
+      };
+    }
+  }
+
+  /**
+   * Get all fleets
+   */
+  private handleFleetsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const fleets: Array<{
+        id: string;
+        name: string;
+        admiralId: string;
+        squadronIds: string[];
+        totalShips: number;
+        combatStrength: number;
+        position?: { x: number; y: number };
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('fleet')) {
+          const fleet = entity.components.get('fleet') as FleetComponent;
+
+          const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+
+          fleets.push({
+            id: entity.id,
+            name: fleet.fleetName || 'Unknown Fleet',
+            admiralId: fleet.admiralId || '',
+            squadronIds: fleet.squadronIds || [],
+            totalShips: fleet.stats?.totalShips || 0,
+            combatStrength: fleet.stats?.combatStrength || 0,
+            position: position ? { x: position.x ?? 0, y: position.y ?? 0 } : undefined,
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: fleets.length, fleets },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query fleets',
+      };
+    }
+  }
+
+  /**
+   * Get all squadrons
+   */
+  private handleSquadronsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const squadrons: Array<{
+        id: string;
+        name: string;
+        commanderId: string;
+        shipIds: string[];
+        totalShips: number;
+        combatStrength: number;
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('squadron')) {
+          const squadron = entity.components.get('squadron') as SquadronComponent;
+
+          squadrons.push({
+            id: entity.id,
+            name: squadron.squadronName || 'Unknown Squadron',
+            commanderId: squadron.commanderId || '',
+            shipIds: squadron.shipIds || [],
+            totalShips: squadron.stats?.totalShips || squadron.shipIds?.length || 0,
+            combatStrength: squadron.stats?.combatStrength || 0,
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: squadrons.length, squadrons },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query squadrons',
+      };
+    }
+  }
+
+  /**
+   * Get all megastructures
+   */
+  private handleMegastructuresQuery(query: QueryRequest): QueryResponse {
+    try {
+      const megastructures: Array<{
+        id: string;
+        megastructureId: string;
+        name: string;
+        category: string;
+        structureType: string;
+        tier: string;
+        operational: boolean;
+        integrity: number;
+        powerOutput: number;
+        crewCount: number;
+        currentTask?: string;
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('megastructure')) {
+          const mega = entity.components.get('megastructure') as {
+            megastructureId?: string;
+            name?: string;
+            category?: string;
+            structureType?: string;
+            tier?: string;
+            operational?: boolean;
+            integrity?: number;
+            powerOutput?: number;
+            crewCount?: number;
+            currentTask?: string;
+          };
+
+          megastructures.push({
+            id: entity.id,
+            megastructureId: mega.megastructureId || entity.id,
+            name: mega.name || 'Unknown Megastructure',
+            category: mega.category || 'unknown',
+            structureType: mega.structureType || 'unknown',
+            tier: mega.tier || 'unknown',
+            operational: mega.operational ?? false,
+            integrity: mega.integrity ?? 0,
+            powerOutput: mega.powerOutput ?? 0,
+            crewCount: mega.crewCount ?? 0,
+            currentTask: mega.currentTask,
+          });
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { count: megastructures.length, megastructures },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query megastructures',
+      };
+    }
+  }
+
+  /**
+   * Get trade network statistics
+   */
+  private handleTradeNetworksQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Count shipping lanes and caravans
+      let shippingLaneCount = 0;
+      let activeCaravanCount = 0;
+      let totalTradeVolume = 0;
+
+      const shippingLanes: Array<{
+        id: string;
+        sourceId: string;
+        destinationId: string;
+        active: boolean;
+        tradedGoods: string[];
+      }> = [];
+
+      for (const entity of this.world.entities.values()) {
+        if (entity.components.has('shipping_lane')) {
+          shippingLaneCount++;
+          const lane = entity.components.get('shipping_lane') as {
+            sourceId?: string;
+            destinationId?: string;
+            active?: boolean;
+            tradedGoods?: string[];
+            tradeVolume?: number;
+          };
+
+          shippingLanes.push({
+            id: entity.id,
+            sourceId: lane.sourceId || '',
+            destinationId: lane.destinationId || '',
+            active: lane.active ?? true,
+            tradedGoods: lane.tradedGoods || [],
+          });
+
+          if (lane.tradeVolume) {
+            totalTradeVolume += lane.tradeVolume;
+          }
+        }
+
+        if (entity.components.has('trade_caravan')) {
+          activeCaravanCount++;
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          shippingLaneCount,
+          activeCaravanCount,
+          totalTradeVolume,
+          shippingLanes: shippingLanes.slice(0, 50), // Limit to first 50
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query trade networks',
+      };
+    }
+  }
+
+  /**
+   * Helper: Count navies belonging to an empire
+   */
+  private countNaviesForEmpire(empireId: string): number {
+    let count = 0;
+    for (const entity of this.world.entities.values()) {
+      if (entity.components.has('navy')) {
+        const navy = entity.components.get('navy') as { ownerEmpireId?: string };
+        if (navy.ownerEmpireId === empireId) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  // ===========================================================================
+  // GRAND STRATEGY ACTION HANDLERS
+  // ===========================================================================
+
+  /**
+   * Handle diplomatic action between empires
+   */
+  private handleDiplomaticAction(action: ActionRequest): ActionResponse {
+    const { empireId, targetEmpireId, diplomaticAction } = action.params;
+
+    if (!empireId || typeof empireId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid empireId parameter',
+      };
+    }
+
+    if (!targetEmpireId || typeof targetEmpireId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid targetEmpireId parameter',
+      };
+    }
+
+    if (!diplomaticAction || typeof diplomaticAction !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid diplomaticAction parameter',
+      };
+    }
+
+    const validActions = ['ally', 'declare_war', 'trade_agreement', 'non_aggression', 'peace'];
+    if (!validActions.includes(diplomaticAction)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Invalid diplomaticAction. Must be one of: ${validActions.join(', ')}`,
+      };
+    }
+
+    const empireEntity = this.world.getEntity(empireId);
+    const targetEntity = this.world.getEntity(targetEmpireId);
+
+    if (!empireEntity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Empire not found: ${empireId}`,
+      };
+    }
+
+    if (!targetEntity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Target empire not found: ${targetEmpireId}`,
+      };
+    }
+
+    const empireComp = empireEntity.components.get('empire') as EmpireComponent | undefined;
+
+    if (!empireComp) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${empireId} is not an empire`,
+      };
+    }
+
+    // Update diplomatic relations - ensure diplomacy object exists
+    if (!empireComp.diplomacy) {
+      empireComp.diplomacy = { relations: new Map<string, unknown>() };
+    }
+    if (!empireComp.diplomacy.relations) {
+      empireComp.diplomacy.relations = new Map();
+    }
+
+    const targetEmpireComp = targetEntity.components.get('empire') as EmpireComponent | undefined;
+    const targetName = targetEmpireComp?.empireName || 'Unknown';
+
+    let relationship: string;
+    let opinion: number;
+    switch (diplomaticAction) {
+      case 'ally':
+        relationship = 'allied';
+        opinion = 50;
+        break;
+      case 'declare_war':
+        relationship = 'at_war';
+        opinion = -100;
+        break;
+      case 'peace':
+        relationship = 'neutral';
+        opinion = 0;
+        break;
+      case 'trade_agreement':
+        relationship = 'friendly';
+        opinion = 25;
+        break;
+      case 'non_aggression':
+        relationship = 'neutral';
+        opinion = 10;
+        break;
+      default:
+        relationship = 'neutral';
+        opinion = 0;
+    }
+
+    empireComp.diplomacy.relations.set(targetEmpireId, {
+      empireId: targetEmpireId,
+      empireName: targetName,
+      relationship,
+      opinion,
+      treaties: diplomaticAction !== 'declare_war' ? [diplomaticAction] : [],
+      diplomaticEvents: [{
+        type: diplomaticAction,
+        description: `${diplomaticAction} initiated`,
+        tick: this.world.tick,
+        opinionImpact: opinion,
+      }],
+    });
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        empireId,
+        targetEmpireId,
+        action: diplomaticAction,
+        newRelationship: relationship,
+        message: `Diplomatic action '${diplomaticAction}' completed`,
+      },
+    };
+  }
+
+  /**
+   * Handle move fleet action
+   */
+  private handleMoveFleet(action: ActionRequest): ActionResponse {
+    const { fleetId, targetX, targetY } = action.params;
+
+    if (!fleetId || typeof fleetId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid fleetId parameter',
+      };
+    }
+
+    if (typeof targetX !== 'number' || typeof targetY !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid targetX/targetY parameters',
+      };
+    }
+
+    const fleetEntity = this.world.getEntity(fleetId);
+    if (!fleetEntity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Fleet not found: ${fleetId}`,
+      };
+    }
+
+    const fleetComp = fleetEntity.components.get('fleet') as FleetComponent | undefined;
+
+    if (!fleetComp) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${fleetId} is not a fleet`,
+      };
+    }
+
+    // Set navigation target
+    if (!fleetComp.navigation) {
+      fleetComp.navigation = {};
+    }
+    fleetComp.navigation.targetPosition = { x: targetX, y: targetY };
+    fleetComp.navigation.status = 'moving';
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        fleetId,
+        targetX,
+        targetY,
+        message: `Fleet ${fleetId} moving to (${targetX}, ${targetY})`,
+      },
+    };
+  }
+
+  /**
+   * Handle megastructure task assignment
+   */
+  private handleMegastructureTask(action: ActionRequest): ActionResponse {
+    const { megastructureId, task } = action.params;
+
+    if (!megastructureId || typeof megastructureId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid megastructureId parameter',
+      };
+    }
+
+    if (!task || typeof task !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid task parameter',
+      };
+    }
+
+    const validTasks = ['maintenance', 'expansion', 'research', 'production', 'defense', 'idle'];
+    if (!validTasks.includes(task)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Invalid task. Must be one of: ${validTasks.join(', ')}`,
+      };
+    }
+
+    const megaEntity = this.world.getEntity(megastructureId);
+    if (!megaEntity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Megastructure not found: ${megastructureId}`,
+      };
+    }
+
+    const megaComp = megaEntity.components.get('megastructure') as MegastructureComponent | undefined;
+
+    if (!megaComp) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${megastructureId} is not a megastructure`,
+      };
+    }
+
+    // Set the task
+    megaComp.currentTask = task;
+    megaComp.taskProgress = 0;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        megastructureId,
+        task,
+        message: `Megastructure ${megastructureId} assigned task: ${task}`,
+      },
+    };
+  }
+
+  // ============================================================================
+  // Timeline & Multiverse Handlers
+  // ============================================================================
+
+  /**
+   * Get timeline information (universe fork tree)
+   */
+  private handleTimelinesQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Get universe metadata from world if available
+      if (!hasUniverseProps(this.world)) {
+        throw new Error('World does not have universe properties');
+      }
+
+      const currentTimeline = {
+        id: this.world.universeId?.id || 'prime',
+        name: this.world.universeId?.name || 'Prime Timeline',
+        currentTick: this.world.tick || this.world.tick,
+        isActive: true,
+        forkMetadata: this.world.forkMetadata,
+      };
+
+      // For now, return just the current timeline
+      // Full implementation would track all forked universes
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          currentTimeline: currentTimeline.id,
+          totalBranches: 1,
+          timelines: [currentTimeline],
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query timelines',
+      };
+    }
+  }
+
+  /**
+   * Get saved timeline checkpoints
+   */
+  private async handleTimelineSavesQuery(query: QueryRequest): Promise<QueryResponse> {
+    try {
+      if (!this.saveLoadService) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'SaveLoadService not available',
+        };
+      }
+
+      const saves = await this.saveLoadService.listSaves();
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          count: saves.length,
+          saves: saves.map(s => ({
+            key: s.key,
+            name: s.name || s.key,
+            tick: s.tick || 0,
+            timestamp: s.timestamp,
+          })),
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to list saves',
+      };
+    }
+  }
+
+  /**
+   * Get all background universes
+   */
+  private handleBackgroundUniversesQuery(query: QueryRequest): QueryResponse {
+    try {
+      if (!this.backgroundUniverseManager) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'BackgroundUniverseManager not available',
+        };
+      }
+
+      const universes = this.backgroundUniverseManager.getAllBackgroundUniverses();
+      const stats = this.backgroundUniverseManager.getStats();
+
+      const universeList = Array.from(universes.values()).map(u => ({
+        id: u.id,
+        name: u.name || u.id,
+        type: u.type,
+        createdTick: Number(u.createdAtTick),
+        currentTick: Number(u.currentTick),
+        population: u.population,
+        isPaused: u.isPaused,
+        lastActivity: u.lastActivity,
+      }));
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          activeUniverse: 'prime',
+          backgroundCount: universeList.length,
+          universes: universeList,
+          stats,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query background universes',
+      };
+    }
+  }
+
+  /**
+   * Get details about a specific background universe
+   */
+  private handleBackgroundUniverseQuery(query: QueryRequest): QueryResponse {
+    try {
+      if (!this.backgroundUniverseManager) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'BackgroundUniverseManager not available',
+        };
+      }
+
+      // Parse universe ID from query params
+      const params = query.entityId ? JSON.parse(query.entityId) : {};
+      const universeId = params.universeId as string | undefined;
+
+      if (!universeId) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'Missing universeId parameter',
+        };
+      }
+
+      const universe = this.backgroundUniverseManager.getBackgroundUniverse(universeId);
+
+      if (!universe) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: `Background universe not found: ${universeId}`,
+        };
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { universe },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query background universe',
+      };
+    }
+  }
+
+  /**
+   * Save current timeline as a checkpoint
+   */
+  private async handleSaveTimeline(action: ActionRequest): Promise<ActionResponse> {
+    const { name, description } = action.params;
+
+    if (!this.saveLoadService) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'SaveLoadService not available',
+      };
+    }
+
+    try {
+      await this.saveLoadService.save(this.world, {
+        name: typeof name === 'string' ? name : undefined,
+        description: typeof description === 'string' ? description : undefined,
+      });
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: {
+          message: `Timeline saved: ${name || 'checkpoint'}`,
+          tick: this.world.tick,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to save timeline',
+      };
+    }
+  }
+
+  /**
+   * Load a saved timeline checkpoint
+   */
+  private async handleLoadTimeline(action: ActionRequest): Promise<ActionResponse> {
+    const { key } = action.params;
+
+    if (!this.saveLoadService) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'SaveLoadService not available',
+      };
+    }
+
+    if (!key || typeof key !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid key parameter',
+      };
+    }
+
+    try {
+      const result = await this.saveLoadService.load(key, this.world);
+
+      if (!result.success) {
+        return {
+          requestId: action.requestId,
+          success: false,
+          error: result.error || 'Failed to load timeline',
+        };
+      }
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: {
+          message: `Timeline loaded: ${key}`,
+          tick: this.world.tick,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to load timeline',
+      };
+    }
+  }
+
+  /**
+   * Pause a background universe
+   */
+  private handlePauseBackgroundUniverse(action: ActionRequest): ActionResponse {
+    const { universeId } = action.params;
+
+    if (!universeId || typeof universeId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid universeId parameter',
+      };
+    }
+
+    // Pause functionality would need to be added to BackgroundUniverseManager
+    // For now, return acknowledgment that this is a planned feature
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        message: `Pause requested for background universe: ${universeId}`,
+        universeId,
+        note: 'Full pause functionality requires BackgroundUniverseManager.pause() method',
+      },
+    };
+  }
+
+  /**
+   * Resume a paused background universe
+   */
+  private handleResumeBackgroundUniverse(action: ActionRequest): ActionResponse {
+    const { universeId } = action.params;
+
+    if (!universeId || typeof universeId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid universeId parameter',
+      };
+    }
+
+    // Resume functionality would need to be added to BackgroundUniverseManager
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        message: `Resume requested for background universe: ${universeId}`,
+        universeId,
+        note: 'Full resume functionality requires BackgroundUniverseManager.resume() method',
+      },
+    };
+  }
+}

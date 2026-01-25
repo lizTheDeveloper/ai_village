@@ -1,5 +1,7 @@
 import type { EntityId, ComponentType, Tick } from '../types.js';
 import type { Component } from './Component.js';
+import type { ComponentTypeMap, ComponentFor } from '../types/ComponentTypeMap.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -22,7 +24,16 @@ export interface Entity {
   /** Check if entity has a component */
   hasComponent(type: ComponentType): boolean;
 
-  /** Get a component by type */
+  /**
+   * Get a component by type with automatic type inference.
+   *
+   * For mapped ComponentTypes (in ComponentTypeMap), the return type is automatically inferred:
+   *   entity.getComponent(CT.Agent)  // Returns AgentComponent | undefined
+   *
+   * For unmapped types or explicit generics, falls back to the generic:
+   *   entity.getComponent<MyComponent>('my_type')  // Returns MyComponent | undefined
+   */
+  getComponent<K extends keyof ComponentTypeMap>(type: K): ComponentTypeMap[K] | undefined;
   getComponent<T extends Component>(type: ComponentType): T | undefined;
 }
 
@@ -84,6 +95,9 @@ export class EntityImpl implements Entity {
     return this._components.has(type);
   }
 
+  // Overload declarations to match Entity interface for proper type inference
+  getComponent<K extends keyof ComponentTypeMap>(type: K): ComponentTypeMap[K] | undefined;
+  getComponent<T extends Component>(type: ComponentType): T | undefined;
   getComponent<T extends Component>(type: ComponentType): T | undefined {
     return this._components.get(type) as T | undefined;
   }

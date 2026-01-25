@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:10f2c6e4",
+  "name": "Epsilon Miranda",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769230102408",
+  "createdAt": 1769230102524,
+  "lastAccessedAt": 1769230102524,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769230102408",
+    "type": "magical"
+  }
+}

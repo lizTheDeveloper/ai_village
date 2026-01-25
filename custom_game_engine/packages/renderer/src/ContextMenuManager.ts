@@ -759,7 +759,7 @@ export class ContextMenuManager {
     this.eventListeners.push({ event: 'input:rightclick', handler: rightClickHandler });
 
     // Listen for confirmation results
-    const confirmHandler = (event: any) => {
+    const confirmHandler = (event: { data?: { actionId?: string; context?: MenuContext } }) => {
       // Validate event structure
       if (!event?.data?.actionId) {
         return;
@@ -780,7 +780,7 @@ export class ContextMenuManager {
    */
   private cleanupEventListeners(): void {
     for (const { event, handler } of this.eventListeners) {
-      this.eventBus.off(event as any, handler);
+      this.eventBus.off(event, handler);
     }
     this.eventListeners = [];
   }

@@ -2,11 +2,12 @@
   "name": "@ai-village/agents",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
       "default": "./dist/index.js"
     }
   },

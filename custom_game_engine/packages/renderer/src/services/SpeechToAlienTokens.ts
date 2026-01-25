@@ -118,7 +118,7 @@ export class SpeechToAlienTokensService {
         tokens.push({
           alien: part,
           english: translation.concept,
-          wordType: translation.wordType as any,
+          wordType: translation.wordType,
         });
       }
       // If no translation found, we skip it (it's likely English text)

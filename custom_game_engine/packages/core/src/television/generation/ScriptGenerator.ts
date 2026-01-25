@@ -206,8 +206,10 @@ export class ScriptGenerator {
 
     try {
       const prompt = this.buildPrompt(request);
-      const response = await this.llmProvider.generate(SCRIPT_SYSTEM_PROMPT, prompt);
-      return this.parseResponse(response, request);
+      // Combine system prompt and user prompt into a single prompt
+      const fullPrompt = `${SCRIPT_SYSTEM_PROMPT}\n\n${prompt}`;
+      const response = await this.llmProvider.generate({ prompt: fullPrompt });
+      return this.parseResponse(response.text, request);
     } catch (error) {
       return {
         success: false,
@@ -572,18 +574,17 @@ Generate a single line of dialogue for ${request.character.name} that:
 Format: [DIRECTION] "DIALOGUE"
 `;
 
-      const response = await this.llmProvider.generate(
-        'You are a dialogue writer. Generate natural, character-appropriate dialogue.',
-        prompt
-      );
+      const fullPrompt = `You are a dialogue writer. Generate natural, character-appropriate dialogue.\n\n${prompt}`;
+      const llmResponse = await this.llmProvider.generate({ prompt: fullPrompt });
+      const responseText = llmResponse.text;
 
       // Parse response
-      const directionMatch = response.match(/\[([^\]]+)\]/);
-      const dialogueMatch = response.match(/"([^"]+)"/);
+      const directionMatch = responseText.match(/\[([^\]]+)\]/);
+      const dialogueMatch = responseText.match(/"([^"]+)"/);
 
       return {
         success: true,
-        line: dialogueMatch?.[1] ?? response.trim(),
+        line: dialogueMatch?.[1] ?? responseText.trim(),
         direction: directionMatch?.[1] ?? request.emotion,
       };
     } catch (error) {

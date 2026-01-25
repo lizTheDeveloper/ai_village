@@ -1,0 +1,1741 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/brewing_beverages-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> brewing_beverages-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/155</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/155</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const YEAST_FERMENTATION_BEVERAGES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'yeast_fermentation_beverages',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Yeast Fermentation Beverages',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_yeast_fermentation_beverages' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE CONTROLLED PUTREFACTION OF SUGARS THROUGH MICROSCOPIC ALLIES: </span>
+A Comprehensive Introduction to Yeast Fermentation Beverages
+&nbsp;
+The ancient art of persuading single-celled organisms to transform sweet liquids into beverages of altered consciousness* represents one of humanity's earliest and most enthusiastically pursued alchemical endeavors†. At its heart, fermentation is a simple bargain: yeast consumes sugar and produces alcohol and carbon dioxide‡, a metabolic exchange that has shaped civilization more profoundly than most military conquests**. The process requires only four essential components—water, a source of fermentable sugars, yeast, and patience††—though the latter proves consistently the most challenging ingredient to maintain‡‡. Understanding this fundamental transformation allows the aspiring alchemist to produce everything from the humblest small beer to beverages of such complexity that tasting them requires three adjectives and a metaphor***.
+&nbsp;
+The practical execution of fermentation begins with sanitization†††, a step that precisely 67.3% of first-time practitioners underestimate‡‡‡. The vessel must be cleaned thoroughly, then sanitized with appropriate solutions****, as wild yeasts and bacteria†† harbor ambitions entirely incompatible with your intentions. Once sanitization is complete, the brewer combines water with their chosen sugar source—malted barley for beer††††, honey for mead‡‡‡‡, or fruit for wine****—and introduces cultured yeast*****. Temperature control proves critical†††††; yeast operates within specific ranges‡‡‡‡‡, becoming sluggish when cold****** and producing undesirable flavors when overheated. The mixture then ferments for anywhere from three days to three months††††††, during which time the practitioner must resist the urge to "check on things" more than absolutely necessary‡‡‡‡‡‡.
+&nbsp;
+Historical records indicate that fermentation beverages arose independently in virtually every human culture*******, suggesting either parallel innovation or the involvement of a very busy ancient traveler********. The Sumerians produced beer over 5,000 years ago and considered it important enough to include recipes in religious texts†††††††; the ancient Chinese fermented rice‡‡‡‡‡‡‡; the Vikings sailed across oceans powered primarily by mead and stubbornness********. Medieval monasteries became centers of brewing excellence*********, not through divine inspiration but because monks possessed the critical combination of literacy, leisure time, and a theological justification for quality control**********. Modern understanding has merely added scientific nomenclature to practices that brewers knew worked through centuries of careful observation and enthusiastic experimentation††††††††.
+&nbsp;
+Safety considerations extend well beyond the obvious caution about consuming one's products too enthusiastically. Glass fermentation vessels under pressure can explode with remarkable force‡‡‡‡‡‡‡‡, leading to what the Guild of Alchemical Insurance refers to as "unfortunate ceiling incidents"***********. Sanitization chemicals must be handled properly and rinsed thoroughly†††††††††, lest your beverage develop what scholars politely term "an industrial finish"************. Fermentation produces carbon dioxide‡‡‡‡‡‡‡‡‡, which, being heavier than air, can collect in enclosed spaces and quietly suffocate the inattentive*************, leading the Worshipful Company of Vintners to mandate that all cellars include warning signs reading "Breathe First, Wonder About The Smell Later"**************. Perhaps most importantly, the aspiring fermenter must develop the wisdom to distinguish between "this smells unusual but acceptable" and "this smells like it might be developing opinions"†††††††††††.
+&nbsp;
+The transformation of sugar-water into something approaching drinkable represents alchemy in its most accessible form—a partnership between human intention and microscopic cooperation that requires no rare ingredients, no dangerous reagents‡‡‡‡‡‡‡‡‡‡, and no Latin incantations***************. Success demands only cleanliness, patience, and the humility to accept that you are not so much commanding the yeast as politely requesting their assistance††††††††††††. The yeast, for their part, ask only for sugar, reasonable temperatures, and to be left alone to work‡‡‡‡‡‡‡‡‡‡‡—requests that align suspiciously well with the typical alchemist's preferred working conditions****************.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+*Consciousness-altering in both senses: the beverage affects the drinker's consciousness, and the act of creating it alters the maker's understanding of transformation. The parallel does not escape notice.
+&nbsp;
+†The Society for the Preservation of Ancient Intoxication Methods maintains that fermentation predates written language, agriculture, and arguably the invention of adequate clothing. Their evidence consists largely of noting that someone had to have been quite desperate to drink fermented fruit juice the first time, suggesting it happened before we'd invented anything better to do.
+&nbsp;
+‡Plus various flavor compounds, esters, and what brewers call "character." Character in this context ranges from "pleasant complexity" to "I don't care what the recipe said, something has gone terribly wrong."
+&nbsp;
+**The Treaty of Versailles was famously negotiated in a haze of wine and champagne. The Congress of Vienna consumed so much wine they had to periodically pause negotiations for what the minutes mysteriously record as "digestive considerations." Whether these events would have proceeded more smoothly sober remains a matter of scholarly debate, though most scholars prefer to conduct this debate while drinking.
+&nbsp;
+††The ratio of patience required increases exponentially with the alcohol content desired. This creates a paradox wherein those most in need of the final product possess the least patience for its creation.
+&nbsp;
+‡‡A survey by the Institute of Delayed Gratification Studies found that 43.7% of novice fermenters open their fermentation vessel "just to check" at least once per day for the first week, despite being explicitly told this is counterproductive. The percentage rises to 71.2% for those fermenting on their birthday†.
+&nbsp;
+†They claim they're just "making sure it's working." The yeast, being unicellular, lack the capacity to complain about this disturbance, which the fermenters take as tacit approval.
+&nbsp;
+***The Guild of Sommeliers issues strict guidelines on tasting notes. "Hints of oak" is acceptable. "Tastes like oak" suggests you've aged it in oak. "Tastes like the oak is angry about something" means you should probably start over††.
+&nbsp;
+††Inanimate objects cannot, technically, be angry. However, the Guild's incident reports suggest otherwise.
+&nbsp;
+†††The First Law of Fermentation, as established by Brother Hildebrand the Meticulous in 1247‡, states: "Cleanliness precedeth drinkability; filth precedeth regret and stomach complaints."
+&nbsp;
+‡Brother Hildebrand established this law after what monastery records describe only as "the Unfortunate Summer of 1246" and refuse to elaborate upon. His contemporaries noted that he became notably obsessive about cleaning afterwards and would sometimes wake screaming about "the smell."
+&nbsp;
+‡‡‡This statistic comes from the Comprehensive Survey of Fermentation Failures (Vol. 4: "We Thought It Would Be Fine"), which documents 2,847 instances of practitioners reasoning that "it looks clean enough."
+&nbsp;
+****The market offers numerous sanitization solutions, each with passionate advocates. The debates between proponents of different sanitizers resemble theological disputes in their intensity, if not their eternal significance. The Festival of St. Sanitizer, held annually in Burton-upon-Trent, has required riot police three times in the last decade****.
+&nbsp;
+****In fairness, the riot of 2019 was primarily caused by someone bringing a six-pack of infected beer to a sanitizer convention, which all parties agreed was deeply provocative.
+&nbsp;
+††Wild yeasts include organisms such as Brettanomyces, which produces flavors described variously as "barnyard," "horse blanket," or "what authenticity tastes like," depending on whether you're a beer snob or just someone who expected their beverage not to taste like agricultural equipment.
+&nbsp;
+††††Malted barley is barley that has been convinced to begin sprouting, then killed just as it commits to the idea of becoming a plant. This brutal but necessary step converts starches into fermentable sugars. The barley presumably has feelings about this, but maltsters have learned not to think about it.
+&nbsp;
+‡‡‡‡Honey, being essentially pre-processed flower nectar, represents nature's way of doing half your work for you. Bees, however, hold firm opinions about humans stealing their processed inventory, leading to what apiarists call "workplace disputes."
+&nbsp;
+****Fruit fermentation is the simplest method, as fruit`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding yeast fermentation beverages in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BEER_BREWING_FUNDAMENTALS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'beer_brewing_fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Beer Brewing Fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['yeast_fermentation_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_beer_brewing_fundamentals' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `BEER BREWING FUNDAMENTALS: AN ALCHEMICAL PRIMER FOR THE MODERATELY AMBITIOUS</span>
+&nbsp;
+Beer brewing represents perhaps the most successful marriage of alchemy and everyday necessity*, combining the ancient arts of transformation with the universal human desire to make grain water taste considerably better**. At its core, brewing is an alchemical process whereby the humble barley grain undergoes a series of carefully orchestrated transformations—from solid to liquid, from sweet to bitter, from disappointingly non-alcoholic to pleasantly intoxicating†—all through the application of heat, water, hops, and the microscopic servants we call yeast. The fundamentals rest upon four pillars: malting, mashing, boiling, and fermentation††, each of which must be understood not merely as mechanical steps but as alchemical transmutations in their own right.
+&nbsp;
+The practical brewing process begins with malting, wherein barley is induced to germinate just enough to convert its starches into fermentable sugars, but not so much that it actually becomes a plant‡. This delicate balance—coaxing the grain into beginning life's journey, then abruptly ending it through kilning‡‡—speaks to the fundamental ambivalence at the heart of all brewing. The mash follows, during which the malted grain is steeped in hot water at precise temperatures‡‡‡, allowing enzymes to complete the conversion to sugars that the yeast will later consume with admirable enthusiasm*. The resulting sweet liquid, called wort**, is then boiled with hops†, which contribute bitterness to balance the sweetness and act as a preservative††, though their primary historical function was keeping beer drinkable during the long winter months when drinking water was inadvisable‡.
+&nbsp;
+Modern brewing alchemy demands attention to sanitation that would make ancient brewers weep with laughter or possibly just weep*. Every surface that touches the beer after boiling must be sanitized to prevent contamination by wild yeasts and bacteria**, which will cheerfully transform your carefully planned amber ale into something more resembling vinegar, or worse†. Temperature control proves equally critical throughout the process††: too hot during mashing and the enzymes denature‡; too cold during fermentation and the yeast sulks reproachfully‡‡; too warm and it produces fusel alcohols that taste like regret‡‡‡. The Alchemical Institute of Beverage Sciences now recommends keeping detailed logs of every parameter*, leading to the modern paradox where brewing—once learned entirely through oral tradition and vague gestures**—now requires more recordkeeping than a small kingdom's tax office†.
+&nbsp;
+The historical development of brewing stretches back into the mists of time, when the first accidental beer was almost certainly discovered by someone who left grain soaking in water and later decided to drink it anyway*. The Sumerians worshipped Ninkasi, goddess of beer**, while medieval monks elevated brewing to an art form during the 194 days per year they were required to fast from solid food†. The discovery that hops could replace the traditional gruit†† revolutionized brewing in the 15th century, much to the dismay of the Gruit Brewers' Guild‡, which spent the next three centuries filing increasingly desperate legal challenges. Modern understanding of fermentation came surprisingly late‡‡—Louis Pasteur's work in the 1860s finally explaining what brewers had been successfully doing for millennia without the faintest idea why‡‡‡.
+&nbsp;
+Safety in brewing extends beyond mere sanitation to include the obvious warnings about not drinking while brewing*, avoiding glass carboys that can explode when dropped**, and never attempting to carbonate beer in anything not specifically rated for pressure†. The Chronicles of Brewing Misadventure record numerous incidents of apprentice brewers who thought themselves clever††, including the famous Case of the Exploding Cellar of 1823‡ and the less famous but more instructive Case of Why You Should Never Bottle Before Fermentation Is Actually Complete‡‡. Success in brewing comes not from following recipes with religious fervor but from understanding the principles well enough to know when the yeast is happy‡‡‡, when the temperature has drifted too far*, and when to resist the urge to open the fermenter "just to check" every six hours**.
+&nbsp;
+&nbsp;
+*Some scholars argue this makes brewing humanity's second-most successful alchemical achievement, after cheese, though the Guild of Vintners maintains that wine should occupy this position. The resulting debate has been ongoing for 847 years and shows no sign of resolution.
+&nbsp;
+**The technical term for this improvement is "potable." The colloquial term varies by region but centers around themes of "vastly better," "actually drinkable," and "thank the gods."
+&nbsp;
+†This final transformation being the entire point of the exercise, as established in the prerequisite study on yeast fermentation. Readers who skipped that fundamental text are advised to return to it immediately, or at least before they ruin their first batch wondering why the sweet liquid won't spontaneously turn alcoholic through force of will alone.
+&nbsp;
+††The Quarterly Journal of Methodical Brewing lists seventeen additional sub-steps, but the Board of Simplified Alchemical Education petitioned to reduce these to four for pedagogical purposes. The compromise was reached after the infamous 1978 Conference of Brussels, where a fistfight broke out over whether whirlpooling constituted a fifth pillar. It does not, officially, though try telling that to the delegates from Bavaria.
+&nbsp;
+‡Dr. Malthus Beerwright, in his 1654 treatise "Observations Upon the Arrested Development of Grain," noted that the barley must be "encouraged but not enabled, awakened but not liberated, begun but not continued." He was considered quite mad until his technique became industry standard three centuries later.
+&nbsp;
+‡‡Known in professional circles as "the death." Kilning temperatures typically reach 80-120°C (176-248°F for those nations still resisting the metric system††), which thoroughly ends any aspirations the grain might have harbored about photosynthesis.
+&nbsp;
+††The United States, Liberia, and Myanmar, a grouping that causes endless amusement to the International Bureau of Weights and Measures.
+&nbsp;
+‡‡‡The University of Brewing Sciences maintains that mash temperatures must be held between 62-68°C (144-154°F††) for optimal enzyme activity, with variations of even 2°C resulting in noticeably different sugar profiles. This precision was achieved through centuries of trial, error, and tasting the results‡.
+&nbsp;
+††See previous footnote regarding temperature conversion, though by this point most readers have learned to simply accept both systems with weary resignation.
+&nbsp;
+‡The traditional method of quality control, which explains why so many historical brewing records contain cheerful commentary followed by increasingly illegible handwriting.
+&nbsp;
+*That said, responsible consumption during the learning process is permitted and even encouraged by the School of Practical Brewing Studies, which maintains that "understanding one's craft requires intimate familiarity with its results." Their annual budget for "research materials" is the envy of every other department.
+&nbsp;
+**Pre-boil contamination merely results in sour beer, which some modern brewers now produce intentionally, proving that every mistake eventually becomes a style if you wait long enough.
+&nbsp;
+†The most common wild yeast, Brettanomyces, produces what connoisseurs call "funky" flavors and what everyone else calls "barnyard." The Brett Appreciation Society insists this is desirable. They are wrong, though admittedly passionate about their wrongness.
+&nbsp;
+††The Fermentation Control League publishes temperature guidelines so specific that they include recommendations for different altitudes, seasons, and presumably phases of the moon, though that last one might be included ironically. With the FCL, it's difficult to tell.
+&nbsp;
+‡These vital proteins unfold and cease functioning, much like university students after examination week.
+&nbsp;
+‡‡This is anthropomorphization of microorganisms, but brewers who ignore their yeast's mood do so at their peril. Happy yeast hums along contentedly at 18-20°C (64-68°F), producing clean, pleasant flavors. Unhappy yeast produces compounds with names like "4-vinyl guaiacol" that taste exactly as chemical as they sound.
+&nbsp;
+‡‡‡Fusel alcohols, produced when fermentation temperatures exceed 24°C (75°F), create intense headaches and the sensation that one has made poor life choices. This sensation is accurate.
+&nbsp;
+*The Institute for Brewing Recordkeeping recommends logging: date, time, temperature (mash, sparge, boil, fermentation, ambient), specific gravity (original and final), pH (mash and wort), water chemistry (calcium, magnesium, sulfate, chloride, bicarbonate), hop additions (variety, alpha acid percentage, timing, form), yeast strain, pitch rate, oxygenation level, and fermentation timeline.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding beer brewing fundamentals in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MALT_PREPARATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'malt_preparation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Malt Preparation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['beer_brewing_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_malt_preparation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `MALT PREPARATION: AN ALCHEMICAL TREATISE ON THE TRANSFORMATION OF GRAIN INTO POTENTIAL</span>
+&nbsp;
+The ancient art of malt preparation stands at the curious intersection of agriculture and alchemy, wherein the practitioner convinces a perfectly content grain of barley* that it should begin the process of germination, only to interrupt this process with extreme prejudice via the application of heat†. This controlled resurrection and subsequent execution of the grain creates a substance possessed of remarkable properties‡, chief among them the ability to convert starches into fermentable sugars—a transformation that medieval alchemists considered only slightly less impressive than turning lead into gold**, and considerably more useful for Friday evenings.
+&nbsp;
+The fundamental process consists of three stages, each requiring precision that would impress a watchmaker†† and patience that would exhaust a saint‡‡. First comes steeping***, wherein barley is submerged in water for periods ranging from 32 to 48 hours§, during which the grain absorbs moisture and begins to suspect that something is afoot. The grain is then transferred to a germination floor or vessel§§, where it is allowed to sprout under carefully controlled conditions for approximately four to six days¶. During this period, enzymes within the grain activate and begin breaking down the endosperm's protein matrix—a process the Guild of Maltsters poetically describes as "teaching the grain to eat itself"¶¶. Finally, the germinated grain undergoes kilning, wherein it is heated to temperatures between 50°C and 100°C*** for twelve to forty-eight hours†††, depending entirely on whether one desires a pale malt suitable for delicate ales or a dark malt that tastes of smoke, caramel, and the dreams of very small dragons‡‡‡.
+&nbsp;
+The practical applications of properly prepared malt extend far beyond the mere brewing of beer§§§, though this remains the primary use in approximately 94.7% of all documented cases¶¶¶. Alchemists have discovered that malt extract serves as an excellent base for various tinctures and elixirs****, particularly those requiring a source of enzymatic activity or a substrate that tastes considerably better than most alchemical ingredients††††. The Helvetian School of Practical Alchemy‡‡‡‡ has published extensive research demonstrating that malt-based preparations show improved patient compliance§§§§, as subjects are significantly more willing to consume medicines that taste like the beginning of beer than those that taste like the end of a swamp¶¶¶¶.
+&nbsp;
+Safety considerations in malt preparation are numerous and, regrettably, learned through expensive experience*****. The primary hazards include spontaneous combustion of kilned malt during storage†††††, ergot contamination‡‡‡‡‡, and the risk of creating what the Guild terms "aggressive malt"§§§§§—grain that has been allowed to germinate too enthusiastically and must be disposed of before it develops opinions¶¶¶¶¶. Modern maltsters follow the Seventeen Precepts of Safe Malting******, first codified after the catastrophic events of 1734 in the Duchy of Barley-on-Wye††††††, and maintain detailed logs of temperature, humidity, and any unusual grain behavior‡‡‡‡‡‡. Students are advised that while malt preparation is among the safer alchemical processes, it remains entirely possible to injure oneself§§§§§§, burn down a building¶¶¶¶¶¶, or create something that violates at least three natural laws*******.
+&nbsp;
+&nbsp;
+* Or wheat, or rye, or any of a dozen other grains, though barley remains the gold standard. The Guild of Maltsters offers a pamphlet titled "Why Not Oats?" which consists primarily of reasons why not oats.
+&nbsp;
+† The grain, having just begun to reach for the sun and dream its grainy dreams of becoming a magnificent plant, finds this rather unfair. Several religious orders have written extensively on the theological implications. The grain's opinion has not been recorded.
+&nbsp;
+†† Specifically, a watchmaker who has had three cups of strong coffee and is being judged by their mother-in-law. The Guild maintains that malt preparation requires "the eye of an eagle, the patience of a tortoise, and the wisdom to know when to apply fire to things."
+&nbsp;
+‡ Including, but not limited to: the aforementioned sugar conversion, a pleasing nutty flavor, the ability to make beer, and—according to certain disreputable grimoires—the capacity to attract grain sprites‡a, though this last property remains unverified by respectable institutions.
+&nbsp;
+‡a Grain sprites, described in Moers' Taxonomia Invisibilis as "small, cheerful entities approximately three inches in height who smell perpetually of bread," are believed to inhabit properly prepared malt stores. They are, according to folklore, entirely harmless unless offended, at which point they will rearrange your grain stores into alphabetical order by color‡b, causing considerable confusion during inventory.
+&nbsp;
+‡b The Chromatic Grain Incident of 1823 at the Königsberg Malthouse resulted in a sorting system so elaborate it required three additional clerks and a philosopher to understand.
+&nbsp;
+** Gold cannot be used to brew beer, and thus its utility remains limited to boring applications such as currency, jewelry, and elaborate dental work. Malt's superiority in practical matters is self-evident to anyone who has ever tried to have a pleasant evening with a pocketful of gold versus a pocketful of malt. One of these produces beer; the other produces suspicious questions from constables.
+&nbsp;
+†† See the extensive documentation by the Maltster's Guild, particularly their treatise "On the Precise Measurement of Moisture Content and Why Harold's 'It Looks About Right' Method Results in Catastrophe." Poor Harold appears in Guild records with disturbing frequency, always as a cautionary example.
+&nbsp;
+‡‡ Saint Columbanus the Patient, patron saint of brewers and maltsters, is said to have achieved his epithet not through religious devotion but through waiting for a particularly stubborn batch of winter barley to germinate during a late frost in 592 CE. His prayer, "Lord, grant me the serenity to accept the things I cannot change, and the wisdom to apply heat to the things I can," remains popular among maltsters today.
+&nbsp;
+*** The steeping stage must be interrupted by air rests§a of 8-12 hours every 24 hours, lest the grain drown and begin producing compounds that smell, according to Guild records, "like regret and old shoes."
+&nbsp;
+§ Precision in timing varies by barley variety, ambient temperature, and whether Mercury is in retrograde. The Guild officially denies that astrological considerations affect malt preparation, but their steeping schedules show suspicious gaps during unfavorable planetary alignments.
+&nbsp;
+§a During which the grain is allowed to breathe and contemplate its choices. Some modern facilities play music during air rests. The grain's preference remains, as always, unrecorded, though research by the Auditory Maltsters of Prague suggests that barley germination rates improve by 3.2% when exposed to classical music, and decrease by 7.8% when exposed to bagpipe music. The bagpipers' union has filed a formal complaint.
+&nbsp;
+§§ Traditional floor malting requires that the grain be turned regularly—every eight hours in traditional practice—to prevent the rootlets from tangling into what the Guild calls "grain mats" and what everyone else calls "that horrible mess that took three men and a chisel to remove from the floor."
+&nbsp;
+¶ During which the grain develops a network of rootlets called the acrospire§b. If allowed to grow too long, the acrospire consumes the starch reserves that the maltster wishes to preserve, converting potential beer into actual plant matter—a transformation considered deeply heretical by brewing traditions worldwide.
+&nbsp;
+§b From the Greek akros (tip) and speira (coil), though medieval scholars insisted it derived from acro (height) and spire (aspiration), thus meaning "that which aspires to height." Either way, the grain is getting ideas above its station, and must be stopped.
+&nbsp;
+¶¶ This poetic turn of phrase appears in the Guild's official motto, inscribed in Old Maltster's Dialect around the rim of their ceremonial steeping vessel: "Doce granum comedere se ipsum." The grain, again, was not consulted about this motto.
+&nbsp;
+*** The temperature curve during kilning determines the final malt character with a precision that borders on fussy. A difference of 5°C can mean the difference between a malt suitable for pale ales and one suitable primarily as a doorstop¶a. Master maltsters speak of "coaxing" and "persuading" the malt to the desired color, as though the grain retains some agency in the matter. It`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding malt preparation in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HOP_SELECTION_PRESERVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'hop_selection_preservation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Hop Selection Preservation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['malt_preparation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_hop_selection_preservation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Hop Selection Preservation: An Alchemical Investigation into the Art of Botanical Conservation</span>
+&nbsp;
+The preservation of hops for alchemical purposes represents one of the cornerstone practices of brewological alchemy*, a field that has suffered more from enthusiastic experimentation than perhaps any other branch of the hermetic sciences†. The fundamental principle underlying hop selection preservation is deceptively simple: one must first select hops of appropriate humoral balance‡, then employ preservation techniques that maintain their essential virtues without allowing the ingress of malevolent influences‡‡ or, more commonly, neighborhood cats***. The ancient alchemists understood that hops possess what they termed the "green essence"—a combination of oils, resins, and what the Monks of St. Gambrinus poetically described as "the soul of bitterness"†††—which must be maintained in a state of suspended temporal flux if one wishes to brew anything more sophisticated than what the dwarfish alchemists dismissively call "ground water with ambitions"‡‡‡.
+&nbsp;
+Modern practitioners have identified four primary methods of hop preservation, each with its own philosophical implications and rate of catastrophic failure****. The cold preservation method, favored by the Northern Schools, involves maintaining hops at temperatures that would make a penguin reconsider its life choices; this technique boasts a 94.7% success rate, with the remaining 5.3% typically attributed to apprentices who confused "cold storage" with "forget about them in the icehouse for three winters"†. The vacuum preservation technique, developed by the notorious Alchemist Helvetius the Partially Deflated††††, removes air from the storage vessel through a process that is theoretically simple but practically fraught with the risk of implosion, explosion, or the mysterious "tertiary plosion" that affected the entire Guild of Bremen in 1743‡‡‡‡. Drying preservation, the oldest method, dates back to the Sumerian beer-priests who discovered that hops left in the sun developed either excellent preservative qualities or the ability to achieve sentience*****—regrettably, the cuneiform tablets are ambiguous on this point. Chemical preservation, the newest and most controversial method, involves the introduction of sulfurous compounds******; this is technically effective but carries what the Royal Alchemical Society primly describes as "certain aesthetic compromises"†††††.
+&nbsp;
+The selection process itself demands attention to seven sacred characteristics, as documented in the Codex Lupulinus‡‡‡‡‡: color (ranging from the desirable "forest maiden's sigh" to the unfortunate "goblin's undergarments"), aroma (evaluated by trained hop-sniffers who undergo a three-year apprenticeship and develop noses of legendary proportions*******, texture (best tested by the traditional method of rubbing hops between thumb and forefinger while muttering incantations†††††††), oil content (measured in mystical units called "glands per destiny"********), alpha acid percentage (a number that causes more arguments among alchemists than the question of whether dragons are real‡‡‡‡‡‡), age (hops should be "youthful but not impetuous"), and what medieval texts mysteriously refer to as "the hop's essential willingness to cooperate"*********. A properly trained alchemist can evaluate all seven characteristics in approximately four minutes, though the Guild examination requires candidates to do so while blindfolded, standing on one leg, and reciting the Periodic Table backwards††††††††—a requirement instituted after the Incident of 1832‡‡‡‡‡‡‡.
+&nbsp;
+Safety considerations in hop preservation are simultaneously obvious and frequently ignored**********. The primary danger lies not in the hops themselves, which are generally benign except when provoked***********, but in the preservation processes, which have demonstrated an alarming tendency to go sideways in unexpected ways†††††††††. The vacuum preservation method has resulted in exactly 247 documented cases of what medical alchemists term "sudden and dramatic equalization of pressure differentials"—a phrase that means something exploded but sounds much more dignified in reports to the Guild Council************. Cold storage, while safer, carries the risk of frostbite, hypothermia, and in one memorable case, the accidental cryogenic preservation of an apprentice who was later thawed and went on to found the School of Extremely Cautious Alchemy in Prague‡‡‡‡‡‡‡‡. The cardinal rule, as stated in every alchemical text since the Codex Lupulinus, remains: "Let not thy enthusiasm for preservation exceed thy understanding of basic physics, nor thy faith in containment vessels outpace thy knowledge of their construction"—advice that approximately 73.2% of alchemists claim to follow while approximately 94.6% demonstrably do not*************.
+&nbsp;
+The historical development of hop preservation techniques reveals a pattern familiar to students of alchemical progress: initial disaster, followed by incremental improvement, occasionally interrupted by spectacular disaster, leading eventually to methods that work adequately most of the time*************. The earliest preserved hops were simply dried in the sun, a technique that worked until someone tried to preserve hops during a thunderstorm and discovered that wet hops in enclosed spaces develop interesting and alarming properties††††††††††. The Middle Ages saw the development of the "hang them in the rafters" method, which functioned admirably until the Great Hop Fire of Antwerp demonstrated that dried plant matter in wooden buildings above open flames requires more careful consideration than medieval alchemists typically employed‡‡‡‡‡‡‡‡‡. The Renaissance brought scientific rigor to the field, by which we mean "people started writing down what went wrong instead of just sweeping up the debris and pretending nothing happened"**************. Modern understanding, built on centuries of accumulated wisdom and cautionary tales, suggests that hop preservation is less an art than a careful dance with entropy, conducted by practitioners who have learned to respect both the hops and the fundamental laws of thermodynamics†††††††††††—though preferably not learning said respect the hard way‡‡‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+* Brewological alchemy: The ancient art of transforming humble grains and hops into potable philosophy. The field emerged independently in at least seven cultures, all of which arrived at roughly the same conclusions but described them in magnificently incompatible terminology. The Babylonian term "sikaru-sha-ilani" (beer of the gods) means essentially the same thing as the Germanic "braukunst" (brewing art), but try telling that to scholars who have spent careers studying only one tradition. The Professional Society of Brewological Alchemists meets annually and spends approximately 67% of its conference time arguing about nomenclature.
+&nbsp;
+† The Guild of Runecarvers maintains detailed injury statistics, cross-referenced by moon phase, ambient temperature, and the carver's emotional state at the time of injury. According to their most recent publication, "Compendium of Regrettable Decisions in Hop Preservation: Volume XVII" (they're up to volume seventeen because they count very thoroughly), the most common injury is not, as one might expect, cuts from preservation knives, but rather back strain from lifting overly ambitious quantities of hops. The second most common is "enthusiastic inhalation of hop dust," which causes sneezing fits that the Guild describes as "memorable" and witnesses describe as "apocalyptic."
+&nbsp;
+‡ Humoral balance in hops refers to the classical theory that all substances contain varying proportions of the four humors: bitter, aromatic, resinous, and what medieval texts call "the green" (vis viridis). A properly balanced hop should make a trained alchemist nod thoughtfully while muttering "yes, yes, good proportion of the green," even though no one has successfully defined what "the green" actually is. The philosopher Paracelsus claimed to understand it perfectly but never wrote it down, leading to centuries of speculation and at least three schisms in various alchemical societies.
+&nbsp;
+‡‡ Malevolent influences: A catch-all term in alchemical literature that can mean anything from demonic possession to mold. Historical texts are frustratingly vague about which they mean in any given instance. The scholar Albertus Magnus, in his "De Vegetabilibus et Plantis," mentions "influences most malevolent that enter through improper sealing," but the accompanying illustration shows either a demon or possibly a very angry rat—the manuscript's condition makes it difficult to tell. Modern alchemists, being more practical, assume it means "anything that makes your hops smell wrong."
+&nbsp;
+*** The problem of cats in alchemical workshops is documented in sources ranging from ancient Egypt (where it was considered a blessing—the cats were sacred, after all) to medieval Europe (where it was considered a nuisance) to the laboratory journals of the renowne`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding hop selection preservation in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WORT_CREATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wort_creation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wort Creation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['hop_selection_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wort_creation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Wort Creation: A Comprehensive Study of Liquid Extraction in the Alchemical Arts</span>
+&nbsp;
+The creation of wort—that amber liquid intermediary between raw grain and finished alchemical preparation—represents one of the more deceptively complex procedures in the practical alchemist's repertoire*. At its essence, wort creation involves the controlled extraction of fermentable sugars from malted grains through the application of heated water at specific temperatures†, a process that sounds remarkably simple until one attempts it for the first time‡. The fundamental principle rests upon enzymatic conversion: diastatic enzymes within the malted grain break down complex starches into simpler sugars when exposed to warm water within particular temperature ranges**, a reaction so precisely calibrated that being off by even five degrees can mean the difference between a serviceable wort and what the Guild of Fermentationists politely refers to as "grain tea"††.
+&nbsp;
+The practical methodology begins with the mash, wherein crushed malted grain meets water at temperatures typically between 148°F and 158°F (64-70°C for those practicing in regions that embraced the metric reforms of 1789)††† ‡. This temperature range activates beta-amylase and alpha-amylase enzymes in carefully orchestrated sequence‡‡, creating what experienced practitioners describe as "giving the grain a warm bath while microscopic scissors cut up its lunch"‡‡‡. The mashing period generally extends between sixty and ninety minutes§, during which the alchemist must maintain temperature stability with what the Thermodynamic Council describes as "obsessive vigilance bordering on the neurotic"§§. Following the mash, the liquid wort must be separated from the spent grain—a process called lautering§§§—and then boiled with the previously selected hops* to create the finished wort ready for fermentation**.
+&nbsp;
+Safety considerations in wort creation primarily concern temperature management and contamination prevention***. The alchemist works with large volumes of near-boiling liquid†††, creating an environment where inattention can result in scalding, steam burns, or what the Healer's Guild categorizes as "regrettable incidents involving gravity and hot wort"‡‡‡‡. Equally critical is maintaining sanitary conditions throughout the process§§§§: wild yeasts and bacteria view unprotected wort as an invitation to an all-you-can-eat buffet*****, and their attendance invariably produces results best described as "unfortunate"†††††. The ancient texts speak of worts that developed sentience due to improper handling‡‡‡‡‡, though modern scholars largely dismiss these accounts as allegorical warnings§§§§§ rather than literal history******.
+&nbsp;
+Historical development of wort creation techniques stretches back to antiquity, with evidence of systematic mashing found in Sumerian tablets dating to 4000 BCE******* and extensive documentation in medieval European monastery records†††††††. The scientific understanding of enzymatic conversion, however, emerged only in the nineteenth century through the work of scholars like Anselme Payen and Louis Pasteur‡‡‡‡‡‡, transforming wort creation from art to science—or rather, as the Philosophical Society for Beverage Studies notes, from "entirely art" to "mostly art with occasional mathematical interludes"§§§§§§. Modern practitioners benefit from precise temperature control equipment, scientific measurement tools, and the collected wisdom of countless generations who learned through trial, error, and extensive note-taking about what not to do********.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The term "wort" derives from the Old English "wyrt," meaning "root" or "plant," which seems etymologically questionable given that wort is definitively liquid. The Linguistic Anomalies Division of the Royal Academy suggests this may be another example of our ancestors' charming disregard for logical naming conventions, joining such classics as "parkway" (where you drive) and "driveway" (where you park).
+&nbsp;
+† The Precise Temperature Guild maintains that the acceptable range is actually 148.3°F to 157.8°F, though their meetings typically devolve into heated arguments about decimal places and whether ambient atmospheric pressure should be factored into the calculations. They have not successfully completed a meeting since 1847.
+&nbsp;
+‡ Apprentice Wilkins of the Eastgate Brewhouse famously attempted wort creation on his first day without reading the manual, resulting in what witnesses described as "enthusiastic grain porridge" and a smell that lingered in the building for three months. The manual, it should be noted, was seventeen pages long. Wilkins had read the title.
+&nbsp;
+** Diastatic enzymes sound like something from a forbidden grimoire but are merely specialized proteins that break chemical bonds. The fact that they accomplish this through what biochemists describe as "molecular violence" does little to dispel the mystical impression†.
+&nbsp;
+††† The same Guild that insists on calling obviously ruined batches "grain tea" also refers to catastrophic equipment failures as "unscheduled rapid disassembly events" and bacterial contamination as "alternative fermentation outcomes." Their public relations department is very good.
+&nbsp;
+††† The metric reforms of 1789 were controversial primarily because the Revolutionary Committee on Weights and Measures insisted on measuring temperature in "degrees of revolutionary fervor," which proved impractical for actual temperature control. The system was quietly abandoned after seventeen months and forty-three documented cases of wort overheating.
+&nbsp;
+‡ Master Brewer Hildegard von Wortstein published her seminal work "On the Thermal Properties of Aqueous Grain Suspensions" in 1623, which included the memorable warning: "Should ye discover thy mash hath exceeded 170°F, know that thou hast created not wort but rather grain soup, fit only for feeding to thine enemies or the pigs, in that order."‡‡
+&nbsp;
+‡‡ Von Wortstein kept extensive records of her pig-feeding experiments, noting that even the pigs showed reluctance to consume over-temperature mash. She concluded that "the wisdom of swine exceedeth that of careless brewers."
+&nbsp;
+‡‡ The enzymatic cascade of amylase activity has been described by the Society of Biochemical Poetry as "a dance of molecular specificity," though this metaphor breaks down when one considers that dances rarely involve dismembering one's partner into component sugars.
+&nbsp;
+‡‡‡ This description appears in the children's educational text "Alchemy for Young Minds" by Professor Artemisia Kettleworth, which was subsequently banned in seven kingdoms for making the subject matter "insufficiently mysterious" and "dangerously comprehensible."
+&nbsp;
+§ The Temporal Standards Bureau attempted to mandate exactly seventy-three minutes for all mashing operations in 1891, arguing that "standardization serves the common good." The Bureau was disbanded after practitioners demonstrated that standardized mash times produced wildly varying results depending on grain quality, water chemistry, and what the Bureau's final report described as "other factors too numerous and irritating to catalog."
+&nbsp;
+§§ The Thermodynamic Council's official handbook contains forty-seven pages on temperature maintenance strategies, thirty-two case studies of temperature failures, and a fold-out chart of "facial expressions that indicate your wort temperature has drifted." The chart is surprisingly accurate.
+&nbsp;
+§§§ The term "lautering" comes from the German "läutern," meaning "to purify" or "to clarify," and involves running the liquid wort through the grain bed itself, using the grain as a natural filter. This is one of those rare instances where nature provides exactly the right solution in exactly the right place, leading some natural philosophers to suspect divine intervention or at least divine suggestion†.
+&nbsp;
+* See the prerequisite paper "Hop Selection and Preservation," which covers the botanical characteristics, storage requirements, and historical significance of Humulus lupulus in alchemical preparations. That paper contains its own footnotes of considerable length and entertainment value.
+&nbsp;
+** This is the same finished wort that medieval monks consumed during Lent, having convinced themselves that "liquid bread" didn't count as breaking their fast. The theological gymnastics involved in this rationalization would later inspire the Scholastic Debate Society's annual awards for "Most Creative Biblical Interpretation."
+&nbsp;
+*** The Catalogue of Wort-Related Injuries maintained by St. Hildegard's Hospital for Alchemical Mishaps runs to 347 pages in its current edition. The most common entry reads simply: "Didn't respect the boiling point of water." The second most common reads: "Assumed the previous entry didn't apply to them."
+&nbsp;
+††† A standard homebrew setup handles approximately 5-10 gallons (19-38 liters) of liquid at temperatures around 212°F (100°C). For context, this is roughly equivalent to the heat capacity of 47,000 cups of tea or one very angry dragon's sneeze‡.
+&nbsp;
+‡‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wort creation in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WINE_MAKING_PRINCIPLES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wine_making_principles',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wine Making Principles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['fermentation_temperature_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wine_making_principles' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `WINE MAKING PRINCIPLES: AN ALCHEMICAL TREATISE ON THE TRANSMUTATION OF GRAPE INTO GLORY</span>
+&nbsp;
+The fundamental principles of wine making represent one of humanity's earliest experiments in controlled transmutation*, a process wherein the humble grape undergoes metamorphosis into what the Ancient Vintners of Thessalonika termed "bottled sunshine with a hangover chaser"**. At its core, wine making is an exercise in patient surrender: the alchemist provides the vessel, the temperature, and the initial conditions, while invisible forces—specifically, the industrious yeast Saccharomyces cerevisiae***—perform the actual labor of converting sugar into alcohol†. The Guild of Sympathetic Fermentation has documented that approximately 47.3% of beginning wine makers fail to grasp this fundamental principle and attempt to "help" the process, leading to what historical records delicately term "incidents"††.
+&nbsp;
+The practical application of wine making alchemy requires three essential components: properly crushed fruit†††, controlled environmental conditions‡, and—perhaps most critically—the ability to leave well enough alone‡‡. The crushing of grapes must be performed with sufficient force to release the juice while avoiding the pulverization of seeds, which impart bitterness and what Professor Hieronymus Bitterstone described as "the distinct impression that one is drinking liquid regret"‡‡‡. Temperature control, as established in the prerequisite studies§, remains paramount: fermentation conducted below 10°C proceeds with geological slowness, while fermentation above 30°C produces what experienced vintners describe as "grape-flavored paint thinner" and what insurance companies describe as "arson evidence"§§.
+&nbsp;
+The historical development of wine making reveals a fascinating progression from accidental discovery to deliberate craft§§§. The earliest wines were almost certainly produced when forgotten grapes fermented naturally in abandoned vessels*, a process that the ancient Mesopotamians attributed to the god Gestin**, who was said to have been either blessing humanity or playing an extremely long practical joke***. Medieval alchemists, upon discovering that wine could be distilled into spirits, briefly believed they had discovered the Elixir of Life†, leading to what the Council of Concerned Monasteries termed "the Regrettable Decade"††. Modern understanding, informed by microbiology and chemistry, has transformed wine making from mystical art into reproducible science—though practitioners insist there remains an ineffable element that separates transcendent wine from merely adequate wine†††, which cynics suggest is primarily the price tag.
+&nbsp;
+Safety considerations in wine making extend beyond the obvious warnings about consuming one's experiments before they are ready‡. The fermentation process produces carbon dioxide in quantities that have astonished generations of novice vintners who sealed their vessels too enthusiastically‡‡, leading to the establishment of the Guild's official motto: "Thou Shalt Vent, Or Thy Ceiling Shalt Vent For Thee"‡‡‡. Chemical sanitation of equipment is essential§, as wild yeasts and bacteria lurk with malicious intent, ready to transform wine into vinegar or worse§§. The Archives of Failed Fermentation contain 1,247 documented cases of wines that achieved sentience and had to be properly exorcised§§§, though the Guild insists these records are "largely metaphorical"*.
+&nbsp;
+The mastery of wine making principles represents a gateway to understanding the broader principles of alchemical transformation: that given the right conditions, time, and patience, base materials can be elevated to something greater**. It teaches humility, as even experienced vintners produce the occasional batch that must be quietly disposed of under cover of darkness***. Most importantly, it demonstrates that some of the most profound transformations require nothing more than creating the proper conditions and trusting the process†—though having a good cork supplier doesn't hurt††.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*Some scholars date this to approximately 6000 BCE in the Caucasus region, though the Caucasians themselves claim their ancestors were making wine "since before the rocks got hard." Geological evidence suggests the rocks were quite hard by then, but pointing this out at Georgian dinner parties is considered deeply unwise.
+&nbsp;
+**The Ancient Vintners of Thessalonika were, in fact, quite modern—they flourished in the 1890s and disbanded in 1923 after the Great Retsina Controversy, which is still not discussed in polite company. Their research papers remain sealed in the Alexandrian Archive under the classification "Technically Scientific But Spiritually Questionable."
+&nbsp;
+***Saccharomyces cerevisiae translates roughly to "sugar-eating fungus of beer," which the wine making community considers insufficiently poetic. They prefer the traditional name given by the monks of Hautvillers: "les petites anges qui boivent et pissent" ("the little angels who drink and piss"), which is technically accurate but was removed from official taxonomy for obvious reasons†.
+&nbsp;
+†The Vatican requested the name change in 1867. The monks complied but maintained their terminology in private. This is why Benedictine wine cellars still contain signs reading "Angels At Work: Quiet Please."
+&nbsp;
+††The Guild maintains a Museum of Helpful Interventions, featuring crystallized wines that zealous makers tried to "speed up" with additions of sugar, honey, elderflower, cinnamon, nutmeg, pepper, gold leaf, ground pearls, and in one memorable case, mercury‡. The museum is free to visit but requires signing a waiver acknowledging that you have learned nothing from others' mistakes and will probably try something similar yourself.
+&nbsp;
+‡The mercury addition was attempted by Sir Archibald Wetherbottom in 1783, who believed that since mercury was liquid metal and wine was liquid joy, combining them would create "liquid imperial joy." He was technically correct but in the worst possible way. His tombstone reads "He Achieved Transmutation (of Wine Into Poison)."
+&nbsp;
+†††The Institut de Viticulture Appliquée in Bordeaux maintains that proper crushing can be achieved by foot, mechanical press, or trained badgers. They refuse to elaborate on the badger method, though German vintners insist it produces a distinct "woodland character"§.
+&nbsp;
+§The German Badger-Pressing Cooperative (Dachs-Presse Genossenschaft) closed in 1961 after the badgers unionized and demanded better working conditions, specifically "literally anything else to do besides this." The final vintage of badger-pressed wine sold at auction in 1963 for 40,000 Deutschmarks, though whether this was due to quality or morbid curiosity remains debated.
+&nbsp;
+‡The complete phrase, as recorded by the Ancient Guild of Vintners, is: "Temperature Controle Most Vitale For Ye Fermentation, Lest Ye Grape-Juice Become Either Syrupe Most Sluggishe Or Vinegar Most Instantaneous."
+&nbsp;
+‡‡The insurance industry categorizes hot-fermented wine differently based on whether it was consumed (medical claim), exploded (property claim), or both (act of God claim). Actuarial tables show that 3.7% of hot-fermented wine drinkers subsequently attempt arson, though whether the wine caused this or merely revealed pre-existing tendencies is philosophically complex.
+&nbsp;
+‡‡‡Dr. Marguerite Bitterstone (no relation to Hieronymus, despite the surname and shared fascination with things that taste terrible) published her definitive work "On Seed Bitterness and Existential Regret in Over-Pressed Wines" in 1891. It remains the only oenological text to reference Kierkegaard and was promptly banned from use in seminary wine-making courses for causing "excessive introspection during what should be celebration."
+&nbsp;
+§§The phrase "grape-flavored paint thinner" appears 847 times in historical wine-making records, suggesting that this particular mistake has been made with impressive consistency across centuries and cultures. The International Board of Oenological Standards attempted to create an official descriptor scale ranging from "Wine" to "Grape-Flavored Paint Thinner" to "Evidence," but legal counsel advised against it††.
+&nbsp;
+††The legal concern was that officially acknowledging "Evidence" as a wine category would complicate insurance claims and potentially require warning labels reading "WARNING: May Be Used Against You In Court Of Law." The Board settled on a simpler system: Good, Acceptable, Questionable, and "No Comment."
+&nbsp;
+§§§The Fermentation Timeline, as established by the Ur-Vintners of ancient Sumer, suggests the discovery occurred when a Sumerian merchant forgot about his grape shipment during the Festival of Akitu (a celebration lasting 12 days, which historians note was "considerable time to forget about grapes, even by ancient standards"). Upon returning, he found his grapes had liquefied and, with the logic of people who had not yet invented many ways to die accidentally, he drank it†††.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wine making principles in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GRAPE_JUICE_FERMENTATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'grape_juice_fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Grape Juice Fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wine_making_principles'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_grape_juice_fermentation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Grape Juice Fermentation: An Alchemical Treatise on the Transmutation of the Innocent into the Divine</span>
+&nbsp;
+The fundamental principle underlying grape juice fermentation represents one of alchemy's most elegant demonstrations of controlled transformation*, wherein the simple sugars present in the fruit of Vitis vinifera undergo systematic conversion into ethanol and carbon dioxide through the metabolic processes of Saccharomyces cerevisiae**. This process, which the Ancient Mesopotamians discovered approximately 7,000 years ago*** and promptly celebrated with what historians delicately term "excessive enthusiasm†", operates on the principle that life itself can be harnessed as an alchemical reagent—a concept that would have greatly disturbed the early theoretical purists†† who insisted that true alchemy required at least three different-colored flames and a minimum of seven crystalline vessels. The transformation occurs in three distinct phases: the lag phase, during which the yeast cells multiply and prepare themselves for their appointed task‡; the exponential phase, during which fermentation proceeds with what the Guild of Vintners Technical Manual describes as "inadvisable rapidity‡‡" if temperature controls are neglected; and the stationary phase, wherein the yeast population stabilizes and the alchemist must demonstrate the patience that approximately 67.3% of practitioners historically lack‡‡‡.
+&nbsp;
+The practical application of grape juice fermentation requires attention to several critical variables, beginning with the initial composition of the must°—a term derived from the Latin "mustum" meaning "new wine" and simultaneously describing both the grape juice itself and the emotional state of most beginning alchemists attempting this process. Temperature control stands paramount among these considerations, with optimal fermentation occurring between 20-25°C for red wines and 15-20°C for white wines°°; deviations of more than three degrees in either direction result in what the Ankh-Morpork Institute of Applied Thaumaturgy's Department of Viticultural Studies refers to as "regrettable outcomes°°°". The introduction of yeast represents a moment of particular anxiety*, as the alchemist must choose between wild fermentation—trusting to the natural yeasts present on the grape skins**—and inoculation with cultured strains, each approach advocating its own philosophy regarding the role of chaos in creative processes***. Monitoring the specific gravity throughout fermentation provides quantitative measurement of the transformation's progress, typically declining from an initial reading of 1.090-1.100 to a final gravity between 0.990-0.995†, though the Discworld Journal of Fermentation Sciences notes that approximately 23% of practitioners still refuse to use hydrometers on the grounds that "it takes the magic out of it††".
+&nbsp;
+Safety considerations in grape juice fermentation extend far beyond the obvious concern of creating a potent intoxicant‡, encompassing the management of carbon dioxide production‡‡, the prevention of oxidation through proper vessel sealing‡‡‡, and the absolute necessity of maintaining sanitary conditions throughout the process°. The historical record provides numerous cautionary examples, perhaps none more instructive than the Genua Incident of 1782°°, wherein an entire monastery's fermentation cellar exploded due to what the subsequent inquiry termed "creative reinterpretation of the concept of airlock°°°". Sulfite additions, typically in the range of 50-100 parts per million*, serve to inhibit unwanted bacterial and wild yeast populations while permitting the selected Saccharomyces strains to flourish**; the precise dosage requires calculation based on the pH of the must, a mathematical operation that the records of St. Ungulant's Monastery suggest was "too troublesome for proper contemplation of the Divine***". Perhaps most critically, the alchemist must resist the temptation to sample the fermenting juice prematurely†, a prohibition that exists for reasons both practical and, according to the testimony of survivors of the Quirm Wine Faire of 1823††, deeply embarrassing.
+&nbsp;
+The historical development of grape juice fermentation as an alchemical discipline traces a path from accidental discovery to systematic science‡, with significant contributions from scholars whose work deserves recognition despite their occasionally questionable judgment‡‡. The transition from wild fermentation to controlled inoculation occurred gradually across centuries, opposed at each step by traditionalists who argued that human intervention disrupted the "natural harmony of the vine's transformation‡‡‡"—an argument that lost considerable force after the Great Spoilage of 1643°, when approximately 73% of that year's European wine production transformed not into the desired beverage but into what contemporary sources describe as "aggressive vinegar°°". Modern understanding of fermentation biochemistry, pioneered by Louis Pasteur in the 1860s and refined by subsequent generations of researchers°°°, has transformed grape juice fermentation from an art practiced by intuition into a science executed with precision*—though the Institut Français d'Oenologie reports that 89% of commercial winemakers still knock on wood after pitching yeast**, suggesting that even in an age of scientific understanding, humanity retains a healthy respect for the role of fortune in fermentation***.
+&nbsp;
+The contemporary alchemist approaching grape juice fermentation thus stands at the intersection of ancient tradition and modern knowledge†, armed with both the empirical wisdom of millennia and the analytical tools of contemporary chemistry††. Success in this endeavor requires not merely technical proficiency but also the cultivation of patience†††, attention to detail‡, and the humility to recognize that despite our best efforts, we remain partners with—rather than masters of—the microbial forces we employ‡‡. The resulting elixir, whether a simple table wine or a complex vintage requiring years of maturation, represents more than mere alcoholic beverage; it embodies the fundamental alchemical principle that transformation, properly guided, can elevate the mundane to the sublime‡‡‡—a truth that has been celebrated, occasionally to excess, since the first conscious fermentation some seven thousand years ago.
+&nbsp;
+---
+&nbsp;
+**FOOTNOTES**
+&nbsp;
+*Though "controlled" here carries the same relationship to reality as "briefly" does when a wizard says "I'll just pop into the library briefly."
+&nbsp;
+**Commonly known as "brewer's yeast" or, in the more poetic nomenclature of the Old School alchemists, "the Invisible Army of Bacchus." The fact that these organisms remain invisible to the naked eye caused considerable theological debate in the 14th century, with the Council of Quirm spending seventeen months discussing whether salvation could be mediated by entities one couldn't see. They eventually concluded that faith itself was invisible, and everyone went home for dinner.
+&nbsp;
+***The precise dating remains controversial. The Archaeological Society of Ankh-Morpork places the date at 7,000 years ago, while the more conservative Djelibeybi Historical Trust insists on 6,000 years, and the Überwald Historical Preservation League claims evidence of fermentation dating back 9,000 years, though this may simply reflect their general enthusiasm for anything involving alcohol†.
+&nbsp;
+†See "The Mesopotamian Wine Crisis of 5000 BCE" in the Journal of Improbable Archaeological Discoveries, Vol. 23, pp. 157-298, which suggests that the first three centuries of fermentation experimentation were characterized by what modern analysis would term "insufficient quality control" and what contemporary clay tablets apparently described as "why does my head hurt and where are my sandals."
+&nbsp;
+††The Hermetic Order of Pure Transformation, founded in 1247 and dissolved in 1249 after what the historical record describes only as "the Crystalline Vessel Incident." Their insistence that alchemy required elaborate equipment was somewhat undermined when a peasant family in the Loire Valley produced superior wine using nothing but a large clay pot and patience. The Order's official response—that this "proved nothing about true alchemy"—convinced no one, particularly after the aforementioned incident involved seventeen broken vessels and a small fire.
+&nbsp;
+‡Typically 24-48 hours, during which period approximately 94.7% of beginning alchemists peer anxiously into their fermentation vessels every thirty minutes, checking for "signs of life." The Vintners' Guild has published a pamphlet titled "A Watched Fermentation Never Bubbles" which is mandatory reading but universally ignored.
+&nbsp;
+‡‡This technical manual, published in AM 1847, contains the magnificent understatement: "Fermentation proceeding above 30°C should be regarded as suboptimal." This describes a temperature at which the yeast essentially commits cellular suicide while simultaneously producing compounds that smell, according to tasting notes from the period, "like old boots soaked in turpentine." The manual's author, Master Vintner Sebastian Grappling, added a footnote suggesting that such wines "might serve adequately for cleaning agricultural equipment‡".
+&nbsp;
+‡The actual passage reads: "such wines, while unsuitable for human consumption, have demonstrated remarkable efficacy in the removal of rust and the dissolution of certain organic stains`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding grape juice fermentation in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WINE_AGING_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wine_aging_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wine Aging Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['grape_juice_fermentation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wine_aging_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `WINE AGING TECHNIQUES: AN ALCHEMICAL TREATISE ON THE PATIENT TRANSFORMATION OF FERMENTED GRAPE LIQUOR</span>
+&nbsp;
+The practice of wine aging represents one of the few alchemical disciplines where doing absolutely nothing constitutes the most critical step in the process*. Unlike the fermentation stage, where the alchemist must carefully manage temperature, vessel selection, and the whims of invisible fungal assistants**, the aging process demands only patience, proper storage, and the ability to resist drinking the product prematurely***. The fundamental principle underlying all wine aging is the slow, controlled oxidation of compounds within the sealed vessel, a process that the Ancient Vintners of Quelm described as "teaching the wine to think before it speaks"†.
+&nbsp;
+The two primary methods of wine aging—bottle aging and barrel aging—represent philosophical as well as practical distinctions in the alchemical tradition††. Barrel aging, the older technique by approximately four thousand years†††, involves storing wine in wooden casks where the liquid exchanges a carefully measured breath with the outside world through the wood's pores‡. This controlled ingress of oxygen, combined with the extraction of tannins and other compounds from the wood itself, creates what the Guild of Patient Alchemists calls "the conversation between tree and grape"‡‡. Bottle aging, by contrast, seals the wine away from the world entirely, forcing the liquid to achieve maturity through internal contemplation of its own chemical constituents‡‡‡. The choice between these methods depends on the desired final character of the wine, though in practice it often depends on whether one can afford barrels§.
+&nbsp;
+Temperature control during aging represents the difference between a sublime vintage and expensive vinegar, a lesson learned repeatedly throughout history§§. The ideal aging temperature hovers between 45 and 65 degrees Fahrenheit, with consistency valued above all else§§§. Wine cellars, those hallowed underground chambers that appear in every respectable alchemical establishment, achieve this stability through depth and darkness¶. Modern practitioners have access to climate-controlled facilities that can maintain temperature within 0.01 degrees¶¶, though the Ancient Masters managed perfectly well with caves and a good understanding of geology¶¶¶. Humidity must also be monitored to prevent cork degradation**, a consideration that becomes relevant approximately six months after one has begun aging wine and three months after discovering that all one's corks have dried out and admitted air to every bottle**.
+&nbsp;
+The transformation that occurs during proper aging involves dozens of chemical reactions proceeding at speeds that would bore a glacier***. Harsh tannins polymerize into smoother compounds, anthocyanins bind with tannins to create stable color compounds, and volatile esters develop that distinguish a great wine from mere fermented grape juice†††. The Guild of Patient Alchemists maintains that these reactions require not just time, but "the right kind of time"—a distinction that sounds mystical but refers to the actual chronological interaction of temperature, time, and chemical reaction rates††††. Records suggest that approximately 90% of all wines improve with short-term aging of one to five years, while perhaps 1% possess the structure necessary for aging beyond twenty years‡‡‡‡. The remaining 9% should have been consumed immediately or, better yet, should never have been bottled at all§§§§.
+&nbsp;
+Safety considerations in wine aging primarily concern storage conditions rather than immediate physical danger¶¶¶¶, though the Historical Registry of Alchemical Mishaps does record seventeen separate incidents involving exploding bottles, spontaneous re-fermentation, and one memorable case of a possessed barrel in 1823*****. The primary risks involve improper storage leading to oxidation (wine becoming vinegar), bacterial contamination (wine becoming something considerably worse than vinegar), or premature consumption (the alchemist becoming insufferable at dinner parties)†††††. Best practices include maintaining horizontal bottle storage to keep corks moist‡‡‡‡‡, avoiding vibration that disturbs sediment§§§§§, and implementing rigorous record-keeping to track which wines have been aging since when¶¶¶¶¶. The latter proves surprisingly challenging after the alchemist has sampled their inventory for quality control purposes.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+&nbsp;
+*The Meditation Masters of the Hrmph Monastery have noted striking similarities between wine aging and their own practices, both requiring decades of sitting still while interesting things happen internally. The key difference is that wine bottles don't complain about back pain.
+&nbsp;
+**See the prerequisite reading, "Grape Juice Fermentation," particularly the section on Saccharomyces cerevisiae and why you should thank them for their service.
+&nbsp;
+***The Great Premature Consumption Crisis of 1847-1891 affected an estimated 43% of all novice vintners. The crisis was declared "ongoing" by the Guild and remains so today. Recovery rates hover at approximately 12%.
+&nbsp;
+†Also translated as "letting the wine mature from a shouty adolescent into someone you'd actually want at a dinner party." The Quelmish were known for their brutal honesty in alchemical metaphors.
+&nbsp;
+††Some scholars argue there are actually three methods, including "aging in one's aunt's garage," though this remains controversial and is generally classified under "mistakes" rather than "techniques." See Bartholomew's "Accidental Excellence: When Negligence Produces Quality" (University of Dubious Practices, 1923).
+&nbsp;
+†††The first barrel-aged wine dates to approximately 1800 BCE in Mesopotamia, predating the invention of the corkscrew by nearly 3,500 years. This temporal gap led to the so-called "Barrel Opening Problem," which claimed numerous ancient alchemists who attempted to open sealed barrels using axes, enthusiasm, and inadequate planning.
+&nbsp;
+‡Oak barrels permit approximately 2-3 milliliters of oxygen per liter of wine per year—a statistic that the Department of Overly Precise Measurements celebrates as "one of the few useful numbers in all of alchemy." Chestnut barrels permit roughly 4-5 milliliters, which explains why they're less popular: overachievers are rarely appreciated in the aging business.
+&nbsp;
+‡‡This conversation reportedly takes three to seven years, making it one of the slower dialogues in nature, second only to the discourse between mountains and weather (estimated at 100,000 years per meaningful exchange).
+&nbsp;
+‡‡‡A process that Dr. Cornelius Winehart, in his seminal 1867 work "Bottled Contemplation," compared to "forcing a young person to sit alone in a dark room until they become interesting." The Guild of Patient Alchemists awarded him their Profound Rudeness Medal for this observation.
+&nbsp;
+§The current market rate for a quality French oak barrel suitable for wine aging is approximately $800-$1,200, or roughly 400-600 bottles worth of mediocre wine. This economic reality has driven more alchemists toward bottle aging than any philosophical consideration.
+&nbsp;
+§§The Great Temperature Fluctuation Disaster of 1756 occurred when Lord Pemberton stored his cellared wines adjacent to his experimental dragon-breeding facility. The resulting "hot and cold variations of spectacular magnitude" (Daily Alchemical Register, March 12, 1756) produced wines that one contemporary critic described as "aggressive, confused, and potentially criminal."
+&nbsp;
+§§§Temperature swings of more than 5 degrees Fahrenheit per day will cause wine to age prematurely and poorly, essentially giving your wine anxiety. The International Society for Wine Psychology (disbanded 1923) published several papers on this before admitting that anthropomorphizing beverages was "perhaps excessive, even for us."
+&nbsp;
+¶The optimal depth for a wine cellar is 10-12 feet underground, where daily temperature variations are dampened to near zero. The Catacombs of Paris, at 20 meters depth, maintain such perfect stability that several illicit aging operations existed there for decades before authorities noticed. Or rather, before authorities admitted they'd noticed and demanded their share.*
+&nbsp;
+*See "The Great Parisian Wine Scandal of 1889," documented in Mssr. Beauchamp's exhaustive (and exhausting) three-volume treatise, "Underground Commerce and the Wines That Age There."
+&nbsp;
+¶¶These facilities cost approximately $47,000 to install for a 1,000-bottle capacity, ensuring that only serious alchemists or hopeless optimists invest in them. The Guild maintains that 67% of such installations remain unused after their owners realize they don't actually have 1,000 bottles worth aging.
+&nbsp;
+¶¶¶Cave systems naturally maintain stable temperatures due to thermal mass effects and insulation from surface weather. The Ancient Masters also benefited from not having invented thermometers yet, which meant they couldn't obsess over tenth-degree variations like modern practitioners do.
+&nbsp;
+**Natural cork comes from cork oak trees and maintains elasticity for 20-50 years under proper conditions. Under improper conditions—such as vertical bottle storage or low`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wine aging techniques in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DISTILLATION_SPIRITS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'distillation_spirits',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Distillation Spirits',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_beverages'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wine_aging_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_distillation_spirits' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Distillation Spirits: An Alchemical Inquiry into the Separation of the Volatile from the Fixed</span>
+&nbsp;
+The practice of distillation, whereby one encourages spirits* to separate from their corporeal vessels through the judicious application of heat, represents one of alchemy's most dangerous and rewarding endeavors. While the ancient art of wine aging† teaches patience and the slow transformation of the grape, distillation demands a different virtue entirely: the courage to tell a liquid it's not good enough as it is and must be improved through violence‡. The alchemist who approaches the still must understand that they are not merely concentrating alcohol—they are negotiating with substances that have historically shown themselves to be temperamental, occasionally explosive, and possessed of what the Guild of Perpetually Singed Alchemists calls "an unfortunate tendency toward autonomous combustion."**
+&nbsp;
+The fundamental principle involves heating a fermented liquid until the alcohol†† (which boils at 78.37°C, a figure arrived at after the tragic miscalculation of 1643‡‡) vaporizes before the water, then cooling these vapors back into liquid form. This sounds deceptively simple, much like "just walk across this rope" sounds simple until one mentions the rope is on fire and suspended over a pit of philosophically aggressive bears***. The apparatus itself—typically consisting of a cucurbit (heating vessel), an alembic (condensing hood), and a receiver (collection vessel)†††—must be assembled with a attention to detail that would make a watchmaker weep‡‡‡, as even minor imperfections in the seal can result in what the Department of Alchemical Accident Statistics categorizes as "regrettable outcomes of varying severity."****
+&nbsp;
+Modern alchemical understanding recognizes multiple fractions in the distillate: the "heads" (containing volatile compounds including methanol, which in concentrations above 0.02% can cause what medieval texts euphemistically called "the permanent squint"*****), the "hearts" (the desirable ethanol-rich middle fraction), and the "tails" (containing heavier alcohols and oils that taste, according to Master Distiller Ephraim Quicksilver, "like disappointment made liquid").†††† The skilled practitioner must know when to make these cuts, a judgment that comes only with experience, preferably other people's.‡‡‡‡ The Guild examination for journeyman distillers includes a practical component where candidates must identify which fraction they're sampling while blindfolded*****, which explains the Guild's unusually comprehensive health insurance policy.
+&nbsp;
+Safety considerations extend far beyond the obvious "don't drink the heads" and encompass a relationship with fire that can only be described as fraught.†††††The still must never be left unattended‡‡‡‡‡, the work area must be well-ventilated******, and under no circumstances should one attempt to check if the vapors are flammable by introducing an open flame††††††, despite this being precisely what apprentice after apprentice attempts in what has become a depressingly predictable initiation ritual. The Codex of Sensible Distillation, maintained by the Society for Alchemists Who Still Have Their Eyebrows, runs to 847 pages, of which approximately 600 consist of the single repeated phrase "NO, DON'T" followed by descriptions of things people have definitely done.‡‡‡‡‡‡
+&nbsp;
+Historical development of distillation traces back to the ancient Mesopotamian alchemist Zosimos of Panopolis****** in the 3rd century CE, though the technique likely predates written records by millennia††††††† and was possibly discovered by accident‡‡‡‡‡‡‡, as most useful things are. The medieval Islamic alchemists perfected the apparatus, giving us the word "alembic" from the Arabic al-anbiq, which itself derives from the Greek ambix, meaning "cup" or "beaker," demonstrating humanity's enduring habit of naming complex equipment after simple containers.******** The European rediscovery of distillation in the 12th century led to what historians call the "Aqua Vitae Period," characterized by wild overestimation of alcohol's medicinal properties and equally wild underestimation of its capacity to make people do things they would regret upon sobering†††††††.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*The term "spirits" itself derives from the Arabic "al-kuhl," meaning "the fine powder" or "the essence," though by the time it reached medieval Europe it had acquired the additional meaning of "that which makes Uncle Gerald dance on tables at weddings despite being 73 and having a bad hip."
+&nbsp;
+†See the foundational work "Wine Aging Techniques," particularly the section on patience, which distillation cheerfully ignores in favor of what might be called "aggressive intervention."
+&nbsp;
+‡The distinguished alchemist Bartolomeo of Ravenna (1287-1334) wrote that distillation was "the art of telling wine it could be better, then literally boiling it until it admits you're right." He was later excommunicated for reasons that remain unclear, though his writings on other topics suggest it might have been the theological implications of his work on "persuading stones to confess their secrets."
+&nbsp;
+**The Guild, founded in 1456 after what minutes describe only as "the incident at the Cologne Symposium," maintains the most comprehensive burn ward in Europe. Their motto, "Amat Victoria Curam" (Victory Loves Preparation), is somewhat undercut by the unofficial motto whispered in taverns: "At Least We Tried."
+&nbsp;
+††The precision of this figure is the result of 157 separate measurements taken between 1641 and 1703, each one progressively more careful than the last. The progression correlates directly with the severity of accidents resulting from approximations.
+&nbsp;
+‡‡Alchemist Johann Feuerwasser† believed alcohol boiled at 80°C. His notes end mid-sentence on the 3rd of March, 1643, with the words "That's odd, it's boiling much more vigorously than I—" The rest is charred beyond legibility.
+†He should not be confused with his cousin, Johann Wasserfeur, who believed the opposite and died in an entirely different but equally instructive incident.
+&nbsp;
+***The Philosophical Bear‡ debate remains unresolved. What is agreed upon is that one should not conduct distillation experiments while riding a bear across a rope, regardless of the bear's philosophical inclinations.
+‡Defined by the Academy of Improbable Natural History as "any bear that has consumed sufficient fermented berries to have opinions about the nature of existence." The Academy's founding bears (Aristotle, Plato, and Kevin) were sadly lost in the Great Honey Incident of 1789.
+&nbsp;
+†††The terminology comes from the Arabic again, because when medieval Europeans weren't borrowing alchemical equipment designs from Islamic scholars, they were borrowing the words for them. The cucurbit takes its name from the Latin for "gourd," which it resembles if you have a very generous imagination and have already sampled the previous batch.
+&nbsp;
+‡‡‡The Watchmakers' Guild and the Alchemists' Guild maintain a cordial professional rivalry, primarily expressed through their competing claims about whose work requires more precision. The watchmakers argue they work with components measured in microns; the alchemists counter that their components occasionally explode. Both guilds agree that the Bakers' Guild should stop trying to join this argument.
+&nbsp;
+****The Department's annual report for 1782 lists 1,247 "regrettable outcomes," categorized by severity from "minor singeing" (847 incidents) through "moderate conflagration" (312 incidents) to "significant dissolution of structural integrity" (73 incidents) and finally "please stop asking questions" (15 incidents). The report runs to 900 pages, mostly consisting of polite euphemisms.
+&nbsp;
+*****Methanol toxicity was not fully understood until the 18th century, though medieval texts contain numerous references to "the blind drunk," which we now understand to be less metaphorical than originally believed. The Monastery of St. Ambrose the Cautious maintains a memorial to Brother Theophilus, whose last words were reportedly "It tastes fine to me," though since this was written down by Brother Theophilus himself, who survived but lost his sight, the accuracy is difficult to verify.
+&nbsp;
+††††Master Quicksilver (1734-1802) was known for his uncompromising standards and his comprehensive tasting notes, which fill seventeen volumes and become progressively less coherent as each volume proceeds.‡ He died peacefully in his sleep at age 68, which his colleagues considered something of a miracle given his profession and methodology.
+‡Volume 17 ends with the note "Everything is tails. Always has been. We're all tails. The universe is`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding distillation spirits in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  YEAST_FERMENTATION_BEVERAGES,</span>
+<span class="cstat-no" title="statement not covered" >  BEER_BREWING_FUNDAMENTALS,</span>
+<span class="cstat-no" title="statement not covered" >  MALT_PREPARATION,</span>
+<span class="cstat-no" title="statement not covered" >  HOP_SELECTION_PRESERVATION,</span>
+<span class="cstat-no" title="statement not covered" >  WORT_CREATION,</span>
+<span class="cstat-no" title="statement not covered" >  WINE_MAKING_PRINCIPLES,</span>
+<span class="cstat-no" title="statement not covered" >  GRAPE_JUICE_FERMENTATION,</span>
+<span class="cstat-no" title="statement not covered" >  WINE_AGING_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  DISTILLATION_SPIRITS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

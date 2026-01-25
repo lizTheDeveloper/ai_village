@@ -1,0 +1,2110 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/masonry_stonework-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> masonry_stonework-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_CUTTING_FUNDAMENTALS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_cutting_fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Cutting Fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_cutting_fundamentals' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Stone Cutting Fundamentals</span>
+&nbsp;
+The art of stone cutting represents one of humanity's oldest and most fundamental construction techniques, predating written language, the wheel, and—rather surprisingly—the invention of complaining about construction delays*. At its core, stone cutting involves the systematic removal of material from a larger stone mass to create desired shapes, surfaces, and dimensions, a process that seems straightforward until one actually attempts it**. The fundamental principle operates on the understanding that stone, despite its reputation for eternal solidity, possesses natural grain patterns, cleavage planes, and structural weaknesses that can be exploited through proper technique†, though the stone itself is rarely informed of this fact and may have other opinions on the matter††.
+&nbsp;
+Modern stone cutting employs three primary methodologies: percussion splitting (striking the stone with deliberate force), abrasive cutting (wearing away material through friction), and thermal shock (exploiting temperature differentials)†††. The selection of appropriate methodology depends on numerous factors including stone composition, desired finish quality, available tools, and the cutter's tolerance for spectacular failure‡. Practitioners must first learn to "read" the stone—identifying its grain direction, detecting hidden fissures, and developing what the Guild of Dimensional Stonemasons calls "lithic empathy"‡‡—before attempting any cutting action. The most critical skill remains knowing where to apply force and, perhaps more importantly, where not to‡‡‡, a lesson historically learned through the sudden and irreversible bisection of expensive marble blocks§.
+&nbsp;
+Safety considerations in stone cutting cannot be overstated, as evidenced by the fact that every major stonemason's manual begins with a chapter entitled "Keeping Your Original Number of Fingers"§§. Primary hazards include flying stone fragments (capable of achieving velocities up to forty-seven feet per second***), repetitive strain injuries (the forearm muscles of master stonemasons have been documented to achieve a diameter approximately 2.3 times that of ordinary humans†††), and the peculiar phenomenon known as "stone deafness"—a condition affecting 73% of career stonemasons who worked before the introduction of ear protection in 1847‡‡‡. The proper personal protective equipment includes safety glasses§§§, reinforced gloves****, leather aprons††††, and—according to the somewhat controversial recommendations of the Northern Continental Association of Applied Lithography—a small brass amulet depicting Saint Clement of the Unbroken Chisel‡‡‡‡.
+&nbsp;
+Historical development of stone cutting stretches back to the Neolithic period, when humans first discovered that hitting one rock with another rock could produce results other than noise and frustration§§§§. The ancient Egyptians achieved remarkable precision using copper tools and dolerite pounders*****, a technique that modern engineers attempted to replicate in 1962 with spectacularly poor results†††††. Medieval stonemasons developed sophisticated measurement systems‡‡‡‡‡, guild structures that would make modern labor unions weep with envy§§§§§, and a tradition of leaving their marks—both intentional signatures and accidental thumb prints—in their work. The Industrial Revolution introduced diamond-tipped saws and pneumatic tools, increasing cutting speed by approximately 847% while simultaneously reducing the poetic tragedy quotient of the profession by a roughly equivalent amount******.
+&nbsp;
+Contemporary stone cutting benefits from computer-aided design systems, water jet technology capable of cutting through granite with the ease of a hot knife through warm butter (assuming the butter were mineralized and had spent several million years under tectonic pressure)††††††, and an understanding of crystalline structure that would have seemed like sorcery to medieval practitioners‡‡‡‡‡‡. Yet despite technological advancement, the fundamental principle remains unchanged: success in stone cutting requires patience, precision, and profound respect for the material§§§§§§, qualities that seem to be inversely proportional to the number of YouTube videos one has watched on the subject*******.
+&nbsp;
+---
+&nbsp;
+*The earliest recorded complaint about construction delays dates to approximately 2800 BCE, found on a Sumerian clay tablet that translates roughly to "The pyramid guy said it would be done by the spring floods." Archaeological evidence suggests stone cutting existed at least 3,000 years prior to this complaint, leading scholars to theorize that early stone cutters worked in blessed silence, free from client interference.
+&nbsp;
+**The Dunning-Kruger effect operates with particular virulence in stone cutting. The Institute for the Study of Overconfident Craftsmanship has documented that 94% of novices believe they could "probably manage" cutting a cornerstone for a cathedral after watching a single demonstration. The Institute's founder, Professor Helmut Scheidenfreude, lost three fingers proving this hypothesis incorrect.
+&nbsp;
+†These weaknesses include bedding planes (horizontal layers), cleavage planes (directions of natural splitting), and what old-time quarrymen called "the bastard spots"—areas of unexpected crystalline structure that would explode without warning. The technical term for these is actually "discontinuities," but the traditional terminology remains more satisfying when one occurs.
+&nbsp;
+††In the animistic traditions of the Kandahar Stonemasons' Brotherhood, each stone possesses a temperament. Granite is considered "steadfast but stubborn," marble "beautiful but temperamental," and limestone "agreeable until wet, then treacherous." Modern geologists dismiss this as superstition while simultaneously admitting that granite "really is quite difficult to work with" and limestone "does tend to surprise you."
+&nbsp;
+†††Thermal shock cutting involves heating stone and then rapidly cooling it, causing differential expansion that creates fractures. This technique was pioneered by ancient miners and perfected by the Bavarian engineer Johann Steinbrecher in 1673***†, who also pioneered the field of "running very quickly away from stones that are making ominous cracking sounds."
+&nbsp;
+***†Steinbrecher's journal, held in the Munich Technical Archive, contains the memorable entry: "November 14th - Discovered that heating limestone to cherry-red and then applying cold water creates immediate fracturing. Also discovered that standing too close to said limestone during this process creates immediate fracturing of other things, including one's dignity."
+&nbsp;
+‡A spectacular failure in stone cutting is defined by the Guild as "any failure visible from more than fifty paces" or "any failure that generates an anecdote lasting longer than the time it took to create the failure." The Great Rose Window Incident of 1392 qualifies on both counts and is still discussed at Guild meetings, always in hushed tones and never while the Master of the Paris Lodge is present.
+&nbsp;
+‡‡Lithic empathy should not be confused with lithic sympathy (feeling sorry for the stone), lithic apathy (not caring about the stone's opinion), or lithic antipathy (actively disliking the stone), though all three conditions have been documented in the medical literature. Dr. Erasmus Rockford's seminal 1891 paper "On the Emotional States Induced by Prolonged Stone Contact" remains required reading at the Academy of Geological Psychology in Oslo.
+&nbsp;
+‡‡‡The distinction between where to apply force and where not to is subtle but crucial. The memorial garden at the International Stone Cutting Institute in Carrara contains 247 sculptures, each commemorating a moment when this distinction was not properly understood. The garden is quite beautiful, though perhaps not in the way originally intended.
+&nbsp;
+§The Most Expensive Mistakes Registry, maintained by Lloyd's of London's Specialized Crafts Division, lists "The Michelangelo That Wasn't" (1523) at number four. A single misplaced chisel blow transformed what would have been a priceless sculpture of David into, according to contemporary accounts, "something that might perhaps be a David if one squints considerably and has consumed wine." The block was eventually recut into paving stones, making it possibly the world's most overqualified walkway.
+&nbsp;
+§§The second chapter is entitled "Keeping Your Fingers in Their Original Arrangement," followed by "Keeping Your Fingers Attached to Your Original Hands." The manual runs to seventeen chapters, becoming progressively more specific about anatomical preservation.
+&nbsp;
+***This velocity was precisely measured by the Research Division of the International Brotherhood of Stonemasons using high-speed photography, after the tragic "Demonstration Day Incident" of 1934 when the Czech ambassador lost his monocle (and nearly his eye) to a fragment of flying schist. The Brotherhood now maintains that demonstrations should be viewed from behind appropriate barriers or from a different postal code entirely.
+&nbsp;
+†††The definitive study, published in the Journal of Occupational Asymmetry (Vol. 34, Issue 7), included photographs that had to be seen to be believed. The researchers noted that long-term stonemasons could often be identified in crowds by their tendency to list slightly to one side and their ability to crack walnuts using only their thumb and forefinger. Attempts to market "The Stonemason Workout" to fitness enthusiasts in the 1990s were unsuccessful, largely because the workout took approximately twenty`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone cutting fundamentals in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CHISEL_HAMMER_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'chisel_hammer_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Chisel Hammer Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_cutting_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_chisel_hammer_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `CHISEL HAMMER TECHNIQUES: A COMPREHENSIVE EXAMINATION OF PERCUSSIVE STONE MANIPULATION IN MODERN CONSTRUCTION PRACTICE</span>
+&nbsp;
+The chisel hammer, that most noble marriage of pointed implement and blunt instrument*, represents humanity's longest-standing relationship with stone†. At its essence, the technique is magnificently simple: one holds a chisel against stone with one hand while striking it with a hammer held in the other hand, thereby transferring kinetic energy through a smaller surface area to encourage the stone to part ways with portions of itself‡. This fundamental principle has remained unchanged since the Third Age of Stone**, when our ancestors discovered that hitting things with other things could produce surprisingly specific results††.
+&nbsp;
+The practical applications of chisel hammer techniques extend from the delicate art of detail carving to the rather more vigorous practice of demolition work***. The key distinction lies in what the Guild of Stone Hammerers refers to as "intentionality of force"†††—which is to say, whether one wishes to remove a thin flake or approximately half the wall‡‡. Modern practitioners employ a variety of chisel types, from the flat chisel (for general work) to the point chisel (for aggressive material removal) to the tooth chisel (which possesses exactly 23.7% more teeth than most practitioners find comfortable)‡‡‡. The angle at which one holds the chisel, typically between 20 and 35 degrees from the stone surface§, determines whether one creates a controlled cut or what the Institute of Regrettable Masonry Incidents classifies as "an unfortunate divot."§§
+&nbsp;
+Safety considerations cannot be overstated, though they are frequently understated by those who believe themselves possessed of sufficient skill to transcend basic precautions§§§. The triumvirate of eye protection, gloves, and proper stance forms what ancient stonemasons called the "Three Pillars of Not Getting Terribly Hurt"*. Contrary to popular belief among apprentices, the human hand does not become progressively more resistant to hammer strikes through exposure**; this misconception has led to what the Royal College of Occupational Hazards terms "an statistically concerning number of preventable thumb incidents."*** The proper grip involves holding the chisel firmly but not rigidly†††, allowing the tool to absorb and redirect impact forces rather than transmitting them directly to one's increasingly-alarmed skeletal structure.
+&nbsp;
+The historical development of chisel hammer techniques traces back to the Neolithic period, when some forgotten genius realized that controlled stone removal was preferable to hoping the rock would crack in convenient places‡‡‡‡. The technique remained essentially unchanged through the Roman Empire§§§§, the Medieval period*, and the Renaissance**, evolving primarily in the metallurgy of the tools rather than the fundamental method††. What our ancestors understood intuitively—that stone prefers to fracture along certain planes and requires different approaches depending on its mood†††—modern practitioners have codified into extensive manuals that are largely ignored in favor of experience-based learning‡‡. The Guild of Traditional Methods maintains that no amount of theoretical instruction can replace the moment when an apprentice finally understands why their master kept telling them to "feel the stone"§§§, though they acknowledge this sounds distressingly mystical to outside observers.
+&nbsp;
+Modern understanding, enhanced by materials science and high-speed photography, has revealed that the seemingly simple act of chisel-and-hammer work involves complex stress wave propagation and fracture mechanics***. The optimal strike delivers enough force to initiate a fracture plane without generating excess energy that might cause unpredictable spalling††††. Professional stonemasons develop an almost musical sense of timing, recognizing the distinct sounds that indicate proper engagement with the material versus the somewhat less pleasant sounds that indicate imminent disaster‡‡‡‡‡. The International Association of Stone Workers notes that approximately 73.6% of skilled practitioners can identify rock type by the sound it makes when struck§§§§§, though they suspect the remaining 26.4% are simply reluctant to admit they're guessing*.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+&nbsp;
+*The marriage was arranged by necessity, as is so often the case with tools. Nobody asked the chisel or the hammer if they wanted to spend eternity in each other's company.
+&nbsp;
+†Some scholars argue that humanity's relationship with fire is older, but fire has never been particularly good at staying exactly where you put it while you work.
+&nbsp;
+‡The stone does not always agree with this encouragement. In fact, geological surveys suggest that stone unanimously resents being encouraged to do anything.
+&nbsp;
+**Not to be confused with the First or Second Ages of Stone, which were marked by hitting things with stones rather than hitting stones with things—a subtle but important distinction according to the Department of Prehistoric Pedantry†.
+&nbsp;
+††Found at the University of Unnecessary Exactitude, a institution that insists on dating everything to the nearest fortnight despite the inherent challenges of carbon dating.
+&nbsp;
+***The vigor of demolition work is directly proportional to one's confidence that the wall in question is not load-bearing. The Guild maintains a Hall of Memorable Miscalculations for those who were overly optimistic.
+&nbsp;
+†††This guild, founded in the Year of the Fallen Arch (the exact date of which has been deliberately obscured following an incident involving an overly enthusiastic secretary), maintains the most comprehensive injury database in the construction trades. Their annual reports make for sobering reading, though they include surprisingly humorous footnotes‡.
+&nbsp;
+‡Written by the Guild's official scribe, Marcus the Mostly-Fingered, who lost three digits to what he describes as "an aggressive disagreement with a piece of limestone."
+&nbsp;
+‡‡The mathematical precision of this figure was determined by Professor Hieronymus Chiselworth of the Academy of Tool-Based Mathematics§, who spent seventeen years measuring teeth on historical chisels before concluding that someone in the past was "having a laugh" with inconsistent manufacturing.
+&nbsp;
+§§An academy that was defunded after it was discovered they'd spent most of their budget on extremely accurate calipers and very little on actual research.
+&nbsp;
+‡‡‡The teeth of a tooth chisel serve to concentrate force across multiple points, though some scholars at the Institute of Unnecessarily Complex Explanations argue that they're actually for frightening the stone into submission§§.
+&nbsp;
+§§This theory was proposed by Dr. Emmeline Frightworthy in her controversial paper "Psychological Warfare Against Geological Formations" and has since been largely ignored by everyone except performance artists.
+&nbsp;
+§This range was established through extensive trial and error, with the emphasis heavily on "error." The 23rd International Conference on Optimal Chisel Angles lasted four days and resulted in seven academic feuds, two duels (both non-fatal), and a general consensus that 27.5 degrees was "probably fine for most things."
+&nbsp;
+§§The Institute, based in the Tower of Previous Mistakes (a building that is notably shorter than originally planned following several unrelated incidents), maintains a museum that is simultaneously educational and deeply unsettling.
+&nbsp;
+§§§The full quote, from the memoirs of Master Mason Cornelius Prideful, reads: "I have been chiseling stone for thirty years without goggles and I can't see what all the fuss is about." He wrote this using a specially adapted writing desk for the partially sighted.
+&nbsp;
+*Recorded in the ancient text "Things Our Ancestors Learned So You Don't Have To: Volume Seven—Hands."
+&nbsp;
+**Though many apprentices continue to test this hypothesis with admirable dedication and regrettable results. The Society for the Prevention of Unnecessary Thumb Damage publishes a quarterly newsletter that is mostly case studies and sighing.
+&nbsp;
+***The Royal College, a venerable institution housed in a building with suspiciously many ground-floor windows (installed after the Upper Window Incident of 1847†††), tracks occupational injuries with bureaucratic thoroughness.
+&nbsp;
+†††Details of which remain sealed, though the phrase "cascading failure" appears seventeen times in the official report.
+&nbsp;
+††††According to the Manual of Proper Gripping Technique, published by the Guild of People Who've Learned Things the Hard Way (motto: "So You Don't Have To"), the ideal grip is "firm as friendship, flexible as diplomacy."
+&nbsp;
+‡‡‡‡The identity of this genius is lost to time, though several competing archaeological sites claim to have found their workshop. The sites have remarkably similar gift shops.
+&nbsp;
+§§§§The Romans, who built most of their empire through the judicious application of chisel hammer techniques, left behind extensive documentation including the famous "Manual of Marcus Malleator" (Marcus the Hammer-Wielder), which contains the immortal advice: "Strike with purpose, not with rage, unless the stone has personally offended you, which it probably has."*
+&nbsp;
+*Marcus was known for his philosophical approach to stonemasonry and his tendency to take geological indifference personally.
+&nbsp;
+**During which period the technique was considered a "Mystery of the Trade" and therefore illegal to write down, resulting in a frustrating gap in historical documentation that makes historians cross†.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding chisel hammer techniques in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_SHAPING_PRECISION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_shaping_precision',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Shaping Precision',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['chisel_hammer_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_shaping_precision' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `STONE SHAPING PRECISION: A COMPREHENSIVE TREATISE ON THE ART OF NOT MAKING ROCKS LOOK LIKE THEY'VE BEEN THROUGH A THRESHING MACHINE</span>
+&nbsp;
+The fundamental principle of stone shaping precision rests upon what the Ancient Guild of Stonemasons called "the three tolerances": how flat is flat enough*, how square is square enough**, and how much does anyone actually notice***. Modern practitioners, equipped with tools their predecessors would have considered sorcerous†, still find themselves subject to the same basic truth discovered by the Mesopotamians some four thousand years ago: stone, being stone, has opinions about how it wishes to be shaped, and these opinions are rarely aligned with architectural drawings††. The precision required varies considerably with application—a foundation stone buried three feet underground requires markedly less finesse than a decorative capital that will spend its existence being scrutinized by people who have nothing better to do than point out minor irregularities†††.
+&nbsp;
+The practical application of stone shaping precision involves a hierarchy of increasingly specific measurements, beginning with the ancient and venerable technique of "eyeballing it"‡ and progressing through the intermediate stages of "using a straight edge," "using an actual measuring device," and finally "using mathematical instruments that would have gotten you burned for witchcraft in certain historical periods"‡‡. The apprentice stonemason must learn to work within tolerances measured in fractions that become progressively smaller as one's master becomes progressively more irritable‡‡‡. Historical records indicate that the acceptable margin of error for a common building block in medieval construction was approximately "close enough that mortar will fix it," whereas modern architectural stone must be precise to within measurements that require scientific notation and a degree in pedantry§.
+&nbsp;
+Safety considerations in precision stone shaping are numerous and frequently discovered through methods best described as "empirical" or "regrettable"§§. The primary danger lies not in the obvious hazards—flying stone chips, crushed fingers, the occasional boulder developing sentience and rolling away§§§—but in the more insidious peril of perfectionism¶. The annals of the International Stonemasons' Benevolent Society contain seventeen documented cases of craftsmen who attempted to achieve tolerances beyond human capability, resulting in what the medical profession terms "precision-induced paralysis" or what everyone else calls "standing there measuring the same stone for six hours"¶¶. Modern best practice recommends working to the precision required by the application, not the precision required by one's wounded pride after a journeyman makes a disparaging comment about one's angles¶¶¶.
+&nbsp;
+The historical development of stone shaping precision reads like a chronicle of humanity's gradual realization that "near enough" is a philosophical position, not an engineering specification**. The Egyptian pyramid builders, working with copper tools and an admirable disregard for their own mortality, achieved precision that modern engineers grudgingly admit is "actually rather impressive"**. The Roman stoneworkers, blessed with iron tools and cursed with supervisors who had studied geometry, pioneered the revolutionary technique of "measuring things before cutting them"***. Medieval masons, working under the dual constraints of limited tools and unlimited religious symbolism, developed the art of making imprecise stonework look intentional through the strategic application of decorative carving†††. Contemporary practitioners benefit from laser measuring devices, diamond-tipped tools, and computer-aided design software, which they use to achieve results that are measurably more precise than ancient work while somehow looking slightly less impressive‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+* Flat enough is defined by the Council of Metrical Philosophy as "flat within the limits of human perception when viewed from the distance at which most humans view things, which is to say, without paying much attention." This standard was revised in 1847 after the Incident of the Supposedly Flat Altar Stone at Canterbury, which turned out to be a hyperbolic paraboloid. Nobody noticed for thirty-seven years.
+&nbsp;
+** Square enough typically means "square within one-eighth of an inch per foot," though this varies by region, tradition, and how many apprentices are watching. The Bavarian stonemasons historically used a more stringent standard of "square enough that the master won't throw it at your head," which worked out to approximately one-sixteenth of an inch. The thrown stones formed the foundation of what is now the Munich Museum of Rejected Work.
+&nbsp;
+*** The answer, according to a comprehensive study by the Institute for Observational Architecture†, is "more people than you'd think, and they all become vocal about it at the worst possible moments."
+&nbsp;
+† Said study involved showing 10,000 randomly selected people photographs of stone blocks with varying degrees of imperfection. Results indicated that 73.4% of humans can detect deviations greater than one-quarter inch at ten paces, 23.1% can detect deviations of one-eighth inch, 3.4% claimed to detect deviations of one-sixteenth inch (of whom half were lying and half were optometrists), and 0.1% were that one person at every building site who has opinions about everything‡.
+&nbsp;
+‡ This person is a recognized phenomenon across all construction trades. The Ancient Greeks called them ὁ ἐνοχλητικός (ho enokhlētikós, "the annoying one"). The Romans called them "Gaius." Modern unions call them "shop steward."
+&nbsp;
+†† In the famous case of the Limestone Uprising of 1634§, a entire shipment of stone refused to be cut to the specified dimensions, repeatedly splitting along the wrong grain no matter how carefully the cuts were planned. The blocks were eventually used for a prison wall, where their stubborn nature was considered appropriate.
+&nbsp;
+§ This incident is documented in the Annals of Geological Stubbornness, vol. 12, though some scholars question whether limestone can actually "revolt." These scholars have clearly never worked with sedimentary rock on a humid day.
+&nbsp;
+††† The Guild maintains a Museum of Notable Mistakes, which includes the Leaning Block of Pisa (no relation to the tower, which was at least intentionally vertical to start), the Inside-Out Cornerstone of Prague, and the Bavarian Cube That Wasn't, which possessed seven faces in apparent defiance of Euclidean geometry.
+&nbsp;
+‡ A technique that served humanity adequately for several millennia and continues to serve adequately in situations where nobody is going to measure anything afterward¶.
+&nbsp;
+¶ Which, to be fair, is most situations. The International Bureau of Things Nobody Checks calculates that 94.7% of all stonework is never measured by anyone after installation, 4.8% is measured once by an inspector who is late for lunch, and 1.5% is measured by people with nothing better to do, who should get a hobby.
+&nbsp;
+‡‡ The transition between these stages is traditionally marked by moments of revelation, usually occurring immediately after cutting something wrong**. Apprentices report a sudden understanding of why measurements matter, typically accompanied by a sinking feeling and the sound of their master approaching.
+&nbsp;
+** The Guild of Stonemasons maintains comprehensive records of expensive mistakes. The most frequently cited is the Incident of the Backwards Keystone, which occurred an average of fourteen times per century between 800 and 1200 CE. After 1200 CE, it occurred less frequently, not because masons became more careful, but because they became better at blaming the apprentice.
+&nbsp;
+‡‡‡ The traditional progression of tolerances follows the Fibonacci sequence, but measured in fractions of an inch and inversely proportional to the master's remaining patience. By the fifth year of apprenticeship, one is expected to work to tolerances of 1/89th of an inch while the master watches, breathing heavily.
+&nbsp;
+§ The equation for this precision, developed by the Swiss mathematician Heinrich von Exactington (1847-1921), is expressed as P = (I × V) / (T × C), where P is required precision, I is importance of visibility, V is value of the installation, T is thickness of mortar joints, and C is concern for one's reputation. Von Exactington went mad in 1919 trying to calculate the precision required for his own tombstone. It remains uncarved.
+&nbsp;
+§§ The definition of "empirical" in stonemason contexts usually means "we tried it, something went wrong, and now we know not to do that." This is considered superior to "theoretical," which means "we think we know what will happen, but we're probably wrong."
+&nbsp;
+§§§ The phenomenon of ambulatory boulders is discussed in the restricted section of the Guild library. Modern scholars attribute reports of "stones that walk away" to poor supervision, inadequate blocking, and the sort of slopes that make physicists nervous. Medieval scholars attributed it to stone spirits, which is less scientific but no less accurate in practice. The liability insurance premiums are identical either way.
+&nbsp;
+¶ The Perfectionist's Syndrome was first identified by Master Mason Albrecht the Precise in`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone shaping precision in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_SURFACE_FINISHING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_surface_finishing',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Surface Finishing',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_shaping_precision'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_surface_finishing' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Stone Surface Finishing</span>
+&nbsp;
+The art of stone surface finishing, while often overlooked in favor of its more dramatic sibling stone carving*, represents the delicate transition between rough-hewn potential and polished reality. This fundamental construction skill transforms brutish slabs into surfaces suitable for everything from palace floors to the modest hearthstones of those who cannot afford palaces but still require somewhere to put the kettle**. The basic principle is deceptively simple: one begins with a surface that could generously be described as "aggressive" and, through the application of abrasive materials in progressively finer grades, achieves a finish ranging from "merely assertive" to "you can see your face in it, though perhaps you'd rather not"†. Modern practitioners typically employ a four-stage progression—rough grinding, intermediate smoothing, fine polishing, and what the Guild of Surface Finishers mysteriously refers to as "the Whispering"††—though historical records suggest our ancestors managed with considerably less ceremony and considerably more patience†††.
+&nbsp;
+The practical applications of proper stone finishing extend far beyond mere aesthetics, a fact that became tragically apparent during the Great Marble Incident of 1437‡. In construction, different finishes serve different purposes: a roughened surface provides grip underfoot‡‡, preventing what insurance scrolls delicately term "involuntary acceleration events," while a polished surface in a temple or courthouse projects the kind of authority that says "we have time to polish rocks, so imagine what we might do to you"‡‡‡. The techniques themselves form a hierarchy of abrasion§, beginning with coarse grinding using materials that sound like they're at war with the stone§§—because they are—and progressing through stages so fine that experienced finishers claim they're essentially negotiating with the molecular structure of the stone itself§§§. Water plays a crucial role throughout this process, serving simultaneously as lubricant, coolant, and remover of that distinctive stone dust which the Physicians' Guild has officially classified as "probably inadvisable to breathe in significant quantities"¶.
+&nbsp;
+Safety considerations in stone finishing cannot be overstated, though they are frequently understated by those who have grown overly comfortable with the work¶¶. The primary dangers fall into three categories: physical injury from the grinding process itself, respiratory complications from stone dust¶¶¶, and the often-overlooked psychological toll of spending eight hours a day making stones smooth while contemplating one's life choices**. Modern best practices mandate the use of water-dampening to minimize dust, protective eyewear to prevent what the Medical Scrolls call "enthusiastic particulate intrusion," and regular breaks to maintain the kind of attention to detail that prevents one from grinding through the stone entirely and into whatever lies beneath††. The Guild strongly recommends against working while fatigued, distracted, or under the influence of substances that make you think you can commune with the essential nature of the stone‡‡, though this latter warning was only added after what the official records describe as "an regrettable experimental period in the late 1300s"§§.
+&nbsp;
+The historical development of stone finishing techniques reveals a progression from brute force to something approaching artistry, though opinions differ on whether this represents genuine advancement or merely the same work done with fancier tools¶¶. Ancient finishers, working with simple sand and water, achieved results that modern craftspeople regard with a mixture of admiration and suspicion—how did they get marble that smooth with nothing but patience and what one scholar termed "an apparently supernatural indifference to the passage of time"?*** The introduction of metal abrasives in the medieval period reduced finishing time by approximately 63.7%†††, though it increased the rate of finger injuries by a roughly proportional amount‡‡‡. Contemporary understanding recognizes stone finishing as a meditation on the relationship between persistence and perfectionism§§§, where the goal is not merely to make stone smooth but to understand what "smooth" means in the context of a material that was old when your civilization was young¶¶¶. The modern finisher, equipped with diamond-tipped tools and rotary polishers****, approaches the work with technologies the ancients would have considered either miraculous or suspiciously lazy, depending on their disposition.
+&nbsp;
+The philosophical dimensions of surface finishing emerge slowly, like the polish itself, as one progresses from mere technique to something approaching understanding††††. There exists a curious paradox at the heart of the craft: the finisher removes material to reveal beauty, suggesting that perfection lies not in addition but in subtraction‡‡‡‡, a concept that has kept monastery stonemasons contentedly contemplating for centuries§§§§. The experienced practitioner develops an almost supernatural sensitivity to surface texture, able to detect irregularities of mere microns by touch alone¶¶¶¶, though skeptics note this ability seems to vanish when asked to find misplaced tools in the workshop*****. As one advances in skill, the work transforms from mechanical repetition into a dialogue with the stone, where each pass of the abrasive reveals a little more of what the stone wishes to become—or what you wish it to become, or what it might become if you don't accidentally grind through a weak spot and ruin three weeks of work, which definitely never happens to experienced professionals and certainly didn't happen to the author of this paper twice in the last month†††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*Stone carving gets all the glory—dramatic chisels, flying chips, the artistic vision made manifest. Surface finishing gets the tedious work of making things actually usable. The Guild of Surface Finishers maintains this is perfectly fair and they're absolutely not bitter about it.
+&nbsp;
+**The Hearthstone Standards Commission, established in 1342, defines minimum smoothness requirements for various applications. They take their work very seriously. Some say too seriously. These people are not invited to Commission meetings.
+&nbsp;
+†This descriptive scale, developed by the Institute for Tactile Assessment in Upper Überwald, runs from Grade 1 ("may cause bleeding on contact") to Grade 10 ("suitable for use as a mirror by narcissistic vampires"). Most applications fall somewhere in the middle.
+&nbsp;
+††The Whispering remains a trade secret, though observers report it involves very fine abrasives, circular motions, and what appears to be the finisher talking to the stone. When questioned, Guild members smile mysteriously and change the subject. ‡
+&nbsp;
+‡Attempts to record the Whispering have resulted in nothing but the sound of grinding and occasional muttered profanity, suggesting either magical sound suppression or that "the Whispering" is simply a pretentious name for "doing it carefully." The Guild maintains the former. Evidence suggests the latter.
+&nbsp;
+†††Specifically, they managed with sand, water, and the kind of time investment that modern workers would recognize as "absolutely not within scope of the current contract, please revise estimate." Archaeological evidence suggests some temple floors took decades to finish properly, though we cannot rule out the possibility that this was padding the timeline.
+&nbsp;
+‡The Great Marble Incident began when the Cathedral of St. Ungulant's decided that highly polished marble floors would project divine authority. They succeeded, projecting approximately forty-seven worshippers into various walls and pillars during the first week alone. The injured sued under the newly established Premises Liability Statutes. The Cathedral now maintains that the original smoothness represented "excessive secular ambition" and has roughened the floors to "more spiritually appropriate" levels. Insurance premiums decreased by 73%.
+&nbsp;
+‡‡The optimal roughness for foot traffic is specified in the Building Codes (Underfoot Surfaces) Act of 1456, which defines no fewer than seventeen grades of "toothiness" for different applications. The Act runs to 847 pages, most of which concern special cases like "surfaces intended for use by clergy in ceremonial footwear" and "floors in establishments where dancing may occur but shouldn't be encouraged." †
+&nbsp;
+†Footnote-within-a-footnote: This Act was drafted following the Slippery Slope Debates of 1454-1455, wherein the Builders' Guild and the Physicians' Guild engaged in increasingly heated arguments about whether smooth floors were a sign of civilization or an invitation to catastrophe. The resulting legislation satisfied no one, suggesting it was a perfect political compromise.
+&nbsp;
+‡‡‡This authoritative gleam is calculated at approximately 87.3% of the psychological effect of the building overall, according to studies by the Institute of Architectural Intimidation. The remaining 12.7% comes from tall ceilings, echo effects, and the implicit threat of bureaucracy.
+&nbsp;
+§The Hierarchy of Abrasion, first codified by Master Finisher Theodora Grindstone in 1289, originally contained twelve stages but was reduced to four after her successor noted that stages six through nine were "essentially the same thing done more slowly." ††
+&nbsp;
+††Master Grindstone contested this revision until her death in 1334, maintaining that her critics simply lacked the refined sensibility to detect the differences`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone surface finishing in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MORTAR_MIXING_RATIOS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'mortar_mixing_ratios',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Mortar Mixing Ratios',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_surface_finishing'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_mortar_mixing_ratios' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Mortar Mixing Ratios: A Comprehensive Study of Proportional Binding in Masonry Construction</span>
+&nbsp;
+The fundamental principle of mortar mixing is deceptively simple: combine sand, cement, and water in specific ratios to create a binding agent that will last for centuries*. This apparent simplicity has led countless apprentices to assume that "eyeballing it" constitutes an acceptable methodology**, a belief that has resulted in more structural failures than the Guild of Concerned Masons† cares to document. The standard ratio of 1:3 (cement to sand) represents not merely a convenient proportion discovered by accident, but rather the culmination of approximately four thousand years of trial, error, and the occasional catastrophic collapse of city walls‡.
+&nbsp;
+The practical application of mortar mixing requires an understanding of consistency that borders on the philosophical*†. Too wet, and the mortar will slump ignominiously down the wall like a discouraged slug; too dry, and it achieves the workability of attempting to spread granite with a butter knife**†. The optimal consistency, described by the ancient Mesopotamian mason-poet Hur-Bal the Viscous as "firm enough to hold its shape, soft enough to accept your love"††, remains the gold standard some forty-three centuries later. Modern practitioners employ the "trowel test"‡†: if the mortar clings to an inverted trowel at a forty-five-degree angle for precisely 3.7 seconds before beginning its descent, the ratio is correct***. Any deviation suggests either insufficient mixing or, more commonly, the intervention of minor masonry deities who remain perpetually dissatisfied with mortar consistency†††.
+&nbsp;
+Safety considerations in mortar mixing extend well beyond the obvious concerns about cement burns and back injuries‡‡. The 1847 Incident at Portsmouth***, wherein an entire construction crew developed what physicians termed "Mason's Melancholia" after mixing mortar in an enclosed space for six consecutive days, led to the establishment of mandatory ventilation standards. Modern regulations require that mixing occur in well-ventilated areas, that workers wear appropriate protective equipment††**, and that under no circumstances should anyone attempt to taste the mortar to determine if the ratio is correct‡‡‡—a practice more common than one might reasonably hope§. The chemical composition of cement, when combined with sand and water, creates an alkaline environment hostile to human tissue and, according to the 1923 findings of Dr. Cornelius Slake§§, potentially attractive to a subspecies of earthworm that should not exist according to conventional biology.
+&nbsp;
+Historical development of mortar technology reveals a pattern of incremental improvement punctuated by spectacular setbacks*†††. The Romans, whose concrete constructions still stand after two millennia, achieved their success through the addition of volcanic ash and, if certain disputed scrolls are to be believed, the blood of criminals and a prayer to Vulcan§§§. Medieval masons, lacking access to volcanic regions, experimented with additives ranging from ox blood to ale to crushed gemstones, with varying degrees of success and sobriety****. The modern understanding of mortar chemistry emerged only in the nineteenth century, when French chemist Louis Vicat finally explained why certain proportions worked and others resulted in expensive piles of unbonded masonry††††. His treatise, "On the Proportion of Useful Binding Agents and the Futility of Hope When Ratios Are Incorrect," remains required reading for masonry students, though most skip directly to the tables in Appendix C‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The operative word being "will." Mortar mixed incorrectly will last considerably fewer than centuries—sometimes barely making it through the inspection phase. The author once witnessed a garden wall whose mortar, mixed by an enthusiastic but mathematically challenged homeowner at a ratio best described as "whatever," achieved structural integrity for nearly seventeen minutes before dissolving back into its constituent elements in a light rain.
+&nbsp;
+**The International Brotherhood of Masons maintains a Hall of Shame dedicated to structures built using the "eyeball method." Photographs include the Leaning Shed of Tuscaloosa (seventeen degrees off vertical), the Collapsed Garage of Bremen (now a cautionary parking lot), and the mysteriously S-shaped garden wall of Sussex, which no amount of surveying can explain.
+&nbsp;
+†Founded in 1842 after the Collapse of the Manchester Flour Mill (which was neither a flour mill nor in Manchester—it was a textile warehouse in Leeds, but "Manchester" sounded more authoritative in official reports), the Guild maintains exhaustive records of structural failures. Their archive contains 47,000 documented cases of improper mortar mixing, catalogued by ratio error, casualty count, and amusing collapse pattern. The building that houses these archives is, ironically, held together with mortar mixed to exacting standards, checked weekly, and blessed monthly by a rotating cast of nervous engineers.
+&nbsp;
+‡The walls of Jericho, for instance, may not have fallen due to trumpet blasts at all, suggests the controversial scholar Dr. Miriam Trowel-Hobbes. Her analysis of archaeological evidence points to a cement-to-sand ratio of approximately 1:47, which would have created mortar with roughly the structural integrity of damp breadcrumbs. The trumpet theory, she notes, makes for better mythology than "the walls fell down because someone was terrible at mixing."
+&nbsp;
+*†The Philosophical Society of Applied Masonry, based in Prague, has dedicated an entire wing of their library to treatises on mortar consistency. Titles include "On the Nature of Binding and Being," "The Phenomenology of Paste," and the alarmingly thick "Thickness: A Comprehensive Study." The latter runs to three volumes and includes a controversial chapter suggesting that mortar achieves consciousness at exactly the wrong consistency for practical application.
+&nbsp;
+**†This comparison, first made by Flemish mason Jan van Spreaden in 1523, appears in his memoir "Thirty Years of Stone and Suffering." Van Spreaden dedicated an entire chapter to consistency failures, which he categorized as: Soup (unsuitably liquid), Custard (approaching useful), Mashed Potato (optimal), Modeling Clay (suboptimal), and Rock (why did you even bring the trowel). His work remained the standard reference until someone invented actual measurements.
+&nbsp;
+††Hur-Bal's complete poem, "Ode to the Perfect Mixture," runs to 347 stanzas and includes extensive metaphors comparing mortar mixing to courtship, warfare, and bread-making. Only the first stanza has proven practically useful. The rest descends into increasingly cryptic observations about the nature of bonding—both chemical and emotional. Scholars remain divided on whether Hur-Bal was a genius or simply working in poorly ventilated spaces.
+&nbsp;
+‡†The trowel test, while widely practiced, has never been successfully standardized. Variables include trowel weight, ambient humidity, the phase of the moon (according to certain traditional masons), and what the British Masonry Standards Institute terms "the coefficient of hope." Their 1967 study found that apprentices who really believed in their mortar mixture achieved test times averaging 0.3 seconds longer than skeptical practitioners, a finding they could not explain and chose not to investigate further.
+&nbsp;
+***Despite attempts to modernize terminology, masonry guilds persist in referring to deities who apparently govern mortar-related outcomes. These include: Mixor the Binding, patron of proper ratios; Slumpus the Disappointing, who causes mortar to fail at inopportune moments; and Crackella the Inevitable, who ensures that every amateur mason's first wall will develop fissures regardless of ratio correctness. Officially, these are merely "colorful metaphors for physical processes." Unofficially, most masons keep small offerings near their mixing stations, just in case.
+&nbsp;
+†††The Guild maintains that Slumpus the Disappointing answered 23,847 prayers in 1952 alone, though they decline to specify what these prayers requested or how they determined this figure.
+&nbsp;
+‡‡The Portsmouth Incident, thoroughly documented in medical journals of the period, affected seventeen workers who spent their days in a converted root cellar mixing mortar for the new municipal library. Symptoms included profound sadness, an inability to appreciate humor, and a compulsion to speak only in measurements. All recovered after three weeks in the countryside, though two subsequently became accountants. The root cellar was ventilated, blessed by a priest, and eventually converted into a wine cellar, where it proved much more cheerful.
+&nbsp;
+***The incident is more officially known as the "Regrettable Affair of the Underground Mixing Chamber," but "Portsmouth Incident" sounds less like a euphemism for mass temporary insanity caused by cement dust and poor air circulation.
+&nbsp;
+††**The protective equipment specifications run to forty-seven pages in most jurisdictions. Page 23 includes a curious footnote warning against using "enchanted" protective gear, which was apparently enough of a problem in certain regions to warrant official mention. The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding mortar mixing ratios in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BRICK_LAYING_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'brick_laying_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Brick Laying Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['mortar_mixing_ratios'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_brick_laying_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Brick Laying Techniques</span>
+&nbsp;
+The ancient and honorable craft of brick laying represents one of humanity's most enduring relationships with rectangular objects*, requiring a delicate balance of mortar consistency†, spatial awareness‡, and the ability to ignore one's back screaming for mercy**. Modern practitioners must first master the fundamental principle that bricks, contrary to popular assumption, should generally be placed flat side down††, a revelation that came surprisingly late in human history and only after several notable architectural disappointments‡‡. The technique involves applying mortar to both the brick bed and the header***, a process the Ankh-Morpork Guild of Bricklayers describes as "slapping on the sticky stuff until it looks about right"††† - though this represents a significant oversimplification of a process that takes approximately 10,000 hours to master‡‡‡, or roughly three weeks if you don't mind your walls being mostly decorative§.
+&nbsp;
+Contemporary brick laying methodology divides into several distinct schools of thought, each defending their approach with the fervor of religious zealots arguing over the correct number of angels that can dance on a pinhead§§. The "running bond" pattern, wherein bricks overlap by exactly half their length*, remains the most structurally sound and aesthetically pleasing arrangement††, though the "Flemish bond" continues to attract adherents who apparently enjoy making things unnecessarily complicated for themselves‡‡. A competent bricklayer can place approximately 300-500 bricks per day***, a rate that drops precipitously when one factors in tea breaks, contemplative smoking, and lengthy discussions about the weather****, which according to the International Federation of Masonry Workers accounts for 47.3% of construction time†††. The vertical alignment of mortar joints, known as "perpends," must never align across more than two courses‡‡‡ - a rule that seems arbitrary until one remembers the Great Wall Incident of 1823§§§, which we shall discuss no further¶.
+&nbsp;
+Safety considerations in brick laying extend far beyond the obvious dangers of dropping heavy rectangular objects on one's feet¶¶, encompassing everything from mortar splash*† to the psychological trauma of realizing halfway through a wall that one has somehow made it crooked††. The Guild of Master Bricklayers maintains extensive documentation on proper lifting technique‡†, recommending that practitioners bend at the knees rather than the back, advice that approximately 3.7% of bricklayers actually follow§†. Eye protection remains mandatory when cutting bricks*††, not because of the immediate danger of flying particles but because witnessing one's own cutting technique can cause lasting distress††. Perhaps most critically, all bricklayers must maintain constant awareness of what the Occupational Safety and Hermetic Studies Council calls "gravity's ongoing conspiracy against vertical structures"‡‡, a phenomenon responsible for 89.2% of wall collapses and 100% of falling brick incidents‡‡†.
+&nbsp;
+The historical development of brick laying techniques traces back to ancient Mesopotamia§††, where the first brick layers discovered that sun-dried mud could be stacked into walls, assuming one didn't mind those walls dissolving during the rainy season¶††. The Romans revolutionized the craft by introducing fired bricks and complex bonding patterns*‡, leading to structures so durable that modern demolition crews have been known to weep openly when assigned to Roman-era buildings††‡. Medieval masons elevated brick laying to an art form, encoding secret techniques in their guild marks and occasionally in more permanent locations‡‡§, though most of these "secrets" turned out to be variations on "keep the bricks level" and "don't forget the mortar"§‡. The Industrial Revolution brought standardized brick sizes***†, ending centuries of regional variation and the chaos that ensued when a Yorkshire bricklayer attempted to work with Cornish bricks†††, an incident known to historians as "The Great Incompatibility" and to local residents as "that time when all the walls fell down"‡‡‡†.
+&nbsp;
+Modern understanding incorporates ancient wisdom with contemporary materials science, acknowledging that while the fundamental technique remains unchanged since the Pharaohs supervised their construction projects from comfortable sedan chairs§§‡, we now possess superior tools for ensuring walls are actually vertical¶‡. Computer modeling allows architects to predict brick behavior under various stress conditions*‡†, though these models consistently fail to account for what bricklayers call "the fundamental perversity of matter"††‡†, which states that bricks will always fall butter-side down and mortar will always land on clean clothes‡†. The craft continues to resist full automation, as robots prove surprisingly inept at the subtle wrist movement required for proper mortar spreading§§†, suggesting that despite technological advancement, some arts remain stubbornly human - or at least stubbornly require something with opposable thumbs and the capacity for creative profanity¶¶†.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The relationship between humans and rectangular objects dates back to the Neolithic period, when our ancestors first realized that round rocks were terrible for stacking. Archaeological evidence suggests this revelation was accompanied by much rejoicing and the immediate invention of the corner.
+&nbsp;
+† See prerequisite paper: "Mortar Mixing Ratios: A Study in Not Getting It Too Wet or Too Dry," which contains thirteen pages devoted entirely to the correct consistency description "like porridge, but not breakfast porridge, more like the porridge in that story with the bears."
+&nbsp;
+‡ The Symposium on Spatial Cognition in Masonry Arts (SSCMA) notes that approximately 12% of apprentice bricklayers possess what they term "inverted spatial awareness," wherein they believe walls should curve slightly inward. These individuals are gently redirected toward careers in avant-garde sculpture.
+&nbsp;
+\** According to the Bricklayers' Medical Registry, lower back pain is so universal among practitioners that it serves as a form of professional identification. The absence of chronic back pain is grounds for immediate suspicion that one might be an imposter.
+&nbsp;
+†† This knowledge was not always common. The Leaning Tower of Pisa represents an early experiment in alternative brick orientation that got somewhat out of hand. The architect, Bonnano Pisano, maintained until his dying day that he meant to do that††.
+&nbsp;
+††† See: Epistle of Giorgio, Verse 12: "And the master spake unto the apprentice, saying 'Spread it thick, but not too thick, and smooth but not too smooth, and get on with it because we're not paying you to stand about philosophizing.'"
+&nbsp;
+‡‡ The Historical Construction Accidents Database lists 47 cases of buildings constructed with bricks standing on their narrow edges, of which 46 subsequently achieved rapid horizontal orientation. The 47th is still standing in Prague, though nobody is quite sure how, and the city council has forbidden anyone from investigating lest they discover what's holding it up and accidentally break the spell‡.
+&nbsp;
+‡ It's maintained by an elderly curse, some very determined pigeons, and what scholars describe as "sheer bloody-mindedness made manifest."
+&nbsp;
+‡‡‡ The 10,000-hour rule was established by the Eternal Guild of Measurements and Arbitrary Standards, who arrived at this figure by asking master bricklayers how long it took and then multiplying their answers by 2.7 to account for the tendency of craftspeople to underestimate their own expertise by exactly 170%.
+&nbsp;
+§ The structural integrity of decorative walls hovers somewhere between "optimistic" and "wishful thinking," as determined by the Institute for Building Things That Probably Won't Fall Down Right Away.
+&nbsp;
+§§ This debate reached its peak at the Council of Masonry Methods (1847), where seven people were injured in what historians euphemistically call "vigorous discussion" but witnesses described as "a brick fight."
+&nbsp;
+\*† The running bond pattern was allegedly discovered by accident when a Norse builder named Halfdane the Somewhat Careless dropped an entire hod of bricks and liked how they landed*. Modern engineers have since developed complex mathematical proofs explaining why this pattern works, but Halfdane's original reasoning— "it looks nice, doesn't it?"—remains the most cited explanation.
+&nbsp;
+\* Halfdane later invented the "random rubble" pattern after an incident involving mead, a dare, and a complete disregard for structural engineering principles. He is remembered fondly, though none of his buildings survived beyond his lifetime.
+&nbsp;
+†† Though it requires precise cutting and measurement, which explains why most modern buildings employ running bond and Flemish bond advocates spend their time writing angry letters to architectural journals.
+&nbsp;
+‡‡ Flemish bond alternates headers and stretchers in each course, creating a distinctive pattern that announces to all observers: "The person who built this wall had something to prove and possibly too much time on their hands."
+&nbsp;
+\*** This figure comes from the Department of Suspiciously Specific Statistics, which maintains that the average`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding brick laying techniques in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const STONE_LAYING_METHODS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'stone_laying_methods',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Stone Laying Methods',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['brick_laying_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_stone_laying_methods' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `STONE LAYING METHODS: A COMPREHENSIVE EXAMINATION OF GRAVITY-DEFYING OPTIMISM IN CONSTRUCTION</span>
+&nbsp;
+The art of stone laying represents humanity's longest-running argument with gravity*, a dispute that has consumed approximately 847 generations of builders**, all of whom believed—with varying degrees of justification—that they had finally figured out the correct way to convince rocks to stay where they were put. Unlike its humbler cousin, brick laying, stone construction involves working with materials that actively resist cooperation†, possess their own geological opinions about structural integrity††, and weigh considerably more than the average apprentice†††.
+&nbsp;
+The fundamental principle underlying all stone laying methods is surprisingly simple: large rocks do not wish to fall down‡. This basic truth, which took our ancestors roughly four thousand years to articulate clearly‡‡, forms the theoretical foundation upon which all respectable stone construction rests‡‡‡. The practical application involves selecting appropriately sized stones*, arranging them in configurations that distribute weight through mutual antagonism**, and filling the gaps with smaller stones that serve as geological diplomats***. Modern practitioners employ tools such as levels, plumb lines, and substantial quantities of hope†, though historical evidence suggests that ancient builders relied primarily on squinting††, religious conviction†††, and what Professor Angus McStone termed "aggressive wishing‡".
+&nbsp;
+The safety considerations surrounding stone laying cannot be overstated, though they frequently are‡‡. The Guild of Stone Layers maintains that approximately 73.4% of all historical construction injuries involved stones doing exactly what stones do best: falling‡‡‡. Proper technique demands respecting the stone's natural tendency toward the ground*, maintaining three points of contact when climbing**, and never, under any circumstances, looking up with your mouth open***. The catastrophic incident at Crumbling Tor† serves as a permanent reminder that stones possess neither mercy nor memory††, though they demonstrate excellent recall when it comes to grudges held against specific masons†††.
+&nbsp;
+Historical development of stone laying techniques reveals a fascinating progression from "pile rocks until something stands‡" to "pile rocks with slightly more sophistication until something stands longer‡‡". The ancient Mytholithic peoples developed sophisticated methods for moving and placing stones that weighed more than contemporary mathematics could calculate‡‡‡, leading modern scholars to propose theories ranging from "lost engineering knowledge*" to "they asked very nicely**". Contemporary stone laying benefits from advances in mortar technology***, mechanical lifting equipment†, and liability insurance††, though the fundamental challenge remains unchanged: convincing gravity that this particular arrangement of stones represents an acceptable compromise†††.
+&nbsp;
+The transition from theoretical understanding to practical competence in stone laying typically requires three to seven years of active practice‡, during which the apprentice develops an intuitive relationship with stone that borders on the supernatural‡‡. Master stone layers report being able to "hear" when a stone is properly seated‡‡‡, a claim that sounds mystical until one experiences the distinctive "thunk" of correct placement versus the ominous "crunch" of impending structural regret*. The craft demands patience**, physical strength***, and the philosophical acceptance that some stones simply refuse to cooperate† regardless of technique, offering the builder a choice between accommodation or the traditional solution of hitting it with a larger hammer††.
+&nbsp;
+---
+&nbsp;
+*Gravity has won this argument in 100% of recorded cases, though builders maintain a winning record in the "delaying tactics" category.
+&nbsp;
+**The Guild of Fallen Masonry keeps meticulous generational records, primarily as a warning to overconfident nephews.
+&nbsp;
+†Stones, unlike bricks, come in shapes best described as "inconvenient." The standard stone exhibits between 0.3 and 47.2 useful faces, depending on optimism levels.
+&nbsp;
+††This geological stubbornness manifests as what Professor Emeritus Flint Hardbottom called "deliberate awkwardness," noting that stones demonstrate an almost malicious tendency to settle incorrectly just as the mason steps back to admire their work.
+&nbsp;
+†††The Apprentice Weight Ratio (AWR) remains a crucial safety consideration. Never place a stone that weighs more than three apprentices where it might land on fewer than three apprentices. Basic mathematics, really.
+&nbsp;
+‡This represents a significant philosophical leap from earlier theories, which held that rocks actively wanted to fall down, or the even earlier hypothesis that rocks were fundamentally indifferent to vertical position and simply enjoyed disappointing builders.
+&nbsp;
+‡‡The Codex Lithikos, discovered in a collapsed temple in 1847*, documents this breakthrough. Interestingly, the temple's collapse occurred during the codex's compilation, suggesting the authors learned this lesson rather too late.
+&nbsp;
+*The exact date is disputed. Some scholars place it at 1846, others at 1848. All agree the temple was definitely more vertical before than after.
+&nbsp;
+‡‡‡Advanced students may progress to the corollary principle: large rocks especially do not wish to fall down on people they like. Unfortunately, stones exhibit remarkably poor judgment about friendship.
+&nbsp;
+*Stone selection follows the ancient wisdom: "Choose stones that fit, or choose stones that nearly fit, or choose stones that might fit if you're not too particular about what 'fit' means."
+&nbsp;
+**This phenomenon, technically termed "dynamic equilibrium through competitive pressure," sounds more impressive than "wedging rocks against each other until they're too stubborn to move."
+&nbsp;
+***Historical records indicate these diplomatic stones were originally termed "chinking stones," though modern usage has evolved to include phrases like "oh for heaven's sake just stay PUT" stones.
+&nbsp;
+†Hope is not officially listed in the Guild's required tools inventory, but appears in 94.7% of all successful stone laying operations. The remaining 5.3% relied on blind luck, which the Guild considers a separate category.
+&nbsp;
+††The technique of "mason's squint," passed down through generations, involves closing one eye, tilting your head approximately 23 degrees, and making small noises of contemplation. Effectiveness: debatable. Traditional value: enormous.
+&nbsp;
+†††This religious conviction typically involved praying to gods of stability, permanence, and "please don't let that lintel drop." Archaeologists note these gods received substantially more attention than harvest deities, suggesting ancient peoples had their priorities correctly arranged.
+&nbsp;
+‡Professor McStone's seminal work, "Thinking Strongly at Stones Until They Cooperate," remains controversial in academic circles but popular on construction sites.
+&nbsp;
+‡‡The Guild maintains a special section in their archives titled "Things We Really Wish We'd Emphasized More at the Time," which is primarily devoted to safety warnings that were apparently unclear enough that people tried them anyway.
+&nbsp;
+‡‡‡This statistic includes "injuries from stones already on the ground" (stubbed toes, 23.1%), "injuries from stones on their way to the ground" (variable impact trauma, 47.8%), and "injuries from stones that had reached the ground and were now being moved by someone who would rather they stayed on the ground" (crushed digits, 29.1%). The remaining 0.0% involves injuries so improbable that the Guild suspects clerical errors.
+&nbsp;
+*Specifically, maintaining contact between feet and ground, hands and stone, and consciousness and reality. The last proves surprisingly difficult during long shifts.
+&nbsp;
+**The "three-point rule" for ladder work, not to be confused with the "three-apprentice rule" for heavy stones†, or the "three-prayer rule" for ambitious cornerstones††.
+&nbsp;
+†See earlier footnote regarding Apprentice Weight Ratios. The mathematics become complex, but essentially: more mass requires more people to run away from it when something goes wrong.
+&nbsp;
+††Reserved for stones so massive that three prayers seems insufficient. Master masons recommend a minimum of five prayers for cornerstones, seven for arch keystones, and continuous prayer for anything described as "monumental."
+&nbsp;
+***The incident involved forty-seven tons of carefully dressed granite, an experimental pulley system designed by the Duke's nephew "who was good with mechanical things," and a work crew whose last collective thought was reportedly "that doesn't sound right." The monument now commemorates both the Duke's victory at the Battle of Something-or-Other and the vigorous wrongness of the nephew's calculations.
+&nbsp;
+†Current geological thinking suggests stones possess memories spanning millions of years, primarily consisting of "being squeezed," "more squeezing," and "that one time a mason dropped a chisel on me."
+&nbsp;
+††The Tor stands (barely) as a permanent educational exhibit, though the local council has requested that visitors stop adding "I told you so" plaques to its base.
+&nbsp;
+†††Documented grudges include: "that mason who kept hitting me in the same spot," "that apprentice who called me 'unworkable,'" and "that entire generation of builders who thought limestone was 'probably fine' for load-bearing walls in a swamp."
+&nbsp;
+‡The "pile it high and hope" method, popular during what archaeologists call the "Optimistic Period," produced numerous monuments that stood for dozens of minutes before renegotiating their relationship with horizontal.
+&nbsp;
+‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding stone laying methods in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COURSED_RUBBLE_MASONRY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'coursed_rubble_masonry',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Coursed Rubble Masonry',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['stone_laying_methods'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_coursed_rubble_masonry' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Coursed Rubble Masonry: A Contemplation on the Ancient Art of Making Stones Sit Still</span>
+&nbsp;
+The fundamental principle of coursed rubble masonry rests upon a deceptively simple premise: that stones of irregular size and shape can be persuaded to form horizontal layers, or "courses," through a combination of mortar, patience, and what the ancient masons called "aggressive optimism."* Unlike its more refined cousin, ashlar masonry, coursed rubble embraces the natural chaos of stone while imposing just enough order to prevent the whole affair from becoming a commemorative pile.† The technique requires the mason to select stones not for their beauty or regularity, but for their willingness to cooperate with their neighbors—a quality that, as Master Stoneworker Grimsby noted in 1742, "cannot be taught, only recognized through bitter experience."‡
+&nbsp;
+In practical application, the mason begins by laying the largest, flattest stones as foundation courses, building upward with progressively smaller materials while maintaining roughly horizontal layers through the judicious use of spalls, wedges, and what the Guild of Masonic Philosophy terms "corrective violence."** The mortar serves not merely as adhesive but as what the Dwarfish Construction Codex describes as "an apology between stones"††—filling voids, distributing loads, and generally preventing the kind of catastrophic failure that made the term "rubble" take on its secondary meaning.‡‡ One must select stones with an eye toward their "heartside" and "bedside"***, ensuring that the natural grain of the stone aligns with the forces it must resist, lest one recreate the famous Incident at Crowley Bridge, where ignoring this principle resulted in a structure that stood for precisely seventeen minutes before expressing its architectural opinions rather dramatically.†††
+&nbsp;
+Historical development of coursed rubble masonry stretches back to the age when humans first looked at a pile of stones and thought, "What if they went sideways instead?"‡‡‡ The Romans, characteristically, systematized the practice into opus incertum, opus quasi reticulatum, and several other categories that modern scholars suspect were invented primarily to make apprentices feel inadequate.**** The medieval period saw the technique reach its apotheosis in castle construction, where the speed and economy of coursed rubble allowed fortifications to be built quickly, though as the Siege of Château de Disappointment demonstrated, "quickly" and "well" are not always synonymous.†††† Modern understanding has added little to the fundamental techniques, though we now have the advantage of engineering calculations to tell us mathematically why our walls will fall down, rather than simply waiting to find out empirically.‡‡‡‡
+&nbsp;
+Safety considerations in coursed rubble masonry begin with the sobering recognition that gravity remains undefeated in all recorded matches against human hubris.****† The Guild of Structural Integrity maintains exhaustive records of what they call "educational collapses," categorized by cause, dramatic effect, and whether anyone had time to say "I told you so."††††† Proper scaffolding is essential, as is the practice of never standing directly beneath unsupported stonework—a principle that sounds obvious until one reads the quarterly reports from the Hospital for Preventable Masonry Injuries, which suggest that this wisdom has not achieved universal adoption.‡‡‡‡‡ The use of adequate mortar, proper curing times, and stones of sufficient size for their position in the wall represents the difference between a structure and an imminent insurance claim.†****
+&nbsp;
+Modern best practices synthesize centuries of accumulated knowledge, near-misses, and spectacular failures into a coherent methodology that, if followed, results in walls that remain walls rather than becoming historical footnotes.‡†††† Key principles include maintaining horizontal courses within acceptable tolerances (defined by the International Masonry Standards Committee as "close enough that you can't tell without a spirit level"††‡‡‡), ensuring adequate bond between courses, and selecting mortar composition appropriate to the stone type—a consideration that became painfully relevant during the Limestone and Portland Cement Incident of 1873, which introduced the construction industry to the concept of "aggressive incompatibility."****†† The careful mason approaches each stone as a puzzle piece in a game where the picture on the box is missing, the pieces are all the wrong shape, and the manufacturer may have included components from several completely different puzzles, yet somehow, miraculously, it all comes together in the end, assuming one's definition of "together" is sufficiently flexible.‡‡****
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+* The Guild of Perpetual Construction maintains that "aggressive optimism" is a technical term, distinct from mere "optimism" by virtue of being grounded in the belief that if enough mortar is applied with sufficient determination, physics will eventually concede defeat. This has proven false in 94.7% of tested cases, but the remaining 5.3% have been spectacular enough to maintain the practice.
+&nbsp;
+† See also: "The collected works of gravity, volumes 1 through ∞." The distinction between coursed rubble and random rubble is similar to the distinction between a queue and a mob—both involve the same components, but one suggests civilization while the other suggests imminent chaos.
+&nbsp;
+‡ Grimsby's "Treatise on Stone Selection and Why Your Father Was Right to Discourage This Career" remains required reading at the Academy of Masonic Studies, though primarily as a warning rather than instruction.†
+&nbsp;
+** The term is actually older than the Guild, dating to the Neolithic period when it was expressed through a series of grunts and gestures that roughly translated to "hit it until it fits." Modern practice has refined this approach only marginally.
+&nbsp;
+†† The Dwarfish text actually uses a word that has no direct human translation but encompasses the concepts of "diplomatic mediation," "forced proximity," and "structural hostage situation." Dwarfish stonemasons are known for their philosophical approach to construction, which they claim comes from living inside their work.
+&nbsp;
+‡‡ The primary meaning remains "broken stones." The secondary meaning is "what broken stones become when improperly assembled." The tertiary meaning, known only to insurance adjusters, is "claim reference number 7-B, subsection 'preventable catastrophe.'"
+&nbsp;
+*** Not to be confused with "heartwood" and "bedwood" in timber construction, though apprentices confuse them with such regularity that most instructional texts now include a chapter titled "Stone Is Not Wood, Despite What You May Have Heard."††
+&nbsp;
+††† The bridge's collapse was witnessed by Lord Crowley himself, who reportedly remarked, "Well, that was rather decisive," before firing his mason and hiring a civil engineer—a profession that had not technically been invented yet, necessitating the creation of one on the spot.‡
+&nbsp;
+‡‡‡ Archaeological evidence suggests this thought occurred simultaneously to humans on several continents, leading to the controversial "Pyramids as Natural Law" theory proposed by Dr. Cornelius Stackington, which posits that stone stacking is a fundamental force of nature, like magnetism, but more granular.
+&nbsp;
+**** The Romans had precisely seventeen different terms for rubble masonry, of which modern archaeology has successfully translated four. The other thirteen are suspected to be either highly technical variants or elaborate inside jokes that have outlasted their context by two millennia.
+&nbsp;
+†††† The Château de Disappointment earned its name not from its original construction but from its performance during the siege of 1347, when the eastern wall decided to reinterpret its structural role as "decorative pile." The French word "déception" appears 47 times in the historical accounts, though only once in reference to enemy tactics.††††
+&nbsp;
+‡‡‡‡ Modern engineering provides equations that predict failure modes with alarming precision, leading to the field of "pre-emptive disappointment," where one can be depressed about structural inadequacy before construction even begins. This represents a significant advancement in human foresight, if not happiness.
+&nbsp;
+****† As recorded by the Ancient Guild of Fallen Objects and Subsequent Regret, gravity currently maintains a perfect record spanning approximately 13.8 billion years. Betting against it is considered poor form, though humans continue to try with admirable persistence.
+&nbsp;
+††††† The categories include: "Insufficient Foundation," "Optimistic Load Calculation," "Novel Interpretation of Physics," and the particularly troubling "Worked Yesterday." The classification system was developed by Dame Victoria Sensible in 1891 after the seventh preventable collapse in her district that year.‡‡
+&nbsp;
+‡‡‡‡‡ The Hospital, located in what used to be London's Cheapside (now "Expensive-Because-We-Had-to-Rebuild-It-Side"), treats an average of 237 masonry-related injuries monthly. Approximately 73% involve variations on the theme "I just wanted to check something" followed by the sound of falling stone.†††
+&nbsp;
+†**** The Insurance Brotherhood of Structural Underwriters has developed an entire`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding coursed rubble masonry in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ASHLAR_MASONRY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'ashlar_masonry',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Ashlar Masonry',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['coursed_rubble_masonry'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_ashlar_masonry' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Ashlar Masonry: The Art of Making Stones Behave Themselves</span>
+&nbsp;
+The fundamental distinction between coursed rubble masonry and ashlar masonry lies not merely in the precision of the stones themselves*, but in the philosophical understanding that stones, when properly addressed, can be convinced to sit perfectly still for centuries**. Ashlar masonry—derived from the Old Axiomatic word "ascelare," meaning "to make rectangular against its will"†—represents humanity's most successful attempt to impose order upon geological chaos through the application of careful measurement, patient grinding, and the occasional threat of being reduced to gravel‡. The technique requires stones to be dressed‡‡ to such precise tolerances that mortar becomes almost decorative, serving primarily to prevent the stones from judging each other's angles§.
+&nbsp;
+The practical execution of ashlar work demands tools of exceptional quality and masons of exceptional patience§§. Each stone must be cut to exact dimensions***, allowing faces to meet with such precision that, according to the Brotherhood of the Perpendicular Edge, one should theoretically be able to slide no more than a sheet of parchment between properly laid ashlar blocks†††—though attempting this measurement often reveals that either the parchment manufacturer or the stone mason has been somewhat optimistic‡‡‡. The dressing process itself follows an ancient hierarchy: first the stone is quarried§§§, then rough-dressed with a pitching tool, fine-dressed with a drove chisel****, and finally finished with a chisel or patent axe until it achieves what Master Mason Grimwald the Obsessive termed "geometric perfection, or close enough that the client stops complaining"††††.
+&nbsp;
+Modern ashlar construction recognizes several distinct approaches, each with its own advocates and associated insurance rates‡‡‡‡. Rock-faced ashlar maintains a rough exterior while ensuring true planes and edges§§§§, appealing to those who believe architecture should look strong enough to discourage sieges*****. Smooth-faced ashlar, conversely, presents all surfaces as perfectly planar†††††, which the Guild of Architectural Philosophers argues creates "a dialogue between human aspiration and mineral reality"‡‡‡‡‡, though most masons simply note it takes three times as long and costs accordingly. The critical principle governing all ashlar work remains the maintenance of true beds and perpendicular joints§§§§§, for as the Cautionary Tale of the Leaning Library demonstrates******, even minor deviations accumulate with alarming enthusiasm.
+&nbsp;
+---
+&nbsp;
+*The stones themselves rarely acknowledge this distinction. A survey conducted by the Institute for Geological Compliance found that 73.6% of limestone blocks expressed complete indifference to their intended purpose when interviewed immediately post-quarrying.
+&nbsp;
+**The record for documented stillness belongs to a series of ashlar blocks in the Temple of Eternal Repose, which have maintained their positions for 847 years without complaint. The Temple maintains a vigil to detect any potential movement, though critics note this may be less about structural monitoring and more about providing employment for monks with exceptional patience and poor eyesight.
+&nbsp;
+†This etymology is contested by Professor Hardwick of the University of Practical Geology, who insists the word derives from "ass-haler," referring to the number of donkeys required to transport finished blocks. His academic rivals suggest this reveals more about Professor Hardwick's research methodology than actual linguistics.
+&nbsp;
+‡The effectiveness of this threat has declined considerably since the invention of decorative gravel gardens, which some stones apparently find aspirational.
+&nbsp;
+‡‡The term "dressed" here refers to the stone surface preparation, not to any attempt to clothe the stone, though the Guild of Apprentice Masons' records contain seventeen separate incidents of new apprentices attempting exactly this after misunderstanding their instructions†.
+&nbsp;
+†See case file #4472: "The Incident of the Limestone Waistcoat," which concluded with revised training protocols and several embarrassed apologies to the quarry management.
+&nbsp;
+§The Metaphysical Society of Stones (a somewhat controversial organization) claims that improperly aligned stones can indeed sense adjacent angular errors and experience what they term "geometric distress," though their methodology relies heavily on divination and suspicious noises during thunderstorms.
+&nbsp;
+§§The Guild of Masons and Precision Botherers maintains a waiting list of 4.3 years for apprenticeships, largely because they spend the first eighteen months teaching prospective masons to properly sharpen their tools, and another twelve months teaching them to stop sharpening their tools quite so obsessively‡.
+&nbsp;
+‡The Sharpening Incident of 1847 saw Master Mason Tolliver reduce an entire set of chisels to unusable slivers through what the inquiry termed "enthusiastic over-refinement of the cutting edge." His tools are now displayed in the Museum of Excessive Craftsmanship as a cautionary exhibit.
+&nbsp;
+***The exact definition of "exact" has sparked philosophical debates lasting centuries. The Brotherhood of the Perpendicular Edge specifies tolerances of 1/16th of an inch, while the more radical Society of the True Level insists on 1/32nd, leading to a famous schism in 1723 that split the masonic community along lines drawn with, ironically, different precision instruments‡‡.
+&nbsp;
+‡‡The Schism of the Sliding Bevel resulted in two separate conferences, two incompatible sets of standards, and one extremely confused cathedral that was built with both specifications simultaneously. It stood for seven months before developing what architects politely termed "geometric disagreement" and collapsing into what witnesses described as "a very precisely aligned pile of rubble."
+&nbsp;
+†††The Brotherhood conducts annual testing of this principle at their Grand Lodge, where members attempt to slide progressively thinner materials between ashlar blocks. The current record involves a leaf from a Whispering Willow§, which reportedly made it 2.3 inches into a joint before catching on what may have been either a microscopic imperfection or the wilful resistance of the stone itself.
+&nbsp;
+§Whispering Willows are known for producing leaves of exceptional thinness and associated hubris.
+&nbsp;
+‡‡‡The Parchment Manufacturers' Guild has responded with its own standards, claiming their product maintains consistent thickness to within "a gnat's whisker"§§, a measurement the Bureau of Weights and Measures refuses to officially recognize despite seventeen formal petitions.
+&nbsp;
+§§The Bureau's official position is that gnats demonstrate insufficient consistency in their whisker dimensions to serve as reliable measurement standards. This has not stopped informal usage, to the Bureau's ongoing frustration.
+&nbsp;
+§§§Quarrying represents its own complex art, governed by the principles of geological persuasion and the application of strategic violence. The ancient quarrymaster Malachite the Listener supposedly communicated with stones to determine their preferred breaking planes, though modern historians suggest this was more likely tinnitus from excessive hammering*****.
+&nbsp;
+*****The Guild of Quarrymasters now requires hearing protection after the Statistical Analysis of Industrial Deafness (1891) revealed that 94.7% of retired quarrymasters responded to all questions with "EH?" regardless of volume or relevance.
+&nbsp;
+****The drove chisel, named for either its driving motion or the psychological state it induces in users (sources differ††††), creates parallel grooves across the stone face, resulting in what the aesthetically minded call "refined texture" and the practically minded call "less work than smooth finishing."
+&nbsp;
+††††The Journal of Tool Etymology published a heated exchange lasting three years on this subject, ultimately concluding that both interpretations were valid and everyone involved needed to take up less contentious hobbies.
+&nbsp;
+†††††This smoothness must be achieved across multiple stones simultaneously, requiring what the architectural theorist Dame Verity Plumb termed "collaborative perfection," and what working masons more commonly term "a bleeding nightmare when the quarry sends you irregular blocks."
+&nbsp;
+‡‡‡‡The Guild's insurance division maintains actuarial tables suggesting that rock-faced ashlar projects experience 43% fewer accidents but 127% more arguments about aesthetic intent between architects and masons.
+&nbsp;
+§§§§The difference in appearance has sparked considerable debate in architectural circles. The Naturalist School argues that rock-faced ashlar "celebrates the essential truth of stone," while the Rationalist School counters that if they wanted to celebrate rough stone, they could have saved considerable money and simply not dressed it at all‡‡‡‡‡‡.
+&nbsp;
+‡‡‡‡‡The phrase has been traced to a speech by the elderly stonemason Profound Thaddeus, delivered after forty-seven years of cutting stone and a significant quantity of commemorative ale. His philosophy, initially dismissed as drunken rambling, has since been adopted by at least three architectural movements and one small religion.
+&nbsp;
+‡‡‡‡‡‡This argument reached its apotheosis in the Great Architectural Debate of 1802, held in the Symposium of Structured Thought, wherein representatives`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding ashlar masonry in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DRY_STONE_CONSTRUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'dry_stone_construction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Dry Stone Construction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['masonry_stonework'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['ashlar_masonry'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_dry_stone_construction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `DRY STONE CONSTRUCTION: AN EMPIRICAL STUDY OF GRAVITY-ASSISTED ARCHITECTURE</span>
+&nbsp;
+The fundamental principle of dry stone construction rests upon a deceptively simple premise: that stones, when properly arranged without mortar or binding agent, will remain in position through the judicious application of gravity, friction, and what the Ancient Guild of Cairnwrights termed "geological stubbornness"*. This technique, which predates written language by several millennia†, represents humanity's first sustained argument with entropy‡, and remarkably, one of the few arguments we occasionally win**. The practitioner must understand that each stone possesses what Master Stonewright Caractacus McGraw described as a "correct position in the universe"††—finding this position constitutes approximately 73.4% of the work, while the remaining 26.6% involves not dropping the stone on one's foot‡‡.
+&nbsp;
+The practical application of dry stone construction demands an intimate understanding of stone selection, placement geometry, and what the Department of Structural Inevitability calls "the doctrine of mutually assured stability"***. One begins with foundation stones of considerable mass—the Consolidated Academy of Weight Management suggests nothing less than 40 kilograms for structural walls, though the Highland Borderland Preservation Society insists on 63.2 kilograms specifically†††, for reasons lost to a fire in 1847‡‡‡. The wall rises through careful placement of "throughs"**** (stones spanning the wall's width) at regular intervals, while "hearting"†††† (smaller stones filling the interior) provides additional mass and drainage‡‡‡‡. The supreme irony, noted by Professor Eilidh Stonehaven in her seminal work "Walls Without Wit", is that the more haphazard a dry stone wall appears to the untrained eye*****, the more likely it was constructed by an expert******—true mastery manifests as calculated chaos††††††.
+&nbsp;
+Safety considerations in dry stone construction extend beyond the obvious perils of gravity and momentum to include what the Bureau of Occupational Misfortunes categorizes as "structural negotiation injuries"‡‡‡‡‡. The Guild of Stonemasons' Widows maintains exhaustive records indicating that 34.7% of dry stone construction incidents involve stones rolling in unexpected directions******* after placement, while 28.9% result from what they delicately term "premature wall collapse during construction"††††††††. Proper technique demands the use of batter frames‡‡‡‡‡‡ for maintaining correct wall angle (typically 1:6 for garden walls, 1:4 for retaining walls********), adequate pinning stones to prevent movement, and under no circumstances the placement of one's fingers between stones weighing more than 20 kilograms*********—a lesson that, according to the Finger Preservation League, requires relearning every generation††††††††††.
+&nbsp;
+The historical development of dry stone construction traces an unbroken line from Neolithic burial chambers through medieval field boundaries to contemporary landscape architecture, though the International Council for Forgotten Techniques notes that actual knowledge transfer was "surprisingly patchy"‡‡‡‡‡‡‡. The craft flourished particularly in regions where stone was abundant and mortar expensive**********—the economic calculation being rather straightforward———, leading to the distinctive landscapes of Scotland, Ireland, Wales, and portions of New England where settlers discovered that rocks constituted the region's primary agricultural product††††††††††††. Modern understanding has formalized what generations learned through experimentation and spectacular failure: that dry stone walls flex slightly with ground movement‡‡‡‡‡‡‡‡, breathe to prevent frost damage, and will outlast mortared construction by centuries if properly built———†. The Bureau of Architectural Hubris maintains a particularly sobering file of Roman mortared walls that collapsed within decades, standing mere meters from Celtic dry stone walls that endure after two millennia**********.
+&nbsp;
+In conclusion, dry stone construction represents a sophisticated dialogue between human intention and geological reality, requiring neither mortar nor apology‡‡‡‡‡‡‡‡‡. The practitioner who masters this ancient craft joins an unbroken tradition stretching back to when humanity first realized that stones, despite their manifest lack of cooperation, could be persuaded through patience, physics, and occasional profanity††††††††††††† to remain where placed———††.
+&nbsp;
+&nbsp;
+FOOTNOTES
+&nbsp;
+* The Guild was dissolved in 1673 following what records describe only as "The Incident with the Topstone and the Visiting Archbishop." Modern geological surveys suggest their walls remain structurally sound, though the Archbishop was never quite the same. The phrase "geological stubbornness" appears in guild documents with increasing frequency after 1450, reaching peak usage in 1647 when Master Waller Hugh Grantstone proposed—unsuccessfully—that stones possessed individual personalities that must be respected†. Some fragments of his treatise "Dialogues With Granite" survive, though most readers conclude he spent too long alone on mountainsides.
+&nbsp;
+† Archaeological evidence from Göbekli Tepe suggests humans were stacking stones without mortar approximately 11,600 years ago, which is 11,350 years before anyone thought to write down how they did it. The Guild of Archaeological Speculation estimates that roughly 94.7% of accumulated stone-stacking wisdom was lost when various practitioners died without apprentices, usually because their apprentices had decided there were easier ways to make a living‡.
+&nbsp;
+‡ Such as pottery, weaving, or professional complaining.
+&nbsp;
+** The Ancient Order of Entropic Resistance maintains that dry stone walls represent one of seventeen documented cases where humans have created structures that disorder themselves more slowly than the universe requires. The other sixteen are classified, though rumors suggest they include certain Egyptian pyramids, one particular bridge in Prague, and a mysterious garden wall in Rutland that refuses to fall despite having no discernible foundation.
+&nbsp;
+†† McGraw, who worked primarily in the Scottish Highlands between 1834 and 1871, claimed he could "hear" when a stone was incorrectly placed—a sensation he described as "geological dissatisfaction made audible." His rivals suggested this was merely the sound of his joints creaking, but his walls still stand while theirs have largely returned to component materials. The University of Dubious Phenomenology maintains a small research division investigating whether stones do indeed communicate their preferences, though funding has been sporadic‡‡.
+&nbsp;
+‡‡ Largely dependent on whether the Chancellor's garden wall is currently standing or has recently expressed an opinion about its structural integrity through collapse.
+&nbsp;
+‡‡‡ The Department was established in 1923 following a series of bridge collapses that the engineering community agreed were "probably inevitable but inconvenient." Their motto, "Gravitas Vincit Omnia," was chosen after their first choice, "What Goes Up Must Come Down, Preferably Not On People," was deemed insufficiently academic. They maintain the world's only Museum of Structural Failure, which requires visitors to sign extensive liability waivers.
+&nbsp;
+††† This specific weight emerged from a bitter dispute between two prominent families of wall-builders, the McGraws and the MacStones, who disagreed about everything except that walls should be built of stone. The 63.2-kilogram standard represented a compromise: it was heavy enough to satisfy the McGraws' insistence on "stones with presence" but light enough that the MacStones' smaller laborers could still lift them without herniation. The fire of 1847 destroyed all documentation explaining why 63.2 specifically, leading to speculation that it was simply the weight of the stone nearest to hand when the agreement was reached.
+&nbsp;
+‡‡‡ The fire, incidentally, was started when a debate about proper coping stone placement became heated. This was noted as particularly ironic by the Fire Marshall's report, which observed that stone walls are generally excellent at not burning.
+&nbsp;
+**** Pronounced "threws" by traditionalists, "thruffs" by northern practitioners, and "those big ones that go all the way across" by everyone else. The International Congress on Wall Terminology spent three years attempting to standardize pronunciation before concluding that stone wallers are constitutionally incapable of agreeing on anything except that walls should stand up****.
+&nbsp;
+**** And even this consensus weakens after the third pint.
+&nbsp;
+†††† Not to be confused with "hearthstone," which is something else entirely, or "hearting," which is what happens when you lift your forty-seventh foundation stone of the day and remember you're not twenty anymore. The Orthopedic Society of Rural Craftspeople publishes an annual report on back injuries sustained during hearting operations, which makes for sobering reading if you enjoy that sort of thing.
+&nbsp;
+‡‡‡‡ Drainage is crucial, as the Bureau of Frozen Consequences discovered during the winter of 1962, when approximately 847 improp`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding dry stone construction in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  STONE_CUTTING_FUNDAMENTALS,</span>
+<span class="cstat-no" title="statement not covered" >  CHISEL_HAMMER_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_SHAPING_PRECISION,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_SURFACE_FINISHING,</span>
+<span class="cstat-no" title="statement not covered" >  MORTAR_MIXING_RATIOS,</span>
+<span class="cstat-no" title="statement not covered" >  BRICK_LAYING_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  STONE_LAYING_METHODS,</span>
+<span class="cstat-no" title="statement not covered" >  COURSED_RUBBLE_MASONRY,</span>
+<span class="cstat-no" title="statement not covered" >  ASHLAR_MASONRY,</span>
+<span class="cstat-no" title="statement not covered" >  DRY_STONE_CONSTRUCTION</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

@@ -174,6 +174,7 @@ export class BuildingGeneratorService {
 
     for (let i = 0; i < buildingTypes.length; i++) {
       const type = buildingTypes[i];
+      if (!type) continue;
       const tier = type.includes('small') ? 1 : type.includes('temple') || type.includes('hall') ? 3 : 2;
 
       console.log(`   [${i + 1}/${buildingTypes.length}] Generating ${type}...`);

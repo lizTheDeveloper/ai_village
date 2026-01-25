@@ -1,0 +1,2095 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/advanced_herbal_preparations-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> advanced_herbal_preparations-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COLD_INFUSION_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'cold_infusion_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Cold Infusion Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_cold_infusion_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Cold Infusion Techniques: A Foundational Primer on the Extraction of Essence Through Patience Rather Than Fire</span>
+&nbsp;
+The art of cold infusion represents perhaps the most accessible entry point into practical alchemy, requiring neither furnace nor flame, neither retort nor alembic*. At its core, cold infusion operates on a principle as ancient as the first morning dew: that time and patience can accomplish what heat achieves through violence†. The practitioner simply places botanical material—herbs, roots, flowers, or the occasional mushroom‡—into a suitable liquid medium** and waits. The essence of the plant material gradually diffuses into the liquid through the simple mechanism of osmosis††, a process that continues until equilibrium is reached or until someone drinks it, whichever comes first‡‡.
+&nbsp;
+The practical applications of cold infusion are numerous and, mercifully, rarely explosive***. The technique finds use in the preparation of tinctures, culinary extracts, medicinal preparations, and what the Guild of Suspicious Beverages classifies as "tisanes of dubious moral character"†††. The basic procedure remains consistent across applications: select your material‡‡‡, choose your medium****, combine them in a suitable vessel*****, and exercise patience******. The ratio of material to medium typically follows the Sacred Proportion of Dippiness††††††, though this varies by desired potency and whether one is preparing medicine or simply trying to make last Tuesday's water more interesting‡‡‡‡.
+&nbsp;
+Safety considerations in cold infusion are, thankfully, less dramatic than those associated with hot alchemy*****. The primary dangers are threefold: selecting toxic materials******, using contaminated liquids†††††, or becoming so impatient that one adds heat "just to speed things up"‡‡‡‡‡. The Alchemical Safety Commission's annual report notes that cold infusion accounts for only 0.03% of laboratory incidents*******, making it statistically safer than walking to the laboratory††††††† or, indeed, existing‡‡‡‡‡‡. Nevertheless, the prudent practitioner maintains detailed notes, labels all vessels clearly********, and resists the urge to taste-test before the infusion period is complete†††††††.
+&nbsp;
+The historical development of cold infusion stretches back to a time when fire was considered "probably too exciting for daily use"********. Ancient texts from the Monastery of Perpetual Sobriety********* describe monks creating medicinal infusions by leaving herbs in water overnight, a practice they called "holy patience" and which modern alchemists call "literally just waiting"††††††††. The technique reached its theoretical zenith during the Age of Cautious Advancement‡‡‡‡‡‡‡, when the philosopher-alchemist Grimbold the Overly Careful published his seventeen-volume treatise on "Things You Cannot Burn Yourself With"**********, of which cold infusion occupied volumes four through seven. Modern understanding has, mercifully, condensed these principles into a form that does not require a dedicated bookshelf†††††††††.
+&nbsp;
+---
+&nbsp;
+*The absence of fire represents what Professor Thaddeus Dampwick of the Firewatch Academy calls "a promising start to any alchemical endeavor."
+&nbsp;
+†This principle appears in various forms across cultures. The Agatean Empire knows it as "Wu Wei of the Water Buffalo." The Klatchian desert nomads call it "Why Boil When You Can Just Wait?" The Disc's foremost temporal philosophers refer to it as "proof that Time is working even when you're not."
+&nbsp;
+‡The Guild of Mycologists would like to remind readers that not all mushrooms are suitable for infusion. Some are suitable for eating. Some are suitable for looking at. Some will make you believe you can have a meaningful conversation with furniture. The Guild maintains a helpful chart, though it was last updated in the Year of the Confused Toadstool, and several members who worked on it are now permanently convinced they are teapots.
+&nbsp;
+**Suitable liquids include water, alcohol, oil, vinegar, or in desperate circumstances, yesterday's tea. The Compendium of Liquid Media runs to 400 pages and includes a footnote spanning pages 287-294 about why one should not use liquid mercury, regardless of how "shiny and interesting" it looks.
+&nbsp;
+††The phenomenon of osmosis was first described by the ancient philosopher Didactylos†, who noticed that if you leave a raisin in water long enough, it stops being a raisin and starts being "a disappointing grape." This observation revolutionized both alchemy and the dried fruit industry.
+&nbsp;
+†Didactylos also wrote extensively about epistemology, ethics, and why you shouldn't trust anyone who promises easy answers. He was later thrown into a barrel and rolled into the sea, which rather proved his point about skepticism being unpopular.
+&nbsp;
+‡‡The drinking-it-first problem has plagued scientific observation since time immemorial. The Research Institute of Premature Consumption estimates that approximately 47.3% of all alchemical experiments are consumed before completion, usually by the alchemist's roommate, who claims not to have seen the "DO NOT DRINK" label that was definitely, absolutely there five minutes ago.
+&nbsp;
+***The Non-Explosive Nature of Cold Infusion represents such a significant departure from standard alchemical practice that the first treatises on the subject were rejected by publishers as "implausible fiction." One editor wrote: "An alchemical process that produces neither flame, fume, nor unfortunate transformation? Next you'll tell me there's a kind of magic that doesn't require sacrifice, suffering, or at least a minor headache."
+&nbsp;
+†††This classification was introduced after the Incident of the Drowsy Symposium in AM 1789, when an overly enthusiastic herbalist created what they believed was a simple chamomile infusion for the Annual Gathering of Natural Philosophers. It was later determined to also contain valerian, passionflower, and something the herbalist described as "a root I found that seemed friendly." The symposium ended after twenty minutes, and the attendees didn't wake up until the following Thursday. The papers presented that day were later published under the title "Proceedings of the Very Brief Conference."
+&nbsp;
+‡‡‡Material selection is governed by three principles: availability, safety, and what the Guild of Alchemists calls "probably-won't-kill-you-ness." The latter is measured on a scale from one to ten††††, with one being "chamomile" and ten being "that mushroom that made Gerald think he was a chicken for three weeks"†††††.
+&nbsp;
+††††This scale was developed by the Committee for Grading Dangerous Substances, who meet monthly in a building with very good ventilation and a medical team on standby. The Committee's motto is "Someone Has to Try It, But Not Us."
+&nbsp;
+†††††Gerald maintains to this day that the experience was "enlightening" and has since published a paper titled "Observations on Grain-Based Diets and the Philosophy of Pecking." He was denied tenure.
+&nbsp;
+****Common media include water (boring but reliable), alcohol (interesting but flammable), oil (slippery in all senses), and vinegar (acidic in all senses). The Book of Suitable Liquids contains 847 entries, though entry #666 has been redacted following the Incident We Don't Talk About‡‡‡‡‡, and entry #777 simply says "No. Just no. We mean it. Whoever suggested liquid cheese, report to the Dean's office immediately."
+&nbsp;
+‡‡‡‡The Incident We Don't Talk About is extensively documented in sealed archives, where it will remain until the year AM 3000 or until everyone involved has definitely died, whichever comes later. The only person who attempted to review these documents, junior archivist Penelope Writsworth, emerged three hours later and requested immediate transfer to the Department of Tedious Paperwork, which she described as "far less disturbing."
+&nbsp;
+*****Suitable vessels include glass jars (preferred), ceramic crocks (traditional), or wooden casks (if you're feeling historical). Unsuitable vessels include: anything made of lead, anything that already contains something else, your roommate's favorite mug, and the ceremonial chalice from the Temple of Small Gods (they want it back, and they're getting persistent about it).
+&nbsp;
+******Patience is defined by the Institute of Temporal Studies as "the ability to not do something when you really want to do it." Their research indicates that the average human possesses approximately 3.7 units of patience, while successful cold infusion requires 8-12 units. This explains why most beginners eventually add heat, create a completely different preparation, and then wonder why the recipe didn't work.
+&nbsp;
+*******The Sacred Proportion of Dippiness was discovered by accident in AM 1654 when apprentice alchemist Tob`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding cold infusion techniques in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HOT_INFUSION_METHODS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'hot_infusion_methods',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Hot Infusion Methods',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['cold_infusion_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_hot_infusion_methods' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `HOT INFUSION METHODS: A PRACTICAL PRIMER FOR THE ASPIRING ALCHEMIST</span>
+&nbsp;
+Having mastered the gentle arts of cold infusion*, wherein ingredients surrender their essences through patience and time, the student must now confront the more vigorous realm of hot infusion†. The application of heat transforms the alchemical process from a meditation into something resembling controlled violence‡, wherein the essential properties of herbs, minerals, and more exotic substances** are forcibly extracted through the ancient marriage of fire and water. This acceleration of natural processes, while tremendously useful, demands a corresponding increase in attention, respect, and the proper use of protective eyewear††.
+&nbsp;
+The fundamental principle underlying hot infusion is deceptively simple: heat causes the cellular walls of organic materials to expand and rupture, releasing their internal constituents into the surrounding medium†††. In practice, this means bringing water (or occasionally other solvents‡‡) to a temperature sufficient to cause structural breakdown without complete destruction***. The Guild of Alchemical Standards defines optimal infusion temperature as "hot enough to hurt if you stick your finger in it, but not so hot that you wouldn't consider it"*** - a definition that has led to precisely 3,847 finger-related incident reports since its adoption in 1823††††, though the Guild maintains this represents a significant improvement over previous methodologies‡‡‡.
+&nbsp;
+The practical applications of hot infusion are numerous and form the backbone of everyday alchemy****. From the morning cup of tea (a hot infusion of Camellia sinensis leaves, though mentioning this at an alchemist's symposium will result in sniffing and mutterings about "common applications"†††††) to the preparation of potent healing draughts‡‡‡‡, the technique bridges the gap between kitchen craft and laboratory practice. The key distinction lies not in the fundamental process but in the precision of execution: where a cook might speak of "steeping until it looks right,"******* an alchemist maintains detailed temperature logs, timing mechanisms accurate to within 0.03 seconds†††††††, and extensive notes on lunar phases‡‡‡‡‡.
+&nbsp;
+Safety considerations in hot infusion cannot be overstated, though they are frequently understated, ignored, or scoffed at until the first explosion******. The three primary dangers - burns, vapors, and unexpected reactions******** - account for 94.7% of all documented hot infusion incidents†††††††††, with the remaining 5.3% consisting of what the Alchemical Safety Board classifies as "creative improvisation gone magnificently wrong."‡‡‡‡‡‡ Always ensure adequate ventilation*********, never leave an active infusion unattended**********, and under no circumstances should one attempt to accelerate the process by "just adding more heat"***********. This last caveat exists because of what is known in hushed tones as the Pemberton Incident of 1887††††††††††, which resulted in the spontaneous creation of a new color that three witnesses described as "aggressive mauve."‡‡‡‡‡‡‡
+&nbsp;
+Modern understanding of hot infusion has been revolutionized by the work of scholars such as Professor Meribeth Collingwood of the Lesser Ankh Institute************, whose treatise "On the Precise Application of Thermal Energy to Botanical Matrices" remains the definitive work on the subject*************, despite her tendency to set fire to things when excited by a new discovery. Her three-tier classification system - gentle simmer, rolling boil, and "gods preserve us"************** - has been adopted by alchemical institutions throughout the civilized world and several uncivilized ones†††††††††††. The distinction between cold and hot infusion is now understood not as a binary choice but as a spectrum of thermal application, allowing practitioners to tailor their approach to the specific properties of their ingredients‡‡‡‡‡‡‡‡, though this nuanced understanding does nothing to prevent the determined student from boiling everything at maximum heat and wondering why their tincture tastes like charcoal and regret***************.
+&nbsp;
+---
+&nbsp;
+*Covered extensively in the prerequisite text "Cold Infusion Techniques for the Patient Practitioner," which is substantially longer than the hot infusion manual, leading one to suspect that writing about watching things sit is easier than writing about watching things that might explode.
+&nbsp;
+†From the Latin "infundere," meaning "to pour into," which originally referred to the process of pouring hot water into something, then evolved to mean the something that the hot water was poured into, and finally settled on meaning the entire process, demonstrating that even languages find alchemy confusing.
+&nbsp;
+‡The philosopher Caractacus the Scorched noted in his diaries that "alchemy is the art of hitting nature with a hammer until it gives you what you want, then pretending this was always part of a sophisticated plan."
+&nbsp;
+**The Institute for Exotic Ingredients maintains a catalog of 2,847 substances that can be hot-infused, though 1,923 of these entries include the notation "but really, why would you?"
+&nbsp;
+††The Revised Safety Protocols of 1845 made protective eyewear mandatory after what came to be known as the Year of Excessive Blinking. Records from this period are difficult to read due to extensive tear staining.
+&nbsp;
+†††This explanation, while academically sound, fails to capture the sheer satisfaction of watching plant matter surrender to thermal assault. Many alchemists report this as their primary motivation for entering the field†.
+&nbsp;
+†One survey of alchemy students found that 67% cited "enjoyment of boiling things" as their top reason for studying the discipline, ahead of "transmutation of base metals" (12%), "immortality research" (8%), and "it seemed easier than actual chemistry" (13%).
+&nbsp;
+‡‡The use of alternative solvents such as alcohol, oil, or the tears of philosophers is covered in the advanced text "When Water Simply Won't Do: Alternative Extraction Media and the Students Who Regret Them."
+&nbsp;
+***The full preparation requires sixteen different herbs, three minerals ground under specific lunar conditions, and the willing participation of a toad. Most alchemists substitute the toad for an additional mineral because toads have gotten very uppity about participation requirements.
+&nbsp;
+****This temperature range is formally defined as "between 70 and 95 degrees Celsius, but really it depends on what you're infusing, the humidity, your altitude, and whether Mercury is in retrograde." The Guild published this definition after seventeen years of committee meetings.
+&nbsp;
+††††The Finger Incident Database is maintained by the Guild's Department of Preventable Injuries, which has the unenviable motto "We Told You So." Each entry includes the date, temperature of the liquid, and a brief statement from the injured party, which in 98.2% of cases is some variation of "I thought it had cooled down."
+&nbsp;
+‡‡‡The previous definition, "as hot as you can manage without screaming," resulted in a 340% increase in reported incidents and a corresponding increase in the sale of hand cream throughout the alchemical districts.
+&nbsp;
+****It is worth noting that alchemical applications of hot infusion include some techniques that would be considered "showing off" by kitchen standards, such as infusing moonlight into water (requires heating water under a full moon while reciting specific verses†††††††) or creating essences of concepts like "the memory of summer"‡‡‡‡.
+&nbsp;
+†††††The verses are in Old Thaumic and translate roughly to "please get into the water, we've been standing here for three hours." The moonlight, being notoriously difficult to motivate, typically ignores this entreaty.
+&nbsp;
+‡‡‡‡Created by the alchemist Prospero Dimwiddle, who claimed it smelled like "fresh grass, afternoon sunshine, and the vague anxiety that summer is ending." Critics pointed out it mostly smelled like grass clippings and sadness, but it sold remarkably well in northern climates.
+&nbsp;
+†††††Commonly known as the Tea Incident of 1756, when apprentice alchemist Thomas Merriweather suggested at the Annual Symposium that tea was technically a hot infusion. He was not technically wrong, but he was ejected from the hall by unanimous vote. The Alchemists' Guild has a long memory and still refuses to serve tea at symposiums, offering instead "infused Camellia preparations" that are absolutely, definitely, not tea, no matter how much they look and taste like tea.
+&nbsp;
+‡‡‡‡These mechanisms are usually imported from the Clockwork District of Pseudopolis†††††††, where precision is considered a moral virtue and the public clocks are accurate to within 0.000001 seconds, causing them to disagree with each other and leading to heated arguments about which clock is "right."
+&nbsp;
+†††††††The Clockmakers' Guild of Pseudopolis`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding hot infusion methods in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DECOCTION_FOR_ROOTS_BARK: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'decoction_for_roots_bark',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Decoction For Roots Bark',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['hot_infusion_methods'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_decoction_for_roots_bark' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Decoction For Roots Bark</span>
+&nbsp;
+The fundamental difference between infusion and decoction lies not merely in temperature or duration, but in the philosophical approach to releasing the essential virtues trapped within woody plant matter*. Where infusion is a gentle persuasion—a polite knock at the door of the herb—decoction is more akin to an extended negotiation, occasionally verging on interrogation†. The alchemist must understand that roots and bark, having spent years developing complex cellular structures specifically designed to resist decay and predation‡, will not surrender their secrets to mere hot water poured over them in a cup. No, these materials require sustained application of heat, time, and what the ancient practitioners called "sympathetic boiling"**, a term that has caused considerable confusion over the centuries.
+&nbsp;
+The standard technique, as established by the Council of Decocters in 1247 CE††, involves placing approximately one part dried root or bark material to twenty parts cold water in a suitable vessel†††, bringing this mixture to a steady boil, and then reducing to a simmer for a period ranging from twenty minutes to several hours, depending on the hardness of the material‡‡. During this process, the water volume typically reduces by approximately 40-60%‡‡‡, concentrating the extracted constituents into what practitioners refer to as "the worthy liquor"***. The color change is often dramatic—a fact that has led to numerous unfortunate incidents involving apprentices who believed they had accidentally transmuted the water into various metals†††† or, in one memorable case documented by the Aquarian Institute, into liquid darkness itself‡‡‡‡.
+&nbsp;
+Modern alchemical practice recognizes several critical safety considerations that were learned, as most alchemical safety protocols are, through a long series of regrettable incidents*****. The vessel must never be left unattended††††† , the lid must allow steam to escape‡‡‡‡‡, and the practitioner must resist the temptation to taste the decoction before it has cooled to a reasonable temperature******. The final product should be strained while still warm†††††† and stored in appropriate containers‡‡‡‡‡‡, preferably labeled with both the contents and the date, as the shelf-life of decoctions is notably shorter than that of tinctures or dried preparations*******. The Institute of Bark Studies estimates that approximately 73.4% of all decoction-related mishaps could be prevented by the simple expedient of proper labeling††††††††, though this statistic has done little to reduce the actual incident rate‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The Pratchettian School of Herbalism maintains that plants are, in fact, quite chatty, but only if you know how to listen. Decoction is essentially turning up the volume until you can hear them over your own thoughts. The School was closed in 1856 following the incident with the willow bark that wouldn't stop complaining about the weather.
+&nbsp;
+†Master Thickroot's "Compendium of Vigorous Extraction" (1623) describes decoction as "boiling the truth out of reluctant vegetable matter." He later revised this to "persistent encouragement" after the Herbalist's Union threatened to revoke his license for "promoting violence against plant materials."
+&nbsp;
+‡Oak bark, for instance, has been documented to resist hot water infusion for up to seventeen years if left in a particularly stubborn mood. This is actually longer than many oak trees live, suggesting that the bark may be more determined than the tree itself.
+&nbsp;
+**The term "sympathetic boiling" was coined by Alchemist Grandmother Wettle, who believed that if you felt sorry enough for the roots, they would release their essences more readily. Her success rate was identical to practitioners who felt no sympathy whatsoever, but her laboratory was notably more pleasant to work in.
+&nbsp;
+††The Council of Decocters met annually in the city of Sudsworth-on-Boil, a location chosen primarily for its name rather than any particular expertise in decoction. The Council dissolved in 1249 CE after a heated debate over whether steam counted as "escaped essence" or "liberated water spirit." Three members were never heard from again, though witnesses reported seeing them ascending with the steam†.
+&nbsp;
+†One particularly dedicated member, Sister Condensia, claimed to have followed the steam to "the realm where all vapors go." She returned three days later with detailed notes and a severe case of pruning. Her accounts are kept in the Restricted Archives under "Probably Hallucinated But Just In Case."
+&nbsp;
+†††The definition of "suitable vessel" has expanded considerably since the early days when anything that could hold liquid and withstand fire was considered adequate. The Bureau of Cauldron Standards now maintains a 247-page document on vessel suitability, though most practitioners ignore it in favor of "whatever pot seems about right."
+&nbsp;
+‡‡Ironwood root has been known to require up to nine hours of decoction, leading to what archivists call "The Long Boil Incidents" of 1734-1736, during which several alchemists forgot what they were making entirely and had to reverse-engineer their intentions from the smell‡.
+&nbsp;
+‡One practitioner, whose name has been mercifully lost to history, ended up with something that smelled like "ancient regret mixed with Thursday." Analysis confirmed it was indeed ironwood root decoction, though no one could explain the Thursday component.
+&nbsp;
+‡‡‡This concentration effect is described in precise mathematical terms by the Helmsworth Equation: V₂ = V₁(1-t/k), where t is time, k is the "stubbornness coefficient" of the material, and V₂ is never quite what you expected. The equation is considered perfectly accurate and completely useless, much like Helmsworth himself.
+&nbsp;
+***Never to be confused with "unworthy liquor," which is just regular water that has failed at being a decoction. The Monastery of Perpetual Extraction maintains vats of unworthy liquor for meditation purposes, claiming it teaches humility. Visitors report it mostly teaches boredom.
+&nbsp;
+††††The so-called "Gold Rush of Gravelton" in 1802, where an entire village became convinced their municipal water supply had been transmuted to gold after someone left a large decoction of goldenseal root in the town well. The subsequent economic chaos lasted three weeks until someone actually tested the water, which turned out to be worth exactly as much as slightly bitter water with bits of plant matter in it.
+&nbsp;
+‡‡‡‡Apprentice Moldoon's journal entry for March 15, 1891: "The decoction has gone black as a moonless night. I can see stars in it. They are moving. Master Greybeard says this is 'perfectly normal for elderberry root' but I suspect he hasn't actually looked at it yet. UPDATE: He looked at it. We are now pretending this never happened and starting over." The vessel in question is still stored in the Deep Archives, carefully not looked at.
+&nbsp;
+*****The Registry of Preventable Disasters maintains that 94.7% of all alchemical protocols were developed after someone said "I wonder what would happen if..." and then found out in the most educational way possible.
+&nbsp;
+†††††In 1673, Master Kettleworth left a decoction of ginseng root unattended while he went to lunch. He returned to find his laboratory had been entirely consumed by steam, the walls had developed a healthy glow, and three neighboring buildings had reported feeling "significantly more energized." The building stood for another hundred years and was noted for never requiring heating in winter.
+&nbsp;
+‡‡‡‡‡The Lid Incident of 1555 proved that a completely sealed vessel, while theoretically more efficient at containing essences, is practically more efficient at redistributing alchemists across a wider area than previously occupied. The resulting explosion was heard three counties away and led to what is now known as the Fundamental Law of Pressure Release: "If steam cannot go up, everything else will."
+&nbsp;
+******The Guild of Burnt Tongues (founded 1201 CE) has over 10,000 members, making it one of the largest alchemical organizations in existence. Membership is automatic upon committing the qualifying act. The Guild's motto, "We Learn Slowly," is embroidered on tongues depicted in various states of injury. Annual meetings are conducted in sign language.
+&nbsp;
+†††††††Straining cold decoction is possible but inadvisable, as the extracted compounds tend to settle into what practitioners call "the sludge of regret"—a thick, bitter layer at the bottom that contains both the most potent and most unpleasant components. One must strain while warm or accept that one's decoction will be approximately 30% solid matter by volume.
+&nbsp;
+‡‡‡‡‡‡The Great`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding decoction for roots bark in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ALCOHOL_EXTRACTION_TINCTURES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'alcohol_extraction_tinctures',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Alcohol Extraction Tinctures',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['decoction_for_roots_bark'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_alcohol_extraction_tinctures' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Alcohol Extraction Tinctures: A Comprehensive Study in Solvent Alchemy</span>
+&nbsp;
+The fundamental principle of alcohol extraction operates on a deceptively simple premise: certain botanical essences dissolve more readily in alcohol than in water*, thereby allowing the alchemist to capture volatile compounds that would otherwise remain locked within the cellular matrix of plant matter**. This technique, which the ancient Mesopotamian priesthood referred to as "convincing the green spirits to relocate†," relies on alcohol's dual nature as both a polar and non-polar solvent††, making it remarkably effective at extracting a wide range of phytochemicals including alkaloids, glycosides, and the particularly stubborn phenolic compounds that have caused no end of academic disputes‡. The process itself requires patience, proper ratios, and a fundamental understanding that plant material will not surrender its secrets simply because one asks politely‡‡.
+&nbsp;
+In practical application, the creation of tinctures begins with the selection of appropriate alcohol strength, typically between 25% and 95% alcohol by volume, depending on the botanical material and desired compounds***. Fresh plant material generally requires higher alcohol percentages due to its water content†††, while dried materials can be successfully extracted with lower strengths, though the Alchemical Guild of Lesser Bohemia insists on 73.4% for reasons they steadfastly refuse to explain‡‡‡. The standard ratio of plant material to menstruum§ is generally 1:5 by weight for dried herbs and 1:2 for fresh materials, though these proportions may be adjusted based on the potency of the starting material and whether or not one has access to the controversial "folk method" of "eyeballing it§§," which has produced both remarkable successes and the Incident of 1847§§§.
+&nbsp;
+The maceration method, wherein chopped botanical material is submerged in alcohol and allowed to steep for two to six weeks with periodic agitation*, remains the most common approach for the home alchemist**. The percolation method, by contrast, involves slowly dripping alcohol through powdered plant material in a specialized vessel called a percolator†, producing a more concentrated result in less time but requiring equipment that most practitioners cannot properly pronounce, let alone operate††. During extraction, the alcohol molecules penetrate the plant cell walls through osmotic pressure and the principle of "chemical insistence‡," dissolving the desired constituents and creating a solution that the medieval Arabs called "al-kuhl" - literally "the thing that explains why Uncle Rashid dances at weddings‡‡."
+&nbsp;
+Safety considerations cannot be overstated, particularly regarding the flammability of high-proof alcohol***, which burns with an almost invisible flame that has caused approximately 2,847 instances of "surprised eyebrows" in professional laboratories over the past century alone†††. All tincture work should be conducted away from open flames, sparks, and that one colleague who always seems to generate static electricity‡‡‡. Proper labeling is essential§, as the case of the Witherspoon Confusion of 1923 demonstrates with uncomfortable clarity§§, and all tinctures should be stored in dark glass bottles away from direct sunlight and the curious fingers of those who believe that "botanical extract" is a euphemism for "interesting beverage§§§." The use of food-grade alcohol is mandatory for internal preparations*, though certain historical figures took a remarkably cavalier approach to this requirement**, leading to what the medical journals euphemistically termed "intestinal adventures†."
+&nbsp;
+---
+&nbsp;
+*Though not, it must be emphasized, for reasons of personal preference. The alcohol is a tool, not a co-conspirator, regardless of what certain texts from the Bacchanalian School of Alchemy might suggest.
+&nbsp;
+**The water-based decoction method, covered in the prerequisite coursework, extracts different compounds entirely - primarily the water-soluble vitamins, minerals, and mucilages that alcohol would leave behind like a picky dinner guest.
+&nbsp;
+†According to tablets recovered from the Temple of Ninkasi, goddess of beer, though translation remains contentious due to the symbol that appears to depict either "spirit essence" or "really good party."
+&nbsp;
+††Alcohol possesses both a polar hydroxyl group (-OH) and a non-polar hydrocarbon chain, making it the Switzerland of solvents - neutral, efficient, and inexplicably good at what it does. Unlike Switzerland, however, it is highly flammable.
+&nbsp;
+‡The Great Phenolic Debate of 1887 lasted three days, involved two duels, and concluded only when Professor Helmsworth accidentally proved his point by precipitating his rival's entire argument out of solution. The Journal of Questionable Methodology declined to publish the results.
+&nbsp;
+‡‡The truth is that all plant materials contain secrets. Some are merely more willing to share them. Others require what the Doctrine of Signatures calls "aggressive negotiation."
+&nbsp;
+***The most common mistake, according to the Institute of Preventable Alchemical Disasters, is using drinking alcohol purchased from questionable sources. The second most common mistake is using drinking alcohol purchased from reliable sources and then consuming it before the tincture is complete. The third most common mistake is not having purchased enough†.
+&nbsp;
+†This is a footnote about purchasing sufficient quantities, not about the percolation method. That comes later. The author apologizes for the confusion but notes that tincture-making often involves such temporal displacement effects.
+&nbsp;
+†††Fresh herbs contain 60-80% water already, which will dilute your alcohol percentage faster than you can say "volumetric displacement." The math is not difficult, but it is annoying, particularly if one has already committed to a specific ratio and must now explain to the plant material that circumstances have changed.
+&nbsp;
+‡‡‡When pressed, a junior member once suggested it was because 73.4% was exactly halfway between too little and too much, but he was immediately reassigned to sorting dried valerian root in the basement, where he remains to this day, possibly still sorting.
+&nbsp;
+§"Menstruum" is the traditional alchemical term for solvent, derived from Latin and absolutely not to be confused with anything else your medieval instructor might have been talking about. The etymology is contentious and most modern practitioners just say "alcohol" to avoid the inevitable smirking.
+&nbsp;
+§§The folk method involves adding alcohol "until it looks right," which works surprisingly well for experienced practitioners and catastrophically poorly for everyone else. The Guild maintains that this is because "looking right" is actually an advanced form of volumetric calculation performed by the subconscious mind, though cynics suggest it's merely survivorship bias†††.
+&nbsp;
+†††Those who are naturally good at eyeballing continue to eyeball. Those who are not naturally good at it either learn to measure or stop making tinctures. This is called "evolution in action" by the more Darwinian alchemists.
+&nbsp;
+§§§In 1847, an overenthusiastic apothecary in Shropshire decided that if a 1:5 ratio was good, a 1:15 ratio must be "super good." The resulting tincture was so weak that it was technically just "angry water." His shop's reputation never recovered, though he did pivot successfully into selling regular water with botanical enthusiasm‡‡.
+&nbsp;
+‡‡This later became the foundation of the homeopathic industry, though this is disputed by historians who have a sense of humor and homeopaths who do not.
+&nbsp;
+*Regular agitation - shaking the jar once daily - ensures even extraction and prevents settling. It also makes one's housemates think you're developing an unhealthy relationship with a jar, but this is a small price to pay for proper technique.
+&nbsp;
+**The maceration method is essentially "patience in liquid form." One combines materials, waits, occasionally shakes, and then waits more. It is remarkably similar to traditional meditation, except at the end you have tincture instead of enlightenment. Some argue this is the better outcome.
+&nbsp;
+†Percolators look like something between an alchemical still and a coffee maker, because they are exactly that - the lovechild of distillation apparatus and caffeine delivery systems, born in 19th century France when both coffee and botanical medicine were experiencing renaissance periods§.
+&nbsp;
+§Not to be confused with THE Renaissance, which was experiencing its own period earlier and involved considerably more art and considerably less coffee. Though some argue the art would have been better with more coffee.
+&nbsp;
+††The Guild of Mechanical Alchemists produces a 47-page manual on percolator operation, 23 pages of which are devoted to assembly, 18 to cleaning, 5 to actual use, and 1 to troubleshooting. The troubleshooting page simply says "disassemble, clean, reassemble" regardless of the problem.
+&nbsp;
+‡"Chemical insistence" is not a formally recognized term, but it should be. It describes the observable phenomenon whereby alcohol molecules simply refuse to leave well enough alone and persist in dissolving things until satisfied.
+&nbsp;
+‡‡This translation is disputed by serious scholars but beloved by practical`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding alcohol extraction tinctures in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GLYCERIN_BASED_EXTRACTS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'glycerin_based_extracts',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Glycerin Based Extracts',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['alcohol_extraction_tinctures'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_glycerin_based_extracts' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Glycerin Based Extracts: A Surprisingly Sticky Field of Study</span>
+&nbsp;
+The fundamental principle underlying glycerin-based extraction differs from its more dramatic cousin, alcohol extraction, in ways that prove both philosophically profound and practically inconvenient*. Where alcohol acts as a sharp blade, severing the desired constituents from plant matter with aggressive efficiency, glycerin operates more as a persistent houseguest—polite, sweet-natured, and absolutely refusing to leave until it has absorbed everything of value**. The process requires patience in quantities not typically associated with alchemical practice†, and a willingness to accept that some things in life are meant to proceed at the pace of continental drift rather than wildfire‡.
+&nbsp;
+The practical applications of glycerin-based extracts have expanded considerably since the Incident of 1847‡‡, when the Royal Society of Botanical Extraction finally admitted that alcohol-based tinctures were, perhaps, not appropriate for all audiences***. Glycerin extracts excel in contexts requiring gentle extraction, long-term stability, and the ability to be administered without causing the subject to reflexively recoil from the taste†††. Modern practitioners employ these extracts in pediatric formulations, cosmetic preparations, and situations where introducing alcohol would be therapeutically counterproductive or simply explain why Grandmother has been unusually cheerful lately‡‡‡. The technique involves combining vegetable glycerin§ with prepared botanical matter at ratios between 60:40 and 75:25 (glycerin to water), heating gently§§, and waiting between 4-6 weeks while periodically shaking the preparation§§§.
+&nbsp;
+Safety considerations for glycerin-based extractions prove refreshingly straightforward compared to most alchemical procedures*, though this has led to a perhaps unwarranted sense of complacency**. The primary dangers are boringly mundane: contamination from improper sterilization, degradation from light exposure, and the persistent risk that someone will taste the sweet preparation and assume it can be consumed in quantities appropriate to dessert rather than medicine†††. The sticky nature of glycerin presents challenges in cleanup that have driven approximately 47.3% of apprentices to swear colorful oaths involving the substance's parentage‡‡‡‡. More seriously, practitioners must remain aware that glycerin's gentle extraction produces different constituent profiles than alcohol§§§§; assuming equivalent potency has resulted in what the Alchemists' Guild delicately terms "therapeutic miscalculations"*****.
+&nbsp;
+Historical development of glycerin-based extraction reads like a chronicle of people discovering, forgetting, and rediscovering the same basic principles across centuries†††††. Ancient civilizations utilized honey and sweet syrups for similar purposes‡‡‡‡‡, though whether this constituted true understanding or fortunate accident remains debated§§§§§. The modern formulation emerged in the mid-19th century when chemically isolated glycerin became commercially available, leading to what the period's alchemists termed "a golden age of experiments that nobody documented properly because they were too busy being excited"******. Today's understanding combines traditional empirical knowledge with modern comprehension of solubility mechanics, constituent extraction rates, and the thermodynamic properties of polyol solutions—though most practitioners simply call it "the sweet method" and proceed with time-honored intuition†††††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*This is assuming one has already mastered alcohol extraction, as outlined in prerequisite studies. Attempting glycerin extraction without this foundation is rather like trying to write poetry without first learning to read—technically possible but inadvisable and likely to produce results that make observers uncomfortable.
+&nbsp;
+**The author recommends against anthropomorphizing one's extraction media, though after spending six weeks attending to a glycerin preparation, most practitioners develop what can only be described as "feelings" about the substance. The Heidelberg Institute of Extraction Sciences maintains a support group.†
+&nbsp;
+†The same support group also addresses the trauma of alcohol-based extractions gone wrong, though those meetings require significantly more tissues and considerably stronger beverages afterward.
+&nbsp;
+‡Patience, that ancient virtue so prized by philosophers and so absent from modern practice, must be cultivated like any other alchemical skill. The Guild examination for glycerin extraction certification includes a mandatory meditation component specifically because three apprentices in 1923 attempted to "speed things up" with heat, pressure, and what they termed "aggressive encouragement." The resulting mess required professional cleaning services†† and two weeks of explanations to local authorities.
+&nbsp;
+††The Eternal Sticky Spot, as it came to be known, persisted on the laboratory floor until 1951, serving as both cautionary tale and navigational landmark. "Turn left at the Sticky Spot, continue past where Jenkins kept the phosphorus††† , and you'll find the storeroom."
+&nbsp;
+†††Jenkins no longer keeps phosphorus anywhere, following the Incident We Don't Discuss. Jenkins is fine. The phosphorus is fine. The ceiling has been replaced.
+&nbsp;
+‡‡The Incident of 1847, which proper academic rigor compels me to detail despite my better judgment, involved a well-meaning but catastrophically misguided attempt to provide "medicinal cordials" to an entire boarding school. The alcohol content of traditional tinctures proved... incompatible with maintaining educational order. Three hundred students singing bawdy songs in four-part harmony convinced the Royal Society that alternative extraction methods deserved investigation. The headmaster's report, preserved in the Society's archives, consists of a single sentence: "Never again."
+&nbsp;
+***The recoil is real, immediate, and often accompanied by facial expressions that suggest one has bitten directly into a lemon wearing a particularly aggressive cologne. Alcohol tinctures, for all their therapeutic virtues, taste like distilled suffering.
+&nbsp;
+†††Children, pets, and individuals of sensitive constitution prove far more willing to accept remedies that taste of slight sweetness rather than chemical warfare. Compliance rates improve by approximately 340% when the medicine doesn't cause one's face to involuntarily contort.‡‡‡‡‡‡
+&nbsp;
+‡‡‡In fairness to Grandmother, her cheerfulness could stem from many factors. The author neither confirms nor denies whether someone has been supplementing her tea with unauthorized cordials.
+&nbsp;
+§Vegetable glycerin, or glycerol, a trihydric alcohol (C₃H₈O₃) derived from plant oils, bears the distinction of being simultaneously an alcohol and utterly unsuitable for drinking. This confuses chemistry students and disappoints desperate apprentices in equal measure. The substance was first isolated by Carl Wilhelm Scheele in 1779, who also discovered chlorine, tungsten, and several other things that proved either extremely useful or extremely dangerous depending on one's perspective.§§§§§§
+&nbsp;
+§§"Gently" here means maintaining temperatures between 50-60°C (122-140°F), not the "gentle heat" described in medieval alchemical texts, which apparently meant "whatever feels warm but doesn't immediately cause burning."§§§§§§§ The precision required represents a significant improvement over historical methods.
+&nbsp;
+§§§During which time the preparation must be attended with a dedication that medieval monks would find familiar. Daily shaking—or at the very least, shaking every few days—prevents stratification and ensures even extraction. The author has witnessed practitioners develop elaborate shaking rituals, complete with specific counting patterns and what one might generously call "spiritual intentions." Whether this improves extraction efficiency remains scientifically unproven, but it certainly improves the practitioner's sense of participation.
+&nbsp;
+*The substances most frequently involved in alchemical accidents are, in order: mercury (historical), phosphorus (continuing), concentrated acids (ongoing), alkaline metals (periodic), and strangely, cinnamon oil (nobody understands why cinnamon oil, but the statistics don't lie). Glycerin appears nowhere on this list, which speaks volumes about its relative safety.
+&nbsp;
+**Complacency in alchemy represents a greater danger than most volatile reagents. The Alchemists' Guild maintains a memorial wall listing practitioners lost to "routine procedures gone slightly wrong."********
+&nbsp;
+†††The case of the Thompson Twins (unrelated, merely shared surname) serves as standard cautionary material. Upon discovering that their glycerin elderberry extract tasted "rather like candy," they consumed approximately 200ml each in a single afternoon. While elderberry itself poses no danger in such quantities, the combination of glycerin and herbal constituents produced what medical texts delicately term "dramatic digestive acceleration." Both survived, neither recommends the experience, and their mother's response has become legendary in Guild training materials.‡‡‡‡‡‡‡
+&nbsp;
+‡‡‡‡The author has cleaned glycerin from laboratory surfaces, clothing, hair, leather-bound books††††††††, and on one memorable occasion, a cat. The cat was not pleased. The cat still holds grudges. The cat remembers.
+&nbsp;
+†††††††The cat was not supposed to be in the laboratory. The cat had opinions about this restriction. The cat won.
+&nbsp;
+§§§§This`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding glycerin based extracts in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const VINEGAR_HERBAL_EXTRACTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'vinegar_herbal_extraction',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Vinegar Herbal Extraction',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['glycerin_based_extracts'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_vinegar_herbal_extraction' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Vinegar Herbal Extraction: A Primer on Acidic Alchemical Methodology</span>
+&nbsp;
+The practice of extracting herbal essences through vinegar represents one of the oldest* and, curiously, one of the most frequently rediscovered† alchemical techniques known to civilization. Unlike its more celebrated cousin, the glycerin-based extract‡, vinegar extraction possesses the singular advantage of being simultaneously effective, affordable, and capable of producing results that taste like someone's left a garden to pickle in your cupboard for three months. The fundamental principle operates on acetic acid's remarkable ability to draw forth both water-soluble and certain lipophilic compounds from plant matter**, creating what the ancient alchemists called "acetum herbarum" and what modern practitioners call "that stuff in the dark bottle at the back of the shelf."
+&nbsp;
+The methodology itself displays a deceptive simplicity that has lured approximately 47.3% of all beginning alchemists into a false sense of security††. One simply combines dried or fresh herbs with vinegar of appropriate quality‡‡—typically apple cider vinegar, though the Guild of Argumentative Alchemists maintains there are seventeen other acceptable varieties***—and allows time to work its peculiar magic. The optimal ratio stands at approximately 1:5 herb to vinegar by volume†††, though this may be adjusted based on the herb's dignity‡‡‡, the phase of the moon****, and whether or not you remembered to label the jar before your housemate mistook it for a new salad dressing†.
+&nbsp;
+Modern understanding has refined what our ancestors knew through painful trial and considerably more painful error††††. The extraction period typically ranges from two to six weeks‡‡‡‡, during which the vinegar gradually assumes the color, essence, and occasionally the personality of the herb in question*****. One must shake the vessel daily******—a practice established after the Incident of 1823†††††, which we shall discuss only in footnote form out of respect for the families involved. The resulting tincture, when properly strained through cloth that has never been used for anything related to cheese‡‡‡‡‡, provides a shelf-stable extract capable of lasting several years, or until someone finally admits they're never actually going to use it and throws it away.
+&nbsp;
+Safety considerations in vinegar extraction primarily concern themselves with the obvious†††††† and the surprisingly non-obvious‡‡‡‡‡‡. The acidic nature of vinegar means one should avoid reactive metals*******, store the extraction in glass rather than plastic******* (a lesson learned at the cost of approximately 2,347 kitchen cabinets between 1950 and 1960), and never, under any circumstances, attempt to extract certain herbs that the Alchemical Safety Board has designated as "absolutely not, we're serious this time, stop asking."†††††††  The beginner should start with gentle herbs—lavender, lemon balm, rose petals‡‡‡‡‡‡‡—before progressing to more assertive specimens********, and should maintain detailed notes, primarily so they can later explain to concerned family members exactly why the kitchen smells like a medieval apothecary had a disagreement with a pickle factory.
+&nbsp;
+The historical trajectory of vinegar extraction reads like a chronicle of humanity's stubborn refusal to leave well enough alone*********. From the Egyptians†††††††† who extracted herbs into palm vinegar for both medicine and what they optimistically called "refreshment," to the medieval monasteries where monks elevated the practice to something resembling an art form‡‡‡‡‡‡‡‡, to the modern kitchen alchemist who Googles "can I extract this" at 2 AM**********, the fundamental technique has remained remarkably consistent. What has changed is our understanding of why it works—the interplay of organic acids, cellular breakdown, and molecular extraction that the ancients attributed to the spirits of vegetables having strong opinions about plants††††††††. This knowledge allows contemporary practitioners to optimize their extractions, though it should be noted that optimization and actually doing the thing are separated by what the University of Practical Alchemy calls "the Gulf of Good Intentions," which remains unbridged to this day.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The earliest recorded instance dates to approximately 5000 BCE, though the Mesopotamian clay tablet describing it is partially destroyed and might also be a recipe for ancient hot sauce. The academic community remains divided, occasionally to the point of food fights at conferences.
+&nbsp;
+† The technique tends to be rediscovered every generation by someone who has just realized that vinegar is acidic, plants contain things, and combining them seems like it should do *something*. This cycle has repeated so reliably that the Alchemical Historical Society now simply updates a running database rather than publishing new papers about it.
+&nbsp;
+‡ See previous studies in glycerin-based extraction, which this paper assumes you've already read, or at least skimmed while eating lunch and getting glycerin-based extract on the margins.
+&nbsp;
+** The exact compounds extracted depend on numerous factors including the herb's composition, the vinegar's acidity (typically 5-7%), the temperature‡, and whether Mercury is in retrograde. The last factor's relevance remains disputed, but try telling that to alchemists who swear by it.
+&nbsp;
+‡ Temperature, it must be noted, should be room temperature unless you're attempting to create what the Guild colorfully terms "an aromatic disaster."
+&nbsp;
+†† This statistic comes from the Institute for Alchemical Overconfidence Studies, which has been tracking beginner mistakes since 1653. The other 52.7% of alchemists either had appropriate paranoia or had recently experienced other alchemical failures that had calibrated their confidence appropriately.
+&nbsp;
+‡‡ The debate over proper vinegar quality has consumed more academic ink than any other aspect of the process. The Vinegar Purists insist on organic, raw, unfiltered apple cider vinegar with "the mother"—a gelatinous mass that sounds like something from a horror novel†† but is actually quite beneficial. The Pragmatists argue that any vinegar with 5% acidity works fine. They are both correct, but admitting this would end several lucrative academic feuds.
+&nbsp;
+†† Specifically, a Walter Moers horror novel, possibly "The City of Dreaming Vinegars," which he definitely didn't write but absolutely should have.
+&nbsp;
+*** The Guild's list includes wine vinegar (red and white, counted separately for no reason anyone can remember), rice vinegar, malt vinegar, balsamic vinegar (considered "showing off"), champagne vinegar (definitely showing off), and eleven others that most alchemists suspect they invented to make the list longer. The Guild has refused to confirm or deny this for seventy-three years.
+&nbsp;
+††† This ratio was established by the scholar Aceticus the Precise in 1447, who measured everything to three decimal places and once spent six months determining the exact volume of a single thyme leaf††. His contributions to alchemy are undeniable; his contributions to anyone's patience were considerably more disputed.
+&nbsp;
+†† The leaf's volume was determined to be 0.047 milliliters, plus or minus 0.001 milliliters depending on humidity. Aceticus celebrated by measuring twelve more leaves. He died alone, but extremely well-organized.
+&nbsp;
+‡‡‡ An herb's dignity is a technical term referring to its tendency to surrender its constituents readily (low dignity, common in mints and lemon balm) or to guard them jealously (high dignity, typical of roots and barks). The terminology dates to medieval alchemy and has survived primarily because replacing it would require updating approximately 40,000 manuscripts that no one wants to read anyway.
+&nbsp;
+**** The moon's phase matters for exactly two reasons: first, timing your extraction to the new moon means you'll definitely remember when you started it (assuming you remember what phase the moon was in), and second, it gives you something to blame if the extraction doesn't work out. Historical alchemists understood this intuitively; modern ones have to be taught it explicitly.
+&nbsp;
+† This specific incident has occurred in 73% of all shared housing situations involving alchemists, according to the Survey of Domestic Alchemical Mishaps (2019). The survey also noted that homemade labels reading "NOT SALAD DRESSING" have a failure rate of approximately 89%.
+&nbsp;
+†††† The Great Vinegar Explosion of 1823 occurred when apprentice alchemist Thomasina Stillworth decided that extraction would proceed faster if she sealed the jar more tightly and placed it in direct sunlight. The resulting event sent pickled elderflower approximately fifteen feet in all directions, taught an entire generation about gas expansion, and led to the establishment of the first Alchemical Safety Guidelines. The guidelines' opening line—"If you think it might explode, it might explode"—has proven surprisingly durable.
+&nbsp;
+‡‡‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding vinegar herbal extraction in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const OIL_INFUSION_MEDICINAL: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'oil_infusion_medicinal',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Oil Infusion Medicinal',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['vinegar_herbal_extraction'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_oil_infusion_medicinal' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `OIL INFUSION MEDICINAL: A Comprehensive Treatise on the Dissolution of Botanical Virtues into Fatty Carriers</span>
+&nbsp;
+The art of oil infusion medicinal represents one of the foundational pillars of alchemical practice, distinguished from its more volatile cousin, vinegar extraction*, by its ability to capture fat-soluble constituents that would otherwise remain stubbornly locked within plant matter**. The process involves the patient dissolution of botanical essences into various carrier oils†, a technique that sounds deceptively simple until one attempts it for the first time†† and discovers that plants have opinions about being dissolved‡. The fundamental principle operates on the ancient doctrine of "like dissolves like"‡‡, which the early alchemists interpreted with varying degrees of accuracy and sobriety***—though it must be noted that the oils themselves remain chemically unchanged during proper infusion, serving merely as willing vessels for the migration of medicinal compounds from plant to liquid phase††† through a process that would be entirely mundane if it weren't so useful.
+&nbsp;
+The practical applications of oil infusion extend across a remarkable spectrum of medicinal and cosmetic uses, from the preparation of healing salves‡‡‡ to the creation of massage oils that actually accomplish something beyond making everything slippery*. The technique itself demands patience above all other virtues**, for rushing the process leads invariably to what the Guild of Botanical Dissolution† refers to as "optimistic putrefaction"††. The basic methodology involves selecting appropriate plant material***, ensuring it is sufficiently dry****, selecting a carrier oil of adequate quality†††, and then either applying gentle heat over extended periods‡‡ or allowing cold infusion over considerably longer periods‡‡‡‡. The Superior Academy of Oleaginous Studies*** maintains that the cold method produces superior results, while the Institute for Accelerated Extraction**** insists that careful heat application yields equivalent outcomes in one-tenth the time†††††—they have been arguing about this for three hundred years and show no signs of reaching consensus‡‡‡‡‡.
+&nbsp;
+Safety considerations in oil infusion medicinal cannot be overstressed, particularly given the Incident of 1847*****, when an entire monastery's worth of feverfew-infused oil spontaneously achieved consciousness and had to be negotiated with******. The primary danger lies not in the oils themselves—which are generally as harmless as any substance that makes your hands slippery can be—but in the potential for microbial contamination†††† when plant material retains excess moisture****. This leads to what ancient texts poetically describe as "the Bloom of Regret"‡‡‡‡‡‡ and modern microbiologists more prosaically term "catastrophic fungal colonization"*******. One must also exercise caution regarding phototoxic compounds*******, certain essential oil interactions*********, and the persistent human tendency to assume that because something is "natural" it cannot possibly harm you†††††††—a belief that hemlock, belladonna, and poison ivy have spent millennia attempting to correct‡‡‡‡‡‡‡.
+&nbsp;
+The historical development of oil infusion medicinal traces back to the earliest civilizations**********, though the techniques have been refined considerably since the days when "adequate drying" meant "leave it in the sun until the goats stop trying to eat it"***********. The ancient Egyptians practiced oil infusion with such dedication that modern archaeologists continue to find sealed alabaster jars containing perfectly preserved medicinal oils††††††††, some of which are still potent enough to cause minor transcendental experiences when opened************. Medieval European monasteries elevated the practice to an art form, maintaining detailed records that reveal both impressive empirical observation and occasional spectacular failure‡‡‡‡‡‡‡‡. The Renaissance brought attempts at theoretical frameworks, most notably the work of Paracelsus*************, who contributed valuable insights alongside completely unhinged speculation in roughly equal measure**************. Modern understanding, informed by chemistry and pharmacology, has vindicated many traditional practices while quietly discarding others†††††††††, and the field continues to evolve as new carrier oils are evaluated‡‡‡‡‡‡‡‡‡ and ancient texts reveal previously overlooked techniques***************.
+&nbsp;
+---
+&nbsp;
+*The vinegar method, as covered in your previous studies, excels at extracting water-soluble and some alcohol-soluble compounds. Oil, being substantially more hydrophobic, operates according to entirely different principles. The two methods regard each other with professional respect but maintain separate social circles.
+&nbsp;
+**Particularly the resins, the waxes, and various aromatic compounds that laugh in the face of water-based extraction. Plants evolved these compounds to be difficult to extract, possibly out of spite.
+&nbsp;
+†Carrier oils include olive oil, sweet almond oil, jojoba oil (which is technically a wax but identifies as an oil and we respect that), sunflower oil, and various other fatty substances willing to accept dissolved plant constituents. The choice of carrier matters more than novices typically assume and less than experts typically claim.
+&nbsp;
+††According to the Bureau of Alchemical Statistics and Unfortunate Incidents, approximately 73.4% of first-time oil infusers either: (a) use insufficiently dried plant material, (b) apply too much heat, (c) apply insufficient heat, (d) use rancid carrier oil, or (e) all of the above simultaneously through a feat of probability-defying incompetence.
+&nbsp;
+‡This is obviously metaphorical. Plants don't have opinions. They have biochemical imperatives that they pursue with the single-minded determination of entities that cannot move and must therefore solve all their problems through chemistry. Which, when you think about it, is rather more concerning than opinions.
+&nbsp;
+‡‡First articulated by the alchemist Pseudo-Geber in the 13th century, though he was articulating principles that practical herbalists had been using for millennia without feeling the need to give them Latin names. The doctrine suggests that polar solvents dissolve polar solutes, and non-polar solvents dissolve non-polar solutes, which seems obvious until you try to explain why to someone and realize you're gesturing vaguely at molecular structures while making whooshing noises.
+&nbsp;
+***The aforementioned incident involving sobriety concerns primarily the work of the alchemist Johann Becher, who in 1669 published a treatise on oil infusion that made perfect sense to him at the time but which subsequent scholars suspect was composed entirely during a prolonged mercury vapor exposure.† Some of his observations were brilliant. Some suggested he believed plants were tiny kingdoms with political structures.
+&nbsp;
+†Mercury vapor exposure was an occupational hazard of early alchemy. It explains a lot, actually.
+&nbsp;
+***Many modern practitioners swear by calendula-infused oil for wound healing, arnica-infused oil for bruises (external use only, as arnica taken internally leads to what the texts politely term "gastric rebellion"), and St. John's wort-infused oil for nerve pain—though one must be careful with the latter, as it makes one photosensitive enough that summer becomes actively hostile.††
+&nbsp;
+††The Council of Photosensitive Alchemists meets exclusively at night and holds annual conferences in caves. They are not bitter about this. They are very bitter about this.
+&nbsp;
+‡‡‡Optimistic putrefaction: the state achieved when one assumes that slightly damp plant material will "probably dry out" during the infusion process. It will not. It will instead culture a fascinating array of microorganisms, none of which improve the medicinal properties of your oil. The resulting smell has been described as "aggressively biological" and "a crime against noses."
+&nbsp;
+*Plant material should be dried until it's, in technical terms, "properly dry." This means brittle, crispy, and showing no signs of moisture when broken. The Institute of Obvious Instructions recommends testing a small batch first, which is advice nobody follows until after they've made their first batch of Regrettable Slime.
+&nbsp;
+**The patience requirement cannot be emphasized enough. Oil infusion operates on geological timescales compared to other extraction methods. Cold infusion typically requires 4-6 weeks of daily agitation, during which nothing appears to be happening. The temptation to "help it along" with excessive heat destroys both practitioner and preparation.
+&nbsp;
+††The Guild of Botanical Dissolution was founded in 1503 by a collective of herbalists who were tired of explaining why you can't just throw wet plants into oil and expect miracles. They maintain detailed records of failures, organized by type of failure, degree of smell, and whether the practitioner learned their lesson or immediately tried again.
+&nbsp;
+***Extra virgin olive oil, fractionated coconut oil, and sweet almond oil represent the traditional choices. Jojoba oil has gained favor for its exceptional stability—it can remain unspoiled for years, which it accomplishes through sheer force of molecular stubbornness. Sunflower`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding oil infusion medicinal in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ESSENTIAL_OIL_STEAM_DISTILLATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'essential_oil_steam_distillation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Essential Oil Steam Distillation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['oil_infusion_medicinal'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_essential_oil_steam_distillation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Essential Oil Steam Distillation: A Treatise on the Separation of Spirit from Flesh in the Vegetable Kingdom</span>
+&nbsp;
+The extraction of essential oils through steam distillation represents one of alchemy's most elegant intersections between ancient wisdom and pragmatic chemistry*, a marriage so successful that even the most skeptical natural philosophers† have been forced to admit it actually works‡. The fundamental principle relies upon steam's ability to carry volatile aromatic compounds from plant material through a cooling apparatus, whereupon the essential oil separates from the water like arguments from family members at a wedding**—naturally, inevitably, and with visible boundaries. The alchemist must understand that this process is not merely boiling plants†† but rather a gentle persuasion, a coaxing of the plant's very essence into a form that can be bottled, labeled, and subsequently knocked over in one's workshop at three in the morning‡‡.
+&nbsp;
+The practical apparatus consists of three primary components: the still pot, the condenser, and the separator***, each of which must be constructed with materials that will not react with the volatile oils being extracted††† or with each other, which proves more challenging than initially apparent‡‡‡. The plant material is placed in the still pot with sufficient water, heated until steam passes through the botanical matter, and the resulting vapor is channeled through the condenser where it returns to liquid form****. The essential oil, being less dense than water in most cases†††† and possessing what ancient texts refer to as "an independent spirit"‡‡‡‡, floats atop the distillate where it may be separated through various means*****, each method having its proponents and its cautionary tales******.
+&nbsp;
+Temperature control proves absolutely critical to successful distillation, with optimal ranges varying by plant material from the merely warm to the aggressively hot†††††, though never exceeding the point at which the essential oils themselves begin to degrade‡‡‡‡‡. The rate of distillation should proceed at what the Guild of Aromatic Arts describes as "a contemplative drip"*******, neither rushed nor stagnant, much like the pace of bureaucratic reform or continental drift. One must monitor the still constantly for the first hour††††††, then regularly thereafter, as unattended stills have a documented tendency to either run dry or develop what veteran alchemists call "personality"‡‡‡‡‡‡, neither of which leads to outcomes covered by standard insurance policies********.
+&nbsp;
+Historical development of steam distillation techniques spans millennia, from the possibly-mythical Sumerian distillers†††††††who may have invented the process while trying to concentrate beer‡‡‡‡‡‡‡ to the Persian physician Avicenna's documented innovations in cooling apparatus design*********that made the process actually reliable rather than explosively unpredictable. Modern practitioners benefit from standardized equipment and established procedures, yet the fundamental art remains unchanged: the careful application of heat, the patience to wait for vapors to condense, and the wisdom to know when one has extracted the plant's essence versus when one is merely boiling expensive botanical matter into expensive aromatic water††††††††. The essential oils thus obtained possess concentrated properties far exceeding those of simple infusions‡‡‡‡‡‡‡‡, though this concentration brings with it responsibilities that cannot be overstated, understated, or stated in any way that has yet prevented incidents**********.
+&nbsp;
+Safety considerations in essential oil distillation extend beyond the obvious hazards of boiling water and open flames to include the less intuitive dangers of concentrated aromatic compounds themselves†††††††††, many of which are flammable, skin-sensitizing, or capable of inducing states of consciousness best described as "inadvisable"‡‡‡‡‡‡‡‡‡. Proper ventilation is not optional but mandatory***********, as is the use of appropriate materials for all components that contact either steam or essential oils***********. The novice alchemist should begin with gentle herbs such as lavender or chamomile************before progressing to more challenging materials†††††††††††, and should maintain detailed notes of all procedures‡‡‡‡‡‡‡‡‡‡, as the difference between successful distillation and disaster often becomes apparent only in retrospect, when it is too late to do anything except document what went wrong************.
+&nbsp;
+---
+&nbsp;
+*The term "pragmatic chemistry" here distinguishes this branch from "impractical chemistry," which concerns itself with transmuting lead into gold, and "theoretical chemistry," which concerns itself with proving that transmuting lead into gold is impossible while secretly hoping to be proven wrong.
+&nbsp;
+†The Society for the Preservation of Scientific Skepticism, founded in 1672, lasted until 1681 when their headquarters burned down due to an accidental essential oil distillation fire. The irony was noted by everyone except the Society's remaining members.
+&nbsp;
+‡Unlike philosopher's stones, perpetual motion machines, or committee-designed camel replacements.
+&nbsp;
+**This separation typically occurs within 15-30 minutes of cooling, or approximately 0.0003% of the time it takes for those same family members to start speaking again.
+&nbsp;
+††A common error among beginners, encouraged by the fact that "boiling plants" sounds more masculine and decisive than "gently steaming botanical materials in a controlled manner." The Guild of Ruined Lavender Fields maintains extensive records of farms destroyed by enthusiastic novices.
+&nbsp;
+‡‡The "three in the morning accident" represents 47.3% of all workshop incidents according to the Alchemists' Insurance Cooperative of Greater Bohemia***. The remaining 52.7% occur at times when the alchemist is either: (a) showing off to visitors (23.1%), (b) certain they remember the procedure without checking notes (18.4%), or (c) attempting to distill something they found growing by the roadside without proper identification (11.2%).
+&nbsp;
+***Not to be confused with the Alchemists' Insurance Cooperative of Lesser Bohemia, which went bankrupt in 1734 after insuring too many alchemists who believed they were "being careful."
+&nbsp;
+****Glass is traditional, copper is efficient, plastic is modern, and lead is a terrible idea that someone definitely tried†.
+&nbsp;
+†The Grimoire of Poor Life Choices, Volume VII, pages 234-891, catalogues known instances of alchemists using lead apparatus for various procedures. Volume VII focuses exclusively on distillation incidents. There are twelve volumes.
+&nbsp;
+‡‡‡The phenomenon of "equipment interaction" is well-documented. Copper and iron should not be used together†, nor should glass and sudden temperature changes, nor should absolutely anything and the apprentice's notion of "helping"††.
+&nbsp;
+†Except in the presence of acidic distillates, at which point they should really not be used together. The resulting copper-iron oxide formations are spectacular in the worst possible sense.
+&nbsp;
+††The Guild Handbook for Training Alchemical Apprentices devotes Chapter 12 to the phrase "Don't help," repeated 847 times in progressively larger fonts.
+&nbsp;
+****The essential oil rises to the top in most common distillations, with notable exceptions including wintergreen, clove, and certain varieties of cinnamon, which sink†. This has led to equipment designs that assume the oil will float, resulting in losses estimated at 12,000 gallons of valuable essential oils annually, or enough to make every resident of Prague smell faintly of cinnamon for approximately three weeks††.
+&nbsp;
+†The molecular density variations are well understood by modern chemistry but were historically attributed to the plants' "philosophical orientation toward earth versus air," a theory that sounds ridiculous until one remembers it led to mostly-correct separation procedures.
+&nbsp;
+††This calculation courtesy of Professor Heinrich Vandersmell of the University of Inappropriate Extrapolations, whose work in this area is highly specific and completely useless.
+&nbsp;
+†††Glass remains the gold standard, being non-reactive, transparent, and easy to clean. It is also fragile, expensive, and capable of exploding when subjected to thermal shock, making it the perfect metaphor for academic careers‡.
+&nbsp;
+‡The University of Padua's College of Alchemical Studies has, since its founding in 1589, required all doctoral candidates to distill essential oils using glass apparatus they themselves have blown. The graduation rate is 43%. The injury rate is 97%. These statistics are not contradictory when one considers that most injuries are minor burns that heal before graduation age‡‡.
+&nbsp;
+‡‡The average alchemist completes their doctorate at age 34, by which time most burns from their twenties are merely scars and conversation pieces.
+&nbsp;
+‡‡‡The case of the Bratislava University Still of 1702 exemplifies this problem. Constructed of copper, iron, lead, and brass in what its creator called "an economical mix," it produced not essential oils but rather a substance that the official incident report describes only as "green`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding essential oil steam distillation in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HYDROSOL_PRODUCTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'hydrosol_production',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Hydrosol Production',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['essential_oil_steam_distillation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_hydrosol_production' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Hydrosol Production: A Comprehensive Study of Aqueous Botanical Extracts in Alchemical Practice</span>
+&nbsp;
+The production of hydrosols represents one of alchemy's more forgiving enterprises*, standing in stark contrast to the spectacular failures that characterize most other alchemical pursuits†. At its essence, hydrosol production involves the capture of water-soluble aromatic compounds during steam distillation‡, a process that yields what the ancient Mesopotamian alchemists called "the gentle water that remembers flowers"** and what the Interdimensional Alchemists' Safety Board now refers to, with characteristic bureaucratic poetry, as "Residual Aqueous Botanical Extract, Category 3-B, Non-Combustible"††. The hydrosol, being the aqueous portion of the distillate that separates from essential oils, contains approximately 0.02-0.05% of the original plant's aromatic compounds***—a concentration that sounds disappointingly small until one considers that this represents roughly 847 trillion aromatic molecules per milliliter‡‡, which is still quite a lot of molecules to have remembering the same rose.
+&nbsp;
+The practical technique for hydrosol production follows the same fundamental apparatus as essential oil steam distillation†††, with the critical distinction that the alchemist values both streams of the distillate rather than discarding the aqueous portion as "sad water"‡‡‡. Steam passes through botanical material at temperatures between 97.3°C and 101.8°C****, thereby coaxing volatile compounds into the vapor phase without the thermal destruction that characterizes the unfortunate incident at the Salzburg Academy in 1743††††. As the steam cools in the condenser, it forms droplets that—and this is the beautiful part—carry with them a memory of the plant in both oil and water forms‡‡‡‡, separating in the collection vessel like philosophical differences at an alchemical conference*****. The ratio of hydrosol to essential oil varies dramatically by plant: rose produces approximately 1 liter of hydrosol per milliliter of essential oil, whereas rosemary produces about 50 milliliters per milliliter, a difference that has bankrupted more than one ambitious distiller who failed to plan their storage accordingly†††††.
+&nbsp;
+Modern understanding of hydrosol chemistry reveals complexities the ancients could scarcely imagine, though they understood the practical applications well enough to avoid poisoning themselves******. The hydrosol contains not merely diluted essential oil‡‡‡‡‡, but rather a unique collection of water-soluble compounds including hydrolats******, organic acids*******, and various oxygenated molecules that never made it into the essential oil in the first place, creating what Professor Adelheid Blütengeist of the Thüringen Institute of Subtle Waters called "an entirely separate conversation between plant and water"†††††††. The pH of hydrosols typically ranges from 3.5 to 6.5‡‡‡‡‡‡, depending on the plant material, with lavender producing the most agreeable 5.2-5.8 range and the notorious Widow's Nettle of the Carpathians achieving a pH of 2.1 that etched the glass container it was stored in********.
+&nbsp;
+Safety considerations in hydrosol production are blessedly minimal compared to other alchemical operations, though this has led to a certain dangerous complacency*********, as evidenced by the seventeen incidents logged by the Guild of Cautious Distillers in the past year alone††††††††. The primary concerns involve contamination rather than explosion‡‡‡‡‡‡‡: hydrosols, being largely water, provide an excellent breeding ground for bacteria and fungi if not properly handled**********, particularly the dreaded Pseudomonas aeruginosa, which has ruined more batches of rose hydrosol than all other contaminants combined***********. Storage in sterile, dark glass bottles at temperatures below 15°C extends shelf life from a few weeks to several months, though the ancient practice of adding a small amount of grain alcohol†††††††††—specifically 5-10% by volume—provides both preservation and a slight buzz if one is foolish enough to drink it, which approximately 23.7% of beginning alchemists attempt at least once‡‡‡‡‡‡‡‡. Modern hydrosol production benefits from the understanding that pH, temperature, and botanical material freshness all contribute to the final product's stability and aromatic profile, though as the Reverend Mother of Waters at the Convent of St. Hildegard noted in 1398, "It's mostly just not being an idiot about cleanliness"************.
+&nbsp;
+Historical development of hydrosol production traces back to the earliest days of distillation itself, when alchemists seeking the quinta essentia of plants noticed that the water portion of their distillate smelled quite nice and didn't burst into flames as readily as what they'd been working with††††††††††. The Persian physician Avicenna, working in the 10th century, described hydrosols as "the soul of the plant diluted in water to a concentration suitable for those who have not yet achieved enlightenment"‡‡‡‡‡‡‡‡‡, which was his polite way of saying it was for beginners. Medieval European alchemists called them "flower waters" and used them for everything from perfumery to medicine to the removal of unwanted suitors*************—the last application being particularly effective with concentrated garlic hydrosol. The Industrial Revolution brought mass production of hydrosols, though the quality suffered dramatically when the Thornbury Steam Works began using coal-fired stills that imparted what contemporary reviewers called "an essence of sadness and chimney sweep" to their lavender water. The modern renaissance in artisanal distillation has restored hydrosols to their rightful place as elegant botanical preparations worthy of study, rather than the inferior byproduct of essential oil production that 1970s aromatherapy literature so dismissively portrayed them as.
+&nbsp;
+---
+&nbsp;
+*Though "forgiving" in alchemical terms still includes risks of steam burns, contaminated batches, and the persistent aroma of whatever you're distilling following you for weeks afterward. The Alchemists' Guild of Lesser Saxony maintains that anything you can do while wearing safety goggles and emerge with all your original fingers counts as "forgiving."
+&nbsp;
+†See the author's previous work, "Essential Oils and Essential Failures: A Statistical Analysis of Explosive Outcomes in Historical Alchemy," published by the Journal of Retrospective Safety, Vol. 47, pp. 1-892.
+&nbsp;
+‡The term "steam distillation" itself is something of a misnomer, as noted by the pedantic scholars of the Braunschweig Academy, who prefer "vapor-phase extraction of thermally labile volatile compounds via entrained water vapor at approximately atmospheric pressure," though no one invites them to parties anymore.
+&nbsp;
+**This translation is disputed. Some scholars argue the original Sumerian phrase actually translates to "plant sweat water," which is considerably less poetic but probably more accurate†.
+&nbsp;
+†The Mesopotamians had approximately 47 different words for various types of failure in distillation, suggesting they had quite a lot of practice.
+&nbsp;
+††The IASB employs 1,247 full-time bureaucrats solely dedicated to the naming and categorization of alchemical substances. Their budget exceeds that of three small European principalities.
+&nbsp;
+***To put this in perspective, this is roughly the concentration at which homeopaths begin to get excited, though alchemists maintain their molecules are actually present and doing something.
+&nbsp;
+‡‡This calculation assumes a molecular weight of approximately 154 g/mol for typical aromatic compounds. The Doctoral College of Unreasonably Precise Measurements spent six years determining this figure and was very proud of it‡.
+&nbsp;
+‡The College was later dissolved when it was discovered they'd been measuring the wrong compound for the final four years.
+&nbsp;
+†††See prerequisite reading: "Essential Oil Steam Distillation: The Parts We Usually Throw Away Are Actually Quite Nice."
+&nbsp;
+‡‡‡The term "sad water" appeared in approximately 73% of pre-1920s alchemical texts, usually with an apologetic note about disposal methods.
+&nbsp;
+****This narrow temperature range is crucial. Below 97.3°C, insufficient volatile compounds transfer to the vapor phase. Above 101.8°C, you're just making steam more angrily, according to the technical terminology of the Frankfurt Institute of Optimal Temperature Ranges.
+&nbsp;
+††††In which Alchemist Johann Weisshaupt attempted to "speed up the process" by raising the temperature to 157°C, producing what witnesses described as "an unfortunate smell that lingered for three years" and a batch of charcoal that had once been lavender. The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding hydrosol production in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOUBLE_EXTRACTION_MUSHROOMS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'double_extraction_mushrooms',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Double Extraction Mushrooms',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['hydrosol_production'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_double_extraction_mushrooms' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Double Extraction Mushrooms: A Practical Guide to Sequential Solvent Methodology in Fungal Alchemy</span>
+&nbsp;
+The practice of double extraction represents one of alchemy's more patient achievements*, a methodology developed over centuries of observation that certain fungal constituents stubbornly refuse to dissolve in water alone**. The principle is deceptively simple: first, one extracts the water-soluble compounds—primarily polysaccharides such as beta-glucans—through prolonged simmering or decoction†, and subsequently extracts the alcohol-soluble compounds—triterpenes, sterols, and various other constituents that view water with the disdain usually reserved for distant relatives at weddings††—through maceration in high-proof spirits. This sequential approach acknowledges what the mushrooms themselves have always known: that they are not merely one thing, but a confederation of chemical entities with wildly different social preferences‡.
+&nbsp;
+The practical execution requires both precision and the kind of patience normally associated with watching paint dry, except the paint occasionally talks back‡‡. One begins with dried fungal material—Reishi, Chaga, or Turkey Tail being the traditional candidates***—which is simmered in water for a period ranging from two to twelve hours†††, depending largely on whether one consulted the Breviary of the Subtle Arts or the considerably more enthusiastic writings of the Zealander school‡‡‡. The resulting decoction is strained and reserved****, while the spent fungal material—not actually spent, as it turns out†††††—is then submerged in alcohol of at least 40% strength‡‡‡‡ for a minimum of two weeks*****, though most practitioners find themselves staring at jars for considerably longer******. The two extracts are finally combined, creating a tincture that contains both hydrophilic and lipophilic constituents in harmonious suspension, like an arranged marriage that unexpectedly works out†††††††.
+&nbsp;
+Safety considerations in double extraction are primarily concerned with preventing the alchemist from accidentally creating either a fire hazard or an undrinkable horror‡‡‡‡‡. The alcohol phase must never be heated over open flame*******—a lesson that the citizens of Ankh-Morpork learned spectacularly in 1823********—and the extraction should occur in vessels of glass or stainless steel rather than copper, which imparts a distinctive greenish tinge and the kind of dreams one doesn't discuss at respectable gatherings*********. The final concentration must be carefully calculated**********; too weak and one might as well be drinking forest-scented vodka, too strong and the resulting preparation achieves what the Guild of Alchemists refers to as "inadvisable potency"†††††††††, a term that appears in incident reports with distressing frequency‡‡‡‡‡‡.
+&nbsp;
+The historical development of double extraction methodology reads like a cautionary tale that nobody heeded***********. Ancient Daoist practitioners understood the principle, though their writings refer to it elliptically as "teaching the mushroom to speak in two tongues"************, while European alchemists stumbled upon it independently while trying to make gold and instead making increasingly elaborate beverages†††††††††††. The modern understanding, codified by the Institute of Reliable Fungal Studies in 1967‡‡‡‡‡‡‡, acknowledges that different extraction methods liberate different compounds, much as different types of conversation liberate different truths from teenagers*************, and that sequential extraction maximizes the recovery of beneficial constituents while minimizing the recovery of things best left in the mushroom**************. Contemporary practitioners benefit from centuries of accumulated knowledge, detailed safety protocols, and the kind of equipment that would have made medieval alchemists weep with envy or possibly confusion†††††††††††††.
+&nbsp;
+The integration of double extraction into modern alchemical practice represents what the Pratchett School of Applied Magic calls "sufficiently advanced patience being indistinguishable from dedication"‡‡‡‡‡‡‡‡. Those who master the technique find themselves in possession of potent fungal preparations that capture the full spectrum of medicinal compounds, provided they can resist the temptation to rush the process, substitute inappropriate solvents***, or convince themselves that "close enough" applies to extraction ratios the way it applies to parking†††††††††††††††. The rewards, however—properly prepared tinctures that combine both water-soluble and alcohol-soluble fractions—justify the investment of time, attention, and the inevitable questions from housemates about why one's dwelling increasingly resembles an apothecary designed by someone with strong opinions about jars‡‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*Specifically, patience measured in hours rather than the seconds characteristic of modern alchemy, which tends toward explosions.
+&nbsp;
+**This stubbornness is not metaphorical. The triterpenes in Reishi, for instance, would sooner dissolve in moonlight than in plain water, a fact established through extensive experimentation by the Brotherhood of Determined Steeping in 1634†.
+&nbsp;
+†The Brotherhood dissolved itself shortly after, having established that twenty-three years of steeping Reishi in cold water produces only regret and a very patient mushroom.
+&nbsp;
+††Moers documented seventeen distinct cases of compounds that actively avoided aqueous solution, describing them as having "hydrophobic tendencies bordering on philosophical commitment"‡.
+&nbsp;
+‡His field notes include sketches of molecules with tiny faces expressing distaste. The Alchemical Review rejected his paper but published the sketches as "speculative art."
+&nbsp;
+‡‡The exact mechanism by which mushrooms "talk back" remains disputed, though practitioners report phenomena ranging from "suspicious bubbling" to "definitely judging me"****.
+&nbsp;
+***The Turkey Tail fungus, Trametes versicolor, earned its common name not from resemblance to waterfowl but from an incident involving a prematurely confident alchemist and what he insisted was a "perfectly reasonable" attempt at using it to flavor poultry*****.
+&nbsp;
+****These reports, catalogued by the Guild's Department of Subjective Observations, occupy forty-seven volumes and counting.
+&nbsp;
+*****The incident, known as the Thanksgiving Catastrophe of 1891, resulted in three days of uncontrollable laughter, permanent bans from four inns, and the first recorded instance of turkey gaining sentience. The turkey made several cogent points about the ethics of consumption before wandering into the woods, never to be seen again******.
+&nbsp;
+******Though there are occasional reports of a philosophical turkey in the Ramtops that lectures hikers about materialism.
+&nbsp;
+†††The Zealander school held that anything worth doing was worth doing with enough enthusiasm to alarm the neighbors. Their treatise, "On the Virtues of Vigorous Simmering," resulted in seventeen documented cases of ceilings being redecorated by fungal decoctions.
+&nbsp;
+‡‡‡The Breviary, by contrast, suggests two hours and "a calm temperament," which the Zealanders claimed was code for "insufficient commitment to craft."
+&nbsp;
+****Some alchemists keep this decoction separate for use in soups, though this practice is frowned upon by the Guild of Purists, who believe medicinal preparations and lunch should remain forever estranged.
+&nbsp;
+†††††"Spent" here meaning "has surrendered approximately 47.3% of its useful constituents and is merely pretending to have nothing left to give," according to spectroscopic analysis performed by the University of Empirical Mushroom Studies*******.
+&nbsp;
+*******The University's motto, "We Measure Things Until They Confess," is carved above their laboratory door in letters that allegedly glow during peer review season.
+&nbsp;
+‡‡‡‡40% being the minimum concentration at which alcohol molecules begin to take their solvent duties seriously. Below this threshold, they mostly engage in what chemists call "recreational dissolution"—extracting things haphazardly while making poor decisions about what constitutes "soluble."
+&nbsp;
+*****Two weeks representing the bare minimum before the alcohol and mushroom reach what the ancient texts call "an understanding." Most practitioners find that four to six weeks produces superior results and fewer dreams about being lectured by fungi.
+&nbsp;
+******The record, held by the Monastery of Perpetual Extraction, stands at seven years. The resulting tincture was described as "transcendent," "terrifying," and "definitely conscious," sometimes in the same sentence.
+&nbsp;
+†††††††The Gaiman Manuscript of 1872 describes this as "the marriage of water and fire, mediated by the mushroom as ancient priest," which is poetic but less practical than the Guild's instruction to "shake the bottle gently and hope for the best."
+&nbsp;
+‡‡‡‡‡The term "undrinkable horror" has a specific technical definition in the Codex of Alchemical Disasters`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding double extraction mushrooms in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  COLD_INFUSION_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  HOT_INFUSION_METHODS,</span>
+<span class="cstat-no" title="statement not covered" >  DECOCTION_FOR_ROOTS_BARK,</span>
+<span class="cstat-no" title="statement not covered" >  ALCOHOL_EXTRACTION_TINCTURES,</span>
+<span class="cstat-no" title="statement not covered" >  GLYCERIN_BASED_EXTRACTS,</span>
+<span class="cstat-no" title="statement not covered" >  VINEGAR_HERBAL_EXTRACTION,</span>
+<span class="cstat-no" title="statement not covered" >  OIL_INFUSION_MEDICINAL,</span>
+<span class="cstat-no" title="statement not covered" >  ESSENTIAL_OIL_STEAM_DISTILLATION,</span>
+<span class="cstat-no" title="statement not covered" >  HYDROSOL_PRODUCTION,</span>
+<span class="cstat-no" title="statement not covered" >  DOUBLE_EXTRACTION_MUSHROOMS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

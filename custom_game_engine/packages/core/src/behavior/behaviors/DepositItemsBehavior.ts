@@ -57,9 +57,9 @@ export class DepositItemsBehavior extends BaseBehavior {
   readonly name = 'deposit_items' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const position = entity.getComponent(ComponentType.Position)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
+    const agent = entity.getComponent(ComponentType.Agent)!;
 
     // Disable steering system so it doesn't override our deposit movement
     this.disableSteering(entity);
@@ -97,8 +97,8 @@ export class DepositItemsBehavior extends BaseBehavior {
         .map((result: { entity: Entity }) => result.entity)
         .filter((storage: Entity) => {
           const storageImpl = storage as EntityImpl;
-          const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
-          const inv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+          const building = storageImpl.getComponent(ComponentType.Building);
+          const inv = storageImpl.getComponent(ComponentType.Inventory);
           if (!building || !inv) return false;
           return (
             (building.buildingType === BuildingType.StorageChest ||
@@ -116,7 +116,7 @@ export class DepositItemsBehavior extends BaseBehavior {
 
       validStorage = storageBuildings.filter(storage => {
         const storageImpl = storage as EntityImpl;
-        const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+        const building = storageImpl.getComponent(ComponentType.Building);
         if (!building) return false;
         return (
           (building.buildingType === BuildingType.StorageChest ||
@@ -162,7 +162,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     }
 
     const nearestStorageImpl = nearestStorage.entity as EntityImpl;
-    const storagePos = nearestStorageImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+    const storagePos = nearestStorageImpl.getComponent(ComponentType.Position)!;
 
     // Move toward storage (with arrival slowdown) and check distance
     const distanceToStorage = this.moveToward(entity, storagePos);
@@ -184,8 +184,8 @@ export class DepositItemsBehavior extends BaseBehavior {
 
     for (const storage of storageList) {
       const storageImpl = storage as EntityImpl;
-      const storagePos = storageImpl.getComponent<PositionComponent>(ComponentType.Position)!;
-      const storageInventory = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory)!;
+      const storagePos = storageImpl.getComponent(ComponentType.Position)!;
+      const storageInventory = storageImpl.getComponent(ComponentType.Inventory)!;
 
       // Skip storage we just used (to avoid infinite loop)
       if (lastStorageId && storage.id === lastStorageId) {
@@ -215,7 +215,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     inventory: InventoryComponent,
     agent: AgentComponent
   ): void {
-    const storageInventory = storageEntity.getComponent<InventoryComponent>(ComponentType.Inventory)!;
+    const storageInventory = storageEntity.getComponent(ComponentType.Inventory)!;
     const itemsDeposited: Array<{ itemId: string; amount: number }> = [];
 
     // Create mutable copies of inventories
@@ -311,7 +311,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     agent: AgentComponent
   ): void {
     // Check if remaining items are even depositable
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory)!;
+    const inventory = entity.getComponent(ComponentType.Inventory)!;
     const hasDepositableItems = inventory.slots.some(slot => {
       if (!slot.itemId || slot.quantity === 0) return false;
       return itemRegistry.isStorable(slot.itemId);
@@ -417,8 +417,8 @@ export function depositItemsBehaviorWithContext(ctx: import('../BehaviorContext.
   const validStorage = ctx.getEntitiesInRadius(SEARCH_RADIUS, [ComponentType.Building, ComponentType.Inventory])
     .filter(({ entity: storage }) => {
       const storageImpl = storage as EntityImpl;
-      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const inv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+      const building = storageImpl.getComponent(ComponentType.Building);
+      const inv = storageImpl.getComponent(ComponentType.Inventory);
       if (!building || !inv) return false;
       return (
         (building.buildingType === BuildingType.StorageChest ||
@@ -444,7 +444,7 @@ export function depositItemsBehaviorWithContext(ctx: import('../BehaviorContext.
     if (lastStorageId && storage.id === lastStorageId) continue;
 
     const storageImpl = storage as EntityImpl;
-    const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory)!;
+    const storageInv = storageImpl.getComponent(ComponentType.Inventory)!;
 
     if (storageInv.currentWeight >= storageInv.maxWeight) continue;
 
@@ -471,7 +471,7 @@ export function depositItemsBehaviorWithContext(ctx: import('../BehaviorContext.
   }
 
   const nearestStorageImpl = nearest.entity as EntityImpl;
-  const storagePos = nearestStorageImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+  const storagePos = nearestStorageImpl.getComponent(ComponentType.Position)!;
 
   const distanceToStorage = ctx.moveToward(storagePos);
 

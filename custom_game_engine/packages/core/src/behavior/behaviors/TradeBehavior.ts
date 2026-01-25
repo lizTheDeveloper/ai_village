@@ -50,8 +50,8 @@ export class TradeBehavior extends BaseBehavior {
   readonly name = 'trade' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -101,7 +101,7 @@ export class TradeBehavior extends BaseBehavior {
     world: World,
     state: TradeBehaviorState
   ): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const position = entity.getComponent(ComponentType.Position)!;
 
     // If shopId already specified, validate it and move to next phase
     if (state.shopId) {
@@ -258,7 +258,7 @@ export class TradeBehavior extends BaseBehavior {
     for (const shopEntity of shops) {
       const shopImpl = shopEntity as EntityImpl;
       const shop = shopImpl.getComponent<ShopComponent>(ComponentType.Shop);
-      const shopPos = shopImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const shopPos = shopImpl.getComponent(ComponentType.Position);
 
       if (!shop || !shopPos) continue;
 

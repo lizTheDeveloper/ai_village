@@ -642,7 +642,9 @@ function tryImproveBuilding(
 
   // Normalize widths
   for (let y = 0; y < height; y++) {
-    while (layout[y].length < width) layout[y].push(' ');
+    const row = layout[y];
+    if (!row) continue;
+    while (row.length < width) row.push(' ');
   }
 
   // Strategy 1: Break Sha Qi by adding furniture
@@ -651,8 +653,9 @@ function tryImproveBuilding(
     const entrance = findEntrance(layout);
     if (entrance) {
       const breakPoint = findBreakPoint(layout, entrance);
-      if (breakPoint && layout[breakPoint.y][breakPoint.x] === TILE_SYMBOLS.FLOOR) {
-        layout[breakPoint.y][breakPoint.x] = TILE_SYMBOLS.TABLE;
+      const breakRow = breakPoint ? layout[breakPoint.y] : undefined;
+      if (breakPoint && breakRow && breakRow[breakPoint.x] === TILE_SYMBOLS.FLOOR) {
+        breakRow[breakPoint.x] = TILE_SYMBOLS.TABLE;
         return {
           building: { ...building, layout: layout.map(row => row.join('')) },
           change: `Added table at (${breakPoint.x},${breakPoint.y}) to break Sha Qi`,
@@ -666,9 +669,11 @@ function tryImproveBuilding(
     if (v.furniture === 'Bed') {
       // Try to find a better position for this bed
       const newPos = findCommandingPosition(layout, v.location);
-      if (newPos) {
-        layout[v.location.y][v.location.x] = TILE_SYMBOLS.FLOOR;
-        layout[newPos.y][newPos.x] = TILE_SYMBOLS.BED;
+      const oldRow = layout[v.location.y];
+      const newRow = newPos ? layout[newPos.y] : undefined;
+      if (newPos && oldRow && newRow) {
+        oldRow[v.location.x] = TILE_SYMBOLS.FLOOR;
+        newRow[newPos.x] = TILE_SYMBOLS.BED;
         return {
           building: { ...building, layout: layout.map(row => row.join('')) },
           change: `Moved bed from (${v.location.x},${v.location.y}) to (${newPos.x},${newPos.y}) for commanding position`,
@@ -686,8 +691,9 @@ function tryImproveBuilding(
     const [element] = deficient;
     const symbol = getElementFurniture(element);
     const emptySpot = findEmptySpot(layout);
-    if (emptySpot && symbol) {
-      layout[emptySpot.y][emptySpot.x] = symbol;
+    const emptyRow = emptySpot ? layout[emptySpot.y] : undefined;
+    if (emptySpot && emptyRow && symbol) {
+      emptyRow[emptySpot.x] = symbol;
       return {
         building: { ...building, layout: layout.map(row => row.join('')) },
         change: `Added ${element} element furniture at (${emptySpot.x},${emptySpot.y})`,

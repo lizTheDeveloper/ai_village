@@ -230,20 +230,17 @@ export interface ExecutorDecisionResult {
   source: 'executor' | 'fallback' | 'none';
 }
 
-/**
- * Custom LLM configuration for per-agent LLM settings
- */
-export interface CustomLLMConfig {
-  model?: string;
-  baseUrl?: string;
-  apiKey?: string;
-  customHeaders?: Record<string, string>;
-}
+// Import canonical LLM types
+import type { CustomLLMConfig, LLMDecisionQueue as BaseLLMDecisionQueue } from '../types/LLMTypes.js';
+
+// Re-export CustomLLMConfig
+export type { CustomLLMConfig };
 
 /**
- * Interface for LLM decision queue
+ * Extended LLM decision queue interface for Executor layer
+ * Adds optional llmType parameter for multi-layer support
  */
-export interface LLMDecisionQueue {
+export interface LLMDecisionQueue extends BaseLLMDecisionQueue {
   getDecision(entityId: string, llmType?: 'talker' | 'executor'): string | null;
   requestDecision(entityId: string, prompt: string, customConfig?: CustomLLMConfig, llmType?: 'talker' | 'executor'): Promise<string>;
 }

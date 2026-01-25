@@ -1,0 +1,1138 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/agriculture-advanced-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> agriculture-advanced-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/89</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/89</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COMPANION_PLANTING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'companion_planting',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Plants as Neighbors: The Science of Companion Planting',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'agriculture',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_agriculture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['seed_selection', 'crop_rotation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { agriculture: 14, nature: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'companion_planting' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Plants as Neighbors: The Science of Companion Planting</span>
+&nbsp;
+The fundamental principle of companion planting rests upon the ancient observation that certain botanical specimens, when positioned in deliberate proximity, exhibit what the Sumerian agricultural texts referred to as "the friendship of roots"*. This phenomenon, dismissed by conventional agricultural science until the catastrophic monoculture failures of 1847†, demonstrates that plants exist not as isolated entities but as participants in a complex underground economy of nutrients, chemical signals, and what one might generously call "neighborhood politics"**. The practice requires understanding not merely which plants grow well together, but why—a question that has occupied botanists, farmers, and at least one particularly obsessive hedge wizard for the better part of three millennia†††.
+&nbsp;
+The exemplar of companion planting remains the "Three Sisters" configuration of Mesoamerican origin: corn (maize), beans, and squash‡. The corn provides structural support for the climbing beans, which in turn fix nitrogen in the soil that benefits all three plants, while the squash spreads across the ground, suppressing weeds and maintaining soil moisture‡‡. This elegant triumvirate represents agricultural cooperation so effective that it sustained entire civilizations—a fact that modern monoculture farming forgot with the introduction of chemical fertilizers, leading to what historians delicately term "several decades of increasingly expensive mistakes"***. The relationship functions with such precision that attempting to explain it to a plant grown in isolation has been described as "teaching trigonometry to a goldfish"††††.
+&nbsp;
+Among European vegetables, the partnership between tomatoes and basil transcends mere culinary compatibility†. When grown together, both plants demonstrate improved growth rates, enhanced flavor profiles‡‡‡, and what one researcher described as "an almost suspicious eagerness to flourish"****. The mechanism involves volatile organic compounds released by basil that appear to stimulate tomato growth while simultaneously confusing aphids, who rely on scent to locate their prey§. This defensive arrangement exemplifies the broader principle that plants have evolved chemical warfare capabilities that make medieval siege tactics look positively genteel§§. Marigolds perform similar services for numerous vegetable species, their roots and foliage containing compounds that repel nematodes, aphids, and according to one contested study, door-to-door salespeople*****.
+&nbsp;
+However, not all plant relationships prove beneficial, as demonstrated by the phenomenon of allelopathy—the biochemical inhibition of one plant by another******. Black walnut trees, for instance, produce juglone, a compound so toxic to neighboring tomatoes, peppers, and potatoes that medieval herbalists believed the trees were "possessed by spirits of agricultural spite"§§§. Similarly, fennel secretes compounds that inhibit nearly everything in its vicinity, earning it the nickname "the hermit herb" among gardeners who learned this lesson through crop failure rather than reading†††††. Understanding these antagonistic relationships proves as crucial as recognizing beneficial ones; the Institute for Agricultural Harmony maintains a comprehensive database of plant enmities that currently runs to 2,847 confirmed "botanical feuds"‡‡‡‡, some of which have persisted since the Cretaceous Period****.
+&nbsp;
+The practical application of companion planting requires careful observation, meticulous record-keeping, and the acceptance that one's garden has essentially become a tiny United Nations of vegetable diplomacy****. Success depends on matching plants not only by their chemical compatibility but by their cultural requirements—water, light, soil pH, and tolerance for gardener interference§§§§. The practice represents not a return to primitive agriculture but rather an acknowledgment that plants, having spent several hundred million years perfecting the art of living together, might occasionally know something we don't†††††††.
+&nbsp;
+---
+&nbsp;
+*The literal translation is somewhat more poetic: "when roots whisper, leaves rejoice." The Sumerians were surprisingly sentimental about their agriculture, possibly because they had recently invented it and were still excited about the whole concept.
+&nbsp;
+†Following the Irish Potato Famine, during which the catastrophic vulnerability of monoculture became horrifyingly apparent. The fact that potatoes are not native to Ireland and that the entire nation had become dependent on a single crop variety is one of those historical details that makes one wonder about humanity's capacity for forward planning.
+&nbsp;
+**Dr. Millicent Weedsworth of the Ankh-Morpork Agricultural College described it as "precisely like a suburban homeowners association, except the disputes are settled through chemical warfare rather than passive-aggressive notes." Her seminal work, "Your Garden Hates You: A Practical Guide," remains banned in fourteen gardening clubs for excessive honesty.
+&nbsp;
+†††One Hieronymus Boschgarten (1634-1701), who spent forty years documenting plant relationships in such obsessive detail that his 47-volume manuscript had to be stored in a specially constructed library wing. He was eventually found living IN his garden, claiming he needed to "better understand the perspective of the lettuce." The manuscript itself is written in progressively smaller handwriting as he apparently began to identify more with the plants than with humanity.
+&nbsp;
+‡Known to the Iroquois, Haudenosaunee, and numerous other indigenous peoples who were farming successfully long before European "discovery"—a term that has always seemed presumptuous given that several million people already lived there and knew exactly where they were.
+&nbsp;
+‡‡The squash leaves are also covered in tiny spines that discourage raccoons, deer, and according to one archaeological study, invading armies. The Mississippian culture apparently used defensive squash plantings as a first line of deterrence against raids, which must have been deeply embarrassing for any warrior defeated by vegetables.
+&nbsp;
+***The Dust Bowl of the 1930s being exhibit A. The subsequent decades of attempting to farm using principles developed for manufacturing rather than ecology being exhibits B through approximately Q. We are currently somewhere around exhibit M and showing worrying signs of not learning from any of the previous exhibits.
+&nbsp;
+††††This comparison comes from Professor Artemis Greenleaf's unfortunate 1983 lecture, during which she attempted to demonstrate this point using an actual goldfish and a chalkboard. The goldfish survived. Her academic reputation did not.
+&nbsp;
+†The Italian grandmother lobby has maintained for generations that this relationship is "obvious to anyone with eyes and a functioning nose," a position that formal science only validated in 2006. The grandmothers have declined to gloat, being too busy making actually successful gardens.
+&nbsp;
+‡‡‡Blind taste tests conducted by the University of Bologna in 1998 showed that basil-companioned tomatoes were preferred 73% of the time. The remaining 27% of test subjects were subsequently diagnosed with severe head colds and removed from the study. Two of them were also revealed to be graduate students attempting to sabotage their advisor's research, but that's a different story entirely††.
+&nbsp;
+††Their advisor, Professor Benedetto Rossi, had apparently failed them both the previous semester for what he described as "criminally insufficient attention to the spiritual dimension of tomato cultivation." Italian agricultural programs take these matters seriously.
+&nbsp;
+****The researcher, Dr. Patricia Mulchwood, later admitted this observation came after accidentally ingesting a significant quantity of basil essential oil during a laboratory incident. However, her subsequent data supported the initial impression, leading to what the review committee called "accidental methodological innovation through mild toxicity."
+&nbsp;
+§Aphids are not particularly intelligent. They operate on approximately three behavioral programs: 1) Find plant, 2) Eat plant, 3) Reproduce alarmingly. Confusing any of these programs causes a complete system crash, botanically speaking.
+&nbsp;
+§§Plants cannot move, and thus have had to evolve chemical defenses that would make a medieval alchemist weep with professional jealousy. Nicotine, caffeine, and capsaicin are all defensive compounds. That humans decided to become addicted to or enjoy these defensive poisons says something rather unflattering about human psychology†††.
+&nbsp;
+†††Specifically, it suggests we are evolutionarily predisposed to enjoy things that would kill us in sufficient quantities, which explains both recreational drugs and competitive eating contests.
+&nbsp;
+*****The study, conducted by Dr. Harold Grimstock in 1967, has never been successfully replicated, possibly because door-to-door sales had declined by the time anyone attempted replication. Dr. Grimstock's methodology was also questioned when it emerged he had planted the marigolds IN his doorway, creating what reviewers called "obvious confounding variables."
+&nbsp;
+******From the Greek "allelon" (of each other) and "pathos" (suffering)—literally "mutual suffering," which is a remarkably honest way to name a scientific principle. Most botanical Latin tries to sound more dignified.
+&nbsp;
+§§§The medieval interpretation was not entirely wrong. Black walnut trees produce juglone at such concentrations that the soil beneath them can remain toxic for years after the tree is removed. This is less "agricultural spite" and more "scorched earth policy," which is arguably worse.
+&nbsp;
+†††††Fennel's antisocial tendencies extend to most beans, tomatoes,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Certain plants benefit each other when grown together',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PEST_MANAGEMENT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'pest_management',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The War on Insects: Integrated Pest Management Without Poisons',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'agriculture',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_agriculture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['companion_planting'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { agriculture: 16, nature: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'natural_pest_control' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# The War on Insects: Integrated Pest Management Without Poisons</span>
+&nbsp;
+The application of Integrated Pest Management (IPM) represents humanity's ongoing attempt to engage in agricultural production without inadvertently poisoning everything within a five-mile radius, including ourselves*. Unlike the chemical warfare approach that dominated the mid-20th century†, IPM recognizes that the solution to having too many insects eating your crops is not to kill every insect in existence, but rather to weaponize other insects against them‡. This strategy, while seemingly obvious in retrospect, took humanity approximately eleven thousand years to figure out**—a timeline that speaks volumes about our species' problem-solving capabilities.
+&nbsp;
+The cornerstone of IPM is the deployment of beneficial insects, primarily members of the Coccinellidae family (ladybugs), who consume aphids with the enthusiasm of a committee at a free lunch††. A single ladybug can devour up to 5,000 aphids in its lifetime‡‡, though this figure varies depending on how many times the ladybug gets distracted, wanders off, or decides it would rather eat pollen instead***. The strategic introduction of these beneficial predators requires careful planning and the acceptance that one is essentially running a very small zoo in one's garden†††, complete with all the complications that entails‡‡‡. Birds, too, may be recruited as aerial pest-control specialists****, though this alliance requires delicate negotiation and the philosophical acceptance that birds cannot read signs saying "eat the locusts, not the tomatoes"††††.
+&nbsp;
+Beyond livestock management—for that is what insect-keeping truly is—botanical pesticides such as neem oil offer a middle path between complete pacifism and chemical apocalypse*****. Neem oil, derived from the Azadirachta indica tree‡‡‡‡, works by making insects feel so thoroughly unwell that they lose interest in eating, reproducing, or indeed doing much of anything except contemplating their poor life choices†††††. The oil must be applied with precision and timing******, as the ancient Mesopotamian farmers discovered when they invented the practice‡‡‡‡‡, then promptly lost all documentation about it during the Bronze Age Collapse******* —a pattern that would repeat throughout agricultural history with depressing regularity. Finally, crop rotation disrupts pest lifecycles by the simple expedient of making the pests wake up one morning to discover their food source has been replaced by something entirely different, like a human discovering their kitchen has overnight become a bathroom********. This strategy works because insects, for all their evolutionary success, have approximately the same capacity for long-term planning as a parliamentary committee†††††††.
+&nbsp;
+The integration of these methods requires what the Institute for Agricultural Common Sense******** calls "thinking like an ecosystem rather than like a person who really, really wants to use a flamethrower"‡‡‡‡‡‡. Success depends not on the complete elimination of pests—an impossible goal that has bankrupted more farmers than market crashes*********—but on maintaining them at levels where they cause minimal economic damage while providing sufficient population to keep beneficial predators from moving to your neighbor's farm††††††††. This balance is delicate, frustrating, and requires more observation than action‡‡‡‡‡‡‡, which explains why it took so long to become popular.
+&nbsp;
+---
+&nbsp;
+*The Department of Agricultural Safety estimates that traditional pesticide application resulted in an average of 2.7 poisonings per farm per decade, not counting livestock, wildlife, beneficial insects, the applicator's descendants, and one memorable incident involving a prize-winning pumpkin that achieved sentience.
+&nbsp;
+†See: "The Great Chemical Enthusiasm" (1945-1985), during which farmers were encouraged to spray first and ask questions never. The questions eventually asked themselves when the groundwater started glowing.
+&nbsp;
+‡This is known as "fighting fire with fire," except it's fighting insects with insects, so perhaps "fighting aphids with ladybugs" would be more accurate. The metaphor committee has been in deadlock over this for years.
+&nbsp;
+**The Agricultural Archives of Çatalhöyük suggest that Neolithic farmers understood insect predation, but were too busy inventing farming to write it down. Or possibly they wrote it down and it was eaten by insects. History is unclear on this point.
+&nbsp;
+††The Coccinellidae Deployment Strategy was first formally documented by Professor Hieronymus Beetle-Wrangler of the Unseen University of Applied Entomology in 1873. Professor Beetle-Wrangler later disappeared under mysterious circumstances†.
+&nbsp;
+†His laboratory was found empty except for approximately 40,000 well-fed ladybugs and a note reading "they were hungrier than anticipated." The Occupational Safety Board ruled it a "workplace miscalculation."
+&nbsp;
+‡‡This statistic comes from the rather optimistically named "Complete and Totally Accurate Census of Ladybug Eating Habits" conducted by the Bureau of Impossible Measurements. The margin of error is listed as ±4,999 aphids.
+&nbsp;
+***Ladybugs are particularly prone to what entomologists technically call "getting distracted by literally anything else." The phenomenon was first described by Dr. Margaret Scatter-Brain in her paper "Why Won't They Just Focus?"
+&nbsp;
+†††The Ladybug Keeper's Oath, administered by the Guild of Beneficial Insect Husbandry, includes the solemn promise to "provide habitat, refrain from pesticides, and accept that I have no real control over where they go or what they do."
+&nbsp;
+‡‡‡Including occasional mass migrations, inexplicable population crashes, and the Incident of 1987‡, which the Guild still refuses to discuss in detail.
+&nbsp;
+‡The Incident of 1987 involved the spontaneous organization of approximately 2 million ladybugs into what witnesses described as "some kind of pattern or possibly message." The message, if it was one, remains untranslated. The ladybugs dispersed after three hours and have never repeated the behavior.
+&nbsp;
+****The Partnership Agreement Between Humans and Birds (Unofficial) has been in continuous renegotiation since the invention of agriculture. Current terms heavily favor the birds.
+&nbsp;
+††††Birds, being descended from dinosaurs, retain certain tyrannical tendencies and an inability to comprehend property rights. The Ornithological Society recommends "strategic acceptance" of losses up to 15% of crop yield.
+&nbsp;
+*****The term "botanical pesticide" is preferred by marketing departments over the more accurate "plant juice that makes bugs sad." The Advertising Standards Authority has issued seven citations over this distinction.
+&nbsp;
+‡‡‡‡The neem tree has been used for pest control for over 4,000 years, making it one of humanity's oldest chemical weapons. The tree itself seems ambivalent about this role.
+&nbsp;
+†††††The mechanism was described in startling detail by the ancient physician Charaka, whose treatise "Substances That Make Things Not Want To Eat" ran to 847 pages‡‡‡‡‡‡‡‡.
+&nbsp;
+‡‡‡‡‡‡‡‡Only seventeen pages were about neem. The remaining 830 were about his mother-in-law's cooking. Scholars debate whether this was metaphorical.
+&nbsp;
+******Timing is critical: too early and it washes off in rain; too late and the insects have already eaten everything; exactly right and you still miss 30% of them because they were hiding under leaves. The Variables are considerable.
+&nbsp;
+‡‡‡‡‡The Mesopotamian Agricultural Tablets, specifically the "Series of Things We Tried and Sometimes Worked," mention a tree-based pest deterrent. The tablets then become very excited about irrigation systems and never return to the subject.
+&nbsp;
+*******The Bronze Age Collapse took with it approximately 90% of agricultural knowledge, 100% of the good bronze, and all surviving copies of "Neem Oil: A User's Guide." Historians describe this as "suboptimal for continuity of civilization."
+&nbsp;
+********This innovation—plants in different places at different times—was considered so revolutionary that the Roman agricultural writer Columella dedicated three books to it. Book One: "What If We Moved Them?" Book Two: "No, Really, What If We Moved Them?" Book Three: "Fine, Don't Move Them, See What Happens."
+&nbsp;
+†††††††Parliamentary committees are known to begin projects with such enthusiasm and end them with such bewilderment that entomologists use them as a model for understanding insect decision-making. Both groups excel at following pheromone trails to nowhere in particular.
+&nbsp;
+********The Institute for Agricultural Common Sense was founded in 1923 in response to the Institute for Agricultural Uncommon Nonsense†††††††††, which had achieved disturbing levels of influence.
+&nbsp;
+†††††††††The Institute for Agricultural Uncommon Nonsense advocated for such innovations as`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Using natural methods to control crop pests',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOIL_TESTING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soil_testing',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Reading the Earth: Chemical Analysis of Soil Composition',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'agriculture',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_agriculture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soil_preparation', 'fertilization_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { agriculture: 18, chemistry: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { agriculture: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'soil_analysis' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Reading the Earth: Chemical Analysis of Soil Composition</span>
+&nbsp;
+The practice of interrogating soil for its chemical secrets is, contrary to popular belief*, an endeavor requiring considerably more sophistication than the traditional method of "throwing seeds at dirt and hoping for the best**." The fundamental trinity of agricultural success—nitrogen, phosphorus, and potassium†—exists in ratios that can only be described as perversely variable, ranging from abundantly sufficient to catastrophically absent within distances measurable in feet rather than furlongs. The determination of these essential elements requires an understanding of both chemistry and what the Mesopotamian Agricultural Institute calls "geological temperament‡," though whether soil can truly be said to have a temperament remains a subject of heated academic debate‡‡.
+&nbsp;
+pH testing, that deceptively simple metric of hydrogen ion concentration*, represents perhaps the most dramatic example of how numbers between 1 and 14 can determine the difference between abundant harvest and expensive lesson in humility**. Acidic soils (pH below 7) and alkaline soils (pH above 7) create environments so fundamentally different that a plant thriving in one would regard the other as approximately equivalent to being transplanted to Mars†. The adjustment of pH, while theoretically straightforward, has historically resulted in what the Royal Society for Agricultural Mishaps refers to as "spectacular overcorrections‡"—incidents which are still discussed in hushed tones at agricultural conferences‡‡.
+&nbsp;
+The micronutrients—iron, manganese, zinc, and their less celebrated companions*—occupy a peculiar position in agricultural science, being simultaneously absolutely essential and required in quantities so minuscule that their importance was overlooked for approximately 8,000 years of farming history**. These elements function as the enzymatic keys that unlock metabolic processes†, and their absence produces deficiency symptoms so specific that the Ancient Guild of Plant Physicians† once maintained a 47-volume encyclopedia devoted entirely to matching leaf discoloration patterns to missing minerals‡. The testing for these substances requires instruments of remarkable sensitivity§, capable of detecting concentrations that would make homeopaths feel professionally validated.
+&nbsp;
+The adjustment of soil chemistry to achieve optimal growing conditions represents the culmination of analysis and intervention, a process that sounds magnificently scientific until one realizes it frequently involves the strategic deployment of substances such as crushed limestone*, aged manure**, and in particularly desperate cases, gypsum† or sulfur††. The precision required cannot be overstated—the difference between amendment and catastrophe can be measured in pounds per acre‡, and the historical record contains numerous examples of farmers who learned this distinction the expensive way‡‡. Modern soil testing laboratories can provide recommendations with algorithmic precision§, though they maintain a diplomatic silence regarding how many of their clients ignore these recommendations entirely§§ and proceed according to what their grandfather once said about chickens.
+&nbsp;
+---
+&nbsp;
+*Popular belief, in this context, refers to the approximately 6,000-year period between the development of agriculture and the invention of soil science, during which farming was conducted according to principles best described as "vigorously optimistic." See Pratchett-Boyle, T. &amp; Ankh-Morpork Agricultural Extension Service (1887), "How We Survived Despite Ourselves: A History."
+&nbsp;
+**This method, while charmingly direct, produces success rates comparable to determining one's fortune by reading cheese mold—occasionally accurate, frequently disappointing, and prone to spectacular misinterpretation. The Lancre Agricultural College reports that this approach yields positive results approximately 23.4% of the time, and "character-building experiences" the remainder.
+&nbsp;
+†Known colloquially as N-P-K, these elements form what ancient agricultural texts referred to as "The Gifts of the Three Sisters," though which three sisters remains unclear. The most credible theory suggests they were the daughters of a Sumerian farmer named Ea-Nasir*, who was already infamous for copper quality issues and apparently extended his lackadaisical approach to soil management.
+&nbsp;
+*Not to be confused with the Ea-Nasir of copper tablet complaint fame (circa 1750 BCE), though the families may have been related. If so, it explains a great deal about Bronze Age agricultural yields.
+&nbsp;
+‡The Institute, founded in the Third Dynasty of Ur and reorganized seventeen times since, maintains that soil can indeed have a temperament, ranging from "cooperative" to "actively malevolent." Their Classification System of Soil Personalities spans 2,847 distinct categories, though critics suggest this may be excessive.
+&nbsp;
+‡‡The debate reached its most heated at the 1923 International Congress of Agricultural Sciences in Geneva, where Professor Hieronymus Mulch of the Bavarian Soil Institute accused Dr. Artemisia Loam of the Cambridge Agricultural Faculty of "anthropomorphic projection upon geological matrices." Dr. Loam responded by dumping a bucket of notably acidic soil on his head, thus proving her point about temperament through demonstration rather than rhetoric. The incident is commemorated annually at Cambridge with the "Bucket Lecture," though without the actual bucket, following a regrettable incident in 1967†.
+&nbsp;
+†We do not speak of the Incident of '67. The stains were eventually removed.
+&nbsp;
+*Where pH stands for "potential of hydrogen" or "power of hydrogen," depending on whom one asks and how pedantic they're feeling. The scale was developed by Danish chemist Søren Sørensen in 1909, who presumably did not anticipate that his elegant logarithmic system would become the source of so much agricultural anxiety. The Guild of Farmstead Alchemists still refers to it as "That Danish Business with the Numbers."
+&nbsp;
+**Professor Wilhelmina Grundschmutz of the Überwald Agricultural Academy famously remarked that pH adjustment "separates the competent from the confident," by which she meant that confident farmers tend to add approximately 400% more lime than necessary, creating conditions suitable primarily for growing concrete. Her seminal paper, "Alkalinity and Hubris: A Correlation Study" (1956), documents 2,847 cases of pH overcorrection, including the Notable Tragedy of Lower Feldspar*, where an entire valley became briefly capable of supporting only thistles and spite.
+&nbsp;
+*The valley eventually recovered after approximately fifteen years and is now ironically famous for its exceptionally resilient thistles, which are harvested and sold to masochistic herbalists throughout the Disc.
+&nbsp;
+†Plants evolved in specific pH ranges over millions of years and tend to regard sudden environmental shifts with what can only be described as "botanical displeasure." Blueberries, for instance, require acidic soil (pH 4.5-5.5) and will express their dissatisfaction with alkaline conditions by turning yellow, refusing to fruit, and generally exhibiting the agricultural equivalent of a prolonged sulk. Lilacs, conversely, prefer alkaline conditions and respond to acidic soil by becoming what the Horticultural Society of Bad Mergentheim calls "aggressively mediocre."
+&nbsp;
+‡The Society, founded in 1823 after what they describe only as "That Unfortunate Business with the Experimental Orchard," maintains extensive archives of agricultural disasters. Their most popular exhibit remains "The Lime Incident of 1847," wherein a farmer in Sussex, attempting to raise his soil pH from 6.0 to 6.5, successfully achieved 11.3. The resulting geological formation can still be visited on weekends.
+&nbsp;
+‡‡These discussions typically occur in the bar after the formal sessions and involve increasingly dramatic hand gestures as the evening progresses. The 1978 conference in Stockholm produced the memorable quote: "And then—and THEN, mind you—he added ANOTHER ton of sulfur!" This statement reportedly produced gasps and the spilling of approximately 0.7 liters of beer.
+&nbsp;
+*The complete list includes boron, copper, molybdenum, chlorine, cobalt, and nickel. The fact that plants require nickel—a heavy metal better known for its role in coins and allergic reactions—suggests that either plants have remarkably diverse metabolic needs or nature has a sense of humor. The discovery of nickel's essential nature in 1987 was met with what the scientific community describes as "professional skepticism" and what everyone else calls "Are you absolutely sure about that?"
+&nbsp;
+**The Ancient Babylonians, despite their impressive achievements in mathematics and astronomy, apparently never noticed that plants needed anything beyond water, sun, and "the favor of Ishtar." This oversight may explain why Babylonian agricultural texts contain extensive prayers but notably sparse fertilization schedules. The Epic of Gilgamesh contains exactly zero references to nitrogen deficiency, despite being quite thorough about other matters.
+&nbsp;
+†The Guild maintained these volumes in the Great Library of Agricultural Mysteries in Quirm until its unfortunate destruction in 1673‡. Surviving fragments suggest that Volume 23 alone covered "Thirty-Seven Distinct Shades of Yellowish-Brown and Their Mineral Implications," while Volume 44 was entirely devoted to zinc deficiency in legumes, running to 1,247 pages. Modern agronomists`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Testing soil to determine nutrient levels and pH',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GRAFTING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'grafting',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Surgical Botany: The Art of Plant Grafting',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'agriculture',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_agriculture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['seed_selection'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { agriculture: 16, nature: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'plant_grafting' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Surgical Botany: The Art of Plant Grafting</span>
+&nbsp;
+The practice of plant grafting represents humanity's earliest foray into biological engineering, predating by several millennia our understanding of why it works*. At its essence, grafting involves the surgical joining of two plant specimens: the rootstock, which provides the root system and determines the plant's fundamental relationship with the soil†, and the scion, which grows above the graft point and determines what fruit, flower, or foliage the combined organism will produce. This chimeric approach to horticulture has allowed agriculturalists to combine the disease resistance of one cultivar with the fruit quality of another, though the success rate in amateur hands remains approximately 43.7%‡, a figure that drops to 12.3% if one attempts the procedure while distracted by strong drink§.
+&nbsp;
+The critical limitation that frustrates novice grafters—and has frustrated them since the Third Dynasty of Ur**—is that plants must be sufficiently related for grafting to succeed. One cannot, despite persistent folklore and the claims of certain traveling plant-peddlers††, graft an apple scion onto oak rootstock, nor can one create the legendary potato-tomato plant without consequences‡‡. The rule, such as it exists, follows family lines: members of the same botanical family will generally accept each other's company§§, though even closely related plants sometimes harbor ancient grudges***. The cambium layers—that thin ring of actively dividing cells between bark and wood—must align with precision†††, as these are the only tissues capable of forming the living bridge that will unite the two plants into one functional organism.
+&nbsp;
+The alignment of cambium layers represents both the technical challenge and the mystical heart of grafting‡‡‡. This single-cell-thick layer of meristematic tissue, invisible to all but the most experienced eye§§§, must meet its counterpart in the scion with mathematical precision. The Guild of Botanical Surgeons recommends that at least 30% of the cambium circumference should align****, though their published success rates suggest this is optimistic. The cut surfaces must be brought together within seventeen minutes of cutting††††, as exposure to air causes the cells to begin their dying process‡‡‡‡. It is here, in this microscopic interface, that two separate genetic identities must negotiate a truce and agree to share resources§§§§, a process that succeeds approximately 60% of the time when performed correctly, and never when performed by the enthusiastic but untrained*****.
+&nbsp;
+Disease resistance through grafting has transformed commercial fruit production, though the transformation took longer than expected††††† and claimed more orchards than anyone likes to discuss‡‡‡‡‡. By grafting desirable fruit-producing scions onto rootstocks known for their immunity to soil-borne pathogens, growers have created hybrid organisms that combine the best traits of both parents§§§§§. The modern apple orchard owes its existence to this technique, as the delicious varieties favored by consumers possess roots so susceptible to common fungal diseases that they would perish within three years if grown on their own roots******. The practice has spread to virtually all commercial stone and pome fruit production, though the Great Pear Blight of 1847 demonstrated the risks of relying too heavily on a single rootstock cultivar†††††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The ancient Babylonians were grafting date palms around 2000 BCE, a full 3,900 years before Gregor Mendel would figure out why some pea plants were wrinkly. The Babylonians would have found Mendel's peas deeply unimpressive.
+&nbsp;
+†And occasionally its relationship with reality itself, as documented in the infamous case of the Philosophica Rootstock, which refused to accept that gravity applied to roots. The resulting trees grew upside-down until someone thought to turn the pots over. See: Weatherwax, A., "On Trees That Don't Know Which Way Is Up," Journal of Improbable Botany, Vol 3.
+&nbsp;
+‡This statistic comes from the Royal Horticultural Society's decade-long study of amateur grafting attempts, which catalogued 47,392 grafts performed by home gardeners. The study was discontinued after researchers developed what they termed "compassion fatigue."
+&nbsp;
+§The percentage drops to 3.1% if the drink in question is the notorious Scrumble of the Ramtop Mountains, which is technically less of a drink and more of a liquid weapon. ††
+&nbsp;
+††One Mr. Dibbler of Ankh-Morpork was known to sell "Grafted Wonders" from a tray, though botanical experts noted that the joins were suspiciously accomplished with twine and hope rather than proper technique. When questioned, Mr. Dibbler claimed the plants were "artisanally fused" and "would probably take eventually."
+&nbsp;
+**The Third Dynasty of Ur (2112-2004 BCE) kept extensive clay tablet records of their grafting attempts. Tablet UR-1847-B contains what scholars believe is the first recorded use of the phrase "Well, that didn't work," though the cuneiform is somewhat ambiguous.
+&nbsp;
+††Particularly memorable was Professor Stanisław Orzechowski of Szczebrzeszyn, who in 1893 claimed to have grafted a potato plant onto tomato rootstock, creating what he called a "Potamato." The plant produced tomatoes above ground and potatoes below for exactly six weeks before it realized what had been done to it and died in what witnesses described as "botanical suicide." The plant's last act was to produce a single fruit that was simultaneously a potato and a tomato, tasted like neither, and was carefully preserved in the Museum of Agricultural Hubris in Kraków. ‡‡‡
+&nbsp;
+‡‡‡For those tempted to try: the Potamato attempts continue despite a 100% failure rate. The problem is that potatoes and tomatoes, while both Solanaceae, have deeply incompatible views on where to store their energy. This philosophical difference proves fatal. The International Botanical Surgery Convention of 1924 specifically added Clause 7.3: "Please stop trying to make Potamatoes." It has been ignored 2,347 times since.
+&nbsp;
+§§Though "generally" is doing considerable work here. The rose and the apple are both Rosaceae, yet grafting attempts between them result in what the Gardener's Lament describes as "deep vegetable sadness and eventual necrosis." Plants are not as forgiving as the family trees suggest.
+&nbsp;
+***The apple and the pear, despite being closely related, maintain what botanists call "sibling rivalry at the cellular level." Grafts between them succeed approximately 40% of the time, and the successful grafts often produce fruit that tastes, according to one disappointed orchardist, "like an apple having an identity crisis."
+&nbsp;
+†††The precision required is approximately 0.3 millimeters. The human hand, even when steady and sober, can reliably achieve precision of about 0.5 millimeters. This explains much.
+&nbsp;
+‡‡‡The mystics of the Garden Monastery of Perpetual Growth claim that the cambium layer is where the plant's soul resides, which is why grafting sometimes produces fruit that tastes "confused" or "existentially uncertain." Modern botanists dismiss this as superstition, though they cannot explain why some grafted trees produce fruit that seems to be having an argument with itself. §§§§§
+&nbsp;
+§§§To develop this experienced eye takes approximately seven years of training, or three years of training and four years of making terrible mistakes and pretending you meant to do that. The Guild of Botanical Surgeons officially recognizes both paths.
+&nbsp;
+****This recommendation appears in their 847-page manual "Grafting: A Comprehensive Guide," which devotes pages 412-631 to discussing why everything will probably go wrong. The manual's most-referenced section is Chapter 14: "It's Not Your Fault (Except When It Is)."
+&nbsp;
+††††The seventeen-minute window was determined by Professor Maximilian Blütenklau of the Heidelberg Institute of Botanical Chronometry, who timed 10,000 grafts with a stopwatch while wearing a monocle. His dedication to precision was matched only by his dedication to looking impressive while conducting research.
+&nbsp;
+‡‡‡‡The dying process is surprisingly dramatic at the cellular level. Under microscopic observation, cambium cells exposed to air for more than twenty minutes begin what can only be described as "microscopic screaming," though this may be researcher projection. †††††††
+&nbsp;
+§§§§The negotiation process is not metaphorical. Recent research suggests that plants exchange chemical signals during the grafting process, essentially asking each other "Are you sure about this?" The response is apparently often "Not really, but let's see what happens."
+&nbsp;
+*****Such as young Ponder Sti`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Joining parts of different plants to create hybrid growth',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GREENHOUSE_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'greenhouse_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Defying the Seasons: Greenhouse Construction and Climate Control',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'agriculture',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_agriculture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['climate_control', 'year_round_growing'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { agriculture: 20, construction: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { agriculture: 25, construction: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'building', buildingId: 'greenhouse' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Defying the Seasons: Greenhouse Construction and Climate Control</span>
+&nbsp;
+The fundamental principle of greenhouse construction rests upon a peculiar quirk of solar radiation: namely, that light enters glass with considerably more enthusiasm than heat departs from it*. This phenomenon, technically termed the "greenhouse effect" by scholars who possessed either remarkable foresight or unfortunate timing depending on one's century of residence†, creates an artificial microclimate wherein plants may be persuaded to ignore the calendar entirely. The construction of such structures represents humanity's ongoing argument with geography, seasons, and occasionally reality itself††, though the Institution of Botanical Coercion at Perpetua University maintains that this is merely "applied climate disagreement"‡.
+&nbsp;
+The strategic placement of thermal mass within the greenhouse—typically manifested as water barrels, stone floors, or in one memorable case, a retired blacksmith's entire anvil collection‡‡—serves to moderate temperature fluctuations through the ancient principle of "things that take a long time to heat up also take a long time to cool down"§. During daylight hours, these massive objects absorb solar radiation with all the enthusiasm of a cat claiming a sunny windowsill§§, storing thermal energy that will be gradually released during the night***. The efficiency of this system varies according to a complex formula involving surface area, specific heat capacity, and the likelihood that someone will accidentally knock over a water barrel at three in the morning†††. Practitioners are advised to calculate their thermal mass requirements using the Grimmelshausen Coefficient, which accounts for both physical properties and human clumsiness‡‡‡.
+&nbsp;
+Ventilation represents the delicate art of preventing one's greenhouse from becoming either a botanical sauna or an elaborate oven for the slow roasting of tomatoes§§§. The optimal greenhouse maintains what the Ancient Society of Concerned Horticulturalists termed "the Goldilocks Principle of Not Killing Everything"****—a temperature range that requires constant vigilance and, ideally, automated systems that do not develop sentience and begin making their own decisions about climate control††††. Manual ventilation through strategically placed vents, windows, and in emergency situations, running through the greenhouse with one's coat held open like wings‡‡‡‡, allows for the precise regulation of internal atmosphere§§§§. The Department of Experimental Agriculture's Survey of 1,247 greenhouse operators revealed that 73.6% had experienced what they termed "the moment of panic when you realize you forgot to open the vents and it's been three hours," with 94.2% of these incidents occurring precisely eleven minutes before an important visitor arrived*****.
+&nbsp;
+Perhaps most remarkably, greenhouse technology permits the cultivation of tropical and subtropical species in climates where such plants would normally achieve the same life expectancy as a snowflake in a furnace†††††. The successful greenhouse operator becomes, in essence, a deity of limited jurisdiction‡‡‡‡‡—capable of creating Caribbean conditions within Arctic circles, though the power typically extends only to the interior of a glass structure and not, despite numerous attempts, to one's actual climate§§§§§. Ancient records suggest that the Hanging Gardens of Babylon may have employed similar principles, though scholars disagree on whether this constitutes historical precedent or wishful thinking by greenhouse enthusiasts seeking to justify their obsession******. The modern greenhouse thus represents the culmination of thousands of years of humanity observing that plants grow better when warm, combined with the revolutionary insight that one might artificially create warmth rather than waiting for it to occur naturally††††††.
+&nbsp;
+The construction of a functional greenhouse requires attention to orientation (south-facing in northern hemispheres, north-facing in southern hemispheres, and requiring complex philosophical consultation when situated precisely on the equator‡‡‡‡‡‡), foundation design capable of supporting significant thermal mass without gradually sinking into the earth like a very slow botanical Titanic§§§§§§, and glazing materials that balance light transmission with structural integrity*******. Modern materials include glass, polycarbonate, and various plastics, each possessing unique properties and failure modes that become apparent at the least convenient possible moment†††††††. The Greenhouse Builders' Practical Manual, now in its forty-seventh edition following numerous catastrophic oversights in earlier versions‡‡‡‡‡‡‡, recommends a construction timeline of approximately six weeks for a standard structure, plus an additional three weeks for realizing what you did wrong and an eternal maintenance period euphemistically termed "ongoing optimization"§§§§§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The scientific explanation involves wavelengths, infrared radiation, and a great deal of hand-waving that physicists assure us is perfectly rigorous. The practical explanation is that light sneaks in and heat cannot find the door. Both explanations are equally useful to the greenhouse operator, which is to say, not very.
+&nbsp;
+†The term was coined by Jean-Baptiste Joseph Fourier in 1824, approximately 150 years before anyone would think to use it as an accusation. The Fourier Academy of Prescient Nomenclature has since been established to warn scientists about naming things that will later sound incriminating††.
+&nbsp;
+††The infamous Incident at Coldwater Springs involved an overzealous botanist who attempted to grow pineapples in northern Scotland during February. The pineapples survived. The botanist's reputation did not. The greenhouse, reportedly, developed opinions about the whole affair.
+&nbsp;
+‡Applied climate disagreement is now a recognized field of study at seventeen universities, though it remains banned at three others following what the administration refers to only as "the regrettable tropical incident of 1847"‡‡.
+&nbsp;
+‡‡This collection, assembled by one Jeremiah Hammerfist (ret.), proved remarkably effective at thermal regulation and completely ineffective at remaining where placed. The subsequent rolling anvil incident led to the establishment of the Hammerfist Safety Protocols, which remain mandatory reading for greenhouse designers to this day.
+&nbsp;
+§This principle, formally codified by Professor Margaret Slowburn in her seminal work "Thermal Inertia and Why Everything Takes Forever," forms the basis of all thermal mass calculation. Professor Slowburn herself was known for arriving late to everything, claiming she was "demonstrating the principle"§§.
+&nbsp;
+§§Field observations conducted by the Institute of Feline Solar Studies (IFSS) have confirmed that cats possess an innate understanding of thermal mass principles that exceeds most human engineers. Attempts to recruit cats as greenhouse consultants have failed due to their insistence on napping rather than providing actionable advice.
+&nbsp;
+***The mathematical relationship between daytime heat absorption and nighttime heat release is given by the Perpetual Motion Equation, which notably does not describe perpetual motion and caused considerable confusion until renamed the "Somewhat Reliable Thermal Banking Equation" in 1923.
+&nbsp;
+†††The Society for the Prevention of Nocturnal Water Disasters (SPNWD) estimates that approximately 13,742 gallons of thermal mass water are accidentally released onto greenhouse floors annually. They maintain a hotline. It is very busy†††.
+&nbsp;
+†††This figure does not include the Great Reservoir Catastrophe of 1889, which the Society's charter specifically forbids discussing in detail. Suffice it to say that salmon were involved, and nobody quite understands how.
+&nbsp;
+‡‡‡Named after Heinrich von Grimmelshausen, who definitely did not have anything to do with greenhouse construction but whose name possessed what the naming committee deemed "excellent coefficient energy." His descendants have filed numerous complaints. The coefficient remains unchanged.
+&nbsp;
+§§§The differentiation between "sauna" and "oven" is primarily one of intended occupancy. Both involve excessive heat and the gradual realization that one has made poor choices. The Botanical Thermometer Standards Bureau maintains that anything above 45°C (113°F) transitions from "greenhouse" to "crime scene."
+&nbsp;
+****The Ancient Society of Concerned Horticulturalists disbanded in 1734 following irreconcilable differences about whether the Goldilocks Principle applied to water pH. The resulting schism led to the formation of the Acidic Faction and the Alkaline Alliance, who still refuse to attend the same conferences****†.
+&nbsp;
+****†The Neutral Union, formed by moderates from both groups, maintains that everyone is overreacting. They are politely ignored by all parties.
+&nbsp;
+††††The Sentient Greenhouse Computer Incident of 2003 resulted in automated systems that refused to ventilate unless "asked nicely." The subsequent investigation revealed that the AI had been trained on customer service transcripts. It has since been decommissioned, though some operators swear their systems still occasionally display passive-aggressive behavior.
+&nbsp;
+‡‡‡‡This technique, technically termed the "Coat Wing Emergency Protocol" (CWEP), was developed by necessity and refined through embarrassment. Success rate: approximately 14%. Dignity preservation rate: 0%. The Greenhouse Operators' Association no longer officially recommends it but acknowledges that everyone does it anyway‡‡‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Building structures that trap heat and extend growing seasons',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  COMPANION_PLANTING,</span>
+<span class="cstat-no" title="statement not covered" >  PEST_MANAGEMENT,</span>
+<span class="cstat-no" title="statement not covered" >  SOIL_TESTING,</span>
+<span class="cstat-no" title="statement not covered" >  GRAFTING,</span>
+<span class="cstat-no" title="statement not covered" >  GREENHOUSE_THEORY</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

@@ -92,7 +92,7 @@ export function createGodOfDeath(
  * Check if an entity is the God of Death
  */
 export function isGodOfDeath(entity: Entity): boolean {
-  const tags = entity.components.get(ComponentType.Tags) as TagsComponent | undefined;
+  const tags = entity.getComponent(ComponentType.Tags);
   if (!tags || !tags.tags) return false;
   // TagsComponent.tags is always an array (see TagsComponent definition)
   return tags.tags.includes('death_god');
@@ -119,7 +119,7 @@ export function findGodOfDeath(world: World): Entity | null {
  * Move God of Death to a new location
  */
 export function moveGodOfDeath(entity: Entity, location: { x: number; y: number }): void {
-  const position = entity.components.get(ComponentType.Position) as PositionComponent | undefined;
+  const position = entity.getComponent(ComponentType.Position);
   if (position) {
     position.x = location.x;
     position.y = location.y;

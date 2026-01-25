@@ -8,7 +8,10 @@
 
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
-export type { CustomLLMConfig } from '../components/AgentComponent.js';
+import type { CustomLLMConfig } from '../components/AgentComponent.js';
+
+// Re-export CustomLLMConfig for external consumers
+export type { CustomLLMConfig };
 
 /**
  * Decision layer type - determines which LLM behavior layer handles the decision

@@ -628,6 +628,12 @@ export interface WorldMutator extends World {
   /** Set feature flag */
   setFeature(feature: string, enabled: boolean): void;
 
+  /**
+   * Set divine configuration for this universe.
+   * Controls how divine powers, belief economy, avatars, angels, etc. work.
+   */
+  setDivineConfig(config: Partial<UniverseDivineConfig>): void;
+
   // ===========================================================================
   // Planet Mutation
   // ===========================================================================
@@ -846,7 +852,7 @@ interface TestEntity extends Entity {
  * World implementation - ECS world with entity management and queries.
  * Also includes convenience test helper methods for component creation.
  */
-export class World implements WorldMutator {
+export class WorldImpl implements WorldMutator {
   private _tick: Tick = 0;
   private _gameTime: GameTime;
   private _entities = new Map<EntityId, Entity>();
@@ -1852,16 +1858,17 @@ export class World implements WorldMutator {
 
     // Add building component with progress=0 (under construction)
     const buildingComponent = createBuildingComponent(buildingType as BuildingType, 1, 0);
-    (entity as EntityImpl).addComponent(buildingComponent);
+    const entityImpl = entity as EntityImpl;
+    entityImpl.addComponent(buildingComponent);
 
     // Add position component using the helper function
     const positionComponent = createPositionComponent(position.x, position.y);
-    (entity as EntityImpl).addComponent(positionComponent);
+    entityImpl.addComponent(positionComponent);
 
     // Add renderable component so the building is visible
     // Uses buildingType as spriteId (e.g., 'workbench', 'storage-chest')
     const renderableComponent = createRenderableComponent(buildingType, 'building');
-    (entity as EntityImpl).addComponent(renderableComponent);
+    entityImpl.addComponent(renderableComponent);
 
     // Emit construction started event
     this._eventBus.emit({
@@ -1879,6 +1886,3 @@ export class World implements WorldMutator {
     return entity;
   }
 }
-
-// Note: WorldImpl is now the primary class name (World)
-// The old separate World test helper has been merged into this class

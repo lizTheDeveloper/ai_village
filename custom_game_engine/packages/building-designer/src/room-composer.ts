@@ -109,6 +109,7 @@ export function composeFromRooms(spec: BuildingSpec): VoxelBuildingDefinition {
   let xOffset = 0;
   for (let i = 0; i < placedRooms.length; i++) {
     const room = placedRooms[i];
+    if (!room) continue;
     drawRoom(layout, room, xOffset);
 
     // Add door to next room if not last
@@ -181,8 +182,9 @@ function createEmptyLayout(width: number, height: number): string[][] {
  * Set a tile in the layout
  */
 function setTile(layout: string[][], x: number, y: number, tile: string): void {
-  if (y >= 0 && y < layout.length && x >= 0 && x < layout[y].length) {
-    layout[y][x] = tile;
+  const row = layout[y];
+  if (y >= 0 && y < layout.length && row && x >= 0 && x < row.length) {
+    row[x] = tile;
   }
 }
 

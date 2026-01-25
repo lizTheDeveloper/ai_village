@@ -24,7 +24,7 @@ export {
 } from './SystemContext.js';
 
 // Re-export World class and types explicitly
-export { World } from './World.js';
-export type { WorldMutator, ITile, TerrainType, IPlanet } from './World.js';
+export { WorldImpl } from './World.js';
+export type { World, WorldMutator, ITile, TerrainType, IPlanet } from './World.js';
 export type { Entity } from './Entity.js';
 export type { Component } from './Component.js';

@@ -41,9 +41,9 @@ export class WanderBehavior extends BaseBehavior {
   readonly name = 'wander' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const movement = entity.getComponent(ComponentType.Movement);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
 
     // Per CLAUDE.md: No silent fallbacks - crash on missing required components
     if (!movement) {

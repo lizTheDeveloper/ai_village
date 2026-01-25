@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:39cf4e09",
+  "name": "Miranda III",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769242468559",
+  "createdAt": 1769242468590,
+  "lastAccessedAt": 1769242468590,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769242468559",
+    "type": "magical"
+  }
+}

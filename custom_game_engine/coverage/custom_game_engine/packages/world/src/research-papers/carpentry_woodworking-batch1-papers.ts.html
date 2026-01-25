@@ -1,0 +1,2035 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/carpentry_woodworking-batch1-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> carpentry_woodworking-batch1-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SAW_TYPES_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'saw_types_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Saw Types Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 1,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_saw_types_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Saw Types Techniques: A Foundational Discourse on the Separation of Materials Through Toothed Implements</span>
+&nbsp;
+The humble saw, that most ancient of tools, represents humanity's eternal struggle against the fundamental property of matter: that it prefers to remain in one piece*. At its core, a saw consists of a blade with teeth—small, angry pieces of metal arranged in a row like a very specific kind of comb—designed to remove material through repeated reciprocal or rotary motion**. The basic principle is deceptively simple: push and pull (or spin) a serrated edge through material, creating a kerf*** that gradually widens until the material is divided. However, as with most things that appear simple, the actual practice of sawing has spawned approximately 247 distinct saw types†, each optimized for specific materials, cut directions, and levels of user frustration.
+&nbsp;
+The practical applications of saw types techniques divide roughly into three categories: hand saws, powered saws, and saws that technically work but should probably not exist††. Hand saws include the venerable crosscut saw (for cutting across wood grain), the rip saw (for cutting with the grain)‡, the coping saw (for curves and making woodworkers feel artistic), and the hacksaw (for metal, and occasionally for escaping prison in films made before 1975)‡‡. Each saw type employs different tooth geometries—a crosscut saw has teeth shaped like tiny knives, while a rip saw has teeth shaped like tiny chisels, and trying to use one type for the other's purpose results in what the Guild of Sawyers calls "an educational experience"‡‡‡. Powered saws, meanwhile, include circular saws, jigsaws, reciprocating saws, and the table saw, which is simultaneously the most useful and most feared tool in any workshop§.
+&nbsp;
+The proper technique for each saw type involves understanding the relationship between the user, the tool, and the material—a trinity that the ancient Mesopotamian god of carpentry, Ziusudra the Level, reportedly described as "mostly about not cutting yourself"§§. For hand saws, technique begins with proper grip: firm but not desperate, confident but not cocky§§§. The cutting motion should be smooth and rhythmic, using the full length of the blade, at an angle appropriate to the saw type*. For powered saws, technique primarily involves keeping all body parts outside the "circle of regret"** that surrounds the blade, maintaining proper blade speed for the material, and never, under any circumstances, removing the safety guard because "it's in the way"***.
+&nbsp;
+Safety considerations in saw usage cannot be overstated, despite humanity's 12,000-year track record of consistently understating them†. The first rule, as established by the Pratchettian Guild of Digits Preservation, is simple: keep your fingers away from the pointy bits††. The second rule involves appropriate eye protection, as sawdust has an inexplicable tendency to seek out unprotected corneas with what researchers at the Institute for Unnecessary Physics have calculated as 87.3% accuracy‡‡. Hearing protection becomes essential with powered saws, which operate at volumes that the ancient Norse actually worshipped as minor thunder gods‡‡‡. Modern best practices also include maintaining sharp blades§, proper lighting, securing workpieces, and maintaining what safety instructor Glenda Smitherson calls "a healthy respect for the machine's utter indifference to your continued wholeness"§§.
+&nbsp;
+The historical development of sawing technology traces back to the Late Bronze Age, when someone—probably while attempting to use a knife—realized that multiple small cuts worked better than one big one§§§. Early Egyptian saws cut on the pull stroke, which modern ergonomics has vindicated as actually more efficient, though try telling that to several millennia of European sawyers who insisted on push-cutting. The Romans developed the frame saw around 250 BCE, supposedly after the legendary craftsman Marcus Serratus* invented it specifically to cut stone for an aqueduct, then promptly used it to divide his business partner's desk in half during a disagreement about profit sharing**. The Industrial Revolution brought powered saws, which reduced cutting time by approximately 94.7% while increasing accident rates by what contemporary medical journals delicately termed "a concerning proportion"***. Today's understanding incorporates metallurgy, physics, ergonomics, and a healthy dose of institutional memory about why certain discontinued saw types are discontinued†††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The universe, it should be noted, has strong opinions about things remaining together. Breaking these opinions requires energy, determination, and occasionally a larger saw.
+&nbsp;
+\** This motion creates heat through friction, which is why sawdust sometimes smokes. The 14th-century Alchemists' Guild believed this smoke contained the "soul of the wood" and spent three years attempting to collect enough of it to resurrect a tree. They got splinters and mild respiratory issues instead.
+&nbsp;
+\*** The kerf—the width of material removed by the saw blade—is among woodworking's most philosophical concepts. It represents material that is no longer part of either piece, having been transformed into sawdust. Ancient Greek philosophers debated whether the kerf was "nothing" or "very small somethings," a debate that continues at woodworking forums today, usually around 2 AM†.
+&nbsp;
+† This number, compiled by the International Registry of Bladed Implements, includes several saws whose sole purpose appears to be decorative or intimidating. The Registry's curator notes that at least forty of these were invented specifically to win bar bets.
+&nbsp;
+†† This category includes the chainsaw bicycle (invented 1876, discontinued 1876, banned 1877), the automatic meat saw with no off switch (five recorded), and whatever the Victorians meant by "gentleman's walking saw"††.
+&nbsp;
+†† Contemporary fashion journals from 1873-1881 suggest it was either a folding pruning saw concealed in a walking stick or something much more sinister that polite society declined to document. The Smithsonian has one in storage but refuses to comment‡.
+&nbsp;
+‡ The official Smithsonian statement reads: "We acknowledge its existence. That is all." This is the same statement they use for the collection's other concerning items, including the self-winding garrote and Benjamin Franklin's "special" kite.
+&nbsp;
+‡‡ The hacksaw was indeed a popular choice for prison escapes before modern security measures. The Guild of Prison Architects' 1974 report noted, with some embarrassment, that 23% of their bar specifications failed to account for "sustained sawing by motivated individuals with nothing but time." Modern bars are now saw-resistant, though sufficiently motivated individuals have switched to other methods‡‡.
+&nbsp;
+‡‡ The current record for creative prison workshop tool misuse is held by HMP Wandsworth, 1989, involving a lathe, seventeen weeks, and what investigators described as "impressive dedication to a fundamentally flawed plan." No further details are available due to security concerns and profound secondhand embarrassment.
+&nbsp;
+‡‡‡ Master carpenter Horace Pennyfarthing's 1923 treatise "On the Matter of Wrong Saws for Wrong Jobs" documents 157 ways to make improper saw selection regrettable. Chapter 4, "When Rip Becomes Tear," includes photographs that caused three printers to refuse the job.
+&nbsp;
+§ Table saw accidents account for approximately 67.3% of all workshop digit losses in industrial nations, according to the Bureau of Regrettable Statistics. The remaining 32.7% are distributed among routers (14.2%), jointers (9.8%), and "what the victim described as 'seemed like a good idea at the time'" (8.7%). The Bureau notes that these statistics may be skewed by victims' reluctance to admit exactly what they were doing§.
+&nbsp;
+§ One memorable case involved an attempt to cut frozen pizza with a table saw "because the kitchen knife was dirty." The individual survived with all digits intact, though their dignity did not.
+&nbsp;
+§§ Ziusudra the Level appears in no authenticated religious texts but is extensively documented in Mesopotamian carpentry guild records. His temple in Ur apparently featured a perfectly level floor that remained precisely level for 800 years, which archaeologists attribute to "very good foundation work" rather than divine intervention. The priests claimed both.
+&nbsp;
+§§§ The Grip Spectrum, as defined by the Sawyers' Guild, ranges from "nervous butterfly" (ineffective) through "confident handshake" (optimal) to "death grip" (causes fatigue and dimensional instability in the space-time continuum surrounding the saw)§§§.
+&nbsp;
+§§§ This last effect has never been scientifically documented, but experienced woodworkers swear it happens, noting that measurements become increasingly incorrect proportional to grip tension and deadline proximity.
+&nbsp;
+* The proper angle varies by saw type: crosscut saws perform best at 45 degrees to the surface, rip`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding saw types techniques in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HAND_PLANE_MASTERY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'hand_plane_mastery',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Hand Plane Mastery',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['saw_types_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_hand_plane_mastery' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Hand Plane Mastery: A Comprehensive Study of Controlled Wood Removal Through Manual Implementation of Blade-Based Surface Reduction Methodologies</span>
+&nbsp;
+The hand plane represents one of humanity's most elegant solutions to the fundamental problem of "this wood is the wrong shape."* The device operates on principles so simple they appear almost mystical: a sharp blade, held at a precise angle, removes controlled shavings from a wooden surface, transforming rough lumber into smooth, dimensionally accurate components.** The process requires an understanding of wood grain direction†, blade sharpness††, and the peculiar physics of why sometimes the plane glides like butter and sometimes it chatters like it's personally offended by your life choices.†††
+&nbsp;
+The fundamental technique involves positioning the plane iron at approximately 45 degrees to the work surface‡, applying downward pressure at the beginning of the stroke, maintaining even pressure through the middle, and lifting slightly at the end.‡‡ This prevents the common beginner's error of creating boards that resemble potato chips in cross-section—thicker at the ends, thinner in the middle.‡‡‡ Proper stance is critical: feet shoulder-width apart, body weight shifting with the stroke, like a very slow, very precise martial art developed by people who really care about drawer fronts.§ The experienced craftsperson reads the wood grain as one might read a map,§§ following the natural lie of the fibers to prevent tearout, that devastating condition where the blade catches and rips chunks from the surface rather than producing the desired gossamer-thin shavings.§§§
+&nbsp;
+Safety considerations with hand planes are subtly different from power tools, operating on what the Worshipful Company of Artisanal Bladeworkers calls "the principle of cumulative carelessness."* They cannot remove a finger in an instant,** but they can certainly establish an intimate and unwanted relationship with your thumb over the course of an afternoon.*** The blade must be kept sharp—a dull plane requires excessive force, leading to slips, whereas a properly sharp plane cuts with minimal pressure and produces shavings thin enough to read through.†† According to the Guild's statistics, approximately 47.3% of hand plane injuries occur while adjusting the blade depth,††† with another 31.8% occurring when testing sharpness with one's thumb in what experts term "the ancient and inadvisable tactile method."‡‡
+&nbsp;
+The historical development of hand planes spans millennia, from Roman smoothing planes§ to the golden age of Stanley Bailey planes in the late 19th century,§§ to the current renaissance of hand tool woodworking among those who find power tools insufficiently contemplative.§§§ The Japanese tradition developed entirely separate plane designs that pull rather than push,* cutting on what Western craftspeople initially viewed as the "wrong" direction until they tried them and experienced revelations about the nature of grain and edge retention.** Modern understanding synthesizes these traditions, recognizing that the perfect plane setup involves variables so numerous and interdependent that achieving it feels less like woodworking and more like negotiating with a particularly temperamental deity of flatness.***
+&nbsp;
+Mastery comes not from knowing the mechanics—any competent text can explain those†—but from developing what the ancient practitioners called "listening hands,"†† the ability to feel through the tool what the wood wants to tell you about its grain, its moisture content, its readiness to yield or resist.††† This sensory feedback loop, operating beneath conscious thought, separates the journeyman who makes flat boards from the master who makes boards that are somehow more perfectly themselves than they were before.‡‡‡
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* In the beginning, there was wood, and it was bumpy. Then someone invented the plane, and there was much rejoicing, followed almost immediately by much cursing when they realized the plane needed sharpening. The cycle continues.
+&nbsp;
+\** The hand plane was actually invented three separate times in human history. Twice by people trying to solve the "bumpy wood" problem, and once by someone who was actually trying to invent a very complicated cheese slicer. This is documented in the Archives of the Museum of Unintentional Innovation in Basel.
+&nbsp;
+† Wood grain direction is visible if you look carefully, invisible if you don't, and becomes painfully obvious the instant you plane against it. The wood will inform you of your error through the medium of catastrophic tearout and what skilled practitioners call "making the board worse than when you started."
+&nbsp;
+†† The Society for Metaphysical Sharpness maintains that a truly sharp blade exists in a quantum state of both "sharp enough" and "could be sharper" until observed by running your thumb along the edge, at which point it collapses into "definitely sharp enough" and "you are bleeding."
+&nbsp;
+††† The peculiar chattering phenomenon occurs when seventeen different variables align incorrectly. The Guild of Plane Adjustment lists these as: blade depth, blade lateral alignment, chipbreaker position, plane sole flatness, blade sharpness, wood hardness, grain direction, moisture content, atmospheric pressure, lunar phase, and seven others that remain classified.
+&nbsp;
+‡ This 45-degree angle is called the "common angle" because approximately 45% of woodworkers use it, 45% use something slightly different, and 10% have descended into the rabbit hole of "micro-bevel optimization" and may never return to normal conversation. The International Congress of Bevel Angles (held annually in Vermont) remains divided on this issue.
+&nbsp;
+‡‡ This technique was first codified by Master Planer Hieronymous Flatwood in 1687, though his original manuscript was written entirely in wood shavings pressed between pages, making it extremely difficult to preserve and absolutely impossible to read in dry climates.
+&nbsp;
+‡‡‡ The potato chip profile, technically termed "dubbing" in professional literature, has ruined more drawer fronts than all other errors combined. The Guild maintains a Hall of Shame containing 3,847 examples, though they stopped accepting new submissions in 1994 when they ran out of wall space. They now maintain a digital archive that receives approximately 140 submissions monthly.
+&nbsp;
+§ This martial art, called "Plane-Fu" by exactly nobody except one enthusiastic instructor in Portland, requires perfect balance and breathing synchronized with each stroke. Students who achieve the highest levels report experiences of transcendent oneness with their workbench, though this may be correlation rather than causation with spending 40+ hours weekly in a workshop.
+&nbsp;
+§§ Maps are easier to read. Maps do not actively resist being read. Maps do not, for instance, suddenly reveal hidden grain directions that cause catastrophic tearout halfway through a piece you've invested six hours in preparing. Wood does this regularly, suggesting either malice or a sense of humor, and wood cannot possibly have either. Probably.
+&nbsp;
+§§§ Tearout is the woodworker's nemesis, the ultimate insult from the material. It occurs when the blade catches grain fibers and rips them out by the roots, creating a surface that looks like it has been attacked by very small but angry beavers. The Institute for the Study of Wood-Based Disappointments estimates that tearout accounts for 73% of workshop cursing and 82% of boards thrown in rage-quit incidents.
+&nbsp;
+\* The Worshipful Company of Artisanal Bladeworkers, founded in 1432, was originally chartered to regulate sword-making but underwent significant mission drift during peacetime. They now primarily concern themselves with hand plane blade geometry and maintain the world's only museum dedicated entirely to cutting bevels. Admission is free, but visitors report it takes "a really specific kind of person" to enjoy it.
+&nbsp;
+\*\* Though it could, theoretically, if you really committed to the error. The Company maintains records of only seven instances where someone managed to remove a significant digit with a hand plane, and all seven involved combinations of circumstances so improbable that they now form the basis of cautionary tales told to apprentices. One involved a ladder, a bucket, and what the official report termed "spectacularly poor judgment about workplace footwear."
+&nbsp;
+\*\*\* The thumb-plane relationship typically develops slowly, featuring shallow cuts that accumulate over weeks. The Company's medical liaison, Dr. Heinrich Bandage-Finger, notes that "the hand plane teaches through persistent minor corrections rather than dramatic demonstrations." He advocates treating your hands better but acknowledges that every woodworker must personally learn why "sharp blade" and "casual contact" are incompatible concepts.
+&nbsp;
+†† The ideal shaving thickness is approximately 0.001 inches, or roughly 1/25th of a millimeter, which is to say "very thin indeed." Craftspeople who achieve consistent shavings at this thickness can read through them like reading through tissue paper, though what they're reading is usually just the wood grain on the other side, which is admittedly less entertaining than a novel but more relevant to the task at hand.
+&nbsp;
+††† Blade adjustment injuries spike notably on Sunday afternoons, suggesting correlation with weekend enthusiasm exceeding weekend attention span. The Guild's safety`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding hand plane mastery in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CHISEL_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'chisel_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Chisel Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['hand_plane_mastery'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_chisel_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Chisel Techniques: A Comprehensive Study of Controlled Material Removal in Construction Contexts</span>
+&nbsp;
+The chisel, that most ancient and democratic of tools*, represents humanity's eternal desire to remove bits of things that shouldn't be there†. Unlike the hand plane, which operates through the principle of continuous removal—what the old masters called "the philosophy of persistent subtraction"‡—the chisel works through discrete, intentional acts of violence against matter**. This fundamental difference in approach has led scholars at the Institute of Applied Percussive Arts to observe that plane work is meditation, while chisel work is conversation: you ask the wood a question with each strike, and it answers with either compliance or the sound of splitting††.
+&nbsp;
+The basic technique involves holding the chisel with one hand while encouraging it forward with either a mallet or the heel of one's other hand***, though the Guild of Reconstructive Surgeons has documented 847 variations on this theme‡‡, most of them discovered accidentally and none of them recommended††† . The angle of approach determines everything: too steep and you're excavating†, too shallow and you're merely polishing with extra steps‡‡‡. Master craftsman Hgharnak the Twelve-Fingered§ famously noted that "the chisel knows three truths: the grain, the angle, and the difference between wood and finger§§," though he learned these truths in reverse order§§§. Modern practitioners should aim for what the ancient texts call "the cut of whispers"**** —removing material so precisely that nearby wood doesn't realize anything has happened until it's too late.
+&nbsp;
+Historical records from the Temple of Exact Carpentry reveal that chisel work was once considered a form of augury††††, with priests interpreting the quality of chips to predict harvest yields‡‡‡‡. While modern practitioners focus on more mundane applications—joinery, mortising, paring, and the creation of decorative elements that clients will paint over—the fundamental principles remain unchanged since the Bronze Age§§§§. The key insight, preserved in the Tablets of Reasonable Force*****, is that the chisel should do the work, not the wielder†††††; excessive force suggests either a dull tool, improper technique, or what the ancients called "the fury of ambitious ignorance."‡‡‡‡‡
+&nbsp;
+Safety considerations deserve particular emphasis, given that the Department of Workshop Mishaps processes approximately 3,247 chisel-related incident reports annually******,  a number that would be higher if embarrassment weren't such a powerful reporting deterrent. The chisel must be sharp enough to cut wood but not so sharp that it develops its own opinions about what to cut††††††. Always chisel away from yourself‡‡‡‡‡‡, secure your workpiece§§§§§, and remember the cautionary tale of Apprentice Hendrick, who believed that "faster is better" until he discovered that "faster is different"*******.  The Guild maintains that proper chisel technique should be boring to watch†††††††—if observers find it exciting, someone is probably about to need stitches‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The chisel's invention is attributed to the first person who looked at a rock and thought, "I could make this sharper and then use it to make other rocks less rock-like," demonstrating the kind of abstract thinking that separates humans from animals who are generally content with rocks as they are.
+&nbsp;
+†This desire manifests differently across cultures. The Überwald School of Excessive Carpentry teaches that every piece of wood contains a perfect form, plus several hundred imperfect forms that got there first and need evicting.
+&nbsp;
+‡Attributed to Master Planer Sigismund the Smooth, who spent forty years perfecting a single table leg before being gently led away to a comfortable retirement home where all the furniture was pre-smoothed.
+&nbsp;
+**The Society for the Prevention of Cruelty to Timber objects to this characterization, arguing that wood "had it coming" by virtue of containing knots, being oddly shaped, or "just sitting there like that."
+&nbsp;
+††This observation appears in their quarterly journal, *Percussive Insights*, alongside articles with titles like "Counting Fingers: A Longitudinal Study" and "When to Stop Hitting: A Framework."
+&nbsp;
+†††The Guild's motto, "Learn from our members' mistakes so you can make interesting new ones," reflects a pragmatic approach to safety education.
+&nbsp;
+‡‡Including the "behind-the-back blind chisel" (12 documented cases), "the double-handed speed mortise" (34 cases), and "chiseling while distracted by a particularly interesting bird outside" (801 cases, mostly in spring).
+&nbsp;
+*The heel-of-hand technique is recommended only for light paring cuts and by practitioners who aren't worried about inheriting their father's ring collection. The Unified Theory of Hand Tool Use notes that "anything you do with your hand that requires the qualifier 'technique' probably deserves a mallet."
+&nbsp;
+‡‡‡Some argue there's also "too correct," but these people are generally philosophers rather than carpenters and can be safely ignored until you need someone to debate whether your mortise exists or merely participates in the concept of existence.
+&nbsp;
+†"Excavating" is the technical term for when you meant to remove a sixteenth of an inch but removed a quarter inch, plus some of yesterday's work, plus your confidence.
+&nbsp;
+††††This discipline, known as "Chipomancy," was abandoned after the Great Schism of 1247, when two competing schools of interpretation predicted opposite harvest outcomes from the same set of wood shavings. Both were wrong, but in different ways, which somehow made it worse.
+&nbsp;
+§Hgharnak started with fourteen fingers, which tells you everything you need to know about his learning process. He documented his journey in the seminal work *Observations Purchased Dearly*.
+&nbsp;
+§§The fourth truth, "the location of the first aid kit," was added posthumously by his students.
+&nbsp;
+§§§His later work, *Further Observations At Considerable Cost*, dealt primarily with nerve damage and phantom sensations, but contained valuable insights about grain direction.
+&nbsp;
+****This term appears in the Codex Carpenterius, specifically in the chapter "Thou Shalt Not Hack At It Like A Maniac."
+&nbsp;
+‡‡‡‡The priests' predictions were approximately as accurate as modern weather forecasting, but with better wood chips.
+&nbsp;
+§§§§Though Bronze Age chisels had the distinct disadvantage of being made of bronze, a material that holds an edge the way a politician holds a promise.
+&nbsp;
+*****Originally written in Early Carpenteric on eight stone tablets, of which only five survive. The missing tablets allegedly contained the secrets of "the perfect dovetail," "mortises that impress your in-laws," and "what to do when you cut too deep and everyone's watching."
+&nbsp;
+†††††The apprentice who believes excessive force compensates for inadequate skill will learn otherwise. Usually immediately. Often painfully. Sometimes repeatedly.
+&nbsp;
+‡‡‡‡‡This phrase appears throughout workshop literature, always in contexts suggesting that someone tried it anyway and the results were "educational."
+&nbsp;
+******This figure, maintained by the Bureau of Occupational Learning Experiences, represents only reported incidents. The actual number is estimated to be 4.3 times higher, accounting for cases where the craftsperson looked around to ensure no witnesses existed before quietly applying a bandage.
+&nbsp;
+††††††A chisel with opinions is called "dangerously sharp" by the timid and "properly maintained" by the confident. These two groups can be distinguished by their finger count.
+&nbsp;
+‡‡‡‡‡‡The corollary—"always chisel toward someone else"—remains controversial and is not officially endorsed by any reputable organization, though it appears as graffiti in approximately 23% of workshop facilities surveyed.
+&nbsp;
+§§§§§The International Standards Committee for Workpiece Security recognizes seventeen acceptable securing methods and maintains a Hall of Shame featuring photographs of the unacceptable ones, including "pinned between knees," "held by an optimistic assistant," and "resting on the work of securing it."
+&nbsp;
+*******Hendrick's experience led to the Third Amendment to the Apprentice Safety Protocols: "Speed is not a substitute for accuracy, though it does make inaccuracy more spectacular."
+&nbsp;
+†††††††The official Guild observation checklist includes items such as "economical movements," "appropriate force application," and "lack of colorful language." Observers checking "yes" to all items are instructed to stay alert for the unexpected.
+&nbsp;
+‡‡‡‡‡‡‡As noted in the Guild's instructional text, *Predictable Outcomes Through Boring Methods*, which has sold remarkably few copies despite being remarkably useful.
+&nbsp;
+---
+&nbsp;
+**`,
+<span class="cstat-no" title="statement not covered" >  abstract: '** This paper examines fundamental chisel techniques in construction, covering proper grip and striking methods,',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const JOINERY_FUNDAMENTALS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'joinery_fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Joinery Fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['chisel_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_joinery_fundamentals' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Joinery Fundamentals: A Comprehensive Introduction to the Art of Making Wood Stay Together When It Would Rather Not</span>
+&nbsp;
+The fundamental principle of joinery, as established by the Guild of Perpetual Carpentry in 1823*, is deceptively simple: two pieces of wood, when properly encouraged, will remain together through forces both mechanical and—according to some of the older texts—mildly theological†. The novice carpenter must first understand that wood, despite appearing solid and compliant, possesses what the Mistress Carpenter Agatha Roundpeg termed "structural memory"‡, meaning it will attempt to return to its original shape at precisely the moment you have declared your work complete**. The mortise-and-tenon joint, arguably the most venerable of all joinery techniques, operates on the principle that a shaped protrusion (the tenon) may be convinced to pass through a corresponding cavity (the mortise) and, through the application of glue, pins, or strongly worded encouragement††, remain there indefinitely‡‡. This relationship between positive and negative space forms the philosophical foundation of all joinery***, a fact that has inspired approximately 47,000 bad metaphors about human relationships†††.
+&nbsp;
+Modern joinery encompasses a bewildering array of joints, each developed to solve a specific problem that arose when someone, somewhere, attempted something ambitious with insufficient planning‡‡‡. The dovetail joint****, designed to resist pulling forces through its characteristic wedge-shaped fingers, was allegedly invented by the ancient Mesopotomian carpenter Gilgamesh the Slightly-Less-Famous†††† when his simple butt joints kept failing on the prototype Ark‡‡‡‡. The lap joint, wherein two pieces overlap like a handshake between wooden entities*****, exists in numerous variations: half-lap, cross-lap, and the rarely-attempted-twice full-lap, which technically isn't a joint at all but rather two pieces of wood occupying the same space in defiance of physics******. The box joint, with its repeating fingers, represents either elegant simplicity or mind-numbing tedium, depending on whether you are demonstrating it to apprentices or actually cutting one†††††. Each joint type carries with it a rich tradition of cursing, improvisation, and the gradual realization that the measuring tape lies‡‡‡‡‡.
+&nbsp;
+The practical application of joinery requires tools that have been properly maintained*******, materials that have been properly seasoned, and a temperament that has been properly adjusted to accept that the first attempt will be educational rather than decorative. The saw must cut true, the chisel must be sharp enough to shave with********—though one absolutely should not test this††††††—and the wood must be dry but not too dry, straight but not too straight, and ideally sympathetic to your emotional state at the time of cutting‡‡‡‡‡‡. The Carpentry College of Lower Ank-Morpork recommends that students practice each joint type exactly seventeen times before attempting it on actual project materials, a number arrived at through extensive statistical analysis that revealed students who practiced sixteen times still ruined everything, while those who practiced eighteen times became insufferably smug*********. The gluing process, often treated as an afterthought by overconfident novices, actually represents 73.4% of joint success according to the peer-reviewed research of Professor Edmund Clampworthy†††††††, who spent forty years determining precisely how much pressure constitutes "adequate" without crossing into "destructive."‡‡‡‡‡‡‡
+&nbsp;
+Safety considerations in joinery cannot be overstated, though they frequently are, often by people missing portions of their fingers**********. The primary danger lies not in the obviously hazardous tools—anyone can fear a spinning table saw blade—but in the moment of complacency when one hand-cuts a tenon "just quickly" without proper clamps, or attempts to pare a mortise "just that tiny bit more" while the wood is held in one's lap††††††††. The Guild of Carpentry maintains the Museum of Regrettable Decisions‡‡‡‡‡‡‡‡, which houses approximately 40,000 misshapen joints and detailed written accounts of exactly what went wrong, organized by injury type***********. Historical records suggest that the development of proper joinery safety protocols was directly proportional to the invention of increasingly sharp and efficient tools, reaching a critical point in 1847 when the first power router was introduced and three separate safety committees were formed within the same afternoon††††††††††. Modern best practices include: measuring twice and cutting once (rather than the traditional measure-once-curse-twice method); marking your waste wood clearly so you don't accidentally cut into the piece you want to keep; never forcing a joint that doesn't fit, as wood remembers being bullied and will exact revenge during finishing‡‡‡‡‡‡‡‡‡; and always, always, maintaining a respectful relationship with your tools, as they will outlive your patience by several decades************.
+&nbsp;
+---
+&nbsp;
+*Founded after the Great Furniture Collapse of 1822, when approximately 40% of London's chairs simultaneously failed during a particularly enthusiastic celebration of something no longer remembered. The Guild's motto, "Measure Twice, Curse Once," appears on its seal beneath an illustration of a perfectly fitted mortise-and-tenon joint and one bandaged thumb.
+&nbsp;
+†The theological aspect was particularly emphasized by Brother Oakenshaft of the Monastery of St. Mortise the Precise, who maintained that properly joined wood contained within it a small portion of divine grace. His treatise, "On the Holy Nature of the Half-Blind Dovetail," was widely read until it was discovered he'd been secretly using metal fasteners in the monastery furniture. He was transferred to dishwashing duties, where joining was unnecessary.
+&nbsp;
+‡Published in her seminal work, "Wood: It's Not as Dead as You Think," which was controversial for suggesting that lumber retained something of its original tree-self. She supported this theory by documenting how oak joints consistently behaved more stubbornly than pine joints, which she attributed to the oak's memory of being more important when it was a tree.
+&nbsp;
+**The phenomenon reaches its peak approximately 2.7 seconds after you have proudly called someone over to admire your work. The wood appears to have been waiting for an audience.
+&nbsp;
+††The strongly worded encouragement method was officially deprecated by the Guild in 1891, after Master Carpenter Wilhelm Shoutalot conducted a five-year study proving conclusively that yelling at furniture had no measurable effect on its structural integrity, though it did significantly affect workshop morale.
+&nbsp;
+‡‡"Indefinitely" is defined by the Guild as "at least until the person who made it has died, ideally much longer, but we'll settle for 'longer than the warranty period.'"
+&nbsp;
+***The Philosopher-Carpenter Diogenes of Carpathia (not to be confused with the other one) wrote extensively about how the void defines the solid, which is profound when you're thinking about mortises but considerably less helpful when you're actually trying to cut one.
+&nbsp;
+†††Most of these metaphors appear in the unfortunate volume "Dovetails and Devotion: Finding Love Through Carpentry" by Romance Novelist and Occasional Woodworker Felicity Sappington. Sample chapter title: "Our Love Was Like a Perfectly Fitted Joint: Impossible to Separate Without Considerable Violence." The book sold poorly but did establish joinery terminology in several unexpected romance subgenres.
+&nbsp;
+‡‡‡The Society for Preservation of Historical Carpentry Mistakes maintains an exhaustive database called "What Were They Thinking?" which catalogs joints invented to solve problems that shouldn't have existed in the first place, such as the Reversed Mortise (don't ask), the Double-Secret Lap Joint (really don't ask), and the Perpendicular Paradox (historians are still unsure if this was a joint or an elaborate prank).
+&nbsp;
+****The name supposedly derives from the joint's resemblance to a dove's tail feathers, though anyone who has actually looked at a dove's tail will note the resemblance is purely metaphorical. Some scholars suggest it was actually named after a carpenter named Dove who had an unusual tail, but these scholars are not taken seriously at conferences.
+&nbsp;
+†††††Not actually related to the more famous one, though he capitalized on the confusion. His lesser-known epic, "The Epic of Gilgamesh (The Carpentry Years)," contains detailed instructions for joining gopher wood, which are surprisingly practical given that no one is entirely certain what gopher wood is.
+&nbsp;
+‡‡‡‡The prototype Ark allegedly sank three times during testing, leading to substantial revisions in the joining methodology. The final design incorporated 47 different joint types and required 312 cubits of waterproof sealant, which was considerably more than originally budgete`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding joinery fundamentals in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MORTISE_TENON_JOINTS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'mortise_tenon_joints',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Mortise Tenon Joints',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['joinery_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_mortise_tenon_joints' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Mortise Tenon Joints: A Comprehensive Study of Ancient Precision and Modern Persistence</span>
+&nbsp;
+The mortise and tenon joint represents one of humanity's earliest successful attempts to convince two pieces of wood that they are, in fact, better together than apart*. At its core, the technique involves cutting a cavity (the mortise) into one piece of timber and a corresponding protrusion (the tenon) on another, creating what the Guild of Traditional Joiners insists on calling "a marriage of purpose"†. This seemingly simple arrangement has held together everything from Egyptian furniture to medieval cathedrals‡, though not always without incident**.
+&nbsp;
+The fundamental principle operates on the assumption that wood, despite its natural inclination toward entropy and rot, can be persuaded through careful measurement and strategic violence†† to form stable structural connections. The mortise must be precisely cut to receive the tenon with what ancient texts describe as "a satisfying tightness"‡‡—typically requiring 0.5mm to 1.5mm of interference fit†††, though the Confederation of Wood Botherers argues this depends substantially on the phase of the moon and the carver's emotional state‡‡‡. The joint achieves strength through friction, mechanical interlocking, and what some scholars suggest might be sheer bloody-mindedness on the part of the wood itself***.
+&nbsp;
+Modern practitioners employ both hand tools and power equipment to create mortise and tenon joints, each method carrying its own distinct risks†††† and rewards. The hand-cut approach, favored by purists and individuals with too much time on their hands‡‡‡‡, involves chisels, mallets, and an intimate relationship with one's local emergency services****. Power tools accelerate the process considerably††††† but introduce new and creative ways to remove portions of one's anatomy‡‡‡‡‡—the Imperial Safety Commission maintains extensive records of incidents they refuse to discuss in polite company*****. Regardless of method, the joint's success depends on attention to grain direction******, proper marking*******, and acknowledging that the first three attempts will probably be terrible†††††††.
+&nbsp;
+The historical lineage of mortise and tenon joinery extends backward into the mists of time, possibly to approximately 5,000 BCE‡‡‡‡‡‡, when some anonymous carpenter made the revolutionary discovery that hitting things with rocks could be purposeful rather than merely therapeutic********. Ancient Egyptian furniture recovered from tombs shows mortise and tenon construction of remarkable sophistication†††††††††, suggesting either that the afterlife required sturdy seating or that pharaohs had very particular furniture preferences‡‡‡‡‡‡‡. Medieval European timber-frame buildings employed massive mortise and tenon joints measuring up to 300mm deep*********, locked with wooden pegs that were expected to survive longer than the civilizations that carved them**********—and frequently did. The technique persists in modern construction not through nostalgia but because†††††††††† it demonstrably works, a rare instance of ancient wisdom remaining relevant in an age of polymer adhesives and structural screws‡‡‡‡‡‡‡‡.
+&nbsp;
+Contemporary applications range from fine furniture making to post-and-beam construction, from restoration work to bespoke joinery that costs approximately 47% more than alternatives***********. The joint's enduring appeal lies in its elegant simplicity: two pieces of wood, one hole, one protrusion, minimal hardware, maximum structural integrity, and absolutely no guarantee that your first attempt won't look like it was chewed by aggressive beavers††††††††††††. Safety considerations demand respect for sharp tools‡‡‡‡‡‡‡‡‡, awareness of grain behavior************, and acceptance that blood, despite traditional beliefs, does not actually improve the wood's appearance†††††††††††††. Best practices emphasize proper layout techniques, sharp tools maintained sharper still, and the wisdom to recognize when a joint has gone wrong before committing further violence to innocent timber‡‡‡‡‡‡‡‡‡‡—a skill the Guild estimates takes approximately 3,000 hours of practice to develop, or roughly one apprenticeship's worth of expensive mistakes*************.
+&nbsp;
+---
+&nbsp;
+*From the Old Dendric "mortes," meaning "to death," and "tendo," meaning "I stretch," suggesting that the ancient joiners understood the joint's function would outlast its creator. This etymology may or may not be completely fabricated by Professor Mallett of the University of Treacle Mine Road.
+&nbsp;
+†They would call it that. The Guild maintains that proper joinery is "the closest most carpenters will come to romance," a statement that explains much about the Guild's persistently low membership numbers and even lower marriage rates.
+&nbsp;
+‡Though primarily medieval cathedrals. The ancient cathedrals hadn't been invented yet, which caused significant scheduling problems for the ecclesiastical construction industry.
+&nbsp;
+**The Incident at Winchester in 1642 being the most notable example, wherein a supporting timber failed during services, though this had less to do with the joinery and more to do with the cannonball that had recently passed through it. The joint itself was found intact in the rubble, prompting the master carpenter to claim vindication before the royalists returned.
+&nbsp;
+††"Strategic violence" being defined by the Royal Society of Woodworkers as "the minimum force necessary to achieve transformation without triggering a formal apology to the timber."
+&nbsp;
+‡‡The 12th century manuscript "De Ligno et Furore" by Brother Cedric of the Monastery of Perpetual Splinters, discovered in 1873 beneath what turned out to be an extremely heavy bookcase that nobody wanted to move.
+&nbsp;
+†††A specification requiring measurement precision that medieval carpenters achieved through methods modern scholars describe as "terrifyingly approximate" yet somehow functional. The phase of the moon correlation has never been scientifically proven but also has never been scientifically disproven, leading to the compromise position that it "might matter" and therefore should be tracked, just in case.
+&nbsp;
+‡‡‡The Confederation, founded in 1847 after a bitter schism with the Guild of Traditional Joiners over the proper angle for a dovetail, maintains its headquarters in three locations simultaneously, none of which acknowledge the others' existence. They are famous for their annual conferences, which have never successfully occurred due to scheduling disputes.
+&nbsp;
+***Dr. Wilhelmina Oakenshaft of the Institute for Anthropomorphic Wood Studies (defunded 1994) published seventeen papers arguing that wood possesses "structural memory" and "takes personal offense at poor joinery." While her academic career ended under mysterious circumstances involving a bookshelf, her theories remain popular among carpenters who have witnessed wood behavior they cannot otherwise explain.
+&nbsp;
+††††The Department of Occupational Hazards publishes an annual digest running to approximately 340 pages, of which mortise and tenon joinery occupies a modest 47 pages. This is considered quite good. By comparison, the chapter on router tables requires its own separate volume and a content warning.
+&nbsp;
+‡‡‡‡According to the Survey of Woodworking Persistence (1998), practitioners who choose hand-cut joinery typically fall into three categories: 1) Those who cannot afford power tools (23%), 2) Those who enjoy suffering (31%), and 3) Those who have been banned from power tool ownership by concerned family members or court order (46%).
+&nbsp;
+****St. Bartholomew's Hospital in London maintains what they informally call "the Chisel Ward," a designation that appears nowhere in official records but that every emergency physician knows intimately. The patron saint of carpenters, incidentally, is St. Joseph, who according to tradition was a tekton—a worker in wood and stone—and who presumably knew his way around both mortise and tenon joints and divine intervention, likely needing both in equal measure.
+&nbsp;
+†††††The Guild's official position is that power tools are "acceptable in modern contexts" but must be blessed by a master joiner before first use. The blessing ceremony involves checking the blade alignment and reminding the tool's owner that "speed is not a substitute for competence." The Guild has never explained whether the blessing protects the user or the workpiece.
+&nbsp;
+‡‡‡‡‡A partial list includes: table saw kickback (classic), router bit departure from collet (terrifying), drill press breakthrough surprise (predictable yet eternal), and the phenomenon known as "aggressive chisel repositioning," wherein the chisel decides to cut something other than wood, typically flesh. The Commission's report on this last category begins with the word "preventable" repeated seventeen times in bold text.
+&nbsp;
+*****During Parliamentary Question Time in 1973, when pressed for statistics, the Commission's representative stated only that "the numbers are higher than anyone would credit and lower than anyone fears," then excused himself for what he called "an urgent appointment with literally anywhere else."
+&nbsp;
+******Wood grain, that mysterious alignment of cellulose fibers, must`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding mortise tenon joints in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DOVETAIL_JOINTS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'dovetail_joints',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Dovetail Joints',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['mortise_tenon_joints'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 3,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_dovetail_joints' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Dovetail Joints: An Examination of Interlocking Principles in Wood Construction</span>
+&nbsp;
+The dovetail joint represents one of humanity's more successful attempts to convince two pieces of wood that they are, in fact, one piece of wood that has temporarily forgotten its unity*. Unlike the mortise and tenon joint, which relies on insertion and faith†, the dovetail achieves its remarkable strength through the ancient principle of "it literally cannot come apart unless you hit it very hard from exactly the wrong direction"††. The joint's distinctive fan-shaped projections—called pins and tails, though which is which depends entirely on which carpenter you ask and how many apprentices are within earshot‡—interlock in a manner that distributes tensile force across multiple contact points while simultaneously making the joiner feel quite clever about themselves‡‡.
+&nbsp;
+The practical application of dovetail joints requires three fundamental components: wood, tools sharp enough to be genuinely concerning*, and a philosophical acceptance that your first seventeen attempts will look like they were gnawed by an artistic but unstable beaver†††. The ratio of pins to tails varies according to the joint's intended purpose, the thickness of the material, and whether the Master Carpenter is watching‡‡‡. Through dovetails—where the joint is visible and therefore subject to judgment by anyone who wanders past**—demand precision to within 1/64th of an inch**, a measurement that medieval craftspeople achieved through a combination of skill, prayer, and knowing exactly which apprentice to blame††. Half-blind dovetails, employed when one wishes the joint's existence to remain a tasteful secret, require routing out waste material from spaces that seem specifically designed to trap tools, fingers, and hope†††.
+&nbsp;
+Historical evidence suggests that dovetail joints have been in use since approximately 4000 BCE, though the ancient Egyptians called them something that translates roughly as "the joiners' revenge upon straight lines"‡‡. The joint's development parallels humanity's growing understanding of wood grain behavior, mechanical advantage, and the fact that some furniture simply must survive being moved by people who have consumed celebratory beverages***. Modern understanding has added little to the basic principle, though we now have the advantage of laser-guided measuring devices that tell us, with admirable precision, exactly how far off we are†††. The International Joinery Standards Committee maintains that a properly executed dovetail joint should last "longer than the civilization that created it, but not quite long enough to become archaeologically significant"‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The wood, for its part, accepts this arranged marriage with the stoic resignation typical of materials that have already been cut, planed, and stored in someone's shed for three years waiting for "the right project."
+&nbsp;
+†And occasionally glue, though purists maintain that a proper mortise and tenon should hold together through sheer geometric inevitability and possibly magic. The Guild of Traditional Joiners has expelled seventeen members for suggesting adhesive might help.
+&nbsp;
+††This direction is, naturally, the exact direction someone will apply force when moving furniture through a doorway that is 0.4 inches too narrow. The Universe maintains detailed statistics on this.
+&nbsp;
+‡The debate has raged for approximately four centuries. The Carpenter's Council of 1743 attempted to settle the matter definitively but ended in what historians delicately term "an unfortunate incident involving a ceremonial mallet and accusations of poor bevel technique." Three people required splints. The question remains unresolved.
+&nbsp;
+‡‡This feeling typically lasts until one attempts to cut the corresponding piece, at which point humility reasserts itself with considerable force.
+&nbsp;
+*Sharp enough that the tool itself seems to lean slightly toward your fingers with malicious intent. The Worshipful Company of Edge Tool Makers recommends chisels be "sharp enough to shave with, though we do not recommend actually shaving with them, as seven people did after our last pamphlet was perhaps too enthusiastically worded."
+&nbsp;
+†††The Guild of Woodland Creatures filed a formal complaint about this comparison in 1847, noting that beaver joinery, while unconventional, demonstrates "admirable structural integrity and significantly fewer instances of swearing." The complaint was denied, though the Guild Clerk did concede that beaver dams rarely require sanding.
+&nbsp;
+‡‡‡The answer is seven. It is always seven. Anyone who tells you otherwise is either selling you something or has not yet discovered that they miscounted.
+&nbsp;
+**This measurement, as any carpenter knows, is itself subject to humidity, the phase of the moon, and whether you measured it on Tuesday or Thursday. Wood moves. It is one of wood's most cherished hobbies, along with warping immediately after you've finished the project.
+&nbsp;
+††The Apprentice Blame Distribution System reached its zenith in 18th-century workshops, where master craftsmen maintained elaborate charts tracking which apprentice was "responsible" for various imperfections. Records show that one unfortunate lad named Thomas Wicksworth was blamed for a misaligned dovetail that occurred three weeks before he was born. The system persists in certain traditional workshops to this day.
+&nbsp;
+†††One medieval manuscript, the Codex Carpentarius, contains a marginal illustration of a joiner attempting to retrieve a chisel from half-cut dovetails. The caption translates as "Here we observe Brother Edmund demonstrating why we do not rush." Brother Edmund apparently required the assistance of two smiths and a butter churn to extract himself. The manuscript does not elaborate on the butter churn's role, and perhaps that is for the best.
+&nbsp;
+‡‡The Egyptian Furniture Makers' Papyrus of Dynasty IV includes seventeen hieroglyphs dedicated solely to describing the angle of dovetail cuts, plus three additional hieroglyphs that translate approximately as "measure twice, cut once, weep briefly, cut again." Egyptologists note that the papyrus shows signs of having been consulted so frequently that certain passages are nearly illegible, particularly the sections about hiding mistakes.
+&nbsp;
+***The Furniture Movers' Guild of Greater Ankh-Morpork maintains that 73.6% of all furniture damage occurs during what they term "celebratory relocations." A further 18.2% occurs during "celebratory existence," which is to say, furniture in the same room as a celebration. The remaining 8.2% occurs during normal use, which the Guild finds "statistically suspicious" and attributes to "people being dishonest about what they were celebrating."
+&nbsp;
+†††These devices beep reassuringly while informing you that your carefully cut joint is off by 0.023 inches. In the pre-digital era, one simply had to discover such discrepancies through the traditional method of attempting assembly, experiencing mysterious gaps, and making creative use of wood filler. The Guild of Honest Joiners refers to this as "character-building." The Guild of Slightly Less Honest Joiners refers to it as "see, this is why glue was invented."
+&nbsp;
+‡‡‡This statement was issued in 1954 after an unfortunate archaeological expedition uncovered 3,000-year-old dovetail joints in remarkably good condition, while the expedition's camp furniture—constructed using "modern methods"—collapsed after just eight weeks. The expedition leader's report noted this with what colleagues described as "barely suppressed indignation" and "excessive underlining."
+&nbsp;
+*The author has examined dovetail joints dating from the Ming Dynasty that remain tight and functional, having survived floods, wars, and the general chaos of history. The author has also examined dovetail joints created last Tuesday that have already begun displaying ominous gaps, which suggests that either the Ming Dynasty possessed knowledge we have lost, or Tuesday was particularly humid. Possibly both.
+&nbsp;
+†A subset of dovetail joints called "secret mitered dovetails" exists primarily to make other carpenters feel inadequate. These joints appear to be simple miters from the outside while concealing full dovetails within, like a structural magic trick. The Guild of Complicated Joiners created them specifically to have something to demonstrate at gatherings. They work, theoretically, though the ratio of "attempted secret mitered dovetails" to "successful secret mitered dovetails" hovers around 1:47, and that's including attempts by guild members themselves.
+&nbsp;
+‡One ancient Greek text, attributed to Sappho of the Sawbench (no relation to the poet, though she did write some quite moving verses about wood grain), describes dovetails as "the joints of honest labor, which reveal themselves boldly unlike politicians." This got her into considerable trouble with the Athenian Assembly, though her furniture commissions increased notably.
+&nbsp;
+**Modern power tools have democratized dovetail cutting, allowing individuals to achieve in minutes what once took hours of patient handwork. This has led to what the Society for the Preservation of Traditional Skills calls "The Great Adequacy," where everyone can produce joints that are perfectly acceptable while no one quite achieves the transcendent perfection of hand-cut work. The Society's chairman was heard muttering something about "power routers and the end of civilization" but was too`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding dovetail joints in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LAP_JOINTS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'lap_joints',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Lap Joints',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['dovetail_joints'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_lap_joints' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Lap Joints: A Practical Guide to Overlapping Timbers Without Overlapping Disasters</span>
+&nbsp;
+The lap joint, despite its deceptively simple name*, represents one of humanity's earliest attempts to make two pieces of wood behave as though they were always meant to be together†. At its essence, a lap joint involves removing material from each of two members so that they overlap to the same thickness as a single member—a concept that sounds straightforward until one considers the extraordinary number of ways this can go catastrophically wrong**. The joint operates on the principle that two half-depth pieces, when combined with appropriate fasteners and perhaps a prayer to whatever gods oversee carpentry†††, will possess structural integrity comparable to a single unbroken piece‡. This has been tested extensively throughout history, with results ranging from "surprisingly adequate" to "spectacular collapse during the mayor's dedication speech"‡‡.
+&nbsp;
+The practical application of lap joints spans numerous construction scenarios, from timber framing to furniture making, each with its own peculiar challenges and opportunities for creative failure*. The half-lap joint remains the most common variety, followed closely by the cross-lap, end-lap, and the rarely-discussed disaster-lap**. Modern practitioners typically create lap joints using table saws, routers, or chisels, though the Guild of Traditional Joiners insists that the only proper method involves hand tools, meditation, and at least three generations of family trauma†. The critical measurement is, of course, that each piece should be notched to exactly half its thickness—a specification that has led to the development of an entire subspecialty of carpentry devoted to arguing about what "exactly half" means in practical terms‡‡‡. When properly executed, the joint should fit together with a satisfying resistance that suggests competence without implying that you'll need a mallet and profanity to assemble it††††.
+&nbsp;
+Safety considerations surrounding lap joints extend well beyond the obvious dangers of sharp tools and heavy timber***. The primary hazard lies in overconfidence: the lap joint's apparent simplicity has lured countless craftspeople into believing they understand it fully, right up until the moment they discover they've notched both pieces on the same side†††††. The International Bureau of Carpentry Mishaps documents approximately 47,000 cases annually of what they term "optimistic depth estimation," where the craftsperson removes either too much material (resulting in a gap large enough to post letters through) or too little (resulting in a joint that sits proud like a badly healed bone)‡‡‡‡. Additionally, the stress concentration at the shoulder of the cut—where full thickness transitions to half thickness—creates what structural engineers poetically call "the most likely place for everything to go pear-shaped"****. Proper fastening is essential; the lap joint alone possesses roughly the same structural integrity as a firm handshake between acquaintances who don't particularly trust each other*****.
+&nbsp;
+The historical development of lap joints traces back to the Early Bronze Age, when human beings first realized they could make longer pieces of wood by combining shorter ones, a discovery that ranks alongside fire and the wheel in terms of civilization-enabling technologies††††††. The ancient Mesopotamians employed lap joints in their door frames, though archaeological evidence suggests they had not yet solved the "measuring twice, cutting once" problem‡‡‡‡‡. Medieval Japanese carpenters elevated the lap joint to an art form, developing variations so subtle that distinguishing between them requires either a master craftsperson or someone willing to lie convincingly******. The modern understanding of lap joints incorporates principles of wood science, structural engineering, and behavioral psychology—the latter being necessary to explain why people continue to attempt lap joints without proper tools or training, despite centuries of documented evidence suggesting this ends poorly*******.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The term "lap" derives from the Old English "læppa," meaning a fold or flap, which is considerably more dignified than the alternative etymology suggested by Professor Wendell Makepiece of the Ankh-Morpork School of Practical Carpentry, who insisted it came from the sound of wood pieces being "lapped" together, which he demonstrated by slapping two boards in a manner that achieved nothing except annoying everyone in the lecture hall.
+&nbsp;
+†This was extensively documented in the Codex Fabricatum, a 12th-century manuscript that devoted seventeen illuminated pages to the lap joint, fourteen of which depicted various saints attempting to explain the concept to confused apprentices. Saint Measure of Croydon became the patron saint of joiners after successfully completing a lap joint on his first attempt, a feat so unlikely that it was immediately declared miraculous.
+&nbsp;
+**The Carpenters' Guild of Greater Widdershins maintains a Museum of Instructive Failures in their basement, where examples of catastrophically failed lap joints are displayed with small brass plaques describing what went wrong. The most popular exhibit is the "Leaning Shed of Little Hemlock," which achieved its distinctive 23-degree tilt due to lap joints cut to three-quarters depth on both pieces, creating what the curator describes as "more of a ledge than a lap, really."
+&nbsp;
+†††In polytheistic woodworking traditions, this would typically be Brigid for Celtic craftspeople, Hephaestus for those of Mediterranean inclination, or Väinämöinen for Finnish carpenters. Monotheistic practitioners generally direct their appeals more generally, though the specific phrasing tends to become increasingly emphatic as the project progresses.
+&nbsp;
+‡The Structural Integrity Comparison Standards, established in 1847 by the Royal Institute of Building Things That Don't Fall Down, specify that a properly executed lap joint should achieve 60-70% of the strength of the original uncut member. This leaves a fascinating 30-40% gap in which projects can fail in interesting ways.
+&nbsp;
+‡‡The mayor's speech incident occurred in 1923 in the town of Steadfast-Upon-Wry, where a newly constructed bandstand collapsed seventeen minutes into the dedication ceremony. Subsequent investigation revealed that the builder had confused "lap joint" with "lap of luxury" and had been using the lumber budget to purchase velvet cushions. The lap joints, what few existed, had been executed by someone who appeared to have only heard of the concept third-hand and assumed it involved a certain amount of guesswork. It did. The guesswork was incorrect.
+&nbsp;
+*The disaster-lap joint is not technically a recognized joint type but rather an unofficial term for any lap joint that has gone so fundamentally wrong that it becomes difficult to determine what the original intention was. The Carpentry Tribunal of Lower Quirm maintains that if you cannot tell which side was supposed to lap over which, it qualifies as a disaster-lap and should be burned while no one is watching.
+&nbsp;
+**The Guild of Traditional Joiners was founded in 1456 by Edmund "Three-Fingers" Mortise, who lost two digits to a misdirected chisel and subsequently devoted his life to ensuring others learned from his example. The Guild's motto, "Measure Thrice, Cut Once, Question Everything," is inscribed above their meeting hall entrance in letters that are, ironically, slightly crooked.
+&nbsp;
+†Each generation passes down not only the techniques but also the specific phrases of frustration appropriate to various failures. The current chair of the Guild, Master Joiner Arabella Throughcut, can curse in seventeen languages, a skill she considers essential to the craft.
+&nbsp;
+‡‡‡The Great Measurement Debate of 1789 began when Journeyman Carpenter Friedrich von Splinterhausen presented a paper arguing that "exactly half" should account for the kerf width of the saw blade. This sparked a schism that lasted forty-three years and resulted in two separate Guilds, three duels (two fatal, one merely embarrassing), and the eventual consensus that yes, obviously you account for the kerf width, what kind of question is that?
+&nbsp;
+††††The Mallet and Profanity Method is officially discouraged by professional organizations but remains the most commonly employed technique for final assembly. A comprehensive study by the Institute for Honest Assessment of Woodworking Practices found that 89% of lap joints require "percussive encouragement" and 94% require at least moderate swearing. The overlap between these groups approaches 100%.
+&nbsp;
+***The Advanced Lap Joint Safety Protocol, published by the Bureau of Keeping Carpenters Intact, runs to 247 pages and includes warnings about splinters, tool injuries, falling timber, spiritual despair, and the risk of developing an obsessive need to explain lap joints to people at parties who absolutely did not ask.
+&nbsp;
+†††††This particular error is so common that it has achieved what anthropologists call "cultural universality"—appearing independently in every carpentry tradition worldwide. The oldest known example was discovered in Egypt, where a tomb wall painting depicts a craftsman staring in dismay at two pieces of wood, both notched on their top surfaces, while a supervisor gestures with what hieroglyphic scholars translate as "considerable exasperation."
+&nbsp;
+‡‡‡‡The International Bureau of`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding lap joints in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WOOD_GLUE_ADHESIVES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wood_glue_adhesives',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wood Glue Adhesives',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['lap_joints'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wood_glue_adhesives' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Wood Glue Adhesives: A Comprehensive Study of Molecular Bonding in Lignocellulosic Materials</span>
+&nbsp;
+The fundamental principle of wood glue adhesion rests upon what the Ankh-Morpork Institute of Applied Stickiness* calls "molecular handshaking"—a process wherein polymeric chains infiltrate the porous structure of wood and, upon curing, create bonds stronger than the wood fibers themselves†. This remarkable property has been known since approximately 2000 BCE‡, though early practitioners lacked our modern understanding of why their hide glue worked, leading to the widespread belief that it was powered by the vengeful spirits of horses‡‡. Modern polyvinyl acetate (PVA) adhesives operate on similar principles but without the theological complications§, achieving bond strengths of 3,000-4,000 PSI when properly applied§§—a measurement that means absolutely nothing to anyone who isn't an engineer, but which everyone nods at sagely during construction meetings§§§.
+&nbsp;
+The practical application of wood glue requires an understanding of what the Guild of Joiners refers to as "The Three Sacred Truths": proper surface preparation*, proper clamping pressure**, and proper cure time***. Surface preparation demands that wood be clean, dry, and freshly cut†—a requirement that approximately 47.3% of amateur woodworkers ignore‡, leading to the phenomenon known as "why-won't-this-stick-itis"‡‡. The optimum moisture content sits between 6-8%§, though the Ancient Guild of Babylonian Carpenters operated quite successfully with whatever moisture content the gods provided§§, which is to say they probably suffered catastrophic joint failures with alarming regularity but lacked the bureaucratic infrastructure to document it properly. Clamping pressure should be firm but not excessive—the International Bureau of Squeeze Measurement† recommends 100-150 PSI for softwoods and 150-200 PSI for hardwoods††, though these figures were determined through what historians delicately term "extensive trial and error"†††.
+&nbsp;
+Contemporary wood adhesives fall into several categories, each with its own personality quirks and deeply held convictions about how construction should work*. PVA glues, the workhorses of modern woodworking, cure through water evaporation and remain slightly flexible throughout their lifetime—a property that saved the Chesapeake Bay Bridge from thermal expansion failure in 1952**, though you won't find that in any official records because the engineers involved were too embarrassed to admit they'd accidentally used the right material for the wrong reasons***. Polyurethane adhesives cure through moisture reaction†, expanding slightly as they set—a feature that fills gaps admirably but has led to more than one woodworker watching in horror as their carefully measured joint begins to foam like a rabid beast††. Epoxy resins provide the highest strength but require mixing ratios so precise that the Society for Unnecessarily Exact Measurements‡ published a 400-page manual on the subject, complete with illustrations of what happens when you deviate by even 2%‡‡.
+&nbsp;
+The safety considerations surrounding wood adhesives extend beyond the obvious warnings about skin contact and ventilation*. The Department of Adhesive Incidents** maintains files on what they call "creative failures"—situations where individuals discovered, through painful experience, that wood glue should not be used to: repair dentures***, affix toupees***, or temporarily hold together a broken finger while finishing a project†. Modern PVA glues are non-toxic when cured††, but this information arrives too late for the Medieval Brotherhood of Glue Tasters‡, who operated under the reasonable-sounding but catastrophically flawed principle that anything used in furniture should be safe to eat‡‡. Polyurethane adhesives, being moisture-cured, will bond enthusiastically to human skin§, leading to the establishment of the Emergency Glue Separation Ward at St. Fabricius's Hospital§§, which sees an average of 247 cases annually§§§—a statistic that would be higher except that many victims are too embarrassed to seek help and simply wait for their fingers to separate naturally over the course of several weeks.
+&nbsp;
+The evolution of wood adhesives from animal-based glues to synthetic polymers represents one of humanity's quieter revolutions*, overshadowed by more glamorous developments like electricity and indoor plumbing but arguably more important to anyone who enjoys sitting on chairs**. The ancient Egyptians used casein glues derived from milk proteins to construct furniture that has survived millennia†—a testament either to their adhesive technology or to their climate††, though probably both. The breakthrough to synthetic adhesives occurred in 1912 when Dr. Fritz Klatte accidentally created polyvinyl acetate while attempting to synthesize a better form of aspirin‡—a happy accident that the Pharmaceutical Association has never quite forgiven him for‡‡. Modern formulations include additives for water resistance, gap filling, and extended open time§, each innovation driven by what the Historical Society of Construction Disasters delicately terms "learning experiences"§§.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*Founded in 1847 by Professor Hubert Gluemaster, who famously declared that "anything worth studying is worth sticking to something else." The Institute occupied fourteen rooms in the University until an unfortunate incident involving experimental super-adhesive and the Dean's cat led to its relocation to a standalone facility. The cat, incidentally, is still attached to a rather nice mahogany desk and has learned to live with it.
+&nbsp;
+†This counterintuitive fact causes no end of confusion. The joint is stronger than the wood, meaning failures occur in the wood fibers rather than the glue line. This leads to the philosophical question: if you break a glued joint, have you really broken the joint, or merely broken the wood that was trying to leave the joint? The Institute of Applied Stickiness has a whole department dedicated to this question. They are not invited to parties.
+&nbsp;
+‡Archaeological evidence suggests the Egyptians were gluing things together with remarkable sophistication, though their papyrus records are frustratingly vague about technique. One recovered text reads, roughly translated, "Take the sticky stuff from the boiled hooves. Apply to wood. Wait. Do not rush or the gods will laugh at you." This is simultaneously the best and worst instruction manual ever written.
+&nbsp;
+‡‡The Theological Adhesive Debate of 1347 consumed fourteen months of church council time and resulted in the official position that glue worked through "divine providence operating through natural means," which satisfied absolutely no one but ended the discussion. Three delegates were later found to have been conducting their own experiments and were gently encouraged to pursue other interests.
+&nbsp;
+§Though some purists argue that modern glue lacks soul. The Romantic Adhesive Movement of 1891 produced several manifestos on this subject, none of which are readable without strong coffee and a higher tolerance for melodrama than most people possess.
+&nbsp;
+§§This is the tensile strength. The shear strength is different. The peel strength is different still. The Guild of Engineers has seventeen different measurements for "strong," all of which are necessary according to engineers and none of which are necessary according to everyone else.
+&nbsp;
+§§§The phenomenon of "engineering number nodding" was first documented by anthropologist Sarah Cramden in her controversial 1973 paper "Statistical Incantations in Professional Hierarchies." She noted that meetings function primarily through the ritualistic exchange of numbers that everyone pretends to understand. Her academic career ended shortly after publication, though she now runs a very successful construction firm.
+&nbsp;
+*The Guild's headquarters contains a shrine to these truths, complete with candles and offerings of sawdust. Membership requires a blood oath, though they'll accept a solemn promise if you're squeamish. The initiation ceremony involves gluing something together while senior members watch silently and judge your technique. Approximately 40% of candidates faint from the pressure.
+&nbsp;
+**"Proper" being defined as "enough to hold the pieces together firmly without squeezing out all the glue or bending the wood." This definition has spawned entire philosophical treatises on the nature of "enough" and "proper." The Library of Ambiguous Construction Terms maintains 2,847 volumes on clamping pressure alone.
+&nbsp;
+***The Guild specifies cure times down to the minute: 30 minutes for PVA under ideal conditions, 24 hours for full strength. However, "ideal conditions" include temperature, humidity, wood species, planetary alignment, and whether or not you're in a hurry. The last factor affects cure time exponentially.
+&nbsp;
+†Freshly cut meaning "cut within the last few hours," not "cut within the last few weeks and left in the garage where it absorbed moisture from the air and possibly some motor oil from that leak you keep meaning to fix." The Guild's manual includes a footnote about this that is longer than some novels.
+&nbsp;
+‡According to the Bureau of Construction Statistics, Division of People Who Don't Read Instructions. Their data collection methodology`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wood glue adhesives in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WOODEN_PEGS_FASTENERS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wooden_pegs_fasteners',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wooden Pegs Fasteners',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wood_glue_adhesives'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wooden_pegs_fasteners' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Wooden Pegs Fasteners: A Comprehensive Study of Traditional Joinery in Modern Construction</span>
+&nbsp;
+The wooden peg represents perhaps the oldest fastening technology known to civilization*, a method so elegantly simple that it has survived every technological revolution from the Bronze Age through the Digital Era**. Unlike their metallic cousins, wooden pegs work through the fundamental principle of sympathetic compression†—as the surrounding wood swells and contracts with moisture, the peg adjusts accordingly, creating what the Ancient Guild of Timber Framers calls "a living joint"††. This dynamic relationship between peg and mortise has confounded modern engineers who prefer their materials to remain precisely the same size at all times†††, leading to the now-infamous Cambridge Incident of 1987‡.
+&nbsp;
+The practical application of wooden pegs requires an understanding that borders on the mystical‡‡, though the Guild insists it is merely "paying attention"‡‡‡. The peg must be carved§ from a wood species that is harder than the pieces being joined, but not so much harder that it acts as a wedge and splits the timber§§. Oak pegs in oak beams, for instance, represent the platonic ideal of peg-craft§§§, achieving what the 15th-century master builder Johann Zimmerwulf called "das Gleichgewicht der Holzseelen"*—the equilibrium of wooden souls. Modern practitioners have found that pegs should be driven when slightly green**, allowing them to cure and expand within the joint***, creating a bond that some estimates suggest is 47.3% stronger than the wood itself†.
+&nbsp;
+The safety considerations surrounding wooden peg installation are considerable, though often overlooked in contemporary construction education††. The primary danger lies not in the peg itself but in the human tendency to apply the principle of "if it won't go in easily, hit it harder"‡. This approach has led to approximately 23,000 documented injuries per year across the seventeen member nations of the International Timber Framers Collective‡‡, not counting the incidents that go unreported due to embarrassment§. The Guild's official manual contains a full chapter titled "Why Your Ancestors Didn't Use Metal Hammers on Wooden Pegs (And Neither Should You)"§§, which includes graphic illustrations that have caused more than one apprentice to reconsider their career choices§§§.
+&nbsp;
+Historical development of wooden peg technology reveals a fascinating pattern of rediscovery and forgotten wisdom*. The Romans knew techniques for peg-making that were lost during the Dark Ages and not fully recovered until the Japanese master carpenters shared their knowledge in the 1970s**. Medieval cathedral builders used pegs up to three feet in length to secure roof trusses***, driving them with wooden mauls while chanting rhythmically to ensure proper alignment—a practice modern acoustic engineers have found actually serves a structural purpose†. The transition to metal fasteners in the Industrial Revolution was seen as progress††, but the late 20th century witnessed what architectural historian Dame Penelope Woodwright termed "the Great Pegging Renaissance"††† as builders rediscovered that wood-to-wood joints could outlast the buildings themselves‡.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*Though the Mesopotamian Carpenters' Union claims to have documentation of pegs dating to 8,000 BCE, the papyrus in question is largely illegible and may actually be a recipe for beer. The two are easily confused in ancient Sumerian.
+&nbsp;
+**The Digital Era has yet to produce a satisfactory digital peg, despite three separate attempts by Silicon Valley startups, each of which received substantial venture capital funding before realizing that wood is, fundamentally, analog. The last attempt, "PegChain™," tried to put the entire history of each peg on the blockchain. It did not go well.
+&nbsp;
+†The term "sympathetic compression" was coined by Dr. Erasmus Plank of the Überwald Institute of Applied Wood Science in 1823. Dr. Plank spent forty years studying a single oak beam with seven pegs, measuring it daily regardless of weather, personal health, or the growing concern of his family. His final paper, delivered on his deathbed, concluded: "The wood knows."
+&nbsp;
+††They also call it "breathing together," "the old conversation," and—after several pints—"that thing what wood does." The Guild is surprisingly poetic for an organization that spends most of its time hitting things with mallets.
+&nbsp;
+†††Modern engineers, trained in materials that maintain consistent properties across temperature ranges, find wood deeply suspicious. The Engineering Council of Greater Birmingham maintains a list of "Materials That Cannot Be Trusted," and wood has held the #1 position since the list's inception in 1974. Concrete is #2, but for different reasons.
+&nbsp;
+‡In 1987, a team of engineers from Cambridge University attempted to "improve" a 16th-century timber frame barn by replacing the wooden pegs with precision-machined steel dowels. The barn stood for 471 years with wooden pegs. It collapsed seventeen months after the "improvement." The engineers' report blamed "unforeseen variables in historical construction methods," which is engineering-speak for "we have no idea what happened, but it's definitely not our fault." The barn's original pegs, recovered from the rubble, were undamaged and were subsequently reinstalled in a reconstructed version, where they continue to function perfectly. The steel dowels were sold as scrap.
+&nbsp;
+‡‡What the Guild doesn't mention is that "paying attention" includes knowing the local weather patterns, the phase of the moon*, the age of the tree the peg came from, and the first name of the person who felled it. This is why Guild members have a reputation for being "a bit odd" at social gatherings.
+&nbsp;
+*The moon phase thing sounds like superstition, but a 1998 double-blind study by the University of Applied Folkloric Science in Bavaria found that pegs installed during a waning moon showed 12.7% less tendency to work themselves loose over a fifty-year period. The researchers published their results, then immediately resigned to join the Guild, stating only: "We understand now."
+&nbsp;
+‡‡‡The Guild's official training manual is 847 pages long, of which 823 pages are dedicated to "paying attention." The remaining 24 pages cover actual peg-making techniques. Apprentices typically find this ratio frustrating until their fifth or sixth year, when they suddenly understand everything simultaneously. This moment is called "the Awakening" and is traditionally celebrated with excessive amounts of cider.
+&nbsp;
+§The act of carving a peg by hand is considered by the Guild to be more important than the peg itself. Master carver Elena Harthwood wrote in her seminal text "The Philosophy of the Draw-Knife": "To carve a peg is to have a conversation with the tree about what it would like to be. Sometimes the tree has strong opinions."**
+&nbsp;
+**Harthwood's other notable works include "Talking to Timber: I'm Not Crazy, You're Crazy" and "No, Really, The Wood Is Speaking To Me," both of which were initially dismissed by the academic community before becoming required reading at the Guild.
+&nbsp;
+§§The difficulty is that what constitutes "too hard" varies by ambient humidity, the specific gravity of both woods involved, the alignment of the grain, and—according to some masters—the carver's mood at the time of creation. The Guild maintains a reference library of 3,472 different wood species with their relative hardness values, updated quarterly. Consulting this library before each peg is theoretically required but, in practice, experienced carvers claim they can tell by the smell.
+&nbsp;
+§§§The Oak-in-Oak Bond has been documented to last at minimum 500 years, though the oldest surviving example in the Shōsō-in Repository in Japan has endured for over 1,300 years. When researchers attempted to remove one peg for study in 1952, they gave up after three days of careful extraction efforts. The peg had, in the words of the lead researcher, "become one with its surrounding wood in a manner that defies rational explanation." They left it alone after that. The peg is believed to be pleased with this decision.†
+&nbsp;
+†The peg in question has developed something of a cult following among timber framers, who make pilgrimages to view it. A small shrine has formed nearby, where visitors leave offerings of draw-knives and beetle mallets. The Japanese Department of Cultural Properties officially denies the shrine exists, while simultaneously maintaining it with considerable care.
+&nbsp;
+*Johann Zimmerwulf (1402-1487) was the master builder of seventeen churches, forty-three guild halls, and one bridge that he refused to discuss. His private journals, discovered in 1923, contain detailed instructions for peg-making along with lengthy philosophical treatises on the nature of wood, the universe, and why apprentices never listen. His final entry reads: "The wood is correct. It is we who are confused." He died the next day, at age 85, while installing a peg in the roof`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wooden pegs fasteners in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TIMBER_FRAMING_BASICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'timber_framing_basics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Timber Framing Basics',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['carpentry_woodworking'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wooden_pegs_fasteners'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_timber_framing_basics' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Timber Framing Basics</span>
+&nbsp;
+The practice of timber framing represents one of humanity's oldest architectural traditions, dating back to when our ancestors first realized that stacking wood horizontally was significantly less exhausting than holding it vertically for extended periods*. At its essence, timber framing involves the joining of large wooden members—posts, beams, and braces—through carefully executed joinery rather than metal fasteners, creating a structural skeleton that has supported civilizations from the Bronze Age through to the present day†. The fundamental principle relies upon compression and tension working in harmony, with each timber member performing a specific structural role: posts carry vertical loads‡, beams span horizontal distances§, and braces resist lateral forces**, all united through joints whose complexity ranges from the elegantly simple to the unnecessarily baroque††.
+&nbsp;
+Modern practitioners must master several core joint types, each evolved through centuries of trial, error, and occasionally spectacular failure‡‡. The mortise and tenon remains the foundation of timber frame joinery, wherein a projecting tenon is fitted into a corresponding mortise cavity with a precision that would make a Swiss watchmaker weep with professional jealousy§§. Lap joints, dovetails, and scarf joints complete the timber framer's essential repertoire***, each serving distinct structural functions while requiring different levels of skill, patience, and willingness to accept that one's first seventeen attempts will not resemble the instructional diagrams†††. The assembly process traditionally proceeds from the ground up—frames are pre-cut, test-fitted, marked with cryptic symbols understood only by the initiated‡‡‡, disassembled, then raised into position with ropes, poles, and a degree of coordination that human beings rarely demonstrate outside of genuine emergencies.
+&nbsp;
+The structural integrity of timber frames depends upon understanding wood's peculiar characteristics as a building material—it shrinks, swells, warps, checks, and generally behaves like a living thing because it was§§§, until quite recently, a living thing****. Different species offer different properties: white oak provides superior strength and rot resistance††††, while pine offers workability at the cost of durability‡‡‡‡, and douglas fir occupies a middle ground that offends neither purists nor pragmatists§§§§. The grain direction, moisture content*****, and presence of defects all influence structural performance, requiring framers to read wood like ancient augurs read sheep entrails, only with somewhat better accuracy and considerably less mess†††††. Proper timber selection can mean the difference between a frame that stands for centuries and one that requires awkward explanations to building inspectors within months‡‡‡‡‡.
+&nbsp;
+Contemporary timber framing has experienced a renaissance among those who believe that true craftsmanship requires splinters, backache, and an intimate relationship with pre-industrial technology§§§§§. Modern practitioners benefit from power tools that would cause medieval framers to spontaneously weep with envy******, yet the fundamental techniques remain largely unchanged: measure carefully†††††† (then measure again‡‡‡‡‡‡), cut conservatively§§§§§§, fit precisely, and secure with wooden pegs that somehow hold better than one would think physically possible*******. The marriage of traditional joinery with contemporary engineering analysis has produced frames that satisfy both building codes and aesthetic sensibilities, proving that one can indeed have both structural integrity and the satisfaction of telling visitors that "no, there's not a single nail in the entire frame"†††††††, a statement that never fails to impress or at least perplex.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*The Historical Society of Unnecessarily Specific Records places this realization at approximately 3,200 BCE, though their dating methodology has been questioned by every reputable institution except themselves. They responded to criticism by publishing a seventeen-volume rebuttal that nobody read past page four.
+&nbsp;
+†Gods of hearth and home have long favored timber frames. The Ancient Sumerians venerated Zababa, who they believed invented the mortise and tenon during a divine woodworking session that lasted forty days and nights. Modern scholars suggest this might explain why early Sumerian frames occasionally feature joints that appear to have been designed by someone extremely tired and possibly hallucinating.
+&nbsp;
+‡Unless they fall over, at which point they carry horizontal loads briefly, then carry nothing at all except the shame of poor engineering. The International Board of Structural Embarrassment maintains archives of such incidents, catalogued by both magnitude and the creativity of the excuses provided.
+&nbsp;
+§The maximum span-to-depth ratio for solid timber beams is approximately 20:1, though pushing this limit requires either exceptional confidence or exceptional foolishness. The Guild of Overambitious Builders keeps a memorial wall for members who couldn't distinguish between the two.
+&nbsp;
+**The Great Bracing Controversy of 1823 divided the timber framing community into two bitterly opposed factions: those who believed knee braces should be curved, and those who insisted on straight cuts. The dispute led to seventeen duels, forty-three broken friendships, and one excellent treatise on structural dynamics that everyone ignored because they were too busy arguing about curves.
+&nbsp;
+††The Baroque Period saw timber joinery reach absurd heights of complexity. Master Framewright Hieronymus Splinterhaus III created a joint requiring seven different angles, three types of wood, and the consultation of an astrologer to determine the proper assembly date‡. It held for approximately six months before the building collapsed during a light breeze. Splinterhaus blamed the astrologer.
+&nbsp;
+‡His star charts were later found to be for the wrong hemisphere, raising questions about either Splinterhaus's geographic knowledge or his willingness to acknowledge obvious problems.
+&nbsp;
+‡‡The Incident at Framingham (1654) serves as a cautionary tale. Apprentice woodworker Thomas Butcher attempted to join two beams using a joint of his own invention, which he called the "Trinity Twisted Tenon." The resulting structure stood for three hours before experiencing what witnesses described as "voluntary disassembly." Butcher was thereafter known as "Whoops-There-It-Goes Thomas" and forbidden from designing anything more complex than firewood.
+&nbsp;
+§§Swiss watchmakers form a small but vocal contingent within the International Timber Framers Guild, having discovered that their skills translate remarkably well to wooden joinery. They are, however, deeply unpopular at guild meetings due to their insistence on timing joint fits with stopwatches and expressing clearances in microns***.
+&nbsp;
+***The metric system's introduction to timber framing caused considerable distress among traditional craftsmen, who had worked in "thumb widths," "hand spans," and "the distance from here to there, but not quite there-there, more like there-ish" for centuries. The Imperial-Metric Wars of 1975-1982 resulted in several buildings being constructed simultaneously in both systems, creating joints that fit only in theoretical space.
+&nbsp;
+†††These symbols, collectively known as "carpenter's marks," range from simple Roman numerals to elaborate glyphs that suggest the involvement of secret societies. Dr. Millicent Framington's doctoral thesis, "Occult Symbolism or Really Bad Handwriting?: A Study of Medieval Timber Marks," concluded that approximately 40% were intentional marks, 35% were accidental tool strikes, and 25% remain "baffling to this day."
+&nbsp;
+‡‡‡The Council of Understanding Traditional Timber Marks (CUTTM) meets annually to decode marks from historical buildings. Their success rate hovers around 12%, not counting the year they accidentally declared a coffee stain to be "an early warning system against fire spirits."
+&nbsp;
+§§§Wood retains cellular memory of being a tree for approximately twenty years after cutting, according to Dr. Barnabas Oakenshield of the Institute for Ridiculous Botanical Claims. His evidence consists entirely of "feelings" and "vibes," yet his papers are cited with surprising frequency, mostly by people who haven't actually read them.
+&nbsp;
+****The philosophical implications of using dead organisms to shelter living ones have troubled approximately three people throughout history, none of whom were invited to parties afterwards.
+&nbsp;
+††††The Brotherhood of Oak Supremacists refuses to work with any other species. They maintain that using pine is morally equivalent to serving instant coffee at a wine tasting. Their manifesto runs to 847 pages and somehow includes a chapter condemning metal roofing.
+&nbsp;
+‡‡‡‡The Great Pine Rebellion of 1891 saw pine enthusiasts storm the Oak Supremacist headquarters, resulting in considerable property damage and the unfortunate discovery that oak furniture is indeed harder to break than pine furniture. The rebellion lasted four hours before everyone agreed to have lunch and discuss their differences like reasonable adults. No differences were resolved, but the lunch was reportedly excellent.
+&nbsp;
+§§§§Douglas fir occupies what negotiators call "the comfortable middle ground" and what extremists call "cowardly fence-sitting." The Moderate Timber League champions fir precisely because it annoys both camps equally, which they consider a feature rather than a bug.
+&nbsp;
+*****Moisture content in timber framing`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding timber framing basics in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  SAW_TYPES_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  HAND_PLANE_MASTERY,</span>
+<span class="cstat-no" title="statement not covered" >  CHISEL_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  JOINERY_FUNDAMENTALS,</span>
+<span class="cstat-no" title="statement not covered" >  MORTISE_TENON_JOINTS,</span>
+<span class="cstat-no" title="statement not covered" >  DOVETAIL_JOINTS,</span>
+<span class="cstat-no" title="statement not covered" >  LAP_JOINTS,</span>
+<span class="cstat-no" title="statement not covered" >  WOOD_GLUE_ADHESIVES,</span>
+<span class="cstat-no" title="statement not covered" >  WOODEN_PEGS_FASTENERS,</span>
+<span class="cstat-no" title="statement not covered" >  TIMBER_FRAMING_BASICS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6ce74b48",
+  "name": "Galactic Umbriel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769241582125",
+  "createdAt": 1769241582137,
+  "lastAccessedAt": 1769241582137,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769241582125",
+    "type": "magical"
+  }
+}

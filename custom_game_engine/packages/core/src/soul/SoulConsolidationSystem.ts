@@ -14,9 +14,8 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
-import type { SilverThreadComponent, SignificantEventType } from './SilverThreadComponent.js';
-import type { SoulLinkComponent } from './SoulLinkComponent.js';
-import type { PlotLinesComponent, PlotLineInstance } from '../plot/PlotTypes.js';
+import type { SignificantEventType } from './SilverThreadComponent.js';
+import type { PlotLineInstance, PlotLinesComponent } from '../plot/PlotTypes.js';
 import { cleanupConsumedHints } from '../plot/PlotTypes.js';
 import { addSignificantEvent } from './SilverThreadComponent.js';
 import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
@@ -40,7 +39,7 @@ export class SoulConsolidationSystem extends BaseSystem {
    */
   async onSleepStart(agent: Entity, world: World): Promise<void> {
     // Check if agent has a soul
-    const soulLink = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
+    const soulLink = agent.getComponent(ComponentType.SoulLink);
     if (!soulLink) return; // No soul = no consolidation
 
     // Get the soul entity
@@ -50,18 +49,18 @@ export class SoulConsolidationSystem extends BaseSystem {
       return;
     }
 
-    const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+    const thread = soul.getComponent(ComponentType.SilverThread);
     if (!thread) {
       console.warn(`[SoulConsolidation] Soul ${soul.id} missing SilverThread component`);
       return;
     }
 
     // Get agent's consolidated memories
-    const episodicMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent | undefined;
+    const episodicMemory = agent.getComponent(ComponentType.EpisodicMemory);
     if (!episodicMemory) return;
 
     // === Phase 5: Clean up consumed dream hints ===
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
     if (plotLines) {
       const cleanedUp = cleanupConsumedHints(plotLines, thread.head.personal_tick, 500);
       if (cleanedUp > 0) {
@@ -104,7 +103,7 @@ export class SoulConsolidationSystem extends BaseSystem {
     const recentMemories = this.getRecentMemories(episodicMemory);
 
     // Check for plot-relevant events
-    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = soul.getComponent(ComponentType.PlotLines);
     if (plotLines) {
       const plotEvents = this.extractPlotEvents(recentMemories, plotLines);
       events.push(...plotEvents);

@@ -3778,14 +3778,37 @@ async function main() {
   (gameLoop.world as any).setBackgroundChunkGenerator(backgroundChunkGenerator);
   console.log('[Main] BackgroundChunkGenerator created (throttle: 2 ticks, pause TPS: <18, resume TPS: 19+, with worker pool)');
 
-  // Show Universe Browser Screen - the gateway to the multiverse
-  // This screen allows players to:
-  // - Create a new universe (leads to UniverseConfigScreen)
-  // - Load a local save
-  // - Browse and load from the multiverse server
-  // Skip if resuming from interrupted creation
+  // Auto-load most recent save or show Universe Browser Screen
+  // Check if we should auto-load the most recent save (default behavior)
+  // Override with URL param ?newGame=true to force universe browser (urlParams already declared above)
+  const forceShowBrowser = urlParams.get('newGame') === 'true' || urlParams.get('browser') === 'true';
+
   let browserResult: UniverseBrowserResult | null = null;
-  if (!creationResumeState) {
+
+  // Auto-load most recent save if available (unless explicitly overridden)
+  if (!creationResumeState && !forceShowBrowser && existingSaves.length > 0) {
+    // Sort saves by timestamp (most recent first)
+    const sortedSaves = [...existingSaves].sort((a, b) => {
+      const timeA = a.metadata?.savedAt || 0;
+      const timeB = b.metadata?.savedAt || 0;
+      return timeB - timeA;
+    });
+
+    const mostRecentSave = sortedSaves[0];
+    console.log(`[Demo] Auto-loading most recent save: ${mostRecentSave.name} (${new Date(mostRecentSave.metadata?.savedAt).toLocaleString()})`);
+    console.log('[Demo] To create a new universe instead, add ?newGame=true to the URL');
+
+    // Simulate the browser result as if user clicked "Load" on the most recent save
+    browserResult = {
+      action: 'load_local',
+      saveKey: mostRecentSave.key
+    };
+  }
+  // Show Universe Browser Screen only if:
+  // - Not resuming creation
+  // - No existing saves OR user explicitly wants to see browser
+  else if (!creationResumeState) {
+    console.log('[Demo] Showing Universe Browser (no saves found or ?newGame=true in URL)');
     browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
       const browserScreen = new UniverseBrowserScreen();
       browserScreen.show((result) => {

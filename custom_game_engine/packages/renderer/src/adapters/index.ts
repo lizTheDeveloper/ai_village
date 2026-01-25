@@ -88,7 +88,7 @@ function createPanelConfig<T>(
     title: data.title,
     defaultWidth: data.defaultWidth,
     defaultHeight: data.defaultHeight,
-    menuCategory: data.menuCategory as any,
+    menuCategory: data.menuCategory as PanelConfig<T>['menuCategory'],
     ...behaviorConfig,
   };
 }

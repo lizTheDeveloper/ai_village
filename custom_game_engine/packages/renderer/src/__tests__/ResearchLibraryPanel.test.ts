@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ResearchLibraryPanel } from '../ResearchLibraryPanel.js';
 import {
-  WorldImpl,
+  World,
   EventBusImpl,
   createResearchStateComponent,
   EntityImpl,

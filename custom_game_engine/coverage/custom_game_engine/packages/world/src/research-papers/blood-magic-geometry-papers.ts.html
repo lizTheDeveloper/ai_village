@@ -1,0 +1,1105 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/blood-magic-geometry-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> blood-magic-geometry-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/89</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/89</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BLOOD_CIRCLE_FUNDAMENTALS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'blood_circle_fundamentals',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Circular Containment: The Geometry of Blood Circles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_geometry'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['blood_as_mana'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 12, geometry: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'basic_blood_circle' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Circular Containment: The Geometry of Blood Circles</span>
+&nbsp;
+The fundamental principle underlying blood circle construction rests upon a truth as old as geometry itself: the circle is the only two-dimensional shape that contains no beginning and no end, no corner where forces might accumulate or escape*. When drawn in blood—that most sympathetically resonant of magical conductors**—the circle becomes a closed system of extraordinary power, simultaneously holding energy within its bounds and directing it according to the practitioner's will. This dual nature of containment and direction has made the blood circle the foundation of practical spellwork for at least seven millennia†, though certain scholars argue for a considerably older lineage‡.
+&nbsp;
+The minimum viable diameter for a functional blood circle stands at precisely three feet‡‡, a measurement that appears to correlate with what the Baroque Institute of Applied Sorcery terms "the human arm-span constant"§. Circles smaller than this threshold fail to generate sufficient internal resonance to maintain coherent magical structures*, leading to what practitioners colloquially term "fizzle-out"**—though this understates the phenomenon considerably***. Conversely, larger circles permit greater working complexity, with reported successful castings occurring in circles up to forty-seven feet in diameter†††, though these require proportionally more blood and significantly more confidence‡‡‡.
+&nbsp;
+The perfection of the circle itself represents the most critical—and most frequently underestimated—element of successful construction§§. A circle that deviates from true roundness by more than 1.3% will fail to contain magical energies properly*, resulting in what the ancient Mesopotamian texts poetically describe as "the escape of hungry fire"**. The historical record documents no fewer than 847 incidents of catastrophic circle failure due to imperfect geometry†, ranging from minor explosions to the complete translocation of the caster's left foot into a parallel dimension‡. Modern practitioners employ string-and-stake methods, protractors, or—for those who can afford them—consecrated compasses§, though the truly adventurous still attempt freehand circles, despite the casualty statistics.
+&nbsp;
+Finally, the distinction between continuous and broken circles cannot be overstated§§§. A continuous circle, drawn without lifting the implement or breaking the bloodline, creates a complete circuit of power—a self-sustaining loop that requires only initial activation to maintain its boundary*. Broken circles, conversely, behave like electrical circuits with gaps: they permit energy to leak through the discontinuities at rates proportional to the gap width**, with even microscopic breaks causing measurable degradation in containment efficacy†††. The Brotherhood of the Unbroken Line‡‡‡ maintains that the single most important moment in any blood circle casting occurs not during the spell itself, but in that final instant when the circle closes and the practitioner must ensure the ending meets the beginning with absolutely no overlap or gap§§§§.
+&nbsp;
+---
+&nbsp;
+*The square, by contrast, has four corners. This sounds obvious, but the Fraternity of Geometric Sorcery spent 130 years attempting to make square containment circles work before finally admitting defeat in 1847. Their headquarters in Prague still bears scorch marks.
+&nbsp;
+**See the prerequisite reading on blood as mana. If you haven't read it, what are you doing here? That's like trying to learn juggling by starting with chainsaws. Actually, that's EXACTLY what you're doing. Please go back.
+&nbsp;
+†The earliest confirmed blood circle appears in archaeological remains from approximately 5,000 BCE, though the circle in question was carved into stone rather than drawn, leading to scholarly debates about whether it "counts." The debates have lasted longer than the civilization that created it.
+&nbsp;
+‡Professor Aldebaran Twistleton-Smythe of the University of Questionable Antiquities insists blood circles date to at least 30,000 BCE, citing "evidence" that most other scholars describe as "a suspicious-looking stain on a cave wall that might be ochre, might be iron oxide, and might be strawberry jam." Professor Twistleton-Smythe is no longer invited to conferences.
+&nbsp;
+‡‡This measurement was established after the regrettable Incident of 1743, when apprentice mage Margaret Holloway attempted to cast a basic containment spell in a circle 2.7 feet in diameter. The resulting implosion created a crater still visible today in the courtyard of the Royal Academy. The Academy uses it as a planter now. They grow petunias in it. The petunias glow faintly at night†.
+&nbsp;
+†Nobody knows why. The Academy's official position is "please stop asking."
+&nbsp;
+§The Baroque Institute, despite its name, was founded in 1923 and has nothing to do with the Baroque period. The founders simply thought it sounded impressive. They were right.
+&nbsp;
+*The arm-span constant appears to derive from the natural reach of a human practitioner kneeling at the circle's center—the optimal position for channeling blood magic. Practitioners with unusually long or short arms must adjust accordingly, leading to the somewhat awkward sight of tall mages hunching or short mages standing.
+&nbsp;
+**The technical term used in academic literature is "catastrophic resonance cascade failure." "Fizzle-out" is what survivors call it when they don't want to think about what they saw.
+&nbsp;
+***The largest recorded "fizzle-out" in an undersized circle occurred in 1891 in Oslo, when Professor Henrik Grimwald attempted to summon a minor demon into a 2.2-foot circle. The subsequent explosion destroyed seventeen buildings, created a new street layout, and briefly turned the city's water supply purple. Professor Grimwald survived but lost his tenure, his eyebrows, and his ability to smell cinnamon‡.
+&nbsp;
+‡The loss of eyebrows was purely physical. The loss of cinnamon-smelling capability was declared "probably psychosomatic" by medical examiners, though they could not explain why it was specifically cinnamon and not, say, nutmeg or cardamom.
+&nbsp;
+†††This record was set in 1978 by the Collective of Ambitious Fools (their actual name) in an abandoned airfield in Nevada§. The spell successfully contained and directed enough energy to power the city of Las Vegas for approximately nineteen minutes. The Collective was immediately recruited by the Department of Energy and never heard from publicly again.
+&nbsp;
+§The choice of Nevada was deliberate. When working with experimental magic of this scale, one prefers locations where strange lights and inexplicable phenomena are considered normal.
+&nbsp;
+‡‡‡See Appendix Q for a complete list. Appendix Q does not exist because nobody has yet compiled it and survived long enough to publish. This is known as "the Appendix Q Problem" in academic circles.
+&nbsp;
+§§Modern geometric instruments help, but cannot entirely eliminate human error. The Guild of Circle-Drawers offers a three-year apprenticeship program with a 67% completion rate. The other 33% are listed as "retired due to accumulated stress-related asymmetry" in official records, which is technically true if you consider "having your skeleton briefly exist in non-Euclidean space" to be stress-related*.
+&nbsp;
+*The Guild's insurance premiums are the highest of any magical trade organization, including the Association of Freelance Demon Negotiators and the Society of People Who Poke Unknown Magical Artifacts With Sticks.
+&nbsp;
+*The Akkadian Tablet of Very Serious Warnings (circa 2,300 BCE) contains a pictographic representation of a wonky circle next to a pictograph that scholars translate as either "bad fire comes" or "the gods laugh at you." Possibly both.
+&nbsp;
+**The escape typically manifests as tendrils of raw magical energy seeking the nearest exit, which unfortunately for the caster is usually the caster themselves. The phenomenon is described in detail in Mortensen's "Why My Left Hand Is Now Mostly Scar Tissue: A Cautionary Memoir" (1934).
+&nbsp;
+†The International Registry of Magical Mishaps maintains these statistics with what many consider to be unseemly enthusiasm†. Their annual publication, "Things That Went Wrong," is the second-most-read magical journal after "Transmutation Today."
+&nbsp;
+†The Registry's headquarters in Geneva features a Hall of Cautionary Examples that includes, among other exhibits, a preserved imperfect circle next to a bronze plaque reading "This killed someone." It's very popular with school groups.
+&nbsp;
+‡The practitioner in question, Bavarian hedge-witch Greta Steinmann (1773-1841), continued her work after the translocation and actually found the alternative-dimensional foot somewhat useful, as it could walk on surfaces that "exist only theoretically." She published several papers on the subject before both feet ended up in different dimensions and she decided to retire‡.
+&nbsp;
+‡Her walking stick is preserved in the Munich Museum of Magical History. It has seventeen feet attached to it, from seventeen different dimensions. None of them are Greta's original`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Why circles drawn in blood contain and direct magical energy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PENTAGRAM_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'pentagram_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Five-Pointed Power: The Pentagram in Blood Magic',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_geometry'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['blood_circle_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 16, geometry: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'blood_pentagram_ritual' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `FIVE-POINTED POWER: THE PENTAGRAM IN BLOOD MAGIC</span>
+&nbsp;
+The pentagram, that most geometrically pleasing of all five-pointed stars*, has long served as the foundational structure for blood magic practitioners seeking to amplify their workings beyond the basic circle†. The efficacy of the pentagram derives from a precise correspondence between its five points and the five essential components of human blood: plasma (the carrier), red cells (the life-force), white cells (the defenders), platelets (the binders), and spirit (the ineffable)‡. This five-fold resonance creates what Professor Hieronymus Bloodworth of the Ankh-Morpork College of Practical Hemomancy termed "sympathetic geometric amplification"**—though he notably failed to achieve it himself††.
+&nbsp;
+The orientation of the pentagram proves critical to the direction and nature of the magical working‡‡. An upright pentagram, with a single point ascending, directs power outward and upward, making it suitable for protective wards, healing magic, and what the Ancient Guild of Responsible Bloodletting calls "benign applications"***. The inverted pentagram, with two points ascending, reverses this flow, drawing power inward and downward—a configuration the same Guild refers to with considerably less enthusiasm as "applications best left unattempted by anyone with functional self-preservation instincts"†††. The Ministry of Thaumaturgical Safety maintains that 73.6% of all documented blood magic incidents involve inverted pentagrams‡‡‡, though this statistic becomes considerably more alarming when one learns that only 12.4% of practitioners actually attempt to work with inverted configurations****.
+&nbsp;
+Perhaps most crucial to successful pentagram construction is the incorporation of the golden ratio (approximately 1.618:1) into the star's geometry****. Each line segment within a properly constructed pentagram divides the others according to this divine proportion, creating what the lost mathematician-mages of Klatch called "the singing geometry"—so named because a correctly drawn pentagram apparently produces a faint humming sound audible only to those who have made significant blood sacrifices†††† or consumed excessive amounts of alcohol‡‡‡‡. The ratio appears naturally in the angles: 36° at each point, 72° between adjacent points, and 108° at each interior angle—measurements that must be maintained with a precision that would make a Lancre clockmaker weep with professional pride*****. Historical records abundantly demonstrate the consequences of imprecise angle measurement††††††, beginning with the infamous Incident at Pseudopolis in AM 1451‡‡‡‡‡, continuing through the Collapsed Star Affair of AM 1782******, and culminating in what is now simply called "The Really Bad Tuesday" of AM 1823†††††††.
+&nbsp;
+Modern practitioners would do well to heed these cautionary tales and invest in proper measuring instruments‡‡‡‡‡‡. The Bloodwright's Comprehensive Manual advises against the use of freehand drawing, estimation, or "eyeballing it"—the last of which accounts for approximately 47.8% of all pentagram-related mishaps*******, according to the actuarial tables maintained by the Union of Concerned Hemomancers††††††††. As the ancient proverb states: "A circle may forgive imprecision, but a pentagram remembers"‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*And, incidentally, one of the few geometric shapes that causes equal consternation to both wizards and priests, though for entirely different reasons. Wizards find it suspiciously tidy; priests find it suspiciously pointy.
+&nbsp;
+†See the prerequisite text "Blood Circle Fundamentals," particularly Chapter 7, "When Circles Aren't Enough: A Graduated Approach to Geometric Hubris."
+&nbsp;
+‡The "spirit" component has caused considerable debate among hemomancers for the past three centuries. The prevailing theory, advanced by Dame Cordelia Sanguine in her treatise "What Even IS Spirit, Really?" (AM 1789), suggests it represents the vital animus present in living blood but absent in the deceased variety. Her critics argue this is "just making things up." Dame Cordelia responded by successfully animating a teacup using only a drop of blood and a properly constructed pentagram, after which criticism became notably more muted.
+&nbsp;
+**Professor Bloodworth's failure wasn't due to lack of skill or knowledge, but rather to an unfortunate incident involving his cat, Mr. Whiskers, who walked through the pentagram at a critical moment. The resulting magical backlash turned Mr. Whiskers purple for three weeks† and gave the Professor a permanent twitch in his left eye. Mr. Whiskers, being a cat, seemed entirely unbothered and possibly even smug about the whole affair.
+&nbsp;
+†Purple with green spots on Tuesdays, for reasons no one could adequately explain. Bloodworth's colleague, Dr. Meredith Clotsworth, published a paper suggesting this proved the existence of a "temporal-chromatic axis" in blood magic. The paper was politely ignored by everyone except three graduate students who would later form the Society for Overly Complicated Magical Theories.
+&nbsp;
+††He did, however, achieve a notable success in developing a hangover cure that worked 60% of the time, which he considered his greatest contribution to magical scholarship.
+&nbsp;
+‡‡The Ancient Guild of Responsible Bloodletting has existed in one form or another since AM 637‡, making it older than most countries, three religious movements, and the concept of proper sewerage. Its charter explicitly forbids "frivolous experimentation, careless geometry, and summoning anything that might eat members."
+&nbsp;
+‡A date which historians note with some skepticism, as written records from AM 637 consist primarily of "Ugh," "More ugh," and crude drawings of what might be either magical circles or really terrible attempts at wheels.
+&nbsp;
+‡‡‡This statistic comes from Form 27-B, "Annual Report of Inadvisable Magical Practices," which runs to approximately 2,847 pages† in its most recent edition. The Ministry employs seventeen full-time statisticians whose sole job is tracking blood magic mishaps. They are collectively the most depressed civil servants in any governmental organization, which is saying something.
+&nbsp;
+†The report would be longer, but budget constraints forced the Ministry to exclude incidents that resulted in fewer than three casualties, property damage under 1,000 AM$, or transformations that reversed themselves within a fortnight.
+&nbsp;
+***"Benign" here being defined as "unlikely to result in tentacles."
+&nbsp;
+†††The full Guild designation is "Applications That Made Sense To Someone At Some Point, We Suppose, Though We Really Wish They Hadn't Thought Of Them, And We Would Appreciate It If You Didn't Think Of Them Either, But If You Must, Please Do It Somewhere Else." The Guild has a committee dedicated solely to writing these designations. They meet monthly and are reportedly quite cheerful about their work.
+&nbsp;
+‡‡‡This statistic has been challenged by the Counter-Ministry of Alternative Thaumaturgical Data, but since that organization was founded by a disgruntled former Ministry employee who was dismissed for "excessive creativity in record-keeping," their objections are generally noted and then filed in the circular cabinet.
+&nbsp;
+****This disparity suggests either remarkable bravery or remarkable stupidity among the 12.4%. The Smart Money Guild‡‡ has odds on stupidity at 8:1.
+&nbsp;
+‡‡The Smart Money Guild isn't actually smart, but they are good at math and probability. They were founded after several wizards realized they could make more money betting on magical mishaps than actually practicing magic. The University considers them traitors to the craft. The Guild considers the University poor at risk assessment.
+&nbsp;
+*****The golden ratio appears throughout nature—in nautilus shells, in the spiral of galaxies, in the proportions of the human body, and in the precise measurements required to make a really good pie, according to the Bakers' Guild****. Its appearance in blood magic is either profoundly significant or a cosmic coincidence, depending on whether you're a mystic or a mathematician. Both groups agree, however, that getting it wrong is Bad.
+&nbsp;
+****This claim is disputed by most scholars but defended vigorously by bakers, who argue that magic and pastry follow similar principles: precise measurements matter, timing is everything, and you really don't want to know what's actually in there.
+&nbsp;
+†††††These lost mathematician-mages achieved remarkably sophisticated results before they apparently lost a critical mathematical proof in AM 892 and, being too proud to admit it, attempted to reconstruct it from memory. The reconstruction went poorly. The survivors don't talk about it, except occasionally to say "no" very firmly when asked.
+&nbsp;
+‡‡‡‡Some researchers have suggeste`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The pentagram amplifies blood magic through geometric resonance',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SIGIL_BLOOD_BINDING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'sigil_blood_binding',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Permanent Inscription: Blood-Drawn Sigils and Lasting Effects',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_geometry'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['blood_circle_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 14, rune_craft: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'blood_sigil_inscription' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `PERMANENT INSCRIPTION: BLOOD-DRAWN SIGILS AND LASTING EFFECTS</span>
+&nbsp;
+The fundamental principle of blood-drawn sigils rests upon a peculiar property of hemoglobin that the ancient practitioners termed "sympathetic adhesion"*—the tendency of blood, when properly prepared and inscribed with intent, to form molecular bonds with substrate materials that far exceed those of conventional inks**. Unlike temporary markings which fade as the organic material degrades, blood sigils achieve what the Carminian Institute for Permanent Magical Solutions describes as "semi-permanent to oh-gods-what-have-we-done levels of durability"†, with the molecular structure of the iron in hemoglobin creating crystalline matrices that interweave with stone, wood, or—most concerningly—living tissue at depths conventional solvents cannot reach††. The practitioner must understand that once a blood sigil achieves full binding, which occurs approximately 73.4 minutes after inscription‡, removal becomes not merely difficult but potentially catastrophic, as the magical pattern has by that point established what scholars poetically term "existential roots"‡‡.
+&nbsp;
+The practice of inscribing blood sigils directly upon human skin—what the profession euphemistically calls "tattoo binding" but what everyone else calls "that thing we don't talk about at dinner parties"***—creates persistent magical effects that can last decades or, in seventeen documented cases, several inconvenient centuries†††. The sigil becomes part of the bearer's magical signature, drawing power from their own life force in a continuous feedback loop that the body's immune system, having evolved for significantly more straightforward threats than self-inflicted magical modifications, simply cannot recognize as foreign‡‡‡. This creates effects ranging from permanent enhancement of specific abilities to what the medical literature delicately terms "unplanned transfigurations"****. The Guild of Responsible Thaumaturgy maintains that tattooed blood sigils should only be applied after at least fourteen years of study, three character witnesses, and a signed affidavit acknowledging that "yes, I understand this is forever, not just until I get bored next Thursday"††††.
+&nbsp;
+The phenomenon of sigil infection represents perhaps the gravest danger in permanent inscription, occurring when ambient magical energies—which exist in the environment at concentrations ranging from 0.3 thaumic units in desert regions to 47.2 in areas where too many wizards gather to argue about academic minutiae*****—interact with improperly sealed blood sigils†††††. The sigil begins to "grow," extending fractal patterns beyond its original boundaries in ways that suggest intelligence but probably just represent extremely unfortunate geometry‡‡‡‡‡. The Incident at Carminian‡‡‡‡‡‡, which the university still refuses to discuss except in sealed documents and nervous whispers, involved a graduate student whose experimental binding sigil expanded to cover 47% of his body and began expressing opinions about breakfast. Modern practice requires containment circles during inscription, constant monitoring during the binding period, and the immediate availability of what safety manuals call "aggressive intervention protocols"******—though what they actually mean is "someone with a very sharp knife and nerves of steel"†††††††.
+&nbsp;
+Not all surfaces accept blood binding equally, a fact that has prevented more disasters than any amount of regulation or common sense. Certain materials—iron, salt, running water, and anything that has been blessed by more than three separate religious traditions‡‡‡‡‡‡‡—actively resist the molecular bonding process, causing inscribed sigils to fade within hours or, in dramatic cases, to ignite spontaneously*******. The rejection occurs at what the Philosophical Chemistry Department of the University of Quirm terms "the thaumic impedance boundary," which is academic language for "these two things really, really don't want to be together"********. Glass presents particularly interesting challenges, as its amorphous structure lacks the regular molecular lattice required for proper binding, causing sigils to slide across the surface at approximately 0.3 millimeters per hour until they either reach an edge and fall off or collide with another sigil and create what the literature calls "annihilation events"†††††††††. Practitioners are strongly advised to test substrate compatibility before attempting permanent inscription, though the Guild estimates that approximately 40% of reported magical accidents involve someone who "just assumed it would work fine"‡‡‡‡‡‡‡‡.
+&nbsp;
+The ethical implications of permanent magical marking remain subjects of heated debate, particularly regarding the practice's use on non-consenting individuals, historical slaves, and one memorable case involving an entire herd of sheep that were allegedly "improving agricultural yield through thaumic enhancement" but actually just glowed disconcertingly in the dark*********.
+&nbsp;
+&nbsp;
+*The term appears in the Codex Sanguis, a 9th-century manuscript that begins with the promising phrase "what follows is probably a terrible idea" and then proceeds for 847 pages regardless.
+&nbsp;
+**The comparison to conventional inks is somewhat unfair, as conventional inks were designed with the reasonable expectation that they might someday need to be removed. Blood sigils were designed by people who believed that if something was worth doing, it was worth doing in a way that would horrify your descendants.
+&nbsp;
+†This classification system was established after the infamous Cartwright Scale incident, in which the original seven-point scale had to be extended to twelve points, then hastily to fifteen, then abandoned entirely in favor of descriptive phrases like "moderately concerning" and "evacuate the building." The Carminian Institute's current system runs from Level 1 ("washes off with soap") to Level 9 ("requires divine intervention or, failing that, significant amounts of sandpaper").
+&nbsp;
+††Professor Helena Marchmont's treatise "On the Molecular Affinities of Unwanted Permanence" includes seventeen pages of increasingly desperate suggestions for sigil removal, including acidic solutions, prayer, vigorous scrubbing, more prayer, and finally just "accepting your fate and perhaps wearing long sleeves." The later chapters were written after her own experimental sigil proved rather more permanent than anticipated.
+&nbsp;
+‡This timing can vary by up to 12 minutes depending on ambient temperature, humidity, the phase of the moon, and what the Institute's documentation mysteriously refers to as "local stubbornness quotients." The Institute has never elaborated on this last factor, though their headquarters is located in a region where even the plants are notoriously difficult to remove.
+&nbsp;
+‡‡The poetic nature of this term masks the rather horrifying reality that the sigil has, in effect, convinced the substrate that it was meant to be there all along. The molecular structures rearrange themselves to accommodate the pattern, in what one researcher described as "matter being gaslit by magic."
+&nbsp;
+***The Guild of Dinner Party Conversation maintains a list of 347 topics that are forbidden at formal dining events. "Tattoo binding" occupies positions 23 through 31, as the original entry expanded to cover several unfortunate subcategories after the Millbrook Banquet Incident of 1847, details of which remain sealed.
+&nbsp;
+†††Three of these cases involved individuals from the Carminian Experiments of 1823-1827, which were officially declared "concluded" but might be more accurately described as "still technically ongoing." The affected individuals attend annual reunions that are, by all accounts, extremely awkward.
+&nbsp;
+‡‡‡The immune system's confusion is well-documented in "Thaumic Immunology: Why Your Body Can't Tell the Difference Between Helpful Magic and Aggressive Invasion," published by the Medical College of Ankh-Morpork. The author notes that the immune system evolved to handle bacteria and viruses, not "mystical symbols that have opinions about your life choices."
+&nbsp;
+****The Guild's records contain 1,247 documented cases of "unplanned transfiguration," ranging from "slight tendency to glow during arguments" to "turned into a small tree every Wednesday." Case File #847 involves a practitioner who inscribed a sigil intended to enhance persuasive abilities but instead gained the power to speak only in rhyme. He now works as a poet and has, by all accounts, made peace with his situation.
+&nbsp;
+†††††This document is approximately 89 pages long and must be signed in the presence of two witnesses and a licensed cleric. The Guild added the cleric requirement after Case #1,039, in which a practitioner successfully argued that they hadn't technically "understood" the permanence because they "didn't think it would be this permanent."
+&nbsp;
+*****The correlation between wizard density and ambient thaumic concentration is well-established but remains controversial. The Wizards' Guild insists that their members do not "leak" magic into the environment, while the Environmental Thaumic Monitoring Agency's data suggests that areas within 500 meters of universities show thaumic readings 23 times higher than baseline. The Agency's proposal to classify certain academic buildings as "hazardous magical waste sites" remains under review.
+&nbsp;
+††††††Imp`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on How to create permanent magical marks using blood as ink',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const THREE_DIMENSIONAL_ARRAYS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'three_dimensional_arrays',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Beyond the Flat Circle: Three-Dimensional Blood Geometry',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_geometry'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['pentagram_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 20, geometry: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { blood_magic: 25, geometry: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'blood_sphere_ritual' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `BEYOND THE FLAT CIRCLE: THREE-DIMENSIONAL BLOOD GEOMETRY</span>
+&nbsp;
+The transition from planar to volumetric blood magic represents what the Sanguine Institute of Higher Geometries refers to as "the moment when everything stops being flat and starts being expensive."* While practitioners of the pentagrammatic arts have long understood the power of two-dimensional blood arrays**, the third dimension introduces complications that range from "slightly inconvenient" to "catastrophic loss of consciousness while simultaneously juggling levitated blood droplets."*** The fundamental challenge lies not in the geometry itself—any competent runecarver can sketch an icosahedron†—but in maintaining twenty suspended droplets of blood in perfect spatial relationship while also, crucially, remaining conscious.††
+&nbsp;
+The icosahedron emerges from both theoretical analysis and bitter experience as the optimal three-dimensional containment shape for blood magic.††† Its twenty equilateral triangular faces provide what Archmagus Bloodworth termed "pleasing symmetry"‡ while requiring exactly twenty droplets of blood, which happens to be the maximum number a human body will grudgingly part with before becoming "noticeably uncooperative."‡‡ The power amplification achieved through proper three-dimensional arrangement is precisely 10.3 times that of equivalent two-dimensional arrays‡‡‡, though this measurement becomes somewhat academic when one considers that 87% of practitioners lose control of their construct before achieving stable levitation§.
+&nbsp;
+The levitation magic required to maintain three-dimensional blood structures operates on principles that would be familiar to any competent airbender, were airbenders real and available for consultation.§§ Each droplet must be held in perpetual suspension against gravity while maintaining exact geometric relationships with its nineteen siblings§§§—a task comparable to conducting an orchestra where all the musicians are floating, bleeding, and have opinions about where they should be standing.* The Institute's recommended approach involves beginning with a single droplet, achieving stable levitation, then adding subsequent droplets one at a time while maintaining increasingly complex geometric relationships.** By the seventeenth droplet, most practitioners report experiencing what the literature euphemistically calls "geometric despair."***
+&nbsp;
+Historical precedent suggests that three-dimensional blood constructs were first achieved by the Zamonians during their Copper Period†, though whether they were attempting sorcery or simply had a remarkable number of accidents remains subject to scholarly debate††. What is certain is that successful three-dimensional blood geometry requires not only mastery of levitation, spatial reasoning, and blood magic, but also the ability to do mathematics while increasingly light-headed‡‡—a combination of skills so rare that the Guild of Three-Dimensional Practitioners maintains an active membership roster of exactly twelve people, three of whom are currently suspended from practice pending "incident review."‡‡‡
+&nbsp;
+The applications of properly constructed three-dimensional blood arrays are both powerful and disturbing in roughly equal measure.§ The blood sphere ritual§§, achievable only through icosahedral geometry, amplifies sympathetic connections to the point where theory meets practice, practice meets caution, and caution meets the Ethics Committee of the Sanguine Institute.§§§ Practitioners are reminded that with great power comes great responsibility, and with blood levitated in complex geometric arrangements comes great potential for cleaning expenses.****
+&nbsp;
+&nbsp;
+* The expenses break down as follows: basic pentagram chalk (3 copper), suspended blood containment vessels (2 silver), emergency healing potions (8 silver), floor cleaning services (1 gold, negotiable if the stains are "merely unsettling rather than prosecutable"), and therapy for witnesses (rates vary by trauma severity). The Institute's annual budget for "experimental cleanup" exceeded the GDP of small farming communities by 1847.
+&nbsp;
+** The classic pentagram, for all its limitations, has the considerable advantage of remaining exactly where you put it. This property, officially termed "geometric stability through terrestrial adhesion," is taken for granted until one begins working with structures that have their own opinions about spatial positioning.
+&nbsp;
+*** The Incident of 1823, involving Practitioner Millicent Bloodworth and what witnesses described as "a sort of hemorrhagic snowglobe," resulted in seventeen separate revisions to the Institute's safety protocols. The protocols now include a mandatory assistant whose sole job is to yell "SIT DOWN" if the primary caster begins to sway.
+&nbsp;
+† Actually drawing an icosahedron from memory is considered an advanced skill. The Institute maintains a collection of 847 attempted sketches, ranging from "nearly correct" to "appears to be a cat."
+&nbsp;
+†† The consciousness requirement cannot be overstated. Unconsciousness while maintaining levitated blood leads to what the Institute's incident reports classify as "uncontrolled descent of biological materials," which is much less dignifying than it sounds. See also: the Great Staining of 1834, the Incident of the Visiting Dignitaries in 1856†††, and every Tuesday at the Institute during student practice sessions.
+&nbsp;
+††† The Incident of the Visiting Dignitaries involved the Ambassador from the Calcified Kingdom, his seven attending staff members, and a practitioner named Jeremy who had assured everyone he "definitely had it this time." The resulting diplomatic incident was resolved only when the Institute agreed to pay for replacement robes, the Ambassador's psychological counseling, and the complete repainting of the conference chamber. Jeremy now works in administration.
+&nbsp;
+‡ Bloodworth's published works include "On the Pleasing Nature of Polyhedra" (1829), "Further Thoughts on Polyhedra" (1831), and "Why Won't Everyone Stop Asking Me About Polyhedra" (1833). She died peacefully in 1847, surrounded by geometric models and mild exasperation.
+&nbsp;
+‡‡ The body's opposition to donating twenty droplets of blood manifests in various ways: dizziness, irritability, the sudden conviction that perhaps two-dimensional magic was adequate all along, and what the Institute's medical staff terms "aggressive horizontal positioning" (falling over). Practitioners are advised to remain seated, hydrated, and humble.
+&nbsp;
+‡‡‡ This measurement was derived by Professor Cantabrigius Meridian after 847 controlled experiments conducted between 1831 and 1844. The 0.3 variance is not experimental error but rather what Meridian called "the universe's sense of humor." Attempts to achieve exactly 10.0 amplification consistently resulted in 10.3, leading Meridian to conclude that "reality itself rounds up, possibly to mock us."
+&nbsp;
+§ The 87% failure rate has remained statistically consistent since measurement began in 1809. The remaining 13% breaks down into: 8% achieved through blind luck, 3% through exceptional skill, and 2% through what witnesses could only describe as "cheating, but we can't prove how." One practitioner, when asked how she maintained perfect control, replied "I just think about how much I don't want to clean the ceiling" and refused to elaborate.
+&nbsp;
+§§ Airbenders are not real. The reference is included because Practitioner Horace Windsworth insisted they were and spent fourteen years attempting to contact them for consultation. His letters went unanswered, possibly because they were addressed to "The Airbending Temple, Somewhere Mountainous, Presumably?" The postal service eventually stopped accepting them.
+&nbsp;
+§§§ The droplets do not, strictly speaking, have opinions. However, after several hours of maintenance, practitioners report that the droplets "seem judgy" and "appear to be drifting spitefully." The Institute's official position is that this is projection caused by blood loss and mathematical exhaustion, but privately maintains incident logs of "blood droplet apparent intentionality."
+&nbsp;
+* This metaphor was suggested by Practitioner Teresa Windsong, who had previously worked as an orchestra conductor before discovering blood magic. She reports that conducting musicians was "significantly less stressful" and involved "far fewer biohazard protocols." She has since returned to conducting.
+&nbsp;
+** The Institute's Graduated Introduction Protocol (GIP) recommends three-week intervals between droplet additions. Ambitious practitioners who attempt to skip steps are reminded of the Incident of Young Bartholomew (1837), who decided to levitate all twenty droplets simultaneously "just to see what would happen." What happened was three weeks of bed rest, a permanent entry in the Institute's "What Not To Do" manual, and Bartholomew's sincere recommendation that others not attempt to replicate his approach.
+&nbsp;
+*** "Geometric despair" was first documented by Professor Meridian, who described it as "the sudden, overwhelming realization that one has fifteen more spatial relationships to maintain, three droplets are drifting leftward, and one's head feels mysteriously light." Symptoms include the urge to abandon the construct, the conviction that Euclidean geometry is a personal attack, and recurring nightmares about the number seventeen. No effective treatment exists beyond completing the array or giving up entirely.
+&nbsp;
+† The Zamonians, according to legend, were a civilization of considerable sophistication who left behind only cryptic`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Creating spherical and polyhedron blood constructs in three dimensions',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FRACTAL_BLOOD_PATTERNS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'fractal_blood_patterns',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Self-Similar Sanguinity: Fractal Patterns in Blood Magic',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['blood_magic_geometry'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['three_dimensional_arrays'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { blood_magic: 25, mathematics: 18 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { blood_magic: 30, mathematics: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'fractal_blood_amplification' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `SELF-SIMILAR SANGUINITY: FRACTAL PATTERNS IN BLOOD MAGIC</span>
+&nbsp;
+The intersection of geometric recursion and hemomantic practice has long fascinated practitioners of the deeper arts*, though the combination has proven considerably more dangerous than either field individually. When one considers that blood magic already operates at the uncomfortable boundary between life and mathematics†, the addition of infinite self-similarity creates what the Ankh-Morpork College of Practical Thaumaturgy describes as "a really quite spectacular way to invalidate your existence warranty‡." The basic principle remains seductively simple: each iteration of a fractal pattern amplifies the power of the previous iteration, creating exponential growth that theoretically approaches infinite magical potential**. In practice, of course, infinity has a way of approaching back††, and it tends to bring friends.
+&nbsp;
+The Sierpiński triangle, when properly executed in blood upon appropriate surfaces***, provides the clearest demonstration of fractal amplification. The first iteration—a simple equilateral triangle—establishes the base power level†††. The second iteration, subdividing this into four smaller triangles and removing the center, doubles the effective potency‡‡. The third iteration quadruples it‡‡‡. The fourth iteration, should one be foolish enough to attempt it§, increases power by a factor of sixteen while simultaneously increasing the probability of catastrophic magical feedback by approximately 847.3%§§. This exponential progression continues—theoretically—unto infinity, though in practice it continues only until something very final happens§§§.
+&nbsp;
+The physical limitations of blood itself present the primary constraint on fractal complexity*, as any apprentice who has attempted to subdivide a droplet beyond its surface tension will unhappily attest**. Blood, despite its remarkable magical conductivity, remains stubbornly corporeal††, subject to viscosity, coagulation, and an irritating tendency to dry at precisely the wrong moment‡‡. The minimum line width achievable with standard ritual implements measures approximately 0.3 millimeters§§, which permits a theoretical maximum of five iterations for a working surface of reasonable size§§§. Beyond this point, practitioners encounter what Professor Octarina Bloodworth-Smythe termed "the squeaky droplet problem***"—the blood simply refuses to cooperate with the geometric demands placed upon it, occasionally emitting small noises of protest†††.
+&nbsp;
+The infamous Mandelbrot Incident of 1823‡‡‡ serves as a permanent reminder of why complete fractals remain prohibited under the Conventions of Geneva, Paris, and That Place We Don't Talk About Anymore§§§§. Dr. Friedrich Mandelbrot, working in his laboratory in Prague*, achieved what he believed to be a perfect seven-iteration Sierpiński triangle using a proprietary blood preservation technique that we now know involved liberal applications of temporal stasis**. The resulting pattern achieved such profound self-similarity that it began recursing not merely in space, but in time††, creating what witnesses described as "an extremely insistent yesterday‡‡." The entire laboratory, Mandelbrot included, became locked in an infinite loop of the same seventeen seconds§§, repeating with such precision that local reality developed what the cleanup team described as "a sort of metaphysical stutter§§§." The building had to be demolished, salted, demolished again, and then the rubble had to be scattered across seven different continents before the recursion finally collapsed***. We still receive postcards from Mandelbrot, arriving like clockwork every third Tuesday, all dated August 15th, 1823, all saying exactly the same thing: "I think I've nearly got it working."†††
+&nbsp;
+Modern practice therefore limits fractal blood working to three iterations maximum under standard circumstances‡‡‡, with special dispensation available for fourth-iteration work provided the practitioner maintains adequate insurance§§§§, has filed the appropriate forms with the Department of Improbable Events*, and accepts full responsibility for any resulting temporal paradoxes, spatial inversions, or manifestations of their own future corpse**. The power gain from three iterations—an eightfold amplification—proves sufficient for most practical applications†† while remaining within the bounds of magical stability that permit the practitioner to continue existing in linear time‡‡. As the saying goes among blood mages: "Three iterations good, four iterations bad, five iterations where did the laboratory go§§."
+&nbsp;
+&nbsp;
+---FOOTNOTES---
+&nbsp;
+*Not to be confused with the shallow arts, which are considerably more popular at parties but unlikely to accidentally summon anything that needs to be hit with a chair.
+&nbsp;
+†The Ancient Guild of Hemomancers maintains that blood is "numbers that walk around," which is a deeply uncomfortable thing to contemplate while having blood drawn for medical purposes. The Guild has been asked repeatedly to stop sharing this information with phlebotomists.
+&nbsp;
+‡Page 347, subsection xiv, clause 8.b: "The College accepts no liability for students who attempt to divide by zero using their own circulatory system as the denominator." The warranty also becomes void if you attempt to prove you don't exist, succeed, and then file a complaint about it.
+&nbsp;
+**Power does not actually approach infinity. It approaches the attention of infinity, which then approaches you, which is considerably worse. The Dean of Applied Metaphysics notes that infinity takes these things personally.
+&nbsp;
+††This is what the textbooks refer to as "aggressive reciprocity" and what survivors call "the universe defending itself."
+&nbsp;
+*There exists considerable debate over what constitutes an "appropriate surface." Traditionally, stone or metal work best. Glass is acceptable. Paper is problematic. Human skin is technically permitted but heavily discouraged after the Self-Portrait Incident of 1776‡.
+&nbsp;
+‡Sir Bartholomew Cruor attempted to inscribe a fractal pattern upon his own chest "to save time." The resulting recursive amplification loop caused him to achieve what he described as "unprecedented clarity of vision" and what witnesses described as "turning partially into a triangle." He spent his remaining years in a specially constructed hexagonal room and could only be photographed from certain angles. His last words were reportedly "At least I'm equilateral."
+&nbsp;
+†††A base power level being defined as "enough to influence outcomes but not enough to influence whether outcomes should exist in the first place."
+&nbsp;
+‡‡The exact mechanism of amplification relates to the pattern's self-similarity causing magical resonance. Think of it as blood singing in harmony with itself, except the harmony is written in the language that reality uses to process existence*. Or don't think about it. Not thinking about it is also valid.
+&nbsp;
+*Reality's language consists primarily of mathematics, with a dialect of pure geometry, and contains no words for "stop" or "please" or "I have learned my lesson."
+&nbsp;
+‡‡‡According to the Fractal Amplification Scale, which ranges from "pleasant tingle" (1st iteration) to "sudden awareness of colors you've never seen and wish you hadn't" (4th iteration) to "you are now a verb" (5th iteration). The scale officially ends at five iterations because nobody has survived a sixth to describe it, though we have found notes written in blood that appear to describe themselves†.
+&nbsp;
+†The notes arrange themselves into fractal patterns when left overnight. The Archivist burns them monthly. They keep coming back. We suspect they may be the only remains of the Henderson Expedition.
+&nbsp;
+§The University of Practical Sanguimancy estimates that approximately 23.7% of all practitioners attempt a fourth iteration at some point in their careers. It estimates that 0.3% survive to regret it. The remaining percentages are classified under "Outcomes Requiring New Mathematical Notation."
+&nbsp;
+§§This statistic comes from the Department of Improbable Events, which maintains actuarial tables for magical mishaps. The tables themselves form fractal patterns and must be read carefully lest one accidentally file an insurance claim for an accident that hasn't happened yet but now inevitably will*.
+&nbsp;
+*This has happened forty-seven times. Sixteen of the resulting accidents could not have physically occurred under normal causality, suggesting that prophecy is just another form of premium.
+&nbsp;
+§§§The definition of "something very final" includes but is not limited to: spontaneous combustion, spontaneous de-combustion (much weirder), temporary cessation of existence, permanent cessation of existence, existence in too many places simultaneously, transformation into a geometric proof, or what the medical journals describe as "acute triangle syndrome."
+&nbsp;
+*The physical limitations of blood represent one of the Old Gods' better practical jokes. Blood is perfectly suited for magic—except for all the ways it isn't. The God of Contradictions took credit for this during an interview in 1845† but then denied it in the same sentence.
+&nbsp;
+†The interview had to be transcribed backwards and translated from Proto-Paradoxical. The interviewer later took up a career in something less confusing, like tax law or quantum mechanics.
+&nbsp;
+**The squeaky droplet problem, while sounding adorable, is actually quite distressing. Witnesses report that blood undergoing excessive fractal subdivision produces sounds variously described as`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Using fractal geometry to create infinitely recursive blood patterns',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  BLOOD_CIRCLE_FUNDAMENTALS,</span>
+<span class="cstat-no" title="statement not covered" >  PENTAGRAM_THEORY,</span>
+<span class="cstat-no" title="statement not covered" >  SIGIL_BLOOD_BINDING,</span>
+<span class="cstat-no" title="statement not covered" >  THREE_DIMENSIONAL_ARRAYS,</span>
+<span class="cstat-no" title="statement not covered" >  FRACTAL_BLOOD_PATTERNS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

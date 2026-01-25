@@ -112,6 +112,7 @@ export class OcclusionCuller {
 
   /**
    * Flood fill from one face to find which other faces are reachable
+   * Optimized: Uses index-based queue (O(1) dequeue) and packed integer keys
    */
   private floodFillFromFace(
     getBlock: (x: number, y: number, z: number) => number,
@@ -124,55 +125,114 @@ export class OcclusionCuller {
     // Get starting positions on face
     const startPositions = this.getFacePositions(startFace, size, height);
 
-    // BFS through air blocks
-    const visited = new Set<string>();
-    const queue: [number, number, number][] = [];
+    // BFS through air blocks - use Set<number> with packed coords for O(1) lookup
+    // Pack: x + z * size + y * size * size (y has largest range)
+    const packCoord = (x: number, y: number, z: number) => x + z * size + y * size * size;
+    const visited = new Set<number>();
+
+    // Pre-allocate queue array - max possible size is size * size * height
+    const queue = new Uint32Array(size * size * height * 3); // x, y, z triples
+    let queueHead = 0;
+    let queueTail = 0;
 
     for (const [x, y, z] of startPositions) {
       const blockType = getBlock(x, y, z);
       if (blockType === 0) {
-        queue.push([x, y, z]);
-        visited.add(`${x},${y},${z}`);
+        const packed = packCoord(x, y, z);
+        if (!visited.has(packed)) {
+          visited.add(packed);
+          queue[queueTail++] = x;
+          queue[queueTail++] = y;
+          queue[queueTail++] = z;
+        }
       }
     }
 
-    const directions: Array<[number, number, number]> = [
-      [1, 0, 0],
-      [-1, 0, 0],
-      [0, 1, 0],
-      [0, -1, 0],
-      [0, 0, 1],
-      [0, 0, -1],
-    ];
+    const sizeM1 = size - 1;
+    const heightM1 = height - 1;
 
-    while (queue.length > 0) {
-      const pos = queue.shift();
-      if (!pos) break;
-      const [x, y, z] = pos;
+    while (queueHead < queueTail) {
+      // Safe: queueHead < queueTail guarantees valid indices
+      const x = queue[queueHead++]!;
+      const y = queue[queueHead++]!;
+      const z = queue[queueHead++]!;
 
       // Check if we reached another face
       if (x === 0) reachable.add('-X');
-      if (x === size - 1) reachable.add('+X');
+      if (x === sizeM1) reachable.add('+X');
       if (y === 0) reachable.add('-Y');
-      if (y === height - 1) reachable.add('+Y');
+      if (y === heightM1) reachable.add('+Y');
       if (z === 0) reachable.add('-Z');
-      if (z === size - 1) reachable.add('+Z');
+      if (z === sizeM1) reachable.add('+Z');
 
-      for (const dir of directions) {
-        const [dx, dy, dz] = dir;
-        const nx = x + dx;
-        const ny = y + dy;
-        const nz = z + dz;
-        const key = `${nx},${ny},${nz}`;
+      // Early exit if all faces reachable
+      if (reachable.size === 6) return reachable;
 
-        if (visited.has(key)) continue;
-        if (nx < 0 || nx >= size || nz < 0 || nz >= size) continue;
-        if (ny < 0 || ny >= height) continue;
-
-        const blockType = getBlock(nx, ny, nz);
-        if (blockType === 0) {
-          visited.add(key);
-          queue.push([nx, ny, nz]);
+      // Check 6 neighbors - inline for speed
+      // +X
+      if (x < sizeM1) {
+        const nx = x + 1;
+        const packed = packCoord(nx, y, z);
+        if (!visited.has(packed) && getBlock(nx, y, z) === 0) {
+          visited.add(packed);
+          queue[queueTail++] = nx;
+          queue[queueTail++] = y;
+          queue[queueTail++] = z;
+        }
+      }
+      // -X
+      if (x > 0) {
+        const nx = x - 1;
+        const packed = packCoord(nx, y, z);
+        if (!visited.has(packed) && getBlock(nx, y, z) === 0) {
+          visited.add(packed);
+          queue[queueTail++] = nx;
+          queue[queueTail++] = y;
+          queue[queueTail++] = z;
+        }
+      }
+      // +Y
+      if (y < heightM1) {
+        const ny = y + 1;
+        const packed = packCoord(x, ny, z);
+        if (!visited.has(packed) && getBlock(x, ny, z) === 0) {
+          visited.add(packed);
+          queue[queueTail++] = x;
+          queue[queueTail++] = ny;
+          queue[queueTail++] = z;
+        }
+      }
+      // -Y
+      if (y > 0) {
+        const ny = y - 1;
+        const packed = packCoord(x, ny, z);
+        if (!visited.has(packed) && getBlock(x, ny, z) === 0) {
+          visited.add(packed);
+          queue[queueTail++] = x;
+          queue[queueTail++] = ny;
+          queue[queueTail++] = z;
+        }
+      }
+      // +Z
+      if (z < sizeM1) {
+        const nz = z + 1;
+        const packed = packCoord(x, y, nz);
+        if (!visited.has(packed) && getBlock(x, y, nz) === 0) {
+          visited.add(packed);
+          queue[queueTail++] = x;
+          queue[queueTail++] = y;
+          queue[queueTail++] = nz;
+        }
+      }
+      // -Z
+      if (z > 0) {
+        const nz = z - 1;
+        const packed = packCoord(x, y, nz);
+        if (!visited.has(packed) && getBlock(x, y, nz) === 0) {
+          visited.add(packed);
+          queue[queueTail++] = x;
+          queue[queueTail++] = y;
+          queue[queueTail++] = nz;
         }
       }
     }

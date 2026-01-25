@@ -80,7 +80,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const actorPos = actor.getComponent(ComponentType.Position);
     if (!actorPos) {
       return {
         valid: false,
@@ -89,7 +89,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
+    const inventory = actor.getComponent(ComponentType.Inventory);
     if (!inventory) {
       return {
         valid: false,
@@ -107,7 +107,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check plant has PlantComponent
-    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent | undefined;
+    const plant = plantEntity.getComponent(ComponentType.Plant);
     if (!plant) {
       return {
         valid: false,
@@ -133,7 +133,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check plant has position
-    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
+    const plantPos = plantEntity.getComponent(ComponentType.Position);
     if (!plantPos) {
       return {
         valid: false,
@@ -207,9 +207,9 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Get components
-    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent;
-    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent;
-    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent;
+    const plant = plantEntity.getComponent(ComponentType.Plant);
+    const inventory = actor.getComponent(ComponentType.Inventory);
+    const plantPos = plantEntity.getComponent(ComponentType.Position);
 
     if (!plant) {
       return {
@@ -224,6 +224,15 @@ export class GatherSeedsActionHandler implements ActionHandler {
       return {
         success: false,
         reason: `Actor ${action.actorId} has no inventory component`,
+        effects: [],
+        events: [],
+      };
+    }
+
+    if (!plantPos) {
+      return {
+        success: false,
+        reason: `Plant entity ${action.targetId} has no position component`,
         effects: [],
         events: [],
       };

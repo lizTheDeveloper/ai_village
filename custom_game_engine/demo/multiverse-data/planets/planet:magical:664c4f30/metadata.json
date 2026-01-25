@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:664c4f30",
+  "name": "Alpha Rhea",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769233806657",
+  "createdAt": 1769233806669,
+  "lastAccessedAt": 1769233806669,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769233806657",
+    "type": "magical"
+  }
+}

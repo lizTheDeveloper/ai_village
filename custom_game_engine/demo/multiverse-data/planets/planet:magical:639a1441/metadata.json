@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:639a1441",
+  "name": "Terra Two",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769229165697",
+  "createdAt": 1769229165715,
+  "lastAccessedAt": 1769229165715,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769229165697",
+    "type": "magical"
+  }
+}

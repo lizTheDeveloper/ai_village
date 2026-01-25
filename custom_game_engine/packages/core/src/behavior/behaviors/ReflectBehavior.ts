@@ -77,7 +77,7 @@ export class ReflectBehavior extends BaseBehavior {
    * Generate reflection monologue based on recent memories.
    */
   private generateReflectionMonologue(entity: EntityImpl, _world: World): string {
-    const memory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+    const memory = entity.getComponent(ComponentType.SpatialMemory);
 
     if (!memory || memory.memories.length === 0) {
       return this.getDefaultReflection();
@@ -139,7 +139,7 @@ export class ReflectBehavior extends BaseBehavior {
       return; // No goals component - skip
     }
 
-    const goals = entity.getComponent<GoalsComponent>(ComponentType.Goals);
+    const goals = entity.getComponent(ComponentType.Goals);
     if (!goals) {
       return;
     }
@@ -155,7 +155,7 @@ export class ReflectBehavior extends BaseBehavior {
     }
 
     // Get personality
-    const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
+    const personality = entity.getComponent(ComponentType.Personality);
     if (!personality) {
       return; // Need personality to form goals
     }
@@ -368,7 +368,7 @@ export function reflectBehaviorWithContext(ctx: import('../BehaviorContext.js').
  * Helper function for reflectBehaviorWithContext.
  */
 function generateReflectionMonologue(ctx: import('../BehaviorContext.js').BehaviorContext): string {
-  const memory = ctx.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+  const memory = ctx.getComponent(ComponentType.SpatialMemory) as SpatialMemoryComponent | undefined;
 
   if (!memory || memory.memories.length === 0) {
     return getDefaultReflection();
@@ -376,8 +376,8 @@ function generateReflectionMonologue(ctx: import('../BehaviorContext.js').Behavi
 
   // Get strongest recent memories
   const recentMemories = memory.memories
-    .filter(m => m.strength > 30)
-    .sort((a, b) => b.strength - a.strength)
+    .filter((m: import('../../components/SpatialMemoryComponent.js').SpatialMemory) => m.strength > 30)
+    .sort((a: import('../../components/SpatialMemoryComponent.js').SpatialMemory, b: import('../../components/SpatialMemoryComponent.js').SpatialMemory) => b.strength - a.strength)
     .slice(0, 3);
 
   if (recentMemories.length === 0) {
@@ -385,7 +385,7 @@ function generateReflectionMonologue(ctx: import('../BehaviorContext.js').Behavi
   }
 
   // Generate monologue based on memory types
-  const memoryTypes = recentMemories.map(m => m.type);
+  const memoryTypes = recentMemories.map((m: import('../../components/SpatialMemoryComponent.js').SpatialMemory) => m.type);
 
   if (memoryTypes.includes('success')) {
     return 'Reflecting on recent accomplishments... I\'ve been making good progress.';
@@ -432,7 +432,7 @@ function attemptGoalFormation(ctx: import('../BehaviorContext.js').BehaviorConte
     return; // No goals component - skip
   }
 
-  const goals = ctx.getComponent<GoalsComponent>(ComponentType.Goals);
+  const goals = ctx.getComponent(ComponentType.Goals) as GoalsComponent | undefined;
   if (!goals) {
     return;
   }
@@ -448,7 +448,7 @@ function attemptGoalFormation(ctx: import('../BehaviorContext.js').BehaviorConte
   }
 
   // Get personality
-  const personality = ctx.getComponent<PersonalityComponent>(ComponentType.Personality);
+  const personality = ctx.getComponent(ComponentType.Personality) as PersonalityComponent | undefined;
   if (!personality) {
     return; // Need personality to form goals
   }

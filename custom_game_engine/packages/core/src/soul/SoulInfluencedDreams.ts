@@ -11,12 +11,11 @@
 import type { Entity } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType } from '../types/ComponentType.js';
-import type { SoulLinkComponent } from './SoulLinkComponent.js';
-import type { SoulIdentityComponent } from './SoulIdentityComponent.js';
-import type { SilverThreadComponent } from './SilverThreadComponent.js';
-import type { PlotLinesComponent, PlotDreamHint } from '../plot/PlotTypes.js';
+import type { PlotDreamHint } from '../plot/PlotTypes.js';
 import { consumeDreamHints } from '../plot/PlotTypes.js';
 import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
+import type { SoulIdentityComponent } from './SoulIdentityComponent.js';
+import type { SilverThreadComponent } from './SilverThreadComponent.js';
 
 /**
  * Soul-influenced dream types
@@ -47,15 +46,15 @@ export function generateSoulDream(
   world: World
 ): SoulDream | null {
   // Check if agent has a soul
-  const soulLink = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
+  const soulLink = agent.getComponent(ComponentType.SoulLink);
   if (!soulLink) return null;
 
   // Get soul entity
   const soul = world.getEntity(soulLink.soul_id);
   if (!soul) return null;
 
-  const identity = soul.getComponent(ComponentType.SoulIdentity) as unknown as SoulIdentityComponent | undefined;
-  const thread = soul.getComponent(ComponentType.SilverThread) as unknown as SilverThreadComponent | undefined;
+  const identity = soul.getComponent(ComponentType.SoulIdentity);
+  const thread = soul.getComponent(ComponentType.SilverThread);
 
   if (!identity || !thread) return null;
 
@@ -213,7 +212,7 @@ function generatePropheticVision(
   soul: Entity,
   identity: SoulIdentityComponent
 ): SoulDream {
-  const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+  const plotLines = soul.getComponent(ComponentType.PlotLines);
 
   if (!plotLines) {
     return {
@@ -439,13 +438,13 @@ export function shouldReceiveSoulDream(
   agent: Entity,
   world: World
 ): boolean {
-  const soulLink = agent.getComponent(ComponentType.SoulLink) as unknown as SoulLinkComponent | undefined;
+  const soulLink = agent.getComponent(ComponentType.SoulLink);
   if (!soulLink) return false;
 
   const soul = world.getEntity(soulLink.soul_id);
   if (!soul) return false;
 
-  const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
+  const identity = soul.getComponent(ComponentType.SoulIdentity);
   if (!identity) return false;
 
   // Base probability: soul influence * wisdom factor

@@ -1664,10 +1664,11 @@ Plant
 1. **Viewport culling:** Only render entities/chunks in camera bounds
 2. **Sprite caching:** Sprites cached by instance ID, shared across entities
 3. **Chunk lazy loading:** Chunks only generated when visible
-4. **Entity depth sorting:** Entities sorted by Y position once per frame
-5. **Particle pooling:** Particles reused from pool instead of creating new objects
-6. **Canvas layer separation:** UI panels rendered on separate layer from game world
-7. **Dirty rectangle rendering:** Only redraw changed regions (future optimization)
+4. **Terrain chunk caching:** Chunks pre-rendered to off-screen canvas and cached
+5. **Entity depth sorting:** Entities sorted by Y position once per frame
+6. **Particle pooling:** Particles reused from pool instead of creating new objects
+7. **Canvas layer separation:** UI panels rendered on separate layer from game world
+8. **Dirty rectangle rendering:** Only redraw changed regions (future optimization)
 
 **Viewport culling:**
 
@@ -1698,6 +1699,35 @@ if (!instanceId) {
   this.entitySpriteInstances.set(entityId, instanceId);
 }
 const sprite = loader.getLoadedSprite(instanceId);
+```
+
+**Terrain chunk caching:**
+
+```typescript
+// TerrainRenderer automatically caches rendered chunks to off-screen canvas
+// Chunks are only re-rendered when terrain data changes (detected via hash)
+// Zoom changes do NOT invalidate cache - cached canvas is just scaled
+
+const renderer = new TerrainRenderer(ctx, tileSize);
+
+// First render: chunk rendered to off-screen canvas and cached
+renderer.renderChunk(chunk, camera);
+
+// Second render: cached canvas is reused (even at different zoom levels)
+camera.zoom = 2.0;
+renderer.renderChunk(chunk, camera); // Fast: uses cached canvas
+
+// Cache invalidation happens automatically when chunk data changes
+chunk.tiles[0].terrain = 'grass'; // Hash changes
+renderer.renderChunk(chunk, camera); // Re-renders to cache
+
+// Manual cache control:
+renderer.invalidateChunkCache(chunkX, chunkY); // Invalidate specific chunk
+renderer.invalidateAllCaches(); // Invalidate all (e.g., on settings change)
+renderer.getCacheStats(); // { size: 42, maxSize: 100 }
+
+// LRU eviction: Cache limited to 100 chunks (~1.6MB at 16px tiles)
+// Oldest unused chunks automatically evicted when cache is full
 ```
 
 **Chunk lazy loading:**

@@ -36,7 +36,7 @@ dotenv.config();
 
 import {
   GameLoop,
-  WorldImpl,
+  World,
   EventBusImpl,
   registerAllSystems,
   initializeNetworkManager,
@@ -44,7 +44,6 @@ import {
   GodChatRoomNetwork,
   type ChatMessage,
   type MultiverseNetworkManager,
-  type World,
   type WorldMutator,
   ComponentType as CT,
   type WeatherComponent,

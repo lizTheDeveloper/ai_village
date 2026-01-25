@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:64dc824c",
+  "name": "Galactic Titan",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769240954255",
+  "createdAt": 1769240954262,
+  "lastAccessedAt": 1769240954262,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769240954255",
+    "type": "magical"
+  }
+}

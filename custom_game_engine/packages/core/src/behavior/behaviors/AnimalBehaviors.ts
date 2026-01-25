@@ -43,9 +43,9 @@ const MAX_HOUSING_RANGE = 50;
 export class TameAnimalBehavior extends BaseBehavior {
   readonly name = 'tame_animal' as const;
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const agent = entity.getComponent(ComponentType.Agent)!;
+    const inventory = entity.getComponent(ComponentType.Inventory);
     this.disableSteering(entity);
     const state = agent.behaviorState || {};
     const targetAnimalId = state.targetAnimalId as string | undefined;
@@ -61,7 +61,7 @@ export class TameAnimalBehavior extends BaseBehavior {
       const animalEntity = world.getEntity(targetAnimalId) as EntityImpl | undefined;
       if (animalEntity) {
         const animal = animalEntity.getComponent<AnimalComponent>(ComponentType.Animal);
-        const animalPos = animalEntity.getComponent<PositionComponent>(ComponentType.Position);
+        const animalPos = animalEntity.getComponent(ComponentType.Position);
         if (animal && animalPos && animal.wild) {
           targetAnimal = { entity: animalEntity, animal, position: animalPos };
         }
@@ -172,7 +172,7 @@ export class TameAnimalBehavior extends BaseBehavior {
     for (const animalEntity of animals) {
       const impl = animalEntity as EntityImpl;
       const animal = impl.getComponent<AnimalComponent>(ComponentType.Animal)!;
-      const animalPos = impl.getComponent<PositionComponent>(ComponentType.Position)!;
+      const animalPos = impl.getComponent(ComponentType.Position)!;
       // Must be wild
       if (!animal.wild) continue;
       // Check if species can be tamed
@@ -206,8 +206,8 @@ export class TameAnimalBehavior extends BaseBehavior {
 export class HouseAnimalBehavior extends BaseBehavior {
   readonly name = 'house_animal' as const;
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const position = entity.getComponent(ComponentType.Position)!;
+    const agent = entity.getComponent(ComponentType.Agent)!;
     this.disableSteering(entity);
     const state = agent.behaviorState || {};
     const targetAnimalId = state.targetAnimalId as string | undefined;
@@ -229,7 +229,7 @@ export class HouseAnimalBehavior extends BaseBehavior {
       return { complete: true, reason: 'Animal no longer exists' };
     }
     const animal = animalEntity.getComponent<AnimalComponent>(ComponentType.Animal);
-    const animalPos = animalEntity.getComponent<PositionComponent>(ComponentType.Position);
+    const animalPos = animalEntity.getComponent(ComponentType.Position);
     if (!animal || !animalPos) {
       this.complete(entity);
       return { complete: true, reason: 'Invalid animal entity' };
@@ -253,8 +253,8 @@ export class HouseAnimalBehavior extends BaseBehavior {
     if (targetHousingId) {
       const housingEntity = world.getEntity(targetHousingId) as EntityImpl | undefined;
       if (housingEntity) {
-        const building = housingEntity.getComponent<BuildingComponent>(ComponentType.Building);
-        const housingPos = housingEntity.getComponent<PositionComponent>(ComponentType.Position);
+        const building = housingEntity.getComponent(ComponentType.Building);
+        const housingPos = housingEntity.getComponent(ComponentType.Position);
         if (building && housingPos) {
           housing = { entity: housingEntity, building, position: housingPos };
         }
@@ -321,8 +321,8 @@ export class HouseAnimalBehavior extends BaseBehavior {
     let bestDistance = Infinity;
     for (const buildingEntity of buildings) {
       const impl = buildingEntity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>(ComponentType.Building)!;
-      const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position)!;
+      const building = impl.getComponent(ComponentType.Building)!;
+      const buildingPos = impl.getComponent(ComponentType.Position)!;
       // Must be animal housing
       if (!isAnimalHousing(building.buildingType)) continue;
       // Must be complete

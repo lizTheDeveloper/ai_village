@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:8134ffa",
+  "name": "Eta--386",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769227031724",
+  "createdAt": 1769227031727,
+  "lastAccessedAt": 1769227031727,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769227031724",
+    "type": "magical"
+  }
+}

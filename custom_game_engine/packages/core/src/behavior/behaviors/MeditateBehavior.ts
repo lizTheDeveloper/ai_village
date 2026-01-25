@@ -93,10 +93,10 @@ export class MeditateBehavior extends BaseBehavior {
     const currentTick = world.tick;
 
     // Get required components
-    const spiritual = entity.getComponent<SpiritualComponent>(ComponentType.Spiritual);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const spiritual = entity.getComponent(ComponentType.Spiritual);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const needs = entity.getComponent(ComponentType.Needs);
+    const position = entity.getComponent(ComponentType.Position);
 
     if (!spiritual || !agent) {
       throw new Error(`[MeditateBehavior] Agent ${entity.id} missing required components: spiritual=${!!spiritual}, agent=${!!agent}`);

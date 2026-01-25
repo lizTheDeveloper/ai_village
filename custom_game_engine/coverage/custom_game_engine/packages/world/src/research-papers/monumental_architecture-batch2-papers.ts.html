@@ -1,0 +1,904 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/monumental_architecture-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> monumental_architecture-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HANGING_GARDENS_ENGINEERING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'hanging_gardens_engineering',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Hanging Gardens Engineering',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['monumental_architecture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['lighthouse_tower_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_hanging_gardens_engineering' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Hanging Gardens Engineering: A Treatise on Defying Gravity with Considerable Optimism</span>
+&nbsp;
+The fundamental principle of hanging gardens engineering rests upon a deceptively simple premise: that vegetation, traditionally content to grow upon the ground where Nature intended*, can be persuaded—through increasingly elaborate applications of force, cunning, and structural steel—to flourish at heights normally reserved for eagles, mountain goats, and those peculiar individuals who write "lighthouse tower engineering" textbooks†. The ancient Babylonians, or possibly the Assyrians‡, or conceivably neither**, mastered this art some two thousand years ago, though their methods have been lost to history, along with their safety regulations, most of their gardeners, and—according to some scholars—their collective sanity. Modern practitioners have rediscovered these principles through the time-honored academic method of trying things until something doesn't fall down††, a process that has contributed significantly to our understanding of both horticulture and insurance premiums.
+&nbsp;
+The practical implementation of hanging gardens requires a thorough understanding of load-bearing calculations, waterproofing techniques, and the approximate weight of wet soil‡‡, which the Interdisciplinary Committee on Suspended Vegetation*** notes is "considerably more than one might optimistically assume, and substantially more than the garden's designer typically budgets for." The structural framework must support not merely the static weight of soil, plants, and decorative stonework, but also the dynamic loads imposed by wind, rain, maintenance workers†††, and the inexorable process of root systems expanding with what can only be described as malicious intent toward whatever structural member stands in their way‡‡‡. Water management presents particular challenges, as irrigation systems must deliver moisture to plants while simultaneously preventing said moisture from cascading through seventeen floors of luxury apartments****, a phenomenon that has inspired more emergency calls to structural engineers than any other single aspect of the discipline.
+&nbsp;
+The vertical garden must contend with what Professor Hieronymus Blackthorne of the Celestial Academy of Improbable Architecture† called "the tyranny of the upward vine," whereby climbing plants, given even the slightest opportunity, will attempt to colonize everything from neighboring balconies to air conditioning units to the Lord Mayor's ceremonial hat††††. Strategic plant selection becomes paramount: certain species demonstrate remarkable adaptability to elevated environments‡‡‡‡, while others respond to being suspended above ground level with what can only be interpreted as botanical depression, manifesting in yellowed leaves, stunted growth, and a general air of leafy resentment*****. The most successful installations employ a careful balance of shallow-rooted groundcovers, strategically placed small trees with constrained root balls†††††, and flowers that have been genetically predisposed—through centuries of cultivation in monastery gardens, rooftop terraces, and the window boxes of determined citizens‡‡‡‡‡—to accept the absurdity of their situation with good grace.
+&nbsp;
+Safety protocols for hanging garden construction and maintenance have evolved considerably since the unfortunate Incident at Thessaly******, wherein an attempt to install a full-scale olive grove on the seventh story of the Merchant's Guild Hall resulted in what contemporary accounts describe as "a most unseemly rain of topsoil and olives lasting the better part of an afternoon"†††††††. Modern engineering standards require load testing to 250% of anticipated maximum weight‡‡‡‡‡‡, redundant structural supports positioned at intervals determined by the Forthright-Willoughby Coefficient*******, and drainage systems capable of handling what the Guild of Municipal Engineers calls "biblically improbable rainfall events." Personal protective equipment for maintenance workers must account not only for fall hazards but also for bee stings, thorn scratches, encounters with nesting birds††††††††, and—following the Kensington Topiary Affair of 1847‡‡‡‡‡‡‡—the possibility of becoming temporarily lost within one's own garden design********.
+&nbsp;
+Historical analysis reveals that hanging gardens serve purposes beyond mere botanical exhibition, functioning as status symbols, defensive fortifications*********, temperature regulators, and—according to the somewhat eccentric theories of Dr. Cornelius Nightingale†††††††††—conduits for ancient earth magic that predates human civilization by several geological epochs‡‡‡‡‡‡‡‡. The earliest documented suspended gardens appear in Sumerian texts dating to approximately 2000 BCE, though scholars debate whether these references describe actual hanging gardens or merely gardens that felt metaphorically suspended due to the effects of fermented date wine**********. The Seven Wonders tradition credits Nebuchadnezzar II with constructing the gardens of Babylon to please his homesick wife Amytis†††††††††††, who apparently found the flat Mesopotamian plains insufficiently mountainous for her refined Median tastes, though archaeological evidence for this romantic tale remains as elusive as the gardens themselves‡‡‡‡‡‡‡‡‡. Medieval European monasteries developed extensive rooftop gardens primarily for medicinal herb cultivation, discovering that plants grown at elevation developed approximately 23% more aromatic compounds, possibly due to increased sun exposure, wind stress, or—as Brother Anselm of Wurzburg theorized in 1287—"the plants' desperate attempt to smell sufficiently pungent that someone might notice them before they blew away"***********.
+&nbsp;
+---
+&nbsp;
+*Nature being a notoriously conservative force that has spent roughly 400 million years perfecting the "grow toward the sun, roots in the dirt" approach and sees little reason to innovate now. Plants attempting to grow horizontally off cliffs are generally viewed by their botanical peers as show-offs.
+&nbsp;
+†See Forthcoming, D. M., "Lighthouse Tower Engineering: Standing Upright in the Face of Maritime Adversity" (Journal of Inadvisable Construction Projects, Vol. 47, pp. 23-89). The lighthouse paper establishes fundamental principles of vertical load distribution that prove surprisingly relevant when one attempts to balance several tons of garden on inadequate structural supports. The author assumes readers have not skipped directly to hanging gardens because they thought it sounded easier. It is not easier. Nothing about defying gravity is easy.
+&nbsp;
+‡The Babylonian attribution stems from classical sources, primarily Strabo and Philo of Byzantium, both of whom wrote their accounts several centuries after the gardens' alleged existence—a journalistic practice that would be considered questionable today but was apparently standard operating procedure for ancient historians, who maintained that getting the facts right was less important than telling a really good story.
+&nbsp;
+**The historical record regarding the Hanging Gardens of Babylon is so thoroughly muddled that the International Congress of Confused Archaeologists† has classified it as a "Type VII Historical Mystery," indicating that we're not entirely certain the thing existed at all, but we're too committed to the story to admit it now.
+&nbsp;
+†Held annually in whichever city has the most hotel rooms and the least clear historical documentation. The Congress's motto, "Reality is Merely Consensus Plus Time," appears on their official seal beneath an image of a shrugging scribe.
+&nbsp;
+††The engineering profession refers to this as "empirical methodology," though it is more honestly described as "iterative failure with gradually improving results." The Structural Testing Institute of Greater London maintains a memorial wall listing the names of 347 prototype hanging gardens that ceased to be hanging and became, briefly, falling gardens before achieving their final state as garden-shaped rubble.
+&nbsp;
+‡‡Approximately 1,600 kilograms per cubic meter when saturated, according to the Society of People Who Learned This the Hard Way†. This is roughly equivalent to suspending a small automobile overhead, except the automobile doesn't require watering, won't attract aphids, and is unlikely to develop root systems that penetrate your waterproofing membrane.
+&nbsp;
+†Membership is free but requires submitting a detailed incident report describing exactly how one learned about soil density through structural failure rather than mathematics.
+&nbsp;
+***Founded in 1823 after a series of balcony collapses across Europe convinced the architectural community that perhaps someone should study this systematically. The Committee's headquarters occupy the third floor of the Suspended Gardens Building in Amsterdam, which they selected specifically to demonstrate either confidence in their engineering principles or an admirably dark sense of irony. Possibly both.
+&nbsp;
+†††Maintenance workers, it must be noted, are significantly heavier than plants†, particularly when carrying tools, spare soil, replacement plants, and the crushing weight of existential dread that comes from working at height in all weather conditions while attempting to prune something that doesn't want to be pruned.
+&nbsp;
+†The average maintenance gardener weighs between 60-90kg, which is fine when standing on solid ground but becomes increasingly concerning when multiplied by the number of gardeners, their equipment, and that rather heavy-looking wheelbarrow they've inexplicably decided to bring up to the roof.
+&nbsp;
+‡‡‡Root systems follow a principle known as "Wilkinson's Law of Botanical Aggression," which states that any`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding hanging gardens engineering in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TEMPLE_COMPLEX_PLANNING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'temple_complex_planning',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Temple Complex Planning',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['monumental_architecture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['hanging_gardens_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_temple_complex_planning' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `TEMPLE COMPLEX PLANNING: A COMPREHENSIVE TREATISE ON SACRED ARCHITECTURE, DIVINE LOGISTICS, AND THE SURPRISING FREQUENCY WITH WHICH GODS CHANGE THEIR MINDS</span>
+&nbsp;
+The planning of temple complexes represents one of humanity's most ambitious architectural endeavors, combining the practical considerations of construction engineering with the somewhat more unpredictable requirements of divine appeasement*. Unlike the Hanging Gardens, which needed merely to defy gravity and basic botanical logic, temple complexes must simultaneously satisfy the demands of worshippers, priests, architects, city planners, and—most challengingly—deities who may or may not exist but whose theoretical preferences must nonetheless be accommodated with utmost precision**. The fundamental principle, established by the Ancient Order of Sacred Geometers in the Third Dynasty†, states that a temple complex must serve as both a functional religious center and a monumentally impressive statement of "our god could absolutely beat up your god."†† This dual purpose has led to some extraordinarily creative solutions, several catastrophic failures, and at least one incident we are contractually obligated not to discuss in the main text‡.
+&nbsp;
+The practical applications of temple complex planning begin with site selection, which involves consulting religious texts, studying astronomical alignments, examining soil composition, negotiating with local landowners, and—in 73.4% of documented cases—ignoring all of the above because the king has already decided where he wants it***. The actual layout requires careful consideration of processional routes, sacrificial areas, treasury placement (ideally where priests can see it but thieves theoretically cannot), housing for temple staff, facilities for ritual purification††, and adequate drainage for what the Royal Society of Temple Engineers delicately refers to as "sacred effluent disposal"‡‡. Modern practitioners utilize the Twelve-Fold Planning Matrix†††, which accounts for everything from sight lines to the eastern horizon to the acoustic properties necessary for properly ominous prophetic utterances****.  The integration of water features, gardens, and what the ancient texts call "zones of mysterious architectural purpose that made sense at the time" requires particular attention*****, as does the seemingly simple task of ensuring that all the doors actually open in directions that allow for ceremonial processions rather than comical bottlenecks.
+&nbsp;
+Safety considerations in temple complex planning extend far beyond the mundane concerns of structural integrity and fire prevention, venturing boldly into the realm of theological risk assessment*†. The Guild of Sacred Architects maintains an extensive database of divine displeasure incidents, ranging from minor manifestations (spontaneous combustion of offering bowls, mysterious appearance of wasps in the inner sanctum) to what are technically classified as "acts of wrathful deity" but which insurance companies refuse to cover**†. Best practices include: maintaining at least three escape routes from any altar area††† (four if blood sacrifice is involved); ensuring that no decorative element can be interpreted as resembling a rival deity's symbol, even when viewed from an angle, in poor lighting, by someone squinting‡†; avoiding the placement of sacred flames directly beneath wooden ceiling beams‡‡† (this should be obvious, yet the incident reports suggest otherwise); and never, under any circumstances, positioning the treasury's air vents such that they create a whistling sound interpretable as divine laughter***†. The comprehensive safety manual, running to some 1,247 pages not including appendices, opens with the sobering statistic that approximately 18% of temple complexes experience at least one "major theological engineering incident" during their first decade of operation††††.
+&nbsp;
+Historical development of temple complex planning reveals a fascinating progression from simple mud-brick structures to the magnificent sacred cities that dominated ancient skylines, though this progression was neither linear nor particularly sensible when examined closely‡‡‡. The earliest temples consisted of little more than a wall, a roof, and "whatever seemed holy at the time," but the competitive nature of ancient kingdoms quickly escalated architectural ambition to previously unimaginable heights—literally, in the case of the Tower of Excessive Confidence, which reached 347 feet before its builders realized they had forgotten to include stairs****. The Classical Period introduced mathematical precision to temple planning, with architects employing sophisticated geometric ratios believed to resonate with cosmic harmonies, though surviving correspondence suggests that many of these ratios were actually determined by "whatever divisions of the measuring rod produced numbers without too many fractions"*****. The post-Classical era saw the development of modular planning systems, allowing temple complexes to be expanded over centuries as congregations grew, donations increased, or neighboring cities built something impressive that simply could not be allowed to stand as the most magnificent structure in the region**†. Modern understanding, aided by archaeological evidence and some extremely candid builders' journals recently discovered in the Archive of Embarrassing Historical Truths††††††, recognizes that successful temple complex planning requires balancing religious requirements, practical functionality, aesthetic grandeur, structural feasibility, and—perhaps most importantly—the ability to convince everyone involved that any problems that arise are part of a divine plan rather than a planning failure.
+&nbsp;
+Contemporary applications of these ancient principles continue to influence modern architectural practice, though typically without the literal incorporation of divine consultation into the planning process (except in certain jurisdictions where religious building codes remain surprisingly specific‡‡‡‡). The lessons learned from temple complex planning—particularly regarding the management of large-scale projects with multiple stakeholders, unclear requirements, and the occasional need to accommodate last-minute additions like "the king wants a pyramid on top now"—have proven invaluable to construction professionals worldwide*††. The field remains active, with the International Symposium on Sacred Architecture convening annually to discuss new findings, share cautionary tales, and collectively wonder how ancient civilizations accomplished so much with so little understanding of engineering principles and yet such an abundance of confidence**††.
+&nbsp;
+---
+&nbsp;
+FOOTNOTES:
+&nbsp;
+* The Codex of Practical Divinity, compiled by the Temple Builders' Confederation in the Year of the Nervous Architect, defines "divine appeasement" as "the art of satisfying requirements that change without notice and cannot be verified until it is catastrophically too late." The Codex runs to 2,847 pages, which its authors claim is only Volume One.
+&nbsp;
+** Recent studies by the Department of Theological Engineering at the University of Ancient Mistakes indicate that approximately 62.3% of temple-related construction delays stem from disagreements about what the god or gods in question would prefer, despite the notable silence from said deities on the matter. The remaining 37.7% is attributed to "budgetary realities conflicting with divine grandeur."
+&nbsp;
+† The Ancient Order of Sacred Geometers, founded in 2847 BCE (or possibly 2874 BCE, depending on whose calendar one trusts), was famously dissolved after the Incident of the Incorrect Angle, wherein a miscalculation of 0.3 degrees in the Great Temple of Thoth resulted in the sunrise illumination striking the High Priest directly in the face rather than the altar† . The Order was later reformed under strict supervision and mandatory peer review.
+&nbsp;
+†† The High Priest, noted for his poor humor in the mornings, declared this a sign of divine disapproval. The architect, noted for his poor judgment in arguments with religious authorities, suggested it was actually a sign of mathematical incompetence among the priesthood. Contemporary records indicate the architect was subsequently reassigned to latrine excavation duties. His mathematical reputation, however, remained intact†††.
+&nbsp;
+††† Later scholars have pointed out that the angle was, in fact, perfect; it was the High Priest who had taken to arriving at the temple progressively earlier each day to "catch the sunrise at its most auspicious moment." This revelation came too late to save the architect's career, though his descendants successfully petitioned for a formal apology some 400 years later.
+&nbsp;
+‡ The Incident of the Inverted Ziggurat is mentioned in exactly three historical sources, all of which stop mid-sentence before describing what actually happened. The Official Archive of Things We Do Not Discuss contains a sealed document labeled "The Ziggurat Incident: For Review in the Year 5000 CE, or When Everyone Involved Is Definitely Dead, Whichever Comes Later." Current year: 2024 CE. We have 2,976 years to wait. Archaeologists are very impatient about this.
+&nbsp;
+*** The Statistical Analysis of Royal Overrides, published by the Institute for Honest Historical Assessment, documents 2,847 cases of "the king knows best" superseding expert opinion. The success rate of royal intuition versus professional expertise is measured at approximately 8%, though pointing this out remains inadvisable in most monarchical systems. The Institute relocated to a republic shortly after publication.
+&nbsp;
+†† Ritual purification facilities, according to the Handbook of Sacred Hygiene, must include: source water of appropriate sanctity (river, spring, or rain collected under specific astronomical conditions)† ‡, drainage that does not inadvertently route sacred water through the kitchens or over the treasury floor (both documented errors), and sufficient capacity to handle festival days when pilgrims number in the thousands. The Handbook's appendix on "Plumbing Disasters with`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding temple complex planning in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FORTRESS_CASTLE_ENGINEERING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'fortress_castle_engineering',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Fortress Castle Engineering',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['monumental_architecture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['temple_complex_planning'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_fortress_castle_engineering' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `FORTRESS CASTLE ENGINEERING</span>
+A Comprehensive Study of Defensive Architecture and the Art of Making Very Large Walls Stand Up
+&nbsp;
+The construction of fortress castles represents perhaps the most ambitious confluence of military necessity, architectural hubris, and pure bloody-mindedness in the history of defensive structures*. Unlike temple complexes, which are designed to welcome the faithful (or at least not actively repel them), fortress castles exist specifically to make unwanted visitors feel deeply unwelcome through the strategic application of walls, murder holes, and an almost pathological attention to the placement of boiling oil repositories**. The basic principles rest upon three fundamental pillars: height (to make approaching armies feel small and inadequate), thickness (to make approaching armies feel their siege equipment is inadequate), and strategic murder-ability (to make approaching armies feel dead)†.
+&nbsp;
+The practical applications of fortress castle engineering extend far beyond simply stacking stones in an intimidating manner, though this remains an essential starting point‡. Modern practitioners must master the calculation of wall stress loads, the optimal angle for archer slits (seventeen degrees from perpendicular, oddly specific but backed by centuries of empirical evidence involving actual arrows and actual people)††, and the precise depth at which to dig a moat to prevent both undermining and uncomfortable conversations with subterranean entities†††. The positioning of towers requires understanding both geometric principles and human psychology—attackers must be able to see the towers from sufficient distance to reconsider their life choices, yet not so far as to mistake them for mountains and thus feel their siege is pointless anyway‡‡. Furthermore, the integration of living quarters, storage facilities, and the mandatory haunted wing‡‡‡ demands careful spatial planning that balances defensive capabilities with the mundane reality that people must actually live in these structures for years at a time, often without going entirely mad.
+&nbsp;
+Safety considerations in fortress castle engineering are extensive, well-documented, and routinely ignored by ambitious lords with more gold than sense§. The historical record is replete with cautionary examples: the Collapse of Greater Wallsbury (1247), wherein Lord Pemberton insisted on towers twelve feet taller than engineering calculations recommended§§; the Unfortunate Incident at Castle Deepmere, where inadequate drainage systems led to the moat seeping into the dungeon and creating what scholars now term "accidental amphibious escape routes"§§§; and most famously, the entire disaster of Fortress Overmuch, which was so over-engineered that it collapsed under its own defensive specifications before a single enemy even approached¶. Best practices therefore emphasize working within material limitations, consulting with the local geology (and, if in certain regions, the local geomancers)¶¶, and maintaining a healthy respect for the load-bearing capacity of medieval mortar, which, despite what ambitious nobles might hope, does not improve simply because one shouts at it¶¶¶.
+&nbsp;
+The historical development of fortress castle engineering traces back to the First Age of Really Quite Worried People, when early humans discovered that while running away from threats was effective, standing behind something very solid while other people ran away was even better||. The art evolved through successive waves of innovation: the Proto-Wallians who first conceived of vertical stone barriers; the Classical Period of Slightly Curved Walls (a revolution in its time); the Age of Enlightened Crenellation; and finally the Modern Era of Mathematical Fortification, which emerged when someone thought to actually calculate the trajectory of a trebuchet stone rather than simply hoping it would miss|||. Contemporary understanding incorporates advanced principles from temple complex planning—the sacred geometry of defensive angles, the ritual importance of cornerstone placement, and the metaphysical significance of threshold spaces||||—while adding the distinctly secular concern for where exactly one positions the privy chutes such that they don't compromise structural integrity or create embarrassing vulnerabilities†|||.
+&nbsp;
+The master fortress castle engineer must therefore embody multiple disciplines: mathematician, architect, military strategist, amateur historian (to avoid repeating spectacular failures), practical psychologist (to design spaces that don't drive the inhabitants to surrender from sheer claustrophobic despair), and occasionally diplomat, particularly when explaining to the client that no, one cannot simply add another tower there without the entire western wall achieving unsanctioned horizontal mobility‡|||. The culmination of proper fortress castle engineering is a structure that stands for centuries, successfully repels invaders, comfortably houses defenders, and most importantly, doesn't fall down on a Tuesday for no apparent reason—an achievement more rare in the historical record than one might hope§|||.
+&nbsp;
+&nbsp;
+FOOTNOTES
+&nbsp;
+*The Institute for Unnecessarily Fortified Architecture maintains that approximately 73.4% of fortress castles were built not from military necessity but from what their records clinically term "compensatory fortification syndrome." The remaining 26.6% were built because someone actually needed them, though these cases are considered statistically aberrant and possibly mythical.
+&nbsp;
+**The Guild of Castle Plumbers has published seventeen volumes on the proper installation of murder holes, and every single volume begins with the disclaimer: "Not to be confused with regular holes, which are for looking through, or trading holes, which are for trading through. Murder holes are specifically for murder." This apparently needed clarifying after the Incident of 1189, which we shall not detail here but which involved a surprising amount of misdelivered groceries and at least one very confused chicken.
+&nbsp;
+†This third pillar was originally termed "defensibility" until the Great Semantic Reform of 1356, when the Guild of Honest Terminology argued that everyone knew what castles were really for and we might as well call it what it is. The motion passed by a vote of 247 to 3. The three opposing votes came from people who were subsequently found to be very optimistic pacifists who had wandered into the wrong meeting.
+&nbsp;
+‡Professor Mortimer Gravelson's seminal work "It's Just Stacking, But Bigger" (University of Applied Masonry Press, 1423) attempted to reduce fortress construction to its essential principles. He was laughed out of three academic conferences before being vindicated when his simplified approach resulted in Castle Sensible, which has stood for 600 years and never fallen to siege, primarily because it looks so boring that no army has bothered to attack it. This is considered a defensive victory.
+&nbsp;
+††The seventeen-degree angle was discovered by the legendary archer-mathematician Sir Geoffrey Trajectorial, who spent three years firing arrows through experimental slits at various angles while his assistant recorded the results. According to his journals, the optimal angle was discovered in year two, but he continued for another year because "the grant money was already allocated, and also I'd grown rather fond of shooting arrows at hay bales." The resulting paper, "Angular Considerations in Projectile Deployment Via Restricted Apertures," remains the most cited work in defensive architecture, despite being, by the author's own admission, "rather longer than it needed to be."
+&nbsp;
+†††The appropriate depth is precisely seventeen feet in most soils, twenty-three feet in clay, and "somewhere between 'ankle-deep puddle' and 'genuine lake'" in regions with high water tables. The precision of these measurements stands in stark contrast to the documented cases of moats that became: (a) accidental aquifers, (b) impromptu fishing ponds that distracted defenders during sieges, or (c) homes to things that should not be disturbed, as documented in the sealed archives of Castle Deepwater, which is now called Castle Slightly-Less-Deep-Water-Than-Before for reasons the surviving records refuse to specify.
+&nbsp;
+‡‡The Wallingham Formulae, developed by Lady Architect Sarah Wallingham in 1402, provide precise calculations for tower visibility ranges. Her work included the revolutionary "Despair Distance" calculation—the exact range at which an approaching army could see the fortifications clearly enough to begin questioning their career choices, but not so clearly that they could identify specific weaknesses that might restore their confidence. This distance varies by terrain but averages 2.73 miles, plus or minus the height of the local vegetation and the collective morale of the approaching force.
+&nbsp;
+‡‡‡Every proper fortress castle includes a haunted wing, though whether this is constructed intentionally or simply emerges naturally from the combination of cold stone, insufficient lighting, and centuries of human drama remains a matter of scholarly debate. The Guild of Paranormal Architecture insists on proper haunting accommodations—adequate darkness, appropriately creaking floorboards, and at least one mirror placed such that it reflects other mirrors in unsettling ways. Failure to include these features doesn't prevent hauntings; it merely makes the ghosts irritable and prone to manifesting in inconvenient locations like the kitchen or the privy.
+&nbsp;
+§According to records maintained by the Institute of Cautionary Construction Tales, approximately 43% of fortress castle failures result from nobles who respond to engineering advice with some variation of "but I want it bigger." The Institute's mascot is a cartoon drawing of a collapsed tower with the caption "He Wanted It Bigger." This is considered by members to be absolutely hilarious, though they admit their sense of humor has been somewhat affecte`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding fortress castle engineering in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WONDER_DURABILITY_PRESERVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wonder_durability_preservation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wonder Durability Preservation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['monumental_architecture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['fortress_castle_engineering'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wonder_durability_preservation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `WONDER DURABILITY PRESERVATION: AN INQUIRY INTO THE PERSISTENT MAINTENANCE OF ARCHITECTURAL IMPOSSIBILITY</span>
+&nbsp;
+The preservation of Wonder-class structures represents perhaps the most paradoxical challenge in advanced construction engineering: how does one maintain something that, by all reasonable accounts, should not exist in the first place?* The fundamental principle underlying Wonder Durability Preservation rests upon what the late Professor Hieronymus Gearwright termed "sympathetic impossibility"—the notion that structures built beyond the conventional limits of physics require maintenance protocols that are themselves equally unconventional†. Unlike ordinary fortifications, which deteriorate according to predictable mechanical principles, Wonders suffer from what the Guild of Impossible Architecture calls "conceptual erosion"**: the gradual loss of their essential impossibility as reality attempts to reassert itself‡.
+&nbsp;
+The practical techniques of Wonder preservation fall into three distinct categories, though practitioners will note that these categories are more like guidelines than rules††. First, one must perform regular "impossibility audits," measuring the structure's deviation from physical law using specialized instruments such as the Dreamwright Compass or the more traditional method of simply watching whether things fall when they shouldn't‡‡. Second, the practitioner must engage in what the Eternal Guild of Structural Mythology calls "narrative reinforcement"—the systematic documentation and retelling of the Wonder's origin story to strengthen its conceptual foundation***. Third, and most controversially, one must occasionally introduce fresh impossibilities into the structure through a process the Clockwork University of Absurdheim describes as "recursive wonderment," which involves making the already-impossible slightly more so†††.
+&nbsp;
+Safety considerations in Wonder preservation cannot be overstated, though they frequently are‡‡‡. The primary danger lies not in physical collapse—though that certainly occurs****—but in what happens when reality wins its argument with impossibility. The Incident at Crystalline Spire remains the cautionary standard: when preservation protocols were neglected for merely seventeen days, the tower didn't fall so much as it decided it had never existed, taking several unfortunate historians with it††††. Modern best practices therefore mandate daily wonder-checks, monthly impossibility recalibration, and quarterly consultations with beings who remember when physics was more of a suggestion than a law‡‡‡‡. The International Board of Structural Improbability recommends a minimum staff of seven preservation specialists per Wonder, though they note that the number itself is subject to change depending on the structure's mood*****.
+&nbsp;
+The historical development of Wonder preservation techniques reads less like a technical manual and more like a list of spectacular failures punctuated by occasional survival†††††. Ancient civilizations, lacking our modern understanding, attempted to maintain their Wonders using conventional masonry techniques with predictably catastrophic results‡‡‡‡‡. The breakthrough came in the Age of Reasonable Doubt, when the architect Magdalena Impossibilis first proposed that Wonders required not reinforcement but rather continuous astonishment******. Her methods, detailed in the infamous treatise "Why Buildings Sometimes Simply Refuse," revolutionized the field by suggesting that maintenance workers should approach their tasks not with tools but with an appropriate sense of wonder and terror††††††. Modern understanding has refined these principles, integrating the mathematical frameworks of improbability theory with the practical wisdom of not touching things that hum ominously‡‡‡‡‡‡.
+&nbsp;
+Today's practitioners stand on the shoulders of giants, assuming those giants haven't been retroactively eliminated from existence by poorly maintained Wonders*******. The field continues to evolve, with new techniques emerging from research institutions like the Improbable Institute and the College of Things That Definitely Shouldn't Work††††††††. Recent advances in wonder-stabilization have reduced the average annual "impossible building becomes possible building" rate from 23% to a more manageable 8.7%, though the Board notes that these statistics themselves sometimes cease to have existed when measured too precisely‡‡‡‡‡‡‡. As we look toward the future of Wonder preservation, we must remember the words inscribed on the Foundation Stone of the Still-Standing Impossitorium: "It is not enough to believe in the impossible; one must also remember to oil it."********
+&nbsp;
+&nbsp;
+*The Guild of Reasonable Engineers maintains that Wonder-class structures do not actually violate physical laws, but rather exist in what they term "aggressive legal loopholes" in the universal code. This semantic distinction has not prevented three separate Guild halls from ceasing to exist when their foundations proved too reasonable to support buildings of such pedantic conviction†.
+&nbsp;
+†Professor Gearwright disappeared in 1847 while attempting to measure the exact degree of impossibility in the Floating Archives of Nebulheim. His last recorded words were "But that's not how cantilevers work—" before both he and his measuring equipment were politely but firmly rejected by consensus reality. His collected works, "Things I Probably Shouldn't Have Measured," remain required reading, though readers are advised not to replicate his experiments unless they're comfortable with the concept of past-tense existence‡.
+&nbsp;
+‡The concept of "past-tense existence" is itself a subject of considerable debate at the Philosophical Engineering Society's annual conference, or rather, was a subject of debate before the conference retroactively decided it had never occurred. The Society now meets exclusively in the subjunctive mood††.
+&nbsp;
+**Conceptual erosion affects different Wonders in different ways. The Hanging Gardens of Impossibilia, for instance, are slowly remembering that plants require soil and that soil requires ground beneath it. The preservation team reports that they're currently arguing with the gardens on a philosophical level, though progress has been slow since the gardens keep winning the debates†††.
+&nbsp;
+††These categories were originally seven in number, but three of them became metaphorical during the Great Categorical Crisis of 1923. The remaining category is currently in negotiations with the others about potentially existing‡‡.
+&nbsp;
+†††The origins of this practice trace back to the Dwarvish tradition of "out-stubborning reality." As Master Stonemason Ironfist famously declared, "If the mountain can refuse to move, so can my tower refuse to fall." That particular tower lasted another three centuries purely through architectural spite before finally conceding to gravity during a moment of weakness††††.
+&nbsp;
+‡‡The most reliable instruments remain the Mark IV Impossibility Gauge, which measures how many engineers need to examine a structure before one of them says "but that's impossible." A score of three or fewer indicates critical erosion. A score of zero indicates the structure has either achieved true perfection or has already ceased to exist and you're looking at the afterimage*****.
+&nbsp;
+‡‡‡Despite the clear documentation of risks, the Preservation Safety Manual must be updated quarterly with new warnings. Recent additions include "Do Not Attempt to Sympathize with Load-Bearing Paradoxes," "Avoid Making Eye Contact with Confused Keystones," and the perennially relevant "If a Wall Asks You a Riddle, Consult a Senior Preservationist Before Answering"******.
+&nbsp;
+****The collapse rate of inadequately maintained Wonders stands at approximately 15.7 structures per year, though this figure doesn't account for buildings that collapsed both forward and backward through time, which creates accounting difficulties. The Department of Temporal Construction Accidents is still processing incidents from 1634, though those incidents won't technically occur until next Thursday†††††.
+&nbsp;
+††††The exact number of historians lost remains disputed, as their own documentation now reads like fantasy novels. The incident report itself keeps changing tense mid-sentence, which the Review Board finds "unsettling but academically interesting"‡‡‡‡.
+&nbsp;
+‡‡‡‡These beings typically include at least one Structural Dragon (who understand that physics is more of a polite suggestion when you're large enough), a Temporal Mason (who remembers next week's problems), and what the Guild refers to as "that old fellow who seems to know things and definitely isn't a minor deity of architecture wearing a hard hat"*******.
+&nbsp;
+*****This number was originally six, but seven insisted quite firmly, and after the Council of Numerical Determination, six had to admit that seven had some compelling points. The number eight remains suspicious of the entire arrangement and occasionally petitions for inclusion, particularly during leap years*********.
+&nbsp;
+†††††The most comprehensive historical account, Professor Weatherby's "One Thousand and One Ways Buildings Have Stopped Being," runs to fourteen volumes and requires six bookends to prevent the earlier volumes from becoming fictional. The last three volumes exist only in the future perfect tense, which makes citation challenging†††††††.
+&nbsp;
+‡‡‡‡‡The Pharaohs of the Impossible Dynasty, for instance, assigned teams of conventional stonemasons to maintain the Pyramid of Inverted Gravity. The masons, trained in traditional methods, attempted to reinforce the foundations, failing to understand that the structure's foundations were, in fact, at the top. The resulting confusion caused the pyramid to briefly exist in four dimensions simultaneously, creating what historians call "the world's`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wonder durability preservation in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MONUMENT_LEGACY_PLANNING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'monument_legacy_planning',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Monument Legacy Planning',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'construction',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['monumental_architecture'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wonder_durability_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { construction: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_monument_legacy_planning' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `MONUMENT LEGACY PLANNING: OR, HOW TO ENSURE YOUR GRANDCHILDREN'S GRANDCHILDREN STILL CURSE YOUR NAME</span>
+&nbsp;
+The fundamental principle of monument legacy planning rests upon a simple question that has plagued humanity since the first ambitious chieftain decided a pile of rocks wasn't quite impressive enough: How does one build something that will outlast not merely one's lifetime, but the memory of one's lifetime, and indeed, the memory of the memory thereof?* The ancient Architects of Perpetuity† understood what modern construction administrators have largely forgotten—that a monument is not simply a large building that refuses to apologize for taking up space‡, but rather a carefully orchestrated argument with entropy itself, conducted across centuries and adjudicated by weather, vandals, and the inexorable march of geological time.** The Guild of Extended Consequence Engineers maintains that proper monument legacy planning requires consideration of no fewer than seventeen distinct failure modes††, each more catastrophically entertaining than the last, though they strongly discourage treating this as a challenge.
+&nbsp;
+The practical applications of monument legacy planning diverge sharply from standard architectural practice in that one must account for civilizations that do not yet exist, languages that have not yet evolved, and maintenance protocols that will be interpreted by people who think your sophisticated drainage system is either a religious artifact or an elaborate practical joke left by the gods.*** The Codex of Improbable Longevity‡‡ recommends assuming that every well-intentioned design feature will be spectacularly misunderstood by future generations†††, and planning accordingly.‡‡‡ This explains why the most successful monuments are those whose function remains obvious even when stripped of all context—one can destroy a civilization's written records, erase its language, and scatter its people, but a pyramid stubbornly remains a pyramid, asking no questions and offering no explanations save for its geometrically aggressive refusal to fall over.**** The modern practice involves calculating what the International Bureau of Temporal Hubris calls the "Ozymandias Quotient"—the probability that your monument will inspire awe rather than mere archaeological confusion, expressed as a percentage that decreases by approximately 0.3% per century.††††
+&nbsp;
+Safety considerations in monument legacy planning extend far beyond the conventional "try not to drop the enormous stone block on your foot" variety of construction wisdom.‡‡‡‡ The Archives of Regrettable Ambition***** document numerous cases where insufficient attention to legacy maintenance resulted in structures becoming more dangerous with age, developing what the Guild refers to as "delayed-action architectural malice."****** The crucial insight—typically acquired after at least one catastrophic ceiling collapse involving visiting dignitaries——is that monuments must be designed not merely to survive, but to survive the progressive loss of institutional knowledge about how they work.†††††† The Department of Things We Wish We'd Thought Of Earlier‡‡‡‡‡ particularly emphasizes the importance of avoiding what they term "helpful innovations that guarantee spectacular future failure"—load-bearing elements that require constant adjustment, drainage systems that work perfectly until they cataclysmically don't, and decorative elements that slowly transmute into structural nightmares over the course of several centuries.******* The statistical analysis is damning: approximately 73.8% of all monument-related disasters occur more than 200 years after construction, involving maintenance workers who have no idea what they're maintaining.‡‡‡‡‡‡
+&nbsp;
+The historical development of monument legacy planning can be traced to the first great crisis of architectural ego, when Emperor Vastus the Insufficiently Humble commissioned a tower so tall it would "surely touch the heavens themselves," only to discover—after fifteen years of construction and the displacement of three villages—that clouds are substantially higher than previously estimated.******** This incident, catalogued extensively in the Scrolls of Expensive Lessons, established several key principles: first, that ambition should be tempered by at least occasional reference to physical law; second, that the opinions of the chief engineer should not be dismissed simply because he keeps predicting catastrophic foundation failure; and third, that "it'll probably be fine" has never been a suitable monument legacy plan.†††††††† The Bronze Age collapse represents a particularly instructive case study in monument planning failure, as excavated administrative tablets reveal increasingly desperate correspondence between temple maintenance departments and stoneworkers' guilds that essentially boil down to "the big triangle thing is leaking again and no one remembers how to fix it."‡‡‡‡‡‡‡ Modern understanding has been significantly enhanced by the International Symposium on Buildings That Refuse to Die*********, whose members have developed sophisticated models for predicting which design features will confuse future archaeologists most thoroughly.††††††††† 
+&nbsp;
+The synthesis of traditional wisdom and contemporary engineering has produced what the Academy of Hubris Management calls "defensive immortality design"—the practice of building monuments under the assumption that everyone who knows how they work will eventually be dead, forgotten, or transformed into a footnote in some future civilization's historical record.********** This involves extensive documentation‡‡‡‡‡‡‡‡, redundant structural systems that continue functioning even when people start using them for purposes never intended†††††††††††, and most critically, the acceptance that your monument's ultimate purpose may be to provide future societies with something impressive to argue about.*********** The Guild of Long-Term Consequences maintains a cheerful motto: "Plan for eternity, prepare for bureaucracy, expect absurdity."‡‡‡‡‡‡‡‡‡ Those who master monument legacy planning understand that they are not merely building structures, but rather creating problems for people who won't be born for centuries—and with sufficient care and attention, those problems might be interesting ones rather than merely lethal.************
+&nbsp;
+&nbsp;
+---FOOTNOTES---
+&nbsp;
+*The earliest recorded instance appears in the Tablets of Excessive Optimism, dating to approximately 2847 BCE, where an unnamed architect promises his pharaoh a tomb that "will definitely still be here when the stars grow cold, or my name isn't—[remainder of tablet unfortunately weathered beyond legibility]." The tomb in question collapsed during the dedication ceremony. The architect's name is indeed lost to history, though whether this constitutes fulfillment of his guarantee remains a topic of debate among particularly pedantic archaeological philosophers.
+&nbsp;
+†Not to be confused with the Architects of Temporary Convenience, who had much shorter careers but substantially lower stress levels.
+&nbsp;
+‡The Fundamental Treatise on Aggressive Architecture defines a monument as "any structure whose primary purpose is to make passersby feel small, insignificant, and vaguely concerned about the psychological state of whoever commissioned it." This definition has held up remarkably well across cultures and centuries.
+&nbsp;
+**The Department of Metaphorical Combat Engineering estimates that a well-constructed monument can maintain active hostilities with entropy for approximately 4,000 to 5,000 years before requiring major reinforcement. Entropy, for its part, has never responded to requests for comment, though its legal representatives (the Law Firm of Time, Decay, and Inevitable Thermodynamic Victory) maintain that it will eventually win all pending cases.
+&nbsp;
+††Including, but not limited to: catastrophic foundation failure, progressive material degradation, unexpected seismic activity, deliberate demolition by invading armies, accidental demolition by incompetent maintenance staff, conversion into entirely different structure by zealous religious reformers, use as quarry by pragmatic later civilization, consumption by unexpectedly aggressive vegetation, subsidence due to underground water sources nobody bothered to check for, unauthorized modifications by well-meaning "improvers," death by tourism, collapse from accumulated bird droppings, and what the Guild euphemistically terms "unforeseen interactions with local geology." The seventeenth failure mode is classified, though rumor suggests it involves mime artists.
+&nbsp;
+***The Scrolls of Misunderstood Infrastructure document the case of the Great Temple of Hydraulic Complexity, whose sophisticated water management system was interpreted by later inhabitants as an oracle chamber. They spent three centuries consulting it for advice before discovering it was actually just a very elaborate toilet. The temple responded with its usual burbling sounds, which were interpreted as either profound wisdom or evidence of divine indigestion, depending on theological faction.
+&nbsp;
+‡‡Written by the Prophet of Pessimism, whose full title was "First Herald of Maybe Just Building Something Simple Instead." He was ignored during his lifetime but is now considered a major figure in conservative monument theory.
+&nbsp;
+†††The famous Law of Inevitable Reinterpretation states that any design feature will be assigned a religious significance within 300 years of the last person who actually knew what it was for dying.† This explains why structural buttresses become prayer alcoves, maintenance access tunnels become pilgrimage routes, and foundation drainage channels become ritual purification channels.
+&nbsp;
+†Proved mathematically by Professor Thaddeus Ironwright using a complex formula involving archaeological confusion indices, theological innovation rates, and the universal constant of human creativity in the face of missing information, which he calculated as approximately 2.7 wishful interpretations per square meter`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding monument legacy planning in the context of construction',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  HANGING_GARDENS_ENGINEERING,</span>
+<span class="cstat-no" title="statement not covered" >  TEMPLE_COMPLEX_PLANNING,</span>
+<span class="cstat-no" title="statement not covered" >  FORTRESS_CASTLE_ENGINEERING,</span>
+<span class="cstat-no" title="statement not covered" >  WONDER_DURABILITY_PRESERVATION,</span>
+<span class="cstat-no" title="statement not covered" >  MONUMENT_LEGACY_PLANNING</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

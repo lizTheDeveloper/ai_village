@@ -138,6 +138,12 @@ export class DivineChatPanel implements IWindowPanel {
   // Track last render bounds for click handling
   private lastRenderBounds: { x: number; y: number; width: number; height: number } | null = null;
 
+  // Screen name input state
+  private nameInputText = '';
+  private nameInputActive = false;
+  private nameInputBounds: { x: number; y: number; width: number; height: number } | null = null;
+  private readonly PLAYER_NAME_KEY = 'divine-chat-player-name';
+
   /**
    * Refresh chat state from the World
    * PERFORMANCE: Uses ECS query to get divine chat room
@@ -180,12 +186,36 @@ export class DivineChatPanel implements IWindowPanel {
   }
 
   /**
+   * Get stored player name from localStorage
+   */
+  private getPlayerName(): string {
+    return localStorage.getItem(this.PLAYER_NAME_KEY) || '';
+  }
+
+  /**
+   * Set player name in localStorage (can only be done once)
+   */
+  private setPlayerName(name: string): void {
+    if (!this.getPlayerName()) {
+      localStorage.setItem(this.PLAYER_NAME_KEY, name);
+    }
+  }
+
+  /**
+   * Check if player has set their name
+   */
+  private hasPlayerName(): boolean {
+    return !!this.getPlayerName();
+  }
+
+  /**
    * Get deity name by ID (or player name for the human player)
    */
   private getDeityName(world: World, deityId: string): string {
     // Handle human player ID
     if (deityId === this.playerId) {
-      return 'Player';
+      const playerName = this.getPlayerName();
+      return playerName || 'Player';
     }
 
     // Handle deity entities
@@ -280,6 +310,11 @@ export class DivineChatPanel implements IWindowPanel {
 
     // Draw header
     currentY = this.renderHeader(ctx, panelX, currentY, panelWidth);
+
+    // Draw name input if player hasn't set their name yet
+    if (!this.hasPlayerName()) {
+      currentY = this.renderNameInput(ctx, panelX, currentY, panelWidth);
+    }
 
     // Draw deity list (who's present)
     if (this.chatRoomComponent && this.chatRoomComponent.isActive && world) {
@@ -572,6 +607,67 @@ export class DivineChatPanel implements IWindowPanel {
   }
 
   /**
+   * Render name input (only shown if player hasn't set their name)
+   */
+  private renderNameInput(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
+    const sectionHeight = 90;
+    const inputHeight = 35;
+
+    // Background for the section
+    ctx.fillStyle = 'rgba(40, 40, 60, 0.9)';
+    ctx.fillRect(x + SIZES.padding, y, width - SIZES.padding * 2, sectionHeight);
+
+    // Border around section
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + SIZES.padding, y, width - SIZES.padding * 2, sectionHeight);
+
+    // Instruction text
+    ctx.fillStyle = '#FFD700';
+    ctx.font = `bold ${SIZES.fontSize}px monospace`;
+    ctx.fillText('Enter your name (cannot be changed):', x + SIZES.padding * 2, y + 20);
+
+    // Input box
+    const inputY = y + 30;
+    ctx.fillStyle = this.nameInputActive ? 'rgba(30, 30, 50, 0.95)' : COLORS.inputBg;
+    ctx.fillRect(x + SIZES.padding * 2, inputY, width - SIZES.padding * 4, inputHeight);
+
+    // Border - highlight when active
+    ctx.strokeStyle = this.nameInputActive ? '#FFD700' : COLORS.inputBorder;
+    ctx.lineWidth = this.nameInputActive ? 2 : 1;
+    ctx.strokeRect(x + SIZES.padding * 2, inputY, width - SIZES.padding * 4, inputHeight);
+
+    // Placeholder or input text
+    ctx.fillStyle = this.nameInputText ? COLORS.text : COLORS.textDim;
+    ctx.font = `${SIZES.fontSize}px monospace`;
+    const placeholder = this.nameInputActive ? 'Type your name...' : 'Click here to enter name';
+    const text = this.nameInputText || placeholder;
+    ctx.fillText(text, x + SIZES.padding * 3, inputY + inputHeight / 2 + 4);
+
+    // Cursor if active
+    if (this.nameInputActive && Math.floor(Date.now() / 500) % 2 === 0) {
+      const textWidth = ctx.measureText(this.nameInputText).width;
+      ctx.fillStyle = COLORS.text;
+      ctx.fillRect(x + SIZES.padding * 3 + textWidth + 2, inputY + 10, 2, 20);
+    }
+
+    // Help text
+    ctx.fillStyle = COLORS.textDim;
+    ctx.font = `${SIZES.fontSize - 2}px monospace`;
+    ctx.fillText('Press Enter to confirm', x + SIZES.padding * 2, inputY + inputHeight + 15);
+
+    // Store bounds for click detection
+    this.nameInputBounds = {
+      x: x + SIZES.padding * 2,
+      y: inputY,
+      width: width - SIZES.padding * 4,
+      height: inputHeight
+    };
+
+    return y + sectionHeight + SIZES.padding;
+  }
+
+  /**
    * Render input area
    */
   private renderInput(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): void {
@@ -659,15 +755,27 @@ export class DivineChatPanel implements IWindowPanel {
     const x = bounds.x + localX;
     const y = bounds.y + localY;
 
-    // Check if click is on input area
+    // Check if click is on name input area (only if name not set)
+    if (!this.hasPlayerName() && this.nameInputBounds) {
+      if (x >= this.nameInputBounds.x && x <= this.nameInputBounds.x + this.nameInputBounds.width &&
+          y >= this.nameInputBounds.y && y <= this.nameInputBounds.y + this.nameInputBounds.height) {
+        this.nameInputActive = true;
+        this.inputActive = false; // Deactivate chat input
+        return true;
+      }
+    }
+
+    // Check if click is on chat input area
     if (this.inputBounds) {
       if (x >= this.inputBounds.x && x <= this.inputBounds.x + this.inputBounds.width &&
           y >= this.inputBounds.y && y <= this.inputBounds.y + this.inputBounds.height) {
         this.inputActive = true;
+        this.nameInputActive = false; // Deactivate name input
         return true;
       } else {
-        // Clicked elsewhere in panel - deactivate input
+        // Clicked elsewhere in panel - deactivate both inputs
         this.inputActive = false;
+        this.nameInputActive = false;
       }
     }
 
@@ -716,14 +824,36 @@ export class DivineChatPanel implements IWindowPanel {
    * Handle keyboard input
    */
   handleKeyPress(key: string): void {
-    if (!this.visible || !this.inputActive) return;
+    if (!this.visible) return;
 
-    if (key === 'Enter') {
-      this.sendMessage();
-    } else if (key === 'Backspace') {
-      this.inputText = this.inputText.slice(0, -1);
-    } else if (key.length === 1) {
-      this.inputText += key;
+    // Handle name input field
+    if (this.nameInputActive && !this.hasPlayerName()) {
+      if (key === 'Enter') {
+        // Confirm name
+        const trimmedName = this.nameInputText.trim();
+        if (trimmedName.length > 0) {
+          this.setPlayerName(trimmedName);
+          this.nameInputActive = false;
+          this.nameInputText = '';
+        }
+      } else if (key === 'Backspace') {
+        this.nameInputText = this.nameInputText.slice(0, -1);
+      } else if (key.length === 1 && this.nameInputText.length < 20) {
+        // Limit name to 20 characters
+        this.nameInputText += key;
+      }
+      return;
+    }
+
+    // Handle chat input field
+    if (this.inputActive) {
+      if (key === 'Enter') {
+        this.sendMessage();
+      } else if (key === 'Backspace') {
+        this.inputText = this.inputText.slice(0, -1);
+      } else if (key.length === 1) {
+        this.inputText += key;
+      }
     }
   }
 
@@ -751,7 +881,7 @@ export class DivineChatPanel implements IWindowPanel {
    * Check if input is currently active (focused)
    */
   isInputActive(): boolean {
-    return this.inputActive;
+    return this.inputActive || this.nameInputActive;
   }
 
   /**
@@ -759,6 +889,7 @@ export class DivineChatPanel implements IWindowPanel {
    */
   activateInput(): void {
     this.inputActive = true;
+    this.nameInputActive = false;
   }
 
   /**
@@ -766,5 +897,6 @@ export class DivineChatPanel implements IWindowPanel {
    */
   deactivateInput(): void {
     this.inputActive = false;
+    this.nameInputActive = false;
   }
 }

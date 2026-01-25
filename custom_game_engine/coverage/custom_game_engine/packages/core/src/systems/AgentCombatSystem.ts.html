@@ -1,0 +1,2836 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/core/src/systems/AgentCombatSystem.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/core/src/systems</a> AgentCombatSystem.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">5.48% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>32/583</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">75% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>3/4</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">9.09% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>2/22</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">5.48% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>32/583</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a>
+<a name='L627'></a><a href='#L627'>627</a>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a>
+<a name='L636'></a><a href='#L636'>636</a>
+<a name='L637'></a><a href='#L637'>637</a>
+<a name='L638'></a><a href='#L638'>638</a>
+<a name='L639'></a><a href='#L639'>639</a>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a>
+<a name='L642'></a><a href='#L642'>642</a>
+<a name='L643'></a><a href='#L643'>643</a>
+<a name='L644'></a><a href='#L644'>644</a>
+<a name='L645'></a><a href='#L645'>645</a>
+<a name='L646'></a><a href='#L646'>646</a>
+<a name='L647'></a><a href='#L647'>647</a>
+<a name='L648'></a><a href='#L648'>648</a>
+<a name='L649'></a><a href='#L649'>649</a>
+<a name='L650'></a><a href='#L650'>650</a>
+<a name='L651'></a><a href='#L651'>651</a>
+<a name='L652'></a><a href='#L652'>652</a>
+<a name='L653'></a><a href='#L653'>653</a>
+<a name='L654'></a><a href='#L654'>654</a>
+<a name='L655'></a><a href='#L655'>655</a>
+<a name='L656'></a><a href='#L656'>656</a>
+<a name='L657'></a><a href='#L657'>657</a>
+<a name='L658'></a><a href='#L658'>658</a>
+<a name='L659'></a><a href='#L659'>659</a>
+<a name='L660'></a><a href='#L660'>660</a>
+<a name='L661'></a><a href='#L661'>661</a>
+<a name='L662'></a><a href='#L662'>662</a>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a>
+<a name='L677'></a><a href='#L677'>677</a>
+<a name='L678'></a><a href='#L678'>678</a>
+<a name='L679'></a><a href='#L679'>679</a>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a>
+<a name='L685'></a><a href='#L685'>685</a>
+<a name='L686'></a><a href='#L686'>686</a>
+<a name='L687'></a><a href='#L687'>687</a>
+<a name='L688'></a><a href='#L688'>688</a>
+<a name='L689'></a><a href='#L689'>689</a>
+<a name='L690'></a><a href='#L690'>690</a>
+<a name='L691'></a><a href='#L691'>691</a>
+<a name='L692'></a><a href='#L692'>692</a>
+<a name='L693'></a><a href='#L693'>693</a>
+<a name='L694'></a><a href='#L694'>694</a>
+<a name='L695'></a><a href='#L695'>695</a>
+<a name='L696'></a><a href='#L696'>696</a>
+<a name='L697'></a><a href='#L697'>697</a>
+<a name='L698'></a><a href='#L698'>698</a>
+<a name='L699'></a><a href='#L699'>699</a>
+<a name='L700'></a><a href='#L700'>700</a>
+<a name='L701'></a><a href='#L701'>701</a>
+<a name='L702'></a><a href='#L702'>702</a>
+<a name='L703'></a><a href='#L703'>703</a>
+<a name='L704'></a><a href='#L704'>704</a>
+<a name='L705'></a><a href='#L705'>705</a>
+<a name='L706'></a><a href='#L706'>706</a>
+<a name='L707'></a><a href='#L707'>707</a>
+<a name='L708'></a><a href='#L708'>708</a>
+<a name='L709'></a><a href='#L709'>709</a>
+<a name='L710'></a><a href='#L710'>710</a>
+<a name='L711'></a><a href='#L711'>711</a>
+<a name='L712'></a><a href='#L712'>712</a>
+<a name='L713'></a><a href='#L713'>713</a>
+<a name='L714'></a><a href='#L714'>714</a>
+<a name='L715'></a><a href='#L715'>715</a>
+<a name='L716'></a><a href='#L716'>716</a>
+<a name='L717'></a><a href='#L717'>717</a>
+<a name='L718'></a><a href='#L718'>718</a>
+<a name='L719'></a><a href='#L719'>719</a>
+<a name='L720'></a><a href='#L720'>720</a>
+<a name='L721'></a><a href='#L721'>721</a>
+<a name='L722'></a><a href='#L722'>722</a>
+<a name='L723'></a><a href='#L723'>723</a>
+<a name='L724'></a><a href='#L724'>724</a>
+<a name='L725'></a><a href='#L725'>725</a>
+<a name='L726'></a><a href='#L726'>726</a>
+<a name='L727'></a><a href='#L727'>727</a>
+<a name='L728'></a><a href='#L728'>728</a>
+<a name='L729'></a><a href='#L729'>729</a>
+<a name='L730'></a><a href='#L730'>730</a>
+<a name='L731'></a><a href='#L731'>731</a>
+<a name='L732'></a><a href='#L732'>732</a>
+<a name='L733'></a><a href='#L733'>733</a>
+<a name='L734'></a><a href='#L734'>734</a>
+<a name='L735'></a><a href='#L735'>735</a>
+<a name='L736'></a><a href='#L736'>736</a>
+<a name='L737'></a><a href='#L737'>737</a>
+<a name='L738'></a><a href='#L738'>738</a>
+<a name='L739'></a><a href='#L739'>739</a>
+<a name='L740'></a><a href='#L740'>740</a>
+<a name='L741'></a><a href='#L741'>741</a>
+<a name='L742'></a><a href='#L742'>742</a>
+<a name='L743'></a><a href='#L743'>743</a>
+<a name='L744'></a><a href='#L744'>744</a>
+<a name='L745'></a><a href='#L745'>745</a>
+<a name='L746'></a><a href='#L746'>746</a>
+<a name='L747'></a><a href='#L747'>747</a>
+<a name='L748'></a><a href='#L748'>748</a>
+<a name='L749'></a><a href='#L749'>749</a>
+<a name='L750'></a><a href='#L750'>750</a>
+<a name='L751'></a><a href='#L751'>751</a>
+<a name='L752'></a><a href='#L752'>752</a>
+<a name='L753'></a><a href='#L753'>753</a>
+<a name='L754'></a><a href='#L754'>754</a>
+<a name='L755'></a><a href='#L755'>755</a>
+<a name='L756'></a><a href='#L756'>756</a>
+<a name='L757'></a><a href='#L757'>757</a>
+<a name='L758'></a><a href='#L758'>758</a>
+<a name='L759'></a><a href='#L759'>759</a>
+<a name='L760'></a><a href='#L760'>760</a>
+<a name='L761'></a><a href='#L761'>761</a>
+<a name='L762'></a><a href='#L762'>762</a>
+<a name='L763'></a><a href='#L763'>763</a>
+<a name='L764'></a><a href='#L764'>764</a>
+<a name='L765'></a><a href='#L765'>765</a>
+<a name='L766'></a><a href='#L766'>766</a>
+<a name='L767'></a><a href='#L767'>767</a>
+<a name='L768'></a><a href='#L768'>768</a>
+<a name='L769'></a><a href='#L769'>769</a>
+<a name='L770'></a><a href='#L770'>770</a>
+<a name='L771'></a><a href='#L771'>771</a>
+<a name='L772'></a><a href='#L772'>772</a>
+<a name='L773'></a><a href='#L773'>773</a>
+<a name='L774'></a><a href='#L774'>774</a>
+<a name='L775'></a><a href='#L775'>775</a>
+<a name='L776'></a><a href='#L776'>776</a>
+<a name='L777'></a><a href='#L777'>777</a>
+<a name='L778'></a><a href='#L778'>778</a>
+<a name='L779'></a><a href='#L779'>779</a>
+<a name='L780'></a><a href='#L780'>780</a>
+<a name='L781'></a><a href='#L781'>781</a>
+<a name='L782'></a><a href='#L782'>782</a>
+<a name='L783'></a><a href='#L783'>783</a>
+<a name='L784'></a><a href='#L784'>784</a>
+<a name='L785'></a><a href='#L785'>785</a>
+<a name='L786'></a><a href='#L786'>786</a>
+<a name='L787'></a><a href='#L787'>787</a>
+<a name='L788'></a><a href='#L788'>788</a>
+<a name='L789'></a><a href='#L789'>789</a>
+<a name='L790'></a><a href='#L790'>790</a>
+<a name='L791'></a><a href='#L791'>791</a>
+<a name='L792'></a><a href='#L792'>792</a>
+<a name='L793'></a><a href='#L793'>793</a>
+<a name='L794'></a><a href='#L794'>794</a>
+<a name='L795'></a><a href='#L795'>795</a>
+<a name='L796'></a><a href='#L796'>796</a>
+<a name='L797'></a><a href='#L797'>797</a>
+<a name='L798'></a><a href='#L798'>798</a>
+<a name='L799'></a><a href='#L799'>799</a>
+<a name='L800'></a><a href='#L800'>800</a>
+<a name='L801'></a><a href='#L801'>801</a>
+<a name='L802'></a><a href='#L802'>802</a>
+<a name='L803'></a><a href='#L803'>803</a>
+<a name='L804'></a><a href='#L804'>804</a>
+<a name='L805'></a><a href='#L805'>805</a>
+<a name='L806'></a><a href='#L806'>806</a>
+<a name='L807'></a><a href='#L807'>807</a>
+<a name='L808'></a><a href='#L808'>808</a>
+<a name='L809'></a><a href='#L809'>809</a>
+<a name='L810'></a><a href='#L810'>810</a>
+<a name='L811'></a><a href='#L811'>811</a>
+<a name='L812'></a><a href='#L812'>812</a>
+<a name='L813'></a><a href='#L813'>813</a>
+<a name='L814'></a><a href='#L814'>814</a>
+<a name='L815'></a><a href='#L815'>815</a>
+<a name='L816'></a><a href='#L816'>816</a>
+<a name='L817'></a><a href='#L817'>817</a>
+<a name='L818'></a><a href='#L818'>818</a>
+<a name='L819'></a><a href='#L819'>819</a>
+<a name='L820'></a><a href='#L820'>820</a>
+<a name='L821'></a><a href='#L821'>821</a>
+<a name='L822'></a><a href='#L822'>822</a>
+<a name='L823'></a><a href='#L823'>823</a>
+<a name='L824'></a><a href='#L824'>824</a>
+<a name='L825'></a><a href='#L825'>825</a>
+<a name='L826'></a><a href='#L826'>826</a>
+<a name='L827'></a><a href='#L827'>827</a>
+<a name='L828'></a><a href='#L828'>828</a>
+<a name='L829'></a><a href='#L829'>829</a>
+<a name='L830'></a><a href='#L830'>830</a>
+<a name='L831'></a><a href='#L831'>831</a>
+<a name='L832'></a><a href='#L832'>832</a>
+<a name='L833'></a><a href='#L833'>833</a>
+<a name='L834'></a><a href='#L834'>834</a>
+<a name='L835'></a><a href='#L835'>835</a>
+<a name='L836'></a><a href='#L836'>836</a>
+<a name='L837'></a><a href='#L837'>837</a>
+<a name='L838'></a><a href='#L838'>838</a>
+<a name='L839'></a><a href='#L839'>839</a>
+<a name='L840'></a><a href='#L840'>840</a>
+<a name='L841'></a><a href='#L841'>841</a>
+<a name='L842'></a><a href='#L842'>842</a>
+<a name='L843'></a><a href='#L843'>843</a>
+<a name='L844'></a><a href='#L844'>844</a>
+<a name='L845'></a><a href='#L845'>845</a>
+<a name='L846'></a><a href='#L846'>846</a>
+<a name='L847'></a><a href='#L847'>847</a>
+<a name='L848'></a><a href='#L848'>848</a>
+<a name='L849'></a><a href='#L849'>849</a>
+<a name='L850'></a><a href='#L850'>850</a>
+<a name='L851'></a><a href='#L851'>851</a>
+<a name='L852'></a><a href='#L852'>852</a>
+<a name='L853'></a><a href='#L853'>853</a>
+<a name='L854'></a><a href='#L854'>854</a>
+<a name='L855'></a><a href='#L855'>855</a>
+<a name='L856'></a><a href='#L856'>856</a>
+<a name='L857'></a><a href='#L857'>857</a>
+<a name='L858'></a><a href='#L858'>858</a>
+<a name='L859'></a><a href='#L859'>859</a>
+<a name='L860'></a><a href='#L860'>860</a>
+<a name='L861'></a><a href='#L861'>861</a>
+<a name='L862'></a><a href='#L862'>862</a>
+<a name='L863'></a><a href='#L863'>863</a>
+<a name='L864'></a><a href='#L864'>864</a>
+<a name='L865'></a><a href='#L865'>865</a>
+<a name='L866'></a><a href='#L866'>866</a>
+<a name='L867'></a><a href='#L867'>867</a>
+<a name='L868'></a><a href='#L868'>868</a>
+<a name='L869'></a><a href='#L869'>869</a>
+<a name='L870'></a><a href='#L870'>870</a>
+<a name='L871'></a><a href='#L871'>871</a>
+<a name='L872'></a><a href='#L872'>872</a>
+<a name='L873'></a><a href='#L873'>873</a>
+<a name='L874'></a><a href='#L874'>874</a>
+<a name='L875'></a><a href='#L875'>875</a>
+<a name='L876'></a><a href='#L876'>876</a>
+<a name='L877'></a><a href='#L877'>877</a>
+<a name='L878'></a><a href='#L878'>878</a>
+<a name='L879'></a><a href='#L879'>879</a>
+<a name='L880'></a><a href='#L880'>880</a>
+<a name='L881'></a><a href='#L881'>881</a>
+<a name='L882'></a><a href='#L882'>882</a>
+<a name='L883'></a><a href='#L883'>883</a>
+<a name='L884'></a><a href='#L884'>884</a>
+<a name='L885'></a><a href='#L885'>885</a>
+<a name='L886'></a><a href='#L886'>886</a>
+<a name='L887'></a><a href='#L887'>887</a>
+<a name='L888'></a><a href='#L888'>888</a>
+<a name='L889'></a><a href='#L889'>889</a>
+<a name='L890'></a><a href='#L890'>890</a>
+<a name='L891'></a><a href='#L891'>891</a>
+<a name='L892'></a><a href='#L892'>892</a>
+<a name='L893'></a><a href='#L893'>893</a>
+<a name='L894'></a><a href='#L894'>894</a>
+<a name='L895'></a><a href='#L895'>895</a>
+<a name='L896'></a><a href='#L896'>896</a>
+<a name='L897'></a><a href='#L897'>897</a>
+<a name='L898'></a><a href='#L898'>898</a>
+<a name='L899'></a><a href='#L899'>899</a>
+<a name='L900'></a><a href='#L900'>900</a>
+<a name='L901'></a><a href='#L901'>901</a>
+<a name='L902'></a><a href='#L902'>902</a>
+<a name='L903'></a><a href='#L903'>903</a>
+<a name='L904'></a><a href='#L904'>904</a>
+<a name='L905'></a><a href='#L905'>905</a>
+<a name='L906'></a><a href='#L906'>906</a>
+<a name='L907'></a><a href='#L907'>907</a>
+<a name='L908'></a><a href='#L908'>908</a>
+<a name='L909'></a><a href='#L909'>909</a>
+<a name='L910'></a><a href='#L910'>910</a>
+<a name='L911'></a><a href='#L911'>911</a>
+<a name='L912'></a><a href='#L912'>912</a>
+<a name='L913'></a><a href='#L913'>913</a>
+<a name='L914'></a><a href='#L914'>914</a>
+<a name='L915'></a><a href='#L915'>915</a>
+<a name='L916'></a><a href='#L916'>916</a>
+<a name='L917'></a><a href='#L917'>917</a>
+<a name='L918'></a><a href='#L918'>918</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">101x</span>
+<span class="cline-any cline-yes">101x</span>
+<span class="cline-any cline-yes">101x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { SystemId, ComponentType } from '../types.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import type { ConflictComponent } from '../components/ConflictComponent.js';
+import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
+import { createInjuryComponent, type InjuryComponent } from '../components/InjuryComponent.js';
+import type { EquipmentComponent } from '../components/EquipmentComponent.js';
+import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { NeedsComponent } from '../components/NeedsComponent.js';
+import { itemRegistry } from '../items/index.js';
+import {
+  TICKS_PER_SECOND,
+  COMBAT_DURATION_MIN,
+  COMBAT_DURATION_BASE,
+  COMBAT_DURATION_EXTENDED,
+  COMBAT_DURATION_LETHAL,
+} from '../constants/index.js';
+import type { EventBus } from '../events/EventBus.js';
+import type { LLMProvider } from '../types/LLMTypes.js';
+&nbsp;
+interface PositionComponent {
+  type: 'position';
+  version: number;
+  x: number;
+  y: number;
+  z: number;
+}
+&nbsp;
+interface AgentComponent {
+  type: 'agent';
+  version: number;
+  name?: string;
+}
+&nbsp;
+interface RelationshipComponent {
+  type: 'relationship';
+  version: number;
+  relationships: Record&lt;string, { opinion: number; trust?: number }&gt;;
+}
+&nbsp;
+interface ReputationComponent {
+  type: 'reputation';
+  version: number;
+  honor: number;
+  violence: number;
+}
+&nbsp;
+interface LawsComponent {
+  type: 'laws';
+  version: number;
+  murderIllegal?: boolean;
+  assaultIllegal?: boolean;
+  selfDefenseLegal?: boolean;
+}
+&nbsp;
+interface EnvironmentComponent {
+  type: 'environment';
+  version: number;
+  terrain?: string;
+  weather?: string;
+  timeOfDay?: string;
+}
+&nbsp;
+/**
+ * AgentCombatSystem - Handles agent vs agent combat
+ *
+ * Implements REQ-CON-003:
+ * - Combat with various causes
+ * - Skill and equipment comparison
+ * - Modifiers (surprise, terrain, injuries)
+ * - Outcome rolling
+ * - Injury determination
+ * - LLM narrative generation
+ * - Social consequences
+ * - Legal consequences
+ */
+export class AgentCombatSystem extends BaseSystem {
+  public readonly <span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >id: SystemId = 'agent_combat';</span></span>
+<span class="cstat-no" title="statement not covered" >  public readonly priority = 46; // After hunting, before injury</span>
+<span class="cstat-no" title="statement not covered" >  public readonly requiredComponents: ReadonlyArray&lt;ComponentType&gt; = ['conflict'];</span>
+  // Only run when conflict components exist (O(1) activation check)
+<span class="cstat-no" title="statement not covered" >  public readonly activationComponents = ['conflict'] as const;</span>
+<span class="cstat-no" title="statement not covered" >  protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  private llmProvider?: LLMProvider;</span>
+&nbsp;
+  /**
+   * Sigmoid lookup table for performance optimization.
+   * Pre-calculated for power differences -50 to +50 (101 values).
+   * Avoids expensive Math.exp() calls in combat calculations.
+   * ~10x faster than calculating sigmoid each time.
+   */
+  private static readonly SIGMOID_LUT = AgentCombatSystem.buildSigmoidLookupTable();
+&nbsp;
+  private static buildSigmoidLookupTable(): Float32Array {
+    const lut = new Float32Array(101); // -50 to +50 = 101 values
+    for (let i = 0; i &lt;= 100; i++) {
+      const powerDiff = i - 50; // Map index to power diff
+      lut[i] = 1 / (1 + Math.exp(-0.2 * powerDiff));
+    }
+    return lut;
+  }
+&nbsp;
+  /**
+   * Fast sigmoid lookup (avoids Math.exp).
+   * Falls back to calculation only for extreme values outside LUT range.
+   */
+  private <span class="fstat-no" title="function not covered" >getSigmoid(powerDiff: number): number {</span>
+    // Round to nearest integer for lookup
+<span class="cstat-no" title="statement not covered" >    const index = Math.round(powerDiff) + 50;</span>
+&nbsp;
+    // Use lookup table for common cases (-50 to +50)
+<span class="cstat-no" title="statement not covered" >    if (index &gt;= 0 &amp;&amp; index &lt;= 100) {</span>
+<span class="cstat-no" title="statement not covered" >      return AgentCombatSystem.SIGMOID_LUT[index]!;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Fallback for extreme values (rare, e.g. god vs peasant)
+<span class="cstat-no" title="statement not covered" >    return 1 / (1 + Math.exp(-0.2 * powerDiff));</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >  constructor(llmProvider?: LLMProvider) {</span>
+<span class="cstat-no" title="statement not covered" >    super();</span>
+<span class="cstat-no" title="statement not covered" >    this.llmProvider = llmProvider;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  protected <span class="fstat-no" title="function not covered" >onUpdate(ctx: SystemContext): void {</span>
+<span class="cstat-no" title="statement not covered" >    const ticksElapsed = ctx.deltaTime * TICKS_PER_SECOND;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    for (const entity of ctx.activeEntities) {</span>
+<span class="cstat-no" title="statement not covered" >      const conflict = ctx.world.getComponent&lt;ConflictComponent&gt;(entity.id, 'conflict');</span>
+<span class="cstat-no" title="statement not covered" >      if (!conflict || conflict.conflictType !== 'agent_combat') {</span>
+<span class="cstat-no" title="statement not covered" >        continue;</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (conflict.state === 'initiated') {</span>
+        // Validate inputs before starting combat
+<span class="cstat-no" title="statement not covered" >        if (!conflict.cause) {</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error('Combat cause is required');</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (!ctx.world.hasComponent(entity.id, 'combat_stats')) {</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error('Attacker missing required component: combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+&nbsp;
+        // Get defender
+<span class="cstat-no" title="statement not covered" >        const defender = ctx.world.getEntity(conflict.target);</span>
+<span class="cstat-no" title="statement not covered" >        if (!defender) {</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error('Combat target entity not found');</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (!ctx.world.hasComponent(defender.id, 'agent')) {</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error('Combat target is not an agent');</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (!ctx.world.hasComponent(defender.id, 'combat_stats')) {</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error('Defender missing required component: combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+&nbsp;
+        // Calculate combat duration and start fighting
+<span class="cstat-no" title="statement not covered" >        const duration = this.calculateCombatDuration(ctx.world, entity, conflict);</span>
+&nbsp;
+        // Calculate combat power for both combatants
+<span class="cstat-no" title="statement not covered" >        const attackerStats = ctx.world.getComponent&lt;CombatStatsComponent&gt;(entity.id, 'combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >        const defenderStats = ctx.world.getComponent&lt;CombatStatsComponent&gt;(defender.id, 'combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >        if (!attackerStats || !defenderStats) {</span>
+          // This should never happen after validation above, but keep for safety
+<span class="cstat-no" title="statement not covered" >          continue;</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        const { attackerPower, defenderPower, modifiers } = this.calculateCombatPower(</span>
+<span class="cstat-no" title="statement not covered" >          ctx.world,</span>
+<span class="cstat-no" title="statement not covered" >          entity,</span>
+<span class="cstat-no" title="statement not covered" >          defender,</span>
+<span class="cstat-no" title="statement not covered" >          attackerStats,</span>
+<span class="cstat-no" title="statement not covered" >          defenderStats,</span>
+<span class="cstat-no" title="statement not covered" >          conflict</span>
+<span class="cstat-no" title="statement not covered" >        );</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        const attackerImpl = entity as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >        attackerImpl.updateComponent&lt;ConflictComponent&gt;('conflict', (c) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >          ...c,</span>
+<span class="cstat-no" title="statement not covered" >          state: 'fighting',</span>
+<span class="cstat-no" title="statement not covered" >          endTime: duration, // Store remaining ticks until combat ends</span>
+<span class="cstat-no" title="statement not covered" >          attackerPower,</span>
+<span class="cstat-no" title="statement not covered" >          defenderPower,</span>
+<span class="cstat-no" title="statement not covered" >          modifiers,</span>
+<span class="cstat-no" title="statement not covered" >        }));</span>
+&nbsp;
+        // Emit combat:started event
+<span class="cstat-no" title="statement not covered" >        const pos = ctx.world.getComponent&lt;PositionComponent&gt;(entity.id, 'position');</span>
+<span class="cstat-no" title="statement not covered" >        ctx.emit('combat:started', {</span>
+<span class="cstat-no" title="statement not covered" >          participants: [entity.id, conflict.target],</span>
+<span class="cstat-no" title="statement not covered" >          initiator: entity.id,</span>
+<span class="cstat-no" title="statement not covered" >          position: pos ? { x: pos.x, y: pos.y } : { x: 0, y: 0 },</span>
+<span class="cstat-no" title="statement not covered" >        });</span>
+<span class="cstat-no" title="statement not covered" >      } else if (conflict.state === 'fighting') {</span>
+        // Decrement remaining combat time
+<span class="cstat-no" title="statement not covered" >        const remainingTicks = (conflict.endTime ?? 0) - ticksElapsed;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (remainingTicks &lt;= 0) {</span>
+          // Combat is over, resolve it
+<span class="cstat-no" title="statement not covered" >          this.resolveCombat(ctx.world, entity, conflict, ctx);</span>
+<span class="cstat-no" title="statement not covered" >        } else {</span>
+          // Update remaining time
+<span class="cstat-no" title="statement not covered" >          const attackerImpl = entity as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >          attackerImpl.updateComponent&lt;ConflictComponent&gt;('conflict', (c) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >            ...c,</span>
+<span class="cstat-no" title="statement not covered" >            endTime: remainingTicks,</span>
+<span class="cstat-no" title="statement not covered" >          }));</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  /**
+   * Calculate how long combat should last based on combat parameters.
+   * Duration scales with lethality and power difference.
+   */
+  private <span class="fstat-no" title="function not covered" >calculateCombatDuration(world: World, attacker: Entity, conflict: ConflictComponent): number {</span>
+    // Get defender to calculate power difference
+<span class="cstat-no" title="statement not covered" >    const defender = world.getEntity(conflict.target);</span>
+<span class="cstat-no" title="statement not covered" >    if (!defender) {</span>
+<span class="cstat-no" title="statement not covered" >      return COMBAT_DURATION_MIN; // Fallback</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const attackerStats = world.getComponent&lt;CombatStatsComponent&gt;(attacker.id, 'combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >    const defenderStats = world.getComponent&lt;CombatStatsComponent&gt;(defender.id, 'combat_stats');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!attackerStats || !defenderStats) {</span>
+<span class="cstat-no" title="statement not covered" >      return COMBAT_DURATION_MIN; // Fallback</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Base duration on lethality
+<span class="cstat-no" title="statement not covered" >    let baseDuration = conflict.lethal ? COMBAT_DURATION_LETHAL : COMBAT_DURATION_BASE;</span>
+&nbsp;
+    // Calculate power difference (simplified version of calculateCombatPower)
+<span class="cstat-no" title="statement not covered" >    const attackerPower = attackerStats.combatSkill * 3;</span>
+<span class="cstat-no" title="statement not covered" >    const defenderPower = defenderStats.combatSkill * 3;</span>
+<span class="cstat-no" title="statement not covered" >    const powerDiff = Math.abs(attackerPower - defenderPower);</span>
+&nbsp;
+    // Very one-sided fights are quicker
+<span class="cstat-no" title="statement not covered" >    if (powerDiff &gt; 15) {</span>
+<span class="cstat-no" title="statement not covered" >      baseDuration = COMBAT_DURATION_MIN;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+    // Evenly matched fights take longer
+<span class="cstat-no" title="statement not covered" >    else if (powerDiff &lt; 5) {</span>
+<span class="cstat-no" title="statement not covered" >      baseDuration = COMBAT_DURATION_EXTENDED;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Add some randomness (±20%)
+<span class="cstat-no" title="statement not covered" >    const variance = baseDuration * 0.2;</span>
+<span class="cstat-no" title="statement not covered" >    const duration = baseDuration + (Math.random() * variance * 2 - variance);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return Math.max(COMBAT_DURATION_MIN, duration);</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >resolveCombat(world: World, attacker: Entity, conflict: ConflictComponent, ctx?: SystemContext): void {</span>
+    // Validate inputs
+<span class="cstat-no" title="statement not covered" >    if (!conflict.cause) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Combat cause is required');</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!world.hasComponent(attacker.id, 'combat_stats')) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Attacker missing required component: combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Get defender
+<span class="cstat-no" title="statement not covered" >    const defender = world.getEntity(conflict.target);</span>
+<span class="cstat-no" title="statement not covered" >    if (!defender) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Combat target entity not found');</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!world.hasComponent(defender.id, 'agent')) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Combat target is not an agent');</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!world.hasComponent(defender.id, 'combat_stats')) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Defender missing required component: combat_stats');</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const attackerStats = world.getComponent&lt;CombatStatsComponent&gt;(attacker.id, 'combat_stats')!;</span>
+<span class="cstat-no" title="statement not covered" >    const defenderStats = world.getComponent&lt;CombatStatsComponent&gt;(defender.id, 'combat_stats')!;</span>
+&nbsp;
+    // Calculate combat power
+<span class="cstat-no" title="statement not covered" >    const { attackerPower, defenderPower, modifiers } = this.calculateCombatPower(</span>
+<span class="cstat-no" title="statement not covered" >      world,</span>
+<span class="cstat-no" title="statement not covered" >      attacker,</span>
+<span class="cstat-no" title="statement not covered" >      defender,</span>
+<span class="cstat-no" title="statement not covered" >      attackerStats,</span>
+<span class="cstat-no" title="statement not covered" >      defenderStats,</span>
+<span class="cstat-no" title="statement not covered" >      conflict</span>
+<span class="cstat-no" title="statement not covered" >    );</span>
+&nbsp;
+    // Roll outcome
+<span class="cstat-no" title="statement not covered" >    const outcome = this.rollOutcome(world, attacker, defender, attackerPower, defenderPower, conflict.lethal);</span>
+&nbsp;
+    // Apply injuries
+<span class="cstat-no" title="statement not covered" >    this.applyInjuries(world, attacker, defender, outcome, attackerPower, defenderPower);</span>
+&nbsp;
+    // Generate narrative
+<span class="cstat-no" title="statement not covered" >    this.generateNarrative(world, attacker, defender, conflict, outcome);</span>
+&nbsp;
+    // Apply social consequences
+<span class="cstat-no" title="statement not covered" >    this.applySocialConsequences(world, attacker, defender, conflict, outcome);</span>
+&nbsp;
+    // Apply legal consequences
+<span class="cstat-no" title="statement not covered" >    this.applyLegalConsequences(world, attacker, conflict);</span>
+&nbsp;
+    // Update conflict component
+<span class="cstat-no" title="statement not covered" >    const attackerImpl = attacker as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >    attackerImpl.updateComponent&lt;ConflictComponent&gt;('conflict', (c) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >      ...c,</span>
+<span class="cstat-no" title="statement not covered" >      state: 'resolved',</span>
+<span class="cstat-no" title="statement not covered" >      attackerPower,</span>
+<span class="cstat-no" title="statement not covered" >      defenderPower,</span>
+<span class="cstat-no" title="statement not covered" >      modifiers,</span>
+<span class="cstat-no" title="statement not covered" >      outcome,</span>
+<span class="cstat-no" title="statement not covered" >    }));</span>
+&nbsp;
+    // Emit combat:ended event
+<span class="cstat-no" title="statement not covered" >    if (ctx) {</span>
+<span class="cstat-no" title="statement not covered" >      const winner = outcome === 'attacker_victory' ? attacker.id :</span>
+<span class="cstat-no" title="statement not covered" >                     outcome === 'defender_victory' ? defender.id : undefined;</span>
+<span class="cstat-no" title="statement not covered" >      ctx.emit('combat:ended', {</span>
+<span class="cstat-no" title="statement not covered" >        participants: [attacker.id, defender.id],</span>
+<span class="cstat-no" title="statement not covered" >        winner,</span>
+<span class="cstat-no" title="statement not covered" >        duration: conflict.endTime ?? 0,</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >calculateCombatPower(</span>
+<span class="cstat-no" title="statement not covered" >    world: World,</span>
+<span class="cstat-no" title="statement not covered" >    attacker: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    _defender: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    attackerStats: CombatStatsComponent,</span>
+<span class="cstat-no" title="statement not covered" >    defenderStats: CombatStatsComponent,</span>
+<span class="cstat-no" title="statement not covered" >    conflict: ConflictComponent</span>
+<span class="cstat-no" title="statement not covered" >  ): { attackerPower: number; defenderPower: number; modifiers: Array&lt;{ type: string; value: number }&gt; } {</span>
+<span class="cstat-no" title="statement not covered" >    const modifiers: Array&lt;{ type: string; value: number }&gt; = [];</span>
+&nbsp;
+    // Get magical skill bonuses from equipment (Phase 36: Combat Integration)
+<span class="cstat-no" title="statement not covered" >    let attackerCombatSkill = attackerStats.combatSkill;</span>
+<span class="cstat-no" title="statement not covered" >    let defenderCombatSkill = defenderStats.combatSkill;</span>
+&nbsp;
+    // Apply magical skill bonuses from equipment
+<span class="cstat-no" title="statement not covered" >    const attackerEquipment = world.hasComponent(attacker.id, 'equipment')</span>
+<span class="cstat-no" title="statement not covered" >      ? (world.getComponent(attacker.id, 'equipment') as EquipmentComponent)</span>
+<span class="cstat-no" title="statement not covered" >      : null;</span>
+<span class="cstat-no" title="statement not covered" >    const defenderEquipment = world.hasComponent(_defender.id, 'equipment')</span>
+<span class="cstat-no" title="statement not covered" >      ? (world.getComponent(_defender.id, 'equipment') as EquipmentComponent)</span>
+<span class="cstat-no" title="statement not covered" >      : null;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (attackerEquipment?.cached?.skillModifiers?.combat) {</span>
+<span class="cstat-no" title="statement not covered" >      const skillBonus = attackerEquipment.cached.skillModifiers.combat;</span>
+<span class="cstat-no" title="statement not covered" >      attackerCombatSkill += skillBonus;</span>
+<span class="cstat-no" title="statement not covered" >      modifiers.push({ type: 'magical_skill_bonus', value: skillBonus });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (defenderEquipment?.cached?.skillModifiers?.combat) {</span>
+<span class="cstat-no" title="statement not covered" >      const skillBonus = defenderEquipment.cached.skillModifiers.combat;</span>
+<span class="cstat-no" title="statement not covered" >      defenderCombatSkill += skillBonus;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Base power from combat skill (scaled 3x to make skill more important)
+    // Skill should matter more than equipment
+<span class="cstat-no" title="statement not covered" >    let attackerPower = attackerCombatSkill * 3;</span>
+<span class="cstat-no" title="statement not covered" >    let defenderPower = defenderCombatSkill * 3;</span>
+&nbsp;
+    // Attacker equipment bonuses (scaled down to 40% to balance with skill)
+<span class="cstat-no" title="statement not covered" >    if (attackerEquipment) {</span>
+<span class="cstat-no" title="statement not covered" >      const weaponBonus = this.getEquipmentWeaponBonus(attackerEquipment) * 0.4;</span>
+<span class="cstat-no" title="statement not covered" >      const armorBonus = this.getEquipmentDefenseBonus(attackerEquipment) * 0.4;</span>
+<span class="cstat-no" title="statement not covered" >      attackerPower += weaponBonus + armorBonus;</span>
+<span class="cstat-no" title="statement not covered" >      modifiers.push({ type: 'weapon', value: weaponBonus });</span>
+<span class="cstat-no" title="statement not covered" >      modifiers.push({ type: 'armor', value: armorBonus });</span>
+<span class="cstat-no" title="statement not covered" >    } else {</span>
+      // Fallback to old CombatStatsComponent strings
+<span class="cstat-no" title="statement not covered" >      const weaponBonus = this.getWeaponBonus(attackerStats.weapon);</span>
+<span class="cstat-no" title="statement not covered" >      const armorBonus = this.getArmorBonus(attackerStats.armor);</span>
+<span class="cstat-no" title="statement not covered" >      attackerPower += weaponBonus + armorBonus;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Defender equipment bonuses (scaled down to 40% to balance with skill)
+<span class="cstat-no" title="statement not covered" >    if (defenderEquipment) {</span>
+<span class="cstat-no" title="statement not covered" >      const defenderWeaponBonus = this.getEquipmentWeaponBonus(defenderEquipment) * 0.4;</span>
+<span class="cstat-no" title="statement not covered" >      const defenderArmorBonus = this.getEquipmentDefenseBonus(defenderEquipment) * 0.4;</span>
+<span class="cstat-no" title="statement not covered" >      defenderPower += defenderWeaponBonus + defenderArmorBonus;</span>
+<span class="cstat-no" title="statement not covered" >    } else {</span>
+      // Fallback to old CombatStatsComponent strings
+<span class="cstat-no" title="statement not covered" >      const defenderWeaponBonus = this.getWeaponBonus(defenderStats.weapon);</span>
+<span class="cstat-no" title="statement not covered" >      const defenderArmorBonus = this.getArmorBonus(defenderStats.armor);</span>
+<span class="cstat-no" title="statement not covered" >      defenderPower += defenderWeaponBonus + defenderArmorBonus;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Surprise modifier
+<span class="cstat-no" title="statement not covered" >    if (conflict.surprise) {</span>
+<span class="cstat-no" title="statement not covered" >      const surpriseBonus = 3;</span>
+<span class="cstat-no" title="statement not covered" >      attackerPower += surpriseBonus;</span>
+<span class="cstat-no" title="statement not covered" >      modifiers.push({ type: 'surprise', value: surpriseBonus });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Terrain modifier
+<span class="cstat-no" title="statement not covered" >    const envEntities = world.query().with('environment').executeEntities();</span>
+<span class="cstat-no" title="statement not covered" >    if (envEntities.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >      const firstEnvEntity = envEntities[0];</span>
+<span class="cstat-no" title="statement not covered" >      if (firstEnvEntity) {</span>
+<span class="cstat-no" title="statement not covered" >        const env = world.getComponent&lt;EnvironmentComponent&gt;(firstEnvEntity.id, 'environment');</span>
+<span class="cstat-no" title="statement not covered" >        if (env?.terrain) {</span>
+<span class="cstat-no" title="statement not covered" >          const terrainMod = this.getTerrainModifier(env.terrain);</span>
+<span class="cstat-no" title="statement not covered" >          attackerPower += terrainMod;</span>
+<span class="cstat-no" title="statement not covered" >          modifiers.push({ type: 'terrain', value: terrainMod });</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Injury penalties
+<span class="cstat-no" title="statement not covered" >    if (world.hasComponent(attacker.id, 'injury')) {</span>
+<span class="cstat-no" title="statement not covered" >      const injury = world.getComponent&lt;InjuryComponent&gt;(attacker.id, 'injury');</span>
+<span class="cstat-no" title="statement not covered" >      if (injury?.skillPenalties?.combat) {</span>
+<span class="cstat-no" title="statement not covered" >        attackerPower += injury.skillPenalties.combat;</span>
+<span class="cstat-no" title="statement not covered" >        modifiers.push({ type: 'injury', value: injury.skillPenalties.combat });</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return { attackerPower, defenderPower, modifiers };</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >getWeaponBonus(weapon?: string | null): number {</span>
+<span class="cstat-no" title="statement not covered" >    if (!weapon) return 0;</span>
+<span class="cstat-no" title="statement not covered" >    switch (weapon) {</span>
+<span class="cstat-no" title="statement not covered" >      case 'sword': return 3;</span>
+<span class="cstat-no" title="statement not covered" >      case 'spear': return 2;</span>
+<span class="cstat-no" title="statement not covered" >      case 'axe': return 2;</span>
+<span class="cstat-no" title="statement not covered" >      case 'club': return 1;</span>
+<span class="cstat-no" title="statement not covered" >      default: return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >getArmorBonus(armor?: string | null): number {</span>
+<span class="cstat-no" title="statement not covered" >    if (!armor) return 0;</span>
+<span class="cstat-no" title="statement not covered" >    switch (armor) {</span>
+<span class="cstat-no" title="statement not covered" >      case 'chainmail': return 2;</span>
+<span class="cstat-no" title="statement not covered" >      case 'leather': return 1;</span>
+<span class="cstat-no" title="statement not covered" >      case 'plate': return 3;</span>
+<span class="cstat-no" title="statement not covered" >      default: return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  /**
+   * Get weapon attack bonus from EquipmentComponent.
+   * Returns weapon damage value or 0 if no weapon equipped.
+   */
+  private <span class="fstat-no" title="function not covered" >getEquipmentWeaponBonus(equipment: EquipmentComponent): number {</span>
+<span class="cstat-no" title="statement not covered" >    const mainHandSlot = equipment.weapons.mainHand;</span>
+<span class="cstat-no" title="statement not covered" >    if (!mainHandSlot) return 0;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const weapon = itemRegistry.tryGet(mainHandSlot.itemId);</span>
+<span class="cstat-no" title="statement not covered" >    if (!weapon?.traits?.weapon) return 0;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return weapon.traits.weapon.damage;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  /**
+   * Get defense bonus from EquipmentComponent.
+   * Uses cached totalDefense from EquipmentSystem.
+   */
+  private <span class="fstat-no" title="function not covered" >getEquipmentDefenseBonus(equipment: EquipmentComponent): number {</span>
+    // EquipmentSystem caches total defense for performance
+<span class="cstat-no" title="statement not covered" >    return equipment.cached?.totalDefense ?? 0;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >getTerrainModifier(terrain: string): number {</span>
+<span class="cstat-no" title="statement not covered" >    switch (terrain) {</span>
+<span class="cstat-no" title="statement not covered" >      case 'forest': return 1; // Cover advantage</span>
+<span class="cstat-no" title="statement not covered" >      case 'plains': return 0;</span>
+<span class="cstat-no" title="statement not covered" >      case 'mountains': return -1; // Difficult footing</span>
+<span class="cstat-no" title="statement not covered" >      default: return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >rollOutcome(</span>
+<span class="cstat-no" title="statement not covered" >    world: World,</span>
+<span class="cstat-no" title="statement not covered" >    attacker: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    defender: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    attackerPower: number,</span>
+<span class="cstat-no" title="statement not covered" >    defenderPower: number,</span>
+<span class="cstat-no" title="statement not covered" >    lethal?: boolean</span>
+<span class="cstat-no" title="statement not covered" >  ): ConflictComponent['outcome'] {</span>
+<span class="cstat-no" title="statement not covered" >    const powerDiff = attackerPower - defenderPower;</span>
+&nbsp;
+    // Use sigmoid for smooth probability curve with diminishing returns
+    // k=0.2 gives ~5% change per point near 50/50, with diminishing returns at extremes
+    // Uses pre-calculated lookup table for performance (~10x faster than Math.exp)
+<span class="cstat-no" title="statement not covered" >    let attackerChance = this.getSigmoid(powerDiff);</span>
+&nbsp;
+    // Apply destiny luck modifiers (Phase 36: Hero Protection)
+<span class="cstat-no" title="statement not covered" >    const attackerLuck = this.getDestinyLuckModifier(world, attacker.id);</span>
+<span class="cstat-no" title="statement not covered" >    const defenderLuck = this.getDestinyLuckModifier(world, defender.id);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (attackerLuck !== 0 || defenderLuck !== 0) {</span>
+<span class="cstat-no" title="statement not covered" >      attackerChance += attackerLuck - defenderLuck;</span>
+&nbsp;
+      // Explicit bounds at 5%-95% (game design: never 100% certain outcomes)
+<span class="cstat-no" title="statement not covered" >      if (attackerChance &gt; 0.95) {</span>
+<span class="cstat-no" title="statement not covered" >        attackerChance = 0.95;</span>
+<span class="cstat-no" title="statement not covered" >      } else if (attackerChance &lt; 0.05) {</span>
+<span class="cstat-no" title="statement not covered" >        attackerChance = 0.05;</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+&nbsp;
+      // Note: Destiny intervention event emission would go here, but ctx is not available
+      // in rollOutcome method. Event emission handled at higher level in resolveCombat.
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const roll = Math.random();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (lethal) {</span>
+      // Lethal combat - death is possible
+<span class="cstat-no" title="statement not covered" >      if (roll &lt; attackerChance * 0.7) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'attacker_victory'; // Could lead to death</span>
+<span class="cstat-no" title="statement not covered" >      } else if (roll &lt; attackerChance * 0.85) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'defender_victory';</span>
+<span class="cstat-no" title="statement not covered" >      } else if (roll &lt; 0.95) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'mutual_injury';</span>
+<span class="cstat-no" title="statement not covered" >      } else {</span>
+<span class="cstat-no" title="statement not covered" >        return 'death'; // Mutual death</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    } else {</span>
+      // Non-lethal combat
+<span class="cstat-no" title="statement not covered" >      if (roll &lt; attackerChance) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'attacker_victory';</span>
+<span class="cstat-no" title="statement not covered" >      } else if (roll &lt; attackerChance + 0.3) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'defender_victory';</span>
+<span class="cstat-no" title="statement not covered" >      } else if (roll &lt; 0.9) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'mutual_injury';</span>
+<span class="cstat-no" title="statement not covered" >      } else {</span>
+<span class="cstat-no" title="statement not covered" >        return 'stalemate';</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >applyInjuries(</span>
+<span class="cstat-no" title="statement not covered" >    world: World,</span>
+<span class="cstat-no" title="statement not covered" >    attacker: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    defender: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    outcome: ConflictComponent['outcome'],</span>
+<span class="cstat-no" title="statement not covered" >    attackerPower: number,</span>
+<span class="cstat-no" title="statement not covered" >    defenderPower: number</span>
+<span class="cstat-no" title="statement not covered" >  ): void {</span>
+<span class="cstat-no" title="statement not covered" >    const attackerImpl = attacker as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >    const defenderImpl = defender as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >    const powerDiff = Math.abs(attackerPower - defenderPower);</span>
+&nbsp;
+    // Check for destiny protection against instant death (Phase 36: Hero Protection)
+    // Normally: power difference &gt;20 = instant death
+    // With destiny: death threshold increases by (destinyLuck × 50)
+<span class="cstat-no" title="statement not covered" >    const applyDeathProtection = (entity: Entity, entityPower: number, opponentPower: number): boolean =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      const diff = Math.abs(opponentPower - entityPower);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (diff &gt; 20) {</span>
+<span class="cstat-no" title="statement not covered" >        const destinyLuck = this.getDestinyLuckModifier(world, entity.id);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (destinyLuck &gt; 0) {</span>
+          // Positive destiny luck provides death resistance
+          // +0.1 luck = need 25 power diff for instant death
+          // +0.2 luck = need 30 power diff for instant death
+<span class="cstat-no" title="statement not covered" >          const deathThreshold = 20 + (destinyLuck * 50);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >          if (diff &lt; deathThreshold) {</span>
+            // Destiny saved them from instant death!
+            // Apply severe injury instead
+<span class="cstat-no" title="statement not covered" >            const entityImpl = entity as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >            this.inflictInjury(entityImpl, diff);</span>
+&nbsp;
+            // Emit destiny intervention event - note: this won't work outside update() call
+            // since ctx is not available in resolveCombat when called from outside update
+            // For now, skip event emission in this rare case
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            return true; // Protected from death</span>
+<span class="cstat-no" title="statement not covered" >          }</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      return false; // No protection</span>
+<span class="cstat-no" title="statement not covered" >    };</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    switch (outcome) {</span>
+<span class="cstat-no" title="statement not covered" >      case 'attacker_victory':</span>
+        // Check if defender protected from instant death
+<span class="cstat-no" title="statement not covered" >        if (!applyDeathProtection(defender, defenderPower, attackerPower)) {</span>
+          // Defender injured (or dies if power diff too high)
+<span class="cstat-no" title="statement not covered" >          this.inflictInjury(defenderImpl, powerDiff);</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      case 'defender_victory':</span>
+        // Check if attacker protected from instant death
+<span class="cstat-no" title="statement not covered" >        if (!applyDeathProtection(attacker, attackerPower, defenderPower)) {</span>
+          // Attacker injured (or dies if power diff too high)
+<span class="cstat-no" title="statement not covered" >          this.inflictInjury(attackerImpl, powerDiff);</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      case 'mutual_injury':</span>
+        // Both injured (destiny protection doesn't apply to mutual injury)
+<span class="cstat-no" title="statement not covered" >        this.inflictInjury(attackerImpl, powerDiff * 0.5);</span>
+<span class="cstat-no" title="statement not covered" >        this.inflictInjury(defenderImpl, powerDiff * 0.5);</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      case 'stalemate':</span>
+        // No injuries
+<span class="cstat-no" title="statement not covered" >        break;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      case 'death':</span>
+        // Both die (destiny protection doesn't apply to mutual death)
+<span class="cstat-no" title="statement not covered" >        if (world.hasComponent(attacker.id, 'needs')) {</span>
+<span class="cstat-no" title="statement not covered" >          attackerImpl.updateComponent&lt;NeedsComponent&gt;('needs', (needs) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >            const updated = needs.clone();</span>
+<span class="cstat-no" title="statement not covered" >            updated.health = 0;</span>
+<span class="cstat-no" title="statement not covered" >            return updated;</span>
+<span class="cstat-no" title="statement not covered" >          });</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >        if (world.hasComponent(defender.id, 'needs')) {</span>
+<span class="cstat-no" title="statement not covered" >          defenderImpl.updateComponent&lt;NeedsComponent&gt;('needs', (needs) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >            const updated = needs.clone();</span>
+<span class="cstat-no" title="statement not covered" >            updated.health = 0;</span>
+<span class="cstat-no" title="statement not covered" >            return updated;</span>
+<span class="cstat-no" title="statement not covered" >          });</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >inflictInjury(entity: EntityImpl, powerDiff: number): void {</span>
+<span class="cstat-no" title="statement not covered" >    const severity: InjuryComponent['severity'] =</span>
+<span class="cstat-no" title="statement not covered" >      powerDiff &gt; 5 ? 'critical' :</span>
+<span class="cstat-no" title="statement not covered" >      powerDiff &gt; 2 ? 'major' :</span>
+<span class="cstat-no" title="statement not covered" >      'minor';</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const locations: Array&lt;InjuryComponent['location']&gt; = ['head', 'torso', 'arms', 'legs'];</span>
+<span class="cstat-no" title="statement not covered" >    const location = locations[Math.floor(Math.random() * locations.length)]!;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const types: Array&lt;InjuryComponent['injuryType']&gt; = ['laceration', 'puncture', 'blunt'];</span>
+<span class="cstat-no" title="statement not covered" >    const type = types[Math.floor(Math.random() * types.length)]!;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const injury = createInjuryComponent({</span>
+<span class="cstat-no" title="statement not covered" >      injuryType: type,</span>
+<span class="cstat-no" title="statement not covered" >      severity,</span>
+<span class="cstat-no" title="statement not covered" >      location,</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    entity.addComponent(injury);</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >  private async generateNarrative(</span>
+<span class="cstat-no" title="statement not covered" >    world: World,</span>
+<span class="cstat-no" title="statement not covered" >    attacker: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    defender: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    conflict: ConflictComponent,</span>
+<span class="cstat-no" title="statement not covered" >    outcome: ConflictComponent['outcome']</span>
+<span class="cstat-no" title="statement not covered" >  ): Promise&lt;void&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (!this.llmProvider) return;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const attackerAgent = world.getComponent&lt;AgentComponent&gt;(attacker.id, 'agent');</span>
+<span class="cstat-no" title="statement not covered" >    const defenderAgent = world.getComponent&lt;AgentComponent&gt;(defender.id, 'agent');</span>
+&nbsp;
+    // Find witnesses
+<span class="cstat-no" title="statement not covered" >    const attackerPos = world.getComponent&lt;PositionComponent&gt;(attacker.id, 'position');</span>
+<span class="cstat-no" title="statement not covered" >    const witnesses: Array&lt;{ id: string; name: string }&gt; = [];</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (attackerPos) {</span>
+<span class="cstat-no" title="statement not covered" >      const nearbyEntities = world.query()</span>
+<span class="cstat-no" title="statement not covered" >        .with('agent')</span>
+<span class="cstat-no" title="statement not covered" >        .with('position')</span>
+<span class="cstat-no" title="statement not covered" >        .executeEntities();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      for (const entity of nearbyEntities) {</span>
+<span class="cstat-no" title="statement not covered" >        if (entity.id === attacker.id || entity.id === defender.id) continue;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        const pos = world.getComponent&lt;PositionComponent&gt;(entity.id, 'position');</span>
+<span class="cstat-no" title="statement not covered" >        if (pos) {</span>
+<span class="cstat-no" title="statement not covered" >          const dx = pos.x - attackerPos.x;</span>
+<span class="cstat-no" title="statement not covered" >          const dy = pos.y - attackerPos.y;</span>
+<span class="cstat-no" title="statement not covered" >          const distanceSquared = dx * dx + dy * dy;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >          if (distanceSquared &lt; 20 * 20) {</span>
+<span class="cstat-no" title="statement not covered" >            const agent = world.getComponent&lt;AgentComponent&gt;(entity.id, 'agent');</span>
+<span class="cstat-no" title="statement not covered" >            witnesses.push({</span>
+<span class="cstat-no" title="statement not covered" >              id: entity.id,</span>
+<span class="cstat-no" title="statement not covered" >              name: agent?.name || entity.id,</span>
+<span class="cstat-no" title="statement not covered" >            });</span>
+<span class="cstat-no" title="statement not covered" >          }</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // TODO: Narrative generation not yet implemented in canonical LLMProvider
+    // The generateNarrative method needs to be added to the LLMProvider interface
+    // or combat narratives should be generated via the standard generate() method
+<span class="cstat-no" title="statement not covered" >    try {</span>
+      // Placeholder for future narrative generation
+      // await this.llmProvider.generate({
+      //   prompt: `Generate combat narrative for ${attackerAgent?.name} vs ${defenderAgent?.name}...`
+      // });
+<span class="cstat-no" title="statement not covered" >    } catch (error) {</span>
+<span class="cstat-no" title="statement not covered" >      console.error('[AgentCombatSystem] LLM narrative generation failed:', error);</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >applySocialConsequences(</span>
+<span class="cstat-no" title="statement not covered" >    world: World,</span>
+<span class="cstat-no" title="statement not covered" >    attacker: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    defender: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    conflict: ConflictComponent,</span>
+<span class="cstat-no" title="statement not covered" >    outcome: ConflictComponent['outcome']</span>
+<span class="cstat-no" title="statement not covered" >  ): void {</span>
+<span class="cstat-no" title="statement not covered" >    const attackerImpl = attacker as EntityImpl;</span>
+<span class="cstat-no" title="statement not covered" >    const defenderImpl = defender as EntityImpl;</span>
+&nbsp;
+    // Find witnesses
+<span class="cstat-no" title="statement not covered" >    const attackerPos = world.getComponent&lt;PositionComponent&gt;(attacker.id, 'position');</span>
+<span class="cstat-no" title="statement not covered" >    if (!attackerPos) return;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const nearbyEntities = world.query()</span>
+<span class="cstat-no" title="statement not covered" >      .with('agent')</span>
+<span class="cstat-no" title="statement not covered" >      .with('position')</span>
+<span class="cstat-no" title="statement not covered" >      .with('relationship')</span>
+<span class="cstat-no" title="statement not covered" >      .executeEntities();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    for (const witness of nearbyEntities) {</span>
+<span class="cstat-no" title="statement not covered" >      if (witness.id === attacker.id || witness.id === defender.id) continue;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      const pos = world.getComponent&lt;PositionComponent&gt;(witness.id, 'position');</span>
+<span class="cstat-no" title="statement not covered" >      if (!pos) continue;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      const dx = pos.x - attackerPos.x;</span>
+<span class="cstat-no" title="statement not covered" >      const dy = pos.y - attackerPos.y;</span>
+<span class="cstat-no" title="statement not covered" >      const distanceSquared = dx * dx + dy * dy;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (distanceSquared &lt; 20 * 20) {</span>
+<span class="cstat-no" title="statement not covered" >        const witnessImpl = witness as EntityImpl;</span>
+&nbsp;
+        // Judge the attacker based on cause
+<span class="cstat-no" title="statement not covered" >        const isJustCause = ['defense', 'honor_duel'].includes(conflict.cause || '');</span>
+<span class="cstat-no" title="statement not covered" >        const opinionChange = isJustCause ? -10 : -30;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        witnessImpl.updateComponent&lt;RelationshipComponent&gt;('relationship', (rel) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >          ...rel,</span>
+<span class="cstat-no" title="statement not covered" >          relationships: {</span>
+<span class="cstat-no" title="statement not covered" >            ...rel.relationships,</span>
+<span class="cstat-no" title="statement not covered" >            [attacker.id]: {</span>
+<span class="cstat-no" title="statement not covered" >              opinion: opinionChange,</span>
+<span class="cstat-no" title="statement not covered" >              trust: opinionChange * 0.5,</span>
+<span class="cstat-no" title="statement not covered" >            },</span>
+<span class="cstat-no" title="statement not covered" >          },</span>
+<span class="cstat-no" title="statement not covered" >        }));</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Update reputation
+<span class="cstat-no" title="statement not covered" >    if (world.hasComponent(attacker.id, 'reputation')) {</span>
+<span class="cstat-no" title="statement not covered" >      attackerImpl.updateComponent&lt;ReputationComponent&gt;('reputation', (rep) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        const honorChange = conflict.cause === 'honor_duel' &amp;&amp; outcome === 'attacker_victory' ? 10 : -5;</span>
+<span class="cstat-no" title="statement not covered" >        return {</span>
+<span class="cstat-no" title="statement not covered" >          ...rep,</span>
+<span class="cstat-no" title="statement not covered" >          honor: rep.honor + honorChange,</span>
+<span class="cstat-no" title="statement not covered" >          violence: rep.violence + 5,</span>
+<span class="cstat-no" title="statement not covered" >        };</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Update relationships between combatants
+<span class="cstat-no" title="statement not covered" >    if (world.hasComponent(attacker.id, 'relationship')) {</span>
+<span class="cstat-no" title="statement not covered" >      attackerImpl.updateComponent&lt;RelationshipComponent&gt;('relationship', (rel) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        const existing = rel.relationships[defender.id] || { opinion: 0, trust: 0 };</span>
+<span class="cstat-no" title="statement not covered" >        return {</span>
+<span class="cstat-no" title="statement not covered" >          ...rel,</span>
+<span class="cstat-no" title="statement not covered" >          relationships: {</span>
+<span class="cstat-no" title="statement not covered" >            ...rel.relationships,</span>
+<span class="cstat-no" title="statement not covered" >            [defender.id]: {</span>
+<span class="cstat-no" title="statement not covered" >              opinion: existing.opinion - 20,</span>
+<span class="cstat-no" title="statement not covered" >              trust: (existing.trust || 0) - 30,</span>
+<span class="cstat-no" title="statement not covered" >            },</span>
+<span class="cstat-no" title="statement not covered" >          },</span>
+<span class="cstat-no" title="statement not covered" >        };</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (world.hasComponent(defender.id, 'relationship')) {</span>
+<span class="cstat-no" title="statement not covered" >      defenderImpl.updateComponent&lt;RelationshipComponent&gt;('relationship', (rel) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        const existing = rel.relationships[attacker.id] || { opinion: 0, trust: 0 };</span>
+<span class="cstat-no" title="statement not covered" >        return {</span>
+<span class="cstat-no" title="statement not covered" >          ...rel,</span>
+<span class="cstat-no" title="statement not covered" >          relationships: {</span>
+<span class="cstat-no" title="statement not covered" >            ...rel.relationships,</span>
+<span class="cstat-no" title="statement not covered" >            [attacker.id]: {</span>
+<span class="cstat-no" title="statement not covered" >              opinion: existing.opinion - 20,</span>
+<span class="cstat-no" title="statement not covered" >              trust: (existing.trust || 0) - 30,</span>
+<span class="cstat-no" title="statement not covered" >            },</span>
+<span class="cstat-no" title="statement not covered" >          },</span>
+<span class="cstat-no" title="statement not covered" >        };</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  private <span class="fstat-no" title="function not covered" >applyLegalConsequences(</span>
+<span class="cstat-no" title="statement not covered" >    world: World,</span>
+<span class="cstat-no" title="statement not covered" >    attacker: Entity,</span>
+<span class="cstat-no" title="statement not covered" >    conflict: ConflictComponent</span>
+<span class="cstat-no" title="statement not covered" >  ): void {</span>
+    // Check if laws exist
+<span class="cstat-no" title="statement not covered" >    const lawEntities = world.query().with('laws').executeEntities();</span>
+<span class="cstat-no" title="statement not covered" >    if (lawEntities.length === 0) return;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const firstLawEntity = lawEntities[0];</span>
+<span class="cstat-no" title="statement not covered" >    if (!firstLawEntity) return;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const laws = world.getComponent&lt;LawsComponent&gt;(firstLawEntity.id, 'laws');</span>
+<span class="cstat-no" title="statement not covered" >    if (!laws) return;</span>
+&nbsp;
+    // Skip if self-defense
+<span class="cstat-no" title="statement not covered" >    if (conflict.cause === 'defense' &amp;&amp; laws.selfDefenseLegal) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Check if assault is illegal
+<span class="cstat-no" title="statement not covered" >    if (laws.assaultIllegal) {</span>
+<span class="cstat-no" title="statement not covered" >      const attackerImpl = attacker as EntityImpl;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      const legalStatus: any = {</span>
+<span class="cstat-no" title="statement not covered" >        type: 'legal_status',</span>
+<span class="cstat-no" title="statement not covered" >        crime: 'assault',</span>
+<span class="cstat-no" title="statement not covered" >        wanted: true,</span>
+<span class="cstat-no" title="statement not covered" >      };</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      attackerImpl.addComponent(legalStatus);</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  /**
+   * Calculate destiny luck modifier for combat rolls (Phase 36: Hero Protection).
+   * Returns a modifier to combat rolls (-0.2 to +0.2).
+   *
+   * Heroes with destiny get luck modifiers based on:
+   * - Has destiny? If `destiny` field is set
+   * - Destiny fulfilled? Protection fades after `destinyRealized = true`
+   * - Cosmic alignment: Multiplies luck (blessed souls get more protection)
+   *
+   * Examples:
+   * - Blessed hero (alignment +0.8, has destiny): +0.08 luck (8% to rolls)
+   * - Neutral hero (alignment 0, has destiny): 0 luck
+   * - Cursed soul (alignment -1.0, has destiny): -0.10 luck (anti-luck!)
+   */
+  private <span class="fstat-no" title="function not covered" >getDestinyLuckModifier(world: World, agentId: string): number {</span>
+    // Get soul link
+<span class="cstat-no" title="statement not covered" >    if (!world.hasComponent(agentId, 'soul_link')) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const soulLink = world.getComponent&lt;SoulLinkComponent&gt;(agentId, 'soul_link');</span>
+<span class="cstat-no" title="statement not covered" >    if (!soulLink?.soulEntityId) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Get soul identity
+<span class="cstat-no" title="statement not covered" >    if (!world.hasComponent(soulLink.soulEntityId, 'soul_identity')) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    const soulIdentity = world.getComponent&lt;SoulIdentityComponent&gt;(</span>
+<span class="cstat-no" title="statement not covered" >      soulLink.soulEntityId,</span>
+<span class="cstat-no" title="statement not covered" >      'soul_identity'</span>
+<span class="cstat-no" title="statement not covered" >    );</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!soulIdentity) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // No protection if destiny is fulfilled
+<span class="cstat-no" title="statement not covered" >    if (soulIdentity.destinyRealized) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // No protection if no destiny
+<span class="cstat-no" title="statement not covered" >    if (!soulIdentity.destiny) {</span>
+<span class="cstat-no" title="statement not covered" >      return 0;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    // Base luck from having a destiny: +10% to combat rolls
+<span class="cstat-no" title="statement not covered" >    let luckModifier = 0.10;</span>
+&nbsp;
+    // Multiply by cosmic alignment (-1 to +1)
+    // Blessed souls (alignment +1.0): +10% luck
+    // Neutral souls (alignment 0): +0% luck
+    // Cursed souls (alignment -1.0): -10% luck (anti-luck!)
+<span class="cstat-no" title="statement not covered" >    luckModifier *= soulIdentity.cosmicAlignment;</span>
+&nbsp;
+    // Explicit saturation at ±20% (game balance limit)
+<span class="cstat-no" title="statement not covered" >    if (luckModifier &gt; 0.2) {</span>
+<span class="cstat-no" title="statement not covered" >      console.warn(`[Combat] Luck modifier ${luckModifier} exceeds cap, saturating to 0.2`);</span>
+<span class="cstat-no" title="statement not covered" >      return 0.2;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    if (luckModifier &lt; -0.2) {</span>
+<span class="cstat-no" title="statement not covered" >      console.warn(`[Combat] Luck modifier ${luckModifier} below floor, saturating to -0.2`);</span>
+<span class="cstat-no" title="statement not covered" >      return -0.2;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return luckModifier;</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+  protected <span class="fstat-no" title="function not covered" >onCleanup(): void {</span>
+    // Custom cleanup if needed
+<span class="cstat-no" title="statement not covered" >  }</span>
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

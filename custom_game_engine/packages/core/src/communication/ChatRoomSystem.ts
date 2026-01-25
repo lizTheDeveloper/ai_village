@@ -55,12 +55,6 @@ export class ChatRoomSystem extends BaseSystem {
   private lastMembershipUpdate = 0;
 
   protected onUpdate(ctx: SystemContext): void {
-    // Initialize permanent rooms on first update
-    if (!this.initialized) {
-      this.initializePermanentRooms(ctx.world);
-      this.initialized = true;
-    }
-
     // Performance: Throttle membership updates to avoid expensive queries every tick
     const shouldUpdateMembership = (ctx.tick - this.lastMembershipUpdate) >= this.throttleInterval;
 
@@ -260,11 +254,21 @@ export class ChatRoomSystem extends BaseSystem {
 
     room.config.membership.members.push(entity.id);
 
+    // Update active state immediately when member joins
+    const threshold = room.config.activationThreshold ?? 1;
+    const wasActive = room.isActive;
+    room.isActive = room.config.membership.members.length >= threshold;
+
     // Create notification
     const notification = createJoinNotification(room.config.id, entity.id, name);
     room.pendingNotifications.push(notification);
 
     console.log(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
+
+    // Log activation state change
+    if (room.isActive && !wasActive) {
+      console.log(`[ChatRoomSystem] ${room.config.name} activated with ${room.config.membership.members.length} members`);
+    }
   }
 
   /**
@@ -274,6 +278,11 @@ export class ChatRoomSystem extends BaseSystem {
     const index = room.config.membership.members.indexOf(entityId);
     if (index !== -1) {
       room.config.membership.members.splice(index, 1);
+
+      // Update active state immediately when member leaves
+      const threshold = room.config.activationThreshold ?? 1;
+      const wasActive = room.isActive;
+      room.isActive = room.config.membership.members.length >= threshold;
 
       // Try to get name from world (entity might be gone)
       const entity = world.getEntity(entityId);
@@ -285,6 +294,11 @@ export class ChatRoomSystem extends BaseSystem {
       room.pendingNotifications.push(notification);
 
       console.log(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
+
+      // Log activation state change
+      if (!room.isActive && wasActive) {
+        console.log(`[ChatRoomSystem] ${room.config.name} deactivated - not enough members`);
+      }
     }
   }
 

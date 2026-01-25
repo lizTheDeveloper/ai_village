@@ -7,7 +7,6 @@
  * Browser-compatible: Save/load operations are no-ops in browser, only work in Node.js.
  */
 
-import type { World } from '../ecs/World.js';
 import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { worldSerializer } from './WorldSerializer.js';

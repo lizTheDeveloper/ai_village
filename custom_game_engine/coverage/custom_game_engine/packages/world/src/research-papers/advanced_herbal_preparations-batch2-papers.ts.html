@@ -1,0 +1,1837 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/advanced_herbal_preparations-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> advanced_herbal_preparations-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PERCOLATION_METHOD: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'percolation_method',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Percolation Method',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['double_extraction_mushrooms'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_percolation_method' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Percolation Method</span>
+&nbsp;
+The percolation method represents one of alchemy's most deceptively simple procedures: the gentle, downward passage of menstruum* through a column of prepared materia†, allowing the solvent to extract desirable essences while leaving behind undesirable dross‡. Unlike the violent enthusiasm of distillation** or the aggressive insistence of maceration††, percolation operates on the principle that some things cannot be rushed, only coaxed‡‡—a lesson that approximately 73.4% of beginning alchemists learn only after their first catastrophic attempt to "speed things up"***. The method's elegance lies in its exploitation of gravity†††, that most democratic of forces, which works equally well whether you believe in it or not‡‡‡.
+&nbsp;
+The practical application of percolation requires three elements of near-mystical importance: proper packing of the percolation cone****, adequate moistening of the materia†††† before extraction begins, and—most critically—patience‡‡‡‡. The alchemist must pack the cone neither too loosely (resulting in channeling*****) nor too tightly (resulting in nothing moving at all and, historically, several notable explosions††††††). The moistening phase, termed "maceration preliminary"‡‡‡‡‡ in older texts, allows the cellular structures of plant matter to swell and soften, making them more amenable to yielding their secrets******. The menstruum is then added at the top and allowed to percolate through at a rate typically measured in drops per minute†††††††—a pace so glacial that the Guild of Impatient Alchemists‡‡‡‡‡‡ officially disbanded in 1743 after all members simultaneously attempted to pursue faster methods*******.
+&nbsp;
+Historical development of percolation reveals a curious pattern: every generation of alchemists believes they have invented it, despite clear evidence of its use dating back to the Mesopotamian Extraction Scrolls********, which themselves reference "the old way of making things drip slowly through other things"†††††††††. The Alexandrian School‡‡‡‡‡‡‡ perfected the glass percolation cone around 300 BCE, though they apparently kept exploding them by using the wrong menstruum*********, leading to the famous cautionary phrase "measure thrice, pour once, run occasionally"††††††††††. Modern understanding, enhanced by actual comprehension of cellular biology rather than theories involving tiny angry spirits‡‡‡‡‡‡‡‡, has revealed that percolation works through a combination of solvent gradient diffusion and capillary action—though the tiny angry spirit theory did produce more entertaining laboratory notes**********.
+&nbsp;
+The safety considerations for percolation are, mercifully, less dramatic than those for more vigorous alchemical procedures, though this has led to a dangerous sense of complacency†††††††††††. The primary hazards involve solvent selection‡‡‡‡‡‡‡‡‡ (some combinations of materia and menstruum produce results ranging from "disappointing" to "everyone evacuate the building"***********), cone failure††††††††††††† (glass breaks, especially glass under pressure, especially especially glass under pressure filled with something reactive‡‡‡‡‡‡‡‡‡‡), and most insidiously, distraction************. The last hazard accounts for approximately 67% of percolation accidents, as alchemists become bored waiting for the slow drip of extraction, wander off to attempt faster methods, forget about their percolation entirely, and return to find—well, the Incident at the Heidelberg Academy************* need not be detailed here in full, though it did result in the phrase "mind your percolations" entering common parlance†††††††††††††.
+&nbsp;
+---
+&nbsp;
+*From the Latin "menstruus," meaning monthly, referring to the cyclical nature of alchemical work and absolutely not to anything else, despite what certain crude apprentices might suggest. The Head Alchemist of the Prague Academy (1654-1671) once turned a student into a toad for making that particular joke. The transformation lasted three days, which was exactly long enough for the lesson to sink in but not long enough to require paperwork explaining a permanent metamorphosis to the Ethics Board.
+&nbsp;
+†The materia, or "stuff you're trying to get the good bits out of," must be properly prepared through grinding, cutting, or powdering. The correct particle size is "smaller than a pea but larger than dust," according to the authoritative text *De Minutis Particularum* (On Tiny Bits), though some scholars argue for "about the size of the thing you'd be annoyed to find in your shoe but not upset enough to stop walking."
+&nbsp;
+‡Dross: the bits you don't want, consisting primarily of plant cellulose, waxes, resins, and the dreams of the materia's former life as a growing thing. Some philosophical alchemists have written extensively on the ethics of extraction, though these texts are generally filed under "Things to Read When Very Drunk."
+&nbsp;
+**Distillation, being a method involving boiling flasks, flames, and the collection of volatile vapors, holds the record for "most dramatic alchemical failures" at the annual Guild meeting. The award is a small crystal flask, and yes, several people have broken it immediately upon receiving it.
+&nbsp;
+††Maceration, the practice of soaking things in liquid for extended periods, is popular among alchemists who enjoy checking their experiments once a week while otherwise pursuing less time-consuming hobbies like "sleeping" or "having relationships." It has been described by the Impatient Alchemists' Guild as "watching paint dry, if paint took several months and occasionally went moldy."
+&nbsp;
+‡‡This wisdom was first expressed by the ancient Chinese alchemist Wei Po-yang in his *Book of the Kinship of the Three*, though he was primarily discussing the philosopher's stone at the time and probably didn't anticipate his philosophy being applied to extracting mushroom essences. †The spirits of dead alchemists are widely believed to be embarrassed by this appropriation of their wisdom for such mundane purposes. ‡Though not embarrassed enough to haunt anyone about it, apparently.
+&nbsp;
+***The "speeding up" attempts include: adding heat (results in distillation, not percolation, and often fire), increasing pressure (results in explosion), adding more menstruum (results in flooding), and the notorious "shake it vigorously" method proposed by Brother Theobald of Cologne in 1456 (results in Brother Theobald being transferred to manuscript illumination duty for life).
+&nbsp;
+†††Gravity was discovered by Sir Isaac Newton in 1687, though alchemists had been using it for centuries without proper documentation. Newton himself was an alchemist, though he kept this quiet in his later years, presumably due to embarrassment over his youthful attempt to percolate pure light through a prism column, which resulted in nothing extracting but did produce lovely rainbow patterns on his laboratory wall.
+&nbsp;
+‡‡‡Some alchemists do attempt to work against gravity, using vacuum percolation or "ascending extraction." These alchemists are referred to professionally as "contrarians" and socially as "the reason we can't have nice things." The counter-gravitational percolation attempts of 1823-1827 resulted in seventeen laboratory ceilings requiring repair and one alchemist permanently convinced he could fly. He could not.
+&nbsp;
+****The percolation cone, or "percolator," should ideally be made of glass, allowing observation of the extraction process. Early versions were made of leather, ceramic, or optimistically, paper. The paper percolators worked exactly once and never again. The Museum of Alchemical Failures in Basel displays over forty examples of paper percolators, all of which look like tragic papier-mâché projects.
+&nbsp;
+†††††This moistening step separates the patient from the impatient, the successful from the hospitalized. Alchemists who skip moistening discover that dry, compacted plant matter repels menstruum like a particularly stubborn philosophical argument repels logic. The resulting "plug" can create enough pressure to launch a cork across a laboratory, as documented in the famous "Projectile Stopper Incident" at the Sorbonne in 1612, where a cork achieved an estimated velocity of forty-seven miles per hour and embedded itself in a portrait of the university's founder. The founder's painted expression was subsequently described as "appropriately alarmed."
+&nbsp;
+‡‡‡‡Patience: that quality possessed by saints, tortoises, and successful percolation alchemists. It cannot be purchased, borrowed, or extracted through any known alchemical method, though many have tried. The "Essence of Patience" experiments at Cambridge (1701-1702)`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding percolation method in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MACERATION_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'maceration_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Maceration Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['percolation_method'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_maceration_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Maceration Techniques: A Comprehensive Study of Controlled Dissolution in Alchemical Practice</span>
+&nbsp;
+The fundamental principle of maceration—the art of softening substances through extended immersion in appropriate solvents*—represents one of the oldest continuously practiced techniques in the alchemical arts, predating even the Third Dynasty's regrettable experiments with quicksilver dentistry†. At its core, maceration operates on the principle that time and patience can accomplish what force cannot, a lesson learned rather spectacularly by the Hasty Alchemists' Guild of Ankh-Morpork in 1782‡. The process involves submerging botanical, mineral, or (in rarer cases) conceptual materials** in a menstruum††—typically alcohol, oil, or in desperate circumstances, tears of frustration†††—for a period ranging from three days to three years, depending on whether one consults the Slow School‡‡ or the Very Slow School‡‡‡ of alchemical thought.
+&nbsp;
+The practical execution of maceration requires precision in vessel selection*, adequate sealing mechanisms**, and most critically, the patience to resist checking the vessel every seventeen minutes†. The standard protocol, as established by the Committee for Standardization of Alchemical Processes‡ (whose seventeen-volume guidelines are themselves an exercise in testing patience), dictates that materials be chopped, ground, or philosophically persuaded into appropriate sizes* before immersion. Temperature control proves essential: too cold and the process stalls indefinitely**; too warm and one risks what the literature politely terms "enthusiastic dissolution"†† but what practitioners more accurately call "the time my laboratory exploded."‡‡ The ratio of solvent to solid material typically ranges from 5:1 to 10:1, though the Transgressive School of Alchemy in Prague maintains that these ratios are merely suggestions, as evidenced by their notably shorter roster of living members***. 
+&nbsp;
+Historical development of maceration techniques reveals a fascinating progression from accidental discovery to systematic methodology, with particular emphasis on the number of incidents that could have been avoided with proper note-taking*. The Ancient Egyptians practiced maceration extensively in their embalming processes, though they notably failed to leave warnings about certain combinations†, leading to the unfortunate Nineteenth Dynasty incident that we shall refer to only as "The Week of Writhing Linens."‡ The medieval period saw maceration emerge as a distinct discipline, separate from percolation**, with the establishment of the Guild of Patient Alchemists†† in 1247, whose motto "Festina Lente" (Make Haste Slowly) was apparently ignored by 67% of their membership‡‡. The Renaissance brought mathematical precision to maceration timing, courtesy of the Venetian alchemist Giacomo Pazienza***, who calculated optimal maceration periods down to the minute†††, though his own tendency to check his vessels obsessively undermined many of his experiments‡‡‡.
+&nbsp;
+Modern understanding of maceration techniques benefits from advances in both theoretical frameworks and catastrophic incident documentation*, with particular progress in identifying which substances should never be macerated together**, a list that currently spans 847 pages and grows quarterly†. The relationship between maceration and its sister-technique percolation‡ represents a fundamental dichotomy in solvent extraction: maceration operates through patience and osmotic pressure, while percolation employs gravity and flow—the difference between waiting for a stone to erode and washing it away**, though both approaches prove equally effective at testing an alchemist's sanity††. Contemporary practitioners increasingly employ the "Modified Patience Method"‡‡, which acknowledges that modern alchemists lack the temporal commitment of their predecessors*** while maintaining acceptable safety margins, defined by the International Board of Alchemical Standards as "less than one catastrophic dissolution per decade of practice."†††
+&nbsp;
+Safety considerations in maceration warrant particular attention, as the technique's apparent simplicity masks numerous opportunities for disaster*. The primary hazards include vessel failure† (ranging from minor leakage to what insurance documents term "spontaneous energetic disassembly"), solvent incompatibility‡ (wherein the menstruum dissolves the container rather than the contents**), and impatience-related incidents†† (accounting for approximately 73.6% of all maceration failures‡‡). Best practices dictate the use of properly aged vessels***, regular but not obsessive monitoring††† (defined as no more than twice daily, though the record holder for "most frequent checking" managed 847 times in a single day‡‡‡), and maintenance of detailed logs including dates, observations, and ominous portents****. The ancient prohibition against macerating anything that whispers, glows, or exhibits signs of autonomous movement remains sound advice, though one suspects this wisdom emerged from specific historical precedents†††† rather than theoretical consideration.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The term "maceration" derives from the Latin *macerare*, meaning "to soften" or "to waste away," the latter interpretation becoming increasingly relevant to practitioners around the third week of waiting for visible results. The Old Alchemists' Society maintains that proper maceration should feel like watching paint dry, except the paint occasionally tries to escape.
+&nbsp;
+† The Third Dynasty's dental experiments are not discussed in polite company, though the Cairo Museum does maintain a small collection of unusually preserved teeth in its Department of Things We'd Rather Not Think About. The less said about the spontaneous gold-mercury amalgam incidents, the better.
+&nbsp;
+‡ The Hasty Alchemists' Guild attempted to accelerate maceration through the application of excessive heat, pressure, and impatient muttering. Their headquarters no longer exists in the conventional sense, though local legends speak of a persistent chemical smell and the occasional mysterious dissolution of nearby stonework. The Guild's final entry in their logbook reads simply: "Faster is not always—" followed by what appears to be a significant ink explosion.
+&nbsp;
+** The maceration of conceptual materials remains controversial. The School of Abstract Alchemy insists that ideas, properly prepared, can be macerated in philosophical alcohol to extract their essence. Critics point out that none of these experiments have produced measurable results, to which the School responds that measurability itself is a concept requiring further maceration. The debate continues, slowly.
+&nbsp;
+†† A menstruum (plural: menstrua, collective noun: a dissolution of menstrua) is any liquid capable of dissolving or extracting desired properties from materials. The term originated with medieval alchemists who believed the perfect solvent would dissolve literally anything, a goal they pursued with disturbing enthusiasm until the "Universal Solvent Paradox" was proposed: namely, what container would hold it? This question stumped the field for approximately three centuries, until someone suggested they might be overthinking things. See also: footnote ‡‡‡.
+&nbsp;
+††† The Bavarian alchemist Friedrich von Tränensammler (1647-1701) famously maintained that tears of frustration possessed unique solvent properties due to their "elevated emotional content." His laboratory notes contain 347 references to failed experiments, suggesting he had abundant supply of this particular menstruum. The von Tränensammler Method, which involves weeping over one's materials at regular intervals, is no longer widely practiced, though it does appear in the curriculum at the College of Dramatic Alchemy in Prague†.
+&nbsp;
+† The College of Dramatic Alchemy was founded in 1698 by former students of von Tränensammler who believed that proper alchemy required not just chemical knowledge but theatrical flair. Their motto, "Scientiam cum Melodramate" (Science with Melodrama), adorns their crest alongside a weeping retort and a dramatically wilting herb. The College was quietly absorbed into Charles University in 1842 after the "Incident of Excessive Pathos" left half their laboratories filled with theatrical fog that refused to disperse for seven months.
+&nbsp;
+‡‡ The Slow School of Alchemy, headquartered in a monastery in the Swiss Alps, maintains that nothing of value can be achieved in fewer than ninety days. Their rivals, the Very Slow School (located in an even more remote monastery), argue that true alchemical wisdom requires a minimum of nine months, mirroring the gestation of new life and new discoveries. The two schools have been engaged in a heated debate about these timings since 1653, which they expect to resolve sometime in the next century. Both schools look down upon the Extremely Slow School, whose members have been macerating the same materials since 1441 and show no signs of stopping.
+&nbsp;
+‡‡‡ The Extremely Slow School's headquarters occupies a small island in Norway where fourteen monks maintain vigilant watch over 127 maceration vessels, some of which were begun by their predecessors' predecessors. They produce a newsletter every fifty years documenting their lack of progress, which somehow manages to be both inspiring and deeply concerning. The current Prior, Brother Tørel, was born in the monastery and has never seen a successful maceration`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding maceration techniques in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PRESSING_HERBAL_JUICES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'pressing_herbal_juices',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Pressing Herbal Juices',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['maceration_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_pressing_herbal_juices' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Pressing Herbal Juices: A Comprehensive Study in Applied Alchemical Extraction</span>
+&nbsp;
+The extraction of essential humours from botanical specimens through mechanical compression represents one of alchemy's most deceptively straightforward operations*. While the uninitiated observer might conclude that pressing juice from herbs involves merely the application of force to vegetable matter†, the actual practice encompasses a complex interplay of pressure gradients, cellular rupture dynamics, and what the Ancient Guild of Pressers termed "the right amount of squishing"**. The fundamental principle rests upon the observation that plants, having spent considerable effort concentrating useful compounds within their tissues‡, can be persuaded—sometimes vigorously—to relinquish these substances through calculated application of mechanical advantage.
+&nbsp;
+The practical applications of herbal juice pressing extend far beyond the simple production of breakfast beverages, despite what the catastrophic Mimosa Incident of 1634 might suggest***. Modern practitioners employ a hierarchy of pressing techniques ranging from the gentle persuasion of fingertip pressure (approximately 2-3 Pressels‡‡) to the industrial deployment of hydraulic systems capable of generating forces that would make a small mountain nervous††. The selection of appropriate methodology depends primarily on three factors: the herb's cellular structure†††, the desired purity of extract‡‡‡, and whether you have already apologized to your neighbors for last time§. Each herb presents unique challenges; for instance, the venerable Moonwort requires exactly 47.3 Pressels applied for no more than 8.2 seconds, while Dragonsbreath Nettle should not be pressed at all, as the Burn Ward at St. Unguent's Hospital will cheerfully confirm§§.
+&nbsp;
+Safety considerations in herbal juice pressing occupy approximately 73% of the Alchemists' General Insurance Company's annual claims reports***, with the remaining 27% consisting of incidents that adjusters refuse to classify under any existing category§§§. The primary hazards divide into three categories: physical injury from pressing apparatus†††, unexpected reactions from the extracted juices‡‡‡‡, and what the literature euphemistically terms "enthusiastic herbs"****. Best practices dictate the use of appropriate protective equipment including leather aprons (treated), goggles (consecrated), and a minimum safe distance that varies by species but should never fall below what you can run in thirty seconds††††. The prudent practitioner will note that many historically significant alchemists are remembered primarily for their pressing accidents rather than their contributions to the field‡‡‡‡‡.
+&nbsp;
+The historical development of pressing techniques traces back to the First Pressers of Mesopotamia, who discovered that hitting plants with rocks produced interesting results, though mainly interesting to the plants§§§§. The methodological refinement proceeded through several key innovations: the invention of the lever press by Archimedes of Syracuse (who immediately regretted it)*****, the development of screw-press technology during the Renaissance†††††, and the brief but memorable period in the 18th century when alchemists attempted to harness volcanic pressure for industrial-scale extraction‡‡‡‡‡‡. Modern understanding benefits from centuries of documented successes, failures, and incidents that survivors prefer not to discuss§§§§§. The field continues to evolve, with contemporary research focusing on nano-pressure systems, sympathetic pressing techniques, and methods that don't void one's equipment warranty******.
+&nbsp;
+---
+&nbsp;
+### FOOTNOTES
+&nbsp;
+*The emphasis here on "deceptively" cannot be overstated. The Pressing Trials at the Academy typically fail 60-70% of first-year students, primarily because they assume pressing an herb is similar to pressing their trousers. It is not. One wrinkles. One explodes. The distinction matters.
+&nbsp;
+†This conclusion represents what Professor Alembic Crushwater called "the first of many tragic assumptions." His collected works, "What I Learned While Healing," runs to fourteen volumes and is illustrated with remarkably detailed medical diagrams.
+&nbsp;
+**The technical precision of this term has caused considerable debate among modern scholars. The Guild's original manuscripts use a unit of measurement called the "Pressel," apparently calibrated against the hand strength of Master Presser Godwin Thumbstrong, who could crack walnuts with his eyelids. Since his death in 1445, the standard has been maintained through a bronze cast of his hand, kept at the Guild Hall under guard†.
+&nbsp;
+†The hand cast itself has its own insurance policy worth more than most noble estates. This is not paranoia—it was stolen twice (both times returned with apologetic notes), once developed sentience (briefly), and on one memorable occasion saved the entire Guild Hall from a fire by enthusiastically pressing the flames until they gave up.
+&nbsp;
+‡Plants are remarkably uncooperative about this. Some theorists propose that herbs actively resist extraction, citing the peculiar fact that pressing difficulty increases proportionally with the value of the resulting juice. This has led to the informal "Spite Coefficient" in botanical calculations.
+&nbsp;
+***The Mimosa Incident of 1634 began innocently enough when Alchemist Werner Blutenpress attempted to create "breakfast juice" from several tons of herbs simultaneously. The resulting geyser of combined juices created a mushroom cloud visible from three counties, temporarily turned the sky orange, and gave everyone within a two-mile radius a remarkably clear complexion for exactly six months. The incident is now commemorated annually with what survivors call "the Day We Don't Talk About Werner."
+&nbsp;
+‡‡The Pressel, as a unit of measurement, converts to approximately 4.7 Newtons, 0.47 Pressure-Stones, or "enough to make something happen but probably not the thing you wanted."
+&nbsp;
+††These systems were briefly banned in the Mercantile Quarter after the Overpressure Catastrophe of 1891, during which an experimental herb press achieved such extraordinary force that it pressed not only through the herb, the table, and three floors of the building, but also slightly forward through time, pressing next Tuesday's newspaper into a very confused state‡.
+&nbsp;
+‡The newspaper, upon arriving at next Tuesday, contained Thursday's news, causing a temporal cascade that required three temporal accountants and a very understanding magistrate to resolve. The headline read "Time-Pressed Alchemist Creates Paradox; Also Stock Prices Rise," which was accurate but unhelpful.
+&nbsp;
+†††Some herbs possess cellular walls so robust they were used as armor by particularly small knights during the Micro-Crusades of 1221-1223. These herbs require industrial-grade pressing equipment and a strongly worded letter of intent.
+&nbsp;
+‡‡‡Purity in alchemical extracts is measured on the Gossamer Scale, where 1.0 represents "perfectly pure" and 0.0 represents "this is mostly other things, possibly including parts of the press." Most working extracts fall between 0.6 and 0.8, which is entirely acceptable unless you're preparing compounds for royalty, in which case anything below 0.95 results in surprisingly specific executions.
+&nbsp;
+§The standard apology letter, as recommended by the Guild, begins: "Dear Neighbor, Regarding the incident of [DATE], I wish to assure you that [COLOR] typically fades after [TIMEFRAME], and the smell should dissipate once the season changes. I am prepared to compensate you for any [LIVESTOCK/FURNITURE/RELATIVES] that may have been affected."
+&nbsp;
+§§St. Unguent's maintains a special wing exclusively for pressing-related injuries. The waiting room features educational posters with titles like "If It Burns Before You Press It, Pressing Won't Help" and "That Sizzling Sound Is Nature's Way of Saying Stop." Despite these warnings, the wing remains the hospital's most profitable department.
+&nbsp;
+***The AGIC's Annual Claims Report makes for surprisingly gripping reading. Last year's highlights included fourteen cases of "spontaneous juice combustion," six instances of "inappropriate herb selection resulting in levitation," and one claim simply labeled "The Turnip Situation" with no further explanation and a payout equivalent to a small manor house.
+&nbsp;
+§§§These incidents are stored in a lead-lined vault beneath the AGIC headquarters and require authorization from three separate board members to access. Rumor suggests they include such events as the Conversion of Senior Claims Adjuster Pemberton into a botanical specimen (he got better, mostly), the Week of Inappropriate Fragrances, and something involving badgers that the records describe only as "ill-advised from the beginning."
+&nbsp;
+†††The infamous case of Alchemist Helena Pressbone, who attempted to extract juice from Adamantine Oak, serves as a cautionary tale. The oak won. Decisively. Helena's press was later found embedded in a hillside three miles away, with a note from the oak (it learned to write specifically for this purpose) reading "No."
+&nbsp;
+‡‡‡‡This category includes juices that react poorly to air (83%), light (67%), each`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding pressing herbal juices in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FERMENTATION_OF_HERBS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'fermentation_of_herbs',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Fermentation Of Herbs',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['pressing_herbal_juices'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_fermentation_of_herbs' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Fermentation Of Herbs: A Comprehensive Treatise on Controlled Decay as Gateway to Transformation</span>
+&nbsp;
+The art of herbal fermentation stands as perhaps the most paradoxical achievement in alchemical history, representing as it does the deliberate cultivation of rot for purposes of enlightenment*. While the pressing of herbal juices (prerequisite knowledge hereby assumed) yields immediate liquid essence, fermentation transforms these essences through time, patience, and the careful management of invisible creatures whose existence most practitioners prefer not to think about too carefully†. The fundamental principle rests upon a simple truth: that which does not kill the mixture makes it stronger‡, though the inverse has proven tragically true in approximately 34.7% of recorded cases**. The alchemist must learn to distinguish between fermentation (desired) and putrescence (less desired, though occasionally useful), a skill that the Monastery of the Blessed Separation reports takes an average of seven years to develop, or alternatively, one catastrophic incident††.
+&nbsp;
+The practical application of fermentation begins with the prepared herbal juice‡‡, which must be placed in vessels of specific materials—glass being traditional, though the ancient Fermentiators of the Third Age employed hollowed dragon teeth for reasons they adamantly refused to explain***. Temperature control proves essential, with optimal fermentation occurring between 15 and 22 degrees on the Philosophical Scale†††, which translates to approximately "cool but not cold, warm but not hot, you know, that temperature‡‡‡"****. The process requires regular observation without interference, a practice the Guild of Patient Watchers describes as "controlled neglect" or "attentive abandonment"*****. One must introduce a starter culture—whether wild yeast from the air, preserved culture from previous batches, or the traditional method of simply hoping something appropriate lands in the mixture before something inappropriate does******. The fermentation proceeds through three distinct phases: the Initial Bubbling (days 1-3), the Vigorous Activity (days 4-7), and the Settling (days 8-onwards), though these timings assume cooperation from microorganisms who, it must be noted, have not read the manual†††††.
+&nbsp;
+Safety considerations in herbal fermentation extend beyond the obvious hazards of explosion‡‡‡‡, toxic gas production******, and spontaneous animation of the mixture itself*******. The primary danger lies in consuming fermented herbal preparations without adequate testing, a practice that the Annals of Regrettable Decisions catalogs with disturbing thoroughness††††††. Proper ventilation remains essential, as certain fermentations produce gases that, while not immediately lethal, cause practitioners to experience vivid hallucinations of their work achieving consciousness and passing judgment upon them‡‡‡‡‡. Vessels must be sealed in a manner that allows gas to escape while preventing contamination, leading to the development of specialized "burping" techniques that the uninitiated often mistake for musical performance********. The famous Incident of the Sealed Chamber at the Academy of Controlled Transformation serves as eternal warning: seventeen researchers entered a perfectly sealed fermentation room in 1673, and while all seventeen emerged alive, none could adequately explain why they spent three hours debating philosophy with a barrel of fermenting wormwood††††††††.
+&nbsp;
+Historical development of fermentation practices reveals a tradition stretching back to before anyone bothered writing things down‡‡‡‡‡‡, with archaeological evidence suggesting that humanity discovered fermentation approximately seventeen minutes after discovering containers*********. The ancient Sumerians fermented herbs for medical purposes, the Egyptians fermented them for spiritual purposes, and the Mesopotamians fermented them because that's what you did with liquids if you wanted them to remain interesting†††††††††. Medieval alchemists elevated the practice from folk tradition to formal science, primarily by writing everything down in cipher so that subsequent generations would have to rediscover it through trial and error**********. The Renaissance saw the publication of comprehensive fermentation manuals, most notably De Fermentatione Herbalis by Philippus Bubblicus, which ran to 847 pages despite the author admitting on page twelve that "mostly you just wait and see what happens"‡‡‡‡‡‡‡. Modern understanding, enhanced by microscopy and an acceptance that invisible creatures exist, has refined these practices considerably, though many practitioners maintain that the old methods worked perfectly well and adding scientific understanding has only made people nervous about what they're doing***********.
+&nbsp;
+The integration of fermentation into broader alchemical practice represents a philosophical stance as much as a technical skill: the acceptance that transformation requires time, that control must be balanced with surrender, and that sometimes the best results emerge from processes we cannot fully direct††††††††††. The fermented herbal preparation carries properties distinct from both the raw herb and its pressed juice—tertiary compounds emerge, primary essences transform, and the resulting tincture possesses what the ancient texts termed "living virtue"‡‡‡‡‡‡‡‡, meaning approximately "it's still doing something even though you thought it was finished"************. Mastery of fermentation unlocks entire branches of alchemical work: the creation of elixirs, the preparation of philosophical vinegars, the cultivation of medicinal mothers, and the production of substances that exist in that peculiar category of "technically not poison anymore"†††††††††††. Those who achieve true understanding of fermentation are said to develop an intuitive sense for the process, able to hear the subtle changes in bubble frequency and smell the progression through phases of transformation, though this may simply be a polite description of obsession‡‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The Council of Traditional Values initially objected to teaching fermentation, arguing it encouraged "waiting around for rot to become respectable." They were overruled when someone pointed out this described most of academia.
+&nbsp;
+†These creatures, now known as yeasts and bacteria, were once attributed to the work of minor household deities called Fermenti. The transition from theological to biological explanation occurred gradually and with considerable grumbling from the theological community.
+&nbsp;
+‡This principle was first articulated by the philosopher Nietzsche in a completely different context, but alchemists have never been particular about proper citation so long as the quote sounds good.
+&nbsp;
+**Statistics maintained by the Bureau of Fermentation Safety, an institution that exists primarily to count disasters and issue warnings that everyone ignores. Their annual report is titled "We Told You So: A Retrospective."
+&nbsp;
+††The catastrophic incident method is substantially faster but involves explaining to one's superiors why the laboratory now smells like that. The Monastery notes that most practitioners experience between one and four catastrophic incidents, after which they either master the art or take up a different field entirely.
+&nbsp;
+‡‡See the prerequisite text on pressing herbal juices, assuming you can find a copy not stained beyond legibility. The Guild of Alchemical Publishers reports that texts on pressing invariably show evidence of having been pressed themselves, usually under circumstances involving hurried consultation during active crises.
+&nbsp;
+***Dragon tooth vessels produced fermentation of "unusual vigor and philosophical depth," according to contemporary accounts. The practice ended when dragons objected, citing intellectual property concerns and also objecting to people stealing their teeth. The subsequent legal proceedings established important precedents in interspecies property law.
+&nbsp;
+****The Philosophical Scale was developed by Thermus Philosophicus in the Second Age, calibrated against abstract concepts rather than physical phenomena. It has proven surprisingly durable, mainly because no one can agree on how to replace it with something more rational. Attempts to convert to Celsius have consistently failed—the yeast don't seem to respond to metric.
+&nbsp;
+*****The Guild of Patient Watchers was established in 1445 following the Great Impatience Disaster, when an entire cohort of apprentices decided to "help" their fermentations along through vigorous stirring, additional heating, and encouraging words. The resulting explosions could be heard in three counties. The Guild's motto is "Observe, but Touch Not," which members often shorten to "Don't."
+&nbsp;
+******This traditional method technically works but introduces a random element that makes reproducibility challenging. The Standardization Committee of 1876 attempted to eliminate this practice, only to discover that standardized cultures cost money while "leaving it open to the air" costs nothing. Economics triumphed over rigor, as it so often does.
+&nbsp;
+†††††These timings come from the Comprehensive Tables of Fermentation, compiled over three centuries by the Order of Sequential Observation. The Order disbanded in 1823 after realizing they'd spent three hundred years watching things bubble, a realization that prompted an institutional existential crisis.
+&nbsp;
+‡‡‡‡The explosion hazard is considered "moderate to severe" depending on the tightness of the seal, the vigor of the fermentation, and whether anyone remembered to open the relief valve. The University of Contained Reactions maintains a gallery of exploded vessels as a teaching aid, organized by "spectacular" to "catastrophic."
+&nbsp;
+******Toxic`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding fermentation of herbs in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const OXIDATION_PREVENTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'oxidation_prevention',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Oxidation Prevention',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['fermentation_of_herbs'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_oxidation_prevention' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Oxidation Prevention: A Practical Guide to Keeping Things the Way They Were (More or Less)</span>
+&nbsp;
+**By the Department of Applied Hermetic Chemistry, University of Unseen Complications**
+&nbsp;
+The fundamental principle of oxidation prevention in alchemical practice rests upon a simple observation that has bedeviled practitioners since the First Age: matter, left to its own devices, prefers to fall apart rather spectacularly*. The ancient alchemist Theophrastus the Mostly-Correct observed that "all things seek their lowest state, except for my apprentices, who consistently seek even lower ones,"† a sentiment that captures both the thermodynamic reality and the perpetual staffing crisis in alchemical laboratories. Oxidation—that insidious process whereby substances surrender electrons to oxygen with all the enthusiasm of a taxpayer at audit time‡—represents perhaps the single greatest challenge to preserving alchemical preparations, second only to preventing said preparations from achieving independent locomotion‡‡.
+&nbsp;
+The practical techniques for oxidation prevention have evolved considerably since the Brotherhood of the Sealed Vessel first attempted to exclude air from their compounds by holding their breath very quietly near the flasks*. Modern practitioners employ a range of sophisticated methods, from physical barriers (oils, waxes, and the ever-reliable paraffin seal**) to chemical interventions that would make earlier alchemists weep with envy, assuming they hadn't already wept themselves into dangerous states of dehydration during their own experiments††. The introduction of inert atmospheres—typically nitrogen or argon, though never helium†††—revolutionized the field in 1847‡‡‡, though the Guild maintains that the Revolution of 1847 was, strictly speaking, about something else entirely*.
+&nbsp;
+Perhaps most critically, the alchemist must understand that oxidation prevention is not merely a technical consideration but a philosophical one, touching upon the ancient question of what it means to preserve something "as it was"**. The Doctrine of Essential Stability, first articulated by the near-legendary Dame Perpetua Ironbind†, holds that nothing truly remains unchanged; we merely slow the inevitable decay to a pace that doesn't result in explosions during office hours‡. This leads us to the uncomfortable truth that all preservation is, in essence, a negotiation with entropy††, and entropy has never been known for its willingness to compromise‡‡.
+&nbsp;
+Safety considerations merit particular attention, given that the history of oxidation prevention reads somewhat like a casualty list from a particularly unfortunate military campaign***. The golden rule—"Never trust a seal you haven't tested, and never test a seal you're not prepared to watch fail dramatically"†††—has been written in consequence of no fewer than forty-seven documented incidents‡‡‡‡, three of which resulted in the spontaneous creation of new alchemical principles, and one of which created the color chartreuse, which nobody had asked for*. Modern best practices emphasize the importance of regular inspections**, redundant protective measures***, and maintaining a respectful distance from any container that has begun to bulge in a manner suggestive of internal contemplation****.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The Technical Academies prefer the term "achieve thermodynamic equilibrium," but this rather glosses over the flames and screaming. The Department of Nomenclature has been arguing about this for sixty years, which is itself a form of achieving equilibrium, albeit a very noisy one.
+&nbsp;
+†From his treatise "De Rerum Degeneratione" (On the Degeneration of Things), which was itself lost to oxidation when his student stored it next to a vat of particularly aggressive vinegar. The irony was noted by contemporary scholars, though Theophrastus himself failed to see the humor.
+&nbsp;
+‡The Annual Audit of the Guild of Alchemists consistently shows that more gold is spent preventing oxidation than is produced through transmutation, a fact that the Guild's accountants attempt to bury under footnotes of their own†. See also: "Why We Don't Discuss Funding with Sponsors: A History" by Lord Erasmus Redacted.
+&nbsp;
+†Accountants, it should be noted, are naturally resistant to oxidation, possibly through sheer force of personality. Studies are ongoing, but nobody wants to fund them.
+&nbsp;
+‡‡Most notably in 1692, when apprentice Jacob Whistlethwaite's compound achieved not only locomotion but also what witnesses described as "a sense of purpose and possibly malice." The incident is commemorated annually by the Society for the Prevention of Ambulatory Chemistry.
+&nbsp;
+*The Silent Breathing Method, as it came to be called, was based on the flawed premise that oxygen molecules could be discouraged by respectful quietness††. It should come as no surprise that the Brotherhood's membership declined sharply after their inaugural demonstration, though historians disagree whether this was due to oxidation of their compounds or asphyxiation of their members‡.
+&nbsp;
+††Founded on the now-discredited Theory of Molecular Embarrassment, which held that atoms could be shamed into better behavior. The theory persisted for an embarrassing length of time before someone thought to actually test it.
+&nbsp;
+‡Both, actually. The official Guild report lists the cause of death as "pneumatic complications arising from methodological enthusiasm." This is bureaucratic language for "they suffocated themselves like idiots." The Guild is very good at bureaucratic language.
+&nbsp;
+**Beeswax remains the sealing agent of choice, not because it is technically superior—modern synthetic compounds perform measurably better—but because it smells better when things go wrong††††. This is a consideration that should not be underestimated.
+&nbsp;
+††††The Comparative Aromatics of Failure, a seminal work by Professor Helena Nosewise‡‡, catalogs the scents of 347 different types of alchemical mishap. Beeswax failure smells like "honey and regret," while synthetic polymer failure smells like "the inside of a dragon's sports shoe." The professor was awarded the Medal of Olfactory Courage (posthumously) for her work, though the circumstances of her death remain unclear, other than that witnesses reported "a particularly unpleasant smell."
+&nbsp;
+‡‡Not to be confused with Professor Nosewise the Elder, who lost his sense of smell in an entirely different alchemical accident and became a noted expert on theoretical scents, which he could only experience mathematically.
+&nbsp;
+††The Fermentation Manuscript, which readers should have studied prior to this work (prerequisite: fermentation_of_herbs), details the controlled surrender to oxidation that produces wine and vinegar. This paper concerns itself with oxidation's unwanted intrusion. The difference is consent, timing, and whether you end up with something drinkable or something that dissolves the container.
+&nbsp;
+†††Helium, being both noble and distressingly eager to escape through materials other gases find impermeable, tends to abandon experiments at critical moments‡‡‡. The Great Helium Betrayal of 1891 is still discussed in hushed tones at conferences.
+&nbsp;
+‡‡‡The incident involved thirty-seven flasks of carefully prepared tinctures, three months of work, and one very expensive balloon that appeared in the laboratory window the next morning, as if to mock the researchers. The balloon was subsequently arrested for contempt of science, though charges were later dropped due to jurisdictional confusion about whether floating objects fall under ground law or sky law.
+&nbsp;
+‡‡‡The Revolution of 1847 was actually about lunch breaks and whether apprentices should be required to taste-test their own compounds before serving them to their masters. The revolution succeeded, which is why modern alchemical education includes extensive training in diplomacy and food safety. The introduction of inert atmospheres occurred the same year, but was generally considered less revolutionary than not being poisoned by one's students.
+&nbsp;
+**The Ship of Theseus paradox becomes the Flask of Theophrastus when applied alchemically: if you replace the air, seal it differently, add preservatives, and store it under different conditions, is it still the same preparation? The Guild's official position is "probably yes, legally speaking, please don't ask us to elaborate."
+&nbsp;
+†Dame Ironbind is notable for three achievements: formulating the Doctrine of Essential Stability, being the first alchemist to successfully preserve elderflower cordial for more than six weeks without it evolving consciousness, and coining the phrase "good enough for government work," which was originally an alchemical term of art meaning "stable enough that it probably won't explode during the inspector's visit."
+&nbsp;
+‡Office hours are officially 9 AM to 5 PM, though the Guild notes that explosions show a marked preference for occurring at 4:47 PM, presumably to maximize paperwork complications. The Statistical Analysis of Inconvenient Timing (Guild Publication #472) makes for sobering reading, or would, if anyone read it†.
+&nbsp;
+†Nobody reads Guild Publication #472. It's very long and uses too many charts. The author, Dr. Cornelius`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding oxidation prevention in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERBAL_POWDER_GRINDING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herbal_powder_grinding',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herbal Powder Grinding',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['oxidation_prevention'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herbal_powder_grinding' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE METHODICAL REDUCTION OF BOTANICAL MATTER TO PARTICULATE SUSPENSION: </span>
+A Comprehensive Treatise on Herbal Powder Grinding in Alchemical Practice
+&nbsp;
+The grinding of herbal matter into fine powders represents one of the foundational skills of practical alchemy, yet its apparent simplicity masks a discipline of considerable depth and—as the records of the Perpetual Hospital of St. Hildegard's unfortunately demonstrate*—occasional danger. The alchemist must understand that the reduction of botanical material is not merely a mechanical process, but rather a transformation that alters the very nature of the herb's essential properties†, releasing volatile principles that have remained dormant within the plant's cellular structure since the world was young‡. The mortar and pestle, those ancient siblings of alchemical practice, serve not as mere tools but as mediators between the gross and subtle realms**, their smooth surfaces polished by ten thousand generations of careful grinding††.
+&nbsp;
+The fundamental principle underlying effective herbal powder grinding concerns the relationship between particle size and surface area, a ratio that increases exponentially as material is reduced†††. When herbs are ground properly, their constituent parts—oils, resins, tannins, and those other substances the Ancient Guild of Nomenclators never quite got around to naming‡‡—become more readily available for extraction, tincturing, or direct application***. The alchemist must employ a circular motion, applying pressure in a clockwise direction for herbs of solar correspondence and counterclockwise for lunar herbs††††, though the Revised Codex of 1743 suggests this distinction may have originated from a clerical error that no one wanted to admit‡‡‡. Temperature control proves critical throughout the process; excessive friction generates heat that can volatilize delicate aromatic compounds****, and the historical record contains numerous accounts of apprentices who learned this lesson through the regrettable expedient of setting fire to three months' worth of dried valerian†††††.
+&nbsp;
+Modern practitioners benefit from centuries of accumulated wisdom regarding which herbs grind easily and which resist reduction with what can only be described as botanical spite‡‡‡‡. Dried leaves and flowers typically yield to the pestle within minutes*****, while roots, barks, and certain seeds demand patience, proper technique, and occasionally the consultation of various forgotten gods of vegetation who might take pity on one's endeavor††††††. The principle of oxidation prevention, previously established in prerequisite studies, becomes paramount when grinding herbs rich in volatile oils or those prone to rapid deterioration upon exposure to air******. The Guild of Herbalists recommends grinding only what one requires for immediate use‡‡‡‡‡, a sensible guideline that approximately 73% of alchemists ignore, as documented in the Quarterly Survey of Alchemical Practices and Regrets*******.
+&nbsp;
+The safety considerations surrounding herbal powder grinding extend beyond the obvious hazards of repetitive wrist strain and the development of what older texts refer to as "grinder's elbow"†††††††. Certain herbs release irritant compounds when their cell walls are ruptured, a fact that can transform a peaceful afternoon of preparation into an experience resembling exposure to military-grade chemical agents‡‡‡‡‡‡. Proper ventilation stands as the alchemist's first line of defense against such unpleasantness, though the Society for the Prevention of Alchemical Mishaps notes that opening a window ranks among the most commonly neglected precautions in recorded history********. The use of appropriate safety equipment—including, at minimum, a proper grinding mask when working with irritant species—separates the experienced practitioner from the sort who provides entertaining anecdotes at Guild gatherings††††††††.
+&nbsp;
+---
+&nbsp;
+FOOTNOTES
+&nbsp;
+*The Perpetual Hospital of St. Hildegard's maintains a dedicated wing for alchemical injuries, which processes an average of forty-seven cases per month involving improper herbal grinding. The hospital's motto, "We've Seen Worse," was adopted in 1687 after the Incident of the Exploding Cayenne, details of which remain sealed under ecclesiastical authority.
+&nbsp;
+†The philosopher Alembicus the Somewhat Careful noted in his treatise "On Crushing Things Small" that "the herb knows when it is being ground, and some herbs take exception to this treatment." While dismissed as animistic nonsense by the Academy of Rational Thought, his observation has proven disturbingly prescient in 43% of documented cases involving nightshade family members.
+&nbsp;
+‡Ancient texts from the Library of Forgotten Herbology speak of a time when plants walked the earth and ground themselves, which seems inefficient from an evolutionary standpoint but explains several puzzling fossilized mortar marks found in Pre-Cambrian strata. Modern scholars prefer not to discuss these findings at reputable conferences.
+&nbsp;
+**The earliest mortars were allegedly carved from the bones of the First Mountain by craftsmen who have since become themselves quite thoroughly dead. Archaeological evidence suggests this claim may be 15% accurate, 30% metaphorical, and 55% the result of ancient marketing practices.
+&nbsp;
+††A well-used mortar develops what practitioners call a "seasoning"—a patina of accumulated botanical residue that theoretically improves grinding efficiency. The Guild's official position is that this represents accumulated wisdom. The Guild's unofficial position, expressed after several ales, is that everyone is too lazy to clean their equipment properly.
+&nbsp;
+†††The mathematical relationship is described by Fibonacci's Lesser-Known Cousin, who calculated that grinding efficiency increases by a factor of 1.618 for every doubling of effort, assuming the grinder hasn't gotten bored and wandered off to check whether lunch is ready. Studies indicate the lunch-checking variable significantly impacts real-world results.
+&nbsp;
+‡‡The Ancient Guild of Nomenclators disbanded in 1445 after a catastrophic disagreement about whether "thingummy" constituted a valid technical term. Their incomplete taxonomy of herbal constituents remains a source of frustration for modern researchers, though it does contain some quite creative profanity in twelve dead languages.
+&nbsp;
+***Direct application of unprepared herbal powder is generally inadvisable unless one enjoys explaining to healers why one's nasal passages now glow faintly in darkness. The phenomenon, known as "Phosphorescent Nostril Syndrome," affects approximately one in twenty novice alchemists and provides a reliable method for identifying recent graduates in dim taverns.
+&nbsp;
+††††This directional distinction has spawned numerous sub-schools of thought. The Clockwise Purists and the Counterclockwise Radicals held a famous debate in 1789 that concluded with both parties agreeing to grind in a figure-eight pattern, which satisfies neither solar nor lunar principles but does provide excellent exercise for the wrist.
+&nbsp;
+‡‡‡The Revised Codex was compiled by Brother Ambrose the Particularly Myopic, whose handwriting in the original manuscript has been described as "enthusiastically illegible." Modern analysis suggests several critical instructions may have been transcribed backward, which would explain the recurring theme of unexpected results throughout the text.
+&nbsp;
+****The auto-ignition temperature of dried herbs varies considerably. Lavender, for instance, requires sustained friction of approximately fourteen minutes to combust, while certain preparations of cayenne pepper have been known to achieve ignition through the mere force of a stern look. The Department of Unlikely Statistics has documented twenty-three cases of spontaneous herbal combustion, seventeen of which occurred during examinations at the Academy.
+&nbsp;
+†††††The Great Valerian Fire of 1823 consumed three floors of the Magisters' Tower and produced a smoke that caused the entire city's population to fall into a peaceful slumber for sixteen hours. The fire brigade, also affected, slept through their own response. Modern fire safety regulations cite this incident extensively, usually in sections titled "What Not To Do, Ever."
+&nbsp;
+‡‡‡‡Certain herbs resist grinding with what researchers have termed "deliberate malice." Marshmallow root, when dried improperly, achieves a consistency somewhere between rock and spite. The Compendium of Frustrating Substances ranks it third, just below dragon scales and petrified motivational posters.
+&nbsp;
+*****Flowers, being delicate creatures of air and light, surrender their structure with minimal protest. The poet Lysander Goldenwort wrote seventeen sonnets about the tragedy of grinding rose petals, which tells you quite a lot about Lysander's social life and possibly explains why he spent so much time alone with flowers.
+&nbsp;
+††††††The forgotten gods of vegetation—including Mulchifer, Compostia, and Bob—were last officially worshipped in the Third Age. However, desperate alchemists have been known to offer prayers when faced with particularly recalcitrant burdock root. The gods' response rate remains statistically insignificant, though one documented case in 1756 involved what witnesses described as "definitely a smirk manifesting in the pestle grain pattern."
+&nbsp;
+******Oxidation, that ancient enemy of freshness and virtue, begins its work the moment plant`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herbal powder grinding in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CAPSULE_FILLING_TECHNIQUES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'capsule_filling_techniques',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Capsule Filling Techniques',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['herbal_powder_grinding'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_capsule_filling_techniques' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE PRECISE ART OF CAPSULE FILLING: A COMPREHENSIVE TREATISE FOR THE DISCERNING ALCHEMIST WHO VALUES THEIR FINGERS</span>
+&nbsp;
+The fundamental challenge of capsule filling, as first properly documented by the Venerable Thaddeus Grindleworth in his seminal work "Why My Apprentice Can No Longer Count Past Seven"*, lies in the deceptively simple act of transferring alchemical powder from container to capsule without losing either the powder, one's sanity, or the respect of one's colleagues†. The capsule itself—that marvel of gelatinous engineering—was not, as many assume, invented by alchemists at all, but rather by the Celestial Confectioners' Guild‡ in their attempts to contain the essence of particularly aggressive candies**. Modern practitioners must master three fundamental approaches: the Tamping Method (favored by those with steady hands and optimistic dispositions)††, the Funnel Technique (preferred by those who have already tried the Tamping Method)‡‡, and the Prayer-and-Hope Approach (documented extensively in monastery records)†††.
+&nbsp;
+The actual mechanics of capsule filling reveal themselves to be an exercise in applied frustration, wherein the alchemist must balance the competing demands of speed, precision, and maintaining one's composure when approximately 73.6% of the powder ends up on the workbench rather than in the capsule***. The traditional method involves holding the capsule body steady‡‡‡—a task made considerably more difficult when one's hands are trembling from the previous seventeen failed attempts—whilst introducing powder in measured increments****. Master Cornelius Wobblethwaite of the Ankh-Morpork College of Alchemical Arts developed what he termed the "Graduated Desperation Scale"†††† to categorize the various stages an alchemist passes through during a typical filling session‡‡‡‡. The discerning practitioner learns to recognize when they have transitioned from Stage Three (Controlled Optimism) to Stage Seven (Considering a Career in Pottery)****.
+&nbsp;
+Safety considerations in capsule filling extend far beyond the obvious concerns about explosive powder contact with static electricity*** or the documented incidents involving apprentices who confused sleeping draughts with itching powder******. The Guild of Responsible Alchemistry maintains that the greatest danger lies not in catastrophic failure but in cumulative minor disasters††††††—the steady erosion of one's patience, the gradual coating of one's workspace in a fine layer of expensive reagents, and the slow realization that one has been breathing in vaporized essence of sneezewort for the past two hours‡‡‡‡‡. Proper ventilation is not merely recommended; it is the thin line between a productive afternoon and an impromptu demonstration of why the ancient Mesopotamian alchemists believed sneezing was a form of demonic possession*******.
+&nbsp;
+Historical development of capsule filling techniques reads like a catalog of increasingly desperate innovations, from the Early Bronze Age practice of simply cramming everything into animal bladders and hoping for the best†††††††, through the Renaissance period's elaborate mechanical contraptions that were more likely to launch powder across the room than into capsules‡‡‡‡‡‡, to the modern era's sophisticated equipment that still requires the user to possess the patience of a saint and the manual dexterity of a neurosurgeon********. The turning point came in 1847 when Madame Esmeralda Precision-Fingers of the Parisian Academy of Minute Manipulations introduced the concept of "capsule stabilization through sheer bloody-mindedness"†††††††† and demonstrated that successful filling was 10% technique, 20% equipment, and 70% refusing to give up and go do something less maddening instead‡‡‡‡‡‡‡. Contemporary alchemists stand upon the shoulders of these giants, though they are considerably more hunched from bending over workbenches and significantly more twitchy*********.
+&nbsp;
+The mastery of capsule filling represents not merely a technical skill but a spiritual journey from cocky confidence through the valley of powder-covered despair and eventually—for the blessed few who persist—to a state of zen-like acceptance that approximately one capsule in four will simply refuse to cooperate for reasons that transcend mortal understanding*********. The advanced practitioner learns to work with rather than against the fundamental nature of the universe, which appears to have a vested interest in ensuring that alchemical powder behaves according to its own arcane principles rather than anything as pedestrian as physics**********. Those who achieve true mastery report entering a meditative state wherein time seems to slow, their movements become fluid and precise, and they no longer notice the tick developing in their left eye††††††††††.
+&nbsp;
+&nbsp;
+*Grindleworth's work, published posthumously in 1672, includes seventeen appendices dedicated entirely to creative cursing appropriate for various filling-related failures. The appendices are longer than the main text by a factor of three. Modern scholars debate whether this was intentional or whether Grindleworth simply had a great deal to get off his chest. Or possibly onto his chest, given the documented powder distribution patterns.
+&nbsp;
+†The Capsule Filler's Guild maintains a "Wall of Shame" in their headquarters featuring daguerreotypes of particularly spectacular messes. The queue to view it extends around the block during annual conventions. They charge admission. The proceeds fund research into "better capsules," though cynics suggest it mainly funds the annual Guild pub crawl‡.
+&nbsp;
+‡The Guild pub crawl is documented to visit seventeen establishments in a single evening. No one has ever completed the route sober enough to file a coherent report. This is considered a feature, not a bug.
+&nbsp;
+**The Celestial Confectioners' Guild was attempting to contain Blast-Ended Bonbons, a confection that combined the worst properties of explosives with the stickiness of toffee. The Guild was dissolved in 1583 following what historians delicately term "The Great Sweetshop Incident." The crater can still be visited in what is now downtown Birmingham††.
+&nbsp;
+††Birmingham City Council maintains it as a tourist attraction under the name "Heritage Excavation Site #47." They do not mention the candy. The locals know better than to ask.
+&nbsp;
+†††The Tamping Method involves using a small implement to compress powder into the capsule. Optimism is required because statistics from the Guild indicate that novices achieve proper density approximately 31.4% of the time, achieve powder compression reminiscent of a failed soufflé 52.1% of the time, and achieve capsule rupture 16.5% of the time. These figures notably sum to 100%, unlike novice capsule filling success rates‡‡.
+&nbsp;
+‡‡These sum to approximately 47% on a good day. Where the other 53% goes is a matter of some theological debate. Leading theories include "the workbench void," "inside one's sleeves," and "a pocket dimension maintained by mischievous spirits." The last theory gains credibility when one considers ancient texts describing the Powder Sprite, a creature that feeds on alchemist frustration†††.
+&nbsp;
+†††The Powder Sprite appears in Babylonian texts as "zumbu-kurgarru," literally "dust-thief-who-laughs." Mesopotamian alchemists left offerings of cheap powder in the corners of their workshops, believing this would appease the sprites. Modern alchemists report this doesn't work, but continue the practice because at least then they know where SOME of the powder went.
+&nbsp;
+‡‡‡The Funnel Technique employs a small cone to direct powder flow. It is superior in theory. In practice, it means one now has TWO items to clean powder from instead of one. Some alchemists consider this progress. Others have been found weeping quietly in supply closets****.
+&nbsp;
+****The Weeping Closet phenomenon was first formally documented by Dr. Patience Threadbare in her groundbreaking work "On the Psychological Toll of Repetitive Precision Tasks in Poorly Ventilated Spaces" (University of Prague, 1891). The study involved 200 alchemists and 17 different closets. Three of the closets are now considered haunted, though by what emotion precisely remains debated.
+&nbsp;
+***The powder-to-workbench ratio was calculated across 1,247 alchemists over a six-month period by the Department of Practical Alchemy at the University of Berlin. The study was funded by the Workbench Cleaning Equipment Manufacturers' Association, who reported record profits the following year. Correlation is not causation, but in this case, it's fairly obvious.
+&nbsp;
+‡‡‡Capsule body stability is influenced by humidity (±3.7%), ambient temperature (±2.1%), lunar phase (±0.003%—a statistically insignificant but emotionally important`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding capsule filling techniques in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SALVE_OINTMENT_PREPARATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'salve_ointment_preparation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Salve Ointment Preparation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['capsule_filling_techniques'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_salve_ointment_preparation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Salve Ointment Preparation: A Comprehensive Study in Alchemical Unguentation</span>
+&nbsp;
+The preparation of salve ointments represents one of the more deceptively simple arts within alchemical practice, requiring as it does the successful marriage of fatty substrates with active medicinal principles—a union that, much like actual marriages, appears straightforward until one attempts it oneself*. The fundamental principle underlying all salve preparation is the concept of molecular suspension within a lipophilic matrix**, whereby the desired therapeutic compounds are distributed throughout a base medium that both preserves their efficacy and facilitates their percutaneous absorption†. This process, while superficially resembling the act of stirring butter into porridge, involves considerably more precision and significantly fewer opportunities to simply give up and order takeaway‡. The transition from capsule filling techniques‡‡ to ointment preparation marks a crucial evolution in the alchemist's career, representing the shift from containing substances to actively combining them in ways that Nature herself might not have anticipated§.
+&nbsp;
+The practical methodology of salve preparation begins with the selection and preparation of one's base medium, typically comprising beeswax, petroleum jelly, or various plant-derived oils§§, each chosen according to the intended application and the solubility characteristics of the active ingredients*. The heating phase requires maintaining temperatures between 45-65 degrees Celsius**—a range that the Guild of Apothecaries describes as "warm enough to melt but not so warm as to ignite"††, which is perhaps the most passive-aggressive safety guideline ever issued by a professional organization‡†. The incorporation of active ingredients must occur at precise thermal points§†, with constant stirring to prevent the formation of what laboratory texts politely term "heterogeneous distribution" and what practitioners more honestly call "useless lumps"*†. The cooling phase represents the final opportunity for disaster, during which the mixture must be decanted into containers while maintaining appropriate viscosity††† and avoiding the introduction of air bubbles that would compromise both efficacy and the all-important professional appearance‡‡†.
+&nbsp;
+Safety considerations in salve preparation extend far beyond the obvious dangers of hot oils and naked flames§‡. The alchemist must remain vigilant against the temptation to "just add a bit more" of particularly potent ingredients*, a impulse that has resulted in more emergency Guild interventions than any other single factor according to the Apothecary General's Annual Report of Preventable Disasters**‡. Proper labeling becomes not merely advisable but legally mandated after the Incident of 1743††‡, and one must ensure that testing protocols‡‡‡ are followed with the same rigor one would apply to any substance intended for cutaneous application§§†. The workspace must be maintained at standards that would satisfy both a military quartermaster and a particularly fastidious deity of cleanliness*‡, which is to say, cleaner than most practitioners naturally prefer but less clean than is theoretically possible.
+&nbsp;
+The historical development of salve preparation traces its lineage back to the earliest days of organized medicine, when the distinction between "healer," "witch," and "person who knows which plants to rub on things" remained cheerfully blurred†‡. The Sumerian texts contain references to salves dating to 2500 BCE‡§, though their preparation methods—involving chanting, the blood of innocents, and what appears to be regular animal fat—suggest either that translation has failed us or that early medicine was even more terrifying than we suspected. The medieval period saw the establishment of formal salve-making guilds§§‡, whose recipe books remain locked in the vaults of the British Museum, not for their mystical content but because opening them releases a smell that violates three provisions of the Geneva Convention*††. Modern understanding has refined these ancient practices through the application of chemistry, thermodynamics, and extensive documentation of what happens when one doesn't follow instructions††§, resulting in preparation methods that are simultaneously more effective and considerably less likely to result in the spontaneous generation of entities best left undiscovered‡‡§.
+&nbsp;
+Contemporary salve preparation represents the convergence of ancient wisdom and modern precision, requiring practitioners to master both the quantifiable science of emulsification and the ineffable art of knowing when something "looks right"§†. The successful alchemist approaches each preparation with the gravity it deserves—which is to say, substantial but not so much as to prevent one from humming while working*‡† —and maintains meticulous records that would allow another practitioner to reproduce both successes and, more importantly, to avoid reproducing failures. The field continues to evolve, incorporating new base materials, novel delivery mechanisms, and an ever-expanding awareness of what can go wrong when lipids and active compounds are encouraged to coexist in close proximity for extended periods††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The key difference being that failed salve preparation rarely results in awkward conversations at family gatherings, though it can result in awkward conversations with the Guild's disciplinary board.
+&nbsp;
+**From the Latin "lipophilia," meaning "love of fat," which makes it sound far more romantic than the reality of standing over a pot of melting wax while trying to remember whether you've added the comfrey or merely intended to.
+&nbsp;
+†The absorption rates vary wildly depending on skin thickness, ambient humidity, and whether the patient has been entirely truthful about their recent bathing habits. The Guild maintains detailed charts on this, cross-referenced by geographic region and social class. They are not pleasant reading.
+&nbsp;
+‡The critical difference being that porridge is meant to be eaten rather than applied topically, though incidents in both directions have been recorded†.
+&nbsp;
+†Incident Report #2847 from the Ankh-Morpork College of Medicine describes a particularly unfortunate evening involving a dyslexic apprentice, poor lighting, and a visiting dignitary who never quite regained faith in organized medicine.
+&nbsp;
+‡‡See the prerequisite paper on capsule filling, which assumes you survived that particular learning curve. Statistics suggest 73.4% of readers did, while 21.2% gave up, and 5.4% are still trying to extract gelatin from unexpected places.
+&nbsp;
+§Particularly not in ways involving heat, stirring, and the muttered incantations that practitioners swear aren't magical but certainly sound suspicious to the layman.
+&nbsp;
+§§The Codex of Unguents lists forty-seven acceptable base materials, though three of them (whale oil, rendered philosopher, and what is described only as "the gleaning of moonbeams") have been struck from modern practice for reasons ranging from ethical concerns to sheer impracticality‡.
+&nbsp;
+‡Moonbeams, it transpires, cannot be gleaned. This was definitively established in 1822 after seventeen years of attempts that produced nothing but madness, poetry, and a surprisingly good cheese.
+&nbsp;
+*The active ingredients range from the mundane (chamomile, calendula) to the exotic (distilled essences of things that probably shouldn't be distilled) to the actively concerning (compounds whose names contain more consonants than vowels and numbers that suggest they were discovered by accident in weapons research).
+&nbsp;
+**This specific range was established through what the Guild terms "empirical observation" and what insurance documents term "a regrettable series of preventable fires." The difference between these temperatures and those that cause combustion is apparently 23.7 degrees Celsius, which seems rather thin as margins go.
+&nbsp;
+††The guideline continues: "but warm enough to maintain proper fluidity without requiring constant reheating, which becomes tedious and leads to the sort of inattention that we're trying to prevent with these guidelines in the first place." The original author was clearly at the end of their tether.
+&nbsp;
+‡†This represents the Guild's third attempt at this particular guideline. The first version said "don't burn it," which was deemed insufficiently specific. The second version included precise temperature ranges, chemical diagrams, and a mathematical formula, which nobody read. The current version strikes what the Guild hopes is a middle ground, though judging by incident reports, hope may be insufficient.
+&nbsp;
+§†The Thermodynamic Principles of Salve Preparation, a seventeen-volume work by Professor Adalbert von Unguency of the Überwald Institute of Practical Medicine††, dedicates Volume 4 through Volume 11 entirely to thermal incorporation points. Volumes 12 through 15 are devoted to angry letters from readers who felt Volumes 4 through 11 could have been condensed. Volume 16 is the author's rebuttal. Volume 17 is mostly recipe cards, suggesting the author had grown weary of the entire project.
+&nbsp;
+††Not to be confused with the Überwald Institute of Impractical Medicine, which was dissolved in 1831 following the Great Experiment That Shall Not Be Named, though the building still stands and occasionally produces interesting noises.
+&nbsp;
+*†Technical language, like political language, exists primarily to make uncomfortable truths sound respectable. "Heterogeneous distribution" sounds like a natural consequence of thermodynamic principles. "Us`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding salve ointment preparation in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const POULTICE_COMPRESS_METHODS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'poultice_compress_methods',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Poultice Compress Methods',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['salve_ointment_preparation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_poultice_compress_methods' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Poultice Compress Methods: A Comprehensive Treatise on the Alchemical Art of Persuading Plants to Help</span>
+&nbsp;
+The poultice compress represents one of alchemy's more aggressive negotiations with the botanical kingdom*, wherein we ask—or, more accurately, demand—that carefully selected plant matter surrender its essences through the application of heat, pressure, and occasionally threats†. Unlike the genteel world of salves and ointments‡, which involve coaxing beneficial properties from ingredients through gentle rendering and mixing, the poultice compress methodology operates on the principle that some wisdom only emerges under duress**. The fundamental mechanism relies upon three interconnected forces: thermal activation (heating the compress to approximately 42°C, or 107.6°F for those who haven't yet adopted the Thermometric Conventions of 1734††), sustained pressure (typically 2.7 pounds per square inch, though this varies with practitioner body weight and enthusiasm†††), and temporal persistence (the average compress requires seventeen minutes of application, plus or minus four minutes depending on whether you're timing it with an hourglass or simply counting "one-hippopotamus, two-hippopotamus"‡).
+&nbsp;
+The practical application of poultice compresses demands a peculiar combination of patience and urgency that tends to sort practitioners into two distinct categories: those who have learned to wait, and those who bear interesting scars‡‡. The preparation sequence follows the ancient Doctrine of Irreversible Steps‡‡‡, meaning that once you've committed to heating the compress, there is no dignified way to stop***—a fact that has led to approximately 73.4% of training incidents†††. The compress must be applied while still warm enough to be therapeutically effective but cool enough not to constitute assault***. This narrow window of optimal application temperature, known colloquially as the "band of screaming,"†††† has been precisely calculated by the Institute of Applied Discomfort‡‡‡‡ to last between forty-seven and fifty-two seconds, depending on ambient humidity and the patient's capacity for stoicism****. Advanced practitioners learn to read the subtle signs—the rising steam****, the shifting scents††††, the increasingly desperate expression of whoever you've convinced to be your practice subject‡‡‡‡‡—that indicate the precise moment for application.
+&nbsp;
+Historical development of poultice compress methodology reads less like scientific advancement and more like a chronicle of gradually learning what not to do*****. The earliest documented attempts, preserved in the Fragments of Theribus the Regretful††††† (circa 300 BCE), describe what can only be termed "optimistic" approaches to heat management, including the now-forbidden practice of fire-poulticing‡‡‡‡‡‡. The Classical Period saw the rise of the Seven Schools of Compress Philosophy******, each developing distinct methodologies that were definitely not attempts to avoid repeating their founder's particular mistake†††††. The medieval era introduced standardized measurements††††††, largely due to the Incident at Salzburg‡‡‡‡‡‡‡ in 1347, after which the Council of Concerned Alchemists mandated that all poultice preparations be recorded with precision "lest we forget why we don't do that anymore."******* Modern compress methodology owes much to the systematic categorization efforts of Lady Millicent Hargreaves-Scorch†††††††, whose seventeen-volume work "On the Properties of Hot Things and Why They Should Not Go There"‡‡‡‡‡‡‡‡ remains required reading*******.
+&nbsp;
+Safety considerations occupy an unusually large proportion of compress methodology training, primarily because the intersection of "beneficial plants," "extreme heat," and "human skin" creates what the Department of Preventable Catastrophes******** calls a "rich environment for learning experiences."†††††††† The fundamental rule—test temperature before application—seems self-evident until one considers that it was codified only after the Tragedy of the Overeager Apprentices‡‡‡‡‡‡‡‡‡ in 1823********. Modern practitioners employ the Three-Point Verification Protocol: first, hover your hand above the compress (if you reflexively jerk away, it's too hot); second, briefly touch the compress edge with a fingertip (if you curse inventively, it's still too hot); third, press the compress against your inner wrist for a full second (if you can complete this without yelping, you may proceed to the patient)*********, with the understanding that the patient's skin is typically more sensitive than your callused alchemist's hands**********. Additional considerations include proper bandaging techniques to maintain compress contact without cutting off circulation†††††††††, regular moisture checking to prevent both desiccation and drowning‡‡‡‡‡‡‡‡‡‡, and the often-overlooked but critical practice of warning the patient before application, as surprise poultices have ended more apprenticeships than failed examinations***********.
+&nbsp;
+The modern understanding synthesizes these historical lessons into a coherent methodology that acknowledges both the art's ancient roots and its continuing evolution***********. Contemporary research by the Guild of Applied Botanicals************ suggests that the effectiveness of poultice compresses may depend as much on the practitioner's confidence as on the precise composition, though this remains controversial among those who believe that alchemy should be more rigorous than "believing really hard that it works"************. The emergence of temperature-sensitive indicators†††††††††† has reduced preparation casualties by approximately 34%, though purists argue this removes the character-building aspect of the traditional methods‡‡‡‡‡‡‡‡‡‡‡. What remains constant is the fundamental understanding that compress methodology represents a dialogue between alchemist, ingredient, and patient—a conversation conducted in the language of heat, herbs, and hope, with occasional exclamations in the dialect of burnt fingers*************.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+* The plant kingdom has filed numerous complaints about this characterization with the Council of Natural Philosophy, but as plants cannot technically sign legal documents, their protests remain unofficial. The fungi, however, hired lawyers, which is why mushroom-based poultices require different licensing.
+&nbsp;
+† Making threats to plants is generally considered poor form and therapeutically ineffective, though the practice persists among certain traditional schools. The Verbalist Compress Methodology, which involves shouting at the herbs during preparation, was formally discredited in 1789 but maintains a surprisingly devoted following in the mountainous regions of Bavaria.
+&nbsp;
+‡ See the prerequisite text "Salve and Ointment Preparation: A Gentleperson's Introduction to Not Burning Things." The transition from salves to compresses represents a significant escalation in both temperature and commitment.
+&nbsp;
+** This principle, known as the Doctrine of Beneficial Violence, has made compress methodology somewhat controversial in more pacific alchemical circles. The Gentle Herbalists' Collective maintains that any preparation requiring the word "violence" in its foundational philosophy might be missing the point.
+&nbsp;
+†† The Thermometric Conventions of 1734 were actually signed in 1735, but nobody wanted to reprint all the letterhead. The Convention established standardized temperature measurements after the Fire of Measurement Disputes destroyed three competing institutes when they couldn't agree on how hot "moderately warm" should be.
+&nbsp;
+††† This calculation comes from the Comprehensive Survey of Applied Pressure Methodologies (Grimsworth et al., 1891), which remains the definitive work despite its unfortunate tendency to use "squish" as a technical term. The survey involved 1,247 practitioners applying compresses while standing on precisely calibrated scales, leading to the memorable opening line: "We asked them to press down, and then we weighed their pressing."
+&nbsp;
+‡ The "hippopotamus method" of time measurement, while charmingly informal, achieves surprising accuracy. A 2003 study by the Institute of Informal Chronometry found that trained practitioners counting hippopotami maintained timing precision within 8% of atomic clocks, particularly if they'd actually seen a hippopotamus and could properly visualize its temporal weight.
+&nbsp;
+‡‡ The scar distribution patterns among compress practitioners tell a story that no safety manual fully captures. The most common locations, in order: left thumb (38%), right forearm (24%), both thumbs simultaneously (12%), and one memorable case involving an ear that the Department of Occupational Peculiarities is still investigating.
+&nbsp;
+‡‡‡ Originally formulated by Thaddeus the Twice-Scarred in his seminal work "Things I Tried to Stop Doing That Kept Happening Anyway" (1456). The Doctrine states that certain alchemical processes, once initiated, must be completed regardless of second thoughts, fire alarms, or the sudden realization that you've forgotten a critical ingredient. Attempting to abort a compress preparation mid-heating has a 67% chance of creating what's technically`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding poultice compress methods in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const HERBAL_SMOKING_BLENDS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'herbal_smoking_blends',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Herbal Smoking Blends',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['advanced_herbal_preparations'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['poultice_compress_methods'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { alchemy: 10, herbalism: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_herbal_smoking_blends' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Herbal Smoking Blends: An Alchemical Treatise on the Controlled Combustion of Botanical Materials for Therapeutic and Meditative Purposes</span>
+&nbsp;
+The preparation of herbal smoking blends represents one of alchemy's most ancient and simultaneously most misunderstood practices*, requiring not merely botanical knowledge but an intimate understanding of combustion temperatures, volatile oil preservation, and the precise moment at which healing smoke becomes merely smoke**. The historical record demonstrates that our ancestors understood what modern practitioners often forget: that the art of blending herbs for inhalation is less about what burns and more about what transforms†—a distinction that cost the Monastery of St. Fumigatus approximately forty-seven senior monks before someone thought to write it down††. The fundamental principle underlying all herbal smoking preparations is that of controlled volatilization, wherein the active constituents of carefully selected botanicals are liberated through measured heat without triggering the destructive pyrolysis that characterizes ordinary combustion‡; this delicate balance, maintained at temperatures between 190°C and 235°C (or "somewhat warm" to "definitely not on fire yet" in traditional terminology), allows for the preservation of therapeutic compounds while eliminating the harsh, lung-scouring byproducts that plagued earlier attempts‡‡.
+&nbsp;
+Contemporary practice distinguishes between five primary categories of smoking herbs, each serving distinct physiological and subtle-body purposes: base herbs (which provide structure and ensure even burning*), supporting herbs (which moderate the intensity and add flavor**), active herbs (containing the primary therapeutic compounds†), binding herbs (which hold the mixture together††), and what the Guild of Herbalists cautiously terms "regret preventatives"‡—those additions that stop you from making a blend so terrible you question your life choices‡‡. The actual blending process demands attention to moisture content (ideally 8-12%, though the traditional test of "slightly crispy but not dusty" remains surprisingly accurate***), particle size uniformity (variations greater than 40% result in uneven burning and what the literature politely calls "disappointing outcomes"†††), and the proper ratio of ingredients based on their individual combustion characteristics‡‡‡. Master Cornelius Ashworth's seminal work, "On Not Making Everything Taste Like Burning Socks" (University of Obscure Knowledge Press, 1743), revolutionized the field by introducing the concept of "sympathetic combustion"§, wherein herbs with similar burn temperatures are grouped together to prevent the dreaded scenario of your relaxing blend transforming into an inadvertent fumigation ceremony§§.
+&nbsp;
+The practical application of herbal smoking blends in therapeutic contexts requires rigorous attention to dosage, timing, and constitutional considerations that far exceed the casual assumptions of the uninitiated§§§. A blend appropriate for one individual may prove catastrophically unsuitable for another, as the Incident of Lord Pemberton's Garden Party (1789) demonstrated with such spectacular clarity that the Royal Society still refuses to publish the full account****. The alchemist must consider not only the overt physical effects of each herb but also their interactions with the subtle bodies, the time of day, the phase of the moon††††, and approximately forty-seven other variables that the ancient texts insisted on listing in no particular order‡‡‡‡. Modern research has validated many traditional practices while exposing others as elaborate pranks perpetuated by apprentices with too much time and too little supervision§§§§—the "Licorice Surprise" being perhaps the most notorious example*****.
+&nbsp;
+Safety considerations in the preparation and use of herbal smoking blends cannot be overstated, though historically they have been understated with remarkable consistency until something exploded or someone started speaking in colors or both†††††. The cardinal rule, carved into the entrance of every reputable Herbalist's Guild‡‡‡‡‡ hall in letters three feet high, states simply: "If you don't know what it is, don't set it on fire"§§§§§. This rule evolved after the Unfortunate Autumn of 1612, when a particularly enthusiastic apprentice decided that "unknown dried leaves found in the back of the storeroom" would make an excellent experimental addition to her evening meditation blend******. The resulting three days of vivid hallucinations, spontaneous poetry composition, and an unshakeable conviction that she was personally responsible for ensuring all the stars stayed in the sky led to both the establishment of mandatory ingredient identification training and the surprisingly popular "Comprehensive Catalogue of Things That Seemed Like Good Ideas at the Time"††††††. Modern practitioners must additionally consider contraindications with existing medical conditions‡‡‡‡‡‡, potential allergic reactions (the Great Ragweed Disaster of 1834 affected an estimated 300 people at the Annual Herbalist Convention§§§§§§), and the often-overlooked fact that some herbs, while perfectly safe when prepared as tea, become moderately dangerous when combusted*******—a distinction that apparently required seventeen separate incidents before anyone bothered to write it down prominently.
+&nbsp;
+The evolution of herbal smoking blends from ancient shamanic practices to contemporary therapeutic applications represents a journey through humanity's long and occasionally catastrophic relationship with plant medicine, fire, and the confident belief that combining the two would definitely work out fine this time†††††††. Archaeological evidence suggests that our ancestors were smoking medicinal herb blends as early as 5000 BCE‡‡‡‡‡‡‡, though whether this was intentional medicine or accidental discovery after someone's herb storage caught fire remains a subject of scholarly debate********. What is certain is that by the time of the Classical period, sophisticated blending techniques had emerged, complete with elaborate preparation rituals, specific tools that absolutely had to be blessed by the right deity†††††††, and instruction manuals so cryptic that modern scholars suspect they were either profound mystical texts or elaborate jokes§§§§§§§. The medieval period saw the establishment of the first formal schools of herbal fumigation, where students learned not only the botanical arts but also the critical skill of looking deeply serious while inhaling smoke, a talent that remains mysteriously important to this day*********. Today's practitioners benefit from centuries of accumulated knowledge, though they've lost some of the original techniques—particularly those involving species now extinct††††††††, or those that were "definitely too effective and let's never speak of them again"‡‡‡‡‡‡‡‡—while gaining the advantage of modern safety standards that mostly prevent the kinds of incidents that used to close down entire monasteries§§§§§§§§.
+&nbsp;
+---
+&nbsp;
+*The misunderstanding primarily stems from confusing "herbal smoking blend" with "literally any dried plant matter you can set on fire," a distinction that seems obvious until you meet someone who tried smoking their houseplants. The Guild of Herbalists maintains a private archive called "The Wall of Why" featuring pressed samples of things people have attempted to smoke, organized by increasing absurdity. The dried cat hair is only at position #23.
+&nbsp;
+**This distinction eluded the famous alchemist Torquemada Smokewhistle (1623-1671), who spent thirty years attempting to create the perfect blend before realizing he'd been working with non-combustible materials. His notes simply state, "Rocks don't burn. Who knew?" followed by what appears to be several pages of angry scribbles.
+&nbsp;
+†The Transformation Principle holds that true herbal alchemy occurs in the liminal space between solid and smoke, where plant matter becomes something other than itself—specifically, something that won't make you cough up a lung. This is the theory, anyway. Practice suggests that achieving this state requires more luck than skill, though the Guild insists it's the opposite. They would say that.
+&nbsp;
+††The monks of St. Fumigatus (patron saint of not inhaling things you shouldn't) approached their smoking blend experiments with religious fervor and zero understanding of combustion chemistry. Their names are recorded in the Martyrology of Preventable Incidents, under the heading "What Not To Do, Seriously, We Mean It This Time." The monastery was eventually converted into a museum, and then, after three separate fires, into a memorial garden with very prominent warning signs.
+&nbsp;
+‡According to Professor Hildegard Smokewise of the University of Obscure Knowledge, pyrolysis is "when your carefully prepared herbal blend transforms into what is technically classified as 'the wrong kind of smoke' at temperatures exceeding 235°C." Her research involved burning approximately 4,000 pounds of various herbs while taking meticulous notes and explaining to increasingly concerned neighbors that yes, it was for science, and no, she couldn't "keep it down a bit."
+&nbsp;
+‡‡The traditional temperature measurement system, still used by elderly practitioners who learned their craft before thermometers became common, involves holding one's hand at varying distances from the burning herbs and muttering things like "too hot," "still too hot," and "perfect—wait, no, too hot." This system has an accuracy rate of about 60%, which is apparently good enough`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding herbal smoking blends in the context of alchemy',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  PERCOLATION_METHOD,</span>
+<span class="cstat-no" title="statement not covered" >  MACERATION_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  PRESSING_HERBAL_JUICES,</span>
+<span class="cstat-no" title="statement not covered" >  FERMENTATION_OF_HERBS,</span>
+<span class="cstat-no" title="statement not covered" >  OXIDATION_PREVENTION,</span>
+<span class="cstat-no" title="statement not covered" >  HERBAL_POWDER_GRINDING,</span>
+<span class="cstat-no" title="statement not covered" >  CAPSULE_FILLING_TECHNIQUES,</span>
+<span class="cstat-no" title="statement not covered" >  SALVE_OINTMENT_PREPARATION,</span>
+<span class="cstat-no" title="statement not covered" >  POULTICE_COMPRESS_METHODS,</span>
+<span class="cstat-no" title="statement not covered" >  HERBAL_SMOKING_BLENDS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

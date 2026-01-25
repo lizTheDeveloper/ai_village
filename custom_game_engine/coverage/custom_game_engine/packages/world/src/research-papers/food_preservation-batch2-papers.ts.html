@@ -1,0 +1,1009 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/food_preservation-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> food_preservation-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/87</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const VINEGAR_PRESERVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'vinegar_preservation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Vinegar Preservation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['food_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['pickling_fundamentals'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_vinegar_preservation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Vinegar Preservation: A Comprehensive Study of Acetic Longevity in Culinary Applications</span>
+&nbsp;
+The fundamental principle underlying vinegar preservation is, like most truths that have survived the millennia, simultaneously elegant and alarming*. When foodstuffs are submerged in a solution containing at least 5% acetic acid, the resulting environment becomes inhospitable to the vast majority of microorganisms that would otherwise enthusiastically consume said foodstuffs†. This process, known technically as "acetous inhibition" or colloquially as "picklement in the sour sense," represents humanity's longest-running chemical warfare campaign against bacteria‡. The mechanism operates through a dual assault: first, the acidic environment disrupts bacterial cell membranes**, and second—and this is the part that should concern us all—the vinegar actually penetrates the food structure, creating what the ancient Guild of Preservationists called "the Eternal Vegetable"††.
+&nbsp;
+The practical application of vinegar preservation demands both precision and a healthy respect for what Professor Alchemilla Sourbrine of the Pseudopolis Institute of Culinary Sciences termed "the Fundamental Incompatibility of Vinegar and Optimism"‡‡. One must begin with vegetables or proteins that are, ideally, both fresh and still attached to their original structural integrity***. The ratio of vinegar to water varies depending on the desired outcome: a 1:1 solution suffices for short-term preservation (measured in months rather than decades), while stronger solutions approaching pure vinegar have been known to preserve items for periods that make archaeologists uncomfortable†††. Modern practitioners typically add supplementary ingredients—salt, sugar, spices‡‡‡—not merely for flavor but because the ancients discovered through regrettable trial that vinegar alone produces what can only be described as "aggressive tartness."
+&nbsp;
+Historical development of vinegar preservation techniques reveals a pattern consistent with most human innovation: initial discovery through accident*, followed by systematic experimentation**, culminating in the establishment of rigid traditions that obscure the original reasoning***. The earliest known vinegar preservation dates to approximately 2400 BCE in Mesopotamia†, though some scholars argue the practice is older than recorded history itself††. The intervening millennia have witnessed numerous "incidents," including the Great Cucumbric Explosion of 1743‡‡ and the lesser-known but equally devastating Brussels Sprout Crisis of 1891***†. The Baroque period proved particularly enthusiastic about vinegar preservation, with certain noble households maintaining "pickle libraries" that required dedicated staff and, in at least one documented case, its own small military force for protection†††.
+&nbsp;
+Safety considerations in vinegar preservation cannot be overstated, primarily because they have been understated for approximately four thousand years with predictable consequences‡‡‡‡. The Bureau of Acidic Foodstuffs and Related Calamities publishes an annual report that grows thicker each year, despite—or perhaps because of—the Bureau's official motto: "If It Fizzes, Something Is Amiss"*****. The most critical rule, emphasized in bold capitals in every reputable preservation manual since the Unfortunate Garlic Affair of 1823, concerns the absolute necessity of sufficient acidity: below 4.6 pH, one is preserving food; above 4.6 pH, one is cultivating what may charitably be termed "biological uncertainty"†††††. Additional considerations include proper jar sterilization‡‡‡‡‡, the avoidance of reactive metals******, and—this bears repeating—never, under any circumstances, preserving foods according to recipes inherited from relatives who are described as "eccentric" or "ahead of their time"††††††.
+&nbsp;
+Contemporary understanding of vinegar preservation has been revolutionized by modern microbiology, which has finally provided scientific explanations for traditional practices while simultaneously revealing that our ancestors were operating under some spectacularly incorrect assumptions that nevertheless produced excellent pickles‡‡‡‡‡‡. The relationship between acetic acid concentration, temperature, and preservation duration can now be expressed in precise mathematical formulae, though practitioners report that traditional methods involving "enough vinegar that your eyes water from across the room" remain surprisingly effective*******. Current research at the Ankh-Morpork Institute of Applied Pickling focuses on optimizing preservation time-to-quality ratios, with preliminary results suggesting that the traditional waiting period of "at least a fortnight" is both scientifically sound and spiritually necessary for proper pickle development††††††††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* Though significantly less alarming than the principles underlying fermentation, which remain, after ten thousand years of practice, essentially "wait and hope nothing terrible happens."
+&nbsp;
+† The 5% threshold was established through what the Historical Records Office delicately terms "accumulated empirical evidence," which is archival-speak for "many people made weak vinegar and suffered predictable consequences." The exact number of such consequences is estimated at 2.7 million incidents between 1200 and 1850 alone.
+&nbsp;
+‡ Second only to the campaign against yeasts, which is technically ongoing and, depending on one's perspective regarding bread and beer, going rather poorly for humanity.
+&nbsp;
+** Some bacterial cell membranes. Others require significantly more aggressive treatment, which brings us to the unfortunate realm of "specialty vinegars"†.
+&nbsp;
+†† The precise translation from ancient Klatchian is disputed. Alternative interpretations include "the Vegetable That Will Not Die," "the Cucumber of Sorrows," and mysteriously, "Kevin."
+&nbsp;
+††† In the year 1872, a sealed jar of pickled onions was discovered in the private collection of Duke Rotharion the Excessively Prepared‡. Carbon dating and taste analysis confirmed the onions had been preserved in 1534. More disturbingly, they were still edible. Even more disturbingly, they were delicious. Most disturbingly of all, the Duke's descendants regularly served them at formal dinners without mentioning their age.
+&nbsp;
+‡ Duke Rotharion maintained seventeen separate storage facilities across the Sto Plains, each one devoted to a different method of food preservation. His personal motto was "Famine Cannot Find the Sufficiently Paranoid," which proved correct during the crop failures of 1521-1523, though his reputation never recovered from his insistence on serving 30-year-old pickled beets to visiting dignitaries.
+&nbsp;
+‡‡ Named thus despite Professor Sourbrine's objectively cheerful disposition. Her pessimism extended only to vinegar-based preservation, where she maintained that "anyone who approaches the pickle jar with joy is someone who hasn't yet experienced what happens when the lid won't come off, or worse, when it comes off unexpectedly."
+&nbsp;
+*** This represents a more stringent requirement than one might initially assume. The Culinary Guild's survey of 1923 found that approximately 47% of items presented for pickling were, technically speaking, "already compromised." The report did not elaborate on what "compromised" meant, but the accompanying photographs were subsequently classified.
+&nbsp;
+††† The Handbook of Dubious Preservation (Ubervald: Dangerous Recipes Press, 1845) contains recipes calling for vinegar solutions approaching 98% acidity. The Handbook's appendix consists entirely of a list of people who tried these recipes, organized chronologically and, eventually, alphabetically by next of kin.
+&nbsp;
+‡‡‡ The role of sugar in vinegar preservation was discovered by the Agatean Empire's Imperial Pickle Ministry in approximately 400 BCE. Records indicate the discovery occurred when a junior minister, attempting to poison his supervisor, accidentally created the precursor to modern sweet pickle relish. He was promoted. The supervisor, who survived and enjoyed the relish, was also promoted. Imperial bureaucracy is rarely so equitable.
+&nbsp;
+**** Specifically, a vintner in what is now the Quirm region left a barrel of wine unsealed during harvest season. Returning three weeks later expecting disaster, he instead found vinegar. What happened next depends on which historical account one trusts: he either shouted "Blessed inconvenience!" or several words not suitable for academic publication. Both versions agree he immediately began marketing his "miraculous wine transformation serum" and died wealthy.
+&nbsp;
+***** Following the wine-to-vinegar discovery, numerous entrepreneurs attempted to replicate the process with varying degrees of success, defined as "successfully producing vinegar" rather than "successfully producing profit." The Vintners' Guild Wars of 230-235 CE stemmed partially from disputes over whether deliberately creating vinegar constituted "wine treason."
+&nbsp;
+****** This period, sometimes called "The Dark Decades of Experimental Preservation," saw numerous aristocratic courts competing to create the most elaborate preserved foods. The competition reached its apex—or nadir, depending on one's perspective—with Baron Eifel von Souren's attempted preservation of an entire roasted swan in vinegar†.
+&nbsp;
+† The swan preservation failed spectacularly in ways that required extensive property repairs and the relocation of several`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding vinegar preservation in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LACTO_FERMENTATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'lacto_fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Lacto Fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['food_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['vinegar_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_lacto_fermentation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Lacto Fermentation: A Treatise on the Ancient Art of Controlled Bacterial Warfare in Foodstuffs</span>
+&nbsp;
+The phenomenon of lacto-fermentation represents humanity's longest-running collaborative project with Lactobacillus bacteria*, a partnership that predates written language, agriculture, and the invention of containers that weren't just "a hole in the ground with a rock on top†." At its essence, lacto-fermentation is the process by which these microscopic allies consume the sugars present in vegetables and other foodstuffs, producing lactic acid as a byproduct—thereby lowering the pH of the environment to levels inhospitable to pathogenic organisms‡. This elegant simplicity has been somewhat obscured by millennia of accumulated folklore, some 2,847 contradictory opinions on salt ratios**, and the persistent human tendency to make things more complicated than necessary††.
+&nbsp;
+The practical execution of lacto-fermentation requires only three elements: the food to be fermented, salt in appropriate quantities, and time‡‡. The salt serves multiple functions—it draws moisture from the vegetables through osmosis***, draws out the Lactobacilli already present on the vegetables' surfaces, and creates an environment that favors these beneficial bacteria over their less desirable cousins†††. The modern practitioner would do well to use approximately 2-3% salt by weight‡‡‡, though this figure has been the subject of considerable debate among the scholarly community§. Temperature control, while not strictly necessary, dramatically affects fermentation speed and flavor development; the optimal range of 18-22°C (64-72°F) represents a comfortable middle ground between "nothing is happening§§" and "everything is happening far too quickly§§§."
+&nbsp;
+The matter of safety in lacto-fermentation deserves particular attention, as it represents one of the rare areas where ancient wisdom and modern microbiology find themselves in complete agreement*. The key indicator of successful fermentation is pH: a properly fermented product should reach a pH of 4.6 or lower within the first week**, at which point it becomes hostile territory for Clostridium botulinum and other dangerous organisms††. Visual inspection remains crucial—the presence of white, filmy yeast on the surface (Kahm yeast‡‡) is unsightly but harmless, whereas fuzzy molds in shades of blue, black, or green indicate that one's fermentation vessel has been colonized by organisms with whom one does NOT wish to collaborate§§§§. The smell test, while less scientific than pH measurement, has saved countless lives; if your fermentation smells of death, decay, or "wrong***," trust your ancient hindbrain and discard it†††††.
+&nbsp;
+The historical development of lacto-fermentation demonstrates humanity's remarkable ability to stumble upon solutions without understanding the underlying mechanisms‡‡‡‡. Every culture that possessed vegetables and salt independently discovered fermentation, from Korean kimchi to German sauerkraut to the now-sadly-forgotten Prussian tradition of fermenting turnips in ale barrels§§§§§. The actual existence of bacteria remained unknown until Antonie van Leeuwenhoek's observations in the 1670s****; prior to this revelation, fermentation was variously attributed to divine intervention, spontaneous generation, the phases of the moon, or—in one particularly creative 14th-century text—"the vegetables choosing to improve themselves††††††." Modern understanding has refined these techniques considerably, though it must be noted that great-grandmothers around the world continue to produce superior ferments while ignoring approximately 90% of the scientific principles involved‡‡‡‡‡.
+&nbsp;
+Contemporary practitioners benefit from both traditional knowledge and scientific understanding, creating a synthesis that would have seemed like sorcery to our ancestors—who, it must be said, were already treating the whole process as a form of benevolent kitchen magic§§§§§§. The resurgence of interest in fermentation during the early 21st century brought with it both valuable experimentation and considerable nonsense*****; the ratio has been estimated at roughly 1:3 by the Institute for Culinary Common Sense†††††††. The fundamental truth remains unchanged: place vegetables in salt water, keep them submerged, wait, and billions of microscopic allies will transform your ingredients into something simultaneously the same and entirely different‡‡‡‡‡‡—a minor miracle that happens in kitchens worldwide, every day, without fanfare or fuss.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+\* *Lactobacillus* is actually a genus containing numerous species, but this level of specificity tends to cause the eyes of anyone not actively pursuing a microbiology degree to glaze over. For our purposes, they are "the good bacteria," as opposed to "the bacteria that make you deeply regret your life choices." The distinction is important.
+&nbsp;
+† The archaeological record suggests this method was more successful than one might expect, though the Department of Ancient Food Safety has declined to officially endorse it. The rock was apparently quite important to the process—exactly which type of rock sparked considerable debate among ancient fermentation enthusiasts, with regional preferences for granite, limestone, and in one documented case from Bronze Age Anatolia, a rock shaped like a duck††.
+&nbsp;
+†† This rock, known as the "Blessed Duck of Fermentation," was considered so essential that its theft in 1847 BCE nearly caused a war between neighboring city-states. Modern recreations have failed to determine what, if anything, made this particular duck-shaped rock special. It was probably just a really good rock.
+&nbsp;
+‡ The pH scale, invented by Søren Sørensen in 1909, gave fermenters something they'd been desperately missing: a way to lose arguments with unprecedented precision. Prior to this, one simply had to taste things and use one's judgment, which was considered deeply unsatisfying by people who prefer numbers.
+&nbsp;
+** The precise ratio varies depending on whom you ask, which vegetables you're fermenting, the ambient temperature, the phase of the moon (according to some sources), your grandmother's opinion (according to other sources), and whether Mercury is in retrograde (according to sources you should probably ignore). The International Congress of Fermentation Studies maintains a 400-page document titled "Acceptable Salt Concentrations and Why Everyone Else Is Wrong."
+&nbsp;
+†† Time being that most difficult of ingredients to source, particularly for those who want their fermented vegetables "right now." The temporal requirements of fermentation have led to more abandoned projects than any other single factor, according to a 1987 study by Dr. Patience N. Virtue‡‡‡.
+&nbsp;
+‡‡‡ Dr. Virtue's seminal work, "Why Your Fermentation Isn't Done Yet: A Longitudinal Study of Premature Jar-Opening," tracked 500 beginning fermenters over five years. The study was eventually abandoned when Dr. Virtue herself fell victim to the same impatience she was studying, opening a particularly promising batch of pickles on day three. They were, predictably, not ready.
+&nbsp;
+*** This same osmotic principle explains why swimming in the ocean eventually makes you look like a raisin, though few have attempted to ferment themselves in salt water. Those who have are asked to leave most reputable fermentation forums.
+&nbsp;
+††† The less desirable cousins include such unpleasant characters as *Clostridium perfringens*, *Staphylococcus aureus*, and the aforementioned *C. botulinum*—organisms that make family reunions incredibly awkward and potentially lethal. The Lactobacilli won't invite them to parties, which is exactly what we want.
+&nbsp;
+‡‡‡ This percentage represents a hard-won compromise between the "maximum salt tolerance" camp and the "but it tastes like the ocean" faction. The Great Salt Debates of 1973-1976, held at the Culinary Institute of Dubious Precision§, nearly led to a permanent schism in the fermentation community.
+&nbsp;
+§ The CIDP maintains that it is actually the Culinary Institute of Demonstrated Precision, but this claim is undermined by their continued inability to agree on what constitutes a "pinch" of anything. Their measuring spoons are marked with phrases like "a smidgen," "a tad," and "approximately this much, maybe."
+&nbsp;
+§§ A state known technically as "lag phase" and colloquially as "did I do something wrong?" This period of apparent inactivity has caused more anxiety among beginning fermenters than any other phenomenon, leading to the development of the practice known as "jar bothering"—the act of checking one's fermentation vessels every six minutes to see if anything has happened yet§§.
+&nbsp;
+§§§ Sometimes referred to as "explosive fermentation," "the incident we don't talk about," or "the reason we now ferment in the garage." The speed of fermentation above 24°C increases exponentially, as do the chances of pressure-related mishaps that require explaining to one's landlor`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding lacto fermentation in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SUGAR_PRESERVATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'sugar_preservation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Sugar Preservation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['food_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['lacto_fermentation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_sugar_preservation' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Sugar Preservation: A Compendium of Crystalline Conservation and Cautionary Confections</span>
+&nbsp;
+The fundamental principle underlying sugar preservation is deceptively elegant: sugar, when present in sufficient concentration, creates an osmotic environment so inhospitable to microbial life that even bacteria capable of surviving in volcanic vents will politely decline to reproduce*. This ancient technique, which predates recorded history by several millennia according to the disputed findings of the Mesopotamian Confectionary Archaeological Survey†, operates through the simple mechanism of water activity reduction‡. When sugar concentration exceeds approximately 50% by weight, the available water molecules become so entranced by their sweet dance partners that microorganisms find themselves unable to access the hydration necessary for cellular function**. The practiced preservationist must understand that this is not merely a battle of concentration, but a siege wherein sugar molecules systematically bind every water molecule in a complex hostage situation that would make the Bureaucratic Council of Sweetness††proud.
+&nbsp;
+The practical applications of sugar preservation span a remarkable range, from the humble jam†† to the architectural marvel of candied citrus peel‡‡, and each technique demands its own peculiar combination of temperature control, timing, and what the Venetian Guild of Preserved Fruits calls "sympathetic stirring"***. The creation of preserves requires heating fruit with sugar to precise temperatures—typically between 104°C and 106°C for jam, or exactly 104.7°C if you believe the writings of Magister Cornelius Sweetwater†††, though his contemporaries disputed whether he ever actually made jam or simply theorized about it from his tower‡‡‡. Candying operates on similar principles but with even higher sugar concentrations, often requiring multiple immersions in increasingly concentrated syrups over periods ranging from three days to three weeks****, during which time one must resist the temptation to sample the work-in-progress†****. The technique of dry sugar preservation, wherein fruits or flowers are layered with granulated sugar in sealed containers, represents perhaps the most ancient method‡****, requiring nothing more than patience, sugar, and the wisdom to resist opening the container every five minutes to check on progress§.
+&nbsp;
+Historical development of sugar preservation techniques reveals a progression from crude necessity to refined art, though the journey was considerably more chaotic than modern practitioners might imagine§§. Before the widespread availability of refined sugar in the 18th century, honey served as the primary preserving agent, though its lower osmotic potential meant preservation success rates hovered around 73.4%*****, according to monastery records that survived the Great Confectionary Fire of 1243††****. The introduction of Caribbean sugar cane to European markets revolutionized the practice, though not without considerable trial, error, and what the Annals of Sweetness Disasters refer to as "regrettable incidents of crystalline enthusiasm"‡‡****. Modern understanding has brought temperature precision through candy thermometers, pH testing, and spectrophotometric analysis of water activity, though the old preservationists would argue—correctly—that one can tell proper gel point by watching how the mixture sheets off a spoon******, a technique that remains stubbornly reliable despite being impossible to explain to food safety regulators§§§.
+&nbsp;
+Safety considerations in sugar preservation extend well beyond the obvious dangers of boiling sugar*******—though these should never be underestimated††††***—to encompass the subtle threats posed by insufficient sugar concentration, inadequate sterilization, and what the Guild cautiously terms "premature consumption confidence"‡‡‡‡. The preservationist must maintain sugar concentrations above critical thresholds, sterilize all equipment with the devotion of a surgical theater, and resist the deadly temptation to reduce sugar content for health consciousness********. Modern food safety guidelines recommend water activity levels below 0.85 for stable preservation, though the ancient practitioners of Kandahar managed perfectly well by the rule of "sweet enough to make your teeth ache"††††††. Perhaps most critically, one must respect the fundamental truth that sugar preservation is a commitment: a jar opened must be consumed promptly†††††††, as the osmotic barrier falls the moment air and its microscopic passengers are introduced‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The exact survival limit for extremophile bacteria in sugar solutions was determined through extensive research by Dr. Philomena Sweetbriar at the Institute for Hostile Environment Microbiology in 1987, though her methodology—which involved creating progressively sweeter solutions until even the bacteria she'd collected from deep-sea vents gave up—was considered "unnecessarily vindictive" by her colleagues. She maintained the bacteria had it coming.
+&nbsp;
+†The MCAS, based in a converted candy factory in modern-day Iraq, has been embroiled in controversy since 2003 when it announced the discovery of what appeared to be a 7,000-year-old jar of fig preserves. Skeptics pointed out that the jar was suspiciously similar to those sold in the museum gift shop. The survey's director insisted this merely proved the timelessness of good design**.
+&nbsp;
+**The survey's findings remain disputed primarily because the jar, when opened for analysis, was found to contain what one researcher described as "perfectly edible" preserves. This raised the troubling question of whether it was genuinely 7,000 years old or if someone had simply labeled their lunch and forgotten about it in the archive. The director refused to comment, though she was observed making toast.
+&nbsp;
+‡Water activity (aw) is measured on a scale from 0 to 1, where 1 represents pure water and 0 represents a theoretical substance so dry that water molecules flee at the sight of it. Most bacteria require aw above 0.90 to thrive. Most yeasts need 0.85. Most molds can manage down to 0.80. Below 0.60, even the most optimistic microorganism admits defeat. Sugar solutions at 65-70% concentration achieve aw around 0.84, creating what microbiologists call "The Zone of Quiet Desperation."
+&nbsp;
+**The "sweet dance partners" metaphor originated with Professor Emmeline Sugarcraft of the University of Heidelberg in 1891, who described sugar and water molecules as being "locked in an eternal waltz from which neither can escape." Her lectures were reportedly quite popular, though this may have had more to do with the free samples she distributed than the scientific content***.
+&nbsp;
+***She was eventually asked to stop distributing samples after the Incident of the Crystallized Lecture Hall, wherein an entire amphitheater's worth of students found themselves unable to take notes due to sticky fingers. The University's custodial staff still speaks of this day in hushed tones.
+&nbsp;
+††The Bureaucratic Council of Sweetness exists only in the fevered imagination of administrative systems, but if it did exist, it would undoubtedly require applications in triplicate for permission to bind water molecules, each form to be filed in a different office, none of which would have compatible opening hours. The estimated processing time would be 6-8 months, by which point your fruit would have spoiled naturally.
+&nbsp;
+††For those unfamiliar with lacto-fermentation (see prerequisite research paper LACTO_FERM_001), it should be noted that sugar preservation represents the philosophical opposite: where fermentation embraces controlled microbial activity, sugar preservation wages total war against it. Practitioners of both arts tend to eye each other suspiciously at culinary conferences†††.
+&nbsp;
+†††The Great Rift of 1923, at the International Congress of Food Preservation in Lyon, saw the fermentationists and the preservationists nearly come to blows over the dessert buffet. The fermentationists had brought kimchi. The preservationists had brought candied violets. Neither group would try the other's offerings, and the standoff lasted until the cheese course, which everyone agreed was neutral territory.
+&nbsp;
+‡‡The architectural properties of properly candied citrus peel were demonstrated most dramatically by the Confectioner-Architect Hieronymus Zest in 1654, when he constructed a scale model of St. Peter's Basilica entirely from candied orange peel. It stood for three years before being consumed during a particularly intense theological debate‡‡‡.
+&nbsp;
+‡‡‡The consumption was not planned. A Cardinal, making an emphatic point about transubstantiation, accidentally bit into a flying buttress and discovered it was delicious. The subsequent feeding frenzy destroyed the entire structure in approximately seven minutes. Contemporary accounts describe the scene as "unseemly" and "theologically confusing." Zest's heirs sued for damages but were counter-sued for creating an "attractive nuisance."
+&nbsp;
+***"Sympathetic stirring" refers to the practice of stirring in a clockwise direction in the Northern Hemisphere and counter-clockwise in the Southern Hemisphere, supposedly to align with natural energy flows. The Venetian Guild insists this is crucial. Everyone else insists it's nonsense. Blind taste tests have so far`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding sugar preservation in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const JAM_JELLY_MAKING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'jam_jelly_making',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Jam Jelly Making',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['food_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['sugar_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_jam_jelly_making' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE TRANSMUTATION OF FRUIT INTO CRYSTALLINE SUSPENSION:</span>
+A Comprehensive Treatise on Jam and Jelly Making
+&nbsp;
+The art of preserving fruit in a state of suspended sweetness has occupied the minds of scholars, housewives, and desperate nobles* for approximately four thousand years, give or take a millennium†. At its heart, jam and jelly making represents humanity's ongoing battle against entropy‡, wherein we capture the fleeting essence of summer berries and imprison them in a matrix of sugar and pectin‡‡, creating what the ancient Preservationists called "bottled time"§. The fundamental principle rests upon achieving a precise ratio of fruit, sugar, acid, and pectin—typically 45% fruit to 55% sugar by weight§§, though the Guild of Concerned Grandmothers insists these numbers are "more like suggestions, dear"***.
+&nbsp;
+The practical execution of jam-making demands both precision and intuition, qualities that are, regrettably, often mutually exclusive in the same practitioner†††. One must first select fruit at the peak of ripeness‡‡‡, then combine it with sugar in quantities that would alarm any physician§§§, add acid to achieve proper pH levels between 2.8 and 3.4****, heat the mixture to exactly 104.5°C (220.1°F)††††, and maintain it there until the mixture reaches "the gel point"—a mystical threshold that separates jam from what the Technical Institute of Preserved Foods calls "expensive fruit soup"‡‡‡‡. The introduction of pectin, whether naturally occurring or commercially added§§§§, creates the miraculous gel structure*****, a molecular lattice that traps water molecules in a dance they will perform for years††††† if properly sealed.
+&nbsp;
+Safety considerations in jam-making extend far beyond the obvious dangers of molten sugar‡‡‡‡‡. The sterilization of jars must be absolute§§§§§; any surviving bacteria will throw a small but devastating party in your preserves******, turning your hard work into what Victorian housekeeping manuals euphemistically termed "biological theatre"†††††††. The water bath canning process, standardized in 1858 by the Perpetually Anxious Society of French Chemists‡‡‡‡‡‡, requires that sealed jars be submerged in boiling water for a minimum of ten minutes§§§§§§, creating the vacuum seal that keeps the Old Gods of Decay******* at bay. Modern food safety regulations†††††††† demand testing pH levels, maintaining proper headspace (precisely 0.25 inches, not 0.24 or 0.26)‡‡‡‡‡‡‡, and resisting the temptation to "just taste a little bit" with non-sterile spoons§§§§§§§.
+&nbsp;
+The historical development of jam-making traces back to the Mesopotamian practice of preserving fruit in honey********, though the term "jam" itself derives from the 17th-century French verb "jambé," meaning "to crush with extreme prejudice"†††††††††. The crucial innovation came with the discovery of pectin in 1790 by Nicolas Leblanc‡‡‡‡‡‡‡‡, who was actually looking for something else entirely§§§§§§§§ and was quite annoyed by his success*********. Medieval recipes, preserved in the Archives of Sticky Manuscripts††††††††††, suggest that early jam-makers had only the vaguest understanding of the chemistry involved, relying instead on what they called "the gift of knowing"—essentially, making it until it looked right‡‡‡‡‡‡‡‡‡. The industrial revolution brought standardization§§§§§§§§§, thermometers, and the devastating realization that grandmothers had been right all along about most things**********.
+&nbsp;
+Modern understanding recognizes jam-making as an elegant application of colloidal chemistry, polymer science, and what the Thermodynamic Philosophers call "controlled chaos"†††††††††††. The gel formation represents a phase transition wherein the liquid state surrenders to a semi-solid network of pectin molecules‡‡‡‡‡‡‡‡‡‡, cross-linked by calcium ions and hydrogen bonds, creating a structure that is simultaneously rigid and yielding—much like the political positions of the Council of Ambiguous Statements§§§§§§§§§§. Success requires understanding not just the recipe, but the deeper magic*** *********** of how temperature, time, and molecular structure conspire to transform the ephemeral into the eternal††††††††††††, or at least into something that lasts until next summer‡‡‡‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The Marquis de Confiture famously bankrupted his estate attempting to preserve a single perfect peach, which he believed contained the soul of his departed wife. It did not. It contained a worm.
+&nbsp;
+†The Society for Unnecessarily Precise Historical Dating puts the figure at 4,247 years, but they also insist we should measure everything from the supposed birth of the Prophet of Preserved Foods, a figure whose historical existence is "debatable at best" according to the Department of Actually Looking Into Things.
+&nbsp;
+‡A battle we are, statistically speaking, losing. The Department of Inevitable Decay estimates that entropy wins 99.97% of all encounters, with the remaining 0.03% being measurement errors.
+&nbsp;
+§The original Preservationist texts were themselves preserved in honey, creating a delicious if somewhat sticky scholarly tradition. Three of the twelve original volumes were accidentally eaten during the Great Famine of 1347. The scholars who ate them reported "excellent mouthfeel but derivative conclusions."
+&nbsp;
+‡‡Pectin, a complex polysaccharide found in fruit cell walls, was unknown to ancient jam-makers, who attributed its effects to "the spirit of the fruit remembering itself." The Guild of Unnecessarily Poetic Explanations still maintains this is the superior definition.
+&nbsp;
+§§The Ratio Wars of 1834-1837 between the French Academy of Precise Measurement and the English Society of Close Enough claimed no lives but destroyed countless batches of jam. A compromise was reached on Tuesdays.
+&nbsp;
+***The Guild of Concerned Grandmothers, founded in 1203, has never lost a debate about cooking ratios, largely because they refuse to acknowledge that debates are occurring. Their official motto is "I've been doing this since before you were born, dear."
+&nbsp;
+†††The Institute for Self-Aware Contradictions published a landmark study in 1987 showing that people who were "good with measurements" scored significantly lower on tests requiring "knowing when it feels right," and vice versa. The study was abandoned when researchers realized they couldn't measure "feels right."
+&nbsp;
+‡‡‡The precise definition of "peak ripeness" varies by fruit, weather, and the philosophical disposition of the person holding it. Raspberries, for instance, achieve peak ripeness approximately 47 seconds before you planned to pick them††.
+&nbsp;
+††This is known as the Raspberry Uncertainty Principle: one cannot simultaneously know both when a raspberry is perfectly ripe and where one's harvesting basket is located.
+&nbsp;
+§§§The average jam recipe calls for a 1:1 ratio of fruit to sugar by weight. For a typical batch using 4 pounds of strawberries, this means consuming approximately 1,800 grams of sugar—enough to power a small child for three weeks or send a Victorian physician into apoplexy.
+&nbsp;
+****pH measurement in jam-making reached obsessive levels during the Acidification Craze of 1923, when prominent chemist Dr. Wilhelmina Sauer‡ insisted that pH variations of more than 0.001 would result in "catastrophic jam failure." She was technically correct but socially exhausting.
+&nbsp;
+‡Dr. Sauer's own jam collection, comprising 3,847 jars of varying pH levels, was donated to the Museum of Unnecessary Precision after her death. It remains the museum's least visited exhibit, though the gift shop does a surprising trade in pH testing strips.
+&nbsp;
+††††The exact temperature is subject to altitude adjustments at a rate of -1°C per 500 feet above sea level. The Guild of Mountain Jam-Makers has developed correction charts covering altitudes up to 14,000 feet, though the notation for "why are you making jam on a mountain" appears frequently.
+&nbsp;
+‡‡‡‡The Technical Institute of Preserved Foods, located in Bordeaux, maintains a Hall of Shame featuring 573 jars of "fruit soup" donated by disappointed jam-makers. Visitors report that the exhibit is "both educational and deeply sa`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding jam jelly making in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const LONG_TERM_FOOD_STORAGE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'long_term_food_storage',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Long Term Food Storage',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['food_preservation'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['jam_jelly_making'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_long_term_food_storage' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Long Term Food Storage: A Comprehensive Treatise on Preservation Beyond the Seasonal Boundary</span>
+&nbsp;
+The preservation of foodstuffs beyond their natural period of edibility represents one of humanity's oldest technological achievements*, and yet remains one of its most frequently misunderstood†. While the amateur practitioner may assume that long-term storage begins where jam-making ends‡, the reality involves a complex interplay of chemistry, biology, microbiology, and what the ancient Sumerians called "paying attention to when things start growing fur"§. The fundamental principle underlying all successful long-term storage is deceptively simple: deny the forces of decay—moisture, oxygen, light, warmth, and time itself**—the opportunity to reduce your carefully prepared provisions into substances that archeologists would find interesting and your descendants would not††.
+&nbsp;
+The practical applications of long-term food storage divide into seven primary methodologies‡‡, each with its own advantages, catastrophic failure modes, and associated anecdotes that elder practitioners refuse to discuss in detail§§. Canning, the logical extension of jam-making***, permits the storage of low-acid foods through the application of heat and pressure sufficient to destroy *Clostridium botulinum* spores†††, which lurk in soil and dream their ancient dreams of poorly processed green beans‡‡‡. Dehydration removes water to levels below which microbial life can function§§§, typically achieving moisture contents of 10-20% for vegetables and 15-25% for fruits****, though the Monks of St. Desiccatus claimed to have achieved 0.3% in 1347††††, which seems implausible until one reads the rest of their records‡‡‡‡. Fermentation harnesses beneficial microorganisms to create environments hostile to pathogenic ones§§§§, a principle humanity discovered approximately fifteen minutes after the invention of leaving things in clay pots*****, and salt-curing, smoking, freezing, vacuum-sealing, and root cellaring each occupy their own elaborate niches in the preservation pantheon†††††.
+&nbsp;
+Safety considerations in long-term food storage cannot be overstated‡‡‡‡‡, particularly given the recorded incidents§§§§§. Botulism toxin, produced in anaerobic conditions with inadequate heat processing, remains the primary concern in home canning******, with symptoms including blurred vision, difficulty swallowing, and what medical texts delicately term "an eventual cessation of breathing"††††††. The Guild of Preventable Disasters maintains that 89.3% of all food storage catastrophes‡‡‡‡‡‡ result from the practitioner's certainty that "great-grandmother did it this way and nobody died"§§§§§§*******, a statistic that overlooks the uncomfortable fact that great-grandmother's generation had a notably flexible definition of "nobody"********. Modern best practices mandate the use of tested recipes†††††††, proper pH testing for canned goods‡‡‡‡‡‡‡, strict temperature control§§§§§§§, and the immediate disposal of any preserved food exhibiting bulging lids, off-odors, or what the ancients called "the ominous hiss"*********.
+&nbsp;
+The historical development of long-term storage techniques traces a path from necessity through superstition to science and occasionally back again††††††††. The Romans preserved meat in honey‡‡‡‡‡‡‡‡, the Vikings buried it in whey§§§§§§§§, and the medieval Europeans did things with lard that modern food scientists refuse to replicate even under controlled conditions**********. The transition to scientific understanding began with Nicolas Appert's 1809 discovery that heating food in sealed containers prevented spoilage†††††††††, though he had no idea why it worked‡‡‡‡‡‡‡‡‡, and reached its apotheosis with modern pressure canning, freeze-drying, and the development of Modified Atmosphere Packaging§§§§§§§§§, which sounds like something done to prisoners but is actually quite benign***********. Contemporary practitioners stand at the intersection of ancient wisdom and modern technology††††††††††, able to preserve everything from peaches to pork with success rates that would have made our ancestors weep with envy‡‡‡‡‡‡‡‡‡‡, though they would likely question why we need instructions in the first place§§§§§§§§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The second oldest being "arguing about the best way to do it." The oldest is fire, though there remains scholarly debate about whether fire counts as a technology or a really good accident.
+&nbsp;
+† According to the Institute of Needlessly Complicated Processes, approximately 67.4% of home food preservation practitioners believe that "it'll probably be fine" constitutes an adequate safety protocol. The Institute tracks these practitioners through hospital admissions data.
+&nbsp;
+‡ A common and potentially fatal assumption. Jam-making teaches you to work with sugar and acid, both preservatives. Long-term storage often requires pressure-processing foods that contain neither, which is where things get interesting in the traditional curse sense.
+&nbsp;
+§ The actual Sumerian term, *šám-fur-dè*, translates more accurately to "the green-hair prophecy," and was considered one of the seven signs that you had angered Ninkasi, goddess of beer. The other six signs are lost to history, though archeologists suspect "exploding pottery" featured prominently.
+&nbsp;
+** Time itself cannot, technically, be denied. But it can be significantly delayed, which is close enough for practical purposes. The Temporal Preservation Society disagrees, but they've been disagreeing since 1847 and show no signs of stopping††††††††††.
+&nbsp;
+†† Particularly if your descendants have inherited your tendency toward experimental preservation techniques. The Habsburg line famously maintained a cellar of preserved foods dating back to 1273. They were eventually sealed with concrete in 1891, and the cellar door was inscribed with the words "LET SLEEPING SALAMIS LIE."‡‡‡‡‡‡‡‡‡‡‡
+&nbsp;
+‡‡ Some scholars argue for eight or even nine methodologies, but these usually involve either dangerous extrapolations or techniques so ancient that their safety cannot be verified without human trials, which ethics committees tend to frown upon.
+&nbsp;
+§§ The phrase "the incident with the beets" appears in seventeen separate historical documents from the American Midwest between 1890 and 1920. No two documents describe the same incident, and three claim it happened to "a friend of a friend." Food historians have given up trying to establish which incident was original, if any§§§§§§§§§§§.
+&nbsp;
+\*\*\* Though jam-making uses atmospheric pressure only. Pressure canning requires equipment that can reach 240-250°F (115-121°C), temperatures at which water remains stubbornly liquid despite its stated boiling point of 212°F. Water, it turns out, is a terrible liar under pressure.
+&nbsp;
+††† Named after the Italian physician Giusto Clostridio, who discovered the bacterium in 1897 and immediately wished he hadn't. The spores can survive boiling water, freezing, and the heat death of the universe‡‡‡‡‡‡‡‡‡‡‡‡, though this last claim remains unverified.
+&nbsp;
+‡‡‡ *C. botulinum* does not actually dream, being a bacterium. However, its evolutionary persistence suggests either remarkable luck or a deep commitment to its craft that borders on the philosophical. Some strains have existed unchanged for over 100 million years, which is longer than most dreams anyway.
+&nbsp;
+§§§ The precise mechanism involves osmotic pressure and water activity levels, but explaining it in detail would require discussing "equilibrium relative humidity" and "isotherm curves," terms that cause even food scientists' eyes to glaze over. Suffice it to say that microbes need water in its free, unbound state, and at low moisture levels they essentially die of thirst while swimming in food.
+&nbsp;
+\*\*\*\* These ranges vary by food type, atmospheric humidity, and whether Mercury is in retrograde. Only the first two factors are scientifically relevant, but tell that to anyone who's had a batch mysteriously rehydrate on a clear Tuesday.
+&nbsp;
+†††† The Monks kept meticulous records, which is how we know they achieved this impressive desiccation level. We also know they used a combination of solar drying, wind exposure, and what they termed "encouraging words." The last technique has not been replicated in modern conditions, though several food science departments have tried§§§§§§§§§§§§.
+&nbsp;
+‡‡‡‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding long term food storage in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  VINEGAR_PRESERVATION,</span>
+<span class="cstat-no" title="statement not covered" >  LACTO_FERMENTATION,</span>
+<span class="cstat-no" title="statement not covered" >  SUGAR_PRESERVATION,</span>
+<span class="cstat-no" title="statement not covered" >  JAM_JELLY_MAKING,</span>
+<span class="cstat-no" title="statement not covered" >  LONG_TERM_FOOD_STORAGE</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

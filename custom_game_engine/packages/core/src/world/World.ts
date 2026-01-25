@@ -1,2 +1,2 @@
-// Re-export the test World for backwards compatibility with test imports
-export { World } from '../World.js';
+// Re-export World from ecs package for backwards compatibility
+export { World } from '../ecs/World.js';

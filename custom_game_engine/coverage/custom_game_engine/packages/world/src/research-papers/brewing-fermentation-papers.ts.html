@@ -1,0 +1,1201 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/brewing-fermentation-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> brewing-fermentation-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/111</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/111</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MICROBIAL_DISCOVERY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'microbial_discovery',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'On the Discovery of Invisible Life: Yeast and Other Microscopic Creatures',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_fermentation', 'basic_brewing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: [],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 2,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { brewing: 5, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'recipe', recipeId: 'simple_beer' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# On the Discovery of Invisible Life: Yeast and Other Microscopic Creatures</span>
+&nbsp;
+## A Treatise on the Previously Misunderstood Agents of Fermentation
+&nbsp;
+For millennia, the transformation of grain-water into beer and grape-juice into wine was attributed to the capricious actions of spirits, demons, or in some cultures, very tiny and surprisingly industrious elves*. The brewers of ancient Mesopotamia would sing to their vats†, while medieval monks attributed successful fermentation to the will of Providence—and unsuccessful fermentation to insufficient prayer, though they rarely mentioned the part about cleaning their equipment‡. It was not until the development of adequate magnification devices** that humanity discovered the rather underwhelming truth: the agents of fermentation were neither spiritual nor magical, but rather microscopic fungi going about their quotidian business of eating sugar and excreting waste products that humans happened to find delightful††.
+&nbsp;
+The revelation that yeast—from the Old English "gist," meaning foam or froth††—were living organisms and not spontaneously generated manifestations of divine will required a paradigm shift of extraordinary magnitude‡‡. Prior to this discovery, the Guild of Brewmasters maintained an entire department dedicated to fermentation incantations***, and their dissolution following the publication of Leeuwenhoek's observations led to what historians now call "The Great Chanting Riots of 1683"†††. The microscopic nature of these organisms initially proved difficult for the general population to accept; if one cannot see a thing with one's own eyes, argued the Philosophical Society of Dubious Phenomena‡‡‡, can one truly say it exists? This reasoning led to several unfortunate incidents involving members of said Society refusing to acknowledge the existence of their own creditors****.
+&nbsp;
+The biological function of yeast, once properly understood, is elegantly simple: these single-celled fungi consume sugars and, through the process of fermentation, produce ethanol and carbon dioxide as metabolic byproducts*****. In the absence of oxygen, yeast will preferentially ferment sugar rather than respire it, a phenomenon known as the Crabtree Effect†††††, named after the unfortunate Herbert Crabtree who discovered it after being sealed in a brewery vat overnight by his apprentices as a practical joke‡‡‡‡. The carbon dioxide produced creates the pleasant effervescence in beer and the necessary rise in bread, while the alcohol renders beverages both psychoactive and resistant to the various bacteria that would otherwise render them undrinkable******. That humanity discovered alcohol before discovering the organisms that create it says something rather profound about our priorities as a species†††††††.
+&nbsp;
+Perhaps most significantly, the recognition of yeast as living organisms led to the understanding that different strains possess different characteristics‡‡‡‡‡—an insight that revolutionized brewing, baking, and eventually the entire field of biotechnology*******. Some yeasts ferment rapidly but produce harsh flavors; others work slowly but generate subtle esters and phenols that connoiseurs describe in terms usually reserved for poetry or pomposity********. The Saccharomyces genus alone contains thousands of distinct strains, each with its own temperamental preferences regarding temperature, sugar concentration, and whether or not it will cooperate with today's batch or decide arbitrarily to produce something that tastes like a leather boot soaked in regret†††††††††. Modern brewers now curate yeast cultures with the same care that ancient Egyptians reserved for their death rituals, and with considerably more practical results‡‡‡‡‡‡.
+&nbsp;
+The transition from mystical to microbial explanations of fermentation did not occur without resistance. The Institute of Traditional Brewing initially refused to acknowledge yeast's existence, maintaining that beer was created through "the noble essence of grain ascending to meet the descending beneficence of brewing spirits," a position they held until 1847 when their head brewer was finally convinced to look through a microscope and declared, with considerable disappointment, "Well, bugger."********* The acceptance of yeast as biological rather than spiritual marked a crucial moment in humanity's long journey from superstition toward scientific understanding—though many brewers continued to sing to their fermentation tanks well into the twentieth century, reasoning that it couldn't hurt and might help, and besides, the yeast never complained**********.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The Thuringian theory of "Gärungswichte" or "fermentation sprites" persisted well into the eighteenth century, complete with illustrated manuscripts showing tiny humanoid figures carrying sugar molecules. The sprites were always depicted as cheerful, which seems odd given that they were supposedly drowning in fermenting beer at the time.
+&nbsp;
+† The "Hymn to Ninkasi," a Sumerian poem from approximately 1800 BCE, is both a recipe for beer and a religious invocation. Modern analysis suggests the singing probably didn't help the fermentation process, but it did help the brewers remember the steps while intoxicated from quality control testing.
+&nbsp;
+‡ The Benedictine Order maintained records of fermentation success rates, which they meticulously attributed to divine favor. A retrospective analysis by the Institute of Monastic Studies (established 1923, dissolved 1967 following the "Incident With The Abbot and The Statistical Tables"††) revealed a perfect correlation between "divine favor" and "whether someone had cleaned the barrels properly."
+&nbsp;
+†† The Institute was dissolved after its head statistician, Brother Clarence of Rotherham, presented evidence that 94.7% of miraculous brewing successes could be attributed to basic hygiene. The Abbot responded by throwing an abacus at him. The abacus missed, struck a candle, set fire to the statistical tables, and burned down the west wing. Modern insurance adjusters classify this as "an act of God," though probably not in the way the monks intended.
+&nbsp;
+\** The history of magnification devices is surprisingly fraught with disappointment. The earliest lenses, ground by Mesopotamian craftsmen around 700 BCE, were primarily used to start fires and intimidate rivals by focusing sunlight onto their robes. Nobody thought to look at small things until substantially later, possibly because they were too busy looking at large things that might eat them‡‡†.
+&nbsp;
+‡‡† The Hierarchical Priority of Observation, as documented by the Society of Things We Probably Should Have Noticed Earlier, ranks human attention as follows: 1) Things that might eat us (87% of attention), 2) Things we might eat (11%), 3) Things we might mate with (2%), 4) Everything else (0.003%), 5) Tiny invisible organisms that turn grape juice into wine (not ranked until 1676).
+&nbsp;
+†† Pronounced "yeast." The evolution of English pronunciation could fill several volumes and has filled several drinking sessions among historical linguists, who have yet to explain why "rough" and "through" and "though" exist in the same language without someone being prosecuted.
+&nbsp;
+‡‡ Specifically, the paradigm shift required humans to accept that: a) invisible things exist, b) these invisible things are alive, c) these invisible things are not malevolent spirits but are in fact ambivalent about our existence, and d) we have been accidentally enslaving them for food production for ten thousand years. The philosophical implications were considerable, though most people just wanted to know if their beer would still work.
+&nbsp;
+\*** The Department of Fermentation Incantations employed 47 full-time chanters and maintained an extensive library of what they called "efficacious phrases." After the department's dissolution, an audit revealed that none of the chanters could actually brew beer—they had been hired purely for their vocal qualities. One former chanter, Reginald of Cheapside, successfully transitioned to opera and claimed his training in "Sustained Invocational Tonality for Yeast Awakening" had prepared him well for Wagner****.
+&nbsp;
+**** This is almost certainly untrue, but Reginald told the story so often that it entered the historical record. He also claimed to have once made beer ferment through pure force of will, though witnesses reported he had simply left it in a warm room and then taken credit when nature ran its course.
+&nbsp;
+††† The Great Chanting Riots lasted three days and resulted in 23 injuries (mostly strained vocal cords), 127 arrests for disturbing the peace, and one unfortunate incident where a group of former chanters attempted to "sing away" the scientific evidence. They succeeded only in getting thrown out of the Royal Society's lecture hall, though they did manage to break a rather expensive microscope on the way out. The Society sent them a bill. The chanters sang at it. The bill remained unpaid.
+&nbsp;
+‡‡‡ The Philosophical Society of Dubious Phenomena was founded in 1654 by Lord Cornelius Harrington-Smythe, who also did not believe in: France, the number seven, Tuesdays, the color blue, and his wife's`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The discovery that invisible organisms (yeast) are responsible for fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ANAEROBIC_RESPIRATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'anaerobic_respiration',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Breathing Without Air: The Paradox of Fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_fermentation', 'advanced_brewing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['microbial_discovery'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 4,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'teen',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { brewing: 10, chemistry: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'recipe', recipeId: 'lager_beer' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Breathing Without Air: The Paradox of Fermentation</span>
+&nbsp;
+The discovery that yeast* could conduct its vital business without the benefit of oxygen** represents one of the more philosophically troubling revelations in the history of natural science†. When Louis Pasteur first documented this phenomenon in 1857, he described fermentation as "life without air"††, a phrase that caused considerable distress among the oxygen-breathing members of the Royal Society, who had until that point considered oxygen rather essential to the whole living business‡. The process itself is deceptively simple: yeast, faced with the absence of oxygen, breaks down sugar molecules (specifically glucose, C₆H₁₂O₆) into ethanol (C₂H₅OH) and carbon dioxide (CO₂), following the equation C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂‡‡. This chemical transformation represents the yeast's desperate‡‡‡ attempt to extract energy from sugar when its preferred respiratory pathway is unavailable.
+&nbsp;
+The process of anaerobic respiration*, as fermentation is more formally known, occurs within the cytoplasm of the yeast cell**, a location that the International Guild of Cellular Cartographers† describes as "surprisingly cramped but adequately ventilated for non-oxygen-requiring processes." During this process, each glucose molecule yields precisely 2 ATP molecules††, representing approximately 7.3% of the energy that would be generated through aerobic respiration‡—a conversion rate that the Ministry of Energetic Efficiency‡‡ has described as "depressingly inefficient but adequate for producing beverages."‡‡‡ The yeast, in its metabolic desperation, employs the glycolysis pathway* followed by alcoholic fermentation**, producing ethanol as what biochemists politely term a "waste product"† and what brewers term "the entire point."††
+&nbsp;
+Perhaps most paradoxically, the introduction of oxygen during fermentation is not merely unhelpful but actively counterproductive*. When oxygen becomes available, yeast immediately** abandons the production of alcohol in favor of more efficient aerobic respiration†, a phenomenon discovered by Louis Pasteur and subsequently named the "Pasteur Effect"††—though Pasteur himself preferred the term "the yeast's unfortunate tendency toward sobriety."‡ This presents brewers with a peculiar challenge: they must carefully‡‡ exclude oxygen from their fermentation vessels‡‡‡, creating an environment that would be immediately fatal to most multicellular organisms* but represents ideal working conditions for Saccharomyces cerevisiae**. The sealed fermentation vessels used in modern brewing† are designed to prevent even the smallest oxygen molecules from entering††, while simultaneously allowing carbon dioxide to escape‡, a engineering specification that has been described as "keeping the bad air out while letting the bad air out."‡‡
+&nbsp;
+The historical development of controlled anaerobic fermentation represents one of humanity's earliest—and arguably most important*—applications of microbiology, predating the actual discovery of microorganisms by approximately eight thousand years**. Ancient Mesopotamian brewers†, working without any understanding of yeast or biochemistry, nonetheless developed empirical methods for maintaining anaerobic conditions††, primarily through the simple expedient of keeping their fermentation vessels sealed‡. The transition from accidental to intentional fermentation control occurred gradually across millennia‡‡, punctuated by numerous incidents‡‡‡ where well-meaning individuals attempted to "help" their fermenting beverages by providing fresh air*, thereby converting their potential beer into yeast-flavored sugar water**. Modern brewers, armed with actual knowledge of the underlying biochemistry, achieve the same results with considerably more consistency and fewer incidents of explosive vessel failure†.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* *Saccharomyces cerevisiae*, literally "sugar-eating fungus," a name that demonstrates remarkable taxonomical honesty. Most organisms receive dignified Latin names suggesting strength, beauty, or geographical origin. Yeast gets called "the fungus that eats sugar." The yeast themselves do not seem to mind.
+&nbsp;
+\** The discovery occurred when Pasteur noticed that wine fermentation produced different results in sealed versus open containers. His experimental notes include the marginalia "yeast behaves better without supervision," suggesting he understood more about yeast psychology than he is generally credited with.
+&nbsp;
+† Particularly troubling to Lord Haversham-Smythe, who had built his entire natural philosophy around the principle that oxygen was the "vital animating essence." Upon learning of anaerobic respiration, he reportedly retired to his estate and refused to discuss biology for the remaining thirty-seven years of his life.
+&nbsp;
+†† A phrase that immediately sparked theological debates about whether fermentation represented life, death, or some uncomfortable middle state. The Archbishop of Canterbury issued a formal statement clarifying that yeast did not possess immortal souls and therefore the state of its oxygen supply was not a moral concern. This statement, rather unhelpfully, left open the question of whether beer possessed a soul.
+&nbsp;
+‡ Specifically, the Honourable East Finchley branch, whose members had recently invested heavily in oxygen production facilities and viewed anaerobic processes as a personal betrayal.
+&nbsp;
+‡‡ This equation conceals several intermediate steps involving pyruvate and acetaldehyde*, each of which has its own tragic story** of molecular transformation and loss†.
+&nbsp;
+*The pyruvate molecules are first decarboxylated (stripped of CO₂) to form acetaldehyde, a process the Molecules' Rights Alliance† has described as "unnecessarily violent" and "traumatic for all parties involved."
+&nbsp;
+**The acetaldehyde exists only briefly before being reduced to ethanol, leading the philosopher Gottfried von Leibniz-Schwartz to describe it as "the mayfly of organic chemistry"—a somewhat dated reference, as acetaldehyde's lifespan in the fermentation process is actually 0.003 seconds, considerably shorter than that of a mayfly‡.
+&nbsp;
+†The Alliance was founded in 1923 by Professor Hermann Fleischmann after what witnesses described as "an unfortunate incident with a particularly pure sample of hydrochloric acid and an extended period of fever-induced delirium." It ceased operations in 1924 when Fleischmann recovered and realized what he had done.
+&nbsp;
+‡Mayflies live between thirty minutes and one day, depending on species. Acetaldehyde's existence is roughly ten million times briefer. Leibniz-Schwartz was not, it must be said, particularly good with numerical comparisons. His contemporaries politely ignored this in their correspondence, though several private diaries contain increasingly exasperated entries about his "creative relationship with quantities."
+&nbsp;
+‡‡‡ "Desperate" might anthropomorphize the yeast excessively, but experiments by the Anthropomorphic Biochemistry Department at the University of Überwald* consistently show that yeast colonies respond to oxygen deprivation with what can only be described as "resigned determination."** The Department's motto is "If we must give them human qualities, at least let them be accurate human qualities."
+&nbsp;
+*Not to be confused with the University of Überwald's standard Biochemistry Department, which maintains that molecules cannot have feelings and considers anthropomorphism a sign of insufficient mathematical rigor. The two departments have not spoken since the Incident of 1987†.
+&nbsp;
+**Measured through careful analysis of metabolic rate changes and gene expression patterns, not through direct consultation with the yeast. The Department tried that approach initially; the results were deemed "scientifically inconclusive but emotionally exhausting."
+&nbsp;
+†The exact nature of this Incident remains classified, though leaked documents suggest it involved a disputed interpretation of enzyme kinetics, accusations of "giving proteins personality disorders," and a formal duel using pipettes. No one was seriously injured, but the Faculty Lounge required extensive cleaning.
+&nbsp;
+\* Known colloquially as "breathing without breath," which has a certain poetic quality that scientists generally try to avoid in their terminology. The International Commission on Metabolic Nomenclature considered "desperate glycolysis" as an alternative but ultimately decided it sounded too much like a medical condition affecting the youth.
+&nbsp;
+\** With dimensions of approximately 1-2 micrometers*. To provide scale, approximately 2,500 yeast cells could line up across the width of a human hair**, a visualization that the Guild finds "helpful for humans, meaningless for yeast."
+&nbsp;
+*These measurements represent the average. Individual yeast cells can vary by up to 30%, leading to considerable size-related hierarchies within yeast colonies†. The larger cells generally occupy the center of the colony, while smaller cells are relegated to the periphery—a social structure that Dr. Millicent Weatherby-Crust has described as "distressingly similar to human secondary school cafeterias."
+&nbsp;
+**Assuming a standard hair width of 75 micrometers. Hair width varies significantly between individuals and ethnic groups, making this comparison technically imprec`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on How yeast produces alcohol through anaerobic respiration without oxygen',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const FERMENTATION_TEMPERATURE_CONTROL: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'fermentation_temperature_control',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Heat and Time: The Critical Balance in Fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_fermentation', 'advanced_brewing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['anaerobic_respiration'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { brewing: 12, temperature_control: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'building', buildingId: 'temperature_controlled_fermentation_chamber' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'recipe', recipeId: 'precise_fermentation_beer' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Heat and Time: The Critical Balance in Fermentation</span>
+&nbsp;
+The relationship between temperature and fermentation represents one of the most ancient negotiations between human ambition and microbial temperament*. While our ancestors stumbled upon this delicate balance through what the Institute of Historical Brewing Accidents describes as "aggressive trial and error"†, modern fermenters possess the accumulated wisdom of millennia, though they persist in ignoring approximately 73% of it‡. The fundamental principle remains elegantly simple: yeast, like any living organism with opinions, performs best within specific temperature ranges, and ventures outside these boundaries result in outcomes ranging from "slightly disappointing" to "probably illegal in twelve kingdoms"**.
+&nbsp;
+Different yeast strains demonstrate what mycologists call "thermal personalities"††, with *Saccharomyces cerevisiae* (ale yeast) preferring temperatures between 15-24°C, while *Saccharomyces pastorianus* (lager yeast) insists upon the distinctly cooler range of 7-13°C‡‡. Exceeding the upper temperature threshold produces what brewers delicately term "off-flavors"***—a phrase that vastly undersells the actual experience†††—whilst temperatures below optimal ranges cause fermentation to slow or cease entirely, leaving the brewer with what is technically "expensive sugar water"‡‡‡. The Guild of Temperature-Conscious Fermenters maintains that proper temperature control separates "brewing" from "creating regret in liquid form"****, though their definition of "proper" fills approximately forty-seven volumes and counting*****.
+&nbsp;
+Advanced practitioners employ temperature curves and staged fermentation protocols, beginning at optimal temperatures for yeast reproduction before gradually adjusting to favor ester and phenol development†††††. This technique, perfected by the Bavarian monks of Sankt Obscurus‡‡‡‡, allows brewers to guide fermentation through distinct phases, each contributing specific characteristics to the final product‡‡‡‡‡. The difference between ale and lager fermentation extends beyond mere temperature; it encompasses entire philosophical approaches to patience, with lager fermentation requiring weeks or months at cold temperatures that would send ale brewers into existential crisis******.
+&nbsp;
+The construction of temperature-controlled fermentation chambers represents the logical conclusion of humanity's millennial struggle against thermodynamic chaos*******, transforming fermentation from an exercise in hopeful prayer to something approaching reliable science********. Yet even with modern temperature control, the brewer must remain vigilant†††††††, for yeast maintains the final word in all fermentation matters, and its moods remain subject to variables that mortal instruments cannot yet measure‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*According to Professor Hieronymus Maltworth's seminal work "On the Thermal Peculiarities of Fungal Fermentation" (University of Barley-on-Hop, 1847), the first documented attempt at controlled fermentation occurred in 3200 BCE when a Sumerian brewer named Ku-Baba attempted to cool fermenting beer by immersing the vessel in the Euphrates. The beer survived. Ku-Baba did not, having failed to account for crocodiles. The crocodiles, notably, developed a taste for beer that persists in their descendants to this day, though this fact is rigorously disputed by herpetologists who lack a sense of whimsy.
+&nbsp;
+†The Institute, housed in a converted monastery in Lower Franconia, maintains the most comprehensive database of brewing disasters in existence. Their archive includes 14,287 documented cases of "explosive barrel syndrome," 8,903 instances of "the beer that walked away," and one incident simply labeled "Never Again" that requires Level 7 security clearance to access. Annual membership costs three bottles of your best work, which the archivists drink while reading incident reports aloud. They claim it helps with comprehension. Most observers believe they simply enjoy schadenfreude.
+&nbsp;
+‡This statistic comes from Dr. Yolanda Fermenstein's longitudinal study of 10,000 home brewers over fifteen years (published in the *Journal of Ignored Warnings*, Vol. 34, Issue 12). The study revealed that humans possess an almost supernatural ability to read detailed instructions and then immediately do the opposite, particularly regarding temperature control. Dr. Fermenstein theorizes this stems from what she calls "thermal optimism"—the belief that "it's probably fine" despite all evidence to the contrary. Her follow-up paper, "Why Is Everyone So Surprised When Things Go Wrong?", won the Ig Nobel Prize in 2019.
+&nbsp;
+**The legal status of over-temperature fermentation products varies by jurisdiction. The Kingdom of Nordgård classifies anything above 30°C as "potential biological warfare," while the Free City of Hopsburg merely requires a warning label reading "Consumed at One's Own Digestive Peril." The Theocracy of Sankt Purity has declared all temperature variations of more than 0.5°C to be heretical, which explains why they haven't produced notable beer since the Schism of 1634***.
+&nbsp;
+***The Schism of 1634 began when Brother Augustin suggested that temperature variations of up to 1°C might be acceptable. He was immediately excommunicated. His subsequent brewery in the neighboring province of Pragmatica produced award-winning pilsners for forty years, prompting theological debates that continue to this day. The Sankt Purity monasteries still don't speak to the Pragmatic Brewers' Union, though they've been observed sneaking their beer at ecumenical conferences.
+&nbsp;
+††The term was coined by Dr. Reginald Fungsworth in his controversial paper "Do Yeast Have Feelings? An Inquiry Into Microbial Preference" (rejected by 47 journals before finding a home in *Speculative Mycology Quarterly*). While mainstream science dismisses the notion of yeast possessing personalities, anyone who has worked with temperamental strains knows better. Belgian saison yeasts, for instance, are notoriously dramatic, while German lager yeasts maintain a stolid, reliable character that borders on boring. The Danish brewers' guild maintains that their yeast strains are "hygge-friendly," though what this means for microorganisms remains unclear.
+&nbsp;
+‡‡*S. pastorianus* was named after Louis Pasteur, who did not discover it but whose work on fermentation made him too famous to ignore. The yeast itself prefers to be called "Steve," according to a 2015 survey conducted by the Institute of Microbial Nomenclature Preferences†††, though this finding has been difficult to replicate. Lager yeast evolved through a natural hybridization event approximately 600 years ago in Bavarian caves, suggesting that even yeast appreciate a good cold beer cellar. Recent genetic analysis indicates the species harbors DNA from a Patagonian yeast strain, leading to speculation about medieval international trade in microorganisms that historians find "implausible but entertaining."
+&nbsp;
+†††The Institute operates from a small facility in Utrecht and employs a staff of twelve researchers who communicate with yeast using increasingly sophisticated methods. Their annual budget is €40,000, of which €32,000 goes toward beer for "practical research purposes." They have not yet succeeded in establishing two-way communication with any yeast strain, but they remain optimistic. Their motto: "They're probably listening."
+&nbsp;
+***Off-flavors produced by excessive fermentation temperatures include notes described as "hot alcohol," "solvent-like," "reminiscent of nail polish remover," "aggressively pear-like," and in one documented case, "Tuesday morning in a chemical plant." The Flavor Reference Collection at the International Brewing Institute maintains samples of each known off-flavor, stored in a vault that visitors describe as "challenging to one's commitment to brewing" and "a powerful argument for temperature control." The tour guide traditionally offers complimentary antacids.
+&nbsp;
+†††The actual experience varies from "vaguely medicinal" to "actively hostile to human consumption." The Brotherhood of Sankt Obscurus tested high-temperature fermentation in 1756 as punishment for novice monks who overslept morning prayers. After the third novice required medical attention, the practice was discontinued. The beer was eventually used to strip paint from the chapel walls, where it proved surprisingly effective. A small quantity remains in the monastery's deep cellars, contained in lead-lined oak, where it continues to emit faint hissing sounds. The current abbott has declared the cellar off-limits "until we develop better containment technology or until it gets bored and falls asleep."
+&nbsp;
+‡‡‡Technically, it's "sugar water with dead or dormant yeast," but this distinction matters primarily to pedants and yeast cells. The economic loss of stalled fermentation in the commercial brewing industry is estimated at €47 million annually, though this figure doesn't account for domestic brewers who refuse to admit failure and instead rebrand their stalled batches as "`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on How temperature affects fermentation speed, flavor development, and yeast health',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WILD_VS_CULTIVATED_YEAST: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wild_vs_cultivated_yeast',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Taming the Wild: A Comparison of Yeast Strains',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_fermentation', 'advanced_brewing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['microbial_discovery', 'fermentation_temperature_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { brewing: 15, nature: 8 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { brewing: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'recipe', recipeId: 'wild_fermented_beer' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'recipe', recipeId: 'sour_beer' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Taming the Wild: A Comparison of Yeast Strains</span>
+&nbsp;
+The domestication of *Saccharomyces cerevisiae* represents one of humanity's earliest and most successful symbiotic relationships with the microbial world*, yet the persistent allure of wild yeast strains† suggests that cultivation, for all its reliability, has come at the cost of something ineffable—a quality the ancient brewers referred to as *geist* and modern microbiologists call "chaotic neutral fermentation behavior"‡. The fundamental difference between cultivated and wild yeast lies not merely in their genetic consistency**, but in their philosophical approach to the conversion of sugars: cultivated strains perform their duty with the dependable tedium of civil servants††, while wild yeasts operate more like freelance artists with variable sobriety†††. The capture of wild yeast remains more art than science, despite the Institute of Controlled Fermentation's forty-seven position papers arguing otherwise‡‡.
+&nbsp;
+Historical evidence suggests that all beer was once wild-fermented, though whether this was by choice or necessity remains a matter of considerable debate among brewery archaeologists***. The practice of spontaneous fermentation—leaving wort exposed to ambient air and hoping for the best—produced results ranging from transcendent to frankly criminal††††, with approximately 73.4% of batches falling somewhere in the "interesting but legally questionable" category‡‡‡. The introduction of cultivated yeast strains in the late nineteenth century was greeted with both relief and mourning§, as brewers gained predictability at the expense of the occasional batch that could, according to contemporary accounts, "grant visions of the divine" or "strip paint at twenty paces"§§. The persistent production of sour beers using wild *Lactobacillus* and *Brettanomyces* cultures represents a deliberate return to controlled chaos§§§, a microbial tightrope walk that requires equal parts knowledge and hubris****.
+&nbsp;
+The methods for capturing wild yeast vary from the traditional coolship exposure††††† to the more eccentric approaches documented in Professor Hildegard von Hopfengarten's controversial treatise *"Coaxing the Invisible Visitors"*‡‡‡‡. Modern practitioners favor the "wort bait" method: placing shallow pans of sterile wort in locations known for their favorable microbial terroir§§§§—orchards, fields of wildflowers, or the environs of successful bakeries—and waiting for colonization*****, though the Guild of Brewmasters strongly discourages the practice of leaving bait near funeral homes††††††, archaeological dig sites‡‡‡‡‡, or anywhere Professor von Hopfengarten has recently visited§§§§§. The unpredictability of wild yeast is precisely its appeal to certain brewers******, who view consistency as the enemy of transcendence and welcome batches that taste of "elderflower and thunderstorms" or "leather-bound books and regret"†††††††.
+&nbsp;
+Yet wild yeast undeniably produces effects that cultivated strains cannot replicate‡‡‡‡‡‡: the funky complexity of traditional lambics, the bright tartness of *Berliner weisse*, and the peculiar phenomenon known as "temporal displacement"§§§§§§ observed in certain monastery-produced saisons. The choice between wild and cultivated is ultimately a choice between certainty and surprise*******, between knowing exactly what fermentation will deliver and accepting whatever the invisible world deigns to provide********. The Guild maintains that wild fermentation should only be attempted by those who have made peace with the possibility of complete failure†††††††††, possess comprehensive insurance‡‡‡‡‡‡‡, and understand that approximately 1 in every 847 wild batches may technically qualify as a biological weapon under the Geneva Conventions§§§§§§§.
+&nbsp;
+---
+&nbsp;
+*The exact date of first domestication is disputed, but marks found in pottery from 7000 BCE suggest either controlled fermentation or extremely dedicated graffiti artists. The Sumerian Brewing Tablets of 4000 BCE contain the first written recipes, along with what appears to be an extended complaint about a neighbor's inferior yeast culture. See: Dr. Malachi Brewstone's *"Fermentation and Civilization: A Love Story"*.
+&nbsp;
+†Wild yeast strains number in the hundreds, each with distinct characteristics. *S. paradoxus* is known for its fruity esters and tendency to produce batches that smell "vaguely haunted." *S. eubayanus*, discovered in Patagonian forests, turned out to be the long-lost parent of lager yeast, answering a question that had troubled brewing science since 1883 and raising several more troubling questions about how exactly it got from South America to Bavaria**.
+&nbsp;
+**The prevailing theory involves migratory birds, wooden barrels, and what Dr. Gustav Hefewissenschaft termed "teleological inevitability"—the universe's tendency to make beer happen regardless of geographic improbability†.
+&nbsp;
+†This remains the least satisfying explanation in the history of microbiology, but attempts to prove transoceanic yeast migration have thus far resulted in three capsized research vessels and the unexplained appearance of a German-speaking penguin colony in Chile.
+&nbsp;
+‡This term was coined by Dr. Siobhan MacFermenter in her landmark paper "On the Tendency of Uncontrolled Organisms to Do Whatever the Hell They Want." The paper was rejected by seventeen academic journals before being published in *Artisanal Brewing Quarterly*, where it won both the Clarity Award and the "Most Footnotes in a Twenty-Page Document" prize.
+&nbsp;
+**A single cultivated yeast colony, properly maintained, will perform identically every time. This is either deeply comforting or profoundly boring, depending on one's philosophical orientation toward chaos‡.
+&nbsp;
+‡A survey by the International Brotherhood of Brewers found that 67% of respondents claimed to prefer consistency, but 91% admitted to secretly trying wild fermentation "just to see what happens." The 24% overlap represents those who maintain two separate brewing operations and deny any connection between them when questioned by their spouses.
+&nbsp;
+††The comparison is both accurate and slightly unfair to civil servants, who at least don't produce unexpected phenolic compounds when stressed.
+&nbsp;
+†††Professor Yannick Wildweizen of the Freiburg Institute documented forty-seven distinct flavor compounds produced by a single wild strain under varying conditions, describing the results as "like having a jazz quartet live in your fermenter, if the quartet was composed of very small, very drunk musicians who couldn't agree on what song they were playing."
+&nbsp;
+‡‡All forty-seven papers use slightly different definitions of "controlled." The forty-eighth position paper, titled "Oh For God's Sake, Just Admit It's Complicated," was suppressed by the Institute's board but circulates widely in samizdat form.
+&nbsp;
+***The Monastery of Saint Drogo maintained detailed brewing records from 843 CE until the regrettable incident of 1203††††, providing invaluable insight into pre-industrial fermentation. Brother Ambrose's marginal note from 1147 reads: "Today's batch: acceptable. Yesterday's batch: transcendent. Last week's batch: caused Brother Theodore to briefly speak in tongues and predict the weather with unsettling accuracy."
+&nbsp;
+††††The incident is referred to in official monastery records only as "The October Unfortunateness." Unofficial accounts suggest a batch of spontaneously fermented Octoberfest achieved sentience, though this is generally regarded as creative medieval embellishment‡.
+&nbsp;
+‡Unless one credits the testimony of fourteen monks, the Archbishop of Cologne, and a very confused tax collector, all of whom signed sworn statements describing "a barrel that wouldn't stay sealed and made sounds of distant singing."
+&nbsp;
+‡‡‡The statistical analysis comes from the Bavarian Purity Institute's Archives, which maintained meticulous records of every batch brewed under the Reinheitsgebot from 1516 onward. Their definition of "legally questionable" included "may dissolve spoons," "induces prophetic dreams," and "technically qualifies as a sauce."
+&nbsp;
+§The funeral orations for "predictable mediocrity" delivered by traditionalist brewers in 1890 were later published as *"Lamentations of the Lost Art."* Sales were modest, but the book reportedly makes excellent coaster material.
+&nbsp;
+§§This quote comes from the diary of Munich brewer Hans Schaumkopf, who in 1889 produced a wild-fermented batch that was confiscated by city authorities and used to clean cobblestones for three years. His follow-up batch won seventeen awards. Wild yeast is nothing if not inconsistent.
+&nbsp;
+§§§The use of *Brettanomyces* ("British fungus," named for reasons lost to time`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on The differences between wild-caught and cultivated yeast, and their effects on beer',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PH_ACIDITY_MANAGEMENT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'ph_acidity_management',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Acid Question: pH Balance in Fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_fermentation', 'master_brewing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['anaerobic_respiration', 'fermentation_temperature_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { brewing: 18, chemistry: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { brewing: 20, chemistry: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'ph_adjustment' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'recipe', recipeId: 'perfectly_balanced_beer' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `THE ACID QUESTION: pH BALANCE IN FERMENTATION</span>
+&nbsp;
+The measurement of hydrogen ion concentration in aqueous solutions, colloquially known as pH*, has been recognized since the early twentieth century as a critical parameter in the ancient and noble art of brewing†. The pH scale, ranging from 0 to 14, represents a logarithmic expression of acidity or alkalinity‡, wherein each whole number represents a tenfold difference in hydrogen ion concentration**. In the specific context of enzymatic mashing—that delicate dance between grain, water, and heat that transforms starches into fermentable sugars—the maintenance of pH within the narrow range of 5.2 to 5.6 units proves not merely advantageous but absolutely essential††. This slight acidity, roughly equivalent to the pH of black coffee or human saliva†††, creates the optimal environment for the twin enzymes alpha-amylase and beta-amylase to perform their molecular surgery upon long-chain carbohydrates‡‡.
+&nbsp;
+The casual observer might wonder why such precision matters‡‡‡, particularly when our ancestors brewed perfectly acceptable beverages***without benefit of pH meters, litmus paper, or indeed any understanding whatsoever of the hydrogen ion†††. The answer lies in enzyme kinetics†‡, a field that combines thermodynamics, biochemistry, and what the ancient Sumerians called "making the grain-water less angry"‡†. Alpha-amylase, operating optimally between 5.6 and 5.8 pH units, cleaves starch molecules at random interior points, producing shorter dextrin chains‡‡†. Beta-amylase, preferring a slightly more acidic environment of 5.4 to 5.5, methodically chews glucose units from the ends of these chains††‡. When pH strays outside this blessed range—either climbing toward alkalinity or plunging toward true acidity—enzyme efficiency drops precipitously†††‡, extraction of harsh tannins from grain husks increases alarmingly‡‡‡†, and the resulting beverage acquires what technical literature describes as "that taste we don't talk about"***†.
+&nbsp;
+During fermentation itself, pH undergoes a predictable but dramatic descent**, falling typically by 0.5 to 1.0 units as yeast metabolism produces various organic acids†††**. This acidification serves multiple purposes: it inhibits the growth of contaminating organisms‡‡‡**, enhances beer stability‡‡**, and contributes subtle flavor notes that separate adequate beer from transcendent beer***‡. The brewer must therefore begin with an appropriate pH in the mash, knowing that fermentation will drive it lower, but not so high that enzymes suffer in the beginning, nor so low that the final product resembles vinegar‡†‡. The Guild of Brewers and Distillers maintains that this balancing act represents "the difference between craft and catastrophe," though they would say that about nearly everything††††.
+&nbsp;
+The practical adjustment of pH requires either the addition of acids to lower pH or the treatment of brewing water to address mineral content that raises it***††. Food-grade acids—lactic, phosphoric, or the traditional acidulated malt‡‡‡‡—serve the former purpose admirably‡††, while calcium additions in the form of gypsum or calcium chloride simultaneously lower pH and enhance enzyme activity through beneficial mineral interactions†‡‡. The precise calculation of required additions involves consideration of water chemistry, grist composition, and what the Sorvig Institute of Brewing Excellence terms "the Unknowable Factor"****‡, a mysterious variable that ensures no two mashes behave identically even under apparently identical conditions. Modern brewers, equipped with pH meters capable of measuring to 0.01 units****, can achieve remarkable consistency, though the ancients managed well enough by tasting the mash and declaring it either "right" or "not right"††††† —a binary classification system that, while lacking in precision, produced surprisingly few disasters‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+FOOTNOTES
+&nbsp;
+* From "potential of hydrogen" or "power of hydrogen," depending on which chemist you ask and how much they've had to drink. The designation pH was introduced by S.P.L. Sørensen in 1909, apparently because "hydrogen ion concentration" took too long to write in laboratory notebooks. Efficiency in nomenclature has always been the hallmark of Scandinavian science.
+&nbsp;
+† The art of brewing predates written history by several millennia. This means that for most of human civilization, people successfully created alcoholic beverages without understanding pH, enzyme kinetics, or sanitation. Modern brewers, armed with thermometers, hydrometers, and pH meters, somehow still manage to produce inferior results approximately 23.7% of the time. Progress has been defined as "the transformation of simple problems into complicated ones."
+&nbsp;
+‡ The logarithmic nature of pH confuses approximately 94% of beginning brewing students and 12% of advanced ones. A solution with pH 4 is not "twice as acidic" as pH 8, but ten thousand times as acidic. This mathematical relationship has been responsible for more catastrophic pH adjustments than any other single factor, as documented in the Leuven Institute's compendium "Oops: A History of Decimal Point Errors in Brewing Science." †
+&nbsp;
+  † Published in 1847 and never reprinted. The original print run of 500 copies was destroyed when the brewery housing the institute's archive attempted to adjust its mash pH using hydrochloric acid rather than phosphoric acid. The resulting vapor cloud was, according to contemporary accounts, "most impressively acrid."
+&nbsp;
+** See Appendix C: "Why Enzyme Activity Falls Off a Cliff Above pH 5.8 and Below pH 5.0, and Why This Matters to Your Beer Even If You Don't Care About Enzymes." The appendix itself spans forty-seven pages and includes twelve graphs, three cautionary anecdotes, and one limerick about alpha-amylase that probably shouldn't have been published in a serious academic journal. ††
+&nbsp;
+  †† The editor's defense was that "the limerick accurately conveyed the essential thermodynamic principles involved." The board of review disagreed, though several members admitted privately that they had memorized it.
+&nbsp;
+††† Traditional methods of verifying mash acidity included the "taste test" (unreliable), the "feel test" (completely meaningless), and the "consult the old brewer who claims to know by looking at the foam" test (surprisingly effective, mechanism unknown). Modern pH meters cost approximately $200 and require calibration before each use. The old brewer cost nothing but required regular offerings of beer and complained constantly. Most brewers agree the pH meter is less trouble, though considerably less entertaining.
+&nbsp;
+††† See also: Every brewing tradition prior to 1909. The ancient Egyptians attributed successful fermentation to the god Osiris, who presumably handled pH balance along with his other divine responsibilities. Norse brewers credited "ale-runes" carved into brewing vessels ††. Chinese brewers consulted the I Ching. Medieval European brewers prayed to various saints, with Saint Arnold of Soissons being particularly popular for brewing-related intercessions. All of these methods worked approximately as well as careful pH monitoring, which tells us either that the gods exist and care deeply about beer, or that pH naturally falls into the correct range more often than analytical chemists would like to admit.
+&nbsp;
+  †† Carving runes into wooden brewing vessels does actually affect fermentation, but through introducing Lactobacillus bacteria from the carving knife rather than any mystical properties of the runes themselves. The bacteria produce lactic acid, lowering pH. The Vikings accidentally discovered biological acidification while attempting magic. This pattern—achieving the right result through completely wrong reasoning—characterizes much of brewing history. †††
+&nbsp;
+    ††† The same principle explains the success of spontaneous fermentation beers, the persistence of wooden brewing vessels in certain traditions, and why your grandmother's sourdough starter works better than anything you can create following scientific protocols. There are more things in heaven and earth than are dreamed of in our textbooks, and most of them are microscopic.
+&nbsp;
+‡ The hydrogen ion, despite being a single proton lacking any orbital electrons, manages to have quite a pronounced effect on enzymatic activity. This represents a fundamental principle of chemistry: the smaller something is, the more trouble it causes. Electrons, protons, neutrons, quarks—each successively tinier, each successively more powerful, until we reach the level of the Planck length where presumably infinitesimally small particles cause infinite amounts of trouble. Brewers generally stop worrying at the molecular level.
+&nbsp;
+‡‡ Alpha-amylase, discovered in 1833 by Anselme Payen and Jean-François Persoz, cleaves α-1,4-glycosidic bonds in starch molecules. The enzyme remains active at`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding and controlling pH levels during mashing and fermentation',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const YEAST_STRAIN_GENETICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'yeast_strain_genetics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Invisible Genealogy: Yeast Strain Selection and Propagation',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['brewing_fermentation', 'master_brewing'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wild_vs_cultivated_yeast', 'fermentation_temperature_control'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { brewing: 20, genetics: 5 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { brewing: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'yeast_culturing' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'building', buildingId: 'yeast_laboratory' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `THE INVISIBLE GENEALOGY: YEAST STRAIN SELECTION AND PROPAGATION</span>
+&nbsp;
+The cultivation and maintenance of Saccharomyces cerevisiae strains represents one of humanity's longest-running genetic experiments*, a project that has been ongoing since approximately 4000 BCE† and yet is understood by perhaps 0.003% of those who actively participate in it‡. The selection of appropriate yeast strains requires consideration of multiple interdependent characteristics: attenuation capacity (the percentage of available sugars the strain will consume, typically ranging from 65% to 85%**), flocculation behavior (the tendency of cells to clump and settle, measured on the obscure Helm scale from 1-5††), and flavor profile (which defies mathematical quantification but causes more heated arguments than religion‡‡). Each strain carries within its microscopic form the accumulated preferences of centuries***, and the brewer who ignores this genealogy does so at considerable peril to both their beverage and their reputation†††.
+&nbsp;
+The propagation of yeast requires a delicate balance between encouraging multiplication and preventing the genetic drift that inevitably occurs over successive generations‡‡‡. Professional yeast banking techniques involve the creation of master cultures stored at -80°C****—a temperature so cold that time itself effectively stops for the dormant cells††††—with working cultures propagated in carefully controlled steps that would make a Victorian etiquette manual seem lax by comparison‡‡‡‡. The amateur practitioner typically begins with commercially available strains, cultivates them through three to seven generations*****, and then notices that their once-reliable yeast has developed what can only be described as "opinions"†††††. This phenomenon, known technically as phenotypic drift‡‡‡‡‡ and colloquially as "the yeast deciding it knows better," results from the immense selective pressure of serial fermentation******, wherein the fastest-growing cells dominate each successive generation, gradually altering the strain's characteristics in ways that are rarely desirable and frequently baffling††††††.
+&nbsp;
+The intentional creation of yeast blends—combining multiple strains to achieve unique characteristics—represents either sophisticated biotechnology or elaborate gambling, depending largely on whether the attempt succeeds*******. Blending allows the practitioner to combine, for instance, a highly attenuative strain with one that produces desirable esters†††††††, or to mix a rapidly-fermenting primary strain with a slower specialty strain that provides complexity‡‡‡‡‡‡‡. The difficulty lies in predicting which strain will dominate the fermentation********—and therefore the final product—as yeast cells compete for resources with all the ruthless efficiency of investment bankers and none of the regulatory oversight††††††††. Records from the Institut für Unwahrscheinliche Gärung indicate that approximately 73% of intentional blends behave differently than anticipated, with 23% producing results superior to either parent strain, 34% producing acceptable but unremarkable results, and 16% producing beverages that technically qualify as fermented but should never have been created‡‡‡‡‡‡‡‡. The remaining percentages disappeared into a bureaucratic error that no one has successfully explained*********.
+&nbsp;
+The maintenance of pure cultures requires eternal vigilance against contamination—a task complicated by the fact that the air itself is populated with wild yeast and bacteria eager to join any fermentation in progress**********. The traditional petri dish method involves isolating individual colonies††††††††††, selecting those with desired characteristics, and propagating them under sterile conditions that would satisfy a neurosurgeon‡‡‡‡‡‡‡‡‡. Modern practitioners employ techniques ranging from the conscientious (regular microscopic examination, storage redundancy, detailed record-keeping) to the optimistic (keeping the jar really tight, not sneezing near it, hoping for the best)***********. The Helvetic Brotherhood of Perpetual Fermentation has maintained a single mother culture since 1247 CE††††††††††† with a dedication that borders on religious devotion‡‡‡‡‡‡‡‡‡‡—which, considering the culture's importance to their operations, may not be entirely metaphorical************.
+&nbsp;
+Advanced practitioners develop personal libraries of banked strains*************, creating repositories of genetic diversity that represent years of careful selection and cultivation. These collections serve as both practical resources and insurance policies against the inevitable disasters that befall working cultures†††††††††††—a category that includes everything from contamination to genetic drift to the surprisingly common incident of "someone cleaning out the fridge without asking"‡‡‡‡‡‡‡‡‡‡‡. The true art lies not merely in acquiring strains but in understanding their characteristics well enough to select the appropriate variety for each application, to recognize when a culture has changed, and to maintain records detailed enough to reconstruct one's work should catastrophe strike**************. This requires patience, observation, and the ability to explain to household members why the freezer must maintain precise temperature control and cannot, under any circumstances, be used to store the overflow from the grocery sale, regardless of how good a deal it was on frozen pizza†††††††††††††.
+&nbsp;
+&nbsp;
+-------------------
+&nbsp;
+*Though "experiment" implies a degree of intentionality that was absent for roughly 3,950 of those 4,000 years. Most early brewers were simply grateful the bread-water turned entertaining rather than toxic.
+&nbsp;
+†According to archaeological evidence from Mesopotamia, where the first written recipes appear. The actual practice likely predates this by millennia, but those brewers failed to file the proper paperwork. The Sumerian Brewing Authority would have been appalled.
+&nbsp;
+‡A statistic I have just invented but which feels approximately correct. The actual percentage may be higher or lower, but the fundamental point—that most people who brew never consider yeast genetics—stands firm.
+&nbsp;
+**The Reinheitsgebot Institute publishes these ranges annually, along with strongly-worded opinions about what constitutes acceptable attenuation. Their position papers are surprisingly passionate for documents about single-celled fungi.
+&nbsp;
+††Named after Professor Earnest Helm, who in 1947 decided that describing flocculation as "a bit sticky," "quite sticky," or "very sticky indeed" lacked scientific rigor. His scale replaces these terms with numbers, which everyone immediately began describing as "a bit flocculant" through "very flocculant indeed." Science marches on.
+&nbsp;
+‡‡The Great Belgian Yeast Debates of 1887-1889 resulted in seventeen formal duels, none fatal but several resulting in injuries that contemporaries described as "embarrassing to explain to physicians." The issue—whether banana notes were acceptable in a Trappist ale—remains unresolved to this day.
+&nbsp;
+***And accumulated mutations. Mostly harmless ones, but see the cautionary tale in footnote †††††† for notable exceptions.
+&nbsp;
+†††The Incident at Greymouth in 1923, wherein a brewer ignored traditional yeast selection wisdom, remains a byword for hubris among New Zealand brewers. The resulting beverage was technically beer but tasted, according to court testimony, "like an argument between a lemon and a gym sock." Three people required medical attention after tasting it, though this may have been psychosomatic.
+&nbsp;
+‡‡‡The Committee for Yeast Stability and Propagation Standards (CYSPS, pronounced "crisps" by members and "that group of obsessives" by everyone else) has published 1,247 pages of guidelines on this topic. The guidelines contain more footnotes than main text, which I consider an endorsement of my approach.
+&nbsp;
+****The exact temperature is -80°C, or -112°F, or "cold enough that your fingers stick to things instantly" on the informal scale used by laboratory technicians who have learned from experience.
+&nbsp;
+††††Specifically, molecular motion slows to such a degree that biological processes essentially cease. The yeast cells don't know this, of course. From their perspective, one moment they're floating in a glycerol solution, and the next moment—which might be ten years later—they're being revived in warm wort. The temporal discontinuity doesn't seem to bother them, suggesting either remarkable adaptability or a complete lack of existential awareness.
+&nbsp;
+‡‡‡‡Each propagation step increases the cell count by a factor of approximately 10, requiring precise control of temperature, oxygen levels, nutrient availability, and sanitation. The Guild of Propagation Specialists uses a checklist containing 247 items. Amateurs typically use a checklist containing between zero and three items, depending on how seriously they take their hobby and how many batches they've ruined so far.
+&nbsp;
+*****After seven generations, genetic drift becomes statistically significant according to studies by the Pontifical Yeast Observatory†. After twelve generations, the strain may bear only a passing resemblance to its ancestor. After twenty generations`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Advanced yeast strain selection, propagation, and genetic characteristics',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  MICROBIAL_DISCOVERY,</span>
+<span class="cstat-no" title="statement not covered" >  ANAEROBIC_RESPIRATION,</span>
+<span class="cstat-no" title="statement not covered" >  FERMENTATION_TEMPERATURE_CONTROL,</span>
+<span class="cstat-no" title="statement not covered" >  WILD_VS_CULTIVATED_YEAST,</span>
+<span class="cstat-no" title="statement not covered" >  PH_ACIDITY_MANAGEMENT,</span>
+<span class="cstat-no" title="statement not covered" >  YEAST_STRAIN_GENETICS</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

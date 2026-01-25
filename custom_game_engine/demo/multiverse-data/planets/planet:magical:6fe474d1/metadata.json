@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6fe474d1",
+  "name": "Oberon Five",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769225181808",
+  "createdAt": 1769225181836,
+  "lastAccessedAt": 1769225181836,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769225181808",
+    "type": "magical"
+  }
+}

@@ -107,9 +107,9 @@ export class UpgradeBehavior extends BaseBehavior {
     const currentTick = world.tick;
     const phase = (state.phase as UpgradePhase) ?? 'searching';
 
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
-    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const position = entity.getComponent(ComponentType.Position);
+    const inventory = entity.getComponent(ComponentType.Inventory);
 
     if (!agent || !position) {
       throw new Error(`[UpgradeBehavior] Agent ${entity.id} missing required components: agent=${!!agent}, position=${!!position}`);
@@ -209,7 +209,7 @@ export class UpgradeBehavior extends BaseBehavior {
       return;
     }
 
-    const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+    const buildingComp = (building as EntityImpl).getComponent(ComponentType.Building);
     if (!buildingComp || buildingComp.tier >= UPGRADE_CONFIG.MAX_TIER) {
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
@@ -241,13 +241,13 @@ export class UpgradeBehavior extends BaseBehavior {
       return { complete: true, reason: 'building_not_found' };
     }
 
-    const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
+    const buildingComp = (building as EntityImpl).getComponent(ComponentType.Building);
     if (!buildingComp) {
       return { complete: true, reason: 'building_missing_component' };
     }
 
     // Check distance
-    const buildingPos = (building as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+    const buildingPos = (building as EntityImpl).getComponent(ComponentType.Position);
     if (buildingPos) {
       const dx = buildingPos.x - position.x;
       const dy = buildingPos.y - position.y;
@@ -260,7 +260,7 @@ export class UpgradeBehavior extends BaseBehavior {
 
     // Calculate upgrade progress based on time
     const elapsed = currentTick - upgradeStarted;
-    const skills = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skills = entity.getComponent(ComponentType.Skills);
     const buildingSkill = skills?.levels?.building ?? 0;
     const speedMultiplier = 1 + (buildingSkill * UPGRADE_CONFIG.SKILL_BONUS_MULTIPLIER);
 
@@ -270,7 +270,7 @@ export class UpgradeBehavior extends BaseBehavior {
     // Check if upgrade is complete
     if (progress >= 100) {
       // Consume resources
-      const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+      const inventory = entity.getComponent(ComponentType.Inventory);
       const cost = this.getUpgradeCost(buildingComp.buildingType, targetTier);
 
       if (inventory && cost) {
@@ -337,8 +337,8 @@ export class UpgradeBehavior extends BaseBehavior {
     let bestScore = -Infinity;
 
     for (const buildingEntity of buildings) {
-      const building = (buildingEntity as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
-      const position = (buildingEntity as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
+      const building = (buildingEntity as EntityImpl).getComponent(ComponentType.Building);
+      const position = (buildingEntity as EntityImpl).getComponent(ComponentType.Position);
 
       if (!building || !position) continue;
 

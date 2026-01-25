@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  WorldImpl,
+  World,
   EntityImpl,
   createEntityId,
   EventBusImpl,

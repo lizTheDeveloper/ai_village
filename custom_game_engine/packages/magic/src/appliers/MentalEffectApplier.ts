@@ -180,10 +180,11 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     let behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
       behavior = { type: 'behavior', currentBehavior: 'flee' };
-      (target as any).components.set('behavior', behavior);
+      target.addComponent(behavior as Component);
+    } else {
+      behavior.currentBehavior = 'flee';
+      behavior.fleeFrom = caster.id;
     }
-    behavior.currentBehavior = 'flee';
-    behavior.fleeFrom = caster.id;
   }
 
   /**
@@ -197,12 +198,12 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
   ): void {
     let mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
-      mentalEffects = { type: 'mental_effects' };
-      (target as any).components.set('mental_effects', mentalEffects);
+      mentalEffects = { type: 'mental_effects', charmedBy: caster.id, aware: !effect.subtle };
+      target.addComponent(mentalEffects as Component);
+    } else {
+      mentalEffects.charmedBy = caster.id;
+      mentalEffects.aware = !effect.subtle; // Subtle = unaware
     }
-
-    mentalEffects.charmedBy = caster.id;
-    mentalEffects.aware = !effect.subtle; // Subtle = unaware
   }
 
   /**
@@ -216,11 +217,17 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
   ): void {
     let behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
-      behavior = { type: 'behavior', currentBehavior: 'confused' };
-      (target as any).components.set('behavior', behavior);
+      behavior = {
+        type: 'behavior',
+        currentBehavior: 'confused',
+        confused: true,
+        confusedUntil: context.tick + (effect.duration ?? 0)
+      };
+      target.addComponent(behavior as Component);
+    } else {
+      behavior.confused = true;
+      behavior.confusedUntil = context.tick + (effect.duration ?? 0);
     }
-    behavior.confused = true;
-    behavior.confusedUntil = context.tick + (effect.duration ?? 0);
   }
 
   /**
@@ -234,12 +241,16 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
   ): void {
     let mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
-      mentalEffects = { type: 'mental_effects' };
-      (target as any).components.set('mental_effects', mentalEffects);
+      mentalEffects = {
+        type: 'mental_effects',
+        dominatedBy: caster.id,
+        dominationEnds: context.tick + (effect.duration ?? 0)
+      };
+      target.addComponent(mentalEffects as Component);
+    } else {
+      mentalEffects.dominatedBy = caster.id;
+      mentalEffects.dominationEnds = context.tick + (effect.duration ?? 0);
     }
-
-    mentalEffects.dominatedBy = caster.id;
-    mentalEffects.dominationEnds = context.tick + (effect.duration ?? 0);
   }
 
   /**
@@ -251,20 +262,25 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     _context: EffectContext
   ): void {
-    interface MemoryComponent {
+    interface MemoryComponent extends Component {
+      type: 'memory';
       modified?: boolean;
       modifiedBy?: string;
-      [key: string]: any;
+      [key: string]: unknown;
     }
 
     let memory = target.components.get('memory') as MemoryComponent | undefined;
     if (!memory) {
-      memory = {};
-      (target as any).components.set('memory', memory);
+      memory = {
+        type: 'memory',
+        modified: true,
+        modifiedBy: caster.id
+      };
+      target.addComponent(memory);
+    } else {
+      memory.modified = true;
+      memory.modifiedBy = caster.id;
     }
-
-    memory.modified = true;
-    memory.modifiedBy = caster.id;
   }
 
   /**
@@ -276,25 +292,31 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     target: Entity,
     context: EffectContext
   ): void {
-    let perceptionEffects = target.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
-    if (!perceptionEffects) {
-      perceptionEffects = { type: 'perception_effects', illusions: [] };
-      (target as any).components.set('perception_effects', perceptionEffects);
-    }
-
-    if (!perceptionEffects.illusions) {
-      perceptionEffects.illusions = [];
-    }
-
     // Get scaled strength value
     const strengthValue = context.scaledValues.get('strength');
     const mentalStrength = strengthValue?.value ?? effect.mentalStrength.base;
 
-    perceptionEffects.illusions.push({
-      content: effect.illusionContent,
-      strength: mentalStrength,
-      casterId: caster.id,
-    });
+    let perceptionEffects = target.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
+    if (!perceptionEffects) {
+      perceptionEffects = {
+        type: 'perception_effects',
+        illusions: [{
+          content: effect.illusionContent,
+          strength: mentalStrength,
+          casterId: caster.id,
+        }]
+      };
+      target.addComponent(perceptionEffects as Component);
+    } else {
+      if (!perceptionEffects.illusions) {
+        perceptionEffects.illusions = [];
+      }
+      perceptionEffects.illusions.push({
+        content: effect.illusionContent,
+        strength: mentalStrength,
+        casterId: caster.id,
+      });
+    }
   }
 
   /**
@@ -308,16 +330,19 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
   ): void {
     let mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
-      mentalEffects = { type: 'mental_effects' };
-      (target as any).components.set('mental_effects', mentalEffects);
+      mentalEffects = {
+        type: 'mental_effects',
+        linkedTo: [caster.id],
+        linkType: 'telepathy'
+      };
+      target.addComponent(mentalEffects as Component);
+    } else {
+      if (!mentalEffects.linkedTo) {
+        mentalEffects.linkedTo = [];
+      }
+      mentalEffects.linkedTo.push(caster.id);
+      mentalEffects.linkType = 'telepathy';
     }
-
-    if (!mentalEffects.linkedTo) {
-      mentalEffects.linkedTo = [];
-    }
-
-    mentalEffects.linkedTo.push(caster.id);
-    mentalEffects.linkType = 'telepathy';
   }
 }
 

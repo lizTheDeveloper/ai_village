@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:31137444",
+  "name": "Quantum Oberon",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769226726629",
+  "createdAt": 1769226726634,
+  "lastAccessedAt": 1769226726634,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769226726629",
+    "type": "magical"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:34bd01bb",
+  "name": "Terra",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769247261669",
+  "createdAt": 1769247261693,
+  "lastAccessedAt": 1769247261693,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769247261669",
+    "type": "magical"
+  }
+}

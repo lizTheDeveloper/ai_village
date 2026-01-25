@@ -50,9 +50,9 @@ export class SeekCoolingBehavior extends BaseBehavior {
   private readonly SEARCH_INTERVAL = 100; // Re-search every 5 seconds (100 ticks at 20 TPS)
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const movement = entity.getComponent(ComponentType.Movement)!;
+    const temperature = entity.getComponent(ComponentType.Temperature);
 
     if (!temperature) {
       // No temperature component
@@ -97,7 +97,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
     // Re-check comfort after potentially finding/using cached cooling source
     // Agent might have cooled down while fleeing/moving
-    const currentTemp = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
+    const currentTemp = entity.getComponent(ComponentType.Temperature);
     if (currentTemp && currentTemp.state === 'comfortable') {
       this.stopAllMovement(entity);
       this.complete(entity);
@@ -230,8 +230,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       for (const { entity: building, distance } of buildingsInRadius) {
         const buildingImpl = building as EntityImpl;
-        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
         if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 
@@ -271,7 +271,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
           shadeRadius?: number;
         }
         const plantComp = plantImpl.getComponent(ComponentType.Plant) as PlantWithShade | undefined;
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const plantPos = plantImpl.getComponent(ComponentType.Position);
 
         if (!plantComp || !plantPos) continue;
 
@@ -291,8 +291,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       for (const building of buildings) {
         const buildingImpl = building as EntityImpl;
-        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
         if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 
@@ -332,7 +332,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
           shadeRadius?: number;
         }
         const plantComp = plantImpl.getComponent(ComponentType.Plant) as PlantWithShade | undefined;
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const plantPos = plantImpl.getComponent(ComponentType.Position);
 
         if (!plantComp || !plantPos) continue;
 
@@ -366,7 +366,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
       const entityImpl = source.entity as EntityImpl;
 
       // Check if it's a building with shade
-      const buildingComp = entityImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const buildingComp = entityImpl.getComponent(ComponentType.Building);
       if (buildingComp) {
         return !!(buildingComp && source.distance <= buildingComp.shadeRadius);
       }
@@ -386,7 +386,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
     if (source.type === 'interior' && source.entity) {
       const buildingImpl = source.entity as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const buildingComp = buildingImpl.getComponent(ComponentType.Building);
       return !!(buildingComp && source.distance <= buildingComp.interiorRadius);
     }
 
@@ -418,8 +418,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       for (const { entity: building, distance } of buildingsInRadius) {
         const buildingImpl = building as EntityImpl;
-        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
         if (!buildingComp || !buildingPos || !buildingComp.providesHeat) continue;
 
@@ -449,8 +449,8 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
       for (const building of buildings) {
         const buildingImpl = building as EntityImpl;
-        const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-        const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+        const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+        const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
         if (!buildingComp || !buildingPos || !buildingComp.providesHeat) continue;
 
@@ -555,7 +555,7 @@ export class SeekCoolingBehavior extends BaseBehavior {
     } else {
       // No heat sources detected but still hot - just move in a random direction
       // This handles cases where heat comes from non-building sources
-      const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
+      const temperature = entity.getComponent(ComponentType.Temperature);
       if (temperature && (temperature.state === 'dangerously_hot' || temperature.state === 'hot')) {
         // Use persistent escape direction here too
         const state = this.getState(entity);

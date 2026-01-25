@@ -58,7 +58,7 @@ export class TileBuildBehavior extends BaseBehavior {
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const position = getPosition(entity);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const agent = entity.getComponent(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -239,7 +239,7 @@ export class TileBuildBehavior extends BaseBehavior {
    * Calculate build speed based on agent's building skill.
    */
   private calculateBuildSpeed(entity: EntityImpl): number {
-    const skills = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const skills = entity.getComponent(ComponentType.Skills);
 
     const buildingLevel = skills?.levels?.building ?? 0;
 

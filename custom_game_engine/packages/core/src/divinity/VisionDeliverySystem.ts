@@ -216,7 +216,7 @@ export class VisionDeliverySystem {
     purpose: VisionPurpose,
     content: VisionContent
   ): { success: boolean; visionId?: string; error?: string } {
-    const deity = deityEntity.getComponent<DeityComponent>(CT.Deity);
+    const deity = deityEntity.getComponent(CT.Deity);
     if (!deity) {
       return { success: false, error: 'Entity is not a deity' };
     }
@@ -477,7 +477,7 @@ export class VisionDeliverySystem {
     // Update deity tracking
     const deity = this.world.getEntity(vision.deityId);
     if (deity) {
-      const deityComp = deity.components.get(CT.Deity) as DeityComponent | undefined;
+      const deityComp = deity.getComponent(CT.Deity);
       if (deityComp) {
         const tracked = deityComp.sentVisions.find((v: { visionId: string }) => v.visionId === vision.id);
         if (tracked) {
@@ -506,7 +506,7 @@ export class VisionDeliverySystem {
     // Update deity tracking
     const deity = this.world.getEntity(vision.deityId);
     if (deity) {
-      const deityComp = deity.components.get(CT.Deity) as DeityComponent | undefined;
+      const deityComp = deity.getComponent(CT.Deity);
       if (deityComp) {
         const tracked = deityComp.sentVisions.find((v: { visionId: string }) => v.visionId === vision.id);
         if (tracked) {
@@ -535,7 +535,7 @@ export class VisionDeliverySystem {
     if (vision.purpose === 'prophecy') {
       const deity = this.world.getEntity(vision.deityId);
       if (deity) {
-        const deityComp = deity.components.get(CT.Deity) as DeityComponent | undefined;
+        const deityComp = deity.getComponent(CT.Deity);
         if (deityComp) {
           const bonusBelief = vision.beliefCost * 2;
           deityComp.addBelief(bonusBelief, this.world.tick);

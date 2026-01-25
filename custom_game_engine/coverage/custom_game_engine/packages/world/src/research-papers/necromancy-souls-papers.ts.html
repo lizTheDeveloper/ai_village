@@ -1,0 +1,1075 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/necromancy-souls-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> necromancy-souls-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/92</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/92</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOUL_BINDING_BASICS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soul_binding_basics',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Chains of the Spirit: Binding Souls to the Material Plane',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['necromancy_souls'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soul_departure_mechanics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { necromancy: 16, arcane: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'bind_soul' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Chains of the Spirit: Binding Souls to the Material Plane</span>
+&nbsp;
+The retention of post-mortem consciousness within the material sphere represents one of the more controversial applications of contemporary necromantic theory*, though the practice itself predates written language by what the Department of Temporal Archaeology estimates as "quite a lot."† The fundamental challenge lies not in the mechanics of soul-binding itself—which any competent practitioner can manage with seventeen pounds of silver, adequate sigils, and a decent working knowledge of Kharzidian verb conjugations‡—but rather in the extraordinarily narrow temporal window between bodily cessation and spiritual departure. Current research suggests this window ranges from forty-seven seconds to eight minutes and thirteen seconds**, depending on factors including cause of death, residual life-force, outstanding debts, and whether the deceased remembered to feed their cat††.
+&nbsp;
+The process of anchoring a departing soul requires what Elder Magister Thornweather termed "aggressive persuasion at the metaphysical level,"‡‡ typically achieved through binding the consciousness to a prepared object (anchoring substrate) or geographic location (fixed-point binding)***. Material anchors present the advantage of portability—one can carry the imprisoned soul about in a convenient locket or ornamental urn†††—though this leads to the well-documented phenomenon of "anchor anxiety," wherein the bound soul becomes acutely aware that its entire post-mortem existence depends on not being dropped‡‡‡. Location-based bindings prove more stable but substantially limit the soul's agency****; the Historical Cases Division notes approximately forty-seven thousand recorded instances of souls bound to locations that were subsequently demolished, renovated, or converted into public lavatories†††† .
+&nbsp;
+The matter of consent remains the discipline's most vexing ethical consideration‡‡‡‡, though one might observe that the dead rarely file formal complaints*****. Unwilling souls demonstrate remarkable resistance to binding attempts, a phenomenon Professor Aldermorth described as "like trying to thread a needle with a particularly angry eel."††††† The Codex of Applied Mortality suggests that resistance increases proportionally to the soul's awareness of its situation, which explains the traditional practice of beginning binding rituals before complete bodily death—though this approach raises entirely different ethical concerns and is frowned upon by most professional organizations******. Willing souls, conversely, may actually assist in their own binding, typically driven by unfinished business, fear of divine judgment, or the desire to haunt that nephew who never visited††††††.
+&nbsp;
+The long-term consequences of soul imprisonment remain incompletely understood, though longitudinal studies suggest bound souls experience progressive deterioration of cognitive function over periods ranging from decades to centuries‡‡‡‡‡. The Ancient Souls Research Initiative has documented thousands of cases where once-articulate bound spirits degraded into mere repeating echoes of their final moments*******—a fate the Guild of Ethical Necromancy considers worse than standard mortality. Furthermore, binding appears to interfere with natural eschatological processes†††††††, preventing souls from reaching whatever afterlife they might otherwise have accessed, which has prompted stern letters from several major religious institutions and at least three verified pantheons‡‡‡‡‡‡. Current best practices therefore recommend soul-binding only for temporary purposes‡‡‡‡‡‡‡, though the definition of "temporary" varies significantly between practitioners, ranging from "a few hours" to "until the stars align for the third time in the age of the Copper Serpent."********
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The Guild of Mortality Studies prefers the term "consciousness retention," while the Department of Thanatological Research insists on "post-vital essence capture," and the Council of Concerned Clerics calls it "an abomination that shall bring ruin upon us all." The author finds "soul-binding" adequately descriptive and significantly shorter.
+&nbsp;
+†Specifically, "between the invention of the wheel and the invention of the wheelbarrow." When pressed for more precise dating, the Department cited budget cuts and "temporal flux readings that make no bloody sense whatsoever."
+&nbsp;
+‡The Kharzidian civilization collapsed approximately four thousand years ago, but their verb system remains essential for commanding the unwilling dead. This is probably not coincidental. The fact that Kharzidian has seventeen different forms of the verb "to remain" and forty-three grammatical moods for expressing "regret" tells you everything you need to know about their culture†.
+&nbsp;
+†The Kharzidian Historical Society maintains that their civilization's collapse was unrelated to their necromantic practices, though they acknowledge "certain irregularities" in the final three decades, during which approximately 87% of the population was technically deceased but still filing tax returns.
+&nbsp;
+**This variance frustrates practitioners immensely. The Standardized Soul-Binding Protocols Committee has spent twelve years attempting to establish predictive models, resulting in a seven-hundred-page document that concludes, essentially, "it depends."
+&nbsp;
+††The Archive of Final Thoughts contains extensive records indicating that forgetting to feed one's pet is the third most common final concern of the dying, after "I wish I'd said I loved them" and "Did I turn off the stove?" The correlation between cat-feeding anxiety and prolonged spiritual presence is statistically significant at p&lt;0.001, though the mechanism remains unclear‡.
+&nbsp;
+‡Professor Aldermorth's controversial paper "Feline Influence on Post-Mortem Consciousness Retention" was rejected by seven journals before publication in the Journal of Improbable Necromantic Findings. His core thesis—that cats may actually be feeding on residual life-force—was widely ridiculed until the Incident at St. Grimwald's‡‡, after which several editors issued posthumous apologies.
+&nbsp;
+‡‡The Incident at St. Grimwald's is not discussed in polite academic circles, though the Forbidden Archives contain depositions from three witnesses whose hair turned white simultaneously. The official record states only that "appropriate containment measures were implemented" and "all cats within a five-mile radius were observed behaving normally afterward." The unofficial record suggests this is a generous interpretation of events.
+&nbsp;
+‡‡‡This unfortunate phrasing comes from Thornweather's seminal work "On Compelling the Reluctant Dead," which was written during his brief period of professional success before the Regrettable Business with the Duchess***. The work remains highly cited, though copies are increasingly difficult to obtain since most were burned by Thornweather himself in a fit of what his physician termed "acute remorse."
+&nbsp;
+***The Duchess of Thornmarch requested binding after her death to ensure her seventeen cats were properly cared for. Thornweather succeeded admirably—she remained conscious and communicative for eight years. Unfortunately, she discovered that death had not improved her husband's character, that her favorite cats had died within months, and that the new Duchess was redecorating in what the bound Duchess's spirit described as "aggressively tasteless mauve." The resulting haunting required four professional exorcists and caused property damage estimated at £47,000. Thornweather's fee was never paid.
+&nbsp;
+****The Guild's Position Paper #447 notes that location-bound souls report experiencing something similar to being "frozen in treacle while simultaneously on fire and also somewhat itchy." The paper recommends avoiding location-binding when possible, though it acknowledges circumstances where it remains "the least terrible option."
+&nbsp;
+††††Case #4,477 involved the soul of Master Architect Pemberton, who had himself bound to the Cathedral he designed to ensure it was properly maintained. The Cathedral was demolished in 1847 to make way for a railway station. The railway station was converted to a public convenience in 1923. Pemberton's increasingly desperate spiritual manifestations were finally addressed in 1968 when a sympathetic custodian noticed the urinals were sobbing. He was relocated to a commemorative plaque, where he remains "as content as circumstances permit."
+&nbsp;
+‡‡‡‡The Ethics Committee of the International Necromantic Council has published 2,847 pages of guidelines on consent in soul-binding, which boil down to: "Ask first, get it in writing, don't bind people who say no, and maybe reconsider the whole enterprise." Compliance rates with these guidelines are estimated at 34% by optimistic observers and "practically nil" by realistic ones.
+&nbsp;
+*****Though the Department of Spectral Legal Affairs has processed 1,247 posthumous complaints since its founding in 1823. Processing times average seventeen years, which the Department claims is "reasonable given the complexity of cross-planar litigation." Critics point out that seventeen years exceeds the typical duration of temporary bindings, rendering most complaints moot by the time of adjudication. The Department responds that this is "regrettable but not technically our problem."
+&nbsp;
+†††††This statement appears in Aldermorth's private journals, which also contain sketches of particularly angry eels and calculations suggesting he spent three weeks attempting to quantify "eel rage metrics." The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Preventing souls from departing to the afterlife',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOUL_JAR_CREATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soul_jar_creation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Vessels of the Departed: Creating Phylacteries and Soul Jars',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['necromancy_souls'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soul_binding_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { necromancy: 22, enchanting: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { necromancy: 25, enchanting: 15 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'create_phylactery' },</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'item', itemId: 'soul_jar' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Vessels of the Departed: Creating Phylacteries and Soul Jars</span>
+&nbsp;
+The creation of soul-containing vessels represents one of the more controversial* branches of practical arcana, requiring not merely technical proficiency but also a certain philosophical flexibility regarding what the Department of Thaumaturgical Ethics† refers to as "the personhood question." The fundamental challenge lies in fashioning a container capable of maintaining a human soul†† in a stable configuration outside its original housing‡—a feat requiring materials of exceptional purity and structural integrity. Historical precedent demonstrates that crystal‡‡, precious gemstones‡‡‡, and certain noble metals§ provide the necessary metaphysical conductivity§§, though one must observe that "necessity" in this context covers a rather broader range of catastrophic failure modes than most crafts§§§.
+&nbsp;
+The actual binding process demands the inscription of preservation runes* upon the vessel's interior surface, a task made considerably more delicate by the fact that most suitable materials actively resist being carved**. The runic schema must establish both a containment field and what Professor Aldous Blackwick†† of the Vermilion University‡‡ describes as "existential stabilization"—preventing the soul from either dissipating into the ambient æther or, more problematically, achieving enough coherence to lodge complaints§§. The standard configuration follows the Threefold Binding principle***: an anchor rune to fix the soul's position, a preservation lattice to prevent degradation over time††, and a recognition seal to ensure the correct soul occupies the vessel‡‡‡. The literature is quite emphatic on this last point§§§§.
+&nbsp;
+One must observe the fundamental law that each vessel contains precisely one soul*, a principle that is technically violable but practically inadvisable**. The soul, being a singular construction of identity and consciousness, does not subdivide gracefully; attempts to partition a soul across multiple vessels tend to produce results that the Consortium of Applied Necromancy†† classifies as "therapeutically challenging"‡‡. Similarly, housing multiple souls in a single container creates what researchers delicately term "metaphysical friction"§§, which manifests as anything from mild personality blending to the spontaneous generation of entirely new entities with grievances against their creators§§§.
+&nbsp;
+The structural integrity of the vessel proves absolutely critical, as evidenced by the fact that approximately 73.4% of documented phylactery-related catastrophes* stem from containment failure**. When a soul jar breaks, the disembodied consciousness faces three primary outcomes: immediate dissipation into component thoughtstuff††, forcible return to any available corpse‡‡ (not necessarily the original), or transformation into what the literature euphemistically calls "free-roaming ætheric entities"‡‡‡. The Guild of Responsible Sorcery§§ maintains extensive documentation on proper disposal protocols, though one notes their filing system appears to have been organized by someone with a deep commitment to alphabetical chaos§§§.
+&nbsp;
+In conclusion, while the creation of soul vessels remains technically feasible for practitioners with sufficient skill and appropriate disregard for conventional ethics*, the margin between success and "incident requiring extensive cleanup and several formal apologies" proves remarkably narrow**. Prospective artificers would do well to remember that the souls in question were, until recently, persons with opinions about their housing arrangements††, and that cutting corners on materials or technique tends to produce containers that function less as eternal vessels and more as temporary inconveniences‡‡.
+&nbsp;
+---
+&nbsp;
+*The Arcane Review Board has spent approximately two hundred and forty-seven years attempting to define "controversial" in a way that meaningfully distinguishes soul jars from other forms of necromancy. They remain in committee.
+&nbsp;
+†Which insists on calling itself the DTE, apparently unaware of the unfortunate acronym overlap with the Department of Textile Enhancement. The resulting confusion led to the regrettable Incident of '847, when a shipment of embroidered pillowcases was accidentally subjected to rigorous ethical review while several phylacteries were approved for decorative use in guest bedrooms. See Feldmarsh, P. "On the Importance of Interdepartmental Communication, With Specific Reference to Soul-Containing Bedroom Accessories." Journal of Applied Hindsight 23, no. 4 (848 ATM): 112-167.
+&nbsp;
+††Throughout this paper, we shall use "soul" as shorthand for "the metaphysically cohesive pattern of consciousness, memory, and identity traditionally associated with sapient existence." The author acknowledges this definition excludes certain categories of beings who may nonetheless object to being excluded†.
+&nbsp;
+†Some philosophers argue these beings don't have souls in the traditional sense. The beings in question have responded by haunting said philosophers with precisely calibrated annoyance.
+&nbsp;
+‡By which we mean the body, though some traditions refer to it as the "original vessel," "meat prison," or, in the case of the Cheerful Nihilists of Gormond Vale, "that thing we're stuck with until we're not."
+&nbsp;
+‡‡Specifically quartz crystal, though this requires considerable purification. Raw quartz contains approximately 0.03% impurities that must be removed lest the soul develop what Blackwick terms "existential graininess"—a condition difficult to describe but apparently quite unpleasant for the sufferer.
+&nbsp;
+‡‡‡Sapphires prove particularly effective, though their market price increased roughly 340% after publication of the famous treatise "On the Unexpected Fungibility of Jewelry and Immortality" (Gretch, 892 ATM). Diamonds, despite popular belief, perform poorly due to their crystalline structure creating what one researcher described as "spiritual claustrophobia."
+&nbsp;
+§Gold and platinum both work admirably, though silver produces an unfortunate resonance effect that one test subject described as "living inside a bell that never stops ringing." The test subject was successfully transferred to a gold vessel after three days, though they report still hearing phantom chiming during thunderstorms.
+&nbsp;
+§§This property, termed "thaumic conductivity" in the technical literature, measures a material's willingness to accept metaphysical energy without either rejecting it entirely or absorbing so much that it begins developing opinions.
+&nbsp;
+§§§The Guild of Paranoid Artificers (motto: "If you're not worried, you're not paying attention") maintains a list of these failure modes that currently runs to seventeen volumes. Volume Twelve, "Spontaneous Combustion and Related Embarrassments," is considered particularly instructive.
+&nbsp;
+*It is worth noting that "delicate" here means roughly what it means when describing brain surgery using a spoon as your primary implement. The author introduces the concept of sympathetic carving—wherein each stroke of the engraving tool produces a corresponding sensation in the carver—though debates rage regarding whether this is a feature or a design flaw**.
+&nbsp;
+**This proves harder than expected. The ratio of "rune successfully carved" to "finger accidentally carved" begins at approximately 3:1 for novices††. The Guild of Runecarvers maintains detailed injury statistics. They are surprisingly cheerful about it.
+&nbsp;
+††Professor Blackwick's seminal work "Things You Probably Shouldn't Put Souls Into (But Technically Could)" remains the standard reference, despite—or perhaps because of—the fact that he vanished in 923 ATM under circumstances that remain euphemistically classified as "a learning opportunity for future researchers."
+&nbsp;
+‡‡The Vermilion University, established in 634 ATM, maintains the world's largest collection of soul vessels, though this is technically classified as "evidence" rather than "exhibits" following the Accreditation Crisis of 891§§.
+&nbsp;
+§§During which the university was briefly reclassified as a "medium-security containment facility" after inspectors discovered that approximately 40% of the Philosophy Department consisted of souls housed in decorative urns, several of whom were still teaching classes. The inspectors noted this explained the unusual consistency of Professor Mendleby's lectures over a sixty-year period.
+&nbsp;
+§§Complaints ranging from "insufficient metaphysical legroom" to "this wasn't what I signed up for" to the notably specific grievance filed by the soul of Margrave Eddis: "The view is terrible and there's no window." When reminded that the jar sat on a shelf overlooking a garden, Eddis clarified: "I mean a window to look OUT of, from INSIDE the jar, you absolute coconut."
+&nbsp;
+***First articulated by the Sage Tremethick the Sufficiently Careful in 567 ATM, shortly before his untimely transformation into a cautionary tale when he attempted a Two-fold Binding "to save time." His phylactery now serves as a teaching aid, occasionally emitting muffled sounds that students report as either profound wisdom or eternal regret. Experts remain divided.
+&nbsp;
+††The expected degradation rate of an unpreserved soul in ætheric suspension measures approximately 0.3% per day,`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Crafting containers capable of holding disembodied souls',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOUL_INTERROGATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soul_interrogation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Speaking with the Dead: Interrogating Captured Souls',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['necromancy_souls'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soul_binding_basics'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { necromancy: 18, arcane: 12 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { necromancy: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'speak_with_dead' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Speaking with the Dead: Interrogating Captured Souls</span>
+&nbsp;
+The art of interrogating captured souls represents one of necromancy's most controversial applications*, combining the metaphysical precision of soul-binding with the awkward social dynamics of questioning someone who is both deceased and understandably irritated about it**. While the theoretical framework appears straightforward—bind a soul, ask it questions, receive answers—the practical reality involves navigating the treacherous waters of post-mortem memory degradation†, ethical quandaries that would make a philosophy department weep††, and the uncomfortable truth that death does not automatically confer either honesty or cooperation upon the deceased†††.
+&nbsp;
+The temporal factor proves paramount in soul interrogation, with freshly deceased souls providing notably clearer and more reliable information than their long-departed counterparts‡. The degradation follows what the Mortuary Academy of Lesser Lheng terms the "Decay Curve of Recollection," wherein memories begin dissolving at a rate inversely proportional to their emotional significance‡‡, resulting in the paradoxical situation where a soul might remember with crystal clarity the name of their childhood pet but possess only the vaguest notion of where they hid the family fortune‡‡‡. This phenomenon has led to the establishment of strict temporal guidelines: souls deceased for less than one week retain approximately 87.3% of their factual memory§, while those departed for a century or more often recall little beyond their name and a general sense of having been vaguely alive once§§.
+&nbsp;
+The assumption that the dead cannot or will not lie represents perhaps the most dangerous misconception in soul interrogation¶. Deceased souls retain their full personality matrix, including any predisposition toward mendacity, evasion, or simple bloody-mindedness¶¶. The famous case of the Merchant-Prince of Tak serves as cautionary illustration: interrogated regarding the location of his legendary treasure vault, he provided precise coordinates that led investigators to a perfectly preserved collection of turnips¶¶¶. Furthermore, souls possess the capacity to refuse answering entirely, a right upheld by both the Ethereal Court of Final Appeals and the increasingly strict regulations of the International Necromantic Ethics Committee#, leading to the professionally embarrassing scenario of threatening someone who has already experienced the worst thing that can happen to them##.
+&nbsp;
+The ethical considerations surrounding soul interrogation have generated more committee meetings, academic conferences, and strongly-worded memoranda than perhaps any other necromantic practice###. The primary objection—that questioning the dead without prior consent constitutes a violation of their eternal rest and personal autonomy—has been upheld by every major magical judiciary since the Treaty of Whispered Souls in 1847*. The practice remains technically legal in only seventeen jurisdictions worldwide**, and even there requires documentation so extensive that most practitioners conclude it would be simpler to just investigate the old-fashioned way by asking living people who might actually want to help you***. The Council of Eternal Repose maintains a comprehensive list of approved circumstances for soul interrogation, which can be summarized as: "basically never, unless you really, really have to, and even then, we're going to judge you†."
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*The Guild of Ethically Concerned Necromancers™ was founded specifically to address this practice. They meet weekly, mostly to be disappointed in people.
+&nbsp;
+**One early practitioner, the unfortunately named Mortimer Graves, described the experience as "rather like interviewing for a position at a job you've already been fired from, except the interviewer is dead and blames you for it." His thesis, "The Phenomenology of Post-Mortem Annoyance," remains required reading at three universities and is banned at four others†.
+&nbsp;
+†Professor Elmwick's University of Practical Necromancy, in particular, refuses to stock it after the Incident of 1893‡.
+&nbsp;
+‡We are not permitted to discuss the Incident of 1893. The University's legal counsel has been extremely clear on this point. Suffice it to say that it involved a misread ritual, seventeen accidentally interrogated faculty members, and revelations about the Dean's expense account that are still being litigated.
+&nbsp;
+††The Department of Philosophy at the University of Pseudopolis attempted to organize a symposium on the ethics of soul interrogation. The symposium itself became so mired in ethical considerations that they spent four years debating whether it was ethical to hold the symposium at all, eventually concluding that they should interrogate the dead philosophers to ask their opinion, which created a paradox that collapsed the entire department into a singularity of recursive moral deliberation. The building is still standing but should not be approached without proper philosophical shielding‡.
+&nbsp;
+‡‡‡Available from Metaphysical Safety Supply, catalogue number PSY-SHIELD-009. Not effective against nihilists.
+&nbsp;
+†††The Dead Speakers' Association records 2,847 documented cases of souls responding to interrogation with variations of "I'm dead, you figure it out." This represents approximately 34.7% of all attempted communications.
+&nbsp;
+‡As discovered by the necromancer Alighieri Morgenstern during his comprehensive study of deceased tax collectors. The souls could remember every slight, every insult, every unpleasant interaction with taxpayers, but not a single numerical figure. His paper, "The Selective Persistence of Grievance," won the Mortuary Academy's annual award for Observations That Surprise Absolutely Nobody§.
+&nbsp;
+§The award is a small trophy shaped like a coffin. It is considered quite prestigious, though winners rarely display it prominently for obvious social reasons.
+&nbsp;
+‡‡The mathematical formula, derived by Professor Wilhelmina Deadwright, states: R = E/(T × 0.0017), where R is retained memory clarity, E is emotional significance (measured in "Dramatic Moments"), and T is time since death in hours. The formula works with 76.4% accuracy, which Professor Deadwright notes is "better than most living people's memories anyway."
+&nbsp;
+‡‡‡The Paradox of Relative Importance, as this phenomenon is known, has caused significant frustration among inheritance lawyers. The firm of Dewey, Deceased &amp; Done maintains a special department staffed with seventeen certified soul-speakers, whose primary function is coaxing property information from souls who would much rather discuss their favorite recipes or that one time they saw a really impressive sunset#.
+&nbsp;
+#The sunset in question, interrogated across 400+ souls, appears to have occurred on the evening of March 15th, 1774, over the bay of Quirm. Meteorological records confirm it was, indeed, "quite nice."
+&nbsp;
+§The Mortuary Academy's Statistical Analysis Division tracks these numbers with unsettling precision. Their latest report, "Degradation Metrics in Post-Mortem Consciousness: A 500-Year Longitudinal Study," runs to 1,247 pages and includes sixteen appendices of raw data that the Academy admits "probably no one will ever read, but we felt thorough."
+&nbsp;
+§§At this stage, interrogation typically yields responses along the lines of "There was light, then darkness, then more darkness, then you showed up and that's annoying." The record for Least Helpful Soul Interrogation belongs to the former Lord Marchwell, deceased 437 years at time of questioning, who responded to every query with "Eh?" followed by spectral snoring.
+&nbsp;
+¶This misconception has resulted in more investigative failures than perhaps any other aspect of the practice. The Criminal Investigation Manual of the City Watch (revised edition, post-Incident) now includes a full chapter titled "Dead People Are Still People, Unfortunately"¶.
+&nbsp;
+¶¶The opening paragraph reads: "Just because someone has shuffled off this mortal coil does not mean they have shuffled off their mortal personality, their grudges, their sense of humor, or their profound desire to mess with you. Proceed accordingly."
+&nbsp;
+¶¶¶The turnips, preserved by magical fields, were estimated to be worth approximately 400 years of appreciation in the turnip futures market, which the Merchant-Prince apparently found hilarious even in death. His spectral laughter could be heard echoing through the vault for weeks. The turnips were eventually donated to the Ankh-Morpork Museum of Boring But Historically Significant Vegetables#.
+&nbsp;
+#The museum receives approximately 34 visitors per year, 33 of whom entered by mistake. The remaining visitor is the museum's curator.
+&nbsp;
+##The Necromancer's Guide to Professional Practice (8th edition) advises: "Do not attempt to threaten souls with further death, additional death, or death-adjacent consequences. They will find this amusing and you will find this humiliating." This advice was added after the Humiliating Incident of 1923, which we are also not permitted to discuss but which involved a very smug ghost and a necromancer who had to change careers###.
+&nbsp;
+###She became a florist. By all accounts, she's much happier.
+&nbsp;
+¶¶`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Extracting information from the souls of the deceased',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOUL_CONSUMPTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soul_consumption',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'The Ultimate Price: Consuming Souls for Power',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['necromancy_souls'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soul_jar_creation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { necromancy: 25, arcane: 20 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { necromancy: 30, arcane: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'consume_soul' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `THE ULTIMATE PRICE: CONSUMING SOULS FOR POWER</span>
+&nbsp;
+It is with considerable hesitation—and the express written permission of no fewer than seven different Councils of Ethical Thaumaturgy*—that this author presents the following research on soul consumption. The practice, which involves the complete and irrevocable destruction of a soul to absorb its accumulated life force, knowledge, and essential essence, represents perhaps the single most efficient method of power acquisition known to arcane scholarship†. The consumed soul is not merely imprisoned, transferred, or diminished, but utterly annihilated‡, its constituent parts absorbed by the practitioner in a process that the Grimwald Institute for Soul Studies describes as "metaphysically indistinguishable from digestion, only significantly less pleasant for all parties involved."**
+&nbsp;
+The power gained from such consumption is, regrettably, substantial. A single consumed soul can increase a practitioner's raw magical capacity by 17-34%††, depending on the soul's age, accomplishment, and what the Department of Thaumaturgical Standards calls "essence density."††† More troublingly, the consumer also absorbs fragments of the victim's memories, skills, and knowledge—a fact that has led more than one practitioner to suddenly discover they can play the harpsichord‡, speak dead languages‡‡, or harbor an inexplicable fondness for butterscotch‡‡‡. The medieval necromancer Valdris the Accumulator reportedly consumed forty-seven souls over his career*** and ended his life able to speak eighteen languages, perform surgery, and weep uncontrollably at the sight of children's toys†††, though whether this last was a borrowed memory or genuine remorse remains a matter of scholarly debate.
+&nbsp;
+The corruption attendant to soul consumption is not merely moral but physiological and metaphysical. The consumer's own soul begins to, in the words of the ancient text "Warnings Writ in Bone and Regret," "fray at the edges like a tapestry washed in acid and regret"****. Early symptoms include difficulty sleeping††††, an inability to appreciate music‡‡‡‡, and what survivors describe as "feeling like you're being watched by your own conscience, which is notably upset with you."***** The Order of the Unbroken Circle maintains detailed records of soul consumers through history; their average lifespan post-first-consumption is 7.3 years†††††, and the quality of those years is what the Order's official documentation describes as "not ideal, really quite poor actually, we have photographs and they're deeply upsetting."‡‡‡‡‡
+&nbsp;
+The practice is universally forbidden across every legitimate magical institution, tradition, and order in recorded history******. The Consortium of Light banned it in 1247††††††. The Shadow Council—who are generally quite relaxed about moral boundaries—banned it in 1248‡‡‡‡‡‡. The gods themselves are said to have issued a joint statement, which is remarkable considering they typically cannot agree on anything, including what color the sky should be*******. Even demons, who one might expect to be enthusiastic about soul consumption, have been notably lukewarm about the practice††††††††; the Archdemon Fashnak reportedly called it "gauche" and "the sort of thing that gives soul-trading a bad name."‡‡‡‡‡‡‡ The Old Powers, those entities that existed before gods and after darkness, are said to mark soul consumers for special attention********—and not the good kind of attention, but rather the kind that makes one's remaining years extremely interesting in the worst possible way.
+&nbsp;
+This paper is published purely for completeness of the academic record and to ensure that practitioners understand precisely why they should not, under any circumstances, engage in this practice. If you have read this far hoping for practical instruction, please note that the actual methodology has been deliberately omitted and is locked in the Vault of Things We're Not Telling You********* at the Grand Library of Preserved Mistakes. If you somehow obtain this information anyway, please immediately report to the nearest Cleansing Temple or ethical review board. They will help you. Probably. The odds are in your favor. Roughly 60-40.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*The Councils in question: Ethical Thaumaturgy (Eastern Reach), Responsible Necromancy (Northern Holds), Very Concerned Wizards (Coastal Cities), Please Stop Doing That (Merchants' Quarter), Think of the Children (Everywhere), Seriously Though (University District), and For the Last Time We Mean It (established specifically to deal with this paper's publication).
+&nbsp;
+†The second most efficient method is stealing it from a god, which has only been attempted six times in recorded history and was successful exactly once. The successful practitioner spent her remaining days as a small potted plant, which she reportedly considered "a fair trade, all things considered."
+&nbsp;
+‡There are, technically, forty-seven different arcane terms for the precise type of annihilation involved. The most poetic is the Old Elvish "sudahraak," which translates roughly to "the last regret of the world forgetting you." The least poetic is the Dwarven "krund," which means "oops."
+&nbsp;
+**This comparison comes from Dr. Helwise Grabmann of the Grimwald Institute, who spent three years studying soul consumption before having what her colleagues described as "a very serious episode" and transferring to the much safer field of demon summoning. Her final research notes simply read "DON'T" in increasingly large letters across forty-seven pages†.
+&nbsp;
+†A decision that her colleagues respected, published posthumously, and framed in the Institute's main hallway as a cautionary example. Dr. Grabmann survived, incidentally, but now works in accounting and refuses to discuss her research period beyond telling new students "Just don't."
+&nbsp;
+††This percentage has been verified through the deeply unfortunate historical record of practitioners who kept detailed journals of their descent into soul consumption. The journals typically begin with clinical observations and end with increasingly erratic entries like "SO MUCH POWER" and "WHY WON'T THE SCREAMING STOP" and "Has anyone seen my moral compass? I swear I left it right here."
+&nbsp;
+†††"Essence density" is measured in Caldwells, named after the scholar who invented the measurement and then immediately wished he hadn't††. One Caldwell equals the essential metaphysical weight of a particularly determined chicken. Most human souls measure between 140-180 Caldwells, though notable historical figures have measured as high as 340 Caldwells (Empress Valdora the Magnificent) and as low as 3 Caldwells (Emperor Blithering Geoffrey, who history remembers mostly for not remembering much of anything).
+&nbsp;
+††Professor Nathaniel Caldwell (1634-1689), who developed the Caldwell Scale during what he later referred to as "a period of profound academic hubris." He spent his later years trying to destroy all copies of his work, but the measurement had already been adopted by the International Standards Board for Soul Metrics, who are notoriously resistant to changing their minds about anything†††.
+&nbsp;
+†††They still use the Imperial System for measuring curse potency, despite the Metric Curse Scale being objectively superior and not requiring one to calculate in stones, drachms, and "bad feelings." The Board's official position is that switching would "confuse the older members," which is touching but also means that modern curse calculations require a conversion chart and a bottle of whiskey.
+&nbsp;
+‡A skill which approximately 89% of consumed souls apparently possessed, leading to the question of why so many people in the medieval period learned the harpsichord and the answer, according to historians, being "there wasn't much else to do before television, was there?"
+&nbsp;
+‡‡Including Prethoric, which is troubling because Prethoric is the language spoken before language existed and technically shouldn't be possible to know‡. Practitioners who find themselves speaking Prethoric are advised to stop immediately, as reality itself finds the experience unsettling.
+&nbsp;
+‡Caused by remembering one's self before one's self existed, a paradox that language centres in the brain are not equipped to handle. Symptoms include speaking prophecies backward, attracting confused ravens, and an intense craving for foods that won't be invented for several centuries.
+&nbsp;
+‡‡‡The Butterscotch Phenomenon is well-documented. In 1456, a soul consumer in Prague suddenly demanded butterscotch constantly, despite the fact that he had never liked butterscotch and indeed had once punched a confectioner who offered him some. Later investigation revealed that his seventh consumed soul had belonged to a butterscotch merchant. The consumer spent his remaining eighteen months demanding butterscotch while simultaneously weeping that he hated butterscotch. His final words were reportedly "Why butterscotch? Why always butterscotch?" which now appears as a warning engraving in the Prague Academy of`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Destroying souls to absorb their life force and knowledge',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SOUL_TRANSPLANTATION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'soul_transplantation',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'A New Vessel: Transplanting Souls Between Bodies',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'arcane',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['necromancy_souls'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['soul_binding_basics', 'soul_jar_creation'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 10,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { necromancy: 30, arcane: 25 },</span>
+<span class="cstat-no" title="statement not covered" >  minimumSkills: { necromancy: 35, arcane: 30 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'spell', spellId: 'soul_transfer' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `A NEW VESSEL: TRANSPLANTING SOULS BETWEEN BODIES</span>
+&nbsp;
+The practice of soul transplantation represents the apex of thaumaturgic achievement, though one must note that "apex" here means "the point at which you've gone too far but can't stop now."* The fundamental principle involves the forcible removal of a soul from its current housing and the insertion of another soul into the vacated premises†, a procedure that the Ethereal College of Transmigratory Sciences rates as having a 47.3% success rate when performed by masters of the craft, and a 0.02% success rate when performed by ambitious apprentices who "thought it looked easy enough."‡
+&nbsp;
+The initial challenge lies in what the literature euphemistically terms "vacancy creation," which is, to put it in less comfortable terms, murder.** The original tenant must be evicted from their corporeal lodgings, though unlike conventional evictions, there is no 30-day notice period and the sheriff is notably absent from proceedings.†† The soul, it transpires, clings to its body with remarkable tenacity—particularly if that body is young, healthy, and not currently occupied by someone researching soul transplantation‡‡. Historical records suggest that the moral implications of this step have troubled precisely three practitioners throughout recorded history, two of whom abandoned the research entirely, while the third decided the problem could be solved by exclusively using "volunteers," a term that his contemporaries found increasingly elastic in definition.***
+&nbsp;
+Body-soul compatibility emerges as the second major obstacle, one that the Collegium of Corporeal Cartography has spent seventeen centuries attempting to quantify.††† The relationship between soul and body proves far more nuanced than the simple "ghost in the machine" model proposed by early researchers‡‡‡—it resembles instead a complex symbiotic relationship in which each party has, over years of cohabitation, learned the other's preferences, quirks, and bathroom schedule.**** Attempting to insert a foreign soul into a new body generates what practitioners term "metaphysical rejection syndrome," symptoms of which include involuntary limb movement, personality fragmentation, and an overwhelming desire to return to one's original body despite it being, technically speaking, deceased and possibly cremated.†*
+&nbsp;
+The question of memory and personality retention has generated more scholarly debate than any other aspect of the procedure, with the Symposium on Persistent Identity having met annually for 843 years without reaching consensus.‡* Most practitioners report significant memory degradation during the transfer process, with the average loss calculated at 23.7% of episodic memories, 8.4% of procedural knowledge, and—most frustratingly—100% of the memory of where one left one's original body's house keys.‡‡* The personality changes prove even more unpredictable: the case of Archmage Thesselin remains instructive, who after seventeen successful body transfers reported feeling "somehow less himself" each time, until his eighteenth transfer resulted in a personality so divergent that he abandoned magic entirely, opened a bakery in Lower Kvatch, and won three consecutive awards for his sourdough.***‡
+&nbsp;
+For those who successfully navigate these challenges, the path diverges into two traditions: the scholarly practice of lichdom, and the somewhat more gourmand approach of body-hopping.††‡ The former involves the preparation of a phylactery to house one's soul between vessels‡‡‡*, allowing for what amounts to immortality with extra steps and significantly reduced social acceptability.****‡ The latter tradition, practiced primarily by those whose research ethics could charitably be described as "flexible," involves the serial occupation of younger bodies as each vessel ages, effectively achieving immortality through what insurance companies would classify as "serial identity fraud with metaphysical components."†*** The Guild of Licensed Necromancers maintains that both approaches are technically legal, though they strongly recommend against discussing either at dinner parties.‡***
+&nbsp;
+&nbsp;
+*The Interdimensional Bureau of Magical Standards (IBMS) requires that all research papers on soul manipulation include a warning label reading: "This research may result in damnation, transformation into an undead horror, or strongly worded letters from the Ministry of Death." The Bureau notes that the letters are, statistically speaking, the most likely outcome.
+&nbsp;
+†The metaphor of "premises" here is surprisingly apt. The soul's relationship to the body mirrors the tenant-landlord relationship in all significant ways: there are disputes about maintenance, arguments about modifications, and occasionally the relationship ends with one party attempting to summon dark forces to resolve the disagreement. The Guild of Metaphysicians has spent considerable time arguing whether this makes necromancers spiritual real estate agents.
+&nbsp;
+‡This statistic comes from the comprehensive study "Outcomes in Amateur Soul Transplantation: A 400-Year Retrospective" published by the Academy of Regrettable Decisions. The study's appendix, titled "Where We Found The Bodies," is longer than the main paper and significantly more disturbing. The 0.02% who succeeded were, upon follow-up interview, unwilling to be considered successes, citing "unforeseen complications" such as "wrong body," "right body but backwards," and in one notable case, "the cat."
+&nbsp;
+**The Celestial Council on Euphemistic Language has a standing committee dedicated to finding gentler terms for the darker aspects of soul magic. Other proposals included "aggressive vacancy creation," "terminal lease acceleration," and "permanent sabbatical induction." The committee was eventually disbanded when members realized they were essentially writing marketing copy for murder.
+&nbsp;
+††The lack of legal infrastructure for spiritual real estate transactions has caused considerable difficulty for both practitioners and victims. The High Court of Ethereal Disputes once spent sixteen years on a case involving whether the original soul's family could sue for wrongful eviction, ultimately ruling that they could, but that enforcing the judgment against someone who could literally hop between bodies presented "certain practical challenges."
+&nbsp;
+‡‡This observation is credited to the legendary researcher Dame Veritania Cross, whose three-volume work "Why Bodies Fight Back: An Ethnography of Resistance" remains the definitive text on soul-body resistance mechanics. Dame Cross spent forty years researching the topic, though cynics noted she spent most of that time trying to find a suitable new body for herself, having worn out three previous vessels. Her response to such criticism was typically frank: "Yes, and?"
+&nbsp;
+***Archmage Mordecai the "Merciful" (872-1047, approximately) defined "volunteer" so broadly that it eventually encompassed "anyone who exists within a one-mile radius and possesses a suitable body." The Conclave of Ethical Magisters issued seventeen separate censures, which Mordecai collected and framed in what he called his "Wall of Complaints." He claimed each one proved he was "doing important work that small minds couldn't appreciate." The eighteenth censure came with a strike team.
+&nbsp;
+†††The Collegium's magnum opus, "The Sympathetic Resonance of Flesh and Spirit: A Comprehensive Analysis," spans 3,847 pages and includes diagrams so complex they require a separate index just for the diagrams. The work concludes, somewhat anticlimactically, that "it's complicated" and "depends on numerous factors we don't fully understand." The Collegium spent 170 years writing this.
+&nbsp;
+‡‡‡The machine in question was later identified as a particularly sophisticated water mill, which rendered the entire metaphor significantly less profound than originally believed. The researcher who proposed it, Magister Vaughn the Philosophical, spent the remainder of his career insisting the water mill was "clearly meant metaphorically," which his colleagues found "rich, coming from him."
+&nbsp;
+****The Handbook of Corporeal Cohabitation (12th Edition) notes that "a soul accustomed to a left-handed body will find a right-handed body profoundly disturbing, roughly equivalent to discovering all your doors open the wrong way and your stairs go down when you expect them to go up." The handbook's chapter on bathroom schedules has been cited in 47% of all failed transplantation case studies, though the exact mechanism remains unclear.
+&nbsp;
+†*The most severe cases of metaphysical rejection syndrome result in what practitioners call "the wandering flesh problem," wherein the body attempts to physically travel back to its original soul, despite said soul being currently housed in a different body entirely. The Sanitarium for Magically Afflicted Bodies in Three Rivers maintains a special wing for such cases, where confused bodies wander hallways looking for souls that have moved on. The head physician describes it as "rather like a very sad lost-and-found."
+&nbsp;
+‡*The Symposium's inability to reach consensus has become something of a running joke in academic circles. The 800th anniversary meeting opened with the Chairman stating, "We still don't know what identity means, but we've become very good friends." The official minutes of each meeting consist primarily of arguments about whether the Chairman is the same person as last year's Chairman, given that he's undergone three body transfers since the Symposium began.
+&nbsp;
+‡‡*The question of where Archm`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Moving souls from one body to another',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  SOUL_BINDING_BASICS,</span>
+<span class="cstat-no" title="statement not covered" >  SOUL_JAR_CREATION,</span>
+<span class="cstat-no" title="statement not covered" >  SOUL_INTERROGATION,</span>
+<span class="cstat-no" title="statement not covered" >  SOUL_CONSUMPTION,</span>
+<span class="cstat-no" title="statement not covered" >  SOUL_TRANSPLANTATION</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

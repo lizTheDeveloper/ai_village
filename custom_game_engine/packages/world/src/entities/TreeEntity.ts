@@ -10,7 +10,18 @@ import {
   createTreeVoxelResource,
   PlantComponent,
 } from '@ai-village/core';
-import { TREE } from '../plant-species/wild-plants.js';
+import { TREE, OAK_TREE, PINE_TREE } from '../plant-species/wild-plants.js';
+import { WILLOW_BARK } from '../plant-species/medicinal-plants.js';
+import { WIND_PINE } from '../plant-species/mountain-plants.js';
+
+// Tree species lookup for spawning
+const TREE_SPECIES: Record<string, { id: string; name: string; woodMaterial?: string }> = {
+  'oak-tree': { id: 'oak-tree', name: 'Oak', woodMaterial: 'oak_wood' },
+  'pine-tree': { id: 'pine-tree', name: 'Pine', woodMaterial: 'pine_wood' },
+  'willow': { id: 'willow_bark', name: 'Willow', woodMaterial: 'willow_wood' },
+  'wind_pine': { id: 'wind_pine', name: 'Wind Pine', woodMaterial: 'pine_wood' },
+  'tree': { id: 'tree', name: 'Tree', woodMaterial: 'wood' }, // Fallback generic
+};
 
 /**
  * Create a tree entity at the specified position.
@@ -23,6 +34,7 @@ import { TREE } from '../plant-species/wild-plants.js';
  * @param options.useVoxelResource - Use voxel resource system (height-based harvesting)
  * @param options.treeHeight - Height in levels for voxel trees (default: 4)
  * @param options.woodMaterial - Wood material type (default: 'wood')
+ * @param options.speciesId - Specific tree species (e.g., 'oak-tree', 'pine-tree', 'willow')
  */
 export function createTree(
   world: WorldMutator,
@@ -33,6 +45,7 @@ export function createTree(
     useVoxelResource?: boolean;
     treeHeight?: number;
     woodMaterial?: string;
+    speciesId?: string;
   }
 ): string {
   // Check if a tree already exists at this position (prevent duplicates on reload)
@@ -56,7 +69,14 @@ export function createTree(
   const entity = new EntityImpl(createEntityId(), world.tick);
   const useVoxel = options?.useVoxelResource ?? false;
   const treeHeight = options?.treeHeight ?? 4;
-  const woodMaterial = options?.woodMaterial ?? 'wood';
+
+  // Get species info for this tree type
+  const speciesKey = options?.speciesId ?? 'tree';
+  const speciesInfo = TREE_SPECIES[speciesKey] ?? TREE_SPECIES['tree']!;
+  const speciesId = speciesInfo.id;
+
+  // Wood material from options or species default
+  const woodMaterial = options?.woodMaterial ?? speciesInfo.woodMaterial ?? 'wood';
 
   // Position with height
   entity.addComponent(createPositionComponent(x, y, z));
@@ -64,8 +84,8 @@ export function createTree(
   // Physics (trees are solid obstacles)
   entity.addComponent(createPhysicsComponent(true, 1, 1));
 
-  // Renderable - sprite varies by tree height for voxel trees
-  const sprite = useVoxel ? `tree_h${treeHeight}` : 'tree';
+  // Renderable - use species-specific sprite, or height-based for voxel trees
+  const sprite = useVoxel ? `tree_h${treeHeight}` : speciesId;
   entity.addComponent(createRenderableComponent(sprite, 'object'));
 
   // Tags - add voxel tag if using voxel system
@@ -92,7 +112,7 @@ export function createTree(
   const shadeRadius = Math.min(5, Math.max(2, effectiveHeight + 1));
 
   entity.addComponent(new PlantComponent({
-    speciesId: 'tree',
+    speciesId: speciesId,
     position: { x, y },
     stage: 'mature',
     health: 100,

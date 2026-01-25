@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:39a2114b",
+  "name": "Umbriel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769221713614",
+  "createdAt": 1769221713620,
+  "lastAccessedAt": 1769221713620,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769221713614",
+    "type": "magical"
+  }
+}

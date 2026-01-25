@@ -89,6 +89,158 @@ interface AgentComponent {
   name?: string;
   generation?: number;
   birthTick?: number;
+  customLLM?: unknown;
+}
+
+interface SkillsComponent {
+  type: 'skills';
+  levels?: Record<string, number>;
+}
+
+interface NeedsComponent {
+  type: 'needs';
+  [key: string]: unknown;
+}
+
+interface InventoryComponent {
+  type: 'inventory';
+  slots?: Array<{ itemId: string; quantity: number } | null>;
+  maxSlots?: number;
+  items?: Array<{ resourceType?: string; quantity?: number }>;
+}
+
+interface PlantComponent {
+  type: 'plant';
+  species?: string;
+  age?: number;
+  health?: number;
+  growthStage?: string;
+  waterLevel?: number;
+  [key: string]: unknown;
+}
+
+interface RenderableComponent {
+  type: 'renderable';
+  sprite?: string;
+  [key: string]: unknown;
+}
+
+interface FederationComponent{
+  type: 'federation_governance';
+  federationName?: string;
+  memberEmpires?: string[];
+  foundedTick?: number;
+  [key: string]: unknown;
+}
+
+interface GalacticCouncilComponent {
+  type: 'galactic_council';
+  councilName?: string;
+  memberEmpires?: string[];
+  chairEmpireId?: string;
+  [key: string]: unknown;
+}
+
+interface ShippingLaneComponent {
+  type: 'shipping_lane';
+  laneName?: string;
+  ownerEmpireId?: string;
+  endpoints?: Array<{ x: number; y: number }>;
+  [key: string]: unknown;
+}
+
+interface NavyComponent {
+  type: 'navy';
+  ownerEmpireId?: string;
+  navyName?: string;
+  fleetIds?: string[];
+  [key: string]: unknown;
+}
+
+interface MegastructureComponent {
+  type: 'megastructure';
+  currentTask?: string;
+  taskProgress?: number;
+  megastructureName?: string;
+  megastructureType?: string;
+  [key: string]: unknown;
+}
+
+interface ConflictComponent {
+  type: 'conflict';
+  version: 1;
+  conflictType: 'hunting' | 'agent_combat';
+  [key: string]: unknown;
+}
+
+/**
+ * Nation component interface
+ */
+interface NationComponent {
+  type: 'nation';
+  nationName?: string;
+  governmentType?: string;
+  economy?: {
+    population?: number;
+    gdp?: number;
+  };
+}
+
+/**
+ * Fleet component interface
+ */
+interface FleetComponent {
+  type: 'fleet';
+  fleetName?: string;
+  admiralId?: string;
+  squadronIds?: string[];
+  stats?: {
+    totalShips?: number;
+    combatStrength?: number;
+  };
+  navigation?: {
+    targetPosition?: { x: number; y: number };
+    status?: string;
+  };
+}
+
+/**
+ * Squadron component interface
+ */
+interface SquadronComponent {
+  type: 'squadron';
+  squadronName?: string;
+  commanderId?: string;
+  shipIds?: string[];
+  stats?: {
+    totalShips?: number;
+    combatStrength?: number;
+  };
+}
+
+/**
+ * Empire component interface
+ */
+interface EmpireComponent {
+  type: 'empire';
+  empireName?: string;
+  governmentType?: string;
+  territory?: { nations?: string[]; totalPopulation?: number };
+  nationRecords?: Array<{ nationId: string }>;
+  economy?: { gdp?: number; imperialTreasury?: number };
+  diplomacy?: {
+    relations?: Map<string, unknown>;
+  };
+}
+
+/**
+ * Megastructure component interface
+ */
+interface MegastructureComponent {
+  type: 'megastructure';
+  currentTask?: string;
+  taskProgress?: number;
+  [key: string]: unknown;
 }
 
 /**
@@ -96,6 +248,252 @@ interface AgentComponent {
  */
 interface MutableEntity extends Entity {
   addComponent(component: unknown): void;
+}
+
+/**
+ * Universe properties that may exist on World at runtime
+ */
+interface UniverseProps {
+  universeId?: { id: string; name: string; createdAt: number };
+  divineConfig?: {
+    name?: string;
+    description?: string;
+    coreParams?: {
+      divinePresence?: number;
+      divineReliability?: number;
+      mortalSignificance?: number;
+      maxActiveDeities?: number;
+    };
+  };
+  getMagicSystemState?: () => {
+    getAllParadigms?: () => unknown[];
+  };
+  forkMetadata?: {
+    parentUniverseId?: string;
+    forkTick?: number;
+    forkReason?: string;
+  };
+}
+
+/**
+ * Terrain access properties that may exist on World at runtime
+ */
+interface TerrainProps {
+  getTileAt?: (x: number, y: number) => unknown;
+  getChunkManager?: () => unknown;
+}
+
+/**
+ * Tile data interface
+ */
+interface TileData {
+  terrain?: string;
+  elevation?: number;
+  biome?: string;
+  wall?: { material?: string };
+}
+
+/**
+ * Magic component interface
+ */
+interface MagicComponent {
+  type: 'magic';
+  magicUser?: boolean;
+  homeParadigmId?: string;
+  knownParadigmIds?: string[];
+  activeParadigmId?: string;
+  knownSpells?: unknown[];
+  totalSpellsCast?: number;
+  totalMishaps?: number;
+  manaPools?: Array<{
+    source: string;
+    current: number;
+    maximum: number;
+    locked: number;
+    regenRate: number;
+  }>;
+  resourcePools?: Record<string, {
+    type: string;
+    current: number;
+    maximum: number;
+    locked: number;
+  }>;
+  casting?: boolean;
+  activeEffects?: string[];
+  techniqueProficiency?: Record<string, number>;
+  formProficiency?: Record<string, number>;
+  paradigmState?: Record<string, unknown>;
+  corruption?: number;
+  attentionLevel?: number;
+  favorLevel?: number;
+  addictionLevel?: number;
+  primarySource?: string;
+}
+
+/**
+ * Deity component interface
+ */
+interface DeityComponentData {
+  type: 'deity';
+  identity?: {
+    primaryName?: string;
+    domain?: string;
+  };
+  belief?: {
+    currentBelief?: number;
+    beliefPerTick?: number;
+    totalBeliefEarned?: number;
+    totalBeliefSpent?: number;
+  };
+  believers?: Set<string> | { size?: number };
+  sacredSites?: Set<string> | { size?: number };
+  controller?: string;
+  prayerQueue?: unknown[];
+}
+
+/**
+ * Spiritual component interface
+ */
+interface SpiritualComponent {
+  type: 'spiritual';
+  totalPrayers?: number;
+  answeredPrayers?: number;
+  believedDeity?: string;
+}
+
+/**
+ * Research state component interface
+ */
+interface ResearchStateComponent {
+  type: 'research_state';
+  completed?: Set<string>;
+  inProgress?: Map<string, {
+    researchId: string;
+    totalRequired: number;
+    currentProgress: number;
+    assignedAgents: string[];
+    startedAt: number;
+    researchers?: string[];
+    insights?: Array<{ agentId: string; contribution: number }>;
+  }>;
+}
+
+/**
+ * Type guard functions for safe type checking
+ */
+function hasUniverseProps(world: World): world is World & UniverseProps {
+  return true; // All properties are optional, so any World could have them
+}
+
+function hasTerrain(world: World): world is World & TerrainProps {
+  return 'getTileAt' in world && typeof world.getTileAt === 'function';
+}
+
+function isMagicComponent(component: unknown): component is MagicComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'magic';
+}
+
+function isDeityComponent(component: unknown): component is DeityComponentData {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'deity';
+}
+
+function isSpiritualComponent(component: unknown): component is SpiritualComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'spiritual';
+}
+
+function isResearchStateComponent(component: unknown): component is ResearchStateComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'research_state';
+}
+
+function isTileData(data: unknown): data is TileData {
+  if (!data || typeof data !== 'object') return false;
+  return true; // TileData has all optional properties, so any object could be valid
+}
+
+function isAgentComponent(component: unknown): component is AgentComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'agent';
+}
+
+function isSkillsComponent(component: unknown): component is SkillsComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'skills';
+}
+
+function isIdentityComponent(component: unknown): component is IdentityComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'identity';
+}
+
+function isPositionComponent(component: unknown): component is PositionComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'position';
+}
+
+function isNeedsComponent(component: unknown): component is NeedsComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'needs';
+}
+
+function isInventoryComponent(component: unknown): component is InventoryComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'inventory';
+}
+
+function isPlantComponent(component: unknown): component is PlantComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'plant';
+}
+
+function isRenderableComponent(component: unknown): component is RenderableComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'renderable';
+}
+
+function isNationComponent(component: unknown): component is NationComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'nation';
+}
+
+function isFleetComponent(component: unknown): component is FleetComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'fleet';
+}
+
+function isSquadronComponent(component: unknown): component is SquadronComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'squadron';
+}
+
+function isEmpireComponent(component: unknown): component is EmpireComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'empire';
+}
+
+function isMegastructureComponent(component: unknown): component is MegastructureComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'megastructure';
+}
+
+function isNavyComponent(component: unknown): component is NavyComponent {
+  if (!component || typeof component !== 'object') return false;
+  return 'type' in component && (component as { type?: string }).type === 'navy';
+}
+
+function hasRuntimeProps(world: World): world is WorldWithRuntimeProps {
+  return true; // All properties are optional
+}
+
+function hasMutator(world: World): world is WorldWithMutator {
+  return 'addComponent' in world && typeof (world as WorldWithMutator).addComponent === 'function';
+}
+
+function isMutableEntity(entity: Entity): entity is MutableEntity {
+  return 'addComponent' in entity && typeof (entity as MutableEntity).addComponent === 'function';
 }
 
 /**
@@ -369,14 +767,15 @@ export class LiveEntityAPI {
       };
     }
 
-    const agent = entity.components.get('agent') as { customLLM?: unknown } | undefined;
-    if (!agent) {
+    const agentComp = entity.components.get('agent');
+    if (!agentComp || !isAgentComponent(agentComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${agentId} is not an agent`,
       };
     }
+    const agent = agentComp;
 
     // Set or clear the custom LLM config
     if (config === null || config === undefined) {
@@ -431,14 +830,15 @@ export class LiveEntityAPI {
       };
     }
 
-    const skills = entity.components.get('skills') as { levels?: Record<string, number> } | undefined;
-    if (!skills) {
+    const skillsComp = entity.components.get('skills');
+    if (!skillsComp || !isSkillsComponent(skillsComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${agentId} does not have skills component`,
       };
     }
+    const skills = skillsComp;
 
     if (!skills.levels) {
       skills.levels = {};
@@ -588,7 +988,8 @@ export class LiveEntityAPI {
       if (name && typeof name === 'string') {
         const entity = this.world.getEntity(agentId);
         if (entity) {
-          const identity = entity.components.get('identity') as { name?: string } | undefined;
+          const identityComp = entity.components.get('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
           if (identity) {
             identity.name = name;
           }
@@ -640,7 +1041,8 @@ export class LiveEntityAPI {
       };
     }
 
-    const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+    const positionComp = entity.components.get('position');
+    const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
     if (!position) {
       return {
         requestId: action.requestId,
@@ -699,7 +1101,8 @@ export class LiveEntityAPI {
       };
     }
 
-    const needs = entity.components.get('needs') as Record<string, unknown> | undefined;
+    const needsComp = entity.components.get('needs');
+    const needs = needsComp && isNeedsComponent(needsComp) ? needsComp : undefined;
     if (!needs) {
       return {
         requestId: action.requestId,
@@ -764,16 +1167,21 @@ export class LiveEntityAPI {
       };
     }
 
-    const inventory = entity.components.get('inventory') as {
-      slots: Array<{ itemId: string; quantity: number } | null>;
-      maxSlots: number;
-    } | undefined;
-
-    if (!inventory) {
+    const inventoryComp = entity.components.get('inventory');
+    if (!inventoryComp || !isInventoryComponent(inventoryComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${agentId} does not have inventory component`,
+      };
+    }
+    const inventory = inventoryComp;
+
+    if (!inventory.slots) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} inventory has no slots`,
       };
     }
 
@@ -844,7 +1252,8 @@ export class LiveEntityAPI {
       };
     }
 
-    const agent = entity.components.get('agent') as { currentBehavior?: string } | undefined;
+    const agentComp = entity.components.get('agent');
+    const agent = agentComp && isAgentComponent(agentComp) ? agentComp : undefined;
     if (!agent) {
       return {
         requestId: action.requestId,
@@ -886,7 +1295,7 @@ export class LiveEntityAPI {
     }
 
     // Access speed multiplier on world (if exists)
-    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    const worldWithRuntime = hasRuntimeProps(this.world) ? this.world : this.world;
     if (worldWithRuntime.speedMultiplier !== undefined) {
       worldWithRuntime.speedMultiplier = speed;
     }
@@ -913,7 +1322,7 @@ export class LiveEntityAPI {
     }
 
     // Access paused state on world (if exists)
-    const worldWithRuntime = this.world as WorldWithRuntimeProps;
+    const worldWithRuntime = hasRuntimeProps(this.world) ? this.world : this.world;
     if (worldWithRuntime.paused !== undefined) {
       worldWithRuntime.paused = paused;
     }
@@ -956,17 +1365,15 @@ export class LiveEntityAPI {
       };
     }
 
-    const magic = entity.components.get('magic') as {
-      knownSpells?: Array<{ spellId: string }>;
-    } | undefined;
-
-    if (!magic) {
+    const magicComp = entity.components.get('magic');
+    if (!magicComp || !isMagicComponent(magicComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${agentId} does not have magic component`,
       };
     }
+    const magic = magicComp;
 
     if (!magic.knownSpells) {
       magic.knownSpells = [];
@@ -1022,17 +1429,15 @@ export class LiveEntityAPI {
       };
     }
 
-    const deity = entity.components.get('deity') as {
-      belief?: { currentBelief?: number; totalBeliefEarned?: number };
-    } | undefined;
-
-    if (!deity) {
+    const deityComp = entity.components.get('deity');
+    if (!deityComp || !isDeityComponent(deityComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${deityId} is not a deity`,
       };
     }
+    const deity = deityComp;
 
     if (!deity.belief) {
       deity.belief = { currentBelief: 0, totalBeliefEarned: 0 };
@@ -1143,21 +1548,14 @@ export class LiveEntityAPI {
     for (const entity of this.world.entities.values()) {
       if (!entity.components.has('plant')) continue;
 
-      const plant = entity.components.get('plant') as {
-        plantType?: string;
-        stage?: string;
-      } | undefined;
+      const plantComp = entity.components.get('plant');
+      const plant = plantComp && isPlantComponent(plantComp) ? plantComp : undefined;
 
-      const position = entity.components.get('position') as {
-        x?: number;
-        y?: number;
-      } | undefined;
+      const positionComp = entity.components.get('position');
+      const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
 
-      const renderable = entity.components.get('renderable') as {
-        spriteId?: string;
-        sizeMultiplier?: number;
-        alpha?: number;
-      } | undefined;
+      const renderableComp = entity.components.get('renderable');
+      const renderable = renderableComp && isRenderableComponent(renderableComp) ? renderableComp : undefined;
 
       // Skip plants without position or renderable
       if (!position || !renderable) continue;
@@ -1381,7 +1779,8 @@ export class LiveEntityAPI {
     const id = entity.id;
 
     // Get name from identity component
-    const identity = entity.components.get('identity') as { name?: string } | undefined;
+    const identityComp = entity.components.get('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
     const name = identity?.name || id;
 
     // Determine type
@@ -1399,11 +1798,13 @@ export class LiveEntityAPI {
     }
 
     // Get position
-    const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+    const positionComp = entity.components.get('position');
+    const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
     const pos = position ? { x: position.x ?? 0, y: position.y ?? 0 } : undefined;
 
     // Get current behavior
-    const agent = entity.components.get('agent') as { currentBehavior?: string } | undefined;
+    const agentComp = entity.components.get('agent');
+    const agent = agentComp && isAgentComponent(agentComp) ? agentComp : undefined;
     const behavior = agent?.currentBehavior;
 
     return { id, name, type, position: pos, behavior };
@@ -1414,7 +1815,8 @@ export class LiveEntityAPI {
    */
   private getEntityDetails(entity: Entity): EntityDetails {
     const id = entity.id;
-    const identity = entity.components.get('identity') as { name?: string } | undefined;
+    const identityComp = entity.components.get('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
     const name = identity?.name;
 
     // Serialize all components
@@ -1459,10 +1861,12 @@ export class LiveEntityAPI {
 
     // Handle plain objects
     const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(component as Record<string, unknown>)) {
-      // Skip functions
-      if (typeof value === 'function') continue;
-      result[key] = this.serializeComponent(value);
+    if (typeof component === 'object' && component !== null) {
+      for (const [key, value] of Object.entries(component)) {
+        // Skip functions
+        if (typeof value === 'function') continue;
+        result[key] = this.serializeComponent(value);
+      }
     }
     return result;
   }
@@ -1473,28 +1877,15 @@ export class LiveEntityAPI {
   private handleUniverseQuery(query: QueryRequest): QueryResponse {
     try {
       // Check if universe config is available (Phase 27+)
-      const worldAny = this.world as unknown as {
-        universeId?: { id: string; name: string; createdAt: number };
-        divineConfig?: {
-          name?: string;
-          description?: string;
-          coreParams?: {
-            divinePresence?: number;
-            divineReliability?: number;
-            mortalSignificance?: number;
-            maxActiveDeities?: number;
-          };
-        };
-      };
+      if (!hasUniverseProps(this.world)) {
+        throw new Error('World does not have universe properties');
+      }
 
-      const universeId = worldAny.universeId;
-      const divineConfig = worldAny.divineConfig;
+      const universeId = this.world.universeId;
+      const divineConfig = this.world.divineConfig;
 
       // Count active magic paradigms
-      const magicSystemAny = worldAny as unknown as { getMagicSystemState?: () => {
-        getAllParadigms?: () => unknown[];
-      }};
-      const magicManager = magicSystemAny.getMagicSystemState?.();
+      const magicManager = this.world.getMagicSystemState?.();
       const paradigmCount = magicManager?.getAllParadigms?.()?.length || 0;
 
       // Count deities
@@ -1611,29 +2002,13 @@ export class LiveEntityAPI {
       // Scan all entities for magic components
       for (const entity of this.world.entities.values()) {
         if (entity.components.has('magic')) {
-          const magic = entity.components.get('magic') as unknown as {
-            magicUser?: boolean;
-            homeParadigmId?: string;
-            knownParadigmIds?: string[];
-            activeParadigmId?: string;
-            knownSpells?: unknown[];
-            totalSpellsCast?: number;
-            totalMishaps?: number;
-            manaPools?: Array<{ source: string; current: number; maximum: number; locked: number; regenRate: number }>;
-            resourcePools?: Record<string, { type: string; current: number; maximum: number; locked: number }>;
-            casting?: boolean;
-            activeEffects?: string[];
-            techniqueProficiency?: Record<string, number>;
-            formProficiency?: Record<string, number>;
-            paradigmState?: Record<string, unknown>;
-            corruption?: number;
-            attentionLevel?: number;
-            favorLevel?: number;
-            addictionLevel?: number;
-            primarySource?: string;
-          };
+          const magicComp = entity.components.get('magic');
+          if (!isMagicComponent(magicComp)) {
+            throw new Error(`Entity ${entity.id} has invalid magic component`);
+          }
 
-          if (!magic.magicUser) continue;
+          if (!magicComp.magicUser) continue;
+          const magic = magicComp;
 
           totalMagicUsers++;
           totalSpellsCast += magic.totalSpellsCast || 0;
@@ -1674,7 +2049,8 @@ export class LiveEntityAPI {
           }
 
           // Get entity name
-          const identity = entity.components.get('identity') as { name?: string } | undefined;
+          const identityComp = entity.components.get('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
           const name = identity?.name || entity.id;
 
           // Collect mana pool info
@@ -1852,19 +2228,11 @@ export class LiveEntityAPI {
       // Find all deity entities
       for (const entity of this.world.entities.values()) {
         if (entity.components.has('deity')) {
-          const deityComp = entity.components.get('deity') as unknown as {
-            identity?: { primaryName?: string; domain?: string };
-            belief?: {
-              currentBelief?: number;
-              beliefPerTick?: number;
-              totalBeliefEarned?: number;
-              totalBeliefSpent?: number;
-            };
-            believers?: Set<string> | { size?: number };
-            sacredSites?: Set<string> | { size?: number };
-            controller?: string;
-            prayerQueue?: unknown[];
-          };
+          const deityCompRaw = entity.components.get('deity');
+          if (!isDeityComponent(deityCompRaw)) {
+            throw new Error(`Entity ${entity.id} has invalid deity component`);
+          }
+          const deityComp = deityCompRaw;
 
           const identity = deityComp.identity || {};
           const belief = deityComp.belief || {};
@@ -1900,15 +2268,14 @@ export class LiveEntityAPI {
       // Count believers with spiritual component
       for (const entity of this.world.entities.values()) {
         if (entity.components.has('spiritual')) {
-          const spiritual = entity.components.get('spiritual') as unknown as {
-            totalPrayers?: number;
-            answeredPrayers?: number;
-            believedDeity?: string;
-          };
+          const spiritualComp = entity.components.get('spiritual');
+          if (!isSpiritualComponent(spiritualComp)) {
+            throw new Error(`Entity ${entity.id} has invalid spiritual component`);
+          }
 
-          if (spiritual.believedDeity) {
-            totalPrayers += spiritual.totalPrayers || 0;
-            totalAnsweredPrayers += spiritual.answeredPrayers || 0;
+          if (spiritualComp.believedDeity) {
+            totalPrayers += spiritualComp.totalPrayers || 0;
+            totalAnsweredPrayers += spiritualComp.answeredPrayers || 0;
           }
         }
       }
@@ -1952,20 +2319,9 @@ export class LiveEntityAPI {
         };
       }
 
-      const researchState = worldEntity.components.get('research_state') as unknown as {
-        completed?: Set<string>;
-        inProgress?: Map<string, {
-          researchId: string;
-          totalRequired: number;
-          currentProgress: number;
-          assignedAgents: string[];
-          startedAt: number;
-          researchers?: string[];
-          insights?: Array<{ agentId: string; contribution: number }>;
-        }>;
-      } | undefined;
+      const researchStateRaw = worldEntity.components.get('research_state');
 
-      if (!researchState) {
+      if (!researchStateRaw) {
         return {
           requestId: query.requestId,
           success: true,
@@ -1976,6 +2332,12 @@ export class LiveEntityAPI {
           },
         };
       }
+
+      if (!isResearchStateComponent(researchStateRaw)) {
+        throw new Error('World entity has invalid research_state component');
+      }
+
+      const researchState = researchStateRaw;
 
       // Get completed papers
       const completedPapers = Array.from(researchState.completed || []);
@@ -2201,12 +2563,15 @@ export class LiveEntityAPI {
       const radius = typeof params.radius === 'number' ? Math.min(params.radius, 100) : 50;
 
       // Access chunk manager via world
-      const worldAny = this.world as unknown as {
-        getTileAt?: (x: number, y: number) => unknown;
-        getChunkManager?: () => unknown;
-      };
+      if (!hasTerrain(this.world)) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'World does not support tile access',
+        };
+      }
 
-      if (!worldAny.getTileAt) {
+      if (!this.world.getTileAt) {
         return {
           requestId: query.requestId,
           success: false,
@@ -2231,12 +2596,7 @@ export class LiveEntityAPI {
 
       for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
-          const tile = worldAny.getTileAt(x, y) as {
-            terrain?: string;
-            elevation?: number;
-            biome?: string;
-            wall?: { material?: string };
-          } | undefined;
+          const tile = this.world.getTileAt(x, y);
 
           if (tile) {
             tiles.push({
@@ -2301,7 +2661,8 @@ export class LiveEntityAPI {
       };
     }
 
-    const identity = entity.getComponent('identity') as IdentityComponent | undefined;
+    const identityComp = entity.getComponent('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
     const agentName = identity?.name || 'Unknown';
 
     this.agentDebugManager.startLogging(agentId, agentName);
@@ -2367,7 +2728,8 @@ export class LiveEntityAPI {
     // Get agent names for each tracked ID
     const agentsWithNames = trackedAgents.map(agentId => {
       const entity = this.world.getEntity(agentId);
-      const identity = entity?.getComponent('identity') as IdentityComponent | undefined;
+      const identityComp = entity?.getComponent('identity');
+      const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
       return {
         id: agentId,
         name: identity?.name || 'Unknown',
@@ -2396,8 +2758,8 @@ export class LiveEntityAPI {
       };
     }
 
-    const agentIdOrName = action.params.agentIdOrName as string | undefined;
-    const limit = action.params.limit as number | undefined;
+    const agentIdOrName = typeof action.params.agentIdOrName === 'string' ? action.params.agentIdOrName : undefined;
+    const limit = typeof action.params.limit === 'number' ? action.params.limit : undefined;
 
     if (!agentIdOrName) {
       return {
@@ -2431,7 +2793,7 @@ export class LiveEntityAPI {
       };
     }
 
-    const agentIdOrName = action.params.agentIdOrName as string | undefined;
+    const agentIdOrName = typeof action.params.agentIdOrName === 'string' ? action.params.agentIdOrName : undefined;
 
     if (!agentIdOrName) {
       return {
@@ -2493,7 +2855,7 @@ export class LiveEntityAPI {
    * Find agent by name and return ID
    */
   private handleFindAgentByName(action: ActionRequest): ActionResponse {
-    const name = action.params.name as string | undefined;
+    const name = typeof action.params.name === 'string' ? action.params.name : undefined;
 
     if (!name) {
       return {
@@ -2511,14 +2873,18 @@ export class LiveEntityAPI {
 
     const normalizedSearch = name.toLowerCase();
     const matches = agents.filter((entity) => {
-      const identity = entity.getComponent('identity') as IdentityComponent | undefined;
+      const identityComp = entity.getComponent('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
       return identity?.name?.toLowerCase().includes(normalizedSearch);
     });
 
     const results = matches.map((entity) => {
-      const identity = entity.getComponent('identity') as IdentityComponent | undefined;
-      const position = entity.getComponent('position') as PositionComponent | undefined;
-      const agent = entity.getComponent('agent') as AgentComponent | undefined;
+      const identityComp = entity.getComponent('identity');
+    const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
+      const positionComp = entity.getComponent('position');
+    const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
+      const agentComp = entity.getComponent('agent');
+    const agent = agentComp && isAgentComponent(agentComp) ? agentComp : undefined;
 
       return {
         id: entity.id,
@@ -2735,8 +3101,8 @@ export class LiveEntityAPI {
       target: defenderId,
       state: 'initiated',
       startTime: this.world.tick,
-      cause: cause as string,
-      lethal: lethal as boolean,
+      cause: typeof cause === 'string' ? cause : String(cause),
+      lethal: Boolean(lethal),
       surprise: false,
     };
 
@@ -2829,18 +3195,16 @@ export class LiveEntityAPI {
 
       for (const entity of this.world.entities.values()) {
         if (entity.components.has('nation')) {
-          const nation = entity.components.get('nation') as {
-            nationName?: string;
-            governmentType?: string;
-            economy?: { population?: number; gdp?: number };
-          };
+          const nationComp = entity.components.get('nation');
+          if (!nationComp || !isNationComponent(nationComp)) continue;
+          const nation = nationComp;
 
           nations.push({
             id: entity.id,
             name: nation.nationName || 'Unknown Nation',
             governmentType: nation.governmentType || 'unknown',
-            population: (nation as any).economy?.population || 0,
-            gdp: (nation as any).economy?.gdp || 0,
+            population: nation.economy?.population || 0,
+            gdp: nation.economy?.gdp || 0,
           });
         }
       }
@@ -3022,23 +3386,20 @@ export class LiveEntityAPI {
 
       for (const entity of this.world.entities.values()) {
         if (entity.components.has('fleet')) {
-          const fleet = entity.components.get('fleet') as {
-            fleetName?: string;
-            admiralId?: string;
-            squadronIds?: string[];
-            stats?: { totalShips?: number; combatStrength?: number };
-            navigation?: { targetPosition?: { x: number; y: number } };
-          };
+          const fleetComp = entity.components.get('fleet');
+          if (!fleetComp || !isFleetComponent(fleetComp)) continue;
+          const fleet = fleetComp;
 
-          const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+          const positionComp = entity.components.get('position');
+          const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
 
           fleets.push({
             id: entity.id,
             name: fleet.fleetName || 'Unknown Fleet',
             admiralId: fleet.admiralId || '',
             squadronIds: fleet.squadronIds || [],
-            totalShips: (fleet as any).stats?.totalShips || 0,
-            combatStrength: (fleet as any).stats?.combatStrength || 0,
+            totalShips: fleet.stats?.totalShips || 0,
+            combatStrength: fleet.stats?.combatStrength || 0,
             position: position ? { x: position.x ?? 0, y: position.y ?? 0 } : undefined,
           });
         }
@@ -3074,20 +3435,17 @@ export class LiveEntityAPI {
 
       for (const entity of this.world.entities.values()) {
         if (entity.components.has('squadron')) {
-          const squadron = entity.components.get('squadron') as {
-            squadronName?: string;
-            commanderId?: string;
-            shipIds?: string[];
-            stats?: { totalShips?: number; combatStrength?: number };
-          };
+          const squadronComp = entity.components.get('squadron');
+          if (!squadronComp || !isSquadronComponent(squadronComp)) continue;
+          const squadron = squadronComp;
 
           squadrons.push({
             id: entity.id,
             name: squadron.squadronName || 'Unknown Squadron',
             commanderId: squadron.commanderId || '',
             shipIds: squadron.shipIds || [],
-            totalShips: (squadron as any).stats?.totalShips || squadron.shipIds?.length || 0,
-            combatStrength: (squadron as any).stats?.combatStrength || 0,
+            totalShips: squadron.stats?.totalShips || squadron.shipIds?.length || 0,
+            combatStrength: squadron.stats?.combatStrength || 0,
           });
         }
       }
@@ -3314,26 +3672,34 @@ export class LiveEntityAPI {
       };
     }
 
-    const empireComp = empireEntity.components.get('empire') as {
-      diplomacy?: { relations?: Map<string, unknown> };
-    } | undefined;
-
-    if (!empireComp) {
+    const empireComp = empireEntity.components.get('empire');
+    if (!empireComp || !isEmpireComponent(empireComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${empireId} is not an empire`,
       };
     }
+    const empire = empireComp;
 
     // Update diplomatic relations - ensure diplomacy object exists
-    const diplomacy = empireComp.diplomacy ?? { relations: new Map<string, unknown>() };
-    if (!diplomacy.relations) {
-      diplomacy.relations = new Map();
+    if (!empire.diplomacy) {
+      empire.diplomacy = { relations: new Map<string, unknown>() };
     }
-    (empireComp as any).diplomacy = diplomacy;
+    if (!empire.diplomacy.relations) {
+      empire.diplomacy.relations = new Map();
+    }
 
-    const targetName = (targetEntity.components.get('empire') as any)?.empireName || 'Unknown';
+    const targetEmpireComp = targetEntity.components.get('empire');
+    if (!targetEmpireComp || !isEmpireComponent(targetEmpireComp)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Target entity ${targetEmpireId} is not an empire`,
+      };
+    }
+    const targetEmpire = targetEmpireComp;
+    const targetName = targetEmpire.empireName || 'Unknown';
 
     let relationship: string;
     let opinion: number;
@@ -3363,7 +3729,7 @@ export class LiveEntityAPI {
         opinion = 0;
     }
 
-    diplomacy.relations.set(targetEmpireId, {
+    empireComp.diplomacy.relations.set(targetEmpireId, {
       empireId: targetEmpireId,
       empireName: targetName,
       relationship,
@@ -3421,24 +3787,22 @@ export class LiveEntityAPI {
       };
     }
 
-    const fleetComp = fleetEntity.components.get('fleet') as {
-      navigation?: { targetPosition?: { x: number; y: number }; status?: string };
-    } | undefined;
-
-    if (!fleetComp) {
+    const fleetComp = fleetEntity.components.get('fleet');
+    if (!fleetComp || !isFleetComponent(fleetComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${fleetId} is not a fleet`,
       };
     }
+    const fleet = fleetComp;
 
     // Set navigation target
-    if (!(fleetComp as any).navigation) {
-      (fleetComp as any).navigation = {};
+    if (!fleet.navigation) {
+      fleet.navigation = {};
     }
-    (fleetComp as any).navigation.targetPosition = { x: targetX, y: targetY };
-    (fleetComp as any).navigation.status = 'moving';
+    fleet.navigation.targetPosition = { x: targetX, y: targetY };
+    fleet.navigation.status = 'moving';
 
     return {
       requestId: action.requestId,
@@ -3492,22 +3856,19 @@ export class LiveEntityAPI {
       };
     }
 
-    const megaComp = megaEntity.components.get('megastructure') as {
-      currentTask?: string;
-      taskProgress?: number;
-    } | undefined;
-
-    if (!megaComp) {
+    const megaComp = megaEntity.components.get('megastructure');
+    if (!megaComp || !isMegastructureComponent(megaComp)) {
       return {
         requestId: action.requestId,
         success: false,
         error: `Entity ${megastructureId} is not a megastructure`,
       };
     }
+    const mega = megaComp;
 
     // Set the task
-    (megaComp as any).currentTask = task;
-    (megaComp as any).taskProgress = 0;
+    mega.currentTask = task;
+    mega.taskProgress = 0;
 
     return {
       requestId: action.requestId,
@@ -3530,22 +3891,16 @@ export class LiveEntityAPI {
   private handleTimelinesQuery(query: QueryRequest): QueryResponse {
     try {
       // Get universe metadata from world if available
-      const worldAny = this.world as unknown as {
-        universeId?: { id: string; name: string };
-        tick?: number;
-        forkMetadata?: {
-          parentUniverseId?: string;
-          forkTick?: number;
-          forkReason?: string;
-        };
-      };
+      if (!hasUniverseProps(this.world)) {
+        throw new Error('World does not have universe properties');
+      }
 
       const currentTimeline = {
-        id: worldAny.universeId?.id || 'prime',
-        name: worldAny.universeId?.name || 'Prime Timeline',
-        currentTick: worldAny.tick || this.world.tick,
+        id: this.world.universeId?.id || 'prime',
+        name: this.world.universeId?.name || 'Prime Timeline',
+        currentTick: this.world.tick || this.world.tick,
         isActive: true,
-        forkMetadata: worldAny.forkMetadata,
+        forkMetadata: this.world.forkMetadata,
       };
 
       // For now, return just the current timeline

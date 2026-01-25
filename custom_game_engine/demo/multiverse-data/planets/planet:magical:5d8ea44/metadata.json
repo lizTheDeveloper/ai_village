@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5d8ea44",
+  "name": "Nova Umbriel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769219743848",
+  "createdAt": 1769219743883,
+  "lastAccessedAt": 1769219743883,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769219743848",
+    "type": "magical"
+  }
+}

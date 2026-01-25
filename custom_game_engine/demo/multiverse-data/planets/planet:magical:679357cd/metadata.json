@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:679357cd",
+  "name": "Rhea VII",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769225644077",
+  "createdAt": 1769225644128,
+  "lastAccessedAt": 1769225644128,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769225644077",
+    "type": "magical"
+  }
+}

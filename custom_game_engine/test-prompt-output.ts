@@ -2,7 +2,7 @@
  * Test script to inspect what the Executor prompt actually looks like
  */
 
-import { EntityImpl, WorldImpl } from './packages/core/src/index.js';
+import { EntityImpl, World } from './packages/core/src/index.js';
 import { ExecutorPromptBuilder } from './packages/llm/src/ExecutorPromptBuilder.js';
 
 // Create minimal test world

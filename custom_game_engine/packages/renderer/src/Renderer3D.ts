@@ -13,6 +13,8 @@ import { ComponentType as CT } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk } from '@ai-village/world';
 import type { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { ChunkManager3D } from './3d/ChunkManager3D.js';
+import { SpriteAtlasBuilder } from './3d/SpriteAtlasBuilder.js';
+import { InstancedSpriteRenderer } from './3d/InstancedSpriteRenderer.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -29,6 +31,8 @@ export interface Renderer3DConfig {
   fogFar: number;
   /** Movement speed */
   moveSpeed: number;
+  /** Use instanced sprite rendering for better performance (experimental) */
+  useInstancedSprites: boolean;
 }
 
 const DEFAULT_CONFIG: Renderer3DConfig = {
@@ -37,6 +41,7 @@ const DEFAULT_CONFIG: Renderer3DConfig = {
   fogNear: 50,
   fogFar: 150,
   moveSpeed: 15,
+  useInstancedSprites: false, // Enable for better performance (experimental)
 };
 
 // Animation directions for walking sprites
@@ -151,7 +156,33 @@ export class Renderer3D {
     worldX: number;
     worldY: number;
     worldZ: number;
+    // Dirty tracking - only update when entity state changes
+    needsTextureUpdate: boolean;
+    lastRenderTime: number;
+    // Movement tracking - only re-render when moving
+    lastPosX: number;
+    lastPosY: number;
+    wasMoving: boolean;
   }> = new Map();
+
+  // Query caching for performance
+  private _cachedAgentEntities: ReadonlyArray<Entity> = [];
+  private _agentCacheLastRefresh = 0;
+  private readonly AGENT_CACHE_REFRESH_INTERVAL = 10; // ~0.5 seconds at 20 TPS
+
+  private _cachedBuildingEntities: ReadonlyArray<Entity> = [];
+  private _buildingCacheLastRefresh = 0;
+  private readonly BUILDING_CACHE_REFRESH_INTERVAL = 60; // ~3 seconds
+
+  private _cachedAnimalEntities: ReadonlyArray<Entity> = [];
+  private _animalCacheLastRefresh = 0;
+  private readonly ANIMAL_CACHE_REFRESH_INTERVAL = 20; // ~1 second
+
+  private _cachedPlantEntities: ReadonlyArray<Entity> = [];
+  private _plantCacheLastRefresh = 0;
+  private readonly PLANT_CACHE_REFRESH_INTERVAL = 100; // ~5 seconds (plants change slowly)
+
+  private _lastWorldTick = 0;
 
   // Buildings
   private buildingMeshes: Map<string, THREE.Mesh> = new Map();
@@ -194,6 +225,12 @@ export class Renderer3D {
   private loadingAnimations: Set<string> = new Set();
   private speciesWithAnimations: Set<string> = new Set();
 
+  // PERF: Global animation timer for batched frame calculation
+  // Instead of each animal tracking its own lastFrameTime, we compute a global frame index
+  private _animationStartTime: number = 0;
+  private _currentGlobalFrame: number = 0;
+  private _lastGlobalFrameTime: number = 0;
+
   // Lighting
   private sunLight: THREE.DirectionalLight | null = null;
   private ambientLight: THREE.AmbientLight | null = null;
@@ -231,6 +268,18 @@ export class Renderer3D {
 
   // PixelLab sprite renderer for getting actual sprite images
   private pixelLabEntityRenderer: PixelLabEntityRenderer | null = null;
+
+  // Frustum culling for sprites
+  private frustum = new THREE.Frustum();
+  private projScreenMatrix = new THREE.Matrix4();
+  // PERF: Reusable Vector3 for frustum checks - avoids allocation in hot path
+  private _frustumCheckVector = new THREE.Vector3();
+
+  // PERF: Instanced sprite rendering for better performance
+  // When enabled, all entity sprites are rendered in 1-4 draw calls instead of N
+  private spriteAtlas: SpriteAtlasBuilder | null = null;
+  private instancedSpriteRenderer: InstancedSpriteRenderer | null = null;
+  private instancedEntityIds: Set<string> = new Set(); // Track which entities use instanced rendering
 
   constructor(
     config: Partial<Renderer3DConfig> = {},
@@ -277,6 +326,38 @@ export class Renderer3D {
 
     // Setup controls
     this.setupControls();
+
+    // Initialize instanced sprite rendering if enabled
+    if (this.config.useInstancedSprites) {
+      this.initInstancedSpriteRendering();
+    }
+  }
+
+  /**
+   * Initialize instanced sprite rendering components.
+   * Creates the sprite atlas and instanced renderer for GPU-batched sprite rendering.
+   */
+  private initInstancedSpriteRendering(): void {
+    // Create sprite atlas (2048x2048 supports ~1700 48x48 sprites)
+    this.spriteAtlas = new SpriteAtlasBuilder({
+      width: 2048,
+      height: 2048,
+      padding: 1,
+    });
+
+    // Create instanced sprite renderer
+    this.instancedSpriteRenderer = new InstancedSpriteRenderer(
+      this.scene,
+      this.spriteAtlas,
+      {
+        maxSprites: 1024,
+        defaultScale: 2.0,
+        billboard: true,
+      }
+    );
+
+    // Set camera for billboarding
+    this.instancedSpriteRenderer.setCamera(this.camera);
   }
 
   private setupLights(): void {
@@ -408,10 +489,72 @@ export class Renderer3D {
     this.world = world;
     this.clearTerrain();
 
+    // Invalidate query caches when world changes
+    this._cachedAgentEntities = [];
+    this._cachedBuildingEntities = [];
+    this._cachedAnimalEntities = [];
+    this._cachedPlantEntities = [];
+    this._agentCacheLastRefresh = 0;
+    this._buildingCacheLastRefresh = 0;
+    this._animalCacheLastRefresh = 0;
+    this._plantCacheLastRefresh = 0;
+
     // Configure chunk manager with world tile accessor
     if (this.chunkManager && world.getTileAt) {
       this.chunkManager.setTileAccessor((x, y) => world.getTileAt?.(x, y) ?? null);
     }
+  }
+
+  /**
+   * Get cached agent entities with periodic refresh
+   */
+  private getCachedAgentEntities(): ReadonlyArray<Entity> {
+    if (!this.world) return [];
+    const currentTick = this.world.tick ?? 0;
+    if (currentTick - this._agentCacheLastRefresh >= this.AGENT_CACHE_REFRESH_INTERVAL) {
+      this._cachedAgentEntities = this.world.query().with(CT.Agent).with(CT.Position).executeEntities();
+      this._agentCacheLastRefresh = currentTick;
+    }
+    return this._cachedAgentEntities;
+  }
+
+  /**
+   * Get cached building entities with periodic refresh
+   */
+  private getCachedBuildingEntities(): ReadonlyArray<Entity> {
+    if (!this.world) return [];
+    const currentTick = this.world.tick ?? 0;
+    if (currentTick - this._buildingCacheLastRefresh >= this.BUILDING_CACHE_REFRESH_INTERVAL) {
+      this._cachedBuildingEntities = this.world.query().with(CT.Building).with(CT.Position).executeEntities();
+      this._buildingCacheLastRefresh = currentTick;
+    }
+    return this._cachedBuildingEntities;
+  }
+
+  /**
+   * Get cached animal entities with periodic refresh
+   */
+  private getCachedAnimalEntities(): ReadonlyArray<Entity> {
+    if (!this.world) return [];
+    const currentTick = this.world.tick ?? 0;
+    if (currentTick - this._animalCacheLastRefresh >= this.ANIMAL_CACHE_REFRESH_INTERVAL) {
+      this._cachedAnimalEntities = this.world.query().with(CT.Animal).with(CT.Position).executeEntities();
+      this._animalCacheLastRefresh = currentTick;
+    }
+    return this._cachedAnimalEntities;
+  }
+
+  /**
+   * Get cached plant entities with periodic refresh
+   */
+  private getCachedPlantEntities(): ReadonlyArray<Entity> {
+    if (!this.world) return [];
+    const currentTick = this.world.tick ?? 0;
+    if (currentTick - this._plantCacheLastRefresh >= this.PLANT_CACHE_REFRESH_INTERVAL) {
+      this._cachedPlantEntities = this.world.query().with(CT.Plant).executeEntities();
+      this._plantCacheLastRefresh = currentTick;
+    }
+    return this._cachedPlantEntities;
   }
 
   /**
@@ -657,6 +800,28 @@ export class Renderer3D {
   }
 
   // ============================================================================
+  // FRUSTUM CULLING
+  // ============================================================================
+
+  /**
+   * Update frustum from current camera - call once per frame before culling checks
+   */
+  private updateFrustum(): void {
+    this.projScreenMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+    this.frustum.setFromProjectionMatrix(this.projScreenMatrix);
+  }
+
+  /**
+   * Check if a world position is within the camera frustum
+   * PERF: Uses reusable Vector3 to avoid allocation per call
+   */
+  private isPositionVisible(x: number, y: number, z: number, _margin: number = 5): boolean {
+    // Note: y/z swap for Three.js coordinates - world Y is Three.js Z
+    this._frustumCheckVector.set(x, z, y);
+    return this.frustum.containsPoint(this._frustumCheckVector);
+  }
+
+  // ============================================================================
   // TERRAIN RENDERING
   // ============================================================================
 
@@ -693,28 +858,70 @@ export class Renderer3D {
   updateEntities(): void {
     if (!this.world) return;
 
+    // Use instanced rendering path if enabled
+    if (this.config.useInstancedSprites && this.instancedSpriteRenderer) {
+      this.updateEntitiesInstanced();
+      return;
+    }
+
     const currentIds = new Set<string>();
 
-    // PERFORMANCE: Use ECS query instead of scanning all entities
-    const agentEntities = this.world.query().with(CT.Agent).with(CT.Position).executeEntities();
+    // PERFORMANCE: Use cached ECS query instead of querying every frame
+    const agentEntities = this.getCachedAgentEntities();
 
     for (const entity of agentEntities) {
       const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
       if (!position) continue;
-
-      currentIds.add(entity.id);
 
       const x = position.x ?? 0;
       const y = position.y ?? 0;
       const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
       const elevation = tile?.elevation ?? 0;
 
+      // Only update/render entities within frustum
+      if (!this.isPositionVisible(x, y, elevation + 1.5)) {
+        // Entity is off-screen, skip expensive operations but keep in scene
+        currentIds.add(entity.id);
+        continue;
+      }
+
+      currentIds.add(entity.id);
+
       this.addOrUpdateEntity(entity, x, y, elevation);
 
-      // Render the entity sprite to the offscreen canvas
+      // Render the entity sprite to the offscreen canvas (smart update)
       const data = this.entitySprites.get(entity.id);
       if (data) {
-        this.renderEntityToCanvas(entity, data);
+        // Detect if entity is moving by comparing position
+        const dx = x - data.lastPosX;
+        const dy = y - data.lastPosY;
+        const isMoving = Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01;
+
+        // Update position tracking
+        data.lastPosX = x;
+        data.lastPosY = y;
+
+        const currentTime = performance.now();
+        // Animation runs at 10 FPS, so only update every 100ms when moving
+        const ANIMATION_FRAME_INTERVAL = 100;
+
+        // Only render texture when:
+        // 1. Initial render (needsTextureUpdate)
+        // 2. Just started moving (transition from idle to walking)
+        // 3. Just stopped moving (transition from walking to idle)
+        // 4. Currently moving AND animation frame interval elapsed
+        const justStartedMoving = isMoving && !data.wasMoving;
+        const justStoppedMoving = !isMoving && data.wasMoving;
+        const animationFrameElapsed = isMoving && (currentTime - data.lastRenderTime > ANIMATION_FRAME_INTERVAL);
+
+        if (data.needsTextureUpdate || justStartedMoving || justStoppedMoving || animationFrameElapsed) {
+          this.renderEntityToCanvas(entity, data);
+          data.needsTextureUpdate = false;
+          data.lastRenderTime = currentTime;
+        }
+
+        // Track movement state for next frame
+        data.wasMoving = isMoving;
       }
     }
 
@@ -727,6 +934,134 @@ export class Renderer3D {
           this.entitySprites.delete(id);
         }
       }
+    }
+  }
+
+  /**
+   * Update entities using instanced sprite rendering.
+   * Renders all entity sprites in 1-4 draw calls instead of N.
+   */
+  private updateEntitiesInstanced(): void {
+    if (!this.world || !this.instancedSpriteRenderer || !this.spriteAtlas) return;
+
+    const currentIds = new Set<string>();
+    const agentEntities = this.getCachedAgentEntities();
+
+    for (const entity of agentEntities) {
+      const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+      if (!position) continue;
+
+      const x = position.x ?? 0;
+      const y = position.y ?? 0;
+      const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
+      const elevation = tile?.elevation ?? 0;
+
+      // Frustum culling - use visibility flag in instanced renderer
+      const visible = this.isPositionVisible(x, y, elevation + 1.5);
+      currentIds.add(entity.id);
+
+      // Get sprite key for this entity's current state
+      const spriteKey = this.getEntitySpriteKey(entity);
+
+      // Ensure sprite is in atlas
+      if (!this.spriteAtlas.hasSprite(spriteKey)) {
+        this.addEntitySpriteToAtlas(entity, spriteKey);
+      }
+
+      // Update position in instanced renderer (Note: Three.js uses x,z,y coords)
+      this.instancedSpriteRenderer.setSprite(
+        entity.id,
+        x,
+        y, // game Y -> instanced renderer handles swap
+        elevation + 1.5,
+        spriteKey,
+        2.0 // default scale
+      );
+
+      // Update visibility for frustum culling
+      this.instancedSpriteRenderer.setSpriteVisible(entity.id, visible);
+    }
+
+    // Remove entities no longer present
+    for (const id of this.instancedEntityIds) {
+      if (!currentIds.has(id)) {
+        this.instancedSpriteRenderer.removeSprite(id);
+        this.instancedEntityIds.delete(id);
+      }
+    }
+
+    // Track current entities
+    for (const id of currentIds) {
+      this.instancedEntityIds.add(id);
+    }
+
+    // Flush all updates to GPU
+    this.instancedSpriteRenderer.flush();
+  }
+
+  /**
+   * Generate a unique sprite key for an entity's current visual state.
+   * This key is used to look up the sprite in the texture atlas.
+   */
+  private getEntitySpriteKey(entity: Entity): string {
+    // Get appearance data
+    const agent = entity.components.get(CT.Agent) as { appearance?: string } | undefined;
+    const appearance = agent?.appearance ?? 'default';
+
+    // For now, use a simple key based on appearance
+    // Later can be extended to include animation direction/frame
+    return `entity:${appearance}`;
+  }
+
+  /**
+   * Add an entity's sprite to the texture atlas.
+   * Creates a placeholder sprite based on entity appearance.
+   * TODO: Integrate with PixelLabSpriteLoader for actual sprite images.
+   */
+  private async addEntitySpriteToAtlas(entity: Entity, spriteKey: string): Promise<void> {
+    if (!this.spriteAtlas) return;
+
+    // Check if already exists
+    if (this.spriteAtlas.hasSprite(spriteKey)) return;
+
+    try {
+      // Create a placeholder sprite based on entity properties
+      const canvas = document.createElement('canvas');
+      canvas.width = 48;
+      canvas.height = 48;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Get entity color based on appearance
+      const agent = entity.components.get(CT.Agent) as { appearance?: string } | undefined;
+      const appearance = agent?.appearance ?? 'default';
+
+      // Simple color hash based on appearance string
+      let colorHash = 0;
+      for (let i = 0; i < appearance.length; i++) {
+        colorHash = appearance.charCodeAt(i) + ((colorHash << 5) - colorHash);
+      }
+      const hue = Math.abs(colorHash) % 360;
+      const color = `hsl(${hue}, 60%, 50%)`;
+
+      // Draw a simple humanoid placeholder
+      ctx.fillStyle = color;
+
+      // Body (circle)
+      ctx.beginPath();
+      ctx.arc(24, 28, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head (smaller circle)
+      ctx.beginPath();
+      ctx.arc(24, 12, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Convert canvas to ImageBitmap and add to atlas
+      const bitmap = await createImageBitmap(canvas);
+      this.spriteAtlas.addSprite(spriteKey, bitmap);
+    } catch (e) {
+      console.warn('[Renderer3D] Failed to add sprite to atlas:', spriteKey, e);
     }
   }
 
@@ -763,6 +1098,13 @@ export class Renderer3D {
         worldX: x,
         worldY: y,
         worldZ: elevation,
+        // Initialize dirty tracking
+        needsTextureUpdate: true, // New sprites need initial render
+        lastRenderTime: 0,
+        // Movement tracking
+        lastPosX: x,
+        lastPosY: y,
+        wasMoving: false,
       };
       this.entitySprites.set(entity.id, data);
     }
@@ -773,6 +1115,9 @@ export class Renderer3D {
     data.worldY = y;
     data.worldZ = elevation;
     data.entity = entity; // Update entity reference in case it changed
+
+    // Let Three.js handle visibility automatically via frustum culling
+    data.sprite.frustumCulled = true;
   }
 
   /**
@@ -879,8 +1224,8 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    // PERFORMANCE: Use ECS query instead of scanning all entities
-    const buildingEntities = this.world.query().with(CT.Building).with(CT.Position).executeEntities();
+    // PERFORMANCE: Use cached ECS query instead of querying every frame
+    const buildingEntities = this.getCachedBuildingEntities();
 
     for (const entity of buildingEntities) {
       const building = entity.components.get('building') as {
@@ -894,12 +1239,18 @@ export class Renderer3D {
       const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
       if (!position) continue;
 
-      currentIds.add(entity.id);
-
       const x = position.x ?? 0;
       const y = position.y ?? 0;
       const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
       const elevation = tile?.elevation ?? 0;
+
+      // Only update/render buildings within frustum
+      if (!this.isPositionVisible(x, y, elevation + 1)) {
+        currentIds.add(entity.id);
+        continue;
+      }
+
+      currentIds.add(entity.id);
 
       this.addOrUpdateBuilding(entity.id, building, x, y, elevation);
     }
@@ -970,8 +1321,8 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    // PERFORMANCE: Use ECS query instead of scanning all entities
-    const animalEntities = this.world.query().with(CT.Animal).with(CT.Position).executeEntities();
+    // PERFORMANCE: Use cached ECS query instead of querying every frame
+    const animalEntities = this.getCachedAnimalEntities();
 
     for (const entity of animalEntities) {
       const animal = entity.components.get('animal') as {
@@ -984,12 +1335,18 @@ export class Renderer3D {
       const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
       if (!position) continue;
 
-      currentIds.add(entity.id);
-
       const x = position.x ?? 0;
       const y = position.y ?? 0;
       const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
       const elevation = tile?.elevation ?? 0;
+
+      // Only update/render animals within frustum
+      if (!this.isPositionVisible(x, y, elevation + 1)) {
+        currentIds.add(entity.id);
+        continue;
+      }
+
+      currentIds.add(entity.id);
 
       this.addOrUpdateAnimal(entity.id, animal, x, y, elevation);
     }
@@ -1306,10 +1663,21 @@ export class Renderer3D {
   /**
    * Update animation frames for all moving animals.
    * Called each render frame to cycle through animation frames.
+   *
+   * PERF: Uses global frame index computed once per frame instead of
+   * per-animal timing calculations. All walking animals use the same
+   * animation frame, reducing overhead significantly.
    */
   private updateAnimalAnimations(): void {
     const now = performance.now();
     const frameDuration = 1000 / ANIMATION_CONFIG.framesPerSecond;
+
+    // PERF: Compute global frame index ONCE per render frame
+    // All walking animals share this frame, so we avoid N timing checks
+    if (now - this._lastGlobalFrameTime >= frameDuration) {
+      this._currentGlobalFrame = (this._currentGlobalFrame + 1) % ANIMATION_CONFIG.frameCount;
+      this._lastGlobalFrameTime = now;
+    }
 
     for (const data of this.animalSprites.values()) {
       if (!data.hasAnimation) continue;
@@ -1320,33 +1688,15 @@ export class Renderer3D {
       const directionFrames = frames.get(data.currentDirection);
       if (!directionFrames || directionFrames.length === 0) continue;
 
-      if (data.isMoving) {
-        // Animate when moving
-        const timeSinceLastFrame = now - data.lastFrameTime;
-        if (timeSinceLastFrame >= frameDuration) {
-          // Advance to next frame
-          data.currentFrame = (data.currentFrame + 1) % ANIMATION_CONFIG.frameCount;
-          data.lastFrameTime = now;
-        }
+      // Determine which frame to show
+      const targetFrame = data.isMoving ? this._currentGlobalFrame : 0;
+      const frameTexture = directionFrames[targetFrame];
 
-        // Get the current frame texture
-        const frameTexture = directionFrames[data.currentFrame];
-        if (frameTexture) {
-          const material = data.sprite.material as THREE.SpriteMaterial;
-          if (material.map !== frameTexture) {
-            material.map = frameTexture;
-            material.needsUpdate = true;
-          }
-        }
-      } else {
-        // When idle, show first frame of current direction (or use static sprite)
-        const idleFrame = directionFrames[0];
-        if (idleFrame) {
-          const material = data.sprite.material as THREE.SpriteMaterial;
-          if (material.map !== idleFrame) {
-            material.map = idleFrame;
-            material.needsUpdate = true;
-          }
+      if (frameTexture) {
+        const material = data.sprite.material as THREE.SpriteMaterial;
+        if (material.map !== frameTexture) {
+          material.map = frameTexture;
+          material.needsUpdate = true;
         }
       }
     }
@@ -1364,8 +1714,8 @@ export class Renderer3D {
 
     const currentIds = new Set<string>();
 
-    // PERFORMANCE: Use ECS query instead of scanning all entities
-    const plantEntities = this.world.query().with(CT.Plant).executeEntities();
+    // PERFORMANCE: Use cached ECS query instead of querying every frame
+    const plantEntities = this.getCachedPlantEntities();
 
     for (const entity of plantEntities) {
       const plant = entity.components.get('plant') as {
@@ -1380,12 +1730,18 @@ export class Renderer3D {
       const position = plant.position;
       if (!position) continue;
 
-      currentIds.add(entity.id);
-
       const x = position.x ?? 0;
       const y = position.y ?? 0;
       const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
       const elevation = tile?.elevation ?? 0;
+
+      // Only update/render plants within frustum
+      if (!this.isPositionVisible(x, y, elevation + 1)) {
+        currentIds.add(entity.id);
+        continue;
+      }
+
+      currentIds.add(entity.id);
 
       // Get tree height from entity's position.z (trees store height there)
       const entityPosition = entity.components.get('position') as { z?: number } | undefined;
@@ -1715,6 +2071,9 @@ export class Renderer3D {
         this.pixelLabEntityRenderer.updateAnimations(performance.now());
       }
 
+      // Update frustum for culling
+      this.updateFrustum();
+
       // Update terrain around camera
       this.updateTerrain();
 
@@ -1792,6 +2151,19 @@ export class Renderer3D {
       this.chunkManager.dispose();
       this.chunkManager = null;
     }
+
+    // Dispose instanced sprite renderer
+    if (this.instancedSpriteRenderer) {
+      this.instancedSpriteRenderer.dispose();
+      this.instancedSpriteRenderer = null;
+    }
+
+    // Dispose sprite atlas
+    if (this.spriteAtlas) {
+      this.spriteAtlas.dispose();
+      this.spriteAtlas = null;
+    }
+    this.instancedEntityIds.clear();
 
     // Dispose building materials
     for (const material of this.buildingMaterials.values()) {

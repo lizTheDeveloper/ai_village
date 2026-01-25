@@ -79,7 +79,7 @@ export class CombatLogPanel implements IWindowPanel {
     for (const eventType of events) {
       const handler = (data: Record<string, unknown>) => this.handleCombatEvent(eventType, data);
       this.eventHandlers.set(eventType, handler);
-      this.eventBus.on(eventType, handler as any);
+      this.eventBus.on(eventType, handler);
     }
   }
 
@@ -425,7 +425,7 @@ export class CombatLogPanel implements IWindowPanel {
    */
   public cleanup(): void {
     for (const [eventType, handler] of this.eventHandlers.entries()) {
-      this.eventBus.off(eventType as any, handler as any);
+      this.eventBus.off(eventType, handler);
     }
     this.eventHandlers.clear();
   }

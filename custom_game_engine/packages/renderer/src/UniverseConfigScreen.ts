@@ -159,7 +159,13 @@ export class UniverseConfigScreen {
    * Generate a random evocative universe name.
    */
   private static generateUniverseName(): string {
-    const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+    const pick = <T>(arr: readonly T[]): T => {
+      const item = arr[Math.floor(Math.random() * arr.length)];
+      if (item === undefined) {
+        throw new Error('Cannot pick from empty array');
+      }
+      return item;
+    };
     const prefix = pick(UniverseConfigScreen.UNIVERSE_PREFIXES);
     const middle = pick(UniverseConfigScreen.UNIVERSE_MIDDLES);
     const ending = pick(UniverseConfigScreen.UNIVERSE_ENDINGS);

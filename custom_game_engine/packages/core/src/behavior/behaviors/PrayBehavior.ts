@@ -102,11 +102,11 @@ export class PrayBehavior extends BaseBehavior {
     const currentTick = world.tick;
 
     // Get required components
-    const spiritual = entity.getComponent<SpiritualComponent>(ComponentType.Spiritual);
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
-    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
-    const mood = entity.getComponent<MoodComponent>(ComponentType.Mood);
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const spiritual = entity.getComponent(ComponentType.Spiritual);
+    const agent = entity.getComponent(ComponentType.Agent);
+    const needs = entity.getComponent(ComponentType.Needs);
+    const mood = entity.getComponent(ComponentType.Mood);
+    const position = entity.getComponent(ComponentType.Position);
 
     if (!spiritual || !agent) {
       throw new Error(`[PrayBehavior] Agent ${entity.id} missing required components: spiritual=${!!spiritual}, agent=${!!agent}`);

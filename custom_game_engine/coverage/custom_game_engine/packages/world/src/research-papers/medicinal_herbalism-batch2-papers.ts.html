@@ -1,0 +1,1783 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/medicinal_herbalism-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> medicinal_herbalism-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GINGER_NAUSEA_RELIEF: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'ginger_nausea_relief',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Ginger Nausea Relief',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['peppermint_stomach_soothing'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_ginger_nausea_relief' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Ginger Nausea Relief: A Comprehensive Study of Zingiber officinale's Antiemetic Properties in Natural Medicine</span>
+&nbsp;
+The application of ginger (Zingiber officinale) for the amelioration of nausea represents one of humanity's oldest pharmaceutical interventions*, dating back to a time when the gods themselves were said to have poor constitutions†. The mechanism by which this humble rhizome achieves its therapeutic effects involves the interaction of gingerols and shogaols with serotonin receptors in the gastrointestinal tract**, a discovery that came approximately 4,000 years after humans started chewing on it and feeling better***. The Ministry of Herbal Remedies and Unlikely Cures†† has documented 1,847 distinct preparations of ginger for nausea, though they admit that 1,843 of them are "basically just ginger, but fancier."
+&nbsp;
+Students of natural medicine who have mastered the peppermint stomach soothing protocols‡ will find ginger relief considerably more aggressive in its approach—where peppermint whispers suggestions to the digestive system, ginger delivers them via strongly-worded memorandum‡‡. The recommended dosage ranges from 250mg to 1g of ginger root extract per administration‡‡‡, though the Ancient Guild of Nausea Preventers§ maintained that "a piece roughly the size of your thumb, unless your thumb is unusually large or you are a giant, in which case adjust accordingly" was perfectly adequate for most purposes. Modern practitioners have developed seventeen distinct methods of ginger preparation§§, each claiming to be superior to the others in ways that become remarkably heated during professional conferences§§§.
+&nbsp;
+The biochemical action of ginger's active compounds operates through multiple pathways simultaneously*, a fact that greatly annoyed Dr. Hieronymous Quilp†* when he attempted to isolate the "single active ingredient" in 1823‡*. The gingerols act as 5-HT3 receptor antagonists**, effectively blocking the signals that trigger nausea††*, while simultaneously exhibiting anti-inflammatory properties that address the root causes of gastric distress‡‡*. The Comprehensive Index of Substances That Make You Feel Less Terrible§* rates ginger as "remarkably effective for something that grows in dirt and looks like a small, knobby fist."
+&nbsp;
+Historical applications of ginger for nausea include maritime anti-seasickness preparations**, the treatment of morning sickness in pregnancy†**, and the desperate attempts of hungover alchemists to continue working‡**. The plant's cultivation spread from Southeast Asia to virtually every temperate and tropical region where humans experienced nausea§**, which is to say, everywhere. The famed Wandering Botanist Mercator Finch††** documented 247 regional varieties of ginger preparation during his travels, though he noted that "after approximately variety number forty, one begins to suspect that regional variation consists primarily of arguing about how finely to grate it."‡‡**
+&nbsp;
+Safety considerations§§** for ginger use are relatively minimal compared to other natural remedies*, though the International Board of Things We Learned the Hard Way† advises against exceeding 4g per day**, combining it with certain blood thinners***, or attempting to use it as a preventive measure before deliberately eating spoiled food†† in what they describe as "The Incident We Don't Discuss, But Please Don't Recreate It."‡‡ The proper preparation of ginger involves careful cleaning‡‡‡, appropriate slicing or grating§, and consumption via tea, capsule, or candied form§§, each method offering distinct advantages in terms of effectiveness, convenience, and ability to mask the taste for those who find it objectionable§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The earliest written reference appears in a Chinese medical text from 2000 BCE, though archaeological evidence suggests humans were chewing ginger significantly earlier, possibly as soon as they discovered that certain roots made them feel less terrible. The International Archive of Ancient Indigestion maintains that ginger use predates writing itself, based on residue analysis of prehistoric teeth that showed both ginger compounds and what they delicately term "evidence of gastric distress."
+&nbsp;
+†According to the fragmentary texts recovered from the Library of Impossible Medicine, the god Lorkanthus the Perpetually Queasy was said to have created ginger after a particularly unfortunate feast involving fermented sea cucumbers. The texts are unclear whether this was an act of divine mercy or an attempt to cover up poor menu planning.
+&nbsp;
+**The discovery of this mechanism in 1989 won Dr. Patricia Hargreaves the prestigious Finchley Award for Explaining Why Things We Already Knew Worked Actually Worked. In her acceptance speech, she noted, "My grandmother could have told you ginger stops nausea. She did tell me. Repeatedly. I simply had to spend fifteen years and £2.4 million in research grants to confirm she was right."
+&nbsp;
+***The ratio of "time spent feeling better after eating ginger" to "time spent understanding why" is approximately 40,000:1, according to calculations by the Society for Belated Scientific Validation.
+&nbsp;
+††An institution that exists primarily to say "yes, that works" or "no, that will kill you" to various folk remedies. Their headquarters in Lesser Swindon features a museum of Natural Remedies That Should Not Have Worked But Did, and a considerably larger memorial to Natural Remedies That Definitely Should Not Have Been Tried.
+&nbsp;
+‡Prerequisites matter in natural medicine. Attempting ginger protocols without first mastering peppermint is rather like trying to learn the Volcano Waltz before mastering basic walking—technically possible, but inadvisable and prone to injury. The Graduated Curriculum of Stomach Settling begins with simple peppermint tea and progresses through increasingly assertive interventions, culminating in what practitioners call "the Nuclear Option" (which is not ginger, but rather a closely-guarded secret involving cayenne pepper and regret).
+&nbsp;
+‡‡Professor Aldous Makepeace of the Herbal Communication Institute wrote extensively about what he termed "the personality of herbs." His seminal work, "Some Plants Are Polite; Others Are Not," describes peppermint as "a gentle librarian suggesting you might feel better if you rested," while ginger "bursts through the door like a Victorian policeman and INSISTS you stop being nauseous immediately."
+&nbsp;
+‡‡‡The precision of modern dosing recommendations represents significant advancement over traditional measurements such as "a bit," "some," and "probably enough." The Dosing Standardization Committee of 1924 spent three years arguing about whether a "pinch" could be legally defined before giving up and switching to grams.
+&nbsp;
+§The Guild, founded in the 13th century by sailors tired of spending entire voyages leaning over railings, maintained meticulous records of ginger efficacy across various causes of nausea. Their categorization system included: Maritime Mal-de-Mer, Pregnancy-Related Queasiness, Rotational Vertigo, Suspicious Meat Consumption, and the somewhat vague category of "General Existential Upset."
+&nbsp;
+§§These include but are not limited to: raw ginger slices, crystallized ginger, ginger tea (seven subtypes), ginger tincture, ginger powder in capsules, ginger essential oil (topically applied, never ingested despite what certain influencers suggest†), pickled ginger, ginger ale (proper, not the commercial lies‡), ginger beer, ginger-infused honey, ginger chews, and what the Advanced Practitioners' Guide calls "just eating the damn root like a medieval peasant with purpose."
+&nbsp;
+†The Essential Oil Incident of 2019, wherein seventeen individuals required medical attention after a wellness blogger suggested ingesting neat ginger oil "for maximum potency." The International Board of Things We Learned the Hard Way added this to their growing collection of cautionary tales, filing it under "Concentration Matters, Volume XVII."
+&nbsp;
+‡Real ginger ale must contain actual ginger and sufficient carbonation to make your eyes water slightly. The commercial beverages labeled "ginger ale" contain approximately 0.0003% ginger essence and the broken dreams of confused consumers. The Traditional Beverage Protection Society has been campaigning for truth in labeling since 1967 with minimal success.
+&nbsp;
+§§§The Conference on Ginger Preparation Methods of 2018 in Utrecht descended into what witnesses described as "unseemly shouting" when the Raw Ginger Coalition implied that the Candied Ginger Federation's methods were "basically just candy." Security footage shows several attendees gesticulating with root vegetables. The conference has not been held since.
+&nbsp;
+*Dr. Quilp, a reductionist of the highest order, spent his entire career attempting to isolate single active compounds from complex natural remedies. His laboratory notebooks reveal increasing`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding ginger nausea relief in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CHAMOMILE_DIGESTIVE_AID: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'chamomile_digestive_aid',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Chamomile Digestive Aid',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['ginger_nausea_relief'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_chamomile_digestive_aid' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Chamomile Digestive Aid: A Comprehensive Study of Matricaria's Medicinal Applications in Gastrointestinal Harmony</span>
+&nbsp;
+The humble chamomile flower (Matricaria chamomilla), that unassuming daisy-faced botanical specimen found lounging in meadows across the temperate zones, has served humanity's digestive difficulties for approximately four thousand years*, give or take a millennium or two**. The mechanisms by which this modest plant achieves its therapeutic effects involve a complex interaction of flavonoids, terpenoids, and various essential oils†, which work in concert to reduce inflammation, ease muscle spasms, and generally convince one's intestinal tract that violence is not, in fact, the answer. Modern phytochemical analysis has identified at least thirty-six bioactive compounds within chamomile flowers, though the plant itself seems entirely unaware of this achievement and continues to grow with indifferent cheerfulness in gardens, waste grounds, and (according to the Bureau of Botanical Invasiveness) seventeen municipal parking lots in Greater Manchester‡.
+&nbsp;
+The preparation of chamomile for digestive purposes requires a delicate balance between extraction efficiency and palatability††, a fact that becomes apparent within approximately forty-five seconds of attempting to brew one's first medicinal infusion. The standard ratio recommended by the International Institute for Herbal Harmony is 2-3 grams of dried chamomile flowers per 250 milliliters of water heated to precisely 93°C‡‡—not boiling, as this destroys certain volatile compounds, and not merely warm, as this produces what one herbalist described as "sad flower water"***. The infusion should steep for 5-10 minutes†††, during which time the beneficial compounds diffuse into the water at a rate inversely proportional to one's patience‡‡‡. The resulting tea should be consumed while still warm, preferably before meals or at the first sign of digestive distress, though certainly not simultaneously with the seventeen substances listed in Appendix C of the Guild of Herbalists' Manual****. 
+&nbsp;
+Historical applications of chamomile reveal a progression from the mystical to the methodical, though the boundary between these categories remains entertainingly porous. Ancient Egyptian physicians prescribed chamomile for what they termed "the wrath of the belly-serpent"†††† while simultaneously offering prayers to Isis, suggesting a healthy appreciation for covering one's bases. The Romans‡‡‡‡, with characteristic practicality, documented chamomile's use for digestive complaints in military campaigns, noting that soldiers who consumed chamomile tea before battle experienced fewer incidents of what military records euphemistically termed "battlefield evacuation syndrome"*****. Medieval monks cultivated chamomile in monastery gardens, where it was employed not only for digestive aid but also for what one 12th-century manuscript describes as "the correction of excessive choler and the restoration of harmonious humours"††††††, which modern gastroenterologists would recognize as irritable bowel syndrome, assuming they could stop laughing long enough to make the diagnosis.
+&nbsp;
+The safety profile of chamomile is remarkably benign, particularly when compared to its more aggressive botanical cousins‡‡‡‡‡, though this should not be interpreted as an invitation to recklessness. The recommended maximum daily dose is approximately 3-4 cups of properly prepared infusion, a limit established after the Incident of 1847*******, about which the Guild of Herbalists maintains a respectful silence. Individuals with known allergies to plants in the Asteraceae family should approach chamomile with the caution one might reserve for introducing oneself to a beloved's unpredictable relatives†††††††. Pregnant individuals are advised to consult healthcare providers before regular chamomile consumption, as the plant contains compounds that may affect uterine muscle tone—a discovery made by the ancient Assyrians, who were apparently far more observant about such matters than their reputation for aggressive imperialism might suggest********. The interaction between chamomile and certain medications, particularly blood thinners and sedatives, necessitates professional consultation, as learned by the unfortunate Mr. Cornelius Whimbrel of Sussex in 1923‡‡‡‡‡‡‡, whose story serves as a cautionary tale in pharmaceutical incompatibility*.
+&nbsp;
+Modern understanding has largely validated traditional applications while providing molecular mechanisms for effects that herbalists could only observe. The compound α-bisabolol reduces inflammation in the gastric mucosa with an efficiency that genuinely surprises researchers who began their careers skeptical of traditional remedies**. Apigenin, a flavonoid present in chamomile, binds to specific receptors in the digestive tract, producing antispasmodic effects that can reduce cramping and discomfort††. The cumulative evidence, gathered from 247 clinical studies conducted between 1987 and 2023‡‡, suggests that chamomile is indeed an effective digestive aid, though perhaps not quite as miraculous as Grandmother's testimonials would suggest***. Nevertheless, in an age of pharmaceutical complexity and side-effect profiles that require separate pamphlets, the gentle efficacy of a simple flower tea possesses a certain ancient wisdom that modern medicine is slowly, grudgingly, learning to respect once more****.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*Dating chamomile's medicinal use precisely is complicated by the fact that ancient peoples were frustratingly vague about botanical distinctions and tended to call several different plants "chamomile" with cheerful imprecision. The Egyptians definitely used *something* resembling chamomile around 2000 BCE, unless that papyrus was mislabeled, which, given bureaucratic tendencies, cannot be entirely ruled out.
+&nbsp;
+**Millennium-counting is notoriously imprecise in archaeological circles. The Guild of Temporal Herbalists has been attempting to establish a standardized system since 1847, but meetings keep getting derailed by arguments about whether to count from the founding of Rome, the birth of Christ, or the invention of the biscuit.
+&nbsp;
+†Flavonoids, for the benefit of readers not versed in phytochemistry, are plant compounds that sound like they should taste better than they do. Terpenoids are the things that make plants smell interesting, or occasionally like a mechanic's garage, depending on the plant. Essential oils are neither essential nor always oils in the strictest sense, but rather volatile aromatic compounds that someone in the 18th century decided to call "essential" and the name stuck††.
+&nbsp;
+††The naming incident occurred during a particularly contentious meeting of the Royal Society of Botanical Nomenclature in 1787, after the third bottle of port had been opened. Minutes from the meeting suggest that "essential" was originally meant as sarcasm, but no one present was sober enough to remember by the following morning.
+&nbsp;
+‡The Bureau of Botanical Invasiveness, established in 1956, maintains meticulous records of where plants grow in urban environments, primarily because someone has to, and they drew the short straw at a Ministry meeting. Their annual report runs to 1,247 pages and is read by approximately four people worldwide, three of whom are legally required to do so.
+&nbsp;
+††The delicate balance was famously disrupted by the enthusiastic Mrs. Millicent Hardscrabble of Yorkshire in 1889, who decided that if some chamomile was good, surely an entire pound of flowers in a single pot would be better‡‡‡. The resulting brew was described by witnesses as "alarmingly viscous" and "possibly sentient."
+&nbsp;
+‡‡The temperature specification of 93°C comes from extensive research conducted by the Tea Research Institute of Uppsala between 1967 and 1971, during which researchers heated water to every temperature between 60°C and 100°C in 0.5-degree increments. The resulting 4,000-page report concluded that 93°C was optimal, though researchers admitted this conclusion was reached partly because everyone wanted to stop heating water and go home.
+&nbsp;
+***Dr. Helena Forsythe, herbalist and reluctant poet, 2003. She later apologized for the description, explaining that it was 4 AM, she'd been up with a colicky infant, and her standards for both tea and vocabulary had slipped considerably.
+&nbsp;
+†††The inverse relationship between steeping time and patience has been mathematically modeled by behavioral psychologists at the University of Bristol, who determined that human fidgeting increases exponentially after the 3-minute mark, reaching critical levels at approximately 7 minutes and 23 seconds******.
+&nbsp;
+‡‡‡This rate of compound diffusion was calculated by Professor Theodore Makepeace in 1934, though his methodology involved watching tea steep for six hours straight, which his colleagues suggested might indicate he needed a holiday.
+&nbsp;
+****Appendix C is a fascinating document, updated quarterly, listing substances that should not be combined with chamomile. Current entries include seventeen types of prescription medication, alcohol (obviously), grapefruit juice (mysteriously), and something called "essence of concentrated rivalry," which was apparently`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding chamomile digestive aid in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RESPIRATORY_HERBS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'respiratory_herbs',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Respiratory Herbs',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['chamomile_digestive_aid'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_respiratory_herbs' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Respiratory Herbs: A Comprehensive Study of Pulmonary Botanical Applications</span>
+&nbsp;
+The study of respiratory herbs represents one of humanity's oldest pharmacological pursuits, dating back to the era when our ancestors first realized that inhaling smoke from certain plants produced effects ranging from "rather pleasant" to "shouldn't have done that"*. Unlike their digestive counterparts—which require the somewhat awkward process of convincing one's stomach to cooperate with foreign vegetable matter—respiratory herbs work through the elegant mechanism of simply existing in proximity to one's breathing apparatus†. This directness has made them simultaneously more popular and more dangerous than their gastrointestinal cousins, a fact reflected in the unusual longevity statistics of historical herbalists‡.
+&nbsp;
+The fundamental principle underlying respiratory herbal medicine involves the delivery of volatile plant compounds directly to the mucous membranes of the respiratory tract, where they interact with various cellular receptors in ways that scientists describe as "surprisingly complex" and hedge-witches describe as "bloody obvious"**. The most commonly employed respiratory herbs include mullein (Verbascum thapsus), which the ancient Greeks believed could commune with the lungs directly††; elecampane (Inula helenium), named after Helen of Troy for reasons that remain magnificently unclear‡‡; thyme (Thymus vulgaris), which is both a respiratory aid and excellent on roasted potatoes§; and eucalyptus (Eucalyptus globulus), which was weaponized by Australian trees in their ongoing war against human sinuses§§. Each of these operates through distinct biochemical pathways, though the end result is generally summarized by patients as "I can breathe better now" or occasionally "why does everything taste purple?"§§§
+&nbsp;
+Modern applications of respiratory herbs have evolved considerably from the traditional approach of "set it on fire and hope for the best"***, though this method retains a certain nostalgic charm among practitioners of what the Royal College of Herbalists delicately terms "aggressive aromatherapy"†††. Contemporary preparation methods include tinctures (which require six weeks of patient steeping and approximately twelve minutes of impatient drinking)‡‡‡, decoctions (which involve more boiling than strictly necessary)§§, glycerites (for those who believe medicine should taste like dessert)§§§§, and steam inhalations (which have been described by the Institute of Thermal Herbalism as "a method whereby one convincingly impersonates a kettle")****. The proper preparation of respiratory herbs requires attention to several critical factors: temperature (too hot and you're making tea-flavored steam; too cold and you're making ineffective room freshener)††††, duration (measured in that universal unit of "until it smells right")‡‡‡‡, and intention (which skeptics dismiss but which any herbalist will tell you makes approximately 23.7% of the difference)§§§§.
+&nbsp;
+Safety considerations merit particular attention, as respiratory herbs possess the unique ability to cause problems both through excessive efficacy and spectacular failure****. The principle of "start low, go slow" applies doubly to herbs intended for inhalation, as the lungs have a notoriously short memory for forgiveness†††††. Contraindications include pregnancy (during which the fetus is already occupying most of the available lung space)‡‡‡‡‡, existing respiratory conditions (though this seems counterintuitive, the lungs are surprisingly opinionated about what help they'll accept)§§§§§, and the presence of household pets (who have very different ideas about optimal air composition)******. The Herbalist's Oath, as amended in 1847 after the Incident at St. Bartholomew's, explicitly requires practitioners to ask three times whether the patient is certain they want to proceed, a precaution that has reduced accidental enlightenment experiences by approximately 67%††††††.
+&nbsp;
+Historical development of respiratory herbal practice reads like a chronicle of humanity's relationship with its own breathing apparatus, filled with triumphs (the discovery that mint makes things feel cold even when they're not)‡‡‡‡‡‡, disasters (the Great Eucalyptus Miscalculation of 1823)§§§§§§, and moments of profound confusion (the entire medieval period's relationship with lung function)*******. The transition from folk knowledge to systematic understanding began in earnest during the Renaissance, when physicians finally agreed that the lungs were probably important†††††††, and accelerated dramatically during the Industrial Revolution when urban populations discovered that coal smoke and mucous membranes had philosophical differences‡‡‡‡‡‡‡. Modern research has vindicated many traditional uses while quietly retiring others to the dustbin of "what were they thinking"§§§§§§§, creating a synthesis that respects historical wisdom while acknowledging that our ancestors were operating with incomplete information and excessive confidence********.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*The Codex Herbarium of Uppsala contains a remarkable passage describing how Björn the Moderately Wise discovered the soporific properties of henbane after accidentally setting his beard on fire with it. The subsequent century of Nordic herbalism was characterized by unusually cautious facial hair management.
+&nbsp;
+†This has led to the unfortunate but persistent belief among certain demographics that one can achieve herbal benefits simply by standing near plants in a hopeful manner. The Society for the Prevention of Magical Thinking has issued seventeen separate pamphlets on this topic, each more exasperated than the last.
+&nbsp;
+‡The median age of death for herbalists specializing in respiratory applications during the 15th century was 43.7 years, compared to 31.2 years for the general population and 28.4 years for people who experimented with mushrooms they found in graveyards. These statistics are maintained by the Guild of Historical Actuarial Studies, whose motto is "Someone Has to Count the Dead."
+&nbsp;
+**A particularly contentious panel at the 1992 International Symposium on Respiratory Herbs in Basel ended with a hedge-witch from Somerset physically demonstrating the difference between "knowing" and "understanding" on a professor from Cambridge. The incident is not discussed in polite academic circles, though video footage circulates at certain gatherings.
+&nbsp;
+††This belief was based on a mistranslation of a text by Dioscorides, who actually wrote that mullein "appeared to make the lungs less angry," which ancient Greeks interpreted with their characteristic enthusiasm for anthropomorphizing organs. The lungs were believed to be the second-most temperamental organ after the spleen, which everyone agreed was simply impossible to please†.
+&nbsp;
+†The ancient Greek theory of organ personalities persisted well into the Middle Ages, during which time the liver was considered pompous, the kidneys were thought to be cowardly, and the appendix was suspected of not really doing anything useful but demanding attention anyway. Modern anatomists find these characterizations "disturbingly accurate in ways we can't quite explain."
+&nbsp;
+‡‡The prevailing theory is that Helen of Troy had magnificent lungs, though no historical texts actually mention this. An alternative hypothesis suggests that the name was assigned by a medieval monk who was desperately trying to make his herbal manuscript more interesting and thought dropping celebrity names might help. The Medieval Studies Department at Oxford describes this as "both probable and deeply relatable."
+&nbsp;
+§The dual-purpose nature of thyme has led to confusion in several notable historical incidents, including the 1756 affair where the Earl of Pembroke attempted to treat his consumption by eating an entire roasted chicken heavily seasoned with thyme, reasoning that if it worked in the lungs, it would work through the stomach as well. He recovered from neither the consumption nor the indigestion, though witnesses reported he smelled wonderful‡.
+&nbsp;
+‡According to the diary of Lady Pembroke, the Earl's final words were "I regret nothing about the seasoning," which the family chose not to include in his official epitaph. The Pembroke Estate Cookbook, published posthumously, includes the recipe and is noted for being the only cookbook in the British Library to carry a medical warning.
+&nbsp;
+§§Eucalyptus globulus was first documented in European herbal texts following Captain Cook's voyage to Australia, where it was described as "a tree so determined to be medicinal that it will force itself upon your attention whether you wish it or not." Australian botanists have since confirmed that eucalyptus evolved its volatile compounds specifically to make koalas' lives difficult, and the therapeutic effects on humans are merely collateral benefit.
+&nbsp;
+§§§This particular side effect is associated with the overconsumption of decoctions containing menthol, camphor, and the patient's poor life choices. The phenomenon is well-documented in the archives of the Emergency Herbalism Response Unit, whose staff have developed a peculiarly specific set of intake questions§.
+&nbsp;
+§These questions include: "On a scale of 1-10, how purple?", "Was the purple preceded by overconfidence?", and "Did you perhaps confuse teaspoons with tablespoons in a manner suggesting you might benefit from adult supervision`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding respiratory herbs in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const THYME_COUGH_REMEDY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'thyme_cough_remedy',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Thyme Cough Remedy',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['respiratory_herbs'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_thyme_cough_remedy' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Thyme Cough Remedy: A Comprehensive Study of Thymus vulgaris in Respiratory Therapeutics</span>
+&nbsp;
+The humble thyme plant, *Thymus vulgaris*, has served humanity's afflicted lungs for approximately 4,237 years*, making it one of the most persistently successful remedies in the entire canon of herbal medicine. The plant's efficacy stems from its remarkable concentration of thymol and carvacrol—compounds which sound like they ought to be villains in a penny dreadful but are, in fact, responsible for the plant's expectorant, antitussive, and antimicrobial properties†. The preparation of thyme as a cough remedy requires neither extensive alchemical training nor a laboratory stocked with improbable glassware‡, merely hot water, patience, and the wisdom not to add seventeen other ingredients "just to be safe"**. Modern pharmacological analysis has confirmed what the ancients suspected: thyme works††, though the ancients believed it worked by "balancing the humours" rather than "inhibiting bacterial adhesion to respiratory epithelial cells"†††, which amounts to much the same thing but with fewer Latin words.
+&nbsp;
+The standard preparation involves steeping one to two teaspoons of dried thyme leaves in boiling water for ten to fifteen minutes‡‡, creating an infusion that tastes precisely as medicinal as one would expect something effective to taste‡‡‡. The addition of honey serves dual purposes: it renders the preparation palatable***, and honey itself possesses antimicrobial properties that complement thyme's action††††. The remedy should be consumed three to four times daily during acute respiratory distress, preferably while sitting upright‡‡‡‡ and not while operating heavy machinery, teaching philosophy, or making important life decisions****. Fresh thyme may be used at triple the quantity of dried, though one must first overcome the psychological hurdle of believing that something one seasons chicken with could possibly cure anything†††††. The active compounds are released more efficiently when the preparation is covered during steeping‡‡‡‡‡, a detail lost to the ages until Dr. Emmeline Forthright's groundbreaking 1847 paper, "On Lid Placement and Therapeutic Efficacy."*****
+&nbsp;
+Historical development of thyme remedies traces back to ancient Egypt******, where it was used in embalming procedures—a fact that should not alarm the modern practitioner†††††††, as the dosage differs considerably. The Greeks burned it as incense in temples‡‡‡‡‡‡, believing it represented courage, while medieval monks cultivated vast thyme gardens specifically for respiratory ailments******* and soup, demonstrating their characteristic pragmatism. The Abbey of St. Cuthbert's maintained records showing a 73.4% reduction in winter mortality after implementing mandatory thyme tea protocols in 1264 CE†††††††††, though these records were later questioned when scholars noted the same year's entry for "reduced mortality via banishment of Brother Adolphus, who had been coughing on everyone."******** Modern understanding recognizes that thyme's volatile oils create an environment hostile to *Streptococcus* and *Staphylococcus* species while simultaneously soothing inflamed mucous membranes‡‡‡‡‡‡‡—a combination as elegant as it is effective, provided one remembers that "volatile" in this context means "evaporates easily" and not "explosive"*********.
+&nbsp;
+Safety considerations demand attention despite thyme's generally benign nature: the remedy should not be used by those allergic to plants in the Lamiaceae family**********, a group that includes mint, basil, and oregano, meaning such individuals face a lifetime of severely restricted Italian cuisine as well as persistent coughs. Pregnant women should consult appropriate authorities before use†††††††††††, as thyme in medicinal quantities may stimulate the uterus*********** in ways that garnish quantities do not. Children under two years should not consume thyme preparations‡‡‡‡‡‡‡‡, and essential thyme oil should never be ingested directly************, a warning that exists because someone, somewhere, at some point, definitely tried it*************, probably while thinking "how bad could it be?"†††††††††††† The remedy works best when combined with rest, hydration, and refraining from activities that irritate the respiratory tract‡‡‡‡‡‡‡‡‡, such as shouting at politicians on the television, inhaling dust while cleaning ancient grimoires, or attempting to smoke anything whatsoever**************.
+&nbsp;
+The intersection of traditional knowledge and modern science reveals thyme's mechanism of action with satisfying precision: the phenolic compounds disrupt bacterial cell membranes while the essential oils stimulate ciliary movement in the bronchial passages‡‡‡‡‡‡‡‡‡‡, essentially causing the lungs to become better at their job of ejecting unwanted material***************. This explains why thyme tea often increases productive coughing before suppressing it—a phenomenon that frightened many early practitioners into abandoning treatment prematurely††††††††††††††. The remedy typically shows effects within twenty-four to forty-eight hours for common respiratory infections‡‡‡‡‡‡‡‡‡‡‡, provided the infection is indeed common and not something requiring antibiotics, surgery, or immediate evacuation of the premises***************. As with all herbal remedies, thyme represents not a miracle cure but a reliable ally in the body's own healing processes, asking only that we steep it properly, drink it faithfully, and resist the urge to dismiss it merely because it grows in gardens rather than laboratories.
+&nbsp;
+---
+&nbsp;
+*According to the somewhat unreliable Chronicles of the Mesopotamian Herb-Keepers, though carbon dating of ancient thyme residues in pottery suggests even earlier use. The Chronicles also claim thyme was used to treat "spirits of ill-temper" and "excessive loquaciousness," for which modern medicine lacks equivalents.
+&nbsp;
+†Thymol comprises 20-54% of thyme's essential oil, depending on variety, growing conditions, and whether Mercury was in retrograde during harvest. The last factor was added by medieval scholars and has not been definitively disproven, though mainly because no one has bothered to check.
+&nbsp;
+‡Unlike dragon's blood tinctures† or the preparation of mandrake root‡, which require protective circles, prayers to at least three saints, and a really good life insurance policy.
+&nbsp;
+†The Compendium of Obsolete Medical Treatments, Vol. 47, notes that dragon's blood (actually resin from Dracaena trees) was thought to cure everything from dysentery to demonic possession. It cured neither, but made excellent red ink.
+&nbsp;
+‡The screaming is, thankfully, metaphorical. Probably. The accounts vary.
+&nbsp;
+**The Institute for Herbological Restraint maintains a Wall of Shame documenting remedies ruined by "helpful additions." The 1634 entry for "What Happens When You Add Everything In The Garden To Thyme Tea" includes the phrase "hospitalization of seven monks" and "temporary closure of the abbey."
+&nbsp;
+††A 2006 German study showed thyme extract reduced coughing fits by 68.7% compared to placebo, which reduced them by the power of positive thinking and desperate hope.
+&nbsp;
+†††The Theory of Humours suggested illness resulted from imbalances of blood, phlegm, yellow bile, and black bile. Modern medicine recognizes this as nonsense, replacing it with the far more sensible explanation involving cytokines, inflammatory mediators, and prostaglandin cascades—which sounds equally made-up but happens to be true.
+&nbsp;
+‡‡The British Tea Council's Subcommittee on Medicinal Infusions (Steering Time) specifies 10-15 minutes at 94-96°C, because British institutions cannot help but form subcommittees about beverage preparation.
+&nbsp;
+‡‡‡Medieval texts describe it as tasting "of virtue and suffering," which remains accurate. One learns to appreciate it, much as one learns to appreciate architectural brutalism or experimental jazz.
+&nbsp;
+***Honey has been used medicinally for 8,000 years*, primarily because it actually works and tastes pleasant—a combination so rare in medicine that many early physicians distrusted it on principle.
+&nbsp;
+*The oldest known instance is a 8,000-year-old cave painting in Spain showing honey gathering. Whether the gatherer was using it medicinally or just really liked honey remains debated, though the presence of bee stings suggests commitment either way.
+&nbsp;
+††††See Appendix G: "The Comparative Antimicrobial Properties of Apis mellifera Products vs. Synthetic Alternatives," which concludes that bees remain better at chemistry than most humans.
+&nbsp;
+‡‡`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding thyme cough remedy in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MULLEIN_LUNG_SUPPORT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'mullein_lung_support',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Mullein Lung Support',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['thyme_cough_remedy'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_mullein_lung_support' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Mullein Lung Support: A Comprehensive Study of Verbascum's Respiratory Applications in Traditional and Contemporary Herbal Practice</span>
+&nbsp;
+The gentle yellow towers of *Verbascum thapsus*, commonly known as mullein, have stood sentinel along disturbed soils and forgotten pathways since time immemorial*, their felted leaves catching morning dew like ancient manuscripts waiting to be read. Modern practitioners of botanical medicine have rediscovered what the Old Gods knew**: that this unassuming plant possesses remarkable affinity for the delicate architecture of human lungs, acting as both guardian and gentle healer of the respiratory passages. The mechanism by which mullein achieves its therapeutic effects involves a complex interplay of mucilaginous compounds†, saponins††, and volatile oils that coat and soothe inflamed bronchial tissues while simultaneously supporting the body's natural expectorant functions. However, one must approach mullein with appropriate reverence and technique; the Guild of Pneumatic Herbalists‡ recorded no fewer than forty-seven distinct preparation methods between 1823 and 1847, each claiming superiority over the others, though only six were demonstrated not to result in what the Guild delicately termed "adverse pulmonary incidents."‡‡
+&nbsp;
+The proper harvesting and preparation of mullein for lung support requires attention that borders on the obsessive, though perhaps not quite reaching the levels exhibited by the Monks of Saint Respiro†††, who reportedly measured atmospheric pressure to the nearest millipascal before even approaching their mullein patches. Fresh leaves must be collected in dry weather‡‡‡, preferably during the plant's second year of growth§, when the concentration of therapeutic compounds reaches its optimal ratio of 3.7:1§§ compared to first-year foliage. The traditional infusion method involves steeping one to two teaspoons of dried leaf§§§ in freshly boiled water for precisely ten to fifteen minutes*, while taking care to strain through fine cloth—and this point cannot be emphasized enough—to remove the tiny trichomes** that, if left in the preparation, will transform your soothing lung remedy into what the Victorian Herb Compendium described as "a most vexing irritant to the throat, inducing paroxysms of coughing rather than their cessation."†† Modern practitioners often combine mullein with thyme‡‡, creating synergistic preparations that address both the productive cough and the dry, irritated cough with what the Institute for Breathable Solutions terms "elegant redundancy."‡‡‡
+&nbsp;
+The safety profile of mullein is remarkably benign§§, though this has not prevented humans from finding creative ways to misuse it§§§. The plant contains no known toxic compounds***, and its use is generally recognized as safe by most herbalist guilds, with the notable exception of the Brotherhood of the Iron Lung††, who maintain that any herb not explicitly tested on at least three species of dragon cannot be considered "truly safe."††† The primary contraindications involve allergic sensitivity to plants in the Scrophulariaceae family‡‡‡, though such allergies are statistically uncommon—occurring in approximately 0.003% of the population§§§§, or roughly the same frequency as people who can properly pronounce "Scrophulariaceae" on the first attempt*. One must also exercise caution when sourcing mullein, as specimens gathered from roadsides may accumulate heavy metals***** from vehicle emissions, a fact discovered in 1967 when the Respiratory Health Society of Lower Saxony experienced what they termed "The Incident of the Lead-Laden Leaves."†††
+&nbsp;
+The historical development of mullein's use for respiratory conditions stretches back into the mists of antiquity‡‡‡‡, with references appearing in the works of Dioscorides§§§§§, though whether these references actually pertain to mullein or simply to "some fuzzy plant that seemed helpful" remains a matter of scholarly debate. The Romans called it *herba lanaria*****, presumably for its wool-like leaves, and employed it in treatments for what they called *tussis*, the Latin term for cough, though their treatment protocols also involved the sacrifice of a white dove on alternate Thursdays, making it difficult to isolate the active therapeutic component††††. Medieval herbalists classified mullein as a plant of Saturn‡‡‡‡‡, cold and dry in the second degree, which tells us more about their cosmological commitments than their empirical observations§§§§§§. The nineteenth century saw a renaissance of interest in mullein, particularly in America where settlers observed its use by indigenous peoples*, though as the Frontier Medicine Journal noted in 1874, "Settlers have an unfortunate tendency to combine native wisdom with their own innovations, often with results that require additional native wisdom to rectify."******
+&nbsp;
+Modern understanding of mullein's therapeutic actions has been refined through chemical analysis and clinical observation, revealing a sophisticated array of compounds working in concert: the mucilage content of 3%†††††, which forms a protective coating over irritated mucous membranes; saponins that support the body's ability to mobilize and expel mucus‡‡‡‡‡‡; and verbascoside, an iridoid glycoside with demonstrated anti-inflammatory properties§§§§§§§. The plant's expectorant action is classified as "amphoteric"*******—meaning it can both dry excess moisture and moisten dry conditions, a property that seemed paradoxical to Victorian scientists until Dr. Cornelius Wheeze proposed his Theory of Pulmonary Equilibration in 1889††††††, which was either brilliant or complete nonsense depending on which faction of the Royal Pneumatic Society one consulted. Contemporary herbalists recommend mullein primarily for dry, unproductive coughs and bronchial inflammation‡‡‡‡‡‡‡, often combining it with demulcent herbs like marshmallow root and expectorant herbs like thyme§§§§§§§§ to create what the Modern Herbal Dispensatory calls "a comprehensive respiratory protocol," though in practice most people just make tea and hope for the best*.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*Or at least since the Last Ice Age, which in geological terms counts as "immemorial," though the mullein plants themselves might have a different perspective on the matter.
+&nbsp;
+**Specifically the Old God of Reasonable Respiratory Function, whose name has been lost but whose symbol—a pair of healthy lungs wreathed in yellow flowers—appears in cave paintings throughout what is now Turkey. Archaeologists remain divided on whether this represents actual divine intervention or merely ancient humanity's tendency to anthropomorphize useful plants.
+&nbsp;
+†The mucilaginous compounds in mullein leaves can constitute up to 3% of the dried weight, which may not sound impressive until you consider that this is roughly 3 million times more mucilage than exists in, say, a granite boulder.
+&nbsp;
+††These are not to be confused with ordinary soaps, though both create foam when agitated. The saponins in mullein have a particular affinity for respiratory tissues, whereas ordinary soaps have a particular affinity for irritating one's eyes while showering.
+&nbsp;
+‡Founded in 1801 by a group of physicians who had grown tired of the Bloodletting Guild's suggestion that pneumonia be treated with "more vigorous bleeding." The Guild's motto, *Pulmones sine cruore* ("Lungs without blood loss"), was considered radical at the time.
+&nbsp;
+‡‡The Guild maintained detailed incident reports, including Case File #23: "On the Inadvisability of Smoking Mullein Leaves While Simultaneously Consuming Mullein Tea," and the infamous Case File #31: "The Gentleman Who Believed More Must Be Better and Subsequently Consumed Three Gallons of Mullein Infusion in One Sitting."†
+&nbsp;
+†In Case File #31, the gentleman in question survived, though he reported becoming "extremely well-hydrated" and developing what physicians termed "heroic diuresis." The Guild now recommends limiting intake to three cups daily.
+&nbsp;
+†††The Monks of Saint Respiro maintained a monastery on what is now Mount Ventoso in Provence. They were dissolved in 1634, not for theological reasons, but because neighboring villages complained about the constant sound of barometric measurements being announced at all hours. Their final abbot, Brother Pneumaticus, was reportedly measuring air pressure during his own death, his last words being "997.3 millibars and falling."
+&nbsp;
+‡‡‡The plant produces moisture-laden dew, which the Guild's 1845 Compendium of Unforced Errors noted "will substantially dilute any therapeutic compounds and may, in extreme cases, result in what amounts to flavored water rather than medicine."
+&nbsp;
+§Mullein is a biennial, producing only a rosette of leaves in its first year and sending up its characteristic flowering stalk in the second year. First-year plants contain approximately 43% less`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding mullein lung support in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const EUCALYPTUS_BREATHING_AID: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'eucalyptus_breathing_aid',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Eucalyptus Breathing Aid',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['mullein_lung_support'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_eucalyptus_breathing_aid' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Eucalyptus Breathing Aid: A Comprehensive Study in Aromatic Respiratory Assistance</span>
+&nbsp;
+The eucalyptus tree (*Eucalyptus globulus*), that peculiar antipodean contribution to respiratory wellness, has served humanity's breathing apparatus for approximately three thousand years*, though its modern scientific understanding dates only to 1788**, when the first European settlers in Australia discovered that the local inhabitants had been doing perfectly well without their help for quite some time***. The tree's leaves contain eucalyptol (1,8-cineole), a compound so volatile that approximately 73.4% of laboratory studies on the subject have ended with the principal investigator developing an inexplicable urge to clear their sinuses†. The fundamental principle underlying eucalyptus as a breathing aid rests upon its ability to interact with mucous membranes in ways that are simultaneously ancient, well-documented, and yet somehow still confusing to watch in practice††. When inhaled as steam, oil, or through direct application†††, eucalyptus compounds trigger what the Institute of Respiratory Herbology calls "aggressive mucous disambiguation"‡—a process that, while therapeutically sound, can be alarmingly productive‡‡.
+&nbsp;
+Building upon the foundational knowledge of mullein lung support‡‡‡, practitioners of eucalyptus breathing therapy employ several distinct methodologies, each with its own peculiar considerations. The steam inhalation method*, typically involving 3-5 drops of essential oil in approximately 946.35 milliliters of hot water**, produces vapors that are 47.3% more effective than placebo***, though substantially more likely to cause what the literature delicately terms "thermal surprise"†. Direct chest application requires dilution ratios of 2-3% in carrier oils††—a specification that emerged only after the Incident of 1923†††, which we shall not discuss in polite company‡. The internal consumption method‡‡, while traditional among certain populations‡‡‡, requires pharmaceutical-grade preparations and the sort of cavalier attitude toward one's digestive tract that characterized the Edwardian era*. Modern practitioners generally recommend a three-phase approach**: initial assessment of individual tolerance***, followed by graduated exposure†, and finally, regular maintenance doses††, though the Guild of Eucalyptus Workers suggests adding a fourth phase consisting entirely of sitting down and having a nice cup of tea†††.
+&nbsp;
+Safety considerations occupy an uncomfortable 68.9% of eucalyptus literature‡, largely because humans possess an almost supernatural ability to misuse beneficial substances‡‡. Pure eucalyptus oil should never contact mucous membranes directly‡‡‡—a warning that, statistically, 1 in 4 practitioners will ignore exactly once*. Children under ten, pregnant individuals, and those with compromised respiratory systems require modified protocols**, as do individuals who have recently completed mullein therapy***, due to what researchers call "herb stacking effects"†, a term that sounds rather more pleasant than the reality it describes††. The Australian College of Traditional Medicine maintains a database of 1,247 documented eucalyptus-related incidents†††, of which 83.4% began with the phrase "I thought it would be fine if I just—"‡, and 14.6% involved someone's well-meaning grandmother‡‡. Particular caution must be exercised when combining eucalyptus with other aromatic therapies‡‡‡, as the cumulative effect can transform one's personal atmosphere into something resembling a particularly aggressive cleaning product*.
+&nbsp;
+The historical development of eucalyptus breathing aid demonstrates humanity's characteristic pattern of discovering something useful, forgetting about it, rediscovering it, using it incorrectly, learning better, and then writing extensive footnotes about the entire process**. Indigenous Australian peoples developed sophisticated eucalyptus applications over millennia***, including smoke therapy, leaf poultices, and what anthropologist Dr. Margaret Whitwood calls "intuitive aromatherapy"†—the practice of simply being near eucalyptus trees during respiratory distress††. European colonizers, displaying their usual subtlety, immediately attempted to patent, bottle, and systematize these practices†††, leading to the Great Eucalyptus Rush of 1854‡, during which approximately 40% of London apothecaries claimed to sell "authentic Aboriginal eucalyptus medicine"‡‡, despite most of them never having left Surrey‡‡‡. Modern understanding, achieved through approximately 847 clinical trials* and untold numbers of enthusiastic amateurs**, recognizes eucalyptus as containing multiple therapeutically active compounds***, including not only eucalyptol but also alpha-pinene, limonene, and other substances with intimidating chemical names†. The contemporary practitioner thus stands at the confluence of ancient wisdom, colonial misadventure, scientific method, and the collected mistakes of everyone who came before††—a position that is simultaneously privileged and slightly overwhelming†††.
+&nbsp;
+Integration of eucalyptus breathing aid into a comprehensive respiratory wellness practice requires what the Breathing Arts Collective calls "sympathetic progression"‡—beginning with milder herbs like mullein‡‡, advancing through eucalyptus, and potentially continuing to more intensive therapies‡‡‡, though one should progress at a pace that doesn't alarm one's respiratory system unduly*. The synergistic effects between mullein's gentle expectorant properties and eucalyptus's more assertive approach create what Dr. Helena Greenbriar termed "productive respiratory dialogue"**—assuming both herbs agree to cooperate***, which isn't always guaranteed†. Regular practice yields cumulative benefits over 3-6 months††, though individual variation means some people respond within days while others remain philosophically opposed to showing improvement on principle†††. The successful practitioner maintains detailed records‡, observes response patterns‡‡, and develops what can only be described as a personal relationship with their respiratory system‡‡‡, acknowledging it as a complex ecosystem rather than a simple air pump*, and treating it with the sort of respect usually reserved for temperamental deities or complicated machinery**.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+\* The earliest recorded use appears in Aboriginal Australian songlines, which encoded medicinal knowledge in oral traditions so sophisticated that European anthropologists spent approximately 150 years assuming they were "just stories" before realizing they were actually comprehensive medical and botanical databases set to music. The eucalyptus features prominently in respiratory healing songs from the Dreamtime, though translating these into Western medical terminology inevitably loses something—specifically, the melody, context, and about 40,000 years of accumulated wisdom.
+&nbsp;
+\*\* Lieutenant James Cook's botanist, Joseph Banks, noted eucalyptus in his journals but was apparently too distracted by kangaroos to investigate its medicinal properties thoroughly. This represents one of history's great missed opportunities, ranking somewhere between "not investing in that fruit company Apple" and "selling Manhattan for $24."
+&nbsp;
+\*\*\* The Eora people, upon being informed that their eucalyptus knowledge was being "discovered," are reported to have exchanged glances that transcended language barriers and communicated the universal sentiment of "You cannot possibly be serious right now."
+&nbsp;
+† Dr. Edmund Fitzgerald of the Cambridge Respiratory Research Society (dissolved 1956 under circumstances involving excessive mentholation) noted that laboratory workers consistently developed what he called "persistently pristine passages." His research assistant, Miss Dorothy Weatherby, added in marginalia: "Also uncontrollable sneezing. Professor neglects to mention his own three-day bout of what he insisted on calling 'aggressive nasal clarity.'"
+&nbsp;
+†† The phenomenon of eucalyptus inhalation affects even observers. The Imperial College of London's 1889 study on eucalyptus vapors had to be halted when the control group, seated in an adjacent room, began experiencing symptomatic relief simply from the fumes escaping under the door. Lead researcher Dr. Albert Whitmore wrote in his notes: "Either eucalyptus is more volatile than previously believed, or our building has remarkably poor ventilation. Possibly both."
+&nbsp;
+††† Direct application includes chest rubs, bath additives, and what 19th-century practitioners called "eucalyptus embracement"—essentially hugging a bottle of eucalyptus oil while contemplating one's life choices. This practice, mercifully, did not survive into modern protocols.
+&nbsp;
+‡ The Institute of Respiratory Herbology, based in Bristol, maintains that their terminology is perfectly clear and that any confusion stems from people not reading the full 47-page explanatory document available upon request. Requests, however, must be submitted in triplicate and accompanied by a doctor's note certifying that one has completed the prerequisite mullein course†.
+&nbsp;
+†Unfortunately, the prerequisite mullein course was discontinued in 2003 due to what the Institute calls "administrative restructuring" and everyone else calls "the incident with the chancellor and the combustible herb garden."
+&nbsp;
+‡‡ "Alarmingly productive" is`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding eucalyptus breathing aid in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const IMMUNE_SUPPORTING_HERBS: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'immune_supporting_herbs',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Immune Supporting Herbs',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['eucalyptus_breathing_aid'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_immune_supporting_herbs' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `IMMUNE SUPPORTING HERBS: A COMPREHENSIVE EXAMINATION OF BOTANICAL IMMUNITY ENHANCEMENT IN THE NATURAL WORLD</span>
+&nbsp;
+The practice of employing herbs to support the immune system represents one of humanity's oldest relationships with the plant kingdom*, a bond forged in an era when the distinction between "medicine" and "not dying horribly" was measured in millimeters rather than philosophical frameworks†. Modern research has confirmed what ancient practitioners understood through a combination of observation, experimentation, and, if we're honest, a statistically significant amount of lucky guessing‡: certain plants possess compounds that interact beneficially with human immune function, though the mechanisms by which they do so would have absolutely baffled anyone attempting to explain them before approximately 1863**.
+&nbsp;
+The primary herbs recognized for immune support include echinacea (Echinacea purpurea), elderberry (Sambucus nigra)††, astragalus (Astragalus membranaceus)‡‡, garlic (Allium sativum)***, and andrographis (Andrographis paniculata)†††, each operating through distinct biochemical pathways that would require approximately seventeen additional papers to fully explicate‡‡‡. These plants function not as simple "immune boosters"—a term that makes immunologists twitch visibly****—but rather as modulators, adaptogens††††, or in some cases, gentle persuaders‡‡‡‡ of various immune cell populations. The compounds involved include polysaccharides, alkaloids, phenolic compounds, and an assortment of other molecules with names that sound like they were generated by throwing Scrabble tiles at a chemistry textbook*****. What matters practically is that these substances can enhance the activity of natural killer cells, support cytokine production, and generally encourage the immune system to perform its duties with slightly more enthusiasm and significantly better coordination†††††.
+&nbsp;
+Application methods vary considerably depending on the herb in question, the desired outcome, and whether one is attempting to treat an active condition or simply hedge against future microbial unpleasantness‡‡‡‡‡. Echinacea, for instance, demonstrates optimal effectiveness when taken at the first sign of symptoms******, a timing requirement that has led to what the Institute for Unnecessary Herb Consumption refers to as "precautionary echinacea syndrome"†††††††. Elderberry syrup must be prepared from cooked berries—never raw‡‡‡‡‡‡—while astragalus traditionally undergoes decoction, a process involving water, heat, and considerably more patience than most modern practitioners possess*******. The dosage requirements span an impressive range, from the single-digit milligrams for certain concentrated extracts to the "small handful" measurements favored by traditional practitioners who viewed precision as something other people worried about††††††††.
+&nbsp;
+Safety considerations merit particular attention, as the phrase "natural" has never been synonymous with "harmless," a fact that would surprise approximately 73% of the general population‡‡‡‡‡‡‡ but zero percent of anyone who has encountered poison ivy********. Echinacea should not be used continuously for more than eight weeks, lest the immune system develop what researchers euphemistically term "tolerance" and what the rest of us might call "complete indifference"†††††††††. Elderberries contain cyanogenic glycosides when raw, making improper preparation a matter of some concern‡‡‡‡‡‡‡‡. Garlic, while generally safe, can interact with blood-thinning medications, a discovery made through what pharmaceutical historians delicately describe as "patient-reported adverse events"*********. Additionally, individuals with autoimmune conditions should approach immune-supporting herbs with extreme caution, as encouraging an already overenthusiastic immune system represents the medical equivalent of giving espresso to a hyperactive squirrel††††††††††. The Council of Herbal Safety maintains a database of contraindications spanning 1,247 pages‡‡‡‡‡‡‡‡‡, most of which boil down to "ask someone qualified before consuming unfamiliar plants"**********.
+&nbsp;
+Historical development of immune-supporting herbs follows the general trajectory of herbal medicine itself: empirical discovery followed by cultural transmission followed by systematic study followed by pharmaceutical companies attempting to patent plant compounds that have existed for several million years***********. Traditional Chinese Medicine employed astragalus for over 2,000 years as a qi tonic, which translates roughly to "something that makes you feel less terrible"†††††††††††. Indigenous North American peoples used echinacea for various ailments, a practice that European settlers initially dismissed before eventually appropriating‡‡‡‡‡‡‡‡‡‡. The modern understanding combines traditional knowledge with contemporary immunology, creating what one scholar termed "the best of both worlds" and what another termed "an unholy compromise between ancient wisdom and reductionist science"************. Research continues to unveil new mechanisms of action, identify active compounds, and occasionally discover that something everyone thought they understood actually works completely differently than supposed†††††††††††††. The field remains dynamic, contentious, and prone to the sort of academic disputes that make department holiday parties extraordinarily awkward‡‡‡‡‡‡‡‡‡‡‡.
+&nbsp;
+&nbsp;
+FOOTNOTES:
+&nbsp;
+* The relationship between humans and medicinal plants predates written history by a margin that archaeobotanists describe as "substantial" and that everyone else describes as "we have literally no idea but probably a very long time." Evidence suggests Neanderthals used yarrow and chamomile, though whether for medicinal purposes or because they simply tasted nice remains subject to interpretation. One cannot exactly interview the deceased about their herbal preferences, though the Department of Necromantic Inquiry at Unseen University continues to try.
+&nbsp;
+† Dr. Fennsworth Blackwood, in his seminal 1823 work "Herbs What Don't Kill You Immediately: A Promising Start," outlined this principle with admirable clarity. His research methodology involved what he termed "careful observation" and what his critics termed "throwing plants at sick people and writing down what happened." Remarkably, this approach succeeded more often than it failed, which tells you everything about early 19th-century medicine that you probably didn't want to know.
+&nbsp;
+‡ The Guild of Ancient Herbalists maintains that their predecessors possessed sophisticated knowledge of plant biochemistry encoded in metaphorical language. Modern researchers suggest they might simply have tried everything growing within walking distance and remembered what didn't cause death. The truth likely occupies the uncomfortable middle ground between "mystical wisdom" and "aggressive trial and error." ‡† The survival rate for early herbalists was approximately 73.4%, which the Guild considers "quite respectable given the circumstances."
+&nbsp;
+** This is when the germ theory of disease achieved general acceptance, revolutionizing medicine and explaining why various herbs worked without requiring reference to humors, miasmas, or vengeful spirits. Prior to this breakthrough, the theoretical framework for herbal medicine included such concepts as "the plant is shaped like the organ it treats" (the Doctrine of Signatures) and "if it tastes terrible, it must be working" (the Principle of Suffering Is Virtue). ‡‡† Both theories produced results, though whether through the mechanisms proposed or through what statisticians call "pure dumb luck" remains debatable.
+&nbsp;
+†† Elderberry deserves special mention as it has achieved what few herbs manage: widespread scientific validation, commercial success, and continued respect from traditional practitioners—a trifecta so rare that the Botanical Trinity Institute studies it as a sociological phenomenon. The plant itself seems entirely unaware of its elevated status and continues growing in hedgerows alongside considerably less distinguished vegetation. ††† There exists a minor academic controversy regarding whether elderberry's immune benefits derive primarily from its anthocyanin content or from what Dr. Millicent Graves termed "the general mystical superiority of plants that can be made into both wine and medicine." The debate has generated approximately 487 papers and counting.
+&nbsp;
+‡‡ Astragalus membranaceus should not be confused with Astragalus woollyii, which is endangered, or Astragalus mollissimus, which is toxic to livestock. The genus Astragalus contains over 3,000 species, leading to what botanists call "nomenclatural complexity" and what herbalists call "an excellent reason to buy from reputable suppliers." ‡‡‡† One infamous incident in 1891 involved a shipment mislabeled at the docks of Portsmouth, resulting in what the Harbor Master's Report delicately termed "considerable intestinal discord among the populace."
+&nbsp;
+*** Garlic's reputation as an immune supporter is matched only by its reputation as a social deterrent, leading to what sociologists identify as "the immune-isolation paradox": one might avoid illness but also avoi`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding immune supporting herbs in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ECHINACEA_IMMUNE_BOOST: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'echinacea_immune_boost',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Echinacea Immune Boost',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['immune_supporting_herbs'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_echinacea_immune_boost' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ECHINACEA IMMUNE BOOST: A COMPREHENSIVE EXAMINATION OF PURPLE CONEFLOWER IMMUNOMODULATION IN NATURAL THERAPEUTIC CONTEXTS</span>
+&nbsp;
+The application of *Echinacea* species—principally *E. purpurea*, *E. angustifolia*, and *E. pallida*—to the enhancement of human immunological function represents one of the more enthusiastically embraced yet persistently misunderstood practices in contemporary botanical medicine*. The mechanism by which these North American prairie flowers stimulate immune response involves a complex cascade of alkylamide and polysaccharide interactions with macrophage activity†, leading to increased production of interferon and other cytokines‡. What makes echinacea particularly fascinating from a naturalist's perspective is not merely its pharmacological efficacy—which, one must note, shows considerable variation depending on preparation method**—but rather its historical journey from indigenous medicine to modern clinical trials, a path littered with both remarkable insights and spectacularly misguided entrepreneurial ventures††.
+&nbsp;
+The practical application of echinacea for immune support requires considerably more nuance than the average health food store would have you believe‡‡. The three primary species vary significantly in their chemical composition and thus their therapeutic effects: *E. purpurea* demonstrates the highest concentration of polysaccharides in its aerial parts***, while *E. angustifolia* root contains superior alkylamide content†††, and *E. pallida* sits somewhere in the middle while apologizing for the confusion‡‡‡. Modern practitioners generally recommend initiating echinacea supplementation at the very first sign of immune challenge—that peculiar throat-tickle or suspicious sneeze—rather than as a continuous preventive measure****, a timing consideration that the Consolidated Institute for Botanical Timing Studies has documented as improving outcomes by approximately 67.3%††††. The standard dosage ranges from 300-500mg of dried extract three times daily‡‡‡‡, though one must account for preparation variability*****, extraction method******, and the phase of the moon†††††.
+&nbsp;
+Perhaps most critical to understanding echinacea's immune-boosting properties is recognizing what it is *not*: it is not an antibiotic‡‡‡‡‡, not a cure-all*******, not suitable for indefinite consumption********, and definitely not to be confused with its ornamental cousin that grows in Mrs. Henderson's garden†††††††. The plant works by stimulating the body's own defense mechanisms rather than directly attacking pathogens, a distinction that proved catastrophically unclear during the Great Echinacea Incident of 1987‡‡‡‡‡‡. Safety considerations include avoiding use in autoimmune conditions*********, limiting continuous use to no more than 8-10 weeks**********, and ensuring proper species identification before harvesting wild specimens—a step that cannot be emphasized enough given the unfortunate similarities between young echinacea shoots and several mildly toxic plants††††††††.
+&nbsp;
+The historical development of echinacea knowledge represents a remarkable convergence of indigenous wisdom and modern scientific inquiry, though the path between these two points resembles less a straight line and more a particularly confused spiral‡‡‡‡‡‡‡. Native American tribes, particularly the Plains peoples, utilized echinacea for everything from snakebite treatment to toothache relief***********, with the Lakota Sioux maintaining particularly sophisticated preparation protocols that weren't fully appreciated by Western medicine until the 1970s***********. The plant entered mainstream American medicine in the late 1800s, reaching peak popularity before being largely abandoned with the advent of antibiotics************, only to experience a renaissance in the 1990s when people remembered that antibiotics don't work on viruses†††††††††. Contemporary research has largely vindicated traditional uses while simultaneously revealing fascinating complexities: the fresh plant extract demonstrates different properties than dried preparations‡‡‡‡‡‡‡‡, different plant parts contain vastly different active compounds*************, and timing of harvest significantly impacts efficacy**************—all factors that traditional practitioners somehow intuited without benefit of gas chromatography-mass spectrometry.
+&nbsp;
+Modern understanding positions echinacea as a valuable but specific tool in the immune support arsenal, neither the panacea its most enthusiastic proponents suggest nor the placebo its harshest critics claim†††††††††††. The most robust clinical evidence supports its use for reducing the duration and severity of upper respiratory infections‡‡‡‡‡‡‡‡‡, particularly when initiated within 24 hours of symptom onset***************. Future research directions include investigation of synergistic effects with other immune-supporting botanicals††††††††††††, optimization of extraction and preparation methods‡‡‡‡‡‡‡‡‡‡, and the somewhat concerning question of whether the plant's increasing popularity might lead to overharvesting of wild populations****************—a concern that has already manifested in certain regions and prompted the establishment of the International Echinacea Conservation Initiative, whose headquarters are, rather appropriately, purple.
+&nbsp;
+---
+&nbsp;
+*A 2019 survey by the Bureau of Botanical Enthusiasm found that 73.4% of echinacea consumers could not correctly identify the plant if it walked up and introduced itself. The remaining 26.6% were mostly gardeners who grew it and herbalists who were contractually obligated to know.
+&nbsp;
+†The exact mechanism took researchers approximately four decades to elucidate, during which time the plant worked perfectly well without their understanding. This is typical of nature, which rarely waits for peer review.
+&nbsp;
+‡Interferon sounds like something that should be against the law, but it's actually quite helpful. Cytokines, meanwhile, are the cellular equivalent of sending strongly-worded memos to various departments of your immune system.
+&nbsp;
+**The difference in efficacy between a properly prepared tincture and a mass-produced capsule from a discount retailer approaches, in some cases, the difference between actual echinacea and purple-dyed sawdust. Though to be fair, one major manufacturer† insisted their product was "spiritually equivalent" to echinacea, which satisfied precisely nobody except their legal team.
+&nbsp;
+†Not naming names, but they're no longer in business. The resulting class-action lawsuit became required reading in pharmaceutical law courses under the section titled "What Not To Do: A Cautionary Tale in Several Volumes."
+&nbsp;
+††Including the memorable venture by Dr. Cornelius Quackenbush‡ in 1893, who marketed "Quackenbush's Miraculous Echinacea Elixir" as a cure for consumption, dropsy, and moral failings. It was 40% alcohol.
+&nbsp;
+‡No relation to the modern Quackenbush Institute of Botanical Excellence, which his great-great-granddaughter founded specifically to atone for his crimes against pharmacology.
+&nbsp;
+‡‡The average health food store employee receives approximately 47 minutes of training on immune support herbs**, most of which focuses on where they're shelved and how to operate the cash register.
+&nbsp;
+**According to the International Guild of Supplement Retail Workers, whose headquarters are in a strip mall in Ohio. They've been trying to increase training requirements since 1987. Progress has been described as "glacial, but slightly faster than actual glaciers, which is something."
+&nbsp;
+***This is why most tinctures and teas use the above-ground parts of *E. purpurea*. Also because harvesting the roots kills the plant, and even 19th-century botanists eventually noticed they were running out of echinacea†.
+&nbsp;
+†Though it took them longer than you'd think. The Victorian era had many virtues. Ecological awareness was not prominently among them.
+&nbsp;
+†††The Alkylamide Content Standardization Committee has spent the last thirty years trying to establish consistent measurement protocols. They meet quarterly in Saskatchewan and have yet to fully agree on anything except that their meetings should involve better coffee.
+&nbsp;
+‡‡‡E. pallida's apologetic nature is, of course, entirely imagined by the author. Plants do not apologize. Though if they did, E. pallida seems like it would be the type**.
+&nbsp;
+**Unlike E. angustifolia, which gives off distinct "don't mess with me" energy. This is, admittedly, an entirely subjective assessment based on nothing whatsoever.
+&nbsp;
+****Continuous use may lead to immune system habituation, rendering the echinacea increasingly ineffective—similar to how repeatedly yelling "Wolf!" makes villagers increasingly skeptical. The immune system, it turns out, has a memory and a somewhat short attention span.
+&nbsp;
+††††The CIBTS conducted a 15-year longitudinal study involving 12,000 participants, 47 different timing protocols, and a budget that would have been better spent on almost anything else. However, their findings did confirm what traditional herbalists had been saying all along: timing matters. The`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding echinacea immune boost in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ASTRAGALUS_VITALITY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'astragalus_vitality',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Astragalus Vitality',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['echinacea_immune_boost'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_astragalus_vitality' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Astragalus Vitality: A Comprehensive Study of Root-Based Constitutional Enhancement in Contemporary Herbological Practice</span>
+&nbsp;
+The astragalus root*, commonly referred to by practitioners as "yellow leader" or "huang qi" by those who prefer their nomenclature to sound more mysterious†, represents one of the most comprehensively studied yet paradoxically misunderstood botanical specimens in the modern herbalist's pharmacopoeia. Unlike its cousin echinacea, which operates on the immune system with all the subtlety of a enthusiastic sheepdog herding white blood cells**, astragalus functions through what the ancient practitioners called "deep constitutional support"*** - a term that originally meant "we're not entirely sure what it does, but people seem less tired afterward." The root itself, harvested from Astragalus membranaceus†† in what can only be described as an unnecessarily theatrical process‡, contains polysaccharides, saponins, and flavonoids in ratios that vary by approximately 47.3% depending on which herbalist you ask‡‡.
+&nbsp;
+The practical application of astragalus vitality requires a fundamental understanding that this is not a "crisis herb"**** but rather what Dr. Cornelius Pemberton-Root†††, the noted phytotherapist, called "constitutional insurance"‡‡‡ - a substance best taken daily over extended periods, much like paying into a pension scheme that may or may not deliver returns in twenty years' time, depending on whether you remembered to process it correctly§. Traditional preparation methods involve slicing the dried root into thin pieces§§ and simmering them for what ancient texts describe as "four hours" but which modern practitioners have determined actually means "until you remember you left something on the stove"§§§. The resulting decoction should taste mildly sweet with an earthy undertone, though if it tastes like regret and poor life choices, you may have accidentally harvested licorice root instead***** - a mistake made by approximately 2,374 novice herbalists annually†††††, according to statistics maintained by the International Bureau of Embarrassing Botanical Incidents‡‡‡‡.
+&nbsp;
+The mechanism by which astragalus supports vitality remains a subject of vigorous debate among scholars§§§§, though current research suggests it functions by modulating the mysterious processes the medical establishment prefers to call "immunomodulation" rather than admitting they mean "it does something good, we think"*****. The polysaccharides present in properly prepared astragalus appear to enhance the activity of natural killer cells††††††, which despite their ominous name are actually quite helpful‡‡‡‡‡, while simultaneously supporting the production of various interleukins§§§§§ - the body's way of sending strongly-worded memos to itself. Studies conducted at the Institute for Unnecessarily Complex Herbal Research****** have demonstrated that regular astragalus consumption correlates with improved stamina, enhanced recovery from illness, and a statistically significant increase in the user's tendency to lecture others about the importance of constitutional support†††††††.
+&nbsp;
+Safety considerations warrant particular attention, as astragalus demonstrates remarkably few contraindications compared to its more aggressive botanical cousins‡‡‡‡‡‡. However, practitioners must observe the Three Sacred Rules of Astragalus Administration§§§§§§: never prescribe during acute infections******* (a lesson learned through the unfortunate Fever Ward Incident of 1847††††††††), always verify the botanical identity before preparation‡‡‡‡‡‡‡ (see: The Great Licorice Confusion of 1923§§§§§§§), and never, under any circumstances, combine it with echinacea while listening to the advice of anyone named "Trevor" who claims to have studied with "monks" in "the mountains"********. Modern practitioners, having learned from these historical cautionary tales, now approach astragalus with appropriate respect while maintaining the healthy skepticism required of anyone working with substances that have been used for approximately 2,000 years†††††††††, which is either a testament to their efficacy or evidence that humans are remarkably persistent in their traditions, even the slightly silly ones‡‡‡‡‡‡‡‡.
+&nbsp;
+The integration of astragalus vitality into a broader constitutional support protocol represents the culmination of both ancient wisdom and modern understanding§§§§§§§§, assuming one defines "understanding" loosely enough to include "educated guessing based on centuries of observation"*********. Practitioners who have mastered the prerequisite echinacea protocols will find astragalus a natural progression††††††††††, though they should be prepared for patients to be less immediately impressed‡‡‡‡‡‡‡‡‡, as "I feel generally more resilient over time" lacks the dramatic satisfaction of "my cold cleared up in three days." The true vitality offered by astragalus lies not in spectacular cures but in the quiet accumulation of constitutional strength - rather like compound interest, but for one's chi§§§§§§§§§, and with fewer forms to fill out**********.
+&nbsp;
+---
+&nbsp;
+## FOOTNOTES
+&nbsp;
+*Astragalus membranaceus, not to be confused with Astragalus ridiculous, which doesn't exist but absolutely should, or Astragalus bureaucraticus, which is what the root becomes after passing through seventeen different regulatory approval processes.
+&nbsp;
+†The Ministry of Herbal Nomenclature estimates that approximately 68.4% of herb names are deliberately made more exotic-sounding to justify the price markup. The other 31.6% just sound exotic by accident.
+&nbsp;
+**This author has witnessed echinacea in action. "Enthusiastic sheepdog" is, if anything, understating the case. "Caffeinated sheepdog with a whistle and a mission" would be more accurate.
+&nbsp;
+***The term "constitutional support" was first recorded in the writings of the legendary herbalist Madame Zephyrine Rootsworth†, who reportedly coined it after her previous term - "making people feel less rubbish generally" - was deemed insufficiently academic by the Guild of Overwrought Medical Terminology‡.
+&nbsp;
+†Madame Rootsworth (1743-1831) was known for three things: her encyclopedic knowledge of herbs, her collection of over 400 teapots, and her habit of beginning every consultation with "Well, that's not supposed to look like that, is it?"
+&nbsp;
+‡The Guild was disbanded in 1956 after it became impossible to determine whether they were satirizing medical language or had actually lost touch with reality. The final communiqué before dissolution described a headache as "cranial discombobulation of the bilateral temporal regions with percussion-responsive exacerbation syndrome."
+&nbsp;
+††The species name "membranaceus" means "like a membrane," which tells you absolutely nothing useful about the plant but apparently made the botanist who named it feel very clever. Botanists, as a rule, enjoy feeling clever.
+&nbsp;
+‡‡When confronted with this statistic, herbalists will typically respond with "Well, it depends on the terroir," which is French for "I'm not entirely sure but saying it in French makes me sound authoritative."
+&nbsp;
+‡‡‡Dr. Pemberton-Root's 1889 treatise, "Constitutional Tonics: A Practical Guide to Not Feeling Dreadful," remains surprisingly readable despite its Victorian-era conviction that everything could be cured with either tonic herbs or a stern talking-to. In cases where both failed, he recommended relocating to the countryside, which at the time was considered a medical intervention§.
+&nbsp;
+§The countryside itself has never been formally tested for therapeutic properties, though the reduction in urban stress, pollution, and soul-crushing commutes may have contributed to the perceived benefits. Then again, the Victorians also thought countryside air contained "vital ethers"§§, so perhaps we shouldn't read too much into their reasoning.
+&nbsp;
+§§Vital ethers, for those unfamiliar with Victorian medical theory, were believed to be invisible beneficial substances floating in the air, particularly in rural areas. This theory was quietly abandoned after someone pointed out that farms smell distinctly of manure, which seemed inconsistent with the "vital" descriptor.
+&nbsp;
+§§§The precise timing of herbal decoctions remains one of the great unresolved debates in botanical medicine. Some traditions insist on exactly four hours. Others claim three is sufficient. A minority faction insists that true potency requires overnight soaking followed by seven hours of simmering, but these people are generally regarded as either extremely dedicated or slightly unhinged. There is often significant overlap between these categories.
+&nbsp;
+****Crisis herbs are those taken during acute illness - what your body might call "emergency services." Constitutional herbs, by contrast, are more like "maintaining the infrastructure." Less dramatic, certainly, but try living in a city with terrible pl`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding astragalus vitality in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ELDERBERRY_ANTIVIRAL: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'elderberry_antiviral',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Elderberry Antiviral',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'nature',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['medicinal_herbalism'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['astragalus_vitality'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { herbalism: 10 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_elderberry_antiviral' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `ON THE PECULIAR VIRTUES OF SAMBUCUS NIGRA IN COMBATING DIMINUTIVE MALEVOLENT ENTITIES: </span>
+A COMPREHENSIVE EXAMINATION OF ELDERBERRY'S ANTIVIRAL PROPERTIES WITH APPROPRIATE CAUTIONARY NOTES
+&nbsp;
+The elderberry (Sambucus nigra) has maintained its reputation as a guardian against invisible assailants for approximately seven thousand years*, a period during which humanity has tried almost everything else first†. Modern investigation confirms what hedge witches and irritable grandmothers have known since the Late Bronze Age: the dark purple berries contain compounds of remarkable efficacy against viral particles‡, provided one remembers to cook them first**. The mechanisms by which elderberry exerts its antiviral effects remain partially mysterious††, though this has not prevented the Guild of Herbological Interventionists from publishing seventeen thousand pages of speculation‡‡, nor stopped approximately 94.7% of practitioners from claiming they understood it all along***. The active constituents—anthocyanins, flavonoids, and other compounds with names designed to intimidate the uninitiated†††—appear to prevent viral adhesion to cellular walls‡‡‡, much like how a sufficiently stern doorman prevents unwanted visitors from entering an establishment****, though the biochemical specifics involve considerably less clipboard consultation and more molecular geometry than one might expect.
+&nbsp;
+The practical application of elderberry as an antiviral agent has evolved considerably from the traditional method of "boiling everything until it submits"*****. Modern preparations include syrups†††††, tinctures‡‡‡‡, and concentrated extracts, each with its own enthusiastic following and surprisingly territorial practitioners******. The optimal dosage appears to be approximately 15 milliliters of standardized elderberry syrup four times daily at the first sign of viral infection††††††, though historical records suggest our ancestors simply consumed it "until the cough stopped or the supply ran out, whichever came first"‡‡‡‡‡. Recent clinical trials have demonstrated a reduction in symptom duration of 2-4 days for influenza patients*******, a result that caused the International Consortium of Skeptical Physicians to begrudgingly admit "perhaps there's something to it after all"********. The antiviral effect appears most pronounced when initiated within the first 24-48 hours of symptom onset†††††††, which has led to the unfortunate modern practice of prophylactically consuming elderberry syrup at the slightest throat tickle, much to the benefit of elderberry cultivators worldwide‡‡‡‡‡‡.
+&nbsp;
+The safety considerations surrounding elderberry use deserve particular attention, as the plant maintains what scholars describe as "a complex relationship with human consumption"*********. While the cooked berries and flowers possess generally recognized-as-safe status from the authorities who determine such things††††††††, the raw berries, leaves, stems, bark, and roots contain cyanogenic glycosides‡‡‡‡‡‡‡, compounds that the human digestive system converts into cyanide with alarming efficiency**********. This has led to The Incident of 1847†††††††††, which we discuss only in hushed tones and which resulted in the founding of the Society for Actually Reading Instructions Before Consuming Plants‡‡‡‡‡‡‡‡. Modern practitioners must also consider potential interactions with immunosuppressant medications***********, as elderberry's immune-stimulating properties may work at cross-purposes with pharmaceutical attempts to calm overenthusiastic immune systems. The recommended approach involves consultation with qualified practitioners††††††††††, though historical records suggest this advice is followed approximately 23% of the time‡‡‡‡‡‡‡‡‡, with the remaining 77% operating under the principle of "it's natural, therefore it must be fine"************.
+&nbsp;
+Historical documentation reveals that elderberry's antiviral reputation predates the discovery of viruses by several millennia†††††††††††, suggesting either remarkable intuitive knowledge or cosmic coincidence‡‡‡‡‡‡‡‡‡‡. Ancient Egyptian physicians prescribed elderberry preparations for "demons of the invisible kind"*************, Medieval European herbalists recognized its efficacy against "ague and pestilence"***************, and Traditional Chinese Medicine incorporated it as "a herb that discourages tiny malicious spirits"***************. The scientific understanding of elderberry's mechanisms has progressed substantially since Dr. Madeleine Umbridge's pioneering 1986 study††††††††††††, which first identified the hemagglutinin inhibition effect‡‡‡‡‡‡‡‡‡‡‡, though her concurrent discovery that elderberry wine loses most of its antiviral properties**************** caused widespread disappointment among those who had hoped to combine medication with recreation. Modern research utilizing spectrophotometry, cellular assays, and other techniques that sound impressive at dinner parties***************** has confirmed the multi-faceted nature of elderberry's antiviral activity, operating through at least four distinct mechanisms that work in concert like a remarkably well-coordinated security team for your respiratory epithelium******************.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*The exact figure depends on which archaeobotanist you ask and how many glasses of elderberry wine they've consumed before answering. The Guild of Ancient Plant Studies maintains it could be anywhere from 5,000 to 9,000 years, but they also maintain that precision is "overrated in matters of deep antiquity."
+&nbsp;
+†Including but not limited to: standing in smoke, consuming mercury, bloodletting, apologizing to various deities, wearing particular colors on particular days, and that incident in 1372 where the Physicians' Guild of Lower Thuringia recommended "thinking happy thoughts at the illness very sternly."
+&nbsp;
+‡The term "viral particles" would not be coined for another several millennia, during which time they were variously known as "bad air," "miasmas," "tiny invisible demons," "punishment for moral failings," and, during one particularly creative period in 15th-century Bavaria, "malicious atmospheric motes of metaphysical wrongness."
+&nbsp;
+**The Great Raw Elderberry Incident of 1847 resulted in the formation of the International Society for Reading Directions Before Consuming Suspicious Berries. Their motto, "Cooking: It's Not Just for Flavor," remains relevant. See footnote ††††††††† for further details, though your lunch may be adversely affected.
+&nbsp;
+††As is the case with approximately 67% of all botanical remedies that actually work. The universe appears to have a sense of humor about explanatory mechanisms, preferring that humans stumble about in partial understanding while the plants smugly refuse to provide their full biochemical secrets.
+&nbsp;
+‡‡Published between 1823 and 2023 by the Guild of Herbological Interventionists, headquartered in what they describe as "an undisclosed location" but which is actually a quite disclosed building in Basel with a large sign. The seventeen thousand pages include numerous contradictions, three separate fistfights recorded in footnotes, and one instance where pages 4,557-4,562 are entirely blank with only the note "we genuinely have no idea about this part."
+&nbsp;
+***This percentage rises to 99.2% among practitioners who charge more than $200 per consultation.
+&nbsp;
+†††Specifically: cyanidin-3-glucoside, cyanidin-3-sambubioside, delphinidin-3-sambubioside, quercetin, rutin, and approximately forty-seven other compounds whose names cause the eyes to glaze over in self-defense. The plants produce these compounds without apparent effort, while human synthesis requires approximately fourteen steps, three different solvents, and at least one moment of existential crisis.
+&nbsp;
+‡‡‡This mechanism, first observed by Dr. Heinrich Feldstein in 1978, involves the anthocyanins binding to hemagglutinin proteins on viral surfaces, effectively removing the virus's ability to attach to host cells. It's rather like removing a burglar's lockpicks before they reach your door, except at a molecular level and involving significantly more hydrogen bonding.
+&nbsp;
+****The Doorman Theory of Viral Inhibition, proposed by Professor Sarah MacIntyre in 2003, has become surprisingly popular despite being "an obvious oversimplification" according to the Journal of Unnecessary Pedantry. Nevertheless, it helps students remember the concept, which is more than can be said for the official explanation involving "multivalent ligand-receptor interference in the context of sialic acid-binding domains."
+&nbsp;
+*****Traditional recipes from various cultures share remarkable similarities: "Take elderberries. Boil them. Continue boiling them. Have you stopped boiling them? Then boil them more. Now add honey and stop bothering me with questions." The archaeological record suggests this approach has remained unchanged since approximately 3000 BCE†.`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding elderberry antiviral in the context of nature',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  GINGER_NAUSEA_RELIEF,</span>
+<span class="cstat-no" title="statement not covered" >  CHAMOMILE_DIGESTIVE_AID,</span>
+<span class="cstat-no" title="statement not covered" >  RESPIRATORY_HERBS,</span>
+<span class="cstat-no" title="statement not covered" >  THYME_COUGH_REMEDY,</span>
+<span class="cstat-no" title="statement not covered" >  MULLEIN_LUNG_SUPPORT,</span>
+<span class="cstat-no" title="statement not covered" >  EUCALYPTUS_BREATHING_AID,</span>
+<span class="cstat-no" title="statement not covered" >  IMMUNE_SUPPORTING_HERBS,</span>
+<span class="cstat-no" title="statement not covered" >  ECHINACEA_IMMUNE_BOOST,</span>
+<span class="cstat-no" title="statement not covered" >  ASTRAGALUS_VITALITY,</span>
+<span class="cstat-no" title="statement not covered" >  ELDERBERRY_ANTIVIRAL</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

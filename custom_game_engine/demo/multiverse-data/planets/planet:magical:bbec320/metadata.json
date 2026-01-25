@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:bbec320",
+  "name": "Nova Gaia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769243063316",
+  "createdAt": 1769243063493,
+  "lastAccessedAt": 1769243063493,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769243063316",
+    "type": "magical"
+  }
+}

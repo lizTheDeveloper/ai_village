@@ -113,12 +113,12 @@ export class LLMVisionGenerator {
     deity: EntityImpl,
     _world: World
   ): string {
-    const agentComp = agent.getComponent<AgentComponent>(CT.Agent);
-    const identity = agent.getComponent<IdentityComponent>(CT.Identity);
-    const spiritual = agent.getComponent<SpiritualComponent>(CT.Spiritual);
-    const needs = agent.getComponent<NeedsComponent>(CT.Needs);
-    const mood = agent.getComponent<MoodComponent>(CT.Mood);
-    const deityComp = deity.getComponent<DeityComponent>(CT.Deity);
+    const agentComp = agent.getComponent(CT.Agent);
+    const identity = agent.getComponent(CT.Identity);
+    const spiritual = agent.getComponent(CT.Spiritual);
+    const needs = agent.getComponent(CT.Needs);
+    const mood = agent.getComponent(CT.Mood);
+    const deityComp = deity.getComponent(CT.Deity);
 
     if (!agentComp || !spiritual || !identity || !deityComp) {
       throw new Error('Missing required components for vision generation');
@@ -314,7 +314,7 @@ Respond with JSON:
     if (!deityId) {
       const agent = world.getEntity(agentId);
       if (agent) {
-        const spiritual = agent.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+        const spiritual = agent.getComponent(CT.Spiritual);
         deityId = spiritual?.believedDeity;
       }
     }

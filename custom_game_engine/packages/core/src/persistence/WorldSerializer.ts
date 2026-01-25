@@ -2,7 +2,7 @@
  * WorldSerializer - Serializes/deserializes entire World instances
  */
 
-import { World } from '../ecs/World.js';
+import type { WorldMutator } from '../ecs/World.js';
 import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';
@@ -21,7 +21,7 @@ export class WorldSerializer {
    * Serialize entire world to snapshot.
    */
   async serializeWorld(
-    world: World,
+    world: WorldMutator,
     universeId: string,
     universeName: string
   ): Promise<UniverseSnapshot> {
@@ -104,7 +104,7 @@ export class WorldSerializer {
   /**
    * Deserialize world from snapshot.
    */
-  async deserializeWorld(snapshot: UniverseSnapshot, world: World): Promise<void> {
+  async deserializeWorld(snapshot: UniverseSnapshot, world: WorldMutator): Promise<void> {
 
     // Verify checksums
     const entitiesChecksum = computeChecksumSync(snapshot.entities);
@@ -117,9 +117,9 @@ export class WorldSerializer {
     }
 
     // Restore divine config if present
-    const worldImpl = world as WorldImpl;
+    // World is now the implementation class
     if (snapshot.config && Object.keys(snapshot.config as object).length > 0) {
-      worldImpl.setDivineConfig(snapshot.config as Partial<UniverseDivineConfig>);
+      world.setDivineConfig(snapshot.config as Partial<UniverseDivineConfig>);
     }
 
     // Deserialize entities
@@ -134,7 +134,7 @@ export class WorldSerializer {
 
     // Deserialize world state (terrain, weather, etc.)
     if (snapshot.worldState.terrain) {
-      const chunkManager = worldImpl.getChunkManager();
+      const chunkManager = world.getChunkManager();
       if (chunkManager) {
         // Dynamic import to break circular dependency: core -> world -> reproduction -> core
         // Type assertion: We trust the serialized terrain data structure matches what chunkSerializer expects
@@ -156,11 +156,11 @@ export class WorldSerializer {
     // breaking all time-delta calculations (pregnancies, cooldowns, behavior states, caches)
     const universeTick = parseInt(snapshot.time.universeTick || '0', 10);
     if (!isNaN(universeTick) && universeTick > 0) {
-      worldImpl.setTick(universeTick);
+      world.setTick(universeTick);
     }
 
     // Emit world:loaded event for systems to invalidate their caches
-    worldImpl.eventBus.emit({
+    world.eventBus.emit({
       type: 'world:loaded',
       source: 'world_serializer',
       data: { tick: universeTick, entityCount: snapshot.entities.length },
@@ -293,8 +293,8 @@ export class WorldSerializer {
    */
   private async serializeWorldState(world: World): Promise<WorldSnapshot> {
     // Serialize terrain using ChunkSerializer
-    const worldImpl = world as WorldImpl;
-    const chunkManager = worldImpl.getChunkManager();
+    // World is now the implementation class
+    const chunkManager = world.getChunkManager();
 
     // Dynamic import to break circular dependency: core -> world -> reproduction -> core
     let terrain = null;

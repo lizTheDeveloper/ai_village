@@ -266,18 +266,21 @@ export class RemoteUniverseView implements IWindowPanel {
         // Apply deltas to entity
         for (const delta of entityUpdate.deltas) {
           const componentIndex = existing.components.findIndex(
-            (c: any) => c.type === delta.componentType
+            (c) => c.type === delta.componentType
           );
 
           if (delta.operation === 'add' && componentIndex === -1) {
             existing.components.push({
               $schema: 'https://aivillage.dev/schemas/component/v1',
               $version: 1,
-              type: delta.componentType as string,
+              type: delta.componentType,
               data: delta.data,
             });
           } else if (delta.operation === 'update' && componentIndex !== -1) {
-            existing.components[componentIndex]!.data = delta.data;
+            const component = existing.components[componentIndex];
+            if (component) {
+              component.data = delta.data;
+            }
           } else if (delta.operation === 'remove' && componentIndex !== -1) {
             existing.components.splice(componentIndex, 1);
           }
@@ -419,7 +422,7 @@ export class RemoteUniverseView implements IWindowPanel {
     tileSize: number
   ): void {
     // Get position component
-    const positionComp = entity.components.find((c: any) => c.type === 'position');
+    const positionComp = entity.components.find((c) => c.type === 'position');
     if (!positionComp || !positionComp.data) return;
 
     // Type guard: Validate position data structure
@@ -438,8 +441,8 @@ export class RemoteUniverseView implements IWindowPanel {
     const screenY = viewY + entityY * tileSize;
 
     // Get renderable component for sprite info
-    const renderableComp = entity.components.find((c: any) => c.type === 'renderable');
-    const renderableData = renderableComp?.data as any;
+    const renderableComp = entity.components.find((c) => c.type === 'renderable');
+    const renderableData = renderableComp?.data as { spriteId?: string } | undefined;
 
     // Convert VersionedEntity to minimal Entity-like object for sprite rendering
     // PixelLabEntityRenderer expects Entity with components Map
@@ -448,10 +451,10 @@ export class RemoteUniverseView implements IWindowPanel {
       componentsMap.set(comp.type, comp.data);
     }
 
-    const entityLike = {
+    const entityLike: { id: string; components: Map<string, unknown> } = {
       id: entity.id,
       components: componentsMap,
-    } as any;
+    };
 
     // Calculate sprite size
     const spriteSize = tileSize;
@@ -482,7 +485,7 @@ export class RemoteUniverseView implements IWindowPanel {
     // Final fallback: colored square based on entity type
     if (!rendered) {
       const hasComponent = (type: string): boolean =>
-        entity.components.some((c: any) => c.type === type);
+        entity.components.some((c) => c.type === type);
 
       let color = '#888';
       if (hasComponent('agent')) {

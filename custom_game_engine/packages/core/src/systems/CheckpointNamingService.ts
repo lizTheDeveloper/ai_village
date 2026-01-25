@@ -17,7 +17,7 @@ import type { World } from '../ecs/World.js';
 import type { Checkpoint } from './AutoSaveSystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
-import type { LLMProvider, LLMRequest, LLMResponse } from '../types/LLMTypes.js';
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 export class CheckpointNamingService {
   private llmProvider: LLMProvider | null = null;

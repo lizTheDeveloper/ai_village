@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:7a6d8968",
+  "name": "Quantum Theia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769220020343",
+  "createdAt": 1769220020394,
+  "lastAccessedAt": 1769220020394,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769220020343",
+    "type": "magical"
+  }
+}

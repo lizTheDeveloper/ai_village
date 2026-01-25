@@ -232,8 +232,8 @@ function runTests(): void {
       capacity: 1,
     };
     const result = validateBuilding(building);
-    assertTrue(result.resourceCost.wood > 0, 'Should calculate wood cost');
-    assertTrue(result.resourceCost.dirt > 0, 'Should calculate dirt cost');
+    assertTrue((result.resourceCost.wood ?? 0) > 0, 'Should calculate wood cost');
+    assertTrue((result.resourceCost.dirt ?? 0) > 0, 'Should calculate dirt cost');
   });
 
   test('Should identify entrances correctly', () => {
@@ -279,6 +279,7 @@ function runDemo(): void {
 
   // Pick a sample building
   const building = ALL_VALID_EXAMPLES[4]; // House with rooms
+  if (!building) throw new Error('Building example not found');
 
   console.log(visualizeBuilding(building));
   console.log('\n');
@@ -287,6 +288,7 @@ function runDemo(): void {
   console.log('\n--- Invalid Building Example ---\n');
 
   const invalidBuilding = ALL_INVALID_EXAMPLES[1]; // Unreachable room
+  if (!invalidBuilding) throw new Error('Invalid building example not found');
   console.log(visualizeBuilding(invalidBuilding));
   console.log('\n');
   console.log(formatValidationResult(validateBuilding(invalidBuilding)));

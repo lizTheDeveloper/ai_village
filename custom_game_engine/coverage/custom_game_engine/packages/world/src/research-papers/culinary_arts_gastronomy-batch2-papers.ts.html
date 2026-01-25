@@ -1,0 +1,1960 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for custom_game_engine/packages/world/src/research-papers/culinary_arts_gastronomy-batch2-papers.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">custom_game_engine/packages/world/src/research-papers</a> culinary_arts_gastronomy-batch2-papers.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/172</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a>
+<a name='L381'></a><a href='#L381'>381</a>
+<a name='L382'></a><a href='#L382'>382</a>
+<a name='L383'></a><a href='#L383'>383</a>
+<a name='L384'></a><a href='#L384'>384</a>
+<a name='L385'></a><a href='#L385'>385</a>
+<a name='L386'></a><a href='#L386'>386</a>
+<a name='L387'></a><a href='#L387'>387</a>
+<a name='L388'></a><a href='#L388'>388</a>
+<a name='L389'></a><a href='#L389'>389</a>
+<a name='L390'></a><a href='#L390'>390</a>
+<a name='L391'></a><a href='#L391'>391</a>
+<a name='L392'></a><a href='#L392'>392</a>
+<a name='L393'></a><a href='#L393'>393</a>
+<a name='L394'></a><a href='#L394'>394</a>
+<a name='L395'></a><a href='#L395'>395</a>
+<a name='L396'></a><a href='#L396'>396</a>
+<a name='L397'></a><a href='#L397'>397</a>
+<a name='L398'></a><a href='#L398'>398</a>
+<a name='L399'></a><a href='#L399'>399</a>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a>
+<a name='L457'></a><a href='#L457'>457</a>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a>
+<a name='L511'></a><a href='#L511'>511</a>
+<a name='L512'></a><a href='#L512'>512</a>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a>
+<a name='L549'></a><a href='#L549'>549</a>
+<a name='L550'></a><a href='#L550'>550</a>
+<a name='L551'></a><a href='#L551'>551</a>
+<a name='L552'></a><a href='#L552'>552</a>
+<a name='L553'></a><a href='#L553'>553</a>
+<a name='L554'></a><a href='#L554'>554</a>
+<a name='L555'></a><a href='#L555'>555</a>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a>
+<a name='L565'></a><a href='#L565'>565</a>
+<a name='L566'></a><a href='#L566'>566</a>
+<a name='L567'></a><a href='#L567'>567</a>
+<a name='L568'></a><a href='#L568'>568</a>
+<a name='L569'></a><a href='#L569'>569</a>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a>
+<a name='L575'></a><a href='#L575'>575</a>
+<a name='L576'></a><a href='#L576'>576</a>
+<a name='L577'></a><a href='#L577'>577</a>
+<a name='L578'></a><a href='#L578'>578</a>
+<a name='L579'></a><a href='#L579'>579</a>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a>
+<a name='L613'></a><a href='#L613'>613</a>
+<a name='L614'></a><a href='#L614'>614</a>
+<a name='L615'></a><a href='#L615'>615</a>
+<a name='L616'></a><a href='#L616'>616</a>
+<a name='L617'></a><a href='#L617'>617</a>
+<a name='L618'></a><a href='#L618'>618</a>
+<a name='L619'></a><a href='#L619'>619</a>
+<a name='L620'></a><a href='#L620'>620</a>
+<a name='L621'></a><a href='#L621'>621</a>
+<a name='L622'></a><a href='#L622'>622</a>
+<a name='L623'></a><a href='#L623'>623</a>
+<a name='L624'></a><a href='#L624'>624</a>
+<a name='L625'></a><a href='#L625'>625</a>
+<a name='L626'></a><a href='#L626'>626</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Generated Research Papers
+ *
+ * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ */
+&nbsp;
+import type { ResearchPaper } from './types.js';
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const SEASONAL_INGREDIENT_SELECTION: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'seasonal_ingredient_selection',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Seasonal Ingredient Selection',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['garnish_selection_purpose'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 5,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_seasonal_ingredient_selection' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `SEASONAL INGREDIENT SELECTION: A TREATISE ON TEMPORAL GASTRONOMY AND THE PERILS OF DINING OUT OF PHASE</span>
+&nbsp;
+The fundamental principle of seasonal ingredient selection rests upon a deceptively simple premise: that ingredients harvested, gathered, or otherwise procured during their natural period of abundance possess superior qualities of flavor, texture, and price point* compared to their out-of-season counterparts. This wisdom, passed down through generations of cooks, market vendors, and those unfortunate souls who attempted to serve strawberries in February†, forms the bedrock of sustainable culinary practice. The seasonal cook must develop what the ancient Mesopotamians called "temporal ingredient awareness"‡, a sensitivity to the rhythmic progression of produce through the year that borders on the prophetic§. Modern research by the Institute of Applied Chronogastronomy** confirms that ingredients consumed during their natural season contain up to 47.3% more "essence of rightness"††, a measurement that has baffled food scientists since its discovery but which every grandmother has understood instinctively‡‡.
+&nbsp;
+The practical application of seasonal selection requires both knowledge and restraint, two qualities rarely found in the same kitchen§§. One must first learn to read the calendar not as a mere temporal marker but as a roadmap of availability***, a skill that separates the competent cook from the enthusiast who wonders why their winter tomatoes taste of sadness and cardboard†††. The technique involves visiting markets‡‡‡, developing relationships with producers§§§, and—most crucially—resisting the temptation to purchase asparagus in November****, regardless of how appealingly it has been arranged††††. Advanced practitioners develop what is known as "seasonal intuition," the ability to determine appropriate ingredients by month, weather, and the particular slant of afternoon light‡‡‡‡. The Guild of Temporal Chefs§§§§ maintains that true mastery occurs when one can taste a dish and identify not only its ingredients but the precise week in which they were harvested*****, a claim that seems far-fetched until one witnesses a Master Seasonal Chef reduce a pretentious restaurant critic to tears by identifying their imported December raspberries as "Wednesday's child, full of woe and airplane fuel"†††††.
+&nbsp;
+Safety considerations in seasonal selection extend beyond mere culinary disappointment into the realm of genuine hazard‡‡‡‡‡. The Historical Archives of Culinary Disasters§§§§§ document numerous incidents of "temporal ingredient discord"******, ranging from the merely unpleasant to the spectacularly catastrophic. The infamous Midwinter Peach Incident of 1847††††††, in which a nobleman demanded fresh peaches for a Christmas feast and subsequently experienced what contemporary accounts describe as "a fundamental disagreement between his digestive system and the laws of nature"‡‡‡‡‡‡, serves as a cautionary tale§§§§§§. Modern practitioners must understand that ingredients forced into season through technological intervention—greenhouse cultivation, international shipping, or the darker arts of chemical preservation*******—lack what the mystics call "temporal coherence"†††††††, leading to dishes that are, in the words of the legendary chef Antonin Carême‡‡‡‡‡‡‡, "technically edible but spiritually bankrupt"§§§§§§§. The wise cook learns to work with the seasons rather than against them, understanding that spring's asparagus tastes of renewal precisely because one has survived months without it********.
+&nbsp;
+Historical development of seasonal awareness follows humanity's agricultural evolution, though our ancestors possessed advantages we have partially lost††††††††. Before the invention of refrigerated transport‡‡‡‡‡‡‡‡, global supply chains§§§§§§§§, and the particularly misguided notion that one should be able to eat any food at any time*********, people maintained an intimate relationship with seasonal cycles born of necessity rather than philosophy. The ancient Romans, despite their many culinary innovations, never confused December with June††††††††, a clarity of seasonal thinking that gave them distinct advantages in both warfare and dinner party planning‡‡‡‡‡‡‡‡‡. The medieval period saw the development of elaborate preservation techniques§§§§§§§§§ designed not to defeat seasonality but to extend its gifts, a philosophical distinction lost on the modern supermarket************. The Industrial Revolution began the great forgetting, as technologies of preservation and transportation created the dangerous illusion that seasons were merely suggestions rather than fundamental truths of the natural world†††††††††. We are only now, in the twenty-first century, rediscovering what our great-great-grandmothers knew in their bones: that there is a time for strawberries, and it is not January‡‡‡‡‡‡‡‡‡‡.
+&nbsp;
+The modern synthesis of seasonal ingredient selection combines ancient wisdom with contemporary understanding, creating a framework for temporal gastronomy that serves both palate and planet§§§§§§§§§§. Today's seasonal cook must navigate between extreme positions—the purist who refuses to cook anything unavailable within five miles of their kitchen***********, and the ignorant optimist who believes that Chilean grapes in March represent the pinnacle of human achievement************. The middle path, as usual, proves most sustainable: learning one's local seasons, understanding the natural progression of ingredients, and occasionally making informed exceptions for ingredients that genuinely travel well or whose cultivation in distant climates causes no temporal discord†††††††††††. Organizations such as the International Committee for Temporal Dining Practices‡‡‡‡‡‡‡‡‡‡‡ now provide seasonal calendars adjusted for climate, latitude, and local agricultural practices, though they caution that no calendar can replace the education gained from visiting a farmers' market every week for a year and actually paying attention§§§§§§§§§§§. The ultimate goal remains what it has always been: to eat in harmony with the turning of the year, experiencing the full cycle of abundance and scarcity that makes each season's particular gifts worth celebrating*************.
+&nbsp;
+&nbsp;
+* The price point consideration deserves particular emphasis. Spring asparagus in April costs approximately one-third of what the same asparagus costs in December, a differential that reflects not gouging but the fundamental expenses of shipping, storage, and the spiritual emptiness of eating the wrong thing at the wrong time.
+&nbsp;
+† The February Strawberry Debacle of 1823 remains a cautionary tale told in culinary schools. The Duke of Winterhaven insisted on serving strawberries at his midwinter ball, resulting in what chroniclers delicately termed "a mass digestive protest" among his guests.
+&nbsp;
+‡ The Mesopotamians, having invented both agriculture and written records, had plenty of time to develop food philosophy. Their clay tablets contain detailed seasonal calendars, though roughly 30% of these tablets are actually complaints about guests who brought off-season figs to dinner parties.
+&nbsp;
+§ Some practitioners claim they can sense the approach of tomato season days in advance, experiencing what they describe as "a tingling in their taste buds." The medical establishment remains skeptical, though they cannot explain Chef Pierre Montagne's famous prediction of the first strawberry harvest of 1891 to within three hours.
+&nbsp;
+** The Institute of Applied Chronogastronomy, located in Geneva, Switzerland, employs 47 researchers, maintains 14 test kitchens across various climate zones, and possesses the world's most extensive collection of historically preserved ingredients. Their basement contains a jar of out-of-season tomatoes from 1967 that they claim still radiates "wrongness" on sensitive equipment.
+&nbsp;
+†† "Essence of rightness" remains poorly defined in scientific terms but readily apparent to anyone who has tasted a tomato in August versus December. Instruments designed to measure this quality consistently malfunction, though lab technicians report that the equipment itself seems to know the difference.
+&nbsp;
+††† The phenomenon of winter tomatoes was extensively studied by Dr. Helena Brightwood in her seminal 1973 paper "On the Spiritual Emptiness of Greenhouse Produce: A Quantitative Analysis." She found that 89.2% of subjects could identify winter tomatoes in blind taste tests, with descriptors ranging from "disappointingly mealy" to "an affront to the natural order."
+&nbsp;
+‡‡ Every grandmother possesses this knowledge, yet the mechanism of transmission remains mysterious. It does not appear in any written form, yet manifests fully formed in women over the age of sixty, regardless of their previous cooking experience. Men can learn it but must study formally for years.
+&nbsp;
+§§ The combination of knowledge and restraint proves particularly elusive in professional kitchens, where chefs often possess extensive seasonal knowledge but lack the restraint to avoid showcasing it at inappropriate times. The Culinary Hubris Index, published quarterly by the Academy of Modest Cooking, tracks chefs who attempt elaborate out-of-season me`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding seasonal ingredient selection in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const TERROIR_FLAVOR_IMPACT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'terroir_flavor_impact',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Terroir Flavor Impact',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['seasonal_ingredient_selection'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_terroir_flavor_impact' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `TERROIR FLAVOR IMPACT: A COMPREHENSIVE EXAMINATION OF SOIL, SOUL, AND SOUP</span>
+&nbsp;
+The concept of terroir—that peculiar marriage of soil, climate, and the ineffable essence of place*—has long fascinated those who seek to understand why a carrot grown in one valley tastes of sunshine and optimism while its genetic twin from across the mountain tastes primarily of disappointment†. At its most fundamental level, terroir represents the sum total of environmental factors that influence the flavor compounds within agricultural products, though this clinical definition fails to capture the reality that certain vineyards in the Burgundy region have been known to produce grapes that taste distinctly of arguments between feudal lords‡. The scientific community has attempted to quantify these effects through soil analysis, climate mapping, and extensive chemical profiling, yet persistently finds itself unable to explain why tomatoes grown in volcanic soil taste "angry" or why certain cheeses carry the distinct flavor memory of the shepherd's regrets**.
+&nbsp;
+The practical application of terroir knowledge in culinary contexts requires first accepting that approximately 73.6% of ingredient selection should account for geographic origin††, though this statistic varies wildly depending on whether one consults the International Bureau of Flavor Standardization‡‡ or simply asks any grandmother in any village anywhere†††. The chef must develop an almost archaeological relationship with their ingredients, learning to taste the limestone in their leeks, the morning mist in their mushrooms, and the existential dread unique to root vegetables grown too close to administrative buildings***. Modern technique dictates the practice of "flavor mapping"—creating detailed charts correlating specific geographic locations with taste profiles—though this exercise often reveals uncomfortable truths about why certain regions have historically specialized in pickling††† or why some valleys are best avoided entirely during ingredient sourcing‡‡‡.
+&nbsp;
+Historical development of terroir understanding can be traced to the ancient Mesopotamians, who first observed that barley grown in fields blessed by priests produced distinctly holier-tasting beer****, though whether this was due to soil composition or psychosomatic expectation remains debated††††. The French, naturally, took the concept and elevated it to something approaching religious dogma, establishing in 1347 the Académie des Sols Précieux (Academy of Precious Soils)‡‡‡‡, which spent the next two centuries creating increasingly baroque classification systems that required seventeen sub-categories just to describe variations in dirt****. The modern understanding synthesizes centuries of empirical observation with contemporary soil science, microclimate analysis, and the grudging admission that terroir effects extend beyond wine and cheese to encompass virtually every ingredient, including—controversially—water†††††.
+&nbsp;
+Safety considerations when working with terroir-influenced ingredients center primarily on the risk of becoming insufferable‡‡‡‡‡. The Guild of Practical Cooks maintains extensive documentation on chefs who became so obsessed with terroir that they refused to cook with ingredients sourced from more than twelve kilometers away, resulting in either enlightenment or bankruptcy at roughly equal rates (49.3% and 50.7% respectively)******. More pressing concerns involve the actual contamination risks associated with certain historic growing regions: soil that once hosted Roman lead processing facilities will, indeed, produce flavorful herbs, but the flavor is approximately 34% neurotoxin by volume††††††. The golden rule remains that understanding terroir should enhance cooking, not paralyze it—a lesson learned painfully by the Venetian chef Giuseppe Mandorla who, in 1823, spent three years searching for the perfect potato and starved to death before finding it‡‡‡‡‡‡.
+&nbsp;
+Modern best practices suggest beginning terroir education with blind tastings of the same ingredient grown in different regions*******, progressing to understanding how terroir interacts with preparation methods (limestone-influenced vegetables require 7.3% less cooking time on average), and ultimately developing an intuitive sense for how place-memory manifests in flavor††††††. The International Culinary Council's latest guidelines recommend against informing diners of specific terroir details unless absolutely necessary, as such information triggers an average 23-minute lecture response in 67% of food enthusiasts‡‡‡‡‡‡‡. The true mastery of terroir impact comes not from pedantic knowledge recitation but from the subtle art of allowing ingredients to sing their geographic songs********, which sounds poetic until one encounters durian fruit and realizes some places should perhaps keep their songs to themselves†††††††.
+&nbsp;
+&nbsp;
+*The French word for "earth" or "land," though it carries implications that simple translation cannot capture. It's rather like trying to explain "hygge" to someone who has never experienced Danish winter, or attempting to describe "Schadenfreude" to someone who has never watched their rival slip on a banana peel. The concept predates the word by several millennia, but the French got the credit because they wrote it down with sufficient pomposity.
+&nbsp;
+†This phenomenon was first documented by Sister Marguerite of the Benedictine Order in 1456, who maintained detailed tasting notes suggesting that vegetables grown in blessed soil tasted "closer to God" while those from the village drunkard's patch tasted "of poor life choices and questionable decisions."
+&nbsp;
+‡The Domaine de Vosne-Romanée maintains that certain parcels produce wine with distinct notes of "medieval property disputes" and "lingering resentment circa 1347." Blind tastings have confirmed this in 12 out of 13 attempts, with the thirteenth taster subsequently revealed to be spiritually insensitive.
+&nbsp;
+**This is not, as skeptics suggest, merely metaphor. Chemical analysis has revealed that volcanic soil imparts elevated levels of sulfurous compounds that, while not technically "angry," do seem "deeply displeased." The tomatoes themselves have been observed to split more aggressively when sliced.
+&nbsp;
+††This figure comes from the Bureau's controversial 2019 study, "Quantifying the Unquantifiable: A Statistical Approach to Basically Guessing." The methodology has been questioned, primarily because the Bureau was created specifically to conduct this study and dissolved immediately afterward.
+&nbsp;
+‡‡The IBFS operates from a building that doesn't appear on most maps†, located in what they describe as "the approximate center of culinary consciousness," which turns out to be a regrettable suburb of Brussels. Their proclamations carry weight inversely proportional to their actual influence, which is mathematically impossible but somehow accurate.
+&nbsp;
+†Found after extensive searching by the dedicated but baffled cartographers of the Rand McNally Institute, who note it exists in a peculiar state of being-both-there-and-not-quite-there, similar to that restaurant you're sure you've been to but can never find again.
+&nbsp;
+†††Grandmothers operate on what the Institute of Ancestral Knowledge calls "absolute conviction based on sample size of one." This methodology has proven surprisingly reliable, succeeding approximately 94% of the time while remaining completely unreplicable by scientific standards.
+&nbsp;
+***The phenomenon of "administrative dread flavoring" remains poorly understood but widely acknowledged. Radishes grown within three hundred meters of tax offices develop notes described variously as "ennui," "processed despair," and "the taste of waiting in line." The British government attempted to classify this effect in 1973 but the resulting 847-page report was deemed too depressing to publish.
+&nbsp;
+†††The great Pickling Belt of Eastern Europe, for instance, developed not from cultural preference but from desperate necessity after it was discovered that everything grown in certain valleys tasted primarily of "regret" when fresh. Fermentation, mercifully, transformed regret into something approaching "acceptance with vinegar notes."
+&nbsp;
+‡‡‡The Valley of Questionable Vegetables, located approximately twelve kilometers southwest of Cluj-Napoca, produces rutabagas that taste distinctly of "mistakes from previous lives." The Local Farmers' Cooperative has stopped fighting this reputation and now markets them specifically for penance-based dishes.
+&nbsp;
+****The Mesopotamian Beer Purity Scrolls of circa 2400 BCE contain extensive notation on barley varieties and their spiritual adequacy. Modern translation reveals one scribe's marginalia: "The barley from Plot 7 produces beer that makes one feel close to the gods, though whether from holiness or merely from high alcohol content remains theologically ambiguous."
+&nbsp;
+††††The debate continues in the Journal of Ancient Brewing Studies, which dedicated its entire Spring 2015 issue to the question. The editorial board concluded that both factors likely contributed, then adjourned to the pub to continue research, as is traditional.
+&nbsp;
+‡‡‡‡This institution lasted exactly 287 years before collapsing under the weight of its own classification system, which by 1624 required a separate Index of Indices just to navigate. The final Grand Master, Philippe de Terre-Sévère, was found deceased in his office, buried under seventeen volumes of soil taxonomy. The official cause of death was listed as "excessive precision."
+&nbsp;
+****The subsoil subsection alone containe`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding terroir flavor impact in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const INGREDIENT_QUALITY_ASSESSMENT: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'ingredient_quality_assessment',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Ingredient Quality Assessment',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['terroir_flavor_impact'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 6,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_ingredient_quality_assessment' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Ingredient Quality Assessment</span>
+&nbsp;
+The assessment of ingredient quality represents one of the fundamental pillars of culinary practice, though it is perhaps the pillar most likely to poke you in the eye if approached incorrectly*. At its core, quality assessment involves the systematic evaluation of ingredients through sensory analysis, visual inspection, and—in cases of extreme necessity—actual tasting†. The principles underlying this practice are deceptively simple: fresh ingredients should look fresh, smell fresh, and ideally not have achieved sentience during storage‡. However, as the Guild of Ingredient Assessors learned during the Notorious Cheese Incident of 1847**, the gap between principle and practice can be vast enough to hide several confused apprentices and at least one lawsuit.
+&nbsp;
+The practical application of ingredient quality assessment requires developing what the ancient practitioners called "the eye of discernment," though modern research suggests that the nose, fingers, and occasionally the tongue also play non-negligible roles††. Visual inspection remains paramount—a tomato should exhibit the firm glossiness of health rather than the suspicious softness of imminent betrayal‡‡. The color should be appropriate to its variety, though one must account for the seventeen thousand subspecies of tomato documented by the Botanical Society of Excessive Cataloguing***. Texture assessment involves gentle pressure application, a skill that separates the competent cook from the one who accidentally crushes produce while merely attempting evaluation†††. The olfactory examination, meanwhile, should reveal the clean, bright notes characteristic of freshness rather than the complex bouquet that suggests fermentation has become ambitious‡‡‡.
+&nbsp;
+Historical development of quality assessment techniques reveals a fascinating evolution from the "poke it and hope" methodology of early agricultural societies to the sophisticated multi-sensory analysis employed by modern culinary professionals****. The Mesopotamians, who were among the first to establish formal quality standards, relied primarily on visual inspection and the consultation of omens—a practice that proved surprisingly effective until the Great Grain Confusion of 2340 BCE*****. Medieval European markets employed official tasters, a position that sounds prestigious until one considers the mortality rate†††††. The Renaissance brought scientific rigor to the field, though this was somewhat undermined by the simultaneous belief that ingredients could be assessed by their astrological alignment‡‡‡‡. Modern understanding emerged in the nineteenth century with the establishment of the International Congress of People Who Smell Things Professionally******, which finally codified assessment criteria based on observable, repeatable phenomena rather than supernatural intervention.
+&nbsp;
+Safety considerations in ingredient quality assessment cannot be overstated, as the historical record makes abundantly clear through its documentation of individuals who learned these lessons in the most educational way possible†††††††. The primary rule—never taste anything that smells actively hostile—seems obvious yet requires regular emphasis‡‡‡‡‡. Visual indicators of spoilage include discoloration, unusual growth, and what the Guild's handbook euphemistically terms "unexpected mobility"*******. Temperature assessment, while not always possible through direct contact, provides critical information; ingredients should feel appropriately cool or ambient, never suspiciously warm as if conducting their own metabolic processes********. The doctrine of "when in doubt, throw it out" has prevented more culinary disasters than any other single principle, though it has admittedly contributed to a staggering amount of waste and several strongly-worded letters from environmental organizations†††††††††.
+&nbsp;
+Modern best practices synthesize centuries of accumulated wisdom, tragic errors, and at least three papal bulls into a coherent framework for ingredient assessment‡‡‡‡‡‡. Professional kitchens maintain detailed receiving protocols, with ingredients subjected to multi-point inspection before acceptance—a practice that seems excessive until one recalls the Great Restaurant Uprising of 1923, when inferior produce led to a citywide boycott and the mysterious disappearance of several suppliers*********. The seasonal approach to ingredient selection, while romanticized in contemporary culinary literature, reflects the pragmatic reality that ingredients are simply better when harvested at their natural peak rather than when commercially convenient††††††††††. Storage assessment, performed daily in establishments of quality, prevents the gradual decay of standards that transforms a respectable kitchen into what health inspectors delicately term "a situation of concern"‡‡‡‡‡‡‡. The integration of these practices creates what Professor Wilhelmina Taste-Bud-Worth termed "a culture of ingredient respect," though she later admitted this was primarily a grant application strategy that accidentally became influential**********.
+&nbsp;
+&nbsp;
+---
+&nbsp;
+*The Pillar Metaphor Index, maintained by the Academy of Overwrought Comparisons, lists 847 different ways culinary writers have described fundamental concepts as "pillars." The index itself has become rather pillar-like in its immovability.
+&nbsp;
+†The International Tasting Order maintains strict protocols about when tasting is appropriate. Their 400-page manual dedicates chapter seventeen entirely to "Things You Should Probably Not Put In Your Mouth Even If They Look Okay."
+&nbsp;
+‡The question of ingredient sentience remains controversial. The Society for the Prevention of Cruelty to Vegetables argues that certain root vegetables exhibit primitive awareness, though their evidence primarily consists of "just look at them" and several unsettling photographs.
+&nbsp;
+**The Notorious Cheese Incident remains classified by the Guild, though rumors persist of an artisanal blue cheese that achieved what witnesses described as "an inappropriate level of blueness."† The subsequent inquiry lasted seven months and required testimony from three bishops and a mycologist who had to be sedated.
+&nbsp;
+†See also: The Excessive Blueness Protocols, established 1848, which specify exact Pantone values for acceptable cheese discoloration.
+&nbsp;
+††Ancient texts describe "the eye of discernment" with reverence typically reserved for holy relics. Modern scholars believe this may have been a metaphor, though the Museum of Culinary Antiquities displays what it claims is the actual preserved eye of Master Chef Hieronymus the Perceptive. Visitors are advised not to make direct eye contact.
+&nbsp;
+‡‡The tomato betrayal phenomenon, documented extensively by Dr. Margot Firmness-Tester, occurs in approximately 23.7% of all tomato purchases. Her landmark study, "On the Treachery of Solanaceae," revolutionized produce handling techniques and won her the Nobel Prize for Vegetables (discontinued 1967 due to lack of interest).
+&nbsp;
+***The Botanical Society of Excessive Cataloguing was eventually disbanded when their offices became physically impassable due to filing cabinets. The last known member, Herbert Subspecies-Counter, was discovered three years after the closure, still cataloguing tomatoes in a forgotten storage room.††
+&nbsp;
+††Herbert reported that he'd had "a perfectly pleasant time" and had discovered seventeen new subspecies, though these were later determined to be the same tomato photographed from different angles.
+&nbsp;
+†††The Guild of Ingredient Assessors maintains a "Wall of Shame" featuring photographs of produce destroyed during examination by overly enthusiastic novices. The watermelon section requires its own room.
+&nbsp;
+‡‡‡Fermentation ambition, a technical term coined by brewmaster Günther Bubble-Watch, describes the point at which natural decomposition processes develop what he termed "ideas above their station." His treatise on the subject, "When Good Ingredients Go Bad: A Tragedy in Three Acts," remains required reading.‡
+&nbsp;
+‡While Bubble-Watch's work is respected, his theatrical presentation of the material—complete with costume changes and a dramatic finale involving a cabbage—is considered excessive by modern pedagogical standards.
+&nbsp;
+****The "poke it and hope" methodology persisted in rural communities well into the twentieth century, defended by practitioners who argued that "it worked for grandma." Statistical analysis suggests grandma's success rate was approximately 67%, with the remaining 33% attributed to "digestive fortitude" and "low expectations."
+&nbsp;
+*****The Great Grain Confusion of 2340 BCE arose when Mesopotamian quality inspectors confused emmer wheat with barley, leading to what cuneiform tablets describe as "bread that caused philosophical distress." Modern historians debate whether this was actual grain confusion or early evidence of ergot poisoning.
+&nbsp;
+†††††Medieval taster mortality rates reached 15% annually, though this was considered acceptable given that the position offered "steady employment" and "all the suspicious food you can eat." The Guild of Tasters was eventually dissolved when membership applications dropped to zero.†††
+&nbsp;
+†††The last official taster, Sir Edmund Digestion-Of-Iron, survived to age eighty-seven through what he described as "careful paranoia and an iron constitution." His autobiography, "I Tasted Death (And Also Bad Fish)," became a surprise bestseller.
+&nbsp;
+‡‡‡‡Renaissance ingredient astrology reached its peak with the publication of "De Qualitate Ingredientium per Stellarum" by the renowned charlatan/scholar Girolamo Celestial-Cabbage. The work suggested that vegetables harvested under Mercury were superior for digestion, while Saturn's influence made root vegetables melancholic. Modern chemists`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding ingredient quality assessment in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const MENU_DESIGN_PRINCIPLES: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'menu_design_principles',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Menu Design Principles',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['ingredient_quality_assessment'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_menu_design_principles' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Menu Design Principles</span>
+&nbsp;
+The art of menu design represents one of the most deceptively complex challenges in the culinary profession, requiring the practitioner to balance aesthetic presentation, psychological manipulation*, economic reality†, and the basic human need to find the thing they want without having to ask for help‡. While contemporary scholarship§ treats menu design as a purely visual exercise, the true master understands that a well-designed menu is a carefully orchestrated journey through possibility space, leading the patron from initial skepticism to inevitable surrender**. The fundamental principle underlying all menu design is what the Institute for Gastronomic Communication†† calls the "Hierarchy of Hunger"—the observation that human beings, when confronted with food choices, make decisions in a predictable cascade of desire, price anxiety, and eventual compromise‡‡.
+&nbsp;
+The practical application of menu design principles requires understanding three core elements: spatial organization§§, linguistic seduction***, and strategic omission†††. The first dictates where items appear on the page (or increasingly, screen‡‡‡), with research from the Pratchett-Brillat-Savarin Institute demonstrating that the upper-right quadrant receives 47.3% more attention than any other area§§§, though this reverses entirely in cultures with right-to-left reading traditions****. Linguistic seduction involves the careful selection of descriptive language: a dish is never merely "chicken" but rather "heritage fowl"††††, never "lettuce" but "artisanal greens"‡‡‡‡, never "expensive" but "market price"§§§§. The third element, strategic omission, concerns what is deliberately *not* stated—a profound tradition dating back to the legendary Menus of Misdirection*****, wherein certain establishments in 18th-century Paris would list dishes they had no intention of preparing, simply to set an atmosphere of impossible abundance†††††.
+&nbsp;
+Contemporary menu design has been revolutionized by the introduction of psychological pricing principles‡‡‡‡‡, font psychology§§§§§, and what culinary semioticians term "aspirational adjacency"******—the practice of placing modest dishes next to expensive ones to make them appear more reasonable by comparison. The modern menu designer must navigate between honesty and salesmanship††††††, between information and seduction‡‡‡‡‡‡, between what the restaurant can actually produce and what the customer wants to believe they serve§§§§§§. This delicate balance was perhaps best articulated by Chef Hieronymus Blütwurst*******, who observed that "a menu is not a contract but a negotiation between the possible and the desired, conducted in a language that both parties pretend to understand perfectly."
+&nbsp;
+The safety considerations in menu design extend far beyond the obvious requirements of allergen disclosure*******† and dietary restrictions‡‡‡‡‡‡‡. The Guild of Menu Architects maintains extensive records of what they term "catastrophic menu failures"—instances where design choices led to operational collapse, customer revolt, or in seventeen documented cases, actual violence§§§§§§§. The most common failure mode involves what the Guild calls "aspiration exceeding capacity"††††††††, wherein a restaurant's menu promises experiences its kitchen cannot possibly deliver‡‡‡‡‡‡‡‡. Best practices therefore include rigorous kitchen capacity assessment§§§§§§§§, staff training that extends beyond mere preparation to performance of the menu's implicit promises*********, and the maintenance of what ancient Roman restaurateurs called the *menu reservatum*—secret fallback dishes that could be rapidly deployed when the advertised items proved impossible to execute†††††††††.
+&nbsp;
+The historical development of menu design as a formal discipline began not with restaurants but with medieval monastery refectories‡‡‡‡‡‡‡‡‡, where the need to communicate complex dietary rules across linguistic barriers led to the first systematic use of symbols, categories, and hierarchical organization. The practice evolved through the French *carte* tradition§§§§§§§§§, survived the Great Menu Simplification of 1847**********, and ultimately transformed into the multi-disciplinary field we recognize today—one requiring expertise in typography, psychology, economics, logistics, and, some scholars argue, minor forms of socially acceptable deception***********. Modern understanding recognizes that a menu is never merely informational but always performative, never simply descriptive but inevitably prescriptive, and that the gap between what appears on the page and what emerges from the kitchen represents one of the fundamental creative tensions in all of human commerce.
+&nbsp;
+---
+&nbsp;
+*The Gastronomic Ethics Board has been trying to establish guidelines around "psychological manipulation" in menu design since 1923. They remain deadlocked, primarily because nobody can agree on where "helpful suggestion" ends and "manipulation" begins. Also, three-quarters of the Board members own restaurants.
+&nbsp;
+†Economic reality being defined as "the actual cost of ingredients, preparation, and service" rather than "what we wish reality was." The gap between these two figures averages 340% in fine dining establishments, according to data that restaurants absolutely do not want you to see.
+&nbsp;
+‡The shame associated with asking "What's good here?" cannot be overstated. The International Society of Dining Psychology has documented elevated cortisol levels equivalent to public speaking in patrons attempting to signal a server for clarification. See also: Footnote ††††††††††.
+&nbsp;
+§Particularly the controversial work of Dr. Verity Silverfish, whose 847-page treatise *On the Semiotics of Food Description* contains only twelve actual sentences about menu design, the rest being elaborate digressions about the etymology of the word "succulent."
+&nbsp;
+**This surrender phase typically occurs 4.7 minutes after initial menu presentation, according to the 2019 International Survey of Dining Decisiveness. The survey polled 10,000 diners across forty-seven countries, though it notably excluded anyone who "just orders the same thing every time," as these individuals were deemed to be in a category beyond the study's scope. Some philosophers argue they have achieved enlightenment.
+&nbsp;
+††Not to be confused with the Institute for Gastronomic Combustion, which studies entirely different matters and maintains a much larger legal defense fund.
+&nbsp;
+‡‡The "Hierarchy of Hunger" is actually more complex than initially theorized. It follows this sequence: 1) What sounds delicious, 2) What I can afford, 3) What others at the table might judge me for ordering, 4) What will arrive quickly, 5) What won't make me feel terrible later, 6) Ah hell, I'll just get the burger. This process takes an average of 11.3 minutes in groups of four or more.†
+&nbsp;
+†The time extends to 47 minutes if one person insists on asking about every ingredient's provenance. The Venetian Council of Restaurants maintains a Hall of Shame dedicated to such individuals, though they wisely keep it secret.
+&nbsp;
+§§The spatial organization of menus reflects ancient principles of visual hierarchy dating back to the first cave paintings, where larger animals were depicted more prominently not because they were more common, but because they made better stories. This principle remains unchanged.
+&nbsp;
+***"Linguistic seduction" is taught as a formal course at the Culinary Rhetoric Institute in Lyon, though the graduation rate is only 23%. Most students fail the final exam, which requires them to make "boiled potatoes" sound like something worth €14. The current record-holder described them as "artisan tubers, gently persuaded by ancestral waters, finished with a whisper of ancient sea crystals." She now works in marketing.
+&nbsp;
+†††The practice of strategic omission reached its apex during what historians call the "Great Foam Period" (2003-2009), when restaurants would list elaborate preparations but fail to mention that most of it would be foam. The Backlash was swift and decisive.††
+&nbsp;
+††Several prominent food critics required counseling. Two changed careers entirely.
+&nbsp;
+‡‡‡The transition to digital menus has proven controversial, with the Traditional Menu Preservation Society arguing that "swipe-based browsing fundamentally undermines the contemplative nature of dining." They may have a point, though they also use quill pens exclusively, so their credibility is mixed.
+&nbsp;
+§§§This percentage drops to 12.4% if there's a photograph in the upper-left quadrant. Humans are simple creatures; we look at pictures first. The Bavarian Institute of Menu Psychology spent €4.7 million confirming what anyone could have told them for free.
+&nbsp;
+****In several documented cases, restaurants have simply flipped their menus horizontally for different markets without adjusting the strategic placement of high-margin items. The resulting confusion led to what economists term "value arbitrage," where customers accidentally ordered the correct things from a profit perspective.
+&nbsp;
+††††"Heritage fowl" can mean anything from "chicken whose great-great-grandmother was vaguely free-range" to "we bought this from the`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding menu design principles in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const COURSE_PROGRESSION_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'course_progression_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Course Progression Theory',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['menu_design_principles'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_course_progression_theory' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `COURSE PROGRESSION THEORY: A COMPREHENSIVE EXAMINATION OF SEQUENTIAL ALIMENTARY ORCHESTRATION</span>
+&nbsp;
+The fundamental principle underlying course progression theory rests upon a deceptively simple premise: that the order in which foods arrive at the table matters as profoundly as the foods themselves*. This is not merely a question of logistics or kitchen timing, though both feature prominently in the literature†, but rather a recognition that the human palate, like any instrument, must be played in sequence rather than all at once‡. The theory posits that each course should prepare the diner's sensory apparatus for the next, creating what Professor Delacroix termed "the symphonic meal"** - a phrase he coined approximately forty-three minutes before his infamous seventeen-course banquet resulted in mass hallucinations and the temporary closure of his restaurant††.
+&nbsp;
+The practical application of course progression theory requires understanding several key mechanisms, beginning with the principle of intensity graduation***. Simply stated, one does not serve the turbot after the beef Wellington‡‡, nor does one present a delicate consommé immediately following anything involving ghost peppers†††. The palate must be guided through a carefully calibrated journey from lighter to heavier, subtle to robust, though certain culinary traditions cheerfully ignore these rules with what can only be described as aggressive confidence‡‡‡. Temperature progression presents an equally critical consideration****, with the ancient Gastronomicon explicitly warning against alternating hot and cold dishes in quick succession - advice that was, unfortunately, not discovered until after the Third Course Wars*****.
+&nbsp;
+Modern practitioners of course progression theory employ sophisticated timing matrices†****, measuring intervals between courses in units called "digestive interludes" or, in more technical literature, "stomach-settling periods"††****. The standard progression follows what is known as the Classical Sequence: appetizer, soup, fish, entrée, palate cleanser, roast, salad, cheese, and dessert‡******, though this order has been modified, inverted, and occasionally set on fire by various culinary movements over the centuries****** †††****. The École Supérieure de Gastronomie Appliquée maintains that proper course progression can reduce post-meal regret by up to 73.4%‡‡******, though their methodology has been questioned by the Institute of Digestive Cartography*******.
+&nbsp;
+The safety considerations surrounding course progression theory cannot be understated, as the historical record contains numerous cautionary tales******** of improperly sequenced meals leading to what the medical literature delicately terms "catastrophic palate failure"†††††††. The temporal spacing between courses proves particularly crucial: serve them too quickly, and the diner experiences what Chef Beauregard described as "a traffic jam of the tongue"********; too slowly, and guests begin contemplating the heat death of the universe††††††††. Additionally, certain combinations, when presented in unfortunate sequence, can create what flavor chemists call "compound sensory collapse" - a phenomenon first documented during the Incident of the Backwards Banquet of 1847‡‡‡‡‡‡‡, which shall not be discussed in detail but which necessitated the creation of an entirely new medical specialty*********.
+&nbsp;
+In conclusion, course progression theory represents the convergence of art, science, and what might charitably be called organized chaos**********. The skilled practitioner must balance chemical principles with psychological timing, cultural expectations with creative innovation, all while preventing their guests from either falling asleep or experiencing transcendent visions††††††††††. Success in this endeavor requires years of study, natural intuition, and a healthy respect for the fact that humans, unlike filing cabinets, cannot simply be loaded with nutrition in any arbitrary order‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+* The discovery of this principle is traditionally attributed to the Abbess Hildegard of Reasonable Meals (1098-1179), who first noticed that monks served dessert before soup tended to throw the soup at each other. The monastery's records indicate this happened with alarming consistency - approximately 67 out of 70 meals, or 95.71428571% of the time.
+&nbsp;
+† The Guild of Harried Sous Chefs maintains an archive of kitchen timing disasters that spans forty-seven volumes and requires its own wing of their headquarters. Researchers report that reading more than three volumes in succession induces a nervous condition characterized by involuntary flinching at the sound of service bells.
+&nbsp;
+‡ As the ancient Sumerian chef-philosopher Nashir-ap-pala wrote on a clay tablet circa 2100 BCE: "One does not strike all the drums simultaneously and call it music, nor does one place all foods upon the tongue at once and call it dining." This tablet was discovered in 1923, being used as a doorstop in a museum basement.
+&nbsp;
+** Professor Henri Delacroix (1834-1891), of the Académie des Arts Digestifs, spent his entire career developing this theory. His mathematical proofs filled notebooks with equations attempting to quantify "flavor momentum" and "gustatory inertia."
+&nbsp;
+†† The Delacroix Incident of 1879 remains shrouded in mystery, though witness accounts mention "colors that don't exist," "a fish course that achieved sentience," and "the cheese plate weeping." The restaurant reopened six months later under new management and a strict five-course limit.
+&nbsp;
+*** The principle was first formally stated by Sir Reginald Pemberton-Smythe in his treatise "On the Graduated Assault of the Taste-Buds" (1842), in which he argued that the palate should be "gently coaxed rather than bludgeoned." He developed this theory after attending a dinner party where dessert was served first, a decision he described as "gustatory warfare."
+&nbsp;
+‡‡ This particular mistake was made by Chef Augustus Flambe in 1891, resulting in what his memoir delicately terms "a rebellion of the taste buds." Diners reported that the turbot, having followed the beef, tasted primarily of "sadness and poor life choices." One duchess was quoted as saying the fish had "given up."
+&nbsp;
+††† The Great Ghost Pepper Symposium of 1999 demonstrated this principle when organizers served a delicate oyster course immediately after a ghost pepper challenge. The oysters were described by attendees as tasting like "the abstract concept of moisture" and "a whisper of the sea that no one could hear over the screaming."
+&nbsp;
+‡‡‡ Certain regional cuisines, particularly those developed in areas the Institute of Culinary Anthropology classifies as "aggressively confident food cultures," serve courses in orders that would make classical theorists weep. The cuisine of Upper Slorvenia, for instance, traditionally begins with the cheese course, proceeds backward through the meal, and ends with appetizers, a practice they defend with the phrase "why waste time?"
+&nbsp;
+**** Research conducted by the Thermal Dynamics Division of the Culinary Institute of Oslo has shown that rapid temperature shifts exceeding 40 degrees Celsius between courses can induce what they term "palate shock," characterized by temporary loss of flavor perception and a strong desire to write angry letters to the chef.
+&nbsp;
+***** The Third Course Wars (1756-1758) were actually a series of heated academic debates at the Sorbonne regarding whether sorbet should be served before or after the meat course. No actual combat occurred, though several professorships were revoked and at least one duel was narrowly averted. The wars ended with the Compromise of 1758, which declared that sorbet's position "depends on the phase of the moon and the chef's mood."
+&nbsp;
+†**** These matrices were developed by Dr. Franziska von Bitterhausen of the Max Planck Institute for Nutritional Sequencing. Her groundbreaking work "Temporal Gastronomy: When to Eat What, and Other Questions That Keep Academics Employed" (1987) contains charts so complex that graduate students have been known to weep upon encountering them.
+&nbsp;
+††**** A "digestive interlude" is precisely 8.7 minutes, according to the International Standards Organization's Committee on Alimentary Timing. This figure was arrived at through extensive research involving 4,000 volunteer diners, 500 different courses, and what the final report describes as "an amount of cleanup that still haunts our janitorial staff."
+&nbsp;
+‡****** The Classical Sequence dates to the French court of Louis XIV, who employed seventeen full-time course sequencers. Their job was so stressful that the position came with a generous pension and complimentary therapy sessions. Only three of the original seventeen lived to retirement age, the others having resigned to become monks, hermits, or professional wine tasters - occupations they considered "less demanding."
+&nbsp;
+****** The Deconstructionist Movement of 1985 served all courses simultaneously but on separate plates arranged in a mystifying spiral pattern. The Futurists of 1922 insisted on serving`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding course progression theory in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const WINE_FOOD_PAIRING: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'wine_food_pairing',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Wine Food Pairing',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['course_progression_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 7,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'adult',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_wine_food_pairing' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Wine Food Pairing: A Comprehensive Study of Gustatory Harmonics and Oenological Complementarity</span>
+&nbsp;
+The ancient art of wine food pairing represents one of humanity's most sophisticated attempts to elevate the act of consumption beyond mere sustenance into something approaching transcendence*. The fundamental principle, as established by the Council of Sensory Sciences in 1743**, involves the matching of wine characteristics—acidity, tannin, body, and fruit—with corresponding elements in food to create either complementary or contrasting harmonies†. What appears simple in theory—red wine with red meat, white wine with fish—reveals itself to be a labyrinth of exceptions, contradictions, and historically documented disasters‡ that would make even the most experienced sommelier weep into their carefully curated cellar‡‡.
+&nbsp;
+The practitioner must first understand that wine contains approximately 847 identifiable compounds§, each capable of interacting with the 1,243 common flavor molecules found in food§§, creating a theoretical matrix of 1,054,821 possible interactions***. This explains why the International Bureau of Wine Pairing Standards employs a staff of 12,000 and maintains offices in seventeen dimensions†††. The basic framework divides into six primary matching strategies: complementary pairing (matching similar flavors), contrasting pairing (balancing opposites), regional pairing (matching wines with foods from their origin), component pairing (matching specific elements like acid to acid), textural pairing (matching body and weight), and the largely theoretical chaos pairing‡‡‡, which we shall not discuss in polite academic circles§§§.
+&nbsp;
+Modern understanding recognizes that successful pairing depends largely on identifying the dominant flavor in a dish and the dominant characteristic in a wine****, then determining whether they should dance together or engage in sophisticated verbal sparring††††. Acidity in wine cuts through rich, fatty foods like a knife through butter, or more accurately, like acidity through lipids at a molecular level‡‡‡‡. Tannins in red wine form complexes with proteins, which sounds technical until you realize this is why that £200 Barolo tastes like old socks when paired with Dover sole§§§§. The residual sugar in wine can balance spice and heat, a discovery made through considerable suffering*****, and salt in food softens the perception of tannins while enhancing fruit flavors, though not, as the Incident of 1887 proved, to unlimited degrees†††††.
+&nbsp;
+The historical development of wine pairing knowledge reads like a catalog of noble failures and accidental discoveries‡‡‡‡‡. The ancient Thracians believed any wine paired perfectly with any food provided you drank enough of both§§§§§, a philosophy that persisted in some academic circles until remarkably recently******. The medieval period gave us the Doctrine of Sympathetic Correspondence, which held that red wine should accompany red foods and white wine white foods, a system that worked until someone invented beets and cauliflower cheese††††††. The Enlightenment brought scientific rigor to the field, primarily through the pioneering work of the Académie des Harmonies Gustatives‡‡‡‡‡‡, though their most significant contribution may have been establishing that some combinations should be actively avoided, a list that currently runs to 347 pages§§§§§§.
+&nbsp;
+Contemporary best practices emphasize experimentation while respecting fundamental principles of chemistry and the hard-won wisdom of those who have gone before*******, though the Guild of Sommeliers maintains a sealed archive of pairings so catastrophic they may only be discussed in writing******* and never attempted outside controlled laboratory conditions†††††††. The field continues to evolve as new wines are developed, fusion cuisines emerge, and brave souls test the boundaries of what is possible‡‡‡‡‡‡‡, though the International Convention on Culinary Safety recommends that amateurs begin with the traditional pairings before attempting anything that might end up in the cautionary literature§§§§§§§.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*The ancient Sumerians had a word for this: "mikhalzubar," which translates roughly as "making the meal mean something before we all die horribly of dysentery."
+&nbsp;
+**Not the 1743 you're thinking of. The Council operates on a different calendar system, one that accounts for temporal anomalies in wine cellars where bottles age at non-standard rates. By their reckoning, it's currently the year 1743. Has been for the past 280 years.
+&nbsp;
+†The term "harmony" here is used in the musical sense, though the Council's official documentation includes seventeen pages explaining why it is NOT meant in the sense of "things not actively fighting each other."
+&nbsp;
+‡The Château Poissonbleu Incident of 1852, wherein the Duc de Montcrabier attempted to serve a heavy Châteauneuf-du-Pape with oysters, remains a cautionary tale. The dinner guests survived. The reputation did not.
+&nbsp;
+‡‡They maintain a special cellar for "Wines of Regret," containing bottles that were perfectly good until someone had the bright idea to pair them with something unconscionable. The cellar is never opened, but you can hear the bottles weeping on quiet nights.
+&nbsp;
+§As determined by the Oenological Analysis Institute in Geneva, working with a mass spectrometer, three supercomputers, and what they describe in their notes as "an unreasonable amount of graduate students."
+&nbsp;
+§§This number includes "that weird taste in the back of your throat that you can't quite identify but you're pretty sure shouldn't be there."
+&nbsp;
+***The Bureau refuses to calculate all possible combinations because the resulting number would, according to their lead mathematician, "make people's heads hurt and possibly violate several laws of thermodynamics."
+&nbsp;
+†††The dimensional expansion was necessary after the Bureau determined that wine pairing in spaces with non-Euclidean geometry follows different rules. The office in the Seventh Dimension specializes in pairings for foods that technically don't exist yet.
+&nbsp;
+‡‡‡Chaos pairing involves deliberately mismatching elements to create cognitive dissonance that somehow transcends traditional understanding. The technique was pioneered by the monk Frère Étienne in 1673 and has resulted in exactly three successful pairings and forty-seven cases of existential crisis.
+&nbsp;
+§§§The Academy of Culinary Arts has a special committee that reviews chaos pairing attempts. They meet twice yearly and spend most of the time in supportive silence.
+&nbsp;
+****The dominant flavor is, unfortunately, rarely the flavor you think it is. The Institute for Gustatory Psychology maintains that 73% of diners incorrectly identify the primary taste in any given dish, a statistic that explains much about the state of modern gastronomy.
+&nbsp;
+††††The dancing metaphor was introduced by sommelier Antoine Beaufort in 1891. He later admitted he'd been describing an actual argument he'd had with his wife, but by then it had entered the literature.
+&nbsp;
+‡‡‡‡The technical term is "precipitation of tannin-protein complexes creating an unpleasant astringent sensation," but "tastes like old socks" appears more frequently in actual professional notes than most academics care to admit.
+&nbsp;
+§§§§The sock taste is specifically described in Guild documentation as "woolen socks, British boarding school vintage, circa 1952, that have been in a gym bag for a fortnight."
+&nbsp;
+*****The Archives of Culinary Exploration contain fourteen volumes devoted entirely to Europeans discovering that chili peppers exist and desperately trying to find wines that won't make their mouths explode. The gewürztraminer pairing was discovered by someone either very brave or very drunk. Possibly both.
+&nbsp;
+†††††The 1887 Incident involved a Bavarian prince who believed that if salt enhanced tannins, more salt would enhance them more. His dining room required complete renovation, and the recipe was sealed by royal decree. It involved anchovies.
+&nbsp;
+‡‡‡‡‡The Historical Society of Wine keeps records going back to the invention of fermentation. Most early entries can be summarized as "put wine in mouth, put food in mouth, seemed fine."
+&nbsp;
+§§§§§This philosophy persists in some fraternities.
+&nbsp;
+******The last academic institution to officially endorse quantity-over-quality pairing was the University of Bohemia in 1973. They have since issued a formal apology.
+&nbsp;
+††††††The beet problem was never satisfactorily resolved. Red beets with red wine create what tasters describe as "drinking dirt." The medieval solution was to pretend beets didn't exist, a practice that continued in some noble houses until the 19th century.
+&nbsp;
+‡‡‡‡‡‡Founded in Paris in 1782, the Académie lasted until 1794, when it was dissolved during the Revolution for being insufficiently revolutionary. Their last`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding wine food pairing in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BEVERAGE_PAIRING_SCIENCE: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'beverage_pairing_science',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Beverage Pairing Science',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['wine_food_pairing'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_beverage_pairing_science' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Beverage Pairing Science: A Comprehensive Study of Liquid Harmonics and Gustatory Resonance</span>
+&nbsp;
+The science of beverage pairing represents one of humanity's most persistent attempts to impose order upon the fundamental chaos of taste*, a noble endeavor that has consumed the better part of seventeen centuries† and approximately 3.7 million liters of experimental liquids‡. At its core, beverage pairing operates on the principle of sympathetic resonance between molecular compounds in both food and drink, though this explanation somewhat undersells the nearly mystical nature of why a 1847 Château Margaux pairs beautifully with lamb while causing beef Wellington to taste, according to the Venetian Sommelier's Collective, "like despair given physical form"**. The fundamental mechanisms involve the interaction of tannins, acids, sugars, and approximately forty-seven other compounds that the International Bureau of Taste Specification has yet to formally categorize††, creating either harmonic enhancement or what the ancient Greeks called "kakophonia glōssēs" (literally: "tongue-cacophony")‡‡.
+&nbsp;
+Modern practitioners must master the Six Pillars of Pairing***, each of which corresponds to a particular sensory dimension and carries its own set of catastrophic failure modes†††. The first pillar, Weight Matching, requires the sommelier to assess the relative "heaviness" of both dish and beverage—a skill that sounds deceptively simple until one attempts to quantify the metaphysical weight of a foam‡‡‡. The second through fifth pillars (Acidity Balance, Tannin Management, Sweetness Calibration, and Alcohol Content Consideration) form what veteran sommeliers call "The Quadrangle of Reasonable Success"*†, while the sixth pillar, Flavor Bridging, remains so contentually complex that the Society for Advanced Beverage Studies recommends a minimum of twelve years' practice before attempting it with actual dinner guests*††. Contemporary techniques have evolved to include aromatic mapping†‡, temperature differential analysis‡†, and the controversial practice of preemptive palate cleansing‡‡†, though the latter remains banned in seven countries following the Helsinki Incident of 1992*‡.
+&nbsp;
+The historical development of pairing science traces back to the Sumerian beer-and-bread symposiums**, though the first systematic study didn't emerge until the Byzantine Empire, when Emperor Justinian II commissioned the "Codex Bibendi et Edendi"††**—a fourteen-volume treatise that ultimately caused more confusion than enlightenment‡**. The medieval period saw the rise of the Guild of Cup-Bearers and Taste-Masters‡†*, who maintained jealously guarded secrets about which wines paired with peacock (most of them, surprisingly) and which caused immediate gastric revolt (also most of them, confusingly)††††. The modern era began in earnest with the French systematization of wine knowledge in the 17th century, though this was nearly derailed by the philosophical divide between the Burgundian Absolutists and the Bordeaux Relativists, a schism that led to the famous Duel of the Decanters in 1673‡††† and set back pairing science by at least three decades*††*. Today's understanding synthesizes centuries of accumulated wisdom, thousands of documented failures†‡†, and the kind of statistical analysis that would make a mathematician weep with joy or frustration—the data is unclear on which‡‡**.
+&nbsp;
+Safety considerations in beverage pairing extend far beyond the obvious dangers of alcohol overconsumption**††, encompassing the subtle but real risks of flavor dissonance syndrome†††**, allergic cascades triggered by unexpected compound interactions‡‡††, and the phenomenon known as "sommelier's hubris"*‡†, wherein a practitioner's confidence vastly exceeds their actual ability to predict outcomes. The International Pairing Safety Council maintains a registry of Forbidden Combinations††‡, updated quarterly to reflect new discoveries in what should never, under any circumstances, be served together‡†††. Perhaps most critically, practitioners must learn to recognize the early warning signs of a failed pairing*†‡: the sudden silence of diners‡‡‡†, the desperate reach for water glasses††*†, and the peculiar expression that the Council's handbook describes as "the face of polite betrayal"‡†*. Modern best practices include extensive pre-service testing**‡, maintaining a minimum 2:1 ratio of backup pairing options to planned courses†**†, and the wisdom to graciously accept defeat when a pairing simply refuses to work‡‡*†—a maturity that distinguishes the master from the merely competent*††**.
+&nbsp;
+The future of beverage pairing science lies in the integration of molecular gastronomy principles with traditional wisdom, creating what Dr. Henrietta Sablewood of the Institute for Culinary Harmonics calls "a bridge between the ancient and the absurd"**††*. Emerging technologies such as chromatographic analysis of volatile compounds†††‡, real-time tannin measurement devices‡‡‡‡, and the experimental (and highly controversial) use of AI pairing algorithms*‡†† promise to revolutionize the field, though purists argue that such tools miss the ineffable nature of true pairing mastery††††*. Yet even as science advances, the fundamental truth remains unchanged: the perfect pairing is a moment of grace, a confluence of preparation and fortune‡†‡†, and occasionally, blind luck that practitioners are reluctant to admit influenced the outcome**†††.
+&nbsp;
+---
+&nbsp;
+## Footnotes
+&nbsp;
+*Though some philosophers argue that taste isn't chaotic at all, but rather humans are simply terrible at perceiving its underlying order. These philosophers have never worked a dinner service during truffle season.
+&nbsp;
+†This timeline begins with the Council of Nicaea's lesser-known "Council of Beverages" in 325 CE, where bishops debated whether wine paired better with fish or fowl—a theological debate that became surprisingly heated and may have indirectly influenced the Arian controversy. The records are wine-stained and difficult to read.
+&nbsp;
+‡This figure comes from the Archives of the Heidelberg Institute for Beverage Studies and represents only the documented experiments. The actual volume is estimated to be closer to 8.2 million liters when accounting for "informal research" and "the French contribution."
+&nbsp;
+**The Venetian Sommelier's Collective, founded in 1492 specifically to avoid thinking about the geopolitical upheaval of that year, maintains extensive tasting notes that span 847 volumes. Volume 234 is dedicated entirely to pairings that "murdered the soul of good meat." It is their shortest volume.
+&nbsp;
+††These compounds include several that exist only momentarily during the act of chewing, which the Bureau finds "methodologically frustrating" and "possibly deliberate" on the part of the universe.
+&nbsp;
+‡‡The ancient Greeks had seventeen different words for various types of taste disasters, suggesting they experienced them frequently. Modern researchers attribute this to their fondness for retsina, which pairs well with absolutely nothing†, not even other retsina.
+&nbsp;
+†A hypothesis the Greek Wine Preservation Society vigorously disputes, though their arguments are, tellingly, never accompanied by actual tasting demonstrations.
+&nbsp;
+***Not to be confused with the Six Pillars of Wisdom, the Seven Pillars of Hercules, or the Twelve Pillars of the Venetian Doge's Palace—though a 16th-century manuscript suggests someone did confuse them, resulting in an architectural disaster that tasted surprisingly good.
+&nbsp;
+†††The failure modes include but are not limited to: Tannic Catastrophe, Acid Clash, Sugar Shock, The Dead Palate Phenomenon, and something the textbooks only refer to as "The Event of 1843" without further elaboration††.
+&nbsp;
+††The Event of 1843 apparently involved a Bavarian prince, a Portuguese port, and venison prepared "in the Prussian style." Three guests required medical attention and the chef fled to Argentina. The recipe, thankfully, was lost.
+&nbsp;
+‡‡‡Foams represent a particular challenge because their molecular structure is approximately 94% air, and air—despite centuries of inquiry—refuses to pair with anything in a predictable manner. The Guild of Molecular Gastronomists has an entire department dedicated to this problem. They are not optimistic about solving it.
+&nbsp;
+*†So called because four out of six attempts to use these principles result in something between "acceptable" and "quite pleasant"—odds that would horrify any other scientific field but which sommeliers consider "practically guaranteed success."
+&nbsp;
+*††The Society's official recommendation is twelve years, but their internal documents suggest twenty years is safer, and thirty years is "when we stop worrying they'll burn down the restaurant through sheer poor judgment."
+&nbsp;
+†‡Aromatic mapping involves creating multi-dimensional charts of scent compounds, which quickly`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding beverage pairing science in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const CULINARY_CREATIVITY_THEORY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'culinary_creativity_theory',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Culinary Creativity Theory',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['beverage_pairing_science'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 8,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_culinary_creativity_theory' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Culinary Creativity Theory</span>
+&nbsp;
+The fundamental principle of Culinary Creativity Theory, as established by the late Professor Madeleine Béchamel-Ffrench* at the Académie des Sciences Gastronomiques et Périlleuses in 1847, posits that true culinary innovation exists at the precise intersection of technical mastery, ingredient wisdom, and what she termed "controlled recklessness"†. This theory emerged from centuries of accumulated knowledge—some of it deliberately forgotten‡—about the nature of flavor combination, structural integrity, and the mysterious phenomenon known as "mouth-feel resonance"**. The mathematical foundations remain controversial††, particularly the Béchamel-Ffrench Constant (approximately 3.7812, though this varies by altitude and the phase of the moon‡‡), which predicts the probability of a novel combination being edible versus requiring emergency medical intervention. Modern practitioners must therefore approach creativity with both abandon and extreme caution***, a paradox that has claimed numerous fingers, reputations, and in one notable case, an entire restaurant†††.
+&nbsp;
+The practical application of Culinary Creativity Theory requires first mastering what the Guild of Creative Cooks‡‡‡ calls the "Seven Pillars of Improvisation"****, each representing a fundamental domain where innovation may safely occur without violating the ancient laws of flavor††††. The first pillar, Textural Transformation, governs all matters relating to the physical state and mouthfeel of ingredients; this was the domain that gave us both the croissant and the Incident of 1923‡‡‡‡. The second through seventh pillars—Temperature Play, Acid-Fat-Salt Balance*****, Aromatic Architecture, Temporal Layering, Cultural Fusion, and Emergency Protocols******—must be understood not as separate disciplines but as interconnected threads in what the old texts call "The Great Tapestry of What Goes With What"††††††. Students typically spend seven to twelve years mastering basic creativity techniques‡‡‡‡‡, though the Guild maintains that true proficiency requires at least one major disaster, two minor revelations, and the forgiveness of a head chef*******.
+&nbsp;
+Safety considerations cannot be overstated, particularly given the seventy-three documented cases of what the medical literature politely terms "Acute Culinary Hubris Syndrome"********. The primary danger lies not in obvious transgressions—combining milk and lemon juice has been understood as perilous since the Bronze Age††††††††—but in subtle violations of harmonic principles that seem perfectly reasonable until the moment they become spectacularly unreasonable‡‡‡‡‡‡. The International Board for Culinary Safety********* recommends a graduated approach: begin with low-risk creativity (herb substitutions, temperature variations), advance cautiously to medium-risk endeavors (sauce reconstructions, protein replacements), and only after minimum fifteen years' experience attempt high-risk innovations such as genre-fusion, molecular deconstruction, or anything involving fermentation and chocolate in the same dish††††††††††. All creativity exercises should be performed with a fire extinguisher within arm's reach and a good lawyer on retainer‡‡‡‡‡‡‡.
+&nbsp;
+The historical development of Culinary Creativity Theory traces back to the mystery kitchens of ancient Mesopotamia**********, where early practitioners discovered that certain combinations of ingredients produced effects that transcended mere sustenance to achieve what they called "the divine mouth-feeling"***********. These early experiments—documented in cuneiform on the famous Clay Tablets of Questionable Recipes†††††††††††—reveal a sophisticated understanding of creative principles, though their safety protocols left much to be desired‡‡‡‡‡‡‡‡. The medieval period saw significant advances through the work of the Culinary Alchemists************, who approached cooking as a mystical practice involving the transformation of base ingredients into transcendent experiences, though their insistence on incorporating mercury into desserts************* set the field back considerably. The Renaissance brought systematic study, the Enlightenment brought theoretical frameworks, and the Industrial Revolution brought standardization that nearly killed creativity altogether††††††††††††—until the Great Culinary Rebellion of 1889‡‡‡‡‡‡‡‡‡, when a coalition of rogue chefs demonstrated that rules existed primarily to be understood before being artfully broken***************.
+&nbsp;
+Modern understanding synthesizes classical wisdom with contemporary science, acknowledging that creativity operates simultaneously on chemical, physical, psychological, and—according to some controversial theorists—metaphysical levels***************. The recent discovery of the so-called "Umami Cascade Effect" by Dr. Heinrich Geschmack at the Technical Institute of Flavor Dynamics†††††††††††††† has revolutionized our comprehension of how creative combinations propagate through a dish, though his theories regarding "temporal flavor echoes" remain unproven and possibly supernatural‡‡‡‡‡‡‡‡‡‡. Current best practice involves what the Nouvelle Académie calls "structured spontaneity"****************—a framework allowing creativity within understood boundaries, much like jazz musicians improvising within a key signature, except with higher stakes and more potential for food poisoning. The field continues to evolve, with the introduction of artificial intelligence raising philosophical questions about whether a algorithm can truly be creative or merely statistically recombinant, though most chefs agree this debate becomes moot after tasting the results†††††††††††††††.
+&nbsp;
+---
+&nbsp;
+*Professor Béchamel-Ffrench (1809-1891) made her breakthrough while attempting to understand why her grandmother's soup tasted better than the chemically identical recreation. Her final words, muttered while sampling an experimental rhubarb-anchovy reduction, were reportedly "I should not have done that." She is remembered fondly, despite everything.
+&nbsp;
+†Defined as "the precise amount of audacity required to create something brilliant without creating something that requires an apology to the fire department." The margin for error is approximately 0.3%.
+&nbsp;
+‡The Culinary Dark Ages (roughly 1320-1420) saw the destruction of many texts deemed "too dangerous for general knowledge," including the complete works of Master Jean le Téméraire, whose recipe collection allegedly caused three noble houses to collapse due to scandals relating to what he called "flavor-based mind control." Modern historians suspect this is exaggerated. Slightly.
+&nbsp;
+**Mouth-feel resonance was first documented in 1723 by Sir Reginald Chewsworth, who noticed that certain combinations of texture created what he described as "a pleasing vibration of the masticatory experience." He was later institutionalized, but his notes proved accurate.
+&nbsp;
+††The Royal Society of Applied Mathematics famously rejected Béchamel-Ffrench's work in 1852, claiming "cooking is not a proper subject for mathematical analysis." They issued a formal apology in 1954 after the development of Food Science proved them catastrophically wrong.
+&nbsp;
+‡‡This variation causes considerable anxiety among baking enthusiasts attempting high-altitude soufflés. The Guild maintains a helpline.
+&nbsp;
+***The Paradox of Creative Constraint has been the subject of seventeen doctoral theses, forty-two philosophical treatises, and one interpretive dance performance that was universally panned as "missing the point entirely, though the costumes were lovely."
+&nbsp;
+†††The Burning of Restaurant Promethée in Paris, 1873, which began as an attempt to create "fire-breathing chicken" and ended with the chef fleeing to Argentina under an assumed name. The chicken was reportedly delicious right up until it wasn't.
+&nbsp;
+‡‡‡A organization with a surprisingly militant stance on the Oxford comma and an even more surprising collection of medieval weaponry in their basement. Membership requires submission of one "perfectly safe innovation" and one "innovation that pushed boundaries but stopped just short of disaster." The application review process takes three years.
+&nbsp;
+****Not to be confused with the "Seven Pillars of Wisdom," though T.E. Lawrence did briefly study at the Guild before deciding that Arabian diplomacy was less dangerous than French cuisine.
+&nbsp;
+††††These laws are not written but somehow known, passed down through generations like genetic memory, though they possibly originate from an actual set of stone tablets that were lost in a kitchen fire in Crete around 1450 BCE. Archeologists remain interested; insurance companies remain skeptical.
+&nbsp;
+‡‡‡‡We do not speak of the Incident of 1923. The survivors prefer it that way. Suffice it to say it involved puff pastry, a pressure cooker, and a fundamental misunderstanding of physics. The bakery was rebuilt, but the building next door was not. A small plaque marks the location, reading simply: "Let this be a lesson."
+&nbsp;
+*****The triumvirate that rules all cooking. Ancient texts suggest these three elements once walked the earth in physical form, teaching humans the`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding culinary creativity theory in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const RECIPE_DEVELOPMENT_METHODOLOGY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'recipe_development_methodology',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Recipe Development Methodology',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['culinary_creativity_theory'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_recipe_development_methodology' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Recipe Development Methodology</span>
+&nbsp;
+The art of recipe development, which the ancient Mesopotamians called *kasû-šipir* ("the unmaking of hunger through systematic trial"), represents humanity's longest-running controlled experiment*. At its core lies a methodology both rigorous and paradoxically chaotic: one must simultaneously understand the chemical architecture of ingredients**, know what flavor combinations the human palate finds acceptable***, and possess the confidence to ignore both when inspiration strikes†. The Guild of Systematic Gastronomes estimates that approximately 73.4% of recipe development occurs in what they term "the panic zone"—that moment when dinner guests arrive in forty minutes and the soufflé has achieved sentience††.
+&nbsp;
+The practical application of recipe development methodology requires what Professor Emeline Saucier-Rothschild of the Culinary Institute of Improbable Sciences termed "controlled recklessness"†††. The developer must maintain meticulous records‡ while simultaneously being willing to throw the recipe card across the kitchen when tasted results demand it‡‡. The Institute's landmark 1847 study, "On the Necessity of Failure in the Pursuit of Excellence," documented 2,847 attempts to create the perfect chocolate soufflé, of which 2,846 were described in lab notes as ranging from "regrettable" to "actively malicious"‡‡‡. What separates recipe development from mere cooking is the requirement to *reproduce* success—a task that has defeated countless chefs who created something magnificent once and then spent decades unable to remember whether they used butter or rendered griffin fat§.
+&nbsp;
+Safety considerations in recipe development extend far beyond the conventional warnings about cross-contamination and proper internal temperatures§§. The Gastronomic Safety Council maintains a database of 14,726 "incidents" related to experimental cooking, ranging from "mild temporal displacement of dinner service" to "complete inversion of kitchen's relationship with normal space"§§§. The methodology demands respect for ingredient boundaries: certain flavor combinations are forbidden not because they taste poor, but because, as the ancient Greeks knew, some doors should remain closed*. The tragic case of Chef Wilhelm von Umami serves as perpetual reminder that discovering what should *not* be combined is equally valuable research**—though preferably conducted by someone else***.
+&nbsp;
+Historical development of recipe methodology traces back to the first human who thought "what if I don't eat this raw?" and forward through millennia of incremental discovery interrupted by occasional catastrophic innovation†. The modern understanding, codified by the International Congress of People Who Make Food Reproducibly in 1923, establishes recipe development as equal parts science, art, archaeology, and controlled demolition††. Contemporary practitioners benefit from digital tools their ancestors would have considered either miraculous or heretical†††—though the fundamental challenge remains unchanged: creating something others can follow to produce approximately the same result, accounting for differences in altitude, ingredient sourcing, equipment calibration, planetary alignment, and the cook's fundamental relationship with entropy‡.
+&nbsp;
+---
+&nbsp;
+**FOOTNOTES**
+&nbsp;
+*The experiment has been running continuously for approximately 10,000 years, making it the longest-term research project in human history, narrowly beating out "trying to understand cats" and "finding matching socks."
+&nbsp;
+**The interaction between proteins, fats, carbohydrates, acids, and heat involves more chemical reactions than occur in many industrial manufacturing processes. The difference is that industrial manufacturers typically *know* what they're doing, whereas recipe developers are essentially conducting organized chaos with edible materials.
+&nbsp;
+***The Guild of Flavor Theorists maintains that there are approximately 10,000 distinct flavor combinations that humans find pleasant, 470,000 they find neutral-to-acceptable, and approximately 6.7 million they find deeply offensive. Recipe development consists largely of avoiding the latter category while occasionally venturing into it for purposes of "artistic expression" or "making a point about contemporary society."
+&nbsp;
+†Lady Marguerite of Abbeville (1723-1791) famously declared that "a recipe written down is already a lie," as no two kitchens, ingredients, or cooks are identical. She was nevertheless required by her publisher to produce a 400-page cookbook, which she did under protest, including a 40-page introduction explaining why the book itself was philosophically impossible.
+&nbsp;
+††This occurs at the intersection of the Dunning-Kruger Curve and the "oh gods what have I done" Realization Function. The Guild's research indicates that panic cooking produces either spectacular success or memorable disaster at a ratio of approximately 1:4, but that the disasters make better dinner party stories, thus contributing more to human culture overall.
+&nbsp;
+†††Saucier-Rothschild (1804-1889) developed her theory after observing that the most innovative recipes came from chefs who kept detailed notes but weren't afraid to write "IGNORE PREVIOUS TEMPERATURE—TRUST YOUR NOSE" in the margins. Her own laboratory notebooks contained 2,347 documented recipes and 8,901 expletives, many in languages she claimed not to speak†.
+&nbsp;
+†Some scholars believe these were simply very emphatic German compound words.
+&nbsp;
+‡The International Standards Organization's ISO 9001-CUL specification for culinary documentation requires records detailed enough to reproduce results while acknowledging that reproduction will inevitably fail due to what the standard technically terms "thermodynamic spite."
+&nbsp;
+‡‡The act of discarding methodology mid-experiment is considered a key indicator of mastery. Novices follow recipes exactly. Experts know when to abandon them. Masters write recipes specifically designed to be abandoned at the correct moment, like philosophical koans that happen to produce boeuf bourguignon‡.
+&nbsp;
+‡This practice was refined to an art form by the monks of the Monastery of Perpetual Revision in the Swiss Alps, who spent 400 years perfecting a cheese that could only be made correctly by ignoring their recipe at the appropriate moment. The cheese achieved enlightenment in 1847 and ascended to a higher plane, leaving only a note reading "you were supposed to trust yourself."
+&nbsp;
+‡‡‡The 2,847th attempt succeeded but, as researcher Dr. Heinrich Schadenfreude noted in his memoir, "We cannot entirely rule out the possibility that success resulted from accumulated spite rather than methodology." The original laboratory remains sealed, as the soufflé reportedly maintained structural integrity for six weeks—a duration considered physically impossible and therefore suspicious.
+&nbsp;
+§Griffin fat produces superior results in pastries but has been largely unavailable since the Mythological Ingredients Shortage of 1847§. Modern recipe developers must make substitutions, leading to the philosophical question: if a recipe calls for griffin fat but you use butter, are you following the recipe or creating a new one?
+&nbsp;
+§The shortage began when griffins, already rare, realized they were being systematically harvested and collectively decided to relocate to a dimension with better employment prospects. The resulting market collapse bankrupted fourteen major pastry houses and led to the Treaty of Ingredient Availability (1851).
+&nbsp;
+§§The Council's safety guidelines include obvious precautions like "wash your hands" and "don't lick the uncooked chicken" alongside less obvious ones such as "ensure kitchen maintains standard relationship with three-dimensional space" and "avoid cooking on Tuesdays between 3-4 PM in leap years."
+&nbsp;
+§§§The database is maintained in a reinforced facility in Geneva and is never consulted on an empty stomach. The most common incident category is "seemed like a good idea at the time" (37.2%), followed by "misread tablespoon as teaspoon" (28.4%), and "the cookbook was published in 1623 and measurements have changed" (19.7%). The remaining 14.7% are classified under "other" and the files are sealed for seventy years after the event.
+&nbsp;
+*The Oracle at Delphi allegedly maintained a list of forbidden flavor combinations, though classical scholars debate whether the surviving fragments reading "NEVER COMBINE—" represent culinary advice or unrelated warnings about Greek politics. The ambiguity is considered appropriate for an oracle.
+&nbsp;
+**Chef Wilhelm von Umami (1834-1891) of the Austro-Hungarian Imperial Kitchens discovered through systematic experimentation that certain combinations of fermented ingredients, when subjected to precise temperature cycling, could temporarily alter the flow of time in the immediate vicinity. His experimental dish "Sauerkraut Temporal" caused Thursday's dinner service to occur simultaneously with Saturday's breakfast, leading to significant confusion and the Imperial decree that henceforth all experimental cooking would be conducted on uninhabited islands. Von Umami's notes were sealed by order of the Emperor, though leaked fragments suggest his final entry read simply "IT WORKS BUT PLEASE DON'T."**
+&nbsp;
+**The islands, known collectively as the Archipelago of Regrettable Decisions, remain off-limits to civilian traffic. Shipping routes avoid them after the incident in 1923 when a passing vessel reported smelling "what we think was supposed to be bouillabaisse but achieved sapience and attempted communication."
+&nbsp;
+***The Guild of Culinary Ethics established the principle of "Negative Knowledge"`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding recipe development methodology in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GASTRONOMY_PHILOSOPHY: ResearchPaper = {</span>
+<span class="cstat-no" title="statement not covered" >  paperId: 'gastronomy_philosophy',</span>
+<span class="cstat-no" title="statement not covered" >  title: 'Gastronomy Philosophy',</span>
+<span class="cstat-no" title="statement not covered" >  field: 'cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  paperSets: ['culinary_arts_gastronomy'],</span>
+<span class="cstat-no" title="statement not covered" >  prerequisitePapers: ['recipe_development_methodology'],</span>
+<span class="cstat-no" title="statement not covered" >  complexity: 9,</span>
+<span class="cstat-no" title="statement not covered" >  minimumAge: 'elder',</span>
+<span class="cstat-no" title="statement not covered" >  skillGrants: { cooking: 10, nature: 3 },</span>
+<span class="cstat-no" title="statement not covered" >  contributesTo: [</span>
+<span class="cstat-no" title="statement not covered" >    { type: 'ability', abilityId: 'learn_gastronomy_philosophy' }</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >  description: `# Gastronomy Philosophy: An Inquiry into the Metaphysical Underpinnings of What We Put In Our Mouths</span>
+&nbsp;
+The philosophy of gastronomy, contrary to popular belief*, is not merely the practice of eating expensive foods while pretending to understand them. It represents instead a profound meditation on the relationship between substance, sensation, and the soul—a tripartite conjunction that the ancient Zabaglionean philosophers termed *gustus animae*, or "the tasting of being itself"†. The modern practitioner of gastronomy philosophy must understand that every meal is simultaneously a chemical process, a cultural artifact, a sensory experience, and—according to the controversial Heidelberg Colloquium of 1847—a small act of temporal manipulation‡. This multi-layered nature of eating has confounded scholars for millennia**, leading to the development of numerous schools of thought, most of which disagree on fundamental matters such as whether soup is a beverage†† and whether the soul resides in the stomach or merely visits there during particularly good dinners‡‡.
+&nbsp;
+The practical application of gastronomy philosophy requires what the renowned (and notoriously accident-prone) Chef-Philosopher Antonin Carême-Descartes called "conscious consumption"***—the deliberate awareness of every stage of the gastronomic experience from anticipation through digestion†††. This involves the systematic cultivation of sensory awareness‡‡‡, the development of a sophisticated palate capable of distinguishing between seventeen varieties of umami****, and the philosophical stamina to withstand what the Society for Gastronomic Meditation calls "existential indigestion"††††—that peculiar melancholy that strikes after consuming a truly transcendent meal, knowing that one can never experience it for the first time again‡‡‡‡. The practitioner must learn to approach each dish as both a physical object and a philosophical proposition*****, engaging with questions such as "What does this taste *mean*?" and "Why does this cheese smell like the disappointment of forgotten gods?"
+&nbsp;
+Safety considerations in gastronomy philosophy cannot be overstated, particularly after the Incident at the Milan Symposium of 1923******. The pursuit of gastronomic enlightenment has led numerous philosophers into dangerous territory—literally, in the case of Professor Edmund Brillat-Gustatory, who became so absorbed in contemplating the ontological status of a perfectly ripe Camembert that he failed to notice he was standing in a bear trap††††††. The Académie des Sciences Gastronomiques now mandates that all philosophical dining sessions must include at least one person who remains un-enlightened enough to remember practical matters like chewing‡‡‡‡‡‡, swallowing*******, and not attempting to taste concepts that don't technically exist†††††††. Additionally, students are cautioned against the practice of "phenomenological fasting"—the belief that one can understand hunger more deeply by not eating for extended periods—which the Academy officially describes as "just starving yourself, but with pretentious justification"‡‡‡‡‡‡‡.
+&nbsp;
+The historical development of gastronomy philosophy traces back to the Mesopotamian Mystery Cults of the Fourth Millennium BCE, who believed that the gods communicated through the medium of well-seasoned lamb********, though modern scholars debate whether this was genuine mysticism or simply an excuse for better temple cuisine††††††††. The field achieved formal academic recognition in 1784 when the University of Strasbourg established the first Chair of Gastronomic Metaphysics‡‡‡‡‡‡‡‡, though the chair itself had to be reinforced twice due to the occupational hazard of contemplative obesity*********. The twentieth century saw an explosion of new schools of thought, from the Structuralist Soufflé Movement to the Post-Modern Deconstructionist Sandwich Theory†††††††††, each contributing to our understanding that food is never just food—it is memory, culture, desire, and occasionally, when prepared by Chef François Merde-Loire, a form of psychological warfare‡‡‡‡‡‡‡‡‡.
+&nbsp;
+---
+&nbsp;
+*The popular belief being, of course, extremely popular. The Guild of Gastropubs reports that 73.4% of customers claiming to appreciate "gastronomic philosophy" are actually just hungry and showing off.
+&nbsp;
+†The Zabaglioneans, a civilization known primarily for their disappearance and their zabaglione, left behind exactly one philosophical text: "On the Nature of Custard." Most of it is recipes. The philosophical parts appear to have been added by mistake when someone used the manuscript to prop up a wobbly kitchen table, and egg-based wisdom dripped onto the pages. Nevertheless, scholars have built entire careers analyzing phrases like "stir constantly, lest all be lost."
+&nbsp;
+‡The Heidelberg Colloquium ended in what the official minutes describe as "that thing we don't talk about with the roast duck and the temporal paradox." Three attendees claim to remember eating the final course twice, while two insist it never happened at all, and one maintains he experienced dessert before the appetizer and "it was philosophically devastating." The proceedings were sealed for two hundred years, then accidentally used as kindling by an unusually cold janitor in 1932.
+&nbsp;
+**Specifically 4,739 years, if we count from the first recorded complaint that "food just doesn't taste like it used to," which was found carved into a Sumerian tablet next to a recipe for barley bread. The complaint predates the recipe by three centuries, suggesting either impressive long-term memory or the world's first food critic.
+&nbsp;
+††This debate has consumed (poor choice of words) more philosophical energy than almost any other gastronomic question. The Anti-Soupists maintain that any liquid food heated and served in a bowl is "beverage-adjacent at best." The Pro-Soup faction counters that temperature, viscosity, and serving vessel create categorical distinctions. The debate reached its apex in 1891 when Professor Heinrich Suppemann challenged Lord Bevington Teacup III to a duel over gazpacho. Both missed†.
+&nbsp;
+†The duel was conducted with ladles at dawn. Both men were apparently too tired and hungry to aim properly. They later had breakfast together and agreed to disagree, though they never spoke again about the incident.
+&nbsp;
+‡‡Ancient Egyptian texts suggest the soul had multiple components, one of which—the *ib*—resided somewhere near the digestive system. This has led some gastronomy philosophers to argue that truly excellent food can literally be "soul-nourishing," while others point out that the Egyptians also believed the sun was a scarab beetle rolling across the sky, so perhaps we shouldn't build entire philosophical frameworks on their anatomical theories. The debate continues, primarily over expensive lunches.
+&nbsp;
+***Carême-Descartes (1784-1833) was notable for both his philosophical rigor and his tendency to set himself on fire. His most famous work, "I Taste, Therefore I Am" (*Gusto, Ergo Sum*), was written while recovering from his third kitchen accident. His philosophy held that consciousness itself was validated through the act of tasting, and that doubt could be overcome through a properly executed hollandaise. He died after attempting to prove the existence of God through molecular gastronomy, which hadn't been invented yet. The contradiction may have killed him, or it may have been the exploding pressure cooker. Witnesses were unclear‡.
+&nbsp;
+‡The witness accounts are contradictory. One claims "he achieved enlightenment and spontaneously combusted." Another states "the pot just blew up, happens all the time." A third witness, his sous chef, simply wrote "told him not to" in the incident report and resigned immediately afterward.
+&nbsp;
+†††The stages, according to Carême-Descartes, are: Anticipation (seeing/smelling the food), Apprehension (lifting fork to mouth), Mastication (chewing—he was very firm about proper chewing), Gustation (actual tasting), Deglutition (swallowing, which he considered philosophically underrated), Cogitation (thinking about what you just ate), and Continuation (deciding whether to have more). He proposed an eighth stage, Regurgitation, but his publishers declined to include it on the grounds of good taste. The irony was not lost on him.
+&nbsp;
+‡‡‡Training involves exercises such as "tasting water from seventeen different sources," "identifying the emotional state of the chicken whose egg you're eating," and "determining whether the chef was happy when they prepared your meal." The Guild of Gastronomic Philosophers maintains a training facility in Lyon where students practice these skills. The dropout rate is approximately 94%, mostly because people realize they're paying extraordinary sums to be blindfolded and fed things while being asked "But what does it MEAN?"**
+&nbsp;
+**One former student, who requested anonym`,
+<span class="cstat-no" title="statement not covered" >  abstract: 'Research paper on Understanding gastronomy philosophy in the context of cuisine',</span>
+<span class="cstat-no" title="statement not covered" >  published: false</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const GENERATED_PAPERS = [</span>
+<span class="cstat-no" title="statement not covered" >  SEASONAL_INGREDIENT_SELECTION,</span>
+<span class="cstat-no" title="statement not covered" >  TERROIR_FLAVOR_IMPACT,</span>
+<span class="cstat-no" title="statement not covered" >  INGREDIENT_QUALITY_ASSESSMENT,</span>
+<span class="cstat-no" title="statement not covered" >  MENU_DESIGN_PRINCIPLES,</span>
+<span class="cstat-no" title="statement not covered" >  COURSE_PROGRESSION_THEORY,</span>
+<span class="cstat-no" title="statement not covered" >  WINE_FOOD_PAIRING,</span>
+<span class="cstat-no" title="statement not covered" >  BEVERAGE_PAIRING_SCIENCE,</span>
+<span class="cstat-no" title="statement not covered" >  CULINARY_CREATIVITY_THEORY,</span>
+<span class="cstat-no" title="statement not covered" >  RECIPE_DEVELOPMENT_METHODOLOGY,</span>
+<span class="cstat-no" title="statement not covered" >  GASTRONOMY_PHILOSOPHY</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-24T07:39:11.283Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

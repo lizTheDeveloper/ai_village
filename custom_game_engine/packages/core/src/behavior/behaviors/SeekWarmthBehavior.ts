@@ -30,9 +30,9 @@ export class SeekWarmthBehavior extends BaseBehavior {
   private readonly SEARCH_INTERVAL = 100; // Re-search every 5 seconds (100 ticks at 20 TPS)
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
-    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
-    const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
+    const position = entity.getComponent(ComponentType.Position)!;
+    const movement = entity.getComponent(ComponentType.Movement)!;
+    const temperature = entity.getComponent(ComponentType.Temperature);
 
     if (!temperature) {
       // No temperature component
@@ -87,8 +87,8 @@ export class SeekWarmthBehavior extends BaseBehavior {
       return; // Continue behavior, will re-search next tick
     }
 
-    const heatSourcePos = heatSourceImpl.getComponent<PositionComponent>(ComponentType.Position);
-    const heatSourceComp = heatSourceImpl.getComponent<BuildingComponent>(ComponentType.Building);
+    const heatSourcePos = heatSourceImpl.getComponent(ComponentType.Position);
+    const heatSourceComp = heatSourceImpl.getComponent(ComponentType.Building);
 
     // Double-check components exist (entity might have lost components)
     if (!heatSourcePos || !heatSourceComp) {
@@ -131,8 +131,8 @@ export class SeekWarmthBehavior extends BaseBehavior {
 
     for (const building of buildings) {
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
-      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const buildingComp = buildingImpl.getComponent(ComponentType.Building);
+      const buildingPos = buildingImpl.getComponent(ComponentType.Position);
 
       if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 

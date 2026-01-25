@@ -343,9 +343,7 @@ export class CompanionSystem extends BaseSystem {
     }
 
     // Update tags
-    const tagsComp = companionEntity.getComponent(CT.Tags) as unknown as
-      | { tags: string[] }
-      | undefined;
+    const tagsComp = companionEntity.getComponent(CT.Tags);
     if (tagsComp) {
       // Remove old tier tag
       tagsComp.tags = tagsComp.tags.filter((tag) => !tag.startsWith('evolution_tier_'));

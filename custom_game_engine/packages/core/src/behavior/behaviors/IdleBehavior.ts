@@ -37,7 +37,7 @@ export class IdleBehavior extends BaseBehavior {
     this.disableSteeringAndStop(entity);
 
     // Track when agent became idle (for boredom system)
-    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const agent = entity.getComponent(ComponentType.Agent);
     if (agent && agent.idleStartTick === undefined) {
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,

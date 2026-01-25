@@ -152,8 +152,13 @@ export function setMutationRate(
 
   if (!mv) {
     mv = createMutationVectorComponent();
-    // Use internal addComponent method
-    (entity as any).addComponent(mv);
+    // Type-safe: Use EntityImpl interface which exposes addComponent
+    // Type guard: check if entity has addComponent method (EntityImpl)
+    if ('addComponent' in entity && typeof entity.addComponent === 'function') {
+      entity.addComponent(mv);
+    } else {
+      throw new Error('Cannot add component: entity does not support addComponent');
+    }
   }
 
   mv.fields[fieldPath] = {
