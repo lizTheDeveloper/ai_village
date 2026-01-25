@@ -67,17 +67,36 @@ export const XP_PER_LEVEL: Record<SkillLevel, number> = {
 /**
  * All skill IDs for iteration.
  */
-export const ALL_SKILL_IDS: readonly SkillId[] = skillsData.skillIds as any;
+export const ALL_SKILL_IDS: readonly SkillId[] = ((): readonly SkillId[] => {
+  // Type guard: validate that skillsData.skillIds contains only valid SkillId values
+  if (!Array.isArray(skillsData.skillIds)) {
+    throw new Error('skillsData.skillIds must be an array');
+  }
+  // Runtime validation could go here if needed
+  return skillsData.skillIds as readonly SkillId[];
+})();
 
 /**
  * Skill icons for UI display.
  */
-export const SKILL_ICONS: Record<SkillId, string> = skillsData.skillIcons as any;
+export const SKILL_ICONS: Record<SkillId, string> = ((): Record<SkillId, string> => {
+  // Type guard: validate that skillsData.skillIcons is an object
+  if (typeof skillsData.skillIcons !== 'object' || skillsData.skillIcons === null) {
+    throw new Error('skillsData.skillIcons must be an object');
+  }
+  return skillsData.skillIcons as Record<SkillId, string>;
+})();
 
 /**
  * Skill display names.
  */
-export const SKILL_NAMES: Record<SkillId, string> = skillsData.skillNames as any;
+export const SKILL_NAMES: Record<SkillId, string> = ((): Record<SkillId, string> => {
+  // Type guard: validate that skillsData.skillNames is an object
+  if (typeof skillsData.skillNames !== 'object' || skillsData.skillNames === null) {
+    throw new Error('skillsData.skillNames must be an object');
+  }
+  return skillsData.skillNames as Record<SkillId, string>;
+})();
 
 /**
  * Skill prerequisite requirements.
@@ -91,7 +110,13 @@ export interface SkillPrerequisite {
 /**
  * Prerequisites for each skill (skill tree).
  */
-export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = skillsData.skillPrerequisites as any;
+export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = ((): Record<SkillId, SkillPrerequisite[]> => {
+  // Type guard: validate that skillsData.skillPrerequisites is an object
+  if (typeof skillsData.skillPrerequisites !== 'object' || skillsData.skillPrerequisites === null) {
+    throw new Error('skillsData.skillPrerequisites must be an object');
+  }
+  return skillsData.skillPrerequisites as Record<SkillId, SkillPrerequisite[]>;
+})();
 
 // ============================================
 // TASK FAMILIARITY (generalized recipe experience)
@@ -486,7 +511,13 @@ export interface SkillSynergy {
 /**
  * All skill synergies in the game.
  */
-export const SKILL_SYNERGIES: SkillSynergy[] = skillsData.skillSynergies as any;
+export const SKILL_SYNERGIES: SkillSynergy[] = ((): SkillSynergy[] => {
+  // Type guard: validate that skillsData.skillSynergies is an array
+  if (!Array.isArray(skillsData.skillSynergies)) {
+    throw new Error('skillsData.skillSynergies must be an array');
+  }
+  return skillsData.skillSynergies as SkillSynergy[];
+})();
 
 /**
  * Check if a synergy is active for a given skills component.

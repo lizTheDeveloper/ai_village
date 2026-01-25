@@ -8,6 +8,34 @@
 import modelProfilesData from '../data/model-profiles.json';
 
 /**
+ * Raw model profile data from JSON (before RegExp conversion)
+ */
+interface ModelProfileData {
+  name: string;
+  modelPattern: string;
+  patternFlags?: string;
+  supportsToolCalling: boolean;
+  supportsThinkTags: boolean;
+  supportsReasoningField: boolean;
+  preferredThinkingFormat: 'think_tags' | 'reasoning_field' | 'none';
+  thinkTagName?: string;
+  systemPromptPrefix?: string;
+  systemPromptSuffix?: string;
+  maxContextTokens: number;
+  maxOutputTokens: number;
+  inputCostPer1M: number;
+  outputCostPer1M: number;
+}
+
+/**
+ * Type definition for the model-profiles.json structure
+ */
+interface ModelProfilesData {
+  defaultProfile: ModelProfileData;
+  profiles: ModelProfileData[];
+}
+
+/**
  * Model profile describing model-specific capabilities and behaviors
  */
 export interface ModelProfile {

@@ -78,7 +78,7 @@ export function generateDeityInterface(config: DeityInterfaceConfig): string {
 
 function getInterfaceTemplates(config: DeityInterfaceConfig): InterfaceTemplate {
   const { benevolence, interventionism, mysteriousness, wrathfulness } = config;
-  const data = deityTemplatesData.interfaces as any;
+  const data = (deityTemplatesData as DeityTemplatesData).interfaces;
 
   // THE COSMIC HELP DESK (high interventionism + high benevolence)
   if (interventionism > 0.5 && benevolence > 0.5) {
@@ -121,7 +121,7 @@ function getInterfaceTemplates(config: DeityInterfaceConfig): InterfaceTemplate 
  */
 export function generateVoiceCharacterization(config: DeityInterfaceConfig): string {
   const { voiceStyle, verbosity, formality } = config;
-  const data = deityTemplatesData as any;
+  const data = deityTemplatesData as DeityTemplatesData;
 
   const styleDescriptions: Record<string, string> = data.voiceStyles;
   const verbosityDescriptions: Record<string, string> = data.verbosityLevels;

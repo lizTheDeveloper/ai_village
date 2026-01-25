@@ -309,9 +309,9 @@ export class FatesCouncilSystem extends BaseSystem {
    * Analyze a soul entity as a narrative thread
    */
   private analyzeSoulThread(soul: Entity, world: World): EntityThread | null {
-    const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
-    const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
-    const thread = soul.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
+    const soulIdentity = soul.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
+    const plotLines = soul.getComponent<PlotLinesComponent>(CT.PlotLines);
+    const thread = soul.getComponent<SilverThreadComponent>(CT.SilverThread);
 
     if (!soulIdentity || !plotLines) return null;
 
@@ -356,11 +356,11 @@ export class FatesCouncilSystem extends BaseSystem {
    * Analyze a deity entity as a narrative thread
    */
   private analyzeDeityThread(deity: Entity, world: World): EntityThread | null {
-    const deityComp = deity.getComponent(CT.Deity) as DeityComponent | undefined;
+    const deityComp = deity.getComponent<DeityComponent>(CT.Deity);
     if (!deityComp) return null;
 
     // Deities can also have plots!
-    const plotLines = deity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = deity.getComponent<PlotLinesComponent>(CT.PlotLines);
 
     // Extract recent actions from deity's episodic memory
     const recentActions = this.extractRecentActions(deity);
@@ -417,7 +417,7 @@ export class FatesCouncilSystem extends BaseSystem {
    * Returns narrative-friendly action summaries for the Fates to consider
    */
   private extractRecentActions(entity: Entity, limit: number = 5): string[] {
-    const memory = entity.getComponent(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
+    const memory = entity.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
     if (!memory) return [];
 
     // Get recent memories sorted by importance and recency
@@ -426,12 +426,12 @@ export class FatesCouncilSystem extends BaseSystem {
 
     // Filter to significant memories (high importance or emotional intensity)
     const significantMemories = memories
-      .filter((m: EpisodicMemory) => m.importance >= 0.5 || m.emotionalIntensity >= 0.6)
-      .sort((a: EpisodicMemory, b: EpisodicMemory) => b.timestamp - a.timestamp)
+      .filter((m) => m.importance >= 0.5 || m.emotionalIntensity >= 0.6)
+      .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, limit);
 
     // Convert to narrative action summaries
-    return significantMemories.map((m: EpisodicMemory) => m.summary);
+    return significantMemories.map((m) => m.summary);
   }
 
   /**
@@ -896,15 +896,15 @@ export class FatesCouncilSystem extends BaseSystem {
     }
 
     // Get PlotLines component
-    const plotLines = entity.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
+    const plotLines = entity.getComponent<PlotLinesComponent>(CT.PlotLines);
     if (!plotLines) {
       console.warn(`[FatesCouncilSystem] Entity ${entityId} has no PlotLines component - skipping plot assignment`);
       return;
     }
 
     // Get soul ID (for souls) or use entity ID
-    const soulIdentity = entity.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
-    const thread = entity.getComponent(CT.SilverThread) as SilverThreadComponent | undefined;
+    const soulIdentity = entity.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
+    const thread = entity.getComponent<SilverThreadComponent>(CT.SilverThread);
     const soulId = soulIdentity?.true_name || entityId;
     const personalTick = thread?.head?.personal_tick || tick;
 
@@ -1193,8 +1193,8 @@ export class FatesCouncilSystem extends BaseSystem {
     let assignedCount = 0;
 
     for (const soul of souls) {
-      const soulIdentity = soul.getComponent(CT.SoulIdentity) as SoulIdentityComponent | undefined;
-      const plotLines = soul.getComponent(CT.PlotLines) as PlotLinesComponent | undefined;
+      const soulIdentity = soul.getComponent<SoulIdentityComponent>(CT.SoulIdentity);
+      const plotLines = soul.getComponent<PlotLinesComponent>(CT.PlotLines);
 
       if (!soulIdentity || !plotLines) continue;
 

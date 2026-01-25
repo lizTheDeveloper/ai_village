@@ -1134,6 +1134,16 @@ export class Renderer3D {
     data.worldZ = elevation;
     data.entity = entity; // Update entity reference in case it changed
 
+    // PERF: Apply LOD-based scale adjustment for distant sprites
+    const camX = this.camera.position.x;
+    const camZ = this.camera.position.z;
+    const dx = x - camX;
+    const dz = y - camZ;  // Note: y is world Z in Three.js coords
+    const distanceSquared = dx * dx + dz * dz;
+    const lod = this.getLODLevel(distanceSquared);
+    const lodScale = 2 * lod.scale;  // Base scale is 2
+    data.sprite.scale.set(lodScale, lodScale, 1);
+
     // Let Three.js handle visibility automatically via frustum culling
     data.sprite.frustumCulled = true;
   }
@@ -1449,6 +1459,16 @@ export class Renderer3D {
     // Update sprite position
     const size = animal.size || 1;
     data.sprite.position.set(x, elevation + size / 2 + 1, y);
+
+    // PERF: Apply LOD-based scale adjustment for distant sprites
+    const camX = this.camera.position.x;
+    const camZ = this.camera.position.z;
+    const lodDx = x - camX;
+    const lodDz = y - camZ;  // Note: y is world Z in Three.js coords
+    const distanceSquared = lodDx * lodDx + lodDz * lodDz;
+    const lod = this.getLODLevel(distanceSquared);
+    const lodScale = size * 1.5 * lod.scale;
+    data.sprite.scale.set(lodScale, lodScale, 1);
   }
 
   /**
@@ -1697,8 +1717,33 @@ export class Renderer3D {
       this._lastGlobalFrameTime = now;
     }
 
+    // PERF: Increment LOD frame counter for animation rate limiting
+    this._lodFrameCounter++;
+
+    // Get camera position for distance-based LOD
+    const camX = this.camera.position.x;
+    const camZ = this.camera.position.z;
+
     for (const data of this.animalSprites.values()) {
       if (!data.hasAnimation) continue;
+
+      // PERF: Calculate squared distance to camera for LOD
+      const dx = data.worldX - camX;
+      const dz = data.worldY - camZ; // worldY maps to Three.js Z
+      const distanceSquared = dx * dx + dz * dz;
+
+      // PERF: Determine LOD level based on distance
+      const lod = this.getLODLevel(distanceSquared);
+
+      // PERF: Skip animation update based on LOD rate
+      // animationUpdateRate of 0 = no animation updates (static sprite)
+      // animationUpdateRate of 2 = update every 2nd frame, etc.
+      if (lod.animationUpdateRate === 0) {
+        continue; // Distant entities: no animation updates at all
+      }
+      if (lod.animationUpdateRate > 1 && (this._lodFrameCounter % lod.animationUpdateRate) !== 0) {
+        continue; // Skip this frame based on LOD rate
+      }
 
       const frames = this.animationFrameCache.get(data.speciesId);
       if (!frames) continue;
@@ -1718,6 +1763,20 @@ export class Renderer3D {
         }
       }
     }
+  }
+
+  /**
+   * Get the LOD level for a given squared distance from camera.
+   * Uses squared distance to avoid sqrt in hot path.
+   */
+  private getLODLevel(distanceSquared: number): LODLevel {
+    for (const level of LOD_LEVELS) {
+      if (distanceSquared <= level.maxDistanceSquared) {
+        return level;
+      }
+    }
+    // Fallback to last level (should not happen with Infinity)
+    return LOD_LEVELS[LOD_LEVELS.length - 1]!;
   }
 
   // ============================================================================
@@ -1833,7 +1892,17 @@ export class Renderer3D {
       const heightMultiplier = 3 + Math.max(0, treeHeight);
       size *= heightMultiplier;
     }
-    data.sprite.scale.set(size, size * 1.5, 1);
+
+    // PERF: Apply LOD-based scale adjustment for distant sprites
+    const camX = this.camera.position.x;
+    const camZ = this.camera.position.z;
+    const dx = x - camX;
+    const dz = y - camZ;  // Note: y is world Z in Three.js coords
+    const distanceSquared = dx * dx + dz * dz;
+    const lod = this.getLODLevel(distanceSquared);
+    const lodScale = size * lod.scale;
+
+    data.sprite.scale.set(lodScale, lodScale * 1.5, 1);
     data.sprite.position.set(x, elevation + size * 0.75 + 1, y);
     data.worldX = x;
     data.worldY = y;
