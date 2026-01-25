@@ -326,7 +326,10 @@ export class MetricsLiveStream {
     if (this.paused) return;
 
     const allMetrics = this.collector.getAllMetrics();
-    const needs = allMetrics.needs as Map<string, any> | undefined;
+
+    // Type guard for needs metrics
+    const needsRaw = allMetrics.needs;
+    const needs = needsRaw instanceof Map ? needsRaw as Map<string, { avgHealth?: number; avgEnergy?: number; avgHunger?: number }> : undefined;
 
     // Calculate averages
     let avgHealth = 0;
@@ -351,10 +354,13 @@ export class MetricsLiveStream {
     }
 
     // Get behavior distribution
-    const behavioral = allMetrics.behavioral as Record<string, any> | undefined;
+    const behavioralRaw = allMetrics.behavioral;
+    const behavioral = (typeof behavioralRaw === 'object' && behavioralRaw !== null)
+      ? behavioralRaw as Record<string, { activityBreakdown?: Record<string, number> }>
+      : undefined;
     if (behavioral) {
       for (const [, agentData] of Object.entries(behavioral)) {
-        const breakdown = agentData.activityBreakdown as Record<string, number> | undefined;
+        const breakdown = agentData.activityBreakdown;
         if (breakdown) {
           for (const [behavior, time] of Object.entries(breakdown)) {
             behaviorDistribution[behavior] = (behaviorDistribution[behavior] || 0) + time;
@@ -363,6 +369,12 @@ export class MetricsLiveStream {
       }
     }
 
+    // Get social network density
+    const socialRaw = allMetrics.social;
+    const social = (typeof socialRaw === 'object' && socialRaw !== null)
+      ? socialRaw as { socialNetworkDensity?: number }
+      : undefined;
+
     const snapshot: SnapshotData = {
       timestamp: Date.now(),
       population,
@@ -370,7 +382,7 @@ export class MetricsLiveStream {
       avgEnergy,
       avgHunger,
       behaviorDistribution,
-      networkDensity: (allMetrics.social as any)?.socialNetworkDensity ?? 0,
+      networkDensity: social?.socialNetworkDensity ?? 0,
     };
 
     this.emit({ type: 'snapshot', data: snapshot });

@@ -1886,3 +1886,7 @@ export class WorldImpl implements WorldMutator {
     return entity;
   }
 }
+
+// Export WorldImpl as World for backwards compatibility
+// This allows `new World()` to work while keeping the World interface for type safety
+export { WorldImpl as World };
