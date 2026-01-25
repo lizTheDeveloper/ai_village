@@ -147,8 +147,12 @@ export class BiosphereGenerator {
         const alien = await this.alienGenerator.generateAlienSpecies(constraints);
 
         // Add niche metadata to species
-        (alien as any).nicheId = niche.id;
-        (alien as any).sizeClass = niche.sizeClass;
+        // Note: GeneratedAlienSpecies extends AlienCreatureSpecies which may not have these fields
+        // They are added dynamically for biosphere tracking
+        Object.assign(alien, {
+          nicheId: niche.id,
+          sizeClass: niche.sizeClass
+        });
 
         species.push(alien);
 
@@ -240,7 +244,9 @@ export class BiosphereGenerator {
 
     // Build predator-prey relationships
     for (const predator of species) {
-      const predatorNiche = niches.find(n => n.id === (predator as any).nicheId);
+      // Access dynamically added nicheId
+      const predatorNicheId = 'nicheId' in predator ? (predator as typeof predator & { nicheId: string }).nicheId : undefined;
+      const predatorNiche = niches.find(n => n.id === predatorNicheId);
       if (!predatorNiche) continue;
 
       if (predatorNiche.category === 'carnivore') {
@@ -248,7 +254,8 @@ export class BiosphereGenerator {
         for (const prey of species) {
           if (prey.id === predator.id) continue;
 
-          const preyNiche = niches.find(n => n.id === (prey as any).nicheId);
+          const preyNicheId = 'nicheId' in prey ? (prey as typeof prey & { nicheId: string }).nicheId : undefined;
+          const preyNiche = niches.find(n => n.id === preyNicheId);
           if (!preyNiche) continue;
 
           // Can eat if: prey is herbivore OR prey is smaller carnivore
@@ -265,7 +272,8 @@ export class BiosphereGenerator {
       } else if (predatorNiche.category === 'herbivore') {
         // Herbivores eat producers
         for (const producer of species) {
-          const producerNiche = niches.find(n => n.id === (producer as any).nicheId);
+          const producerNicheId = 'nicheId' in producer ? (producer as typeof producer & { nicheId: string }).nicheId : undefined;
+          const producerNiche = niches.find(n => n.id === producerNicheId);
           if (producerNiche?.category === 'producer') {
             foodWeb[predator.id]!.preys.push(producer.id);
             foodWeb[producer.id]!.predators.push(predator.id);
@@ -276,9 +284,11 @@ export class BiosphereGenerator {
 
     // Build competition relationships (same niche)
     for (const s1 of species) {
+      const s1NicheId = 'nicheId' in s1 ? (s1 as typeof s1 & { nicheId: string }).nicheId : undefined;
       for (const s2 of species) {
         if (s1.id === s2.id) continue;
-        if ((s1 as any).nicheId === (s2 as any).nicheId) {
+        const s2NicheId = 'nicheId' in s2 ? (s2 as typeof s2 & { nicheId: string }).nicheId : undefined;
+        if (s1NicheId && s1NicheId === s2NicheId) {
           if (!foodWeb[s1.id]!.competitors.includes(s2.id)) {
             foodWeb[s1.id]!.competitors.push(s2.id);
           }
@@ -307,7 +317,10 @@ export class BiosphereGenerator {
 
     for (const niche of niches) {
       mapping[niche.id] = species
-        .filter(s => (s as any).nicheId === niche.id)
+        .filter(s => {
+          const nicheId = 'nicheId' in s ? (s as typeof s & { nicheId: string }).nicheId : undefined;
+          return nicheId === niche.id;
+        })
         .map(s => s.id);
     }
 
