@@ -453,8 +453,31 @@ export class DivineChatPanel implements IWindowPanel {
       return aTime - bTime;
     });
 
-    // Calculate total content height
-    this.contentHeight = items.length * (SIZES.messageHeight + 4);
+    // Calculate total content height by measuring actual wrapped heights
+    let totalContentHeight = 0;
+    const contentWidth = width - SIZES.padding * 2 - SIZES.scrollbarWidth;
+    const maxTextWidth = contentWidth - SIZES.padding * 2;
+
+    for (const item of items) {
+      if (item.type === 'message') {
+        const msg = item.data as ChatMessage;
+        ctx.font = `bold ${SIZES.nameSize}px monospace`;
+        const nameLines = this.wrapTextToLines(ctx, msg.senderName, maxTextWidth);
+        ctx.font = `${SIZES.fontSize}px monospace`;
+        const contentLines = this.wrapTextToLines(ctx, msg.content, maxTextWidth);
+        const nameHeight = nameLines.length * SIZES.lineHeight;
+        const contentHeight = contentLines.length * SIZES.lineHeight;
+        totalContentHeight += Math.max(SIZES.messageHeight, nameHeight + contentHeight + SIZES.padding * 2) + 4;
+      } else {
+        const notif = item.data as ChatNotification;
+        const text = this.formatNotification(notif);
+        ctx.font = `italic ${SIZES.fontSize}px monospace`;
+        const lines = this.wrapTextToLines(ctx, text, maxTextWidth);
+        totalContentHeight += Math.max(SIZES.notificationHeight, lines.length * SIZES.lineHeight + SIZES.padding) + 4;
+      }
+    }
+
+    this.contentHeight = totalContentHeight;
     this.visibleHeight = messageAreaHeight;
 
     // Auto-scroll to bottom when new messages arrive

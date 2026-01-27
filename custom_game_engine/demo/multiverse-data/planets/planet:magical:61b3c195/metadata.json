@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:61b3c195",
+  "name": "Gaia Tertius",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769481933805",
+  "createdAt": 1769481933945,
+  "lastAccessedAt": 1769481933945,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769481933805",
+    "type": "magical"
+  }
+}

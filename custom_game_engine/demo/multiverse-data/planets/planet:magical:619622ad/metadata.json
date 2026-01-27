@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:619622ad",
+  "name": "Nereid IX",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769481910301",
+  "createdAt": 1769481910421,
+  "lastAccessedAt": 1769481910421,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769481910301",
+    "type": "magical"
+  }
+}

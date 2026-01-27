@@ -3423,14 +3423,27 @@ async function main() {
   // Create game loop (either direct or via SharedWorker bridge)
   let gameLoop: GameLoop;
   let isSharedWorkerMode = false;
+  let sharedWorkerBridge: typeof import('@ai-village/shared-worker').gameBridge | null = null;
+
+  // Track if we're resuming an already-running simulation (page refresh case)
+  let workerAlreadyRunning = false;
 
   if (useSharedWorker) {
     console.log('[Main] Using SharedWorker architecture');
     const { gameBridge } = await import('@ai-village/shared-worker');
     await gameBridge.init();
     gameLoop = gameBridge.gameLoop;
+    sharedWorkerBridge = gameBridge;
     isSharedWorkerMode = true;
-    console.log('[Main] SharedWorker bridge initialized');
+
+    // Check if worker was already running (page refresh case)
+    // If tick > 0, simulation was running before we connected
+    if (gameLoop.tick > 0) {
+      workerAlreadyRunning = true;
+      console.log(`[Main] SharedWorker already running at tick ${gameLoop.tick} - skipping save loading`);
+    } else {
+      console.log('[Main] SharedWorker bridge initialized (waiting for save to load)');
+    }
   } else {
     console.log('[Main] Using direct GameLoop');
     gameLoop = new GameLoop();
@@ -3624,8 +3637,13 @@ async function main() {
   }
 
   // Initialize storage backend for save/load system FIRST
-  const storage = new IndexedDBStorage('ai-village-saves');
-  saveLoadService.setStorage(storage);
+  // In SharedWorker mode, the worker handles storage - skip initialization here
+  if (!isSharedWorkerMode) {
+    const storage = new IndexedDBStorage('ai-village-saves');
+    saveLoadService.setStorage(storage);
+  } else {
+    console.log('[Main] Skipping saveLoadService setup - SharedWorker handles persistence');
+  }
 
   // Enable server sync for multiverse persistence
   // Get or create a persistent player ID
@@ -3677,16 +3695,22 @@ async function main() {
   }
 
   // Check for existing saves and auto-load the most recent one
+  // In SharedWorker mode, use the worker to list saves (non-blocking for main thread)
   let existingSaves: any[] = [];
   try {
     // Add timeout to prevent hanging on IndexedDB issues
-    const listSavesPromise = saveLoadService.listSaves();
+    const listSavesPromise = isSharedWorkerMode && sharedWorkerBridge
+      ? sharedWorkerBridge.listSaves()
+      : saveLoadService.listSaves();
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('listSaves timeout after 5s')), 5000)
     );
     const allSaves = await Promise.race([listSavesPromise, timeoutPromise]);
     // Filter out any undefined/null entries
     existingSaves = allSaves.filter(save => save != null && save.name && save.key);
+    if (isSharedWorkerMode) {
+      console.log(`[Main] SharedWorker listed ${existingSaves.length} saves`);
+    }
   } catch (error) {
     console.warn('[Demo] Could not load existing saves (this is normal on first run or if IndexedDB is blocked):', error);
     console.log('[Demo] Starting fresh game...');
@@ -3785,8 +3809,15 @@ async function main() {
 
   let browserResult: UniverseBrowserResult | null = null;
 
+  // In SharedWorker mode, if worker was already running (page refresh), skip save loading entirely
+  // The worker already has the world state and we're just syncing to it
+  if (workerAlreadyRunning) {
+    console.log('[Main] Skipping save loading - SharedWorker already has running simulation');
+    loadedCheckpoint = true;  // Treat as if we loaded a checkpoint
+    universeSelection = { type: 'load', checkpointKey: 'worker-resume' };
+  }
   // Auto-load most recent save if available (unless explicitly overridden)
-  if (!creationResumeState && !forceShowBrowser && existingSaves.length > 0) {
+  else if (!creationResumeState && !forceShowBrowser && existingSaves.length > 0) {
     // Sort saves by timestamp (most recent first)
     const sortedSaves = [...existingSaves].sort((a, b) => {
       const timeA = a.metadata?.savedAt || 0;
@@ -3838,20 +3869,70 @@ async function main() {
     });
   } else if (browserResult && browserResult.action === 'load_local' && browserResult.saveKey) {
     // Load a local save
-    const result = await saveLoadService.load(browserResult.saveKey, gameLoop.world);
-    if (result.success) {
-      loadedCheckpoint = true;
-      universeSelection = { type: 'load', checkpointKey: browserResult.saveKey };
-    } else {
-      console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
-      // Fall back to showing universe creation screen
-      universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
-        universeConfigScreen = new UniverseConfigScreen();
-        universeConfigScreen.show((config) => {
-          universeConfig = config;
-          resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
-        });
+    // In SharedWorker mode, use worker to load (non-blocking for main thread)
+    if (isSharedWorkerMode && sharedWorkerBridge) {
+      console.log(`[Main] Loading save via SharedWorker: ${browserResult.saveKey}`);
+
+      // Show a simple loading indicator while worker loads
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'worker-loading';
+      loadingDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;font-family:monospace;';
+      loadingDiv.innerHTML = '<div id="loading-message" style="font-size:18px;margin-bottom:16px;">Loading universe...</div><div id="loading-progress" style="width:300px;height:20px;background:#333;border-radius:10px;overflow:hidden;"><div id="loading-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#4a9eff,#9b4aff);transition:width 0.3s;"></div></div>';
+      document.body.appendChild(loadingDiv);
+
+      // Subscribe to loading progress
+      const unsubProgress = sharedWorkerBridge.onLoadingProgress((progress) => {
+        const msgEl = document.getElementById('loading-message');
+        const barEl = document.getElementById('loading-bar');
+        if (msgEl) msgEl.textContent = progress.message;
+        if (barEl) barEl.style.width = `${progress.progress}%`;
       });
+
+      // Wait for load to complete
+      const loadResult = await new Promise<{ success: boolean; error?: string }>((resolve) => {
+        const unsub = sharedWorkerBridge!.onLoadComplete((result) => {
+          unsub();
+          unsubProgress();
+          resolve(result);
+        });
+        sharedWorkerBridge!.loadSave(browserResult.saveKey!);
+      });
+
+      // Remove loading indicator
+      loadingDiv.remove();
+
+      if (loadResult.success) {
+        loadedCheckpoint = true;
+        universeSelection = { type: 'load', checkpointKey: browserResult.saveKey };
+        console.log('[Main] Save loaded successfully via SharedWorker');
+      } else {
+        console.error(`[Demo] Failed to load checkpoint via worker: ${loadResult.error}`);
+        // Fall back to showing universe creation screen
+        universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+          universeConfigScreen = new UniverseConfigScreen();
+          universeConfigScreen.show((config) => {
+            universeConfig = config;
+            resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+          });
+        });
+      }
+    } else {
+      // Direct mode - load on main thread
+      const result = await saveLoadService.load(browserResult.saveKey, gameLoop.world);
+      if (result.success) {
+        loadedCheckpoint = true;
+        universeSelection = { type: 'load', checkpointKey: browserResult.saveKey };
+      } else {
+        console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
+        // Fall back to showing universe creation screen
+        universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+          universeConfigScreen = new UniverseConfigScreen();
+          universeConfigScreen.show((config) => {
+            universeConfig = config;
+            resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+          });
+        });
+      }
     }
   } else if (browserResult && browserResult.action === 'load_server' && browserResult.universeId) {
     // Load from multiverse server

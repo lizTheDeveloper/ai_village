@@ -178,9 +178,14 @@ export class UniverseClient {
 
   /**
    * Check if connected
+   *
+   * Returns true if we have a live connection to the worker.
+   * This is true in two cases:
+   * - Worker is running and we received an init message (connectionId set)
+   * - Worker is waiting and we received a worker-ready message (workerReady set)
    */
   isConnected(): boolean {
-    return this.connected && this.connectionId !== null;
+    return this.connected && (this.connectionId !== null || this.workerReady);
   }
 
   /**

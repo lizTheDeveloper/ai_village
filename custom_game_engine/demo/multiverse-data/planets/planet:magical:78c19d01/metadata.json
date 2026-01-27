@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:78c19d01",
+  "name": "Oberon Minor",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769482033904",
+  "createdAt": 1769482034018,
+  "lastAccessedAt": 1769482034018,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769482033904",
+    "type": "magical"
+  }
+}
