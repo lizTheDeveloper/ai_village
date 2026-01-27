@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:25fa5dc1",
+  "name": "Triton Minor",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769317129925",
+  "createdAt": 1769317129956,
+  "lastAccessedAt": 1769317129956,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769317129925",
+    "type": "magical"
+  }
+}

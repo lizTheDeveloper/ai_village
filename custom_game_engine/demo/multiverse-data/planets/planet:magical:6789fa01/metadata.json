@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6789fa01",
+  "name": "Proteus Two",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769319652069",
+  "createdAt": 1769319652071,
+  "lastAccessedAt": 1769319652071,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769319652069",
+    "type": "magical"
+  }
+}

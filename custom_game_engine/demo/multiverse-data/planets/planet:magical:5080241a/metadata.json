@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5080241a",
+  "name": "Cosmic-130",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769321130871",
+  "createdAt": 1769321130875,
+  "lastAccessedAt": 1769321130875,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769321130871",
+    "type": "magical"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:20fedca1",
+  "name": "Gaia IX",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769320480547",
+  "createdAt": 1769320480555,
+  "lastAccessedAt": 1769320480555,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769320480547",
+    "type": "magical"
+  }
+}

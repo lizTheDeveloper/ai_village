@@ -3,7 +3,12 @@
  *
  * Thin client that connects to the SharedWorker.
  * Windows are pure views - no computation, just rendering.
+ *
+ * NEW: Supports save management - main thread can ask worker to list/load saves
+ * instead of loading saves itself (which blocks the main thread).
  */
+
+/// <reference lib="dom" />
 
 import type {
   UniverseState,
@@ -12,6 +17,8 @@ import type {
   WorkerToWindowMessage,
   WindowToWorkerMessage,
   Viewport,
+  SaveMetadata,
+  LoadingProgress,
 } from './types.js';
 import type { DeltaUpdate } from './path-prediction-types.js';
 
@@ -21,6 +28,21 @@ import type { DeltaUpdate } from './path-prediction-types.js';
 export type DeltaCallback = (delta: DeltaUpdate) => void;
 
 /**
+ * Callback for loading progress updates
+ */
+export type LoadingProgressCallback = (progress: LoadingProgress) => void;
+
+/**
+ * Callback for worker ready status
+ */
+export type WorkerReadyCallback = (status: { hasExistingSave: boolean; currentUniverseId?: string; currentTick?: number }) => void;
+
+/**
+ * Callback for load complete
+ */
+export type LoadCompleteCallback = (result: { success: boolean; error?: string; universeId?: string; tick?: number }) => void;
+
+/**
  * Client for connecting to the Universe SharedWorker
  */
 export class UniverseClient {
@@ -28,9 +50,14 @@ export class UniverseClient {
   private port: MessagePort | null = null;
   private listeners: Set<StateCallback> = new Set();
   private deltaListeners: Set<DeltaCallback> = new Set();
+  private loadingProgressListeners: Set<LoadingProgressCallback> = new Set();
+  private workerReadyListeners: Set<WorkerReadyCallback> = new Set();
+  private loadCompleteListeners: Set<LoadCompleteCallback> = new Set();
   private state: UniverseState | null = null;
   private connectionId: string | null = null;
   private connected = false;
+  private workerReady = false;
+  private hasExistingSave = false;
 
   /**
    * Connect to the SharedWorker
@@ -56,7 +83,7 @@ export class UniverseClient {
       };
 
       // Handle errors
-      this.worker.onerror = (error) => {
+      this.worker.onerror = (error: ErrorEvent) => {
         console.error('[UniverseClient] Worker error:', error);
       };
 
@@ -183,7 +210,9 @@ export class UniverseClient {
         type: 'request-snapshot',
       };
 
-      this.port.postMessage(message);
+      if (this.port) {
+        this.port.postMessage(message);
+      }
     });
   }
 
@@ -258,6 +287,140 @@ export class UniverseClient {
     };
 
     this.port.postMessage(message);
+  }
+
+  // ============================================================================
+  // SAVE MANAGEMENT API - New methods for worker-first loading
+  // ============================================================================
+
+  /**
+   * List all available saves from the worker
+   * Returns a promise that resolves with the list of saves
+   */
+  listSaves(): Promise<SaveMetadata[]> {
+    if (!this.port) {
+      return Promise.reject(new Error('Not connected'));
+    }
+
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('List saves timeout'));
+      }, 10000);
+
+      const handler = (e: MessageEvent<WorkerToWindowMessage>) => {
+        if (e.data.type === 'saves-list') {
+          clearTimeout(timeout);
+          this.port?.removeEventListener('message', handler);
+          resolve(e.data.saves);
+        }
+      };
+
+      this.port?.addEventListener('message', handler);
+
+      const message: WindowToWorkerMessage = {
+        type: 'list-saves',
+      };
+      this.port.postMessage(message);
+    });
+  }
+
+  /**
+   * Request the worker to load a specific save
+   * Returns immediately - subscribe to onLoadComplete for the result
+   */
+  loadSave(saveKey: string): void {
+    if (!this.port) {
+      console.warn('[UniverseClient] Not connected, cannot load save');
+      return;
+    }
+
+    const message: WindowToWorkerMessage = {
+      type: 'load-save',
+      saveKey,
+    };
+
+    this.port.postMessage(message);
+  }
+
+  /**
+   * Request the worker to create a new universe
+   * Returns immediately - subscribe to onLoadComplete for the result
+   */
+  createNewUniverse(config: { name?: string; magicParadigm?: string; scenario?: string } = {}): void {
+    if (!this.port) {
+      console.warn('[UniverseClient] Not connected, cannot create universe');
+      return;
+    }
+
+    const message: WindowToWorkerMessage = {
+      type: 'create-new-universe',
+      config,
+    };
+
+    this.port.postMessage(message);
+  }
+
+  /**
+   * Request worker status
+   */
+  getWorkerStatus(): void {
+    if (!this.port) return;
+
+    const message: WindowToWorkerMessage = {
+      type: 'get-status',
+    };
+
+    this.port.postMessage(message);
+  }
+
+  /**
+   * Subscribe to loading progress updates
+   */
+  onLoadingProgress(callback: LoadingProgressCallback): () => void {
+    this.loadingProgressListeners.add(callback);
+    return () => {
+      this.loadingProgressListeners.delete(callback);
+    };
+  }
+
+  /**
+   * Subscribe to worker ready status
+   */
+  onWorkerReady(callback: WorkerReadyCallback): () => void {
+    this.workerReadyListeners.add(callback);
+
+    // If we already know the status, call immediately
+    if (this.workerReady) {
+      callback({ hasExistingSave: this.hasExistingSave });
+    }
+
+    return () => {
+      this.workerReadyListeners.delete(callback);
+    };
+  }
+
+  /**
+   * Subscribe to load complete events
+   */
+  onLoadComplete(callback: LoadCompleteCallback): () => void {
+    this.loadCompleteListeners.add(callback);
+    return () => {
+      this.loadCompleteListeners.delete(callback);
+    };
+  }
+
+  /**
+   * Check if worker is ready (systems initialized)
+   */
+  isWorkerReady(): boolean {
+    return this.workerReady;
+  }
+
+  /**
+   * Check if there are existing saves
+   */
+  hasExistingSaves(): boolean {
+    return this.hasExistingSave;
   }
 
   /**

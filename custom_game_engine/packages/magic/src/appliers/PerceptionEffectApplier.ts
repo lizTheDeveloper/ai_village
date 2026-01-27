@@ -81,10 +81,14 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
     _world: World,
     context: EffectContext
   ): EffectApplicationResult {
-    const appliedValues: Record<string, any> = {};
+    const appliedValues: Record<string, number> = {};
 
     // Check if target has perception component
-    let perception = target.components.get('perception') as PerceptionComponent | undefined;
+    const perceptionRaw = target.components.get('perception');
+    let perception: PerceptionComponent | undefined;
+    if (perceptionRaw && typeof perceptionRaw === 'object' && 'type' in perceptionRaw && (perceptionRaw as { type: unknown }).type === 'perception') {
+      perception = perceptionRaw as unknown as PerceptionComponent;
+    }
     if (!perception) {
       return {
         success: false,
@@ -115,7 +119,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
       identifyDetails?: boolean;
       detectionTypes?: string[];
     }
-    const extendedEffect = effect as unknown as ExtendedPerceptionEffect;
+    const extendedEffect = effect as ExtendedPerceptionEffect;
     const perceptionType = extendedEffect.perceptionType || 'unknown';
 
     // Calculate detection range with scaling
@@ -192,7 +196,6 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
           expiresAt,
           effectId: effect.id,
         });
-        appliedValues.detectionType = 'alignment';
         break;
 
       case 'detect_magic':
@@ -219,7 +222,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
           effectId: effect.id,
           identifyDetails,
         });
-        appliedValues.identifyDetails = identifyDetails;
+        appliedValues.identifyDetails = identifyDetails ? 1 : 0;
         break;
 
       case 'enhanced_vision':
@@ -314,10 +317,11 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
     _world: World
   ): void {
     // Clean up perception state when effect expires or is dispelled
-    const perception = target.components.get('perception') as PerceptionComponent | undefined;
-    if (!perception) {
+    const perceptionRaw = target.components.get('perception');
+    if (!perceptionRaw || typeof perceptionRaw !== 'object' || !('type' in perceptionRaw) || (perceptionRaw as { type: unknown }).type !== 'perception') {
       return;
     }
+    const perception = perceptionRaw as unknown as PerceptionComponent;
 
     // Remove the specific perception entry
     if (perception.activePerceptions) {

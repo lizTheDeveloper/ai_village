@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:25d19c48",
+  "name": "Epsilon Theia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769480507323",
+  "createdAt": 1769480507404,
+  "lastAccessedAt": 1769480507404,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769480507323",
+    "type": "magical"
+  }
+}

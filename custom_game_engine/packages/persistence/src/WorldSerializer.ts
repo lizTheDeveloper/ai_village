@@ -2,7 +2,8 @@
  * WorldSerializer - Serializes/deserializes entire World instances
  */
 
-import { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
+import { WorldImpl } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { Component } from '@ai-village/core';
 import type { UniverseDivineConfig } from '@ai-village/divinity';
@@ -13,8 +14,16 @@ import type {
 } from './types.js';
 import { componentSerializerRegistry } from './serializers/index.js';
 import { computeChecksumSync } from './utils.js';
-import { chunkSerializer } from '@ai-village/world';
+import { chunkSerializer, type TerrainSnapshot } from '@ai-village/world';
 import { getZoneManager } from '@ai-village/core';
+
+interface ZoneData {
+  id: string;
+  type: string;
+  priority: number;
+  tiles: string[];
+  createdAt: number;
+}
 
 export class WorldSerializer {
   /**
@@ -136,8 +145,7 @@ export class WorldSerializer {
     if (snapshot.worldState.terrain) {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
-        // Type assertion: We trust the serialized terrain data structure matches what chunkSerializer expects
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as any, chunkManager as any);
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as TerrainSnapshot, chunkManager);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -146,7 +154,7 @@ export class WorldSerializer {
     // Deserialize zones
     if (snapshot.worldState.zones && snapshot.worldState.zones.length > 0) {
       const zoneManager = getZoneManager();
-      zoneManager.deserializeZones(snapshot.worldState.zones);
+      zoneManager.deserializeZones(snapshot.worldState.zones as ZoneData[]);
     }
 
     // NOTE: Weather and buildings are already deserialized through entity system (lines 125-133)
@@ -286,7 +294,7 @@ export class WorldSerializer {
     const chunkManager = worldImpl.getChunkManager();
 
     const terrain = chunkManager
-      ? chunkSerializer.serializeChunks(chunkManager as any)
+      ? chunkSerializer.serializeChunks(chunkManager)
       : null;
 
     // Serialize zones using ZoneManager

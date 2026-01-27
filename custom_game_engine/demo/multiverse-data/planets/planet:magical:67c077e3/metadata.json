@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:67c077e3",
+  "name": "Proteus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769319616438",
+  "createdAt": 1769319616446,
+  "lastAccessedAt": 1769319616446,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769319616438",
+    "type": "magical"
+  }
+}

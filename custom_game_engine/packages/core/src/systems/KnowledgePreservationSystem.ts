@@ -132,6 +132,15 @@ export class KnowledgePreservationSystem extends BaseSystem {
 
   // ========== Collapse Handling ==========
 
+  private worldRef?: World;
+
+  /**
+   * Override initialize to store world reference
+   */
+  protected onInitialize(world: World): void {
+    this.worldRef = world;
+  }
+
   /**
    * Handle civilization collapse - preserve technologies
    */
@@ -142,10 +151,10 @@ export class KnowledgePreservationSystem extends BaseSystem {
     erasLost: number;
     tick: number;
   }): void {
-    // Get world from event bus (attached as property)
-    const world = (this.events as any).world as World;
+    // Get world from stored reference
+    const world = this.worldRef;
     if (!world) {
-      console.error('[KnowledgePreservation] Cannot access world from event bus');
+      console.error('[KnowledgePreservation] World not initialized');
       return;
     }
 

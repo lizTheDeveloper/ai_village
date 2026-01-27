@@ -3,7 +3,7 @@
  */
 
 import { BaseComponentSerializer } from '../ComponentSerializerRegistry.js';
-import type { ParadigmStateComponent } from '@ai-village/core';
+import type { ParadigmStateComponent, ParadigmAdaptation, ParadigmSpecificState } from '@ai-village/core';
 import { createParadigmStateComponent } from '@ai-village/core';
 
 export class ParadigmStateSerializer extends BaseComponentSerializer<ParadigmStateComponent> {
@@ -29,8 +29,8 @@ export class ParadigmStateSerializer extends BaseComponentSerializer<ParadigmSta
     const comp = createParadigmStateComponent();
     comp.homeParadigmId = d.homeParadigmId as string | undefined;
     comp.activeParadigmId = d.activeParadigmId as string | undefined;
-    comp.adaptations = d.adaptations as any[] | undefined;
-    comp.paradigmState = d.paradigmState as any || {};
+    comp.adaptations = (d.adaptations as ParadigmAdaptation[] | undefined) ?? undefined;
+    comp.paradigmState = (d.paradigmState as Partial<Record<string, ParadigmSpecificState>>) ?? {};
     comp.corruption = d.corruption as number | undefined;
     comp.attentionLevel = d.attentionLevel as number | undefined;
     comp.favorLevel = d.favorLevel as number | undefined;

@@ -278,7 +278,7 @@ export class UniverseConfigScreen {
         stepDiv.onclick = () => {
           // Handle navigation based on skipPlanet mode
           if (step === 'planet' && skipPlanet) return;
-          this.currentStep = step as any;
+          this.currentStep = step;
           this.render();
         };
       }

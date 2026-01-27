@@ -14,7 +14,7 @@
  * - Grand Strategy inspection (Empires, Federations, Councils, Trade, Fleets, Megastructures, Multiverse)
  */
 
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import {
   type ResearchStateComponent,
   type SkillsComponent,
@@ -428,7 +428,7 @@ export class DevPanel implements IWindowPanel {
   private skillXp = new Map<string, number>();
 
   private actionLog: string[] = [];
-  private world: World | null = null;
+  private world: WorldMutator | null = null;
   private agentSpawnHandler: AgentSpawnHandler | null = null;
   private scheduler: LLMScheduler | null = null;
 
@@ -2871,15 +2871,15 @@ export class DevPanel implements IWindowPanel {
         if (this.selectedIntrospectionComponent === 'identity' && 'name' in testEntity) {
           // Type guard: if name exists, we can safely treat it as an object with those properties
           if (typeof testEntity === 'object' && testEntity !== null) {
-            (testEntity as { name: string; age: number; species: string }).name = 'Test Entity';
-            (testEntity as { name: string; age: number; species: string }).age = 1000;
-            (testEntity as { name: string; age: number; species: string }).species = 'elf';
+            (testEntity as unknown as { name: string; age: number; species: string }).name = 'Test Entity';
+            (testEntity as unknown as { name: string; age: number; species: string }).age = 1000;
+            (testEntity as unknown as { name: string; age: number; species: string }).species = 'elf';
           }
         } else if (this.selectedIntrospectionComponent === 'personality' && 'openness' in testEntity) {
           if (typeof testEntity === 'object' && testEntity !== null) {
-            (testEntity as { openness: number; agreeableness: number; spirituality: number }).openness = 0.9;
-            (testEntity as { openness: number; agreeableness: number; spirituality: number }).agreeableness = 0.8;
-            (testEntity as { openness: number; agreeableness: number; spirituality: number }).spirituality = 0.7;
+            (testEntity as unknown as { openness: number; agreeableness: number; spirituality: number }).openness = 0.9;
+            (testEntity as unknown as { openness: number; agreeableness: number; spirituality: number }).agreeableness = 0.8;
+            (testEntity as unknown as { openness: number; agreeableness: number; spirituality: number }).spirituality = 0.7;
           }
         } else if (this.selectedIntrospectionComponent === 'skills' && 'levels' in testEntity) {
           if (typeof testEntity === 'object' && testEntity !== null && 'levels' in testEntity) {
@@ -2890,9 +2890,9 @@ export class DevPanel implements IWindowPanel {
           }
         } else if (this.selectedIntrospectionComponent === 'needs' && 'hunger' in testEntity) {
           if (typeof testEntity === 'object' && testEntity !== null) {
-            (testEntity as { hunger: number; energy: number; socialContact: number }).hunger = 0.3;
-            (testEntity as { hunger: number; energy: number; socialContact: number }).energy = 0.4;
-            (testEntity as { hunger: number; energy: number; socialContact: number }).socialContact = 0.2;
+            (testEntity as unknown as { hunger: number; energy: number; socialContact: number }).hunger = 0.3;
+            (testEntity as unknown as { hunger: number; energy: number; socialContact: number }).energy = 0.4;
+            (testEntity as unknown as { hunger: number; energy: number; socialContact: number }).socialContact = 0.2;
           }
         }
 

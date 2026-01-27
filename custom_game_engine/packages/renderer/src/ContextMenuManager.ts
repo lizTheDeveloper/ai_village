@@ -6,7 +6,7 @@
 
 import { EntityImpl } from '@ai-village/core';
 import type { World } from '@ai-village/core';
-import type { EventBus } from '@ai-village/core';
+import type { EventBus, EventType, EventHandler, GameEvent } from '@ai-village/core';
 import type { Camera } from './Camera.js';
 import { MenuContext } from './context-menu/MenuContext.js';
 import { ContextActionRegistry } from './context-menu/ContextActionRegistry.js';
@@ -53,7 +53,7 @@ export class ContextMenuManager {
   private currentItems: RadialMenuItem[] = [];
   private menuId: string = '';
 
-  private eventListeners: Array<{ event: string; handler: (...args: any[]) => void }> = [];
+  private eventListeners: Array<{ event: EventType; handler: EventHandler }> = [];
 
   // Hover position for context-aware shortcuts
   private hoverWorldX: number = 0;
@@ -745,10 +745,11 @@ export class ContextMenuManager {
    */
   private setupEventListeners(): void {
     // Listen for right-click events
-    const rightClickHandler = (event: { data: { x: number; y: number } }) => {
+    const rightClickHandler: EventHandler = (event: GameEvent) => {
       try {
-        if (event.data && typeof event.data.x === 'number' && typeof event.data.y === 'number') {
-          this.open(event.data.x, event.data.y);
+        const data = event.data as { x?: number; y?: number } | undefined;
+        if (data && typeof data.x === 'number' && typeof data.y === 'number') {
+          this.open(data.x, data.y);
         }
       } catch (error) {
         console.error('[ContextMenuManager] Exception in rightClickHandler:', error);
@@ -759,16 +760,17 @@ export class ContextMenuManager {
     this.eventListeners.push({ event: 'input:rightclick', handler: rightClickHandler });
 
     // Listen for confirmation results
-    const confirmHandler = (event: { data?: { actionId?: string; context?: MenuContext } }) => {
+    const confirmHandler: EventHandler = (event: GameEvent) => {
+      const data = event.data as { actionId?: string; context?: MenuContext } | undefined;
       // Validate event structure
-      if (!event?.data?.actionId) {
+      if (!data?.actionId) {
         return;
       }
-      if (!event.data.context) {
+      if (!data.context) {
         return;
       }
       // Re-execute action after confirmation
-      this.registry.execute(event.data.actionId, event.data.context as MenuContext);
+      this.registry.execute(data.actionId, data.context as MenuContext);
     };
 
     this.eventBus.on('ui:confirmation:confirmed', confirmHandler);

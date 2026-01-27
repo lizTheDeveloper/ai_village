@@ -29,8 +29,8 @@ async function main() {
     if (component && component.type === 'empire') {
       const emp = component as import('@ai-village/core').EmpireComponent;
       console.log(`  ${emp.empireName || 'unnamed'}:`);
-      console.log(`    - Government: ${emp.governance.governmentType}`);
-      console.log(`    - Stability: ${emp.governance.stability}`);
+      console.log(`    - Government: ${emp.leadership.type}`);
+      console.log(`    - Legitimacy: ${emp.stability.imperialLegitimacy}`);
       console.log(`    - Treasury: ${emp.economy.imperialTreasury}`);
       console.log(`    - Nations: ${emp.territory.nations.length || 0}`);
     }
@@ -44,8 +44,8 @@ async function main() {
     if (component && component.type === 'navy') {
       const nav = component as import('@ai-village/core').NavyComponent;
       console.log(`  ${nav.name}:`);
-      console.log(`    - Empire: ${nav.empireId}`);
-      console.log(`    - Budget: ${nav.budget}`);
+      console.log(`    - Faction: ${nav.factionId}`);
+      console.log(`    - Budget: ${nav.economy.annualBudget}`);
       console.log(`    - Total Ships: ${nav.assets.totalShips || 0}`);
       console.log(`    - Total Crew: ${nav.assets.totalCrew || 0}`);
       console.log(`    - Maintenance Cost: ${nav.economy.maintenanceCost || 0}`);
@@ -63,7 +63,7 @@ async function main() {
       console.log(`    - Category: ${mega.category}`);
       console.log(`    - Type: ${mega.structureType}`);
       console.log(`    - Operational: ${mega.operational}`);
-      console.log(`    - Integrity: ${mega.integrity}`);
+      console.log(`    - Efficiency: ${mega.efficiency}`);
     }
   }
 
@@ -82,7 +82,7 @@ async function main() {
     const component = e.getComponent(CT.Empire);
     if (component && component.type === 'empire') {
       const emp = component as import('@ai-village/core').EmpireComponent;
-      console.log(`  ${emp.empireName || 'unnamed'}: stability=${emp.governance.stability}, treasury=${emp.economy.imperialTreasury}`);
+      console.log(`  ${emp.empireName || 'unnamed'}: legitimacy=${emp.stability.imperialLegitimacy}, treasury=${emp.economy.imperialTreasury}`);
     }
   }
 
@@ -100,7 +100,7 @@ async function main() {
     const component = e.getComponent(CT.Megastructure);
     if (component && component.type === 'megastructure') {
       const mega = component as import('@ai-village/core').MegastructureComponent;
-      console.log(`  ${mega.name}: operational=${mega.operational}, integrity=${mega.integrity}`);
+      console.log(`  ${mega.name}: operational=${mega.operational}, efficiency=${mega.efficiency}`);
     }
   }
 

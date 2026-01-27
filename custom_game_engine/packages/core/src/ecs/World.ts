@@ -1076,16 +1076,18 @@ export class WorldImpl implements WorldMutator {
     }
 
     // Add test helper methods to entity
+    // Type-safe: We're adding methods to EntityImpl, which is the concrete type
+    const entityImpl = entity as EntityImpl;
     const testEntity = entity as unknown as TestEntity;
 
     // Store original addComponent from EntityImpl
-    const entityImpl = entity as EntityImpl;
     const originalAddComponent = entityImpl.addComponent.bind(entity);
 
     testEntity.addComponent = (ComponentClassOrInstance: ComponentClassOrString, data?: Record<string, unknown>): Component => {
       // If it's already a component instance, use it directly
-      if (typeof ComponentClassOrInstance === 'object' && ComponentClassOrInstance !== null && 'type' in ComponentClassOrInstance) {
-        const component = ComponentClassOrInstance as unknown as Component;
+      if (typeof ComponentClassOrInstance === 'object' && ComponentClassOrInstance !== null && 'type' in ComponentClassOrInstance && 'version' in ComponentClassOrInstance) {
+        // Type guard: checked that it has 'type' and 'version' properties, so it's a Component
+        const component = ComponentClassOrInstance as Component;
         originalAddComponent(component);
         return component;
       }
@@ -1175,15 +1177,18 @@ export class WorldImpl implements WorldMutator {
 
     // Remove from spatial grid
     const posRaw = entity.components.get('position');
-    const pos = posRaw as unknown as
-      | { x: number; y: number; chunkX: number; chunkY: number }
-      | undefined;
-    if (pos) {
+    // Type guard: check that position has required fields
+    if (posRaw && typeof posRaw === 'object' && 'x' in posRaw && 'y' in posRaw && 'chunkX' in posRaw && 'chunkY' in posRaw) {
+      const pos = posRaw as { x: number; y: number; chunkX: number; chunkY: number };
+
       this._spatialGrid.remove(id);
 
       // Also remove from chunk index
       const key = `${pos.chunkX},${pos.chunkY}`;
       this.chunkIndex.get(key)?.delete(id);
+    } else if (posRaw) {
+      // Fallback: position component exists but missing chunk coordinates
+      this._spatialGrid.remove(id);
     }
 
     // Decrement component type counts for all components this entity has
@@ -1231,12 +1236,15 @@ export class WorldImpl implements WorldMutator {
 
     // Update spatial index if position component
     if (component.type === 'position') {
-      const pos = component as unknown as { chunkX: number; chunkY: number };
-      const key = `${pos.chunkX},${pos.chunkY}`;
-      if (!this.chunkIndex.has(key)) {
-        this.chunkIndex.set(key, new Set());
+      // Type guard: check that position has chunk coordinates
+      if ('chunkX' in component && 'chunkY' in component && typeof component.chunkX === 'number' && typeof component.chunkY === 'number') {
+        const pos = component as { chunkX: number; chunkY: number };
+        const key = `${pos.chunkX},${pos.chunkY}`;
+        if (!this.chunkIndex.has(key)) {
+          this.chunkIndex.set(key, new Set());
+        }
+        this.chunkIndex.get(key)!.add(entityId);
       }
-      this.chunkIndex.get(key)!.add(entityId);
     }
 
     this._eventBus.emit({
@@ -1272,10 +1280,9 @@ export class WorldImpl implements WorldMutator {
     // Update spatial index if removing position
     if (componentType === 'position') {
       const posRaw = entity.components.get('position');
-      const pos = posRaw as unknown as
-        | { chunkX: number; chunkY: number }
-        | undefined;
-      if (pos) {
+      // Type guard: check that position has chunk coordinates
+      if (posRaw && typeof posRaw === 'object' && 'chunkX' in posRaw && 'chunkY' in posRaw) {
+        const pos = posRaw as { chunkX: number; chunkY: number };
         const key = `${pos.chunkX},${pos.chunkY}`;
         this.chunkIndex.get(key)?.delete(entityId);
       }
@@ -1371,10 +1378,9 @@ export class WorldImpl implements WorldMutator {
 
     // Update spatial chunk index if entity has position component
     const posRaw = entity.components.get('position');
-    const pos = posRaw as unknown as
-      | { x: number; y: number; chunkX?: number; chunkY?: number }
-      | undefined;
-    if (pos) {
+    // Type guard: check that position has x and y coordinates
+    if (posRaw && typeof posRaw === 'object' && 'x' in posRaw && 'y' in posRaw) {
+      const pos = posRaw as { x: number; y: number; chunkX?: number; chunkY?: number };
       // Calculate chunk coordinates if not present (migration for old saves)
       const CHUNK_SIZE = 32;
       const chunkX = pos.chunkX ?? Math.floor(pos.x / CHUNK_SIZE);
@@ -1887,6 +1893,8 @@ export class WorldImpl implements WorldMutator {
   }
 }
 
-// Export WorldImpl as World for backwards compatibility
-// This allows `new World()` to work while keeping the World interface for type safety
-export { WorldImpl as World };
+// World value alias for backwards compatibility: allows `new World()` syntax
+// This creates a value export that can be used as a constructor.
+// The interface World (above) provides the type, and this const provides the runtime value.
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const World = WorldImpl;

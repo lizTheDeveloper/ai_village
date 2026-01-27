@@ -338,19 +338,19 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
     const additionalChannels = Array.isArray(effect.parameters.additionalChannels)
       ? effect.parameters.additionalChannels.map((c: unknown) => {
           if (typeof c === 'object' && c !== null && 'type' in c) {
-            return (c as ChannelData).type;
+            return (c as ChannelData).type as string;
           }
           return undefined;
-        }).filter((t): t is string => t !== undefined)
+        }).filter((t): t is string => t !== undefined) as string[]
       : undefined;
 
     const additionalRisks = Array.isArray(effect.parameters.additionalRisks)
       ? effect.parameters.additionalRisks.map((r: unknown) => {
           if (typeof r === 'object' && r !== null && 'type' in r) {
-            return (r as RiskData).type;
+            return (r as RiskData).type as string;
           }
           return undefined;
-        }).filter((t): t is string => t !== undefined)
+        }).filter((t): t is string => t !== undefined) as string[]
       : undefined;
 
     targetMagic.adaptations.push({
@@ -358,8 +358,8 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
       adaptationType,
       modifications: {
         costModifier: effect.parameters.costModifier as number | undefined,
-        additionalChannels,
-        additionalRisks,
+        additionalChannels: additionalChannels as any,
+        additionalRisks: additionalRisks as any,
       },
     });
 

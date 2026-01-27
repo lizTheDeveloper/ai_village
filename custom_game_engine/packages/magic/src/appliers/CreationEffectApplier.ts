@@ -6,7 +6,8 @@
  */
 
 import type { Entity } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
+import { EntityImpl } from '@ai-village/core';
 import type {
   CreationEffect,
   EffectApplicationResult,
@@ -139,11 +140,12 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
 
         // Set position
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z);
-        itemEntity.addComponent('position', positionComponent as unknown as Record<string, unknown>);
+        (world as WorldMutator).addComponent(itemEntity.id, positionComponent);
 
         // Add item component with quality metadata
         const itemComponent: ItemComponent = {
           type: 'item',
+          version: 1,
           itemType: effect.createdItem,
           quality: quality,
           createdBy: caster.id,
@@ -151,26 +153,28 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
           spellId: context.spell.id,
           permanent: effect.permanent,
         };
-        itemEntity.addComponent('item', itemComponent as unknown as Record<string, unknown>);
+        (world as WorldMutator).addComponent(itemEntity.id, itemComponent);
 
         // Add identity component for the item
         const identityComponent: IdentityComponent = {
           type: 'identity',
+          version: 1,
           name: effect.createdItem,
           description: `A ${effect.createdItem} created by magic`,
         };
-        itemEntity.addComponent('identity', identityComponent as unknown as Record<string, unknown>);
+        (world as WorldMutator).addComponent(itemEntity.id, identityComponent);
 
         // If temporary, add expiration data
         if (!effect.permanent && (effect.duration || context.spell.duration)) {
           const duration = effect.duration ?? context.spell.duration ?? 0;
           const expirationComponent: ExpirationComponent = {
             type: 'expiration',
+            version: 1,
             expiresAt: context.tick + duration,
             creatorId: caster.id,
             reason: 'temporary_creation',
           };
-          itemEntity.addComponent('expiration', expirationComponent as unknown as Record<string, unknown>);
+          (world as WorldMutator).addComponent(itemEntity.id, expirationComponent);
         }
 
         createdEntityIds.push(itemEntity.id);
@@ -229,7 +233,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
           if (expiration && context.tick >= expiration.expiresAt) {
             // Item has expired - mark for destruction
             try {
-              world.destroyEntity(itemId, 'creation_expired');
+              (world as WorldMutator).destroyEntity(itemId, 'creation_expired');
             } catch (error) {
               // Entity might have already been destroyed
             }
@@ -258,7 +262,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
         try {
           const entity = world.getEntity(itemId);
           if (entity) {
-            world.destroyEntity(itemId, 'creation_effect_expired');
+            (world as WorldMutator).destroyEntity(itemId, 'creation_effect_expired');
           }
         } catch (error) {
           // Entity might have already been destroyed - that's fine

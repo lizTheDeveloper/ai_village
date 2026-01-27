@@ -3,7 +3,7 @@
  */
 
 import { BaseComponentSerializer } from '../ComponentSerializerRegistry.js';
-import type { CastingStateComponent } from '@ai-village/core';
+import type { CastingStateComponent, CastingState } from '@ai-village/core';
 import { createCastingStateComponent } from '@ai-village/core';
 
 export class CastingStateSerializer extends BaseComponentSerializer<CastingStateComponent> {
@@ -26,7 +26,7 @@ export class CastingStateSerializer extends BaseComponentSerializer<CastingState
     comp.casting = d.casting as boolean || false;
     comp.currentSpellId = d.currentSpellId as string | undefined;
     comp.castProgress = d.castProgress as number | undefined;
-    comp.castingState = d.castingState as any;
+    comp.castingState = (d.castingState as CastingState | null | undefined) ?? null;
     return comp;
   }
 

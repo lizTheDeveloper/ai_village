@@ -396,9 +396,8 @@ export class MetricsLiveStream {
    */
   private checkAlerts(snapshot: SnapshotData): void {
     for (const threshold of this.alertThresholds) {
-      // Access snapshot property dynamically but safely
-      const snapshotRecord = snapshot as unknown as Record<string, unknown>;
-      const value = snapshotRecord[threshold.metric] as number | undefined;
+      // Access snapshot property dynamically but safely using type-safe key access
+      const value = this.getSnapshotValue(snapshot, threshold.metric);
       if (value === undefined) continue;
 
       let triggered = false;
@@ -433,6 +432,30 @@ export class MetricsLiveStream {
         };
         this.emit({ type: 'alert', data: alert });
       }
+    }
+  }
+
+  /**
+   * Get a numeric value from snapshot by key name (type-safe dynamic access)
+   */
+  private getSnapshotValue(snapshot: SnapshotData, metric: string): number | undefined {
+    // Type-safe access to SnapshotData properties
+    switch (metric) {
+      case 'timestamp':
+        return snapshot.timestamp;
+      case 'population':
+        return snapshot.population;
+      case 'avgHealth':
+        return snapshot.avgHealth;
+      case 'avgEnergy':
+        return snapshot.avgEnergy;
+      case 'avgHunger':
+        return snapshot.avgHunger;
+      case 'networkDensity':
+        return snapshot.networkDensity;
+      default:
+        // For unknown metrics, return undefined
+        return undefined;
     }
   }
 

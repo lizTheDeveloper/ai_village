@@ -3,13 +3,13 @@ import { BackgroundChunkGenerator } from '../BackgroundChunkGenerator.js';
 import { ChunkManager } from '../ChunkManager.js';
 import { TerrainGenerator } from '../../terrain/TerrainGenerator.js';
 import { createChunk } from '../Chunk.js';
-import type { World } from '@ai-village/core';
+import type { WorldMutator } from '@ai-village/core';
 
 describe('BackgroundChunkGenerator', () => {
   let chunkManager: ChunkManager;
   let terrainGenerator: TerrainGenerator;
   let generator: BackgroundChunkGenerator;
-  let mockWorld: World;
+  let mockWorld: WorldMutator;
 
   beforeEach(() => {
     chunkManager = new ChunkManager();
@@ -36,7 +36,7 @@ describe('BackgroundChunkGenerator', () => {
         hasComponent: vi.fn(() => false),
         getComponent: vi.fn(),
       })),
-    } as unknown as World;
+    } as unknown as WorldMutator;
   });
 
   describe('queueChunk', () => {

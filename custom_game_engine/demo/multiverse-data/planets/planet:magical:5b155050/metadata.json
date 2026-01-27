@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5b155050",
+  "name": "Quantum Umbriel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769318161828",
+  "createdAt": 1769318161831,
+  "lastAccessedAt": 1769318161831,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769318161828",
+    "type": "magical"
+  }
+}

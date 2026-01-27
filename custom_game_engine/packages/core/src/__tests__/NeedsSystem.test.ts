@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { World } from '../ecs/index.js';
+import { World, WorldImpl } from '../ecs/index.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { NeedsComponent, type NeedsComponentLegacy } from '../components/NeedsComponent.js';
@@ -45,7 +46,7 @@ describe('NeedsSystem', () => {
     thirst: 1.0,
     temperature: 1.0,
   });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const initialHunger = needs.hunger;
 
@@ -69,7 +70,7 @@ describe('NeedsSystem', () => {
     thirst: 1.0,
     temperature: 1.0,
   });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -93,8 +94,8 @@ describe('NeedsSystem', () => {
   });
       const circadian = createCircadianComponent();
       circadian.isSleeping = true;
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(circadian);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(circadian);
 
       const initialHunger = needs.hunger;
 
@@ -128,7 +129,7 @@ describe('NeedsSystem', () => {
     thirst: 1.0,
     temperature: 1.0,
   });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const initialHunger = needs.hunger;
 
@@ -150,7 +151,7 @@ describe('NeedsSystem', () => {
     thirst: 1.0,
     temperature: 1.0,
   });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const initialEnergy = needs.energy;
 
@@ -173,7 +174,7 @@ describe('NeedsSystem', () => {
     thirst: 1.0,
     temperature: 1.0,
   });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -196,8 +197,8 @@ describe('NeedsSystem', () => {
   });
       const circadian = createCircadianComponent();
       circadian.isSleeping = true;
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(circadian);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(circadian);
 
       const initialEnergy = needs.energy;
 
@@ -220,8 +221,8 @@ describe('NeedsSystem', () => {
   });
       const agent = createAgentComponent('test-agent', 'Agent', { x: 0, y: 0 });
       agent.behavior = 'gather';
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(agent);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(agent);
 
       const initialEnergy = needs.energy;
 
@@ -246,8 +247,8 @@ describe('NeedsSystem', () => {
   });
       const agent = createAgentComponent('test-agent', 'Agent', { x: 0, y: 0 });
       agent.behavior = 'build';
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(agent);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(agent);
 
       const initialEnergy = needs.energy;
 
@@ -273,9 +274,9 @@ describe('NeedsSystem', () => {
       const agent = createAgentComponent('test-agent', 'Agent', { x: 0, y: 0 });
       const movement = createMovementComponent(5, 5); // Fast speed
       movement.speed = 4.0; // Running speed
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(agent);
-      (entity as any).addComponent(movement);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(agent);
+      (entity as EntityImpl).addComponent(movement);
 
       const initialEnergy = needs.energy;
 
@@ -301,8 +302,8 @@ describe('NeedsSystem', () => {
     temperature: 1.0,
   });
       const temperature = createTemperatureComponent(5, 15, 25, 10, 30); // 5°C - cold, comfort: 15-25
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(temperature);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(temperature);
 
       const initialEnergy = needs.energy;
 
@@ -326,8 +327,8 @@ describe('NeedsSystem', () => {
     temperature: 1.0,
   });
       const temperature = createTemperatureComponent(35, 15, 25, 10, 30); // 35°C - hot, comfort: 15-25
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(temperature);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(temperature);
 
       const initialEnergy = needs.energy;
 
@@ -351,8 +352,8 @@ describe('NeedsSystem', () => {
     temperature: 1.0,
   });
       const temperature = createTemperatureComponent(20, 15, 25, 10, 30); // 20°C - comfortable, comfort: 15-25
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(temperature);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(temperature);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
       system.update(world, entities, 10.0);
@@ -380,7 +381,7 @@ describe('NeedsSystem', () => {
         thirst: 1.0,
         temperature: 1.0,
       });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -408,7 +409,7 @@ describe('NeedsSystem', () => {
         thirst: 1.0,
         temperature: 1.0,
       });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -443,7 +444,7 @@ describe('NeedsSystem', () => {
         thirst: 1.0,
         temperature: 1.0,
       });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -478,7 +479,7 @@ describe('NeedsSystem', () => {
         thirst: 1.0,
         temperature: 1.0,
       });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -504,7 +505,7 @@ describe('NeedsSystem', () => {
         thirst: 1.0,
         temperature: 1.0,
       });
-      (entity as any).addComponent(needs);
+      (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
@@ -529,7 +530,7 @@ describe('NeedsSystem', () => {
 
     it('should handle very small deltaTime', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent({
+      (entity as EntityImpl).addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 1.0,
     health: 1.0,
@@ -544,7 +545,7 @@ describe('NeedsSystem', () => {
 
     it('should handle very large deltaTime', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent({
+      (entity as EntityImpl).addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 1.0,
     health: 1.0,
@@ -559,7 +560,7 @@ describe('NeedsSystem', () => {
 
     it('should throw when entity missing required needs component', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(createAgentComponent('test', 'Test', { x: 0, y: 0 }));
+      (entity as EntityImpl).addComponent(createAgentComponent('test', 'Test', { x: 0, y: 0 }));
 
       const entities = [entity]; // Force entity without needs into update
 
@@ -569,7 +570,7 @@ describe('NeedsSystem', () => {
 
     it('should handle entity with needs but no circadian component', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent({
+      (entity as EntityImpl).addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 1.0,
     health: 1.0,
@@ -585,7 +586,7 @@ describe('NeedsSystem', () => {
 
     it('should handle entity with needs but no agent component', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent({
+      (entity as EntityImpl).addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 1.0,
     health: 1.0,
@@ -609,8 +610,8 @@ describe('NeedsSystem', () => {
     temperature: 1.0,
   });
       const agent = createAgentComponent('test', 'Test', { x: 0, y: 0 });
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent(agent);
+      (entity as EntityImpl).addComponent(needs);
+      (entity as EntityImpl).addComponent(agent);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 

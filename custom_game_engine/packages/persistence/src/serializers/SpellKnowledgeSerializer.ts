@@ -24,11 +24,11 @@ export class SpellKnowledgeSerializer extends BaseComponentSerializer<SpellKnowl
   protected deserializeData(data: unknown): SpellKnowledgeComponent {
     const d = data as Record<string, unknown>;
     const comp = createSpellKnowledgeComponent();
-    comp.knownSpells = d.knownSpells as any[] || [];
-    comp.knownParadigmIds = d.knownParadigmIds as string[] || [];
-    comp.activeEffects = d.activeEffects as string[] || [];
-    comp.techniqueProficiency = d.techniqueProficiency as any || {};
-    comp.formProficiency = d.formProficiency as any || {};
+    comp.knownSpells = (d.knownSpells as Array<{ spellId: string; proficiency: number; timesCast: number; lastCast?: number }>) || [];
+    comp.knownParadigmIds = (d.knownParadigmIds as string[]) || [];
+    comp.activeEffects = (d.activeEffects as string[]) || [];
+    comp.techniqueProficiency = (d.techniqueProficiency as SpellKnowledgeComponent['techniqueProficiency']) || {};
+    comp.formProficiency = (d.formProficiency as SpellKnowledgeComponent['formProficiency']) || {};
     return comp;
   }
 

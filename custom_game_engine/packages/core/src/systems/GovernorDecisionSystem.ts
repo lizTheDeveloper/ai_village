@@ -533,7 +533,7 @@ export class GovernorDecisionSystem extends BaseSystem {
     governor: EntityImpl,
     govComp: GovernorComponent,
     world: World
-  ): Record<string, unknown> {
+  ): GovernorContext {
     // Get political entity if it exists
     const politicalEntity = this.findPoliticalEntity(govComp.jurisdiction, world);
 

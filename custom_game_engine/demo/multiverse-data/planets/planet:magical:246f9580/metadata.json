@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:246f9580",
+  "name": "Epsilon Ariel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769480463908",
+  "createdAt": 1769480464167,
+  "lastAccessedAt": 1769480464167,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769480463908",
+    "type": "magical"
+  }
+}

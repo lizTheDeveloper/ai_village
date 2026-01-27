@@ -67,7 +67,7 @@ export class GameLoop {
     return this._state;
   }
 
-  get world(): World {
+  get world(): WorldMutator {
     return this._world;
   }
 

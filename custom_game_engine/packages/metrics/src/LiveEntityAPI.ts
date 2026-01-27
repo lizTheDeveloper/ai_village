@@ -234,16 +234,6 @@ interface EmpireComponent {
 }
 
 /**
- * Megastructure component interface
- */
-interface MegastructureComponent {
-  type: 'megastructure';
-  currentTask?: string;
-  taskProgress?: number;
-  [key: string]: unknown;
-}
-
-/**
  * Extended Entity interface with mutable addComponent
  */
 interface MutableEntity extends Entity {

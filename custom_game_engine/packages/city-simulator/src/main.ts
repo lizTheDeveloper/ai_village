@@ -6,7 +6,18 @@
 
 import { HeadlessCitySimulator, type SimulatorStats } from './HeadlessCitySimulator.js';
 import { GrandStrategySimulator } from './GrandStrategySimulator.js';
-import type { StrategicPriorities, CityDecision } from '@ai-village/core';
+import type { CityDecision } from '@ai-village/core';
+
+// CityManager StrategicPriorities type (all fields required)
+type CityManagerPriorities = {
+  gathering: number;
+  building: number;
+  farming: number;
+  social: number;
+  exploration: number;
+  rest: number;
+  magic: number;
+};
 
 // =============================================================================
 // UI CLASS
@@ -104,7 +115,7 @@ class UI {
     });
   }
 
-  private readPriorities(): StrategicPriorities {
+  private readPriorities(): CityManagerPriorities {
     const gathering = parseFloat((document.getElementById('gathering-slider') as HTMLInputElement)?.value ?? '0.2');
     const building = parseFloat((document.getElementById('building-slider') as HTMLInputElement)?.value ?? '0.2');
     const farming = parseFloat((document.getElementById('farming-slider') as HTMLInputElement)?.value ?? '0.2');

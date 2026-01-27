@@ -32,7 +32,7 @@ export interface OrientationComponent {
 // Status & State
 // ============================================================================
 
-export interface StatusEffectsComponent {
+export interface StatusEffectsComponent extends Component {
   type: 'status_effects';
   isStunned?: boolean;
   isDead?: boolean;
@@ -56,7 +56,7 @@ export interface TemporalEffectData {
 // Behavior & AI
 // ============================================================================
 
-export interface BehaviorComponent {
+export interface BehaviorComponent extends Component {
   type: 'behavior';
   currentBehavior: string;
   fleeFrom?: string;
@@ -79,7 +79,7 @@ export interface NeedsComponentWithHealth {
 // Mental Effects
 // ============================================================================
 
-export interface MentalEffectsComponent {
+export interface MentalEffectsComponent extends Component {
   type: 'mental_effects';
   charmedBy?: string;
   aware?: boolean;
@@ -89,7 +89,7 @@ export interface MentalEffectsComponent {
   linkType?: string;
 }
 
-export interface PerceptionEffectsComponent {
+export interface PerceptionEffectsComponent extends Component {
   type: 'perception_effects';
   detectsSouls?: boolean;
   soulDetectionRange?: number;
@@ -132,7 +132,7 @@ export interface EnvironmentalZoneComponent {
 // Appearance & Transform
 // ============================================================================
 
-export interface AppearanceComponent {
+export interface AppearanceComponent extends Component {
   type: 'appearance';
   form: string;
   size: number;
@@ -165,7 +165,7 @@ export interface RiskData {
 // Items & Creation
 // ============================================================================
 
-export interface ItemComponent {
+export interface ItemComponent extends Component {
   type: 'item';
   itemType: string;
   quality: number;
@@ -175,13 +175,13 @@ export interface ItemComponent {
   permanent: boolean;
 }
 
-export interface IdentityComponent {
+export interface IdentityComponent extends Component {
   type: 'identity';
   name: string;
   description?: string;
 }
 
-export interface ExpirationComponent {
+export interface ExpirationComponent extends Component {
   type: 'expiration';
   expiresAt: number;
   creatorId: string;
@@ -208,12 +208,12 @@ export interface TeleportAnchor {
 // Temporal & Age
 // ============================================================================
 
-export interface AgeComponent {
+export interface AgeComponent extends Component {
   type: 'age';
   years: number;
 }
 
-export interface TemporalStateComponent {
+export interface TemporalStateComponent extends Component {
   type: 'temporal_state';
   rewindRequests: RewindRequest[];
 }

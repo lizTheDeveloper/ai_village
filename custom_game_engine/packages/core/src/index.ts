@@ -18,7 +18,9 @@ export { ComponentType } from './types/ComponentType.js';
 export * from './ecs/index.js';
 // Explicit ECS type re-exports for renderer package
 export type { WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
-export { EntityImpl, createEntityId, World, WorldImpl } from './ecs/index.js';
+export { EntityImpl, createEntityId, WorldImpl } from './ecs/index.js';
+// World is exported as a type via 'export *' from ecs/index.js
+// Use WorldImpl for construction (new WorldImpl())
 export * from './events/index.js';
 // Explicit EventBus type re-export
 export type { EventBus } from './events/index.js';
@@ -50,6 +52,7 @@ export * from './systems/index.js';
 export { WildAnimalSpawningSystem } from './systems/index.js';
 // Explicit system type re-exports
 export type { PossessionStatus } from './systems/PossessionSystem.js';
+export type { CastingState } from './systems/CastingState.js';
 // Resolve duplicate exports between systems and components
 export { addShipToSquadron } from './systems/SquadronSystem.js';
 export type { Season } from './types.js';

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:719cc01c",
+  "name": "Epsilon Proteus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769319082230",
+  "createdAt": 1769319082421,
+  "lastAccessedAt": 1769319082421,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769319082230",
+    "type": "magical"
+  }
+}

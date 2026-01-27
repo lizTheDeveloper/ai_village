@@ -13,7 +13,6 @@ import {
   type World,
   type WorldMutator,
   type CityStats,
-  type StrategicPriorities,
   type CityDecision,
   createEntityId,
   EntityImpl,
@@ -36,6 +35,17 @@ import {
   globalRecipeRegistry,
   registerDefaultResearch,
 } from '@ai-village/core';
+
+// StrategicPriorities type for CityManager (all fields required)
+type CityManagerPriorities = {
+  gathering: number;
+  building: number;
+  farming: number;
+  social: number;
+  exploration: number;
+  rest: number;
+  magic: number;
+};
 
 // Import PlantSystemsConfig from the systems module since it's not re-exported
 // Use local type definition to avoid import path issues
@@ -93,7 +103,7 @@ export interface SimulatorStats {
   monthsElapsed: number;
   ticksPerSecond: number;
   cityStats: CityStats;
-  cityPriorities: StrategicPriorities;
+  cityPriorities: CityManagerPriorities;
 }
 
 type EventCallback = (...args: any[]) => void;
@@ -419,7 +429,7 @@ export class HeadlessCitySimulator {
   // MANUAL CONTROL
   // ---------------------------------------------------------------------------
 
-  setPriorities(priorities: StrategicPriorities): void {
+  setPriorities(priorities: CityManagerPriorities): void {
     this.cityManager.setPriorities(priorities);
     this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
     this.emit('priorities-changed', priorities);

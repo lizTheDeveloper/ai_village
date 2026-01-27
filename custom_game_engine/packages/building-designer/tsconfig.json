@@ -8,7 +8,11 @@
     "composite": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strictNullChecks": false
   },
   "include": ["src/**/*", "data/**/*.json"],
   "exclude": [

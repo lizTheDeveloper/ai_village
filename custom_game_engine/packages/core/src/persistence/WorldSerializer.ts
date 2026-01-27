@@ -359,8 +359,8 @@ export class WorldSerializer {
    * Used for universe forking to create independent timelines.
    */
   async cloneWorld(
-    sourceWorld: World,
-    targetWorld: World,
+    sourceWorld: WorldMutator,
+    targetWorld: WorldMutator,
     universeId: string,
     universeName: string
   ): Promise<void> {
@@ -377,7 +377,7 @@ export class WorldSerializer {
    * Returns the serialized snapshot without writing to disk.
    */
   async createTimelineSnapshot(
-    world: World,
+    world: WorldMutator,
     universeId: string,
     tick: bigint
   ): Promise<TimelineSnapshot> {

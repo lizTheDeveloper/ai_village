@@ -6,7 +6,8 @@
  */
 
 import type { MagicCostType, MagicCost, MagicParadigm } from '../MagicParadigm.js';
-import type { ComposedSpell, MagicComponent, ResourcePool } from '@ai-village/core';
+import type { ComposedSpell, MagicComponent } from '@ai-village/core';
+import type { ResourcePool } from '@ai-village/core';
 import type { BodyComponent } from '@ai-village/core';
 import type { SpiritualComponent } from '@ai-village/core';
 
@@ -363,8 +364,12 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
       if (!pool) {
         // Create pool if it doesn't exist (for cumulative costs)
         if (this.isCumulativeCost(cost.type)) {
-          pool = this.createDefaultPool(cost.type) as any;
-          caster.resourcePools[cost.type] = pool as any;
+          pool = this.createDefaultPool(cost.type);
+          // Note: Type assertion needed due to duplicate ResourcePool interfaces
+          // (MagicComponent and ManaPoolsComponent both define ResourcePool).
+          // The structures are compatible; only the 'type' field differs slightly.
+          // Using 'as unknown as' because TypeScript sees these as incompatible types.
+          caster.resourcePools[cost.type] = pool as unknown as ResourcePool;
         } else {
           // Can't deduct from non-existent pool
           continue;

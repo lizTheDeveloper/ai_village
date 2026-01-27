@@ -8,6 +8,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent, type DivineDomain } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -643,8 +644,8 @@ export class AIGodBehaviorSystem extends BaseSystem {
     const targetWeather = domainWeatherMap[domain] || 'clear';
 
     // Update weather component
-    const impl = weatherEntity as any;
-    impl.updateComponent(CT.Weather, (current: any) => ({
+    const impl = weatherEntity as EntityImpl;
+    impl.updateComponent(CT.Weather, (current) => ({
       ...current,
       weatherType: targetWeather,
       intensity: 0.7,
@@ -674,8 +675,8 @@ export class AIGodBehaviorSystem extends BaseSystem {
     const blessedPlants: string[] = [];
 
     for (const plant of plants) {
-      const plantComp = plant.components.get(CT.Plant) as any;
-      if (!plantComp || !plantComp.planted) continue; // Only bless agent-planted crops
+      const plantComp = plant.components.get(CT.Plant);
+      if (!plantComp || !(plantComp as {planted?: boolean}).planted) continue; // Only bless agent-planted crops
 
       blessedPlants.push(plant.id);
       if (blessedPlants.length >= 5) break; // Bless up to 5 plants
@@ -689,9 +690,9 @@ export class AIGodBehaviorSystem extends BaseSystem {
         if (!plant) continue;
 
         // Improve plant genetics (growth rate and yield)
-        const impl = plant as any;
-        impl.updateComponent(CT.Plant, (current: any) => {
-          const genetics = current.genetics || {};
+        const impl = plant as EntityImpl;
+        impl.updateComponent(CT.Plant, (current) => {
+          const genetics = (current as {genetics?: any}).genetics || {};
           return {
             ...current,
             genetics: {
@@ -699,7 +700,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
               growthRate: Math.min(2.0, (genetics.growthRate || 1.0) * 1.2),
               yieldAmount: Math.min(2.0, (genetics.yieldAmount || 1.0) * 1.2),
             },
-            health: Math.min(100, (current.health || 100) + 10),
+            health: Math.min(100, ((current as {health?: number}).health || 100) + 10),
           };
         });
       }
@@ -727,8 +728,8 @@ export class AIGodBehaviorSystem extends BaseSystem {
       const entity = world.getEntity(believerId);
       if (!entity) continue;
 
-      const temperature = entity.components.get(CT.Temperature) as any;
-      if (temperature && temperature.currentTemp < 10) {
+      const temperature = entity.components.get(CT.Temperature) as {currentTemp?: number} | undefined;
+      if (temperature && temperature.currentTemp !== undefined && temperature.currentTemp < 10) {
         coldBelievers.push(believerId);
         if (coldBelievers.length >= 3) break; // Help up to 3 cold believers
       }
@@ -741,10 +742,10 @@ export class AIGodBehaviorSystem extends BaseSystem {
         const entity = world.getEntity(believerId);
         if (!entity) continue;
 
-        const impl = entity as any;
-        impl.updateComponent(CT.Temperature, (current: any) => ({
+        const impl = entity as EntityImpl;
+        impl.updateComponent(CT.Temperature, (current) => ({
           ...current,
-          currentTemp: Math.min(20, (current.currentTemp || 10) + 10),
+          currentTemp: Math.min(20, ((current as {currentTemp?: number}).currentTemp || 10) + 10),
         }));
       }
 
@@ -771,7 +772,7 @@ export class AIGodBehaviorSystem extends BaseSystem {
       const entity = world.getEntity(believerId);
       if (!entity) continue;
 
-      const needs = entity.components.get(CT.Needs) as any;
+      const needs = entity.components.get(CT.Needs) as NeedsComponent | undefined;
       if (needs && needs.health < 50) {
         injured.push({ id: believerId, health: needs.health });
       }

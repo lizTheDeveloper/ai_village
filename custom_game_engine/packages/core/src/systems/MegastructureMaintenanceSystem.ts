@@ -24,7 +24,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType as CT_Type } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { EntityImpl } from '../ecs/Entity.js';
@@ -404,7 +404,7 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
   // Memoization cache for maintenance cost calculations
   private readonly maintenanceCostCache = new Map<string, number>();
 
-  protected onInitialize(world: World, _eventBus: EventBus): void {
+  protected onInitialize(world: WorldMutator, _eventBus: EventBus): void {
     this.world = world;
     // Build all lookup tables once at initialization
     for (const [type, config] of Object.entries(MAINTENANCE_CONFIGS)) {

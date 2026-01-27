@@ -158,8 +158,10 @@ export class EntityAwakenerSystem implements System {
 
       // Create EventBus subscription for this event type
       if (this.eventBus && this.world) {
-        // Note: eventType may not be in GameEventMap - cast as any to support arbitrary events
-        const unsubscribe = this.eventBus.subscribe(eventType as any, () => {
+        // Note: eventType is a string that may not be in GameEventMap
+        // Cast to EventType to allow dynamic event subscriptions
+        // This is safe because the eventBus accepts any string at runtime
+        const unsubscribe = this.eventBus.subscribe(eventType as import('../events/EventMap.js').EventType, () => {
           // Wake all entities subscribed to this event
           // Safe to use this.world here because it's set in initialize() before any subscriptions
           if (this.world) {

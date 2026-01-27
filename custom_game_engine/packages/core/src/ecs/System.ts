@@ -1,6 +1,6 @@
 import type { SystemId, ComponentType } from '../types.js';
 import type { Entity } from './Entity.js';
-import type { World } from './World.js';
+import type { World, WorldMutator } from './World.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { GameEvent } from '../events/GameEvent.js';
 
@@ -62,11 +62,11 @@ export interface System {
   readonly metadata?: SystemMetadata;
 
   /** Called once when system is registered */
-  initialize?(world: World, eventBus: EventBus): void;
+  initialize?(world: WorldMutator, eventBus: EventBus): void;
 
   /** Called each tick for entities with required components */
   update(
-    world: World,
+    world: WorldMutator,
     entities: ReadonlyArray<Entity>,
     deltaTime: number
   ): void;

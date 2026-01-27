@@ -15,7 +15,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { EntityImpl } from '../ecs/Entity.js';
@@ -123,7 +123,7 @@ export class AutoSaveSystem extends BaseSystem {
   /**
    * Create a checkpoint at midnight.
    */
-  private async createCheckpoint(world: World, day: number): Promise<void> {
+  private async createCheckpoint(world: WorldMutator, day: number): Promise<void> {
     if (this.nameGenerationPending) {
       return; // Already creating a checkpoint
     }
@@ -283,7 +283,7 @@ export class AutoSaveSystem extends BaseSystem {
   /**
    * Generate a poetic name for the checkpoint using LLM.
    */
-  private async generateCheckpointName(checkpoint: Checkpoint, world: World): Promise<void> {
+  private async generateCheckpointName(checkpoint: Checkpoint, world: WorldMutator): Promise<void> {
     if (!this.llmQueue) {
       // No LLM queue - emit event for potential external handling
       this.events.emitGeneric('checkpoint:name_request', { checkpoint });
@@ -307,7 +307,7 @@ export class AutoSaveSystem extends BaseSystem {
   /**
    * Build LLM prompt for generating a poetic checkpoint name.
    */
-  private buildCheckpointNamePrompt(checkpoint: Checkpoint, world: World): string {
+  private buildCheckpointNamePrompt(checkpoint: Checkpoint, world: WorldMutator): string {
     // Get world stats
     const agents = world.query().with(CT.Agent).executeEntities();
     const buildings = world.query().with(CT.Building).executeEntities();
@@ -344,7 +344,7 @@ export class AutoSaveSystem extends BaseSystem {
   /**
    * Process pending LLM name generation requests.
    */
-  private processPendingNameRequests(world: World): void {
+  private processPendingNameRequests(world: WorldMutator): void {
     if (!this.llmQueue) return;
 
     const completedRequests: string[] = [];
@@ -425,7 +425,7 @@ export class AutoSaveSystem extends BaseSystem {
   /**
    * Rewind to a specific checkpoint (creates a universe fork).
    */
-  async rewindToCheckpoint(checkpointKey: string, world: World): Promise<boolean> {
+  async rewindToCheckpoint(checkpointKey: string, world: WorldMutator): Promise<boolean> {
     const checkpoint = this.checkpoints.find(c => c.key === checkpointKey);
 
     if (!checkpoint) {

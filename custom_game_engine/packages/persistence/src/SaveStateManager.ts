@@ -7,9 +7,8 @@
  * Browser-compatible: Save/load operations are no-ops in browser, only work in Node.js.
  */
 
-import type { World } from '@ai-village/core';
-import { World } from '@ai-village/core';
-import { EventBusImpl } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
+import { WorldImpl, EventBusImpl } from '@ai-village/core';
 import { worldSerializer } from './WorldSerializer.js';
 
 // Check if running in Node.js
@@ -330,12 +329,11 @@ export class SaveStateManager {
   /**
    * Restore world from save state
    */
-  async restoreWorld(saveState: SaveState): Promise<World> {
+  async restoreWorld(saveState: SaveState): Promise<WorldMutator> {
     const eventBus = new EventBusImpl();
-    const world = new World(eventBus);
-    // WorldImpl implements World interface, so this cast is safe
-    await worldSerializer.deserializeWorld(saveState.snapshot, world as World);
-    return world as World;
+    const world = new WorldImpl(eventBus);
+    await worldSerializer.deserializeWorld(saveState.snapshot, world);
+    return world;
   }
 
   /**

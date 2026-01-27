@@ -983,7 +983,7 @@ export const RESEARCH_BUILDING_REQUIREMENTS = {
   // Tier 1 - No requirements
   tier1: {
     buildings: ['campfire', 'workbench', 'storage_chest'],
-    research: null,
+    research: null as string | null,
   },
   // Tier 2 - Requires Tier 1 research
   tier2: {
@@ -991,7 +991,7 @@ export const RESEARCH_BUILDING_REQUIREMENTS = {
     loom: { research: 'textiles_i', prereq: 'crafting_i' },
     oven: { research: 'cuisine_i', prereq: 'agriculture_i' },
     warehouse: { research: 'construction_ii', prereq: 'construction_i' },
-    library: { research: null, prereq: 'building skill 3' },
+    library: { research: null as string | null, prereq: 'building skill 3' },
   },
   // Tier 3 - Requires Tier 2 research
   tier3: {

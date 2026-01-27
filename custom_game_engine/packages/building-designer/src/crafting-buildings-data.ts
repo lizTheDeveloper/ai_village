@@ -62,14 +62,14 @@ export const TIER_5_CRAFTING = buildings.filter(b => b.tier === 5);
 export const RESEARCH_BUILDING_REQUIREMENTS = {
   tier1: {
     buildings: ['campfire', 'workbench', 'storage_chest'],
-    research: null,
+    research: null as string | null,
   },
   tier2: {
     forge: { research: 'metallurgy_i', prereq: 'crafting_i' },
     loom: { research: 'textiles_i', prereq: 'crafting_i' },
     oven: { research: 'cuisine_i', prereq: 'agriculture_i' },
     warehouse: { research: 'construction_ii', prereq: 'construction_i' },
-    library: { research: null, prereq: 'building skill 3' },
+    library: { research: null as string | null, prereq: 'building skill 3' },
   },
   tier3: {
     workshop: { research: 'construction_ii', prereq: 'construction_i' },

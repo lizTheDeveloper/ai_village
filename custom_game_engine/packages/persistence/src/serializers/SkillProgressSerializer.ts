@@ -3,7 +3,7 @@
  */
 
 import { BaseComponentSerializer } from '../ComponentSerializerRegistry.js';
-import type { SkillProgressComponent } from '@ai-village/core';
+import type { SkillProgressComponent, SkillTreeParadigmState } from '@ai-village/core';
 import { createSkillProgressComponent } from '@ai-village/core';
 
 export class SkillProgressSerializer extends BaseComponentSerializer<SkillProgressComponent> {
@@ -20,7 +20,7 @@ export class SkillProgressSerializer extends BaseComponentSerializer<SkillProgre
   protected deserializeData(data: unknown): SkillProgressComponent {
     const d = data as Record<string, unknown>;
     const comp = createSkillProgressComponent();
-    comp.skillTreeState = d.skillTreeState as any || {};
+    comp.skillTreeState = (d.skillTreeState as Partial<Record<string, SkillTreeParadigmState>>) ?? {};
     return comp;
   }
 

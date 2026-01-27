@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2d020405",
+  "name": "Mundo Minor",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769317560898",
+  "createdAt": 1769317560909,
+  "lastAccessedAt": 1769317560909,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769317560898",
+    "type": "magical"
+  }
+}

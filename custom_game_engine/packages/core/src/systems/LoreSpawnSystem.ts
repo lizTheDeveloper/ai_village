@@ -154,8 +154,12 @@ export class LoreSpawnSystem extends BaseSystem {
       return;
     }
 
-    // Use type assertion since we know this is the CreatorInterventionSystem
-    const creatorIntervention = interventionSystem as any;
+    // Type guard: Check if system has the expected methods
+    if (!this.hasInterventionMethods(interventionSystem)) {
+      return;
+    }
+
+    const creatorIntervention = interventionSystem;
 
     // Count entities with Mark of the Sinner
     // Note: Cannot optimize with queries as marks/silence are stored in CreatorInterventionSystem's
@@ -340,5 +344,19 @@ export class LoreSpawnSystem extends BaseSystem {
     // Query for all entities with lore_frag component
     const loreEntities = world.query().with(ComponentType.LoreFrag).executeEntities();
     return loreEntities.map((entity) => entity.id);
+  }
+
+  /**
+   * Type guard for CreatorInterventionSystem methods
+   */
+  private hasInterventionMethods(system: unknown): system is {
+    hasMarkOfSinner?: (entityId: string) => boolean;
+    hasDivineSilence?: (entityId: string) => boolean;
+    bannedSpells?: Set<string> | Map<string, unknown>;
+  } {
+    return (
+      typeof system === 'object' &&
+      system !== null
+    );
   }
 }

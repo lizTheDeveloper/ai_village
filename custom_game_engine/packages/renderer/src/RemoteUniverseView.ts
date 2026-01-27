@@ -11,6 +11,7 @@ import type {
   UniverseTickUpdate,
   Bounds,
   VersionedEntity,
+  Entity,
 } from '@ai-village/core';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { renderSprite } from './SpriteRenderer.js';
@@ -444,16 +445,36 @@ export class RemoteUniverseView implements IWindowPanel {
     const renderableComp = entity.components.find((c) => c.type === 'renderable');
     const renderableData = renderableComp?.data as { spriteId?: string } | undefined;
 
-    // Convert VersionedEntity to minimal Entity-like object for sprite rendering
-    // PixelLabEntityRenderer expects Entity with components Map
-    const componentsMap = new Map();
-    for (const comp of entity.components) {
-      componentsMap.set(comp.type, comp.data);
+    // Convert VersionedEntity to Entity-compatible object for sprite rendering
+    // PixelLabEntityRenderer expects Entity with Component objects (which have type + version)
+    interface MinimalComponent {
+      readonly type: string;
+      readonly version: number;
+      [key: string]: unknown;
     }
 
-    const entityLike: { id: string; components: Map<string, unknown> } = {
+    const componentsMap = new Map<string, MinimalComponent>();
+    for (const comp of entity.components) {
+      // Construct a Component-like object from VersionedComponent
+      const componentData: MinimalComponent = {
+        type: comp.type,
+        version: comp.$version || 1,
+        ...(typeof comp.data === 'object' && comp.data !== null ? comp.data : {}),
+      };
+      componentsMap.set(comp.type, componentData);
+    }
+
+    // Create Entity interface implementation
+    const entityLike: Entity = {
       id: entity.id,
       components: componentsMap,
+      createdAt: 0,
+      version: entity.$version || 1,
+      hasComponent: (type: string): boolean => componentsMap.has(type),
+      getComponent: <T = unknown>(type: string): T | undefined => {
+        const comp = componentsMap.get(type);
+        return comp as T | undefined;
+      },
     };
 
     // Calculate sprite size

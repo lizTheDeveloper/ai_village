@@ -79,7 +79,18 @@ export function CulturalDiffusionView({
         nodeMap.set(node.id, i);
       });
 
-      const graph = {
+      interface SankeyNode {
+        id: string;
+        name: string;
+      }
+
+      interface SankeyLink {
+        source: number | undefined;
+        target: number | undefined;
+        value: number;
+      }
+
+      const graph: { nodes: SankeyNode[]; links: SankeyLink[] } = {
         nodes: data.sankeyData.nodes.map((n) => ({ ...n })),
         links: data.sankeyData.links.map((l) => ({
           source: nodeMap.get(l.source),
@@ -88,7 +99,7 @@ export function CulturalDiffusionView({
         })),
       };
 
-      const { nodes, links } = sankeyGenerator(graph as any);
+      const { nodes, links } = sankeyGenerator(graph);
 
       const g = svg.append('g');
 

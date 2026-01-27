@@ -8,7 +8,7 @@
  */
 
 import type { Entity, Component } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type {
   BuffEffect,
   DebuffEffect,
@@ -467,9 +467,10 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
         if (!target.components.get('status_effects')) {
           const newStatusEffects: StatusEffectsComponent = {
             type: 'status_effects' as const,
+            version: 1,
             isStunned: true
           };
-          world.addComponent(target.id, newStatusEffects as unknown as Component);
+          (world as WorldMutator).addComponent(target.id, newStatusEffects);
         } else {
           const statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
           if (statusEffects) {
@@ -681,9 +682,10 @@ export class ControlEffectApplier implements EffectApplier<ControlEffect> {
     if (!behavior) {
       const newBehavior: BehaviorComponent = {
         type: 'behavior' as const,
+        version: 1,
         currentBehavior: 'flee' as const
       };
-      world.addComponent(target.id, newBehavior as unknown as Component);
+      (world as WorldMutator).addComponent(target.id, newBehavior);
     } else {
       behavior.currentBehavior = 'flee';
     }

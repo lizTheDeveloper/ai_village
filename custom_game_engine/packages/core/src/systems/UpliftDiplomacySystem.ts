@@ -751,7 +751,9 @@ export class UpliftDiplomacySystem extends BaseSystem {
   private getWorldFromContext(): World | null {
     // This is a hack - in production, events should carry world reference
     // For now, we rely on the system having been initialized with a world
-    return (this as any)._world ?? null;
+    // Access _world through index signature instead of type assertion
+    const systemWithWorld = this as Record<string, unknown>;
+    return (systemWithWorld._world as World | undefined) ?? null;
   }
 }
 

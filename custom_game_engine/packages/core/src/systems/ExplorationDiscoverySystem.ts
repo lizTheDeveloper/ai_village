@@ -231,12 +231,11 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     // Check if within arrival threshold
     if (distanceSquared <= arrivalThresholdSquared) {
       // Mark as arrived
-      (missionEntity as EntityImpl).updateComponent(
+      (missionEntity as EntityImpl).updateComponent<ExplorationMissionComponent>(
         'exploration_mission',
         (old) => {
-          const typed = old as ExplorationMissionComponent;
           return {
-            ...typed,
+            ...old,
             hasArrived: true,
           };
         }
@@ -276,12 +275,11 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     const progressIncrement = progressRate * BASE_PROGRESS_PER_TICK;
 
     // Update mission
-    (missionEntity as EntityImpl).updateComponent('exploration_mission', (old) => {
-      const typed = old as ExplorationMissionComponent;
+    (missionEntity as EntityImpl).updateComponent<ExplorationMissionComponent>('exploration_mission', (old) => {
       return {
-        ...typed,
-        progress: Math.min(100, typed.progress + progressIncrement),
-        surveyDuration: typed.surveyDuration + 1,
+        ...old,
+        progress: Math.min(100, old.progress + progressIncrement),
+        surveyDuration: old.surveyDuration + 1,
       };
     });
   }
@@ -352,16 +350,15 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     const isEraGated = requiredTechLevel >= 10;
 
     // Add to mission discoveries
-    (missionEntity as EntityImpl).updateComponent('exploration_mission', (old) => {
-      const typed = old as ExplorationMissionComponent;
+    (missionEntity as EntityImpl).updateComponent<ExplorationMissionComponent>('exploration_mission', (old) => {
       return {
-        ...typed,
+        ...old,
         discoveredResources: new Set([
-          ...typed.discoveredResources,
+          ...old.discoveredResources,
           resourceSpawn.resourceType,
         ]),
         discoveries: [
-          ...typed.discoveries,
+          ...old.discoveries,
           {
             resourceType: resourceSpawn.resourceType,
             discoveredTick: currentTick,
@@ -456,17 +453,16 @@ export class ExplorationDiscoverySystem extends BaseSystem {
         // Award sample (10-50 units based on abundance)
         const sampleSize = Math.floor(10 + abundance * 40);
 
-        (warehouseEntity as EntityImpl).updateComponent('warehouse', (old) => {
-          const typed = old as WarehouseComponent;
+        (warehouseEntity as EntityImpl).updateComponent<WarehouseComponent>('warehouse', (old) => {
           return {
-            ...typed,
+            ...old,
             stockpiles: {
-              ...typed.stockpiles,
+              ...old.stockpiles,
               [resourceType]:
-                (typed.stockpiles[resourceType] ?? 0) + sampleSize,
+                (old.stockpiles[resourceType] ?? 0) + sampleSize,
             },
             lastDepositTime: {
-              ...typed.lastDepositTime,
+              ...old.lastDepositTime,
               [resourceType]: Date.now(),
             },
           };
@@ -494,10 +490,9 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     currentTick: number
   ): void {
     // Mark mission as completed
-    (missionEntity as EntityImpl).updateComponent('exploration_mission', (old) => {
-      const typed = old as ExplorationMissionComponent;
+    (missionEntity as EntityImpl).updateComponent<ExplorationMissionComponent>('exploration_mission', (old) => {
       return {
-        ...typed,
+        ...old,
         completedTick: currentTick,
         progress: 100,
       };
@@ -596,10 +591,9 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     currentTick: number
   ): void {
     // Mark mission as failed (set completedTick but keep progress < 100)
-    (missionEntity as EntityImpl).updateComponent('exploration_mission', (old) => {
-      const typed = old as ExplorationMissionComponent;
+    (missionEntity as EntityImpl).updateComponent<ExplorationMissionComponent>('exploration_mission', (old) => {
       return {
-        ...typed,
+        ...old,
         completedTick: currentTick,
         // Progress stays where it is (failed before completion)
       };
@@ -623,7 +617,7 @@ export class ExplorationDiscoverySystem extends BaseSystem {
     // Apply damage to ship based on phenomenon danger
     const shipEntity = world.getEntity(mission.shipId);
     if (shipEntity) {
-      const ship = shipEntity.getComponent('spaceship') as SpaceshipComponent | undefined;
+      const ship = shipEntity.getComponent<SpaceshipComponent>('spaceship');
       if (ship) {
         // Calculate damage based on phenomenon danger level
         const baseDanger = PHENOMENON_DANGER[phenomenon.type] ?? 0.05;
@@ -632,12 +626,11 @@ export class ExplorationDiscoverySystem extends BaseSystem {
 
         // Apply hull damage
         const newIntegrity = Math.max(0, ship.hull.integrity - damageAmount);
-        (shipEntity as EntityImpl).updateComponent('spaceship', (old) => {
-          const typed = old as SpaceshipComponent;
+        (shipEntity as EntityImpl).updateComponent<SpaceshipComponent>('spaceship', (old) => {
           return {
-            ...typed,
+            ...old,
             hull: {
-              ...typed.hull,
+              ...old.hull,
               integrity: newIntegrity,
             },
           };
@@ -659,15 +652,14 @@ export class ExplorationDiscoverySystem extends BaseSystem {
             // Remove casualties from crew roster
             const survivingCrew = ship.crew.member_ids.filter(id => !casualties.includes(id));
 
-            (shipEntity as EntityImpl).updateComponent('spaceship', (old) => {
-              const typed = old as SpaceshipComponent;
+            (shipEntity as EntityImpl).updateComponent<SpaceshipComponent>('spaceship', (old) => {
               return {
-                ...typed,
+                ...old,
                 crew: {
-                  ...typed.crew,
+                  ...old.crew,
                   member_ids: survivingCrew,
                   // Reduce coherence due to loss
-                  coherence: Math.max(0, typed.crew.coherence - casualties.length * 0.1),
+                  coherence: Math.max(0, old.crew.coherence - casualties.length * 0.1),
                 },
               };
             });

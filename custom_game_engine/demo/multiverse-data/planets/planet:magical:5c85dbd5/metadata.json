@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5c85dbd5",
+  "name": "Gaia VIII",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769318216075",
+  "createdAt": 1769318216078,
+  "lastAccessedAt": 1769318216078,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769318216075",
+    "type": "magical"
+  }
+}

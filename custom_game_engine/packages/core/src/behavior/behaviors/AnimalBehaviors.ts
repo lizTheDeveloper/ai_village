@@ -7,7 +7,7 @@
  * Part of the animal husbandry system integration
  */
 import type { EntityImpl } from '../../ecs/Entity.js';
-import type { World } from '../../ecs/World.js';
+import type { World, WorldMutator } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
@@ -115,7 +115,7 @@ export class TameAnimalBehavior extends BaseBehavior {
       }
       // Create taming system instance for this attempt
       const tamingSystem = new TamingSystem();
-      tamingSystem.setWorld(world);
+      tamingSystem.setWorld(world as WorldMutator);
       // Attempt taming
       const result = tamingSystem.attemptTaming(
         world,
@@ -472,7 +472,7 @@ export function tameAnimalBehaviorWithContext(ctx: BehaviorContext): ContextBeha
     const tamingSystem = new TamingSystem();
     // Access world from BehaviorContext
     interface ContextWithWorld {
-      world: World;
+      world: WorldMutator;
     }
     const world = (ctx as unknown as ContextWithWorld).world;
     tamingSystem.setWorld(world);

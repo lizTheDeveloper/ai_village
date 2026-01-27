@@ -34,6 +34,47 @@ import {
   DIVINE_CHAT_CONFIG,
 } from './ChatRoom.js';
 
+// ============================================================================
+// DIVINE CHAT PERSISTENCE
+// ============================================================================
+
+const DIVINE_CHAT_STORAGE_KEY = 'multiverse_divine_chat_messages';
+const MAX_STORED_MESSAGES = 100; // Limit stored messages to prevent localStorage bloat
+
+/**
+ * Load divine chat messages from localStorage (browser only)
+ */
+function loadDivineChatMessages(): ChatMessage[] {
+  if (typeof localStorage === 'undefined') return [];
+
+  try {
+    const stored = localStorage.getItem(DIVINE_CHAT_STORAGE_KEY);
+    if (!stored) return [];
+
+    const messages = JSON.parse(stored) as ChatMessage[];
+    console.log(`[ChatRoomSystem] Loaded ${messages.length} divine chat messages from localStorage`);
+    return messages;
+  } catch (e) {
+    console.warn('[ChatRoomSystem] Failed to load divine chat from localStorage:', e);
+    return [];
+  }
+}
+
+/**
+ * Save divine chat messages to localStorage (browser only)
+ */
+function saveDivineChatMessages(messages: ChatMessage[]): void {
+  if (typeof localStorage === 'undefined') return;
+
+  try {
+    // Only keep the most recent messages
+    const toStore = messages.slice(-MAX_STORED_MESSAGES);
+    localStorage.setItem(DIVINE_CHAT_STORAGE_KEY, JSON.stringify(toStore));
+  } catch (e) {
+    console.warn('[ChatRoomSystem] Failed to save divine chat to localStorage:', e);
+  }
+}
+
 export class ChatRoomSystem extends BaseSystem {
   readonly id = 'chat_room' as const;
   readonly priority: number = 50;
@@ -103,7 +144,14 @@ export class ChatRoomSystem extends BaseSystem {
    */
   private initializePermanentRooms(world: World): void {
     // Auto-initialize divine chat room (permanent, criteria-based)
-    this.getOrCreateRoom(world, DIVINE_CHAT_CONFIG);
+    const divineChat = this.getOrCreateRoom(world, DIVINE_CHAT_CONFIG);
+
+    // Load persisted messages from localStorage
+    const savedMessages = loadDivineChatMessages();
+    if (savedMessages.length > 0) {
+      divineChat.messages = savedMessages;
+      console.log(`[ChatRoomSystem] Restored ${savedMessages.length} divine chat messages`);
+    }
   }
 
   /**
@@ -360,6 +408,7 @@ export class ChatRoomSystem extends BaseSystem {
       type?: ChatMessage['type'];
       replyTo?: string;
       whisperTo?: string[];
+      senderName?: string; // Optional override for sender name
     }
   ): ChatMessage | null {
     const room = this.getRoom(world, roomId);
@@ -368,19 +417,22 @@ export class ChatRoomSystem extends BaseSystem {
       return null;
     }
 
-    // Get sender name (handle special 'player' ID for human players)
-    let senderName = 'Unknown';
-    if (senderId === 'player') {
-      senderName = 'Player';
-    } else {
-      const sender = world.getEntity(senderId);
-      if (!sender) {
-        console.error(`[ChatRoomSystem] Sender not found: ${senderId}`);
-        return null;
-      }
+    // Get sender name - use provided name if available
+    let senderName = options?.senderName || 'Unknown';
+    if (!options?.senderName) {
+      if (senderId === 'player') {
+        // Fallback for player without name (should have name in browser)
+        senderName = 'Player';
+      } else {
+        const sender = world.getEntity(senderId);
+        if (!sender) {
+          console.error(`[ChatRoomSystem] Sender not found: ${senderId}`);
+          return null;
+        }
 
-      const identity = sender.getComponent<IdentityComponent>(ComponentType.Identity);
-      senderName = identity?.name ?? 'Unknown';
+        const identity = sender.getComponent<IdentityComponent>(ComponentType.Identity);
+        senderName = identity?.name ?? 'Unknown';
+      }
     }
 
     // Create message
@@ -407,15 +459,25 @@ export class ChatRoomSystem extends BaseSystem {
     room.lastMessageTick = world.tick;
     room.lastActivityTick = world.tick;
 
+    // Persist divine chat messages to localStorage
+    if (roomId === 'divine_chat') {
+      saveDivineChatMessages(room.messages);
+    }
+
     console.log(`[ChatRoomSystem] [${room.config.name}] ${senderName}: ${content}`);
 
-    // Emit event for UI
-    this.events.emit('chat:message_sent', {
-      roomId,
-      messageId: message.id,
-      senderId,
-      senderName,
-      content,
+    // Emit event for UI and other systems (e.g., AdminAngelSystem)
+    // Must use world.eventBus so other systems can receive it
+    world.eventBus.emit({
+      type: 'chat:message_sent',
+      source: 'chat_room_system',
+      data: {
+        roomId,
+        messageId: message.id,
+        senderId,
+        senderName,
+        content,
+      },
     });
 
     return message;
@@ -618,6 +680,7 @@ export class ChatRoomSystem extends BaseSystem {
       const data = event.data as {
         roomId: string;
         senderId: string;
+        senderName?: string; // Optional name from UI (persisted in localStorage)
         message: string;
         type?: 'message' | 'action' | 'whisper';
         replyTo?: string;
@@ -628,6 +691,7 @@ export class ChatRoomSystem extends BaseSystem {
         type: data.type,
         replyTo: data.replyTo,
         whisperTo: data.whisperTo,
+        senderName: data.senderName,
       });
     });
 

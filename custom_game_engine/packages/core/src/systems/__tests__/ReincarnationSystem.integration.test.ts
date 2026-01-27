@@ -12,6 +12,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import type { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHarness.js';
 import type { World } from '../../ecs/World.js';
+import { WorldImpl } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { ReincarnationSystem } from '../ReincarnationSystem.js';
 import { DeathTransitionSystem } from '../DeathTransitionSystem.js';
@@ -19,10 +20,10 @@ import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
-import { createPositionComponent } from '../../components/PositionComponent.js';
+import { createPositionComponent, type PositionComponent } from '../../components/PositionComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { createRealmLocationComponent } from '../../components/RealmLocationComponent.js';
-import { createSpiritualComponent } from '../../components/SpiritualComponent.js';
+import { createSpiritualComponent, type SpiritualComponent } from '../../components/SpiritualComponent.js';
 import { generateRandomStartingSkills } from '../../components/SkillsComponent.js';
 import { createDeedLedgerComponent, recordDeed } from '../../components/DeedLedgerComponent.js';
 import type { Deity } from '../../divinity/DeityTypes.js';
@@ -51,11 +52,11 @@ describe('ReincarnationSystem Integration', () => {
       const entity = new EntityImpl(entityId, 0);
 
       // Add required components
-      (entity as any).addComponent(createIdentityComponent('Reborn Hero'));
-      (entity as any).addComponent(createPositionComponent(50, 50));
-      (entity as any).addComponent(createRealmLocationComponent('mortal'));
-      (entity as any).addComponent(createAgentComponent('idle', 20, true, 0)); // LLM agent
-      (entity as any).addComponent(new NeedsComponent({
+      entity.addComponent(createIdentityComponent('Reborn Hero'));
+      entity.addComponent(createPositionComponent(50, 50));
+      entity.addComponent(createRealmLocationComponent('mortal'));
+      entity.addComponent(createAgentComponent('idle', 20, true, 0)); // LLM agent
+      entity.addComponent(new NeedsComponent({
         hunger: 0, // Will die from starvation
         energy: 0.5,
         health: 0.1,
@@ -68,10 +69,10 @@ describe('ReincarnationSystem Integration', () => {
         agreeableness: 0.6,
         neuroticism: 0.3,
       });
-      (entity as any).addComponent(personality);
+      entity.addComponent(personality);
 
       const skills = generateRandomStartingSkills(personality);
-      (entity as any).addComponent(skills);
+      entity.addComponent(skills);
 
       // Add memories
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -82,7 +83,7 @@ describe('ReincarnationSystem Integration', () => {
         emotionalValence: 0.9,
         emotionalIntensity: 1.0,
       });
-      (entity as any).addComponent(episodic);
+      entity.addComponent(episodic);
 
       world.addEntity(entity);
 
@@ -116,7 +117,7 @@ describe('ReincarnationSystem Integration', () => {
       expect(reincarnationSystem.getQueuedSoulCount()).toBe(1);
 
       // Advance time and process reincarnation
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -132,8 +133,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Memory Keeper'));
-      (entity as any).addComponent(createPositionComponent(10, 10));
+      entity.addComponent(createIdentityComponent('Memory Keeper'));
+      entity.addComponent(createPositionComponent(10, 10));
 
       const personality = new PersonalityComponent({
         openness: 0.7,
@@ -142,10 +143,10 @@ describe('ReincarnationSystem Integration', () => {
         agreeableness: 0.7,
         neuroticism: 0.3,
       });
-      (entity as any).addComponent(personality);
+      entity.addComponent(personality);
 
       const skills = generateRandomStartingSkills(personality);
-      (entity as any).addComponent(skills);
+      entity.addComponent(skills);
 
       // Add multiple memories with varying importance
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -165,7 +166,7 @@ describe('ReincarnationSystem Integration', () => {
         emotionalIntensity: 0.1,
         importance: 0.1,
       });
-      (entity as any).addComponent(episodic);
+      entity.addComponent(episodic);
 
       world.addEntity(entity);
 
@@ -189,7 +190,7 @@ describe('ReincarnationSystem Integration', () => {
 
       world.eventBus.flush();
 
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -202,8 +203,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Fragment Soul'));
-      (entity as any).addComponent(createPositionComponent(10, 10));
+      entity.addComponent(createIdentityComponent('Fragment Soul'));
+      entity.addComponent(createPositionComponent(10, 10));
 
       const personality = new PersonalityComponent({
         openness: 0.5,
@@ -212,7 +213,7 @@ describe('ReincarnationSystem Integration', () => {
         agreeableness: 0.5,
         neuroticism: 0.5,
       });
-      (entity as any).addComponent(personality);
+      entity.addComponent(personality);
 
       // Add many memories
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -225,7 +226,7 @@ describe('ReincarnationSystem Integration', () => {
           emotionalIntensity: Math.random(),
         });
       }
-      (entity as any).addComponent(episodic);
+      entity.addComponent(episodic);
 
       world.addEntity(entity);
 
@@ -249,7 +250,7 @@ describe('ReincarnationSystem Integration', () => {
 
       world.eventBus.flush();
 
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -262,8 +263,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Blank Slate'));
-      (entity as any).addComponent(createPositionComponent(10, 10));
+      entity.addComponent(createIdentityComponent('Blank Slate'));
+      entity.addComponent(createPositionComponent(10, 10));
 
       world.addEntity(entity);
 
@@ -287,7 +288,7 @@ describe('ReincarnationSystem Integration', () => {
 
       world.eventBus.flush();
 
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -304,8 +305,8 @@ describe('ReincarnationSystem Integration', () => {
 
       const deathX = 100;
       const deathY = 200;
-      (entity as any).addComponent(createIdentityComponent('Local Rebirth'));
-      (entity as any).addComponent(createPositionComponent(deathX, deathY));
+      entity.addComponent(createIdentityComponent('Local Rebirth'));
+      entity.addComponent(createPositionComponent(deathX, deathY));
 
       world.addEntity(entity);
 
@@ -329,7 +330,7 @@ describe('ReincarnationSystem Integration', () => {
 
       world.eventBus.flush();
 
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -339,7 +340,7 @@ describe('ReincarnationSystem Integration', () => {
       // Check new entity position is within expected range
       const newEntity = world.getEntity(newEntityId!);
       if (newEntity) {
-        const position = newEntity.components.get('position') as any;
+        const position = newEntity.components.get('position') as PositionComponent | undefined;
         if (position) {
           const distance = Math.sqrt(
             Math.pow(position.x - deathX, 2) + Math.pow(position.y - deathY, 2)
@@ -357,8 +358,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Faithful Soul'));
-      (entity as any).addComponent(createPositionComponent(10, 10));
+      entity.addComponent(createIdentityComponent('Faithful Soul'));
+      entity.addComponent(createPositionComponent(10, 10));
 
       world.addEntity(entity);
 
@@ -384,7 +385,7 @@ describe('ReincarnationSystem Integration', () => {
 
       world.eventBus.flush();
 
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -393,9 +394,9 @@ describe('ReincarnationSystem Integration', () => {
 
       const newEntity = world.getEntity(newEntityId!);
       if (newEntity) {
-        const spiritual = newEntity.components.get('spiritual') as any;
+        const spiritual = newEntity.components.get('spiritual') as SpiritualComponent | undefined;
         expect(spiritual).toBeDefined();
-        expect(spiritual.believedDeity).toBe(deityId);
+        expect(spiritual?.believedDeity).toBe(deityId);
       }
     });
   });
@@ -406,8 +407,8 @@ describe('ReincarnationSystem Integration', () => {
 
       for (const soulId of souls) {
         const entity = new EntityImpl(soulId, 0);
-        (entity as any).addComponent(createIdentityComponent(`Entity ${soulId}`));
-        (entity as any).addComponent(createPositionComponent(Math.random() * 100, Math.random() * 100));
+        entity.addComponent(createIdentityComponent(`Entity ${soulId}`));
+        entity.addComponent(createPositionComponent(Math.random() * 100, Math.random() * 100));
         world.addEntity(entity);
 
         world.eventBus.emit({
@@ -434,7 +435,7 @@ describe('ReincarnationSystem Integration', () => {
       });
 
       // Advance time and process all
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();
@@ -449,8 +450,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Original'));
-      (entity as any).addComponent(createPositionComponent(10, 10));
+      entity.addComponent(createIdentityComponent('Original'));
+      entity.addComponent(createPositionComponent(10, 10));
 
       world.addEntity(entity);
 
@@ -472,7 +473,7 @@ describe('ReincarnationSystem Integration', () => {
 
       world.eventBus.flush();
 
-      (world as any)._tick = 100;
+      (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
       world.eventBus.flush();

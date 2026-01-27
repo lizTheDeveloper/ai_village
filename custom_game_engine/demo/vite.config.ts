@@ -293,6 +293,11 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
+      // Sprite generation API - routes to metrics server
+      '/api/sprites': {
+        target: 'http://localhost:8766',
+        changeOrigin: true,
+      },
     },
   },
   resolve: {

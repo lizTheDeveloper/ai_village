@@ -308,16 +308,16 @@ export class ExplorationSystem extends BaseSystem {
         if (!agentComp || !posComp) {
           throw new Error(`ExplorationSystem: Entity ${entity.id} missing required components for milestone event`);
         }
-        this.events.emitGeneric({
-          type: 'exploration:milestone',
-          source: 'exploration',
-          data: {
+        this.events.emitGeneric(
+          'exploration:milestone',
+          {
             agentId: entity.id, // Use entity id as agent id
             entityId: entity.id,
             milestoneType: `coverage_${milestone}`,
             location: { x: posComp.x, y: posComp.y },
           },
-        });
+          entity.id
+        );
         this.lastCoverageMilestone.set(entity.id, milestone);
       }
     }

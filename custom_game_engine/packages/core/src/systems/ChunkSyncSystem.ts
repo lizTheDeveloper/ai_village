@@ -55,11 +55,12 @@ export class ChunkSyncSystem extends BaseSystem {
   protected async onUpdate(ctx: SystemContext): Promise<void> {
     const { world } = ctx;
 
-    // Get chunk manager from world
-    const chunkManager = (world as any).getChunkManager?.();
+    // Get chunk manager from world (duck typing for optional method)
+    const worldWithChunks = world as { getChunkManager?: () => unknown };
+    const chunkManager = worldWithChunks.getChunkManager?.();
 
     // Check if it's a ServerBackedChunkManager (duck typing)
-    if (!chunkManager || typeof chunkManager.flushDirtyChunks !== 'function') {
+    if (!chunkManager || typeof (chunkManager as Record<string, unknown>).flushDirtyChunks !== 'function') {
       return; // Not using server-backed storage
     }
 

@@ -7,7 +7,7 @@
  * Browser-compatible: Save/load operations are no-ops in browser, only work in Node.js.
  */
 
-import { World } from '../ecs/World.js';
+import { World, WorldImpl, WorldMutator } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { worldSerializer } from './WorldSerializer.js';
 
@@ -98,7 +98,7 @@ export class SaveStateManager {
    * Save current world state
    */
   async saveState(
-    world: World,
+    world: WorldMutator,
     sessionId: string,
     options: {
       saveName?: string;
@@ -329,9 +329,9 @@ export class SaveStateManager {
   /**
    * Restore world from save state
    */
-  async restoreWorld(saveState: SaveState): Promise<World> {
+  async restoreWorld(saveState: SaveState): Promise<WorldMutator> {
     const eventBus = new EventBusImpl();
-    const world = new World(eventBus);
+    const world = new WorldImpl(eventBus);
     await worldSerializer.deserializeWorld(saveState.snapshot, world);
     return world;
   }

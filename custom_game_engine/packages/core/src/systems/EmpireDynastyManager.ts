@@ -124,7 +124,7 @@ function getCandidates(
     }
 
     // Calculate age from identity
-    const age = (identity as any).age ?? 25; // Default to 25 if not set
+    const age = (identity && 'age' in identity && typeof identity.age === 'number') ? identity.age : 25;
 
     // Get skills
     const skillsComp = entity.getComponent<SkillsComponent>(CT.Skills);
@@ -154,7 +154,7 @@ function getCandidates(
 
     candidates.push({
       agentId: entity.id,
-      agentName: (identity as any).name ?? 'Unknown',
+      agentName: (identity && 'name' in identity && typeof identity.name === 'string') ? identity.name : 'Unknown',
       dynastyComponent: updatedDynasty,
       legitimacy,
       age,
@@ -406,7 +406,7 @@ function findRivalClaimants(
 
     // Get agent name
     const identity = entity.getComponent(CT.Identity);
-    const agentName = (identity as any)?.name ?? 'Unknown Claimant';
+    const agentName = (identity && 'name' in identity && typeof identity.name === 'string') ? identity.name : 'Unknown Claimant';
 
     claimants.push({
       agentId: entity.id,

@@ -876,7 +876,7 @@ export class RebellionEventSystem extends BaseSystem {
       }, 'rebellion_event_system');
 
       // Update fleet combat history
-      (world as any).updateComponent(fleetEntity, CT.Fleet, (f: FleetComponent): FleetComponent => ({
+      (fleetEntity as EntityImpl).updateComponent<FleetComponent>(CT.Fleet, (f: FleetComponent): FleetComponent => ({
         ...f,
         status: {
           ...f.status,

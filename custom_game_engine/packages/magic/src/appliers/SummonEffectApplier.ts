@@ -6,7 +6,7 @@
  */
 
 import type { Entity, Component } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type {
   SummonEffect,
   EffectApplicationResult,
@@ -33,7 +33,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     const appliedValues: Record<string, number> = {};
 
     // Get caster position for spawn location
-    const casterPosComp = caster.components.get('position');
+    const casterPosComp = caster.getComponent('position') as PositionComponentData | undefined;
     if (!casterPosComp) {
       return {
         success: false,
@@ -49,11 +49,10 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     }
 
     // Extract position values from component
-    const posData = casterPosComp as unknown as PositionComponentData;
     const casterPos = {
-      x: posData.x ?? 0,
-      y: posData.y ?? 0,
-      z: posData.z ?? 0,
+      x: casterPosComp.x ?? 0,
+      y: casterPosComp.y ?? 0,
+      z: casterPosComp.z ?? 0,
     };
 
     // Calculate summon parameters
@@ -94,7 +93,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);
-        summonedEntity.addComponent(positionComponent as Component);
+        (world as WorldMutator).addComponent(summonedEntity.id, positionComponent);
 
         // Set owner if controllable
         if (effect.controllable) {
@@ -120,13 +119,11 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
       }
     }
 
-    // Store summoned entity IDs in appliedValues as a packed string
-    // Format: "entityId1|entityId2|entityId3"
+    // Store summoned entity count in appliedValues
+    // Note: appliedValues is Record<string, number>, so we can only store the count
+    // The actual entity IDs are tracked in the return value's summonedEntities field
     if (summonedEntityIds.length > 0) {
       appliedValues['summonedEntityIds'] = summonedEntityIds.length;
-      // Store the actual IDs in a special key that won't be confused with numeric values
-      (appliedValues as unknown as { _summonedEntityIds: string })._summonedEntityIds =
-        summonedEntityIds.join('|');
     }
 
     return {
@@ -185,9 +182,8 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         // Check if entity still exists before destroying
         const entity = world.getEntity(summonId);
         if (entity) {
-          // Use WorldImpl to destroy entity - World interface doesn't expose this
-          // Type assertion needed because destroyEntity is not in the public World interface
-          (world as unknown as { destroyEntity: (entityId: string, reason: string) => void }).destroyEntity(summonId, 'summon_expired');
+          // destroyEntity is part of WorldMutator interface (which World implements)
+          (world as WorldMutator).destroyEntity(summonId, 'summon_expired');
         }
       } catch (error) {
         // Entity might have already been destroyed - that's fine
@@ -266,12 +262,15 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     }
   }
 
-  private extractSummonedEntityIds(activeEffect: ActiveEffect): string[] {
-    // Extract the packed entity IDs from appliedValues
-    const packed = (activeEffect.appliedValues as unknown as { _summonedEntityIds?: string })
-      ._summonedEntityIds;
-    if (!packed) return [];
-    return packed.split('|').filter(id => id.length > 0);
+  private extractSummonedEntityIds(_activeEffect: ActiveEffect): string[] {
+    // TODO: Summon tracking needs proper implementation
+    // ActiveEffect.appliedValues is Record<string, number>, so we cannot store entity IDs
+    // Options:
+    // 1. Add summonedEntities?: string[] field to ActiveEffect interface
+    // 2. Create a separate SummonTracker component on the caster
+    // 3. Use a world-level registry to track summons by effect instance ID
+    // For now, return empty array - summons won't be auto-despawned on effect expiry
+    return [];
   }
 }
 

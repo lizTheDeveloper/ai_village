@@ -8,7 +8,7 @@
  * See: PHASE_33_ARCHITECTURE.md for full specification
  */
 
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { Component } from '@ai-village/core';
 
@@ -206,7 +206,7 @@ export class RejectedArtifactSystem {
       creatorId,
     };
 
-    this.world.addComponent(entity.id, component);
+    (this.world as WorldMutator).addComponent(entity.id, component);
 
     return entity;
   }
@@ -244,7 +244,7 @@ export class RejectedArtifactSystem {
       creatorId,
     };
 
-    this.world.addComponent(entity.id, component);
+    (this.world as WorldMutator).addComponent(entity.id, component);
 
     return entity;
   }
@@ -534,10 +534,10 @@ export class RejectedArtifactSystem {
     const effect = component.effectExpression;
 
     // Remove rejected artifact component (it's been recovered)
-    this.world.removeComponent(entity.id, 'rejected_artifact');
+    (this.world as WorldMutator).removeComponent(entity.id, 'rejected_artifact');
 
     // Add recovered artifact component for tracking
-    this.world.addComponent(entity.id, {
+    (this.world as WorldMutator).addComponent(entity.id, {
       type: 'recovered_artifact',
       version: 1,
       recoveredAt: Date.now(),

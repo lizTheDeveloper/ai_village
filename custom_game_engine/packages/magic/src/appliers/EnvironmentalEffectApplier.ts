@@ -10,8 +10,8 @@
  * - Support for 8 area shapes (circle, square, sphere, cube, cone, line, ring, wall)
  */
 
-import type { Entity } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { Entity, Component } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type {
   EnvironmentalEffect,
   EffectApplicationResult,
@@ -321,27 +321,27 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
    * Get or create the global environment entity.
    */
   private getOrCreateEnvironmentEntity(world: World): Entity {
-    // Look for existing environment entity (if query is available)
-    const worldWithQuery = world as unknown as { query?: () => { with: (type: string) => { executeEntities: () => Entity[] } } };
-    if (typeof worldWithQuery.query === 'function') {
-      const existingEnv = worldWithQuery.query()
-        .with('environment')
-        .executeEntities()[0];
+    // Look for existing environment entity
+    const existingEnv = world.query()
+      .with('environment')
+      .executeEntities()[0];
 
-      if (existingEnv) {
-        return existingEnv;
-      }
+    if (existingEnv) {
+      return existingEnv;
     }
 
     // Create new environment entity
     const envEntity = world.createEntity();
-    envEntity.addComponent('environment', {
+    const environmentComp = {
+      type: 'environment' as const,
+      version: 1,
       weather: 'clear',
       weatherIntensity: 0,
       globalLightLevel: 0,
       temperatureModifier: 0,
       globalZones: [],
-    });
+    };
+    (world as WorldMutator).addComponent(envEntity.id, environmentComp as unknown as Component);
 
     return envEntity;
   }
@@ -358,12 +358,17 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
   ): void {
     const zoneEntity = world.createEntity();
 
-    zoneEntity.addComponent('position', {
+    const posComp = {
+      type: 'position' as const,
+      version: 1,
       x: center.x,
       y: center.y,
-    });
+    };
+    (world as WorldMutator).addComponent(zoneEntity.id, posComp as unknown as Component);
 
-    zoneEntity.addComponent('environmental_zone', {
+    const zoneComp = {
+      type: 'environmental_zone' as const,
+      version: 1,
       effectId: effect.id,
       environmentType: effect.environmentType,
       radius,
@@ -372,12 +377,16 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       areaEffects: effect.areaEffects ?? [],
       createdAt: Date.now(),
       duration: effect.duration,
-    });
+    };
+    (world as WorldMutator).addComponent(zoneEntity.id, zoneComp as unknown as Component);
 
     // Add tags for identification
-    zoneEntity.addComponent('tags', {
+    const tagsComp = {
+      type: 'tags' as const,
+      version: 1,
       tags: ['environmental_zone', effect.environmentType, ...(effect.tags ?? [])],
-    });
+    };
+    (world as WorldMutator).addComponent(zoneEntity.id, tagsComp as unknown as Component);
   }
 
   /**
@@ -389,12 +398,6 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
     radius: number,
     world: World
   ): void {
-    // Skip if world doesn't support query (mock world in tests)
-    const worldWithQuery = world as unknown as { query?: () => { with: (type: string) => { with: (type: string) => { executeEntities: () => Entity[] } } } };
-    if (typeof worldWithQuery.query !== 'function') {
-      return;
-    }
-
     // Find zone entities matching this effect
     const zones = world.query()
       .with('environmental_zone')
@@ -412,7 +415,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
         Math.abs(zonePos.y - center.y) < 0.1 &&
         Math.abs(zoneComp.radius - radius) < 0.1
       ) {
-        world.destroyEntity(zone.id, 'environmental_zone_effect_ended');
+        (world as WorldMutator).destroyEntity(zone.id, 'environmental_zone_effect_ended');
       }
     }
   }

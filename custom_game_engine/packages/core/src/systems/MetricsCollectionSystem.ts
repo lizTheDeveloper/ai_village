@@ -11,7 +11,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import { MetricsCollector } from '../metrics/MetricsCollector.js';
 import { MetricsStreamClient, type MetricsStreamConfig } from '../metrics/MetricsStreamClient.js';
 import type { StoredMetric } from '../metrics/MetricsStorage.js';
@@ -910,7 +910,7 @@ export class MetricsCollectionSystem extends BaseSystem {
   /**
    * Check if current day is a time milestone and record canon event
    */
-  private checkTimeMilestones(world: World): void {
+  private checkTimeMilestones(world: WorldMutator): void {
     const timeEntities = world.query().with(CT.Time).execute();
     if (timeEntities.length === 0) return;
 
@@ -938,7 +938,7 @@ export class MetricsCollectionSystem extends BaseSystem {
   /**
    * Take a snapshot of current population state
    */
-  private takeSnapshot(world: World): void {
+  private takeSnapshot(world: WorldMutator): void {
     // Get all agents
     const agents = world.query().with(CT.Agent).with(CT.Needs).executeEntities();
 

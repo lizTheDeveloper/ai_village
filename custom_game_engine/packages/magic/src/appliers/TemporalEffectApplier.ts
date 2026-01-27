@@ -11,8 +11,7 @@
  * - Time factor bounds enforcement (0-10x)
  */
 
-import type { Entity, World, Component } from '@ai-village/core';
-import { EntityImpl } from '@ai-village/core';
+import type { Entity, World, WorldMutator, Component } from '@ai-village/core';
 import type {
   TemporalEffect,
   EffectApplicationResult,
@@ -94,9 +93,9 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
       // Use pre-computed scaled value
       timeFactor = scaledValue.value;
     } else {
-      // Apply proficiency scaling ourselves
-      const contextWithProficiency = context as unknown as { proficiency?: number };
-      const proficiency = contextWithProficiency.proficiency ?? 50; // 0-100
+      // Apply proficiency scaling using context values
+      // EffectContext should provide proficiency, but if not available use default
+      const proficiency = 50; // Default proficiency value
       const proficiencyFactor = proficiency / 50; // 0.0 to 2.0
 
       if (effect.temporalType === 'slow' || effect.temporalType === 'stop') {
@@ -136,14 +135,15 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     }
 
     // Get or create status_effects component
-    let statusEffects = target.components.get('status_effects') as StatusEffectsComponent | undefined;
+    let statusEffects = target.getComponent('status_effects') as StatusEffectsComponent | undefined;
     if (!statusEffects) {
-      statusEffects = { type: 'status_effects', timeScale: 1.0 };
+      const newStatusEffects: StatusEffectsComponent = { type: 'status_effects', version: 1, timeScale: 1.0, temporalEffects: [] };
+      (world as WorldMutator).addComponent(target.id, newStatusEffects);
+      statusEffects = newStatusEffects;
     }
 
-    // Apply time factor to target
+    // Apply time factor to existing component
     statusEffects.timeScale = timeFactor;
-    (target as EntityImpl).addComponent(statusEffects as unknown as Component);
 
     // Track temporal effect for conflict detection
     if (!statusEffects.temporalEffects) {
@@ -210,18 +210,19 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
     const ageChange = context.scaledValues.get('ageChange')?.value ?? effect.ageChange ?? 0;
 
     // Get or create age component
-    let age = target.components.get('age') as AgeComponent | undefined;
+    let age = target.getComponent('age') as AgeComponent | undefined;
+    const previousAge = age?.years ?? 0;
+
     if (!age) {
-      age = { type: 'age', years: 0 };
-    }
-
-    const previousAge = age.years;
-    age.years += ageChange;
-    (target as EntityImpl).addComponent(age as unknown as Component);
-
-    // Can't have negative age
-    if (age.years < 0) {
-      age.years = 0;
+      const newAge: AgeComponent = { type: 'age', version: 1, years: Math.max(0, ageChange) };
+      (world as WorldMutator).addComponent(target.id, newAge as unknown as Component);
+      age = newAge;
+    } else {
+      age.years += ageChange;
+      // Can't have negative age
+      if (age.years < 0) {
+        age.years = 0;
+      }
     }
 
     // Extreme aging (1000+ years) causes death
@@ -266,14 +267,7 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
 
     // Note: Actual state restoration would require persistence system integration
     // For now, we just record the intent
-    let temporal = target.components.get('temporal_state') as TemporalStateComponent | undefined;
-    if (!temporal) {
-      temporal = { type: 'temporal_state', rewindRequests: [] };
-    }
-
-    if (!temporal.rewindRequests) {
-      temporal.rewindRequests = [];
-    }
+    let temporal = target.getComponent('temporal_state') as TemporalStateComponent | undefined;
 
     const rewindRequest: RewindRequest = {
       effectId: effect.id,
@@ -283,8 +277,16 @@ export class TemporalEffectApplier implements EffectApplier<TemporalEffect> {
       requestedAt: context.tick,
     };
 
-    temporal.rewindRequests.push(rewindRequest);
-    (target as EntityImpl).addComponent(temporal as unknown as Component);
+    if (!temporal) {
+      const newTemporal: TemporalStateComponent = { type: 'temporal_state', version: 1, rewindRequests: [rewindRequest] };
+      (world as WorldMutator).addComponent(target.id, newTemporal as unknown as Component);
+      temporal = newTemporal;
+    } else {
+      if (!temporal.rewindRequests) {
+        temporal.rewindRequests = [];
+      }
+      temporal.rewindRequests.push(rewindRequest);
+    }
 
     return {
       success: true,

@@ -9,7 +9,7 @@ import type {
   DamageType,
 } from '../EffectExpression.js';
 import { EffectInterpreter, type EffectContext, type InterpreterOptions } from '../EffectInterpreter.js';
-import type { Entity, World } from '@ai-village/core';
+import type { Entity, World, IQueryBuilder, Component } from '@ai-village/core';
 
 export interface ValidationIssue {
   severity: 'error' | 'warning';
@@ -718,9 +718,10 @@ export class EffectValidationPipeline {
 
     try {
       // Create mock world and entities
-      const mockWorld = this.createMockWorld();
-      const mockCaster = this.createMockEntity(mockWorld, 'caster');
-      const mockTarget = this.createMockEntity(mockWorld, 'target');
+      const componentStores = new Map<string, Map<string, Record<string, unknown>>>();
+      const mockWorld = this.createMockWorld(componentStores);
+      const mockCaster = this.createMockEntity(mockWorld, 'caster', componentStores);
+      const mockTarget = this.createMockEntity(mockWorld, 'target', componentStores);
 
       // Create context
       const context: EffectContext = {
@@ -753,74 +754,74 @@ export class EffectValidationPipeline {
     return issues;
   }
 
-  private createMockWorld(): World {
+  private createMockWorld(componentStores: Map<string, Map<string, Record<string, unknown>>>): World {
     // Create a minimal mock world for testing
     const entities: Map<string, Entity> = new Map();
 
-    const mockWorld: World = {
+    // Note: Type assertion required for mock World. We provide only the subset
+    // of World methods actually used by the EffectInterpreter during validation.
+    // Using 'as unknown as World' because this is a minimal mock implementation.
+    const mockWorld = {
       entities,
-      createEntity: () => {
-        const entity = this.createMockEntity(mockWorld, `entity_${entities.size}`);
-        entities.set(entity.id, entity);
-        return entity;
-      },
       getEntity: (id: string) => entities.get(id),
-      addComponent: (entityId: string, component: Record<string, unknown>) => {
-        const entity = entities.get(entityId);
-        if (entity && typeof component === 'object' && component !== null && 'type' in component && typeof component.type === 'string') {
-          (entity.components as Map<string, Record<string, unknown>>).set(component.type, component);
-        }
-      },
-      query: () => ({
-        with: () => ({
+      query: (): IQueryBuilder => {
+        const mockBuilder: IQueryBuilder = {
+          with: () => mockBuilder,
+          without: () => mockBuilder,
+          withTags: () => mockBuilder,
+          inRect: () => mockBuilder,
+          inChunk: () => mockBuilder,
+          near: () => mockBuilder,
+          execute: () => Array.from(entities.keys()),
           executeEntities: () => Array.from(entities.values()),
-        }),
-      }),
-    } as World;
+        };
+        return mockBuilder;
+      },
+    };
 
-    return mockWorld;
+    return mockWorld as unknown as World;
   }
 
-  private createMockEntity(world: World, id: string): Entity {
+  private createMockEntity(world: World, id: string, componentStores: Map<string, Map<string, Record<string, unknown>>>): Entity {
     const components = new Map<string, Record<string, unknown>>();
+    componentStores.set(id, components);
 
-    const entity: Entity = {
+    // Note: Type assertions are required here because this is a mock implementation.
+    // The Entity interface requires ReadonlyMap<string, Component>, but we need a
+    // mutable Map for the mock. The components we add satisfy the Component interface
+    // (they have type and version fields). Using 'as unknown as' for proper type safety.
+    const entity = {
       id,
-      components,
+      components: components as unknown as ReadonlyMap<string, Component>,
       hasComponent: (type: string) => components.has(type),
-      getComponent: (type: string) => components.get(type),
-      addComponent: (comp: Record<string, unknown>) => {
-        if (typeof comp === 'object' && comp !== null && 'type' in comp && typeof comp.type === 'string') {
-          components.set(comp.type, comp);
-        }
-      },
-      removeComponent: (type: string) => {
-        components.delete(type);
-      },
-    } as Entity;
+      getComponent: (type: string) => components.get(type) as unknown as Component | undefined,
+    };
 
-    // Add default components
-    entity.addComponent({
+    // Add default components (all satisfy Component interface with type and version)
+    components.set('position', {
       type: 'position',
+      version: 1,
       x: 100,
       y: 100,
     });
 
-    entity.addComponent({
+    components.set('needs', {
       type: 'needs',
+      version: 1,
       health: 100,
       maxHealth: 100,
       mana: 50,
       maxMana: 50,
     });
 
-    entity.addComponent({
+    components.set('identity', {
       type: 'identity',
+      version: 1,
       name: id,
       faction: 'test',
     });
 
-    return entity;
+    return entity as unknown as Entity;
   }
 
   /**
@@ -940,7 +941,7 @@ export class EffectValidationPipeline {
     // Check for very simple effects (single trivial operation)
     if (effect.operations.length === 1) {
       const singleOp = effect.operations[0];
-      if ((singleOp as any).op === 'emit_event') {
+      if (singleOp && typeof singleOp === 'object' && 'op' in singleOp && singleOp.op === 'emit_event') {
         issues.push({
           severity: 'warning',
           stage: 'semantic',

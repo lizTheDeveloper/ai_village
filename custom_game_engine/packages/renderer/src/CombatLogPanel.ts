@@ -1,4 +1,4 @@
-import type { EventBus } from '@ai-village/core';
+import type { EventBus, EventType, EventHandler, GameEvent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 interface CombatEvent {
@@ -28,7 +28,7 @@ export class CombatLogPanel implements IWindowPanel {
   private element: HTMLElement | null = null;
 
   // Event handlers for cleanup
-  private eventHandlers: Map<string, (data: Record<string, unknown>) => void> = new Map();
+  private eventHandlers: Map<EventType, EventHandler> = new Map();
 
 
   getDefaultWidth(): number {
@@ -77,7 +77,10 @@ export class CombatLogPanel implements IWindowPanel {
     ] as const;
 
     for (const eventType of events) {
-      const handler = (data: Record<string, unknown>) => this.handleCombatEvent(eventType, data);
+      const handler: EventHandler = (event: GameEvent) => {
+        const data = (event.data as Record<string, unknown>) || {};
+        this.handleCombatEvent(eventType, data);
+      };
       this.eventHandlers.set(eventType, handler);
       this.eventBus.on(eventType, handler);
     }

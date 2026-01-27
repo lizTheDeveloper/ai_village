@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2d063f44",
+  "name": "Quantum Titan",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769480974170",
+  "createdAt": 1769480974322,
+  "lastAccessedAt": 1769480974322,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769480974170",
+    "type": "magical"
+  }
+}

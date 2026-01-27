@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:1a3991fc",
+  "name": "Alpha Ariel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769320090570",
+  "createdAt": 1769320090642,
+  "lastAccessedAt": 1769320090642,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769320090570",
+    "type": "magical"
+  }
+}

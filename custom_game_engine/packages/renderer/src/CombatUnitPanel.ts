@@ -1,4 +1,4 @@
-import type { EventBus, World, Entity, NeedsComponent } from '@ai-village/core';
+import type { EventBus, World, Entity, NeedsComponent, EventHandler, GameEvent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // Component interfaces for type safety
@@ -48,7 +48,7 @@ export class CombatUnitPanel implements IWindowPanel {
   private element: HTMLElement | null = null;
 
   // Event handlers for cleanup
-  private entitySelectedHandler: ((data: EntitySelectedData) => void) | null = null;
+  private entitySelectedHandler: EventHandler | null = null;
 
 
   getDefaultWidth(): number {
@@ -79,7 +79,10 @@ export class CombatUnitPanel implements IWindowPanel {
     this.world = world;
 
     // Subscribe to entity selection events
-    this.entitySelectedHandler = this.handleEntitySelected.bind(this);
+    this.entitySelectedHandler = (event: GameEvent) => {
+      const data = (event.data as EntitySelectedData) || {};
+      this.handleEntitySelected(data);
+    };
     this.eventBus.on('ui:entity:selected', this.entitySelectedHandler);
   }
 

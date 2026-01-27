@@ -16,7 +16,7 @@ import type {
 import { worldSerializer } from './WorldSerializer.js';
 import { computeChecksumSync, getGameVersion } from './utils.js';
 import { validateWorldState, validateSaveFile } from './InvariantChecker.js';
-import { multiverseCoordinator, godCraftedQueue } from '@ai-village/core';
+import { multiverseCoordinator, godCraftedQueue, type QueueEntry } from '@ai-village/core';
 import {
   multiverseClient,
   type CanonEvent,
@@ -405,8 +405,7 @@ export class SaveLoadService {
 
       // Restore god-crafted queue
       if (saveFile.godCraftedQueue) {
-        // Type assertion: We trust the serialized queue data structure
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue as { version: number; entries: QueueEntry[] });
       }
 
       // Deserialize universe(s) first, before creating passages
@@ -594,8 +593,7 @@ export class SaveLoadService {
       coordinatorInternal.passages.clear();
 
       if (saveFile.godCraftedQueue) {
-        // Type assertion: We trust the serialized queue data structure
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue as { version: number; entries: QueueEntry[] });
       }
 
       // Deserialize universe(s) first, before creating passages

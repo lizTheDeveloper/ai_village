@@ -90,15 +90,10 @@ export class WorkerMonitorSystem extends BaseSystem {
     }
 
     // Emit event for metrics dashboard
-    // Note: Using 'test:event' as a general-purpose event type until a dedicated worker stats event is added
-    (ctx.world.eventBus as any).emit({
-      type: 'test:event',
-      source: 'WorkerMonitorSystem',
-      data: {
-        eventType: 'worker_pool_stats',
-        tick: ctx.tick,
-        pools: stats,
-      },
+    // Using emitGeneric for untyped event data
+    this.events.emitGeneric('worker:pool_stats', {
+      tick: ctx.tick,
+      pools: stats,
     });
   }
 
@@ -131,24 +126,34 @@ export class WorkerMonitorSystem extends BaseSystem {
       };
     }> = [];
 
-    // Get chunk worker pool stats
-    const chunkGenerator = (ctx.world as any).backgroundChunkGenerator;
-    if (chunkGenerator && chunkGenerator.workerPool) {
-      const workerPool = chunkGenerator.workerPool;
-      if (typeof workerPool.getStatus === 'function') {
-        const status = workerPool.getStatus();
-        stats.push({
-          name: 'ChunkGeneration',
-          stats: {
-            total: status.numWorkers || 0,
-            available: 0, // ChunkGenerationWorkerPool doesn't track this
-            active: status.pendingRequests || 0,
-            queued: 0, // ChunkGenerationWorkerPool doesn't have a queue
-            completed: 0, // Not tracked yet
-            failed: 0, // Not tracked yet
-          },
-        });
-      }
+    // Get chunk worker pool stats using index signature access
+    // World may have backgroundChunkGenerator added at runtime
+    interface WorldWithChunkGenerator {
+      backgroundChunkGenerator?: {
+        workerPool?: {
+          getStatus(): {
+            numWorkers?: number;
+            pendingRequests?: number;
+          };
+        };
+      };
+    }
+    const worldWithGenerator = ctx.world as unknown as WorldWithChunkGenerator;
+    const chunkGenerator = worldWithGenerator.backgroundChunkGenerator;
+
+    if (chunkGenerator?.workerPool) {
+      const status = chunkGenerator.workerPool.getStatus();
+      stats.push({
+        name: 'ChunkGeneration',
+        stats: {
+          total: status.numWorkers || 0,
+          available: 0, // ChunkGenerationWorkerPool doesn't track this
+          active: status.pendingRequests || 0,
+          queued: 0, // ChunkGenerationWorkerPool doesn't have a queue
+          completed: 0, // Not tracked yet
+          failed: 0, // Not tracked yet
+        },
+      });
     }
 
     return stats;

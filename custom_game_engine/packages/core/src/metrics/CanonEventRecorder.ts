@@ -11,7 +11,7 @@
  * This allows universe forking, time travel, and cross-universe comparisons.
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { UniverseSnapshot } from '../persistence/types.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
@@ -522,7 +522,7 @@ export class CanonEventRecorder {
    */
   async recordEvent(
     type: CanonEventType,
-    world: World,
+    world: WorldMutator,
     options: {
       description: string;
       agentIds?: string[];

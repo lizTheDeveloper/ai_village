@@ -20,15 +20,75 @@ import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import {
   type AdminAngelComponent,
   type AdminAngelMemory,
+  type AngelObservation,
+  type AngelMood,
+  type AgentFamiliarity,
   createAdminAngelComponent,
   createAdminAngelMemory,
   addMessageToContext,
   addPendingObservation,
   popPendingObservation,
 } from '../components/AdminAngelComponent.js';
+import type { AgentComponent, AgentBehavior } from '../components/AgentComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { generateRandomName } from '../utils/nameGenerator.js';
+
+// ============================================================================
+// Angel Name Persistence
+// ============================================================================
+
+const ANGEL_NAME_KEY = 'multiverse_angel_name';
+
+/**
+ * Get or create a stable angel name using localStorage
+ */
+function getStableAngelName(): string {
+  // Check if we're in a browser environment
+  if (typeof localStorage !== 'undefined') {
+    const savedName = localStorage.getItem(ANGEL_NAME_KEY);
+    if (savedName) {
+      return savedName;
+    }
+    // Generate new name and save it
+    const newName = generateRandomName(2);
+    localStorage.setItem(ANGEL_NAME_KEY, newName);
+    return newName;
+  }
+  // Node.js environment - generate fresh each time (headless mode)
+  return generateRandomName(2);
+}
+
+// ============================================================================
+// Player Greeting Persistence
+// ============================================================================
+
+const PLAYER_GREETED_KEY = 'multiverse_player_greeted';
+const DIVINE_CHAT_STORAGE_KEY = 'multiverse_divine_chat_messages';
+
+/**
+ * Check if the player has been greeted before (chat history exists)
+ */
+function hasPlayerBeenGreeted(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+
+  // Check if there are saved chat messages (indicates returning player)
+  const savedMessages = localStorage.getItem(DIVINE_CHAT_STORAGE_KEY);
+  if (savedMessages) {
+    try {
+      const messages = JSON.parse(savedMessages);
+      if (Array.isArray(messages) && messages.length > 0) {
+        return true;
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  return false;
+}
 
 // ============================================================================
 // LLM Queue Interface (imported from canonical source)
@@ -91,6 +151,9 @@ function buildAngelPrompt(
   const pk = mem.playerKnowledge;
   const rel = mem.relationship;
   const conv = mem.conversation;
+  const consciousness = mem.consciousness;
+  const attention = mem.attention;
+  const agentFamiliarity = mem.agentFamiliarity;
 
   // Build memory section
   const memoryLines: string[] = [];
@@ -134,11 +197,56 @@ function buildAngelPrompt(
     stateLines.push(`recent: ${gameState.recentEvents.slice(0, 3).join(', ')}`);
   }
 
+  // Build awareness sections (Phase 4)
+  let awarenessSection = '';
+
+  // 1. Current mood
+  awarenessSection += `u feel ${consciousness.mood} rn\n\n`;
+
+  // 2. Recent observations (last 5-10)
+  if (consciousness.observations.length > 0) {
+    const recentObs = consciousness.observations.slice(-10);
+    awarenessSection += `things uv noticed lately:\n`;
+    for (const obs of recentObs) {
+      awarenessSection += `- ${obs.text}\n`;
+    }
+    awarenessSection += '\n';
+  }
+
+  // 3. Focused agent (if watching someone)
+  if (attention.focusedAgentId && attention.focusedAgentName) {
+    const familiarity = agentFamiliarity.get(attention.focusedAgentId);
+    if (familiarity) {
+      awarenessSection += `ur watching ${attention.focusedAgentName} rn. `;
+      awarenessSection += `u think of them as "${familiarity.impression}". `;
+      awarenessSection += `last u saw: ${familiarity.lastSeenDoing}\n\n`;
+    }
+  }
+
+  // 4. Familiar agents (interest > 0.3, top 5)
+  const familiarAgents = Array.from(agentFamiliarity.values())
+    .filter(f => f.interestLevel > 0.3)
+    .sort((a, b) => b.interestLevel - a.interestLevel)
+    .slice(0, 5);
+
+  if (familiarAgents.length > 0) {
+    awarenessSection += `agents u know:\n`;
+    for (const fam of familiarAgents) {
+      awarenessSection += `- ${fam.name}: "${fam.impression}"\n`;
+    }
+    awarenessSection += '\n';
+  }
+
+  // 5. Current wonder (only if no player message)
+  if (consciousness.currentWonder && !playerMessage) {
+    awarenessSection += `something on ur mind: ${consciousness.currentWonder}\n\n`;
+  }
+
   // The prompt - written casually, not corporate
   const prompt = `ur ${angel.name}. ur an angel in the chat helping someone play this game
 
 ${memoryLines.length > 0 ? `u remember:\n${memoryLines.map(l => `- ${l}`).join('\n')}\n` : ''}
-game rn:
+${awarenessSection}game rn:
 ${stateLines.map(l => `- ${l}`).join('\n')}
 
 to do stuff, put [commands] in ur response. they auto-execute. examples:
@@ -407,17 +515,52 @@ export class AdminAngelSystem extends BaseSystem {
   }
 
   /**
-   * Handle a player message - queue for LLM response
+   * Handle a player message - check for commands first, then queue for LLM response
    */
-  private handlePlayerMessage(angel: AdminAngelComponent, message: string): void {
-    // Add to pending messages
-    angel.pendingPlayerMessages.push(message);
-
+  private handlePlayerMessage(angel: AdminAngelComponent, message: string, world: World): void {
     // Add to memory context
     addMessageToContext(angel.memory, 'player', message, angel.contextWindowSize);
 
     // Increment message count
     angel.memory.relationship.messageCount++;
+
+    // Phase 3: Check for commands first
+    const command = this.detectCommand(message);
+
+    if (command) {
+      // Handle command directly
+      let response = '';
+
+      switch (command.type) {
+        case 'watch':
+          if (command.target) {
+            response = this.handleWatchCommand(world, angel, command.target);
+          } else {
+            response = 'watch who?';
+          }
+          break;
+
+        case 'debug':
+          if (command.target) {
+            response = this.handleDebugCommand(world, angel, command.target);
+          } else {
+            response = 'debug who?';
+          }
+          break;
+
+        case 'status':
+          response = this.handleStatusCommand(world, angel);
+          break;
+      }
+
+      // Add response as pending message (skip LLM for simple commands)
+      if (response) {
+        angel.pendingPlayerMessages.push(`__command_response__:${response}`);
+      }
+    } else {
+      // Not a command - add to pending messages for LLM response
+      angel.pendingPlayerMessages.push(message);
+    }
   }
 
   /**
@@ -430,6 +573,13 @@ export class AdminAngelSystem extends BaseSystem {
     playerMessage?: string
   ): Promise<void> {
     if (angel.awaitingResponse) return;
+
+    // Check if this is a command response
+    if (playerMessage?.startsWith('__command_response__:')) {
+      const response = playerMessage.substring(21); // Remove prefix
+      this.handleAngelResponseDirect(ctx.world, angel, angelEntity, response);
+      return;
+    }
 
     // Check for bifurcation acceptance
     const bifurcationAvailable = (angel as AdminAngelComponent & { bifurcationAvailable?: boolean }).bifurcationAvailable;
@@ -900,12 +1050,567 @@ export class AdminAngelSystem extends BaseSystem {
     return messages.slice(0, 5); // Max 5 messages per turn
   }
 
+  // ============================================================================
+  // Phase 2: Ambient Scanning - Angel Awareness System
+  // ============================================================================
+
+  /**
+   * Phase 3: Command Detection - Parse player messages for commands
+   * Returns null if not a command
+   */
+  private detectCommand(message: string): { type: string; target?: string } | null {
+    const lower = message.toLowerCase().trim();
+
+    // Watch command patterns
+    if (lower.startsWith('watch ') || lower.includes('keep an eye on ') ||
+        lower.includes('keep watching ') || lower.includes('focus on ')) {
+      // Extract agent name
+      let target = '';
+      if (lower.startsWith('watch ')) {
+        target = message.substring(6).trim();
+      } else if (lower.includes('keep an eye on ')) {
+        target = message.substring(lower.indexOf('keep an eye on ') + 15).trim();
+      } else if (lower.includes('keep watching ')) {
+        target = message.substring(lower.indexOf('keep watching ') + 14).trim();
+      } else if (lower.includes('focus on ')) {
+        target = message.substring(lower.indexOf('focus on ') + 9).trim();
+      }
+      return { type: 'watch', target };
+    }
+
+    // Debug command patterns
+    if (lower.startsWith('debug ') || lower.includes('state') ||
+        lower.includes('what\'s ') && lower.includes(' doing')) {
+      let target = '';
+      if (lower.startsWith('debug ')) {
+        target = message.substring(6).trim();
+      } else if (lower.includes('what\'s ') && lower.includes(' doing')) {
+        // "what's Marcus doing" or "whats Marcus doing"
+        const match = message.match(/what'?s\s+(\w+)\s+doing/i);
+        if (match) target = match[1] || '';
+      } else if (lower.includes(' state')) {
+        // "Marcus's state" or "Marcus state"
+        const match = message.match(/(\w+)'?s?\s+state/i);
+        if (match) target = match[1] || '';
+      }
+      return { type: 'debug', target };
+    }
+
+    // Status command patterns
+    if (lower.includes('how\'s everyone') || lower.includes('hows everyone') ||
+        lower.includes('village status') || lower.includes('how are they') ||
+        lower === 'status' || lower.includes('everyone ok') ||
+        lower.includes('how is everyone')) {
+      return { type: 'status' };
+    }
+
+    return null;
+  }
+
+  /**
+   * Phase 3: Find agent by name (case insensitive)
+   */
+  private findAgentByName(world: World, name: string): Entity | null {
+    const nameLower = name.toLowerCase().trim();
+    const agents = world.query().with(CT.Agent).executeEntities();
+
+    for (const agent of agents) {
+      const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+      if (identity?.name && identity.name.toLowerCase() === nameLower) {
+        return agent;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Phase 3: Handle watch command - Set focus on an agent
+   */
+  private handleWatchCommand(world: World, angel: AdminAngelComponent, agentName: string): string {
+    const agent = this.findAgentByName(world, agentName);
+
+    if (!agent) {
+      return `i dont see anyone named ${agentName}...`;
+    }
+
+    // Set focus
+    angel.memory.attention.focusedAgentId = agent.id;
+    angel.memory.attention.focusedAgentName = agentName;
+    angel.memory.attention.focusSinceTick = Number(world.tick);
+
+    // Ensure familiarity entry exists
+    const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+    const name = identity?.name ?? agentName;
+
+    if (!angel.memory.agentFamiliarity.has(agent.id)) {
+      angel.memory.agentFamiliarity.set(agent.id, {
+        agentId: agent.id,
+        name,
+        firstNoticedTick: Number(world.tick),
+        playerInteractionCount: 0,
+        lastSeenDoing: 'just noticed them',
+        lastSeenTick: Number(world.tick),
+        impression: 'newly noticed',
+        interestLevel: 0.8, // High initial interest when player asks
+        memories: []
+      });
+    }
+
+    // Increment player interaction count
+    const familiarity = angel.memory.agentFamiliarity.get(agent.id);
+    if (familiarity) {
+      familiarity.playerInteractionCount++;
+      familiarity.interestLevel = Math.min(1.0, familiarity.interestLevel + 0.2);
+    }
+
+    return `ok ill keep an eye on ${agentName} for u`;
+  }
+
+  /**
+   * Phase 5: Handle debug command - Dump agent state
+   */
+  private handleDebugCommand(world: World, angel: AdminAngelComponent, agentName: string): string {
+    const agent = this.findAgentByName(world, agentName);
+
+    if (!agent) {
+      return `cant find ${agentName}`;
+    }
+
+    // Get relevant components
+    const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+    const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
+    const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+    const position = agent.getComponent(CT.Position) as { x: number; y: number; z?: number } | undefined;
+
+    // Build debug dump
+    let dump = `debug info for ${identity?.name || agentName}:\n`;
+    dump += `- id: ${agent.id}\n`;
+
+    if (position) {
+      dump += `- pos: (${Math.round(position.x)}, ${Math.round(position.y)})\n`;
+    }
+
+    if (agentComp) {
+      dump += `- behavior: ${agentComp.behavior || 'none'}\n`;
+    }
+
+    if (needs) {
+      dump += `- hunger: ${(needs.hunger * 100).toFixed(0)}%\n`;
+      dump += `- energy: ${(needs.energy * 100).toFixed(0)}%\n`;
+    }
+
+    // Add familiarity info if exists
+    const familiarity = angel.memory.agentFamiliarity.get(agent.id);
+    if (familiarity) {
+      dump += `- interest: ${(familiarity.interestLevel * 100).toFixed(0)}%\n`;
+      dump += `- impression: "${familiarity.impression}"\n`;
+      dump += `- last seen: ${familiarity.lastSeenDoing}\n`;
+    }
+
+    return dump;
+  }
+
+  /**
+   * Phase 5: Handle status command - Village overview
+   */
+  private handleStatusCommand(world: World, angel: AdminAngelComponent): string {
+    const agents = world.query().with(CT.Agent).executeEntities();
+
+    if (agents.length === 0) {
+      return 'no agents in the village rn';
+    }
+
+    // Count agents with critical needs
+    let criticalCount = 0;
+    let healthyCount = 0;
+
+    for (const agent of agents) {
+      const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+      if (needs) {
+        if (needs.hunger < 0.2 || needs.energy < 0.2) {
+          criticalCount++;
+        } else if (needs.hunger > 0.5 && needs.energy > 0.5) {
+          healthyCount++;
+        }
+      }
+    }
+
+    let status = `village status: ${agents.length} agents\n`;
+
+    if (criticalCount > 0) {
+      status += `- ${criticalCount} struggling (low needs)\n`;
+    }
+    if (healthyCount > 0) {
+      status += `- ${healthyCount} doing well\n`;
+    }
+
+    status += `- mood: ${angel.memory.consciousness.mood}`;
+
+    return status;
+  }
+
+  /**
+   * Phase 5: Update focused agent - Called more frequently when watching someone
+   * Generates detailed observation for focused agent (every 20-40 ticks)
+   */
+  private updateFocusedAgent(ctx: SystemContext, angel: AdminAngelComponent): void {
+    const focusId = angel.memory.attention.focusedAgentId;
+    if (!focusId) return;
+
+    const agent = ctx.world.getEntity(focusId);
+    if (!agent) {
+      // Agent gone - clear focus
+      const lostName = angel.memory.attention.focusedAgentName || 'them';
+      angel.memory.attention.focusedAgentId = null;
+      angel.memory.attention.focusedAgentName = null;
+      angel.memory.attention.focusSinceTick = null;
+
+      this.addObservation(angel, {
+        tick: Number(ctx.tick),
+        timestamp: Date.now(),
+        text: `lost sight of ${lostName}...`,
+        type: 'atmosphere',
+        salience: 0.5
+      });
+      return;
+    }
+
+    // Generate detailed observation
+    const observation = this.observeAgent(ctx.world, agent, angel, { detailed: true });
+
+    // Always add focused agent observations (even if low salience)
+    this.addObservation(angel, observation);
+
+    // Update familiarity
+    this.updateFamiliarity(angel, agent, observation);
+  }
+
+  /**
+   * Perform ambient scan of the world - picks agents to observe and updates consciousness
+   * Called periodically (every 100-200 ticks)
+   */
+  private performAmbientScan(ctx: SystemContext, angel: AdminAngelComponent): void {
+    // 1. Pick 1-3 agents to observe
+    const agents = this.selectAgentsToObserve(ctx.world, angel);
+
+    for (const agent of agents) {
+      // 2. Generate observation
+      const observation = this.observeAgent(ctx.world, agent, angel);
+
+      // 3. Add to consciousness if interesting enough
+      if (observation.salience > 0.3) {
+        this.addObservation(angel, observation);
+      }
+
+      // 4. Update familiarity
+      this.updateFamiliarity(angel, agent, observation);
+    }
+
+    // 5. Update mood based on overall village state
+    this.updateMood(ctx.world, angel);
+
+    // 6. Update last thought tick
+    angel.memory.consciousness.lastThoughtTick = Number(ctx.tick);
+  }
+
+  /**
+   * Select agents to observe using weighted selection
+   * Returns 1-3 agents weighted by interest, player interaction, and notable states
+   */
+  private selectAgentsToObserve(world: World, angel: AdminAngelComponent): Entity[] {
+    const allAgents = world.query().with(CT.Agent).executeEntities();
+    if (allAgents.length === 0) return [];
+
+    // Build weighted selection
+    const weights: { agent: Entity; weight: number }[] = allAgents.map(agent => {
+      let weight = 1.0;
+
+      // Boost agents we've interacted with
+      const familiarity = angel.memory.agentFamiliarity.get(agent.id);
+      if (familiarity) {
+        weight += familiarity.interestLevel * 2;
+        weight += familiarity.playerInteractionCount * 0.5;
+      }
+
+      // Boost agents with notable states
+      const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+      if (needs) {
+        if (needs.hunger < 0.2) weight += 1.5; // Hungry
+        if (needs.energy < 0.2) weight += 1.5; // Exhausted
+      }
+
+      // Boost agents doing interesting things
+      const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
+      if (agentComp) {
+        if (agentComp.behavior === 'build') weight += 1.0;
+        if (agentComp.behavior === 'craft') weight += 0.8;
+        if (agentComp.behavior === 'talk') weight += 0.5;
+      }
+
+      // Reduce weight for recently observed
+      if (angel.memory.attention.recentlyNoticed.includes(agent.id)) {
+        weight *= 0.3;
+      }
+
+      // Add randomness
+      weight *= 0.5 + Math.random();
+
+      return { agent, weight };
+    });
+
+    // Sort and pick top 1-3
+    weights.sort((a, b) => b.weight - a.weight);
+    const count = 1 + Math.floor(Math.random() * 3);
+
+    const selected = weights.slice(0, count).map(w => w.agent);
+
+    // Update recently noticed list
+    for (const agent of selected) {
+      if (!angel.memory.attention.recentlyNoticed.includes(agent.id)) {
+        angel.memory.attention.recentlyNoticed.push(agent.id);
+      }
+    }
+
+    // Keep recentlyNoticed to max 10
+    if (angel.memory.attention.recentlyNoticed.length > 10) {
+      angel.memory.attention.recentlyNoticed = angel.memory.attention.recentlyNoticed.slice(-10);
+    }
+
+    return selected;
+  }
+
+  /**
+   * Generate an observation about an agent
+   * Returns observation with text, type, and salience
+   */
+  private observeAgent(
+    world: World,
+    agent: Entity,
+    angel: AdminAngelComponent,
+    options?: { detailed?: boolean }
+  ): AngelObservation {
+    const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+    const name = identity?.name ?? 'Unknown';
+    const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
+    const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+
+    // Determine what to say
+    let text: string;
+    let type: AngelObservation['type'];
+    let salience: number;
+
+    // Check for concerns first (highest priority)
+    if (needs) {
+      if (needs.hunger < 0.15) {
+        text = `${name} looks really hungry`;
+        type = 'concern';
+        salience = 0.9;
+      } else if (needs.energy < 0.15) {
+        text = `${name} is exhausted`;
+        type = 'concern';
+        salience = 0.8;
+      } else {
+        // No critical concern - observe current action
+        const behavior = agentComp?.behavior;
+        if (behavior) {
+          switch (behavior) {
+            case 'build':
+              text = `${name} is building something`;
+              type = 'action';
+              salience = 0.7;
+              break;
+            case 'gather':
+              text = `${name} is gathering resources`;
+              type = 'action';
+              salience = 0.4;
+              break;
+            case 'eat':
+              text = `${name} is eating`;
+              type = 'action';
+              salience = 0.3;
+              break;
+            case 'rest':
+            case 'seek_sleep':
+            case 'forced_sleep':
+              text = `${name} is resting`;
+              type = 'state';
+              salience = 0.3;
+              break;
+            case 'wander':
+              text = `${name} is wandering around`;
+              type = 'action';
+              salience = 0.2;
+              break;
+            default:
+              text = `${name} is ${behavior}`;
+              type = 'action';
+              salience = 0.3;
+          }
+        } else {
+          text = `${name} seems idle`;
+          type = 'state';
+          salience = 0.2;
+        }
+      }
+    } else {
+      // No needs component - just observe behavior
+      const behavior = agentComp?.behavior;
+      if (behavior) {
+        text = `${name} is ${behavior}`;
+        type = 'action';
+        salience = 0.3;
+      } else {
+        text = `${name} seems idle`;
+        type = 'state';
+        salience = 0.2;
+      }
+    }
+
+    // Add detail if focused
+    if (options?.detailed && needs) {
+      const hungerPct = Math.round(needs.hunger * 100);
+      const energyPct = Math.round(needs.energy * 100);
+      text += ` (hunger: ${hungerPct}%, energy: ${energyPct}%)`;
+    }
+
+    return {
+      tick: Number(world.tick),
+      timestamp: Date.now(),
+      text,
+      agentId: agent.id,
+      agentName: name,
+      type,
+      salience
+    };
+  }
+
+  /**
+   * Add observation to consciousness buffer
+   * Prunes old observations if over max
+   */
+  private addObservation(angel: AdminAngelComponent, observation: AngelObservation): void {
+    angel.memory.consciousness.observations.push(observation);
+
+    // Prune if over max - keep high salience observations
+    const maxObs = angel.memory.consciousness.maxObservations;
+    if (angel.memory.consciousness.observations.length > maxObs) {
+      // Sort by salience descending
+      angel.memory.consciousness.observations.sort((a, b) => b.salience - a.salience);
+      // Keep top maxObs
+      angel.memory.consciousness.observations = angel.memory.consciousness.observations.slice(0, maxObs);
+      // Re-sort by tick to maintain chronological order
+      angel.memory.consciousness.observations.sort((a, b) => a.tick - b.tick);
+    }
+  }
+
+  /**
+   * Update familiarity tracking for an agent
+   * Creates new entry if needed, updates existing
+   */
+  private updateFamiliarity(
+    angel: AdminAngelComponent,
+    agent: Entity,
+    observation: AngelObservation
+  ): void {
+    const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+    const name = identity?.name ?? 'Unknown';
+
+    let familiarity = angel.memory.agentFamiliarity.get(agent.id);
+
+    if (!familiarity) {
+      // Create new familiarity entry
+      familiarity = {
+        agentId: agent.id,
+        name,
+        firstNoticedTick: observation.tick,
+        playerInteractionCount: 0,
+        lastSeenDoing: observation.text,
+        lastSeenTick: observation.tick,
+        impression: 'newly noticed',
+        interestLevel: 0.5,
+        memories: []
+      };
+      angel.memory.agentFamiliarity.set(agent.id, familiarity);
+    } else {
+      // Update existing familiarity
+      familiarity.lastSeenDoing = observation.text;
+      familiarity.lastSeenTick = observation.tick;
+
+      // Boost interest level based on salience
+      familiarity.interestLevel = Math.min(1.0, familiarity.interestLevel + observation.salience * 0.1);
+    }
+  }
+
+  /**
+   * Update mood based on village state
+   * Checks for critical needs, deaths, achievements
+   */
+  private updateMood(world: World, angel: AdminAngelComponent): void {
+    const agents = world.query().with(CT.Agent).executeEntities();
+
+    // Count agents with critical needs
+    let criticalCount = 0;
+    for (const agent of agents) {
+      const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+      if (needs) {
+        if (needs.hunger < 0.15 || needs.energy < 0.15) {
+          criticalCount++;
+        }
+      }
+    }
+
+    // Determine mood
+    let newMood: AngelMood = 'content';
+
+    if (criticalCount > 0) {
+      if (criticalCount >= agents.length * 0.5) {
+        newMood = 'worried'; // Half the village in trouble
+      } else {
+        newMood = 'protective'; // Some agents need help
+      }
+    } else if (agents.length === 0) {
+      newMood = 'pensive'; // No agents to watch
+    } else {
+      // Check for interesting activity
+      let buildingCount = 0;
+      for (const agent of agents) {
+        const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
+        if (agentComp?.behavior === 'build') buildingCount++;
+      }
+
+      if (buildingCount > 0) {
+        newMood = 'curious'; // Something interesting happening
+      }
+    }
+
+    angel.memory.consciousness.mood = newMood;
+  }
+
   protected onUpdate(ctx: SystemContext): void {
     const angelEntity = this.getOrCreateAngel(ctx.world);
     if (!angelEntity) return;
 
     const angel = angelEntity.getComponent(CT.AdminAngel) as AdminAngelComponent | undefined;
     if (!angel || !angel.active) return;
+
+    // Phase 2: Ambient scanning (every 100-200 ticks, ~5-10 seconds)
+    const ticksSinceLastThought = Number(ctx.tick) - angel.memory.consciousness.lastThoughtTick;
+    const scanInterval = 100 + Math.floor(Math.random() * 100); // Random 100-200 ticks
+    if (ticksSinceLastThought >= scanInterval) {
+      this.performAmbientScan(ctx, angel);
+    }
+
+    // Phase 5: Focused agent updates (every 20-40 ticks, ~1-2 seconds when watching)
+    if (angel.memory.attention.focusedAgentId) {
+      const focusInterval = 20 + Math.floor(Math.random() * 20); // Random 20-40 ticks
+      if (angel.memory.attention.focusCooldown <= 0) {
+        this.updateFocusedAgent(ctx, angel);
+        angel.memory.attention.focusCooldown = focusInterval;
+      } else {
+        angel.memory.attention.focusCooldown--;
+      }
+    }
 
     // Check for pending player messages
     if (angel.pendingPlayerMessages.length > 0 && !angel.awaitingResponse) {
@@ -934,8 +1639,8 @@ export class AdminAngelSystem extends BaseSystem {
     // Auto-spawn the admin angel if none exists
     const existingAngels = world.query().with(CT.AdminAngel).executeEntities();
     if (existingAngels.length === 0) {
-      // Generate a random 2-syllable name from universal phonemes
-      const angelName = generateRandomName(2);
+      // Get stable name from localStorage (persists across reloads)
+      const angelName = getStableAngelName();
       const angelId = spawnAdminAngel(world, angelName);
       this.angelEntityId = angelId;
       console.log(`[AdminAngelSystem] Spawned admin angel '${angelName}' (${angelId})`);
@@ -954,7 +1659,7 @@ export class AdminAngelSystem extends BaseSystem {
       // Ignore our own messages
       if (data.senderId === this.angelEntityId) return;
 
-      this.handlePlayerMessage(angel, data.content);
+      this.handlePlayerMessage(angel, data.content, world);
     });
 
     // Listen for LLM responses
@@ -1380,20 +2085,9 @@ export function spawnAdminAngel(
     source: entity.id,
   });
 
-  // Send greeting
-  setTimeout(() => {
-    world.eventBus.emit({
-      type: 'chat:send_message',
-      data: {
-        roomId: 'divine_chat',
-        senderId: entity.id,
-        senderName: name,
-        message: 'hey',
-        type: 'message',
-      },
-      source: entity.id,
-    });
-
+  // Send greeting only if this is a new player (no chat history exists)
+  const isReturningPlayer = hasPlayerBeenGreeted();
+  if (!isReturningPlayer) {
     setTimeout(() => {
       world.eventBus.emit({
         type: 'chat:send_message',
@@ -1401,15 +2095,27 @@ export function spawnAdminAngel(
           roomId: 'divine_chat',
           senderId: entity.id,
           senderName: name,
-          message: existingMemory
-            ? 'welcome back lol'
-            : 'welcome to the game. its kinda complicated but ill help u figure it out',
+          message: 'hey',
           type: 'message',
         },
         source: entity.id,
       });
-    }, 1000);
-  }, 500);
+
+      setTimeout(() => {
+        world.eventBus.emit({
+          type: 'chat:send_message',
+          data: {
+            roomId: 'divine_chat',
+            senderId: entity.id,
+            senderName: name,
+            message: 'welcome to the game. its kinda complicated but ill help u figure it out',
+            type: 'message',
+          },
+          source: entity.id,
+        });
+      }, 1000);
+    }, 500);
+  }
 
   return entity.id;
 }

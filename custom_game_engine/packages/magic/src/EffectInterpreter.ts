@@ -12,7 +12,7 @@ import type {
   BinaryOp,
 } from './EffectExpression.js';
 import { ExpressionEvaluator } from './ExpressionEvaluator.js';
-import type { Entity, World, NeedsComponent, PositionComponent } from '@ai-village/core';
+import type { Entity, World, WorldMutator, NeedsComponent, PositionComponent, Component } from '@ai-village/core';
 
 export interface EffectContext {
   caster: Entity;
@@ -381,7 +381,8 @@ export class EffectInterpreter {
       expiresAt: duration > 0 ? context.tick + duration : undefined,
     };
 
-    context.world.addComponent(context.target.id, { ...modifier, version: 1 });
+    const modifierComp = { ...modifier, version: 1 };
+    (context.world as WorldMutator).addComponent(context.target.id, modifierComp as unknown as Component);
     this.modifications.push(modifier);
   }
 
@@ -401,7 +402,8 @@ export class EffectInterpreter {
       value,
     };
 
-    context.world.addComponent(context.target.id, { ...modifier, version: 1 });
+    const modifierComp = { ...modifier, version: 1 };
+    (context.world as WorldMutator).addComponent(context.target.id, modifierComp as unknown as Component);
   }
 
   // ============================================================================
@@ -424,7 +426,8 @@ export class EffectInterpreter {
       expiresAt: context.tick + duration,
     };
 
-    context.world.addComponent(context.target.id, { ...statusEffect, version: 1 });
+    const statusComp = { ...statusEffect, version: 1 };
+    (context.world as WorldMutator).addComponent(context.target.id, statusComp as unknown as Component);
     this.statusesApplied.push(statusEffect);
   }
 
@@ -591,7 +594,7 @@ export class EffectInterpreter {
       version: 1,
     };
 
-    context.world.addComponent(context.target.id, transformation);
+    (context.world as WorldMutator).addComponent(context.target.id, transformation as unknown as Component);
   }
 
   private executeTransformMaterial(operation: TransformMaterialOp, context: EffectContext): void {
@@ -603,7 +606,7 @@ export class EffectInterpreter {
       version: 1,
     };
 
-    context.world.addComponent(context.target.id, transformation);
+    (context.world as WorldMutator).addComponent(context.target.id, transformation as unknown as Component);
   }
 
   // ============================================================================

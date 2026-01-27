@@ -17,6 +17,7 @@
  */
 
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type {
   GovernanceHistoryComponent,
@@ -247,7 +248,7 @@ function executeVoteOutcome(
     .executeEntities()
     .find((e) => {
       const n = e.getComponent('nation');
-      return n && (n as any).nationName === context.nation.name;
+      return n && 'nationName' in n && n.nationName === context.nation.name;
     });
 
   if (!nationEntity) {
@@ -295,8 +296,13 @@ function executeVoteTaxPolicy(
     },
   }));
 
-  const nation = nationEntity.getComponent('nation') as any;
-  const oldRate = nation.economy.taxPolicy === 'low' ? 0.1 : nation.economy.taxPolicy === 'moderate' ? 0.2 : 0.3;
+  const nation = nationEntity.getComponent('nation');
+  if (!nation || !('economy' in nation)) {
+    console.warn('[DecisionProtocols] Nation component missing economy data');
+    return;
+  }
+  const economy = (nation as {economy: {taxPolicy: 'low' | 'moderate' | 'high'}}).economy;
+  const oldRate = economy.taxPolicy === 'low' ? 0.1 : economy.taxPolicy === 'moderate' ? 0.2 : 0.3;
   const newRate = taxLevel === 'low' ? 0.1 : taxLevel === 'moderate' ? 0.2 : 0.3;
 
   world.eventBus.emit({
@@ -388,7 +394,7 @@ function executeVoteLaw(
     scope: proposal.context?.scope as 'military' | 'economic' | 'social' | 'foreign_policy' ?? 'economic',
     enactedTick: world.tick,
     enactedBy: proposal.proposedBy,
-    effects: proposal.context?.effects as any[] ?? [],
+    effects: (Array.isArray(proposal.context?.effects) ? proposal.context.effects : []) as unknown[],
   };
 
   nationEntity.updateComponent('nation', (current: any) => ({
@@ -1115,7 +1121,7 @@ function getOrCreateGovernanceHistory(world: World): GovernanceHistoryComponent 
     tickIndex: new Map(),
   };
 
-  const historyEntity = world.createEntity() as any;  // EntityImpl has addComponent
+  const historyEntity = world.createEntity() as EntityImpl;  // EntityImpl has addComponent
   historyEntity.addComponent(historyComponent);
 
   // Get the component back from the entity to ensure we have the correct reference

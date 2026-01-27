@@ -3,7 +3,7 @@
  */
 
 import { BaseComponentSerializer } from '../ComponentSerializerRegistry.js';
-import type { ManaPoolsComponent } from '@ai-village/core';
+import type { ManaPoolsComponent, ManaPool, ResourcePool } from '@ai-village/core';
 import { createManaPoolsComponent } from '@ai-village/core';
 
 export class ManaPoolsSerializer extends BaseComponentSerializer<ManaPoolsComponent> {
@@ -22,9 +22,9 @@ export class ManaPoolsSerializer extends BaseComponentSerializer<ManaPoolsCompon
   protected deserializeData(data: unknown): ManaPoolsComponent {
     const d = data as Record<string, unknown>;
     const comp = createManaPoolsComponent();
-    comp.manaPools = d.manaPools as any[] || [];
-    comp.resourcePools = d.resourcePools as any || {};
-    comp.primarySource = d.primarySource as any;
+    comp.manaPools = (d.manaPools as ManaPool[]) || [];
+    comp.resourcePools = (d.resourcePools as Partial<Record<string, ResourcePool>>) || {};
+    comp.primarySource = d.primarySource as ManaPoolsComponent['primarySource'];
     return comp;
   }
 

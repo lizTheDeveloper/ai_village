@@ -223,16 +223,16 @@ export class WildPlantPopulationSystem extends BaseSystem {
     world.simulationScheduler.updateAgentPositions(world);
 
     // Update plant counts per chunk (only for visible chunks)
-    this.updateChunkCounts(world as any);
+    this.updateChunkCounts(world);
 
     // Age seed bank entries
     this.ageSeedBank();
 
     // Try to germinate seeds from bank
-    this.germinateSeedBank(world as any);
+    this.germinateSeedBank(world);
 
     // Natural spawning in low-density areas
-    this.checkNaturalSpawning(world as any);
+    this.checkNaturalSpawning(world);
   }
 
   /**

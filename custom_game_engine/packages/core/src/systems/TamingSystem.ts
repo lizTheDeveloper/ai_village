@@ -1,7 +1,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
@@ -239,7 +239,7 @@ export class TamingSystem extends BaseSystem {
    * Set world reference (for compatibility with behaviors that create instances)
    * @deprecated Use initialize() instead
    */
-  public setWorld(world: World): void {
+  public setWorld(world: WorldMutator): void {
     // Call initialize for backwards compatibility
     this.initialize(world, world.eventBus).catch(err => {
       console.error('TamingSystem initialization failed:', err);

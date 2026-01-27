@@ -8,7 +8,7 @@
  * - Coordinate passage connections between universes
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
 import { timelineManager } from './TimelineManager.js';
 
@@ -40,7 +40,7 @@ export interface UniverseConfig {
 
 export interface UniverseInstance {
   config: UniverseConfig;
-  world: World;
+  world: WorldMutator;
 
   /** Current universe-relative tick count */
   universeTick: bigint;
@@ -82,7 +82,7 @@ export class MultiverseCoordinator {
   /**
    * Register a new universe.
    */
-  registerUniverse(world: World, config: UniverseConfig): void {
+  registerUniverse(world: WorldMutator, config: UniverseConfig): void {
     if (this.universes.has(config.id)) {
       throw new Error(`Universe ${config.id} is already registered`);
     }

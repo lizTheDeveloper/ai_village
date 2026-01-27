@@ -814,8 +814,8 @@ export function startMegastructureProject(
   });
 
   // Create construction project entity
-  const projectEntity = world.createEntity();
-  (projectEntity as any).addComponent({
+  const projectEntity = world.createEntity() as EntityImpl;
+  const component: ConstructionProjectComponent = {
     type: 'construction_project',
     version: 1,
     projectId,
@@ -852,7 +852,8 @@ export function startMegastructureProject(
       delayTicks: 0,
       vulnerableTo: blueprint.vulnerableTo,
     },
-  });
+  };
+  projectEntity.addComponent(component);
 
   // Emit project started event
   world.eventBus.emit({

@@ -30,9 +30,9 @@ export class InjurySerializer extends BaseComponentSerializer<InjuryComponent> {
   protected deserializeData(data: unknown): InjuryComponent {
     const d = data as Record<string, unknown>;
     return createInjuryComponent({
-      injuryType: d.injuryType as any,
-      severity: d.severity as any,
-      location: d.location as any,
+      injuryType: d.injuryType as InjuryComponent['injuryType'],
+      severity: d.severity as InjuryComponent['severity'],
+      location: d.location as InjuryComponent['location'],
       skillPenalties: d.skillPenalties as Record<string, number> | undefined,
       movementPenalty: d.movementPenalty as number | undefined,
       healingTime: d.healingTime as number | undefined,
@@ -40,7 +40,11 @@ export class InjurySerializer extends BaseComponentSerializer<InjuryComponent> {
       requiresTreatment: d.requiresTreatment as boolean | undefined,
       treated: d.treated as boolean | undefined,
       untreatedDuration: d.untreatedDuration as number | undefined,
-      injuries: d.injuries as any,
+      injuries: d.injuries as Array<{
+        injuryType: InjuryComponent['injuryType'];
+        severity: InjuryComponent['severity'];
+        location: InjuryComponent['location'];
+      }> | undefined,
     });
   }
 

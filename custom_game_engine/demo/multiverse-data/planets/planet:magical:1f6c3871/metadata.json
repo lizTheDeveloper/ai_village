@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:1f6c3871",
+  "name": "Theia Secundus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769480181270",
+  "createdAt": 1769480181438,
+  "lastAccessedAt": 1769480181438,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769480181270",
+    "type": "magical"
+  }
+}

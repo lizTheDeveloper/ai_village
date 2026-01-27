@@ -37,12 +37,11 @@ interface QueuedAction {
 /** Type guard to check if component is an ActionQueue with methods */
 function isActionQueue(component: Component | undefined): component is ActionQueueWithMethods {
   if (!component) return false;
-  const comp = component as Record<string, unknown>;
   return (
-    typeof comp.isEmpty === 'function' &&
-    typeof comp.size === 'function' &&
-    typeof comp.peek === 'function' &&
-    Array.isArray(comp.queue)
+    'isEmpty' in component && typeof component.isEmpty === 'function' &&
+    'size' in component && typeof component.size === 'function' &&
+    'peek' in component && typeof component.peek === 'function' &&
+    'queue' in component && Array.isArray(component.queue)
   );
 }
 import {
@@ -149,7 +148,9 @@ export class InfoSection {
         const entity = world.getEntity(this.currentEntityId);
         if (!entity) return false;
         const needs = entity.components.get('needs') as Record<string, number> | undefined;
-        const currentValue = needs?.[region.needType] ?? 0.5;
+        if (!needs || !(region.needType in needs)) return false;
+        const currentValue = needs[region.needType];
+        if (typeof currentValue !== 'number') return false;
         const result = devActionsService.setNeed(
           this.currentEntityId,
           region.needType,
@@ -164,7 +165,9 @@ export class InfoSection {
         const entity = world.getEntity(this.currentEntityId);
         if (!entity) return false;
         const needs = entity.components.get('needs') as Record<string, number> | undefined;
-        const currentValue = needs?.[region.needType] ?? 0.5;
+        if (!needs || !(region.needType in needs)) return false;
+        const currentValue = needs[region.needType];
+        if (typeof currentValue !== 'number') return false;
         const result = devActionsService.setNeed(
           this.currentEntityId,
           region.needType,

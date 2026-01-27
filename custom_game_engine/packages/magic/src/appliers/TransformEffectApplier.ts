@@ -8,7 +8,7 @@
  */
 
 import type { Entity, Component } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type {
   TransformEffect,
   EffectApplicationResult,
@@ -46,8 +46,9 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
 
     let appearance = target.components.get('appearance') as AppearanceComponent | undefined;
     if (!appearance) {
-      appearance = { type: 'appearance', form: 'default', size: 1.0, material: 'flesh' };
-      world.addComponent(target.id, appearance as unknown as Component);
+      const newAppearance = { type: 'appearance' as const, version: 1, form: 'default', size: 1.0, material: 'flesh' };
+      (world as WorldMutator).addComponent(target.id, newAppearance as unknown as Component);
+      appearance = newAppearance as AppearanceComponent;
     }
 
     // Store original form for restoration
@@ -62,7 +63,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
         // Support both 'targetState' and 'newForm' properties
         const effectWithExtras = effect as TransformEffect & { newForm?: string };
         const newForm = effect.targetState || effectWithExtras.newForm;
-        if (newForm) {
+        if (newForm && appearance) {
           appearance.form = newForm;
           appliedValues.newForm = newForm;
           const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
@@ -73,22 +74,26 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
 
       case 'size': {
         // Enlarge/Reduce
-        const originalSize = appearance.size || 1.0;
-        const sizeMultiplier = parseFloat(effect.targetState) || 1.0;
-        appearance.size = originalSize * sizeMultiplier;
+        if (appearance) {
+          const originalSize = appearance.size || 1.0;
+          const sizeMultiplier = parseFloat(effect.targetState) || 1.0;
+          appearance.size = originalSize * sizeMultiplier;
 
-        appliedValues.sizeMultiplier = sizeMultiplier;
-        appliedValues.newSize = appearance.size;
+          appliedValues.sizeMultiplier = sizeMultiplier;
+          appliedValues.newSize = appearance.size;
+        }
         break;
       }
 
       case 'material': {
         // Petrify, Gaseous Form, etc.
-        appearance.material = effect.targetState;
+        if (appearance) {
+          appearance.material = effect.targetState;
 
-        appliedValues.newMaterial = effect.targetState;
-        const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
-        appliedValues.oldMaterial = originalForm?.material || 'flesh';
+          appliedValues.newMaterial = effect.targetState;
+          const originalForm = this.originalForms.get(target.id) as AppearanceComponent | undefined;
+          appliedValues.oldMaterial = originalForm?.material || 'flesh';
+        }
         break;
       }
 

@@ -8,6 +8,8 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { Component } from '../ecs/Component.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
@@ -252,9 +254,9 @@ export class BuildingSummoningSystem extends BaseSystem {
    * Add component to entity safely.
    * Uses EntityImpl.addComponent directly for proper type handling.
    */
-  private addComponentSafely(entity: Entity, component: any): void {
-    // Cast to any to access internal addComponent method
-    // This is safe because world.createEntity() returns EntityImpl
-    (entity as any).addComponent(component);
+  private addComponentSafely(entity: Entity, component: Component | Record<string, unknown>): void {
+    // world.createEntity() returns EntityImpl which has addComponent
+    const entityImpl = entity as EntityImpl;
+    entityImpl.addComponent(component as Component);
   }
 }

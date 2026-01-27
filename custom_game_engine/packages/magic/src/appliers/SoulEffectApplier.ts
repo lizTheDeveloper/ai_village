@@ -13,8 +13,9 @@
  * - Paradigm restrictions (some paradigms may prohibit soul magic)
  */
 
-import type { Entity } from '@ai-village/core';
+import type { Entity, Component } from '@ai-village/core';
 import type { World } from '@ai-village/core';
+import { EntityImpl } from '@ai-village/core';
 import type {
   SoulEffect,
   EffectApplicationResult,
@@ -413,10 +414,22 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Add or enhance perception_effects component on caster
-    let perceptionEffects = caster.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
+    const perceptionEffects = caster.components.get('perception_effects') as PerceptionEffectsComponent | undefined;
     if (!perceptionEffects) {
-      perceptionEffects = { type: 'perception_effects' };
-      caster.addComponent({ type: 'perception_effects' } as Component);
+      // Component doesn't exist - would need world to add it
+      // Skip for now, component should be added elsewhere
+      appliedValues.detectionRange = effect.range ?? 50;
+      return {
+        success: false,
+        effectId: effect.id,
+        targetId: target.id,
+        appliedValues,
+        resisted: false,
+        error: 'Caster lacks perception_effects component',
+        appliedAt: context.tick,
+        casterId: caster.id,
+        spellId: context.spell.id,
+      };
     }
 
     // Enable soul detection

@@ -72,7 +72,7 @@ export function getPersonalityVariation(
   seed?: number
 ): { openness?: string; extraversion?: string; agreeableness?: string; workEthic?: string; leadership?: string; creativity?: string; neuroticism?: string } {
   const variations: Record<string, string[]> = {};
-  const data = personalityVariationsData as any;
+  const data = personalityVariationsData as PersonalityVariationsData;
 
   // OPENNESS VARIATIONS (curious vs traditional)
   if (personality.openness > 0.85) {

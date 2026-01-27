@@ -75,6 +75,30 @@ export interface GameAction {
 }
 
 /**
+ * Save file metadata for listing
+ */
+export interface SaveMetadata {
+  key: string;
+  name: string;
+  description?: string;
+  timestamp: number;
+  tick: number;
+  universeId: string;
+  playTime?: number;
+}
+
+/**
+ * Loading progress update
+ */
+export interface LoadingProgress {
+  phase: 'connecting' | 'reading' | 'deserializing' | 'initializing' | 'ready';
+  progress: number; // 0-100
+  message: string;
+  entityCount?: number;
+  loadedEntities?: number;
+}
+
+/**
  * Messages sent from worker to window
  */
 export type WorkerToWindowMessage =
@@ -102,6 +126,27 @@ export type WorkerToWindowMessage =
       type: 'error';
       error: string;
       details?: any;
+    }
+  | {
+      type: 'saves-list';
+      saves: SaveMetadata[];
+    }
+  | {
+      type: 'loading-progress';
+      progress: LoadingProgress;
+    }
+  | {
+      type: 'load-complete';
+      success: boolean;
+      error?: string;
+      universeId?: string;
+      tick?: number;
+    }
+  | {
+      type: 'worker-ready';
+      hasExistingSave: boolean;
+      currentUniverseId?: string;
+      currentTick?: number;
     };
 
 /**
@@ -132,6 +177,24 @@ export type WindowToWorkerMessage =
   | {
       type: 'set-viewport';
       viewport: Viewport;
+    }
+  | {
+      type: 'list-saves';
+    }
+  | {
+      type: 'load-save';
+      saveKey: string;
+    }
+  | {
+      type: 'create-new-universe';
+      config: {
+        name?: string;
+        magicParadigm?: string;
+        scenario?: string;
+      };
+    }
+  | {
+      type: 'get-status';
     };
 
 /**

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:1a3af20a",
+  "name": "Eta-666",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769320093609",
+  "createdAt": 1769320093614,
+  "lastAccessedAt": 1769320093614,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769320093609",
+    "type": "magical"
+  }
+}

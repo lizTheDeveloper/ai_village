@@ -8,7 +8,7 @@
  * - Message routing by type
  */
 
-type EventHandler = (...args: any[]) => void;
+type EventHandler = (...args: unknown[]) => void;
 
 interface WebSocketOptions {
   autoReconnect?: boolean;
@@ -150,7 +150,7 @@ export class MetricsWebSocketClient {
   /**
    * Emit an event to all registered handlers
    */
-  private emit(event: string, ...args: any[]): void {
+  private emit(event: string, ...args: unknown[]): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach(handler => {
@@ -166,7 +166,7 @@ export class MetricsWebSocketClient {
   /**
    * Send a message through the WebSocket
    */
-  send(data: any): void {
+  send(data: string | Record<string, unknown>): void {
     if (!this.ws || this.ws.readyState !== 1) { // WebSocket.OPEN === 1
       throw new Error('WebSocket is not connected');
     }
@@ -184,14 +184,13 @@ export class MetricsWebSocketClient {
     }
     // WebSocket.OPEN === 1, but handle test mocks where readyState might be undefined
     // In real browsers: readyState is 0-3, OPEN is 1
-    // In test mocks: readyState might be set to WebSocket.OPEN (which could be undefined)
-    // So check instance OPEN constant if readyState is undefined
+    // WebSocket instances have OPEN constant at the class level, not instance level
+    // In production, readyState should always be defined
     if (this.ws.readyState === undefined) {
-      // Check if instance has OPEN constant (test mock pattern)
-      const instanceOpen = (this.ws as any).OPEN;
-      return instanceOpen !== undefined && instanceOpen === 1;
+      // Fallback for test mocks - check static WebSocket.OPEN
+      return WebSocket.OPEN === 1;
     }
-    return this.ws.readyState === 1;
+    return this.ws.readyState === WebSocket.OPEN;
   }
 
   /**

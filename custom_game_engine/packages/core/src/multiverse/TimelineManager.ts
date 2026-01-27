@@ -13,7 +13,7 @@
  * - Configurable retention policy (max snapshots, max age)
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
 import type { UniverseSnapshot } from '../persistence/types.js';
@@ -120,7 +120,7 @@ export class TimelineManager {
    * Attach to a world's event bus to listen for canon events.
    * This enables automatic snapshots on births, deaths, marriages, etc.
    */
-  attachToWorld(universeId: string, world: World): void {
+  attachToWorld(universeId: string, world: WorldMutator): void {
     if (this.attachedWorlds.has(universeId)) {
       return;
     }
@@ -217,7 +217,7 @@ export class TimelineManager {
    * Update the timeline for a universe (called each tick).
    * Creates automatic snapshots based on variable intervals that increase over time.
    */
-  async tick(universeId: string, world: World, currentTick: bigint): Promise<void> {
+  async tick(universeId: string, world: WorldMutator, currentTick: bigint): Promise<void> {
     if (!this.config.autoSnapshot) {
       return;
     }
@@ -244,7 +244,7 @@ export class TimelineManager {
    */
   async onCanonEvent(
     universeId: string,
-    world: World,
+    world: WorldMutator,
     currentTick: bigint,
     eventType: CanonEventType,
     eventDescription: string
@@ -283,7 +283,7 @@ export class TimelineManager {
    */
   async createSnapshot(
     universeId: string,
-    world: World,
+    world: WorldMutator,
     tick: bigint,
     isAutoSave: boolean = false,
     label?: string,

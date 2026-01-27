@@ -144,6 +144,9 @@ export class DivineChatPanel implements IWindowPanel {
   private nameInputBounds: { x: number; y: number; width: number; height: number } | null = null;
   private readonly PLAYER_NAME_KEY = 'divine-chat-player-name';
 
+  // Auto-scroll tracking
+  private lastMessageCount = 0;
+
   /**
    * Refresh chat state from the World
    * PERFORMANCE: Uses ECS query to get divine chat room
@@ -215,7 +218,8 @@ export class DivineChatPanel implements IWindowPanel {
     // Handle human player ID
     if (deityId === this.playerId) {
       const playerName = this.getPlayerName();
-      return playerName || 'Player';
+      // Don't show fallback - name input is shown until player enters name
+      return playerName || '(enter name above)';
     }
 
     // Handle deity entities
@@ -451,6 +455,16 @@ export class DivineChatPanel implements IWindowPanel {
 
     // Calculate total content height
     this.contentHeight = items.length * (SIZES.messageHeight + 4);
+    this.visibleHeight = messageAreaHeight;
+
+    // Auto-scroll to bottom when new messages arrive
+    const currentMessageCount = items.length;
+    if (currentMessageCount > this.lastMessageCount) {
+      // New message(s) arrived - scroll to bottom
+      const maxScroll = Math.max(0, this.contentHeight - messageAreaHeight);
+      this.scrollOffset = maxScroll;
+    }
+    this.lastMessageCount = currentMessageCount;
 
     // Render scrollable messages
     ctx.save();
@@ -863,13 +877,21 @@ export class DivineChatPanel implements IWindowPanel {
   private sendMessage(): void {
     if (!this.world || !this.inputText.trim()) return;
 
+    // Require player name before sending messages
+    if (!this.hasPlayerName()) {
+      console.warn('[DivineChatPanel] Cannot send message without entering name first');
+      return;
+    }
+
     // Emit event for ChatRoomSystem to handle
+    // Include player name so it's persisted in the message
     this.world.eventBus.emit({
       type: 'chat:send_message',
       source: 'divine_chat_panel',
       data: {
         roomId: 'divine_chat',
         senderId: this.playerId,
+        senderName: this.getPlayerName(), // Guaranteed to exist now
         message: this.inputText.trim(),
       },
     });

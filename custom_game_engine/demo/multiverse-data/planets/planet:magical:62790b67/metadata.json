@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:62790b67",
+  "name": "Rhea",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769319943299",
+  "createdAt": 1769319943304,
+  "lastAccessedAt": 1769319943304,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769319943299",
+    "type": "magical"
+  }
+}

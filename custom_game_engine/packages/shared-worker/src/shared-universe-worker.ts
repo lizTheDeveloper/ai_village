@@ -4,13 +4,16 @@
  * Runs ONCE, shared by all tabs/windows on same origin.
  * Owns the simulation loop and IndexedDB.
  *
+ * KEY CHANGE: Now uses the SAME persistence layer as main thread (IndexedDBStorage)
+ * so that saves created by main.ts can be loaded by the worker and vice versa.
+ *
  * Based on: openspec/specs/ringworld-abstraction/RENORMALIZATION_LAYER.md
  */
 
 /// <reference lib="webworker" />
 
-import { GameLoop } from '@ai-village/core';
-import { PersistenceService } from './persistence.js';
+import { GameLoop, worldSerializer, type WorldMutator } from '@ai-village/core';
+import { IndexedDBStorage, type SaveMetadata as PersistenceSaveMetadata, type SaveFile } from '@ai-village/persistence';
 import { setupGameSystems, type GameSetupResult } from './game-setup.js';
 import { PathPredictionSystem } from './PathPredictionSystem.js';
 import { DeltaSyncSystem } from './DeltaSyncSystem.js';
@@ -23,15 +26,23 @@ import type {
   WindowToWorkerMessage,
   SerializedWorld,
   Viewport,
+  SaveMetadata,
+  LoadingProgress,
 } from './types.js';
 import type { DeltaUpdate } from './path-prediction-types.js';
 
 /**
  * UniverseWorker - The heart of the SharedWorker architecture
+ *
+ * KEY ARCHITECTURE:
+ * - Worker starts but does NOT run simulation until a save is loaded or new universe created
+ * - Uses the SAME IndexedDB storage as the main thread (database: 'ai_village')
+ * - Main thread asks worker to list/load saves instead of loading itself
+ * - Worker handles deserialization in background, streaming progress to main thread
  */
 class UniverseWorker {
   private gameLoop: GameLoop;
-  private persistence: PersistenceService;
+  private storage: IndexedDBStorage;
   private connections: Map<string, ConnectionInfo> = new Map();
   private gameSetup: GameSetupResult | null = null;
 
@@ -42,6 +53,8 @@ class UniverseWorker {
   private tick = 0;
   private running = false;
   private paused = false;
+  private initialized = false;
+  private currentSaveKey: string | null = null;
 
   private config: WorkerConfig = {
     targetTPS: 20,
@@ -53,13 +66,22 @@ class UniverseWorker {
 
   constructor() {
     this.gameLoop = new GameLoop();
-    this.persistence = new PersistenceService();
+    // Use the SAME storage as main thread - database 'ai_village'
+    this.storage = new IndexedDBStorage('ai_village');
   }
 
   /**
-   * Initialize the worker and start simulation
+   * Initialize the worker systems (but don't start simulation yet)
+   *
+   * The worker initializes systems but waits for:
+   * - 'load-save' message to load an existing save
+   * - 'create-new-universe' message to start fresh
+   *
+   * This allows the main thread to show a universe browser first.
    */
   async init(): Promise<void> {
+    console.log('[UniverseWorker] Initializing systems...');
+
     // Set up all game systems using shared setup logic
     // This matches the initialization in demo/headless.ts
     this.gameSetup = await setupGameSystems(this.gameLoop, {
@@ -83,19 +105,183 @@ class UniverseWorker {
       this.gameLoop.systemRegistry.register(this.deltaSyncSystem);
     }
 
-    // Try to load saved state
-    const savedState = await this.persistence.loadState();
+    this.initialized = true;
+    console.log('[UniverseWorker] Systems initialized, waiting for load-save or create-new-universe command');
 
-    if (savedState) {
-      this.loadState(savedState);
-      this.tick = savedState.tick;
-    } else {
-      this.tick = 0;
+    // NOTE: We do NOT start the simulation loop here
+    // The main thread will tell us to load a save or create a new universe
+  }
+
+  /**
+   * List all available saves from IndexedDB
+   */
+  async listSaves(): Promise<SaveMetadata[]> {
+    const saves = await this.storage.list();
+
+    // Convert PersistenceSaveMetadata to our SaveMetadata format
+    return saves.map((save): SaveMetadata => ({
+      key: save.key,
+      name: save.name,
+      timestamp: save.lastSavedAt,
+      tick: 0, // Will be populated from save file if needed
+      universeId: '', // Will be populated from save file if needed
+      playTime: save.playTime,
+    }));
+  }
+
+  /**
+   * Load a specific save by key
+   * Sends progress updates to all connected windows
+   */
+  async loadSave(saveKey: string, requestingPort?: MessagePort): Promise<boolean> {
+    console.log(`[UniverseWorker] Loading save: ${saveKey}`);
+
+    try {
+      // Phase 1: Reading from storage
+      this.broadcastLoadingProgress({
+        phase: 'reading',
+        progress: 10,
+        message: 'Reading save file...',
+      });
+
+      const saveFile = await this.storage.load(saveKey);
+
+      if (!saveFile) {
+        this.broadcastLoadComplete(false, 'Save file not found');
+        return false;
+      }
+
+      // Phase 2: Deserializing
+      this.broadcastLoadingProgress({
+        phase: 'deserializing',
+        progress: 30,
+        message: 'Deserializing world state...',
+        entityCount: Object.keys(saveFile.universes?.[0]?.world?.entities || {}).length,
+      });
+
+      // Pause simulation during load
+      const wasRunning = this.running;
+      this.running = false;
+      this.paused = true;
+
+      // Clear current world
+      const world = this.gameLoop.world as WorldMutator;
+      for (const entity of Array.from(world.entities.values())) {
+        world.destroyEntity(entity.id, 'save_load');
+      }
+
+      // Deserialize the save file using the proper WorldSerializer
+      if (saveFile.universes && saveFile.universes.length > 0) {
+        const universeSnapshot = saveFile.universes[0];
+
+        this.broadcastLoadingProgress({
+          phase: 'deserializing',
+          progress: 50,
+          message: `Loading ${Object.keys(universeSnapshot?.world?.entities || {}).length} entities...`,
+        });
+
+        // Use the worldSerializer to properly deserialize
+        await worldSerializer.deserializeWorld(universeSnapshot, this.gameLoop.world);
+
+        // Update tick from save
+        if (universeSnapshot.time?.tick) {
+          this.tick = universeSnapshot.time.tick;
+        }
+      }
+
+      // Phase 3: Initializing
+      this.broadcastLoadingProgress({
+        phase: 'initializing',
+        progress: 80,
+        message: 'Initializing systems...',
+      });
+
+      this.currentSaveKey = saveKey;
+
+      // Phase 4: Ready
+      this.broadcastLoadingProgress({
+        phase: 'ready',
+        progress: 100,
+        message: 'World loaded!',
+        loadedEntities: Array.from(world.entities.values()).length,
+      });
+
+      // Resume simulation
+      this.paused = false;
+      if (!this.running) {
+        this.running = true;
+        this.loop();
+      }
+
+      this.broadcastLoadComplete(true, undefined, this.gameLoop.universeId, this.tick);
+
+      console.log(`[UniverseWorker] Save loaded successfully: ${saveKey}, ${world.entities.size} entities`);
+      return true;
+    } catch (error) {
+      console.error('[UniverseWorker] Failed to load save:', error);
+      this.broadcastLoadComplete(false, error instanceof Error ? error.message : 'Unknown error');
+      return false;
     }
+  }
 
-    // Start simulation loop
-    this.running = true;
-    this.loop();
+  /**
+   * Broadcast loading progress to all connections
+   */
+  private broadcastLoadingProgress(progress: LoadingProgress): void {
+    const message: WorkerToWindowMessage = {
+      type: 'loading-progress',
+      progress,
+    };
+
+    for (const conn of this.connections.values()) {
+      if (conn.connected) {
+        try {
+          conn.port.postMessage(message);
+        } catch {
+          // Ignore errors during progress updates
+        }
+      }
+    }
+  }
+
+  /**
+   * Broadcast load complete to all connections
+   */
+  private broadcastLoadComplete(success: boolean, error?: string, universeId?: string, tick?: number): void {
+    const message: WorkerToWindowMessage = {
+      type: 'load-complete',
+      success,
+      error,
+      universeId,
+      tick,
+    };
+
+    for (const conn of this.connections.values()) {
+      if (conn.connected) {
+        try {
+          conn.port.postMessage(message);
+        } catch {
+          // Ignore errors
+        }
+      }
+    }
+  }
+
+  /**
+   * Send worker status to a specific connection
+   */
+  private async sendWorkerStatus(port: MessagePort): Promise<void> {
+    const saves = await this.listSaves();
+    const hasExistingSave = saves.length > 0;
+
+    const message: WorkerToWindowMessage = {
+      type: 'worker-ready',
+      hasExistingSave,
+      currentUniverseId: this.running ? this.gameLoop.universeId : undefined,
+      currentTick: this.running ? this.tick : undefined,
+    };
+
+    port.postMessage(message);
   }
 
   /**
@@ -230,12 +416,61 @@ class UniverseWorker {
   }
 
   /**
-   * Persist current state to IndexedDB
+   * Persist current state to IndexedDB using the same format as saveLoadService
    */
   private async persist(): Promise<void> {
-    const state = this.serializeState();
+    if (!this.currentSaveKey) {
+      // Auto-generate a save key if we don't have one
+      this.currentSaveKey = `autosave_${Date.now()}`;
+    }
 
-    await this.persistence.saveState(state);
+    try {
+      // Use worldSerializer to create a proper save file
+      const universeSnapshot = await worldSerializer.serializeWorld(
+        this.gameLoop.world,
+        this.gameLoop.universeId,
+        'SharedWorker Auto-save'
+      );
+
+      const saveFile: SaveFile = {
+        $schema: 'https://aivillage.dev/schemas/savefile/v1',
+        $version: 1,
+        header: {
+          createdAt: Date.now(),
+          lastSavedAt: Date.now(),
+          playTime: 0,
+          gameVersion: '1.0.0',
+          formatVersion: 1,
+          name: 'Auto-save',
+          description: 'SharedWorker auto-save',
+          decayPolicy: { decayAfterTicks: 1728000 },
+        },
+        multiverse: {
+          $schema: 'https://aivillage.dev/schemas/multiverse/v1',
+          $version: 1,
+          time: {
+            absoluteTick: this.tick.toString(),
+            originTimestamp: Date.now(),
+            currentTimestamp: Date.now(),
+            realTimeElapsed: 0,
+          },
+          config: {},
+        },
+        universes: [universeSnapshot],
+        passages: [],
+        player: undefined,
+        godCraftedQueue: [],
+        checksums: {
+          overall: '',
+          universes: {},
+          multiverse: '',
+        },
+      };
+
+      await this.storage.save(this.currentSaveKey, saveFile);
+    } catch (error) {
+      console.error('[UniverseWorker] Failed to persist:', error);
+    }
   }
 
   /**
@@ -266,7 +501,7 @@ class UniverseWorker {
     const entities: Record<string, Record<string, any>> = {};
 
     // Serialize entities (with optional spatial culling)
-    const allEntities = this.gameLoop.world.getAllEntities();
+    const allEntities = Array.from(this.gameLoop.world.entities.values());
     for (const entity of allEntities) {
       // Spatial culling: skip entities outside viewport
       if (viewport) {
@@ -278,23 +513,16 @@ class UniverseWorker {
 
       const components: Record<string, any> = {};
 
-      for (const [type, component] of entity.getAllComponents()) {
+      for (const [type, component] of entity.components) {
         components[type] = component;
       }
 
       entities[entity.id] = components;
     }
 
-    // Serialize tiles
-    const tiles = [];
-    for (const tile of this.gameLoop.world.getAllTiles()) {
-      tiles.push({
-        x: tile.x,
-        y: tile.y,
-        type: tile.type,
-        data: tile,
-      });
-    }
+    // Serialize tiles (Note: World doesn't expose tile iteration)
+    // TODO: Use ChunkManager or WorldSerializer for proper tile serialization
+    const tiles: any[] = [];
 
     // Extract global state (singletons)
     const globals: Record<string, any> = {};
@@ -319,29 +547,6 @@ class UniverseWorker {
   /**
    * Load state from serialized data
    */
-  private loadState(state: UniverseState): void {
-    // Clear current world
-    for (const entity of this.gameLoop.world.getAllEntities()) {
-      this.gameLoop.world.removeEntity(entity.id);
-    }
-
-    // Load entities
-    for (const [entityId, components] of Object.entries(state.world.entities)) {
-      const entity = this.gameLoop.world.createEntity(entityId);
-
-      for (const [type, component] of Object.entries(components)) {
-        entity.addComponent(component);
-      }
-    }
-
-    // Load tiles
-    for (const tileData of state.world.tiles) {
-      this.gameLoop.world.setTile(tileData.x, tileData.y, tileData.type, tileData.data);
-    }
-
-    this.tick = state.tick;
-  }
-
   /**
    * Handle new window connection
    */
@@ -358,23 +563,30 @@ class UniverseWorker {
 
     this.connections.set(id, conn);
 
-    // Send initial state
-    const state = this.serializeState();
-    const initMessage: WorkerToWindowMessage = {
-      type: 'init',
-      connectionId: id,
-      state,
-      tick: this.tick,
-    };
-
-    port.postMessage(initMessage);
-
     // Handle messages from this connection
     port.onmessage = (e: MessageEvent<WindowToWorkerMessage>) => {
       this.handleMessage(id, e.data);
     };
 
     port.start();
+
+    // If simulation is running, send current state
+    // Otherwise, send worker-ready status so main thread knows what to do
+    if (this.running) {
+      const state = this.serializeState();
+      const initMessage: WorkerToWindowMessage = {
+        type: 'init',
+        connectionId: id,
+        state,
+        tick: this.tick,
+      };
+      port.postMessage(initMessage);
+    } else {
+      // Worker is initialized but waiting for load-save or create-new-universe
+      this.sendWorkerStatus(port).catch((error) => {
+        console.error('[UniverseWorker] Failed to send initial status:', error);
+      });
+    }
   }
 
   /**
@@ -427,7 +639,83 @@ class UniverseWorker {
       case 'set-viewport':
         conn.viewport = message.viewport;
         break;
+
+      // NEW: Save management messages
+      case 'list-saves':
+        this.handleListSaves(conn.port);
+        break;
+
+      case 'load-save':
+        this.loadSave(message.saveKey, conn.port).catch((error) => {
+          console.error('[UniverseWorker] Failed to load save:', error);
+        });
+        break;
+
+      case 'create-new-universe':
+        this.handleCreateNewUniverse(message.config, conn.port);
+        break;
+
+      case 'get-status':
+        this.sendWorkerStatus(conn.port).catch((error) => {
+          console.error('[UniverseWorker] Failed to send status:', error);
+        });
+        break;
     }
+  }
+
+  /**
+   * Handle list-saves request
+   */
+  private async handleListSaves(port: MessagePort): Promise<void> {
+    try {
+      const saves = await this.listSaves();
+      const message: WorkerToWindowMessage = {
+        type: 'saves-list',
+        saves,
+      };
+      port.postMessage(message);
+    } catch (error) {
+      console.error('[UniverseWorker] Failed to list saves:', error);
+      this.broadcastError('Failed to list saves', error);
+    }
+  }
+
+  /**
+   * Handle create-new-universe request
+   * Starts a fresh simulation without loading a save
+   */
+  private handleCreateNewUniverse(config: { name?: string; magicParadigm?: string; scenario?: string }, port: MessagePort): void {
+    console.log('[UniverseWorker] Creating new universe:', config);
+
+    this.broadcastLoadingProgress({
+      phase: 'initializing',
+      progress: 50,
+      message: 'Creating new universe...',
+    });
+
+    // Reset world state
+    const world = this.gameLoop.world as WorldMutator;
+    for (const entity of Array.from(world.entities.values())) {
+      world.destroyEntity(entity.id, 'new_universe');
+    }
+
+    this.tick = 0;
+    this.currentSaveKey = null;
+
+    // Start simulation loop if not already running
+    if (!this.running) {
+      this.running = true;
+      this.paused = false;
+      this.loop();
+    }
+
+    this.broadcastLoadingProgress({
+      phase: 'ready',
+      progress: 100,
+      message: 'Universe ready!',
+    });
+
+    this.broadcastLoadComplete(true, undefined, this.gameLoop.universeId, 0);
   }
 
   /**
@@ -435,11 +723,6 @@ class UniverseWorker {
    */
   private applyAction(action: GameAction): void {
     try {
-      // Log action to IndexedDB
-      this.persistence.logEvent(action, this.tick).catch((error) => {
-        console.error('[UniverseWorker] Failed to log action:', error);
-      });
-
       // Handle action based on type
       switch (action.type) {
         case 'SPAWN_AGENT':
@@ -463,22 +746,31 @@ class UniverseWorker {
 
     const agent = this.gameLoop.world.createEntity();
 
-    // Add basic components for agent
-    agent.addComponent({
+    // Add basic components for agent using world.addComponent
+    this.gameLoop.world.addComponent(agent.id, {
       type: 'identity',
-      name: name || `Agent ${this.gameLoop.world.getAllEntities().length}`,
+      version: 1,
+      name: name || `Agent ${Array.from(this.gameLoop.world.entities.values()).length}`,
       age: 18,
       species: 'human',
     });
 
-    agent.addComponent({
+    this.gameLoop.world.addComponent(agent.id, {
       type: 'position',
+      version: 1,
       x,
       y,
     });
 
-    agent.addComponent({
+    this.gameLoop.world.addComponent(agent.id, {
       type: 'agent',
+      version: 1,
+      behavior: 'wander',
+      behaviorState: {},
+      thinkInterval: 20,
+      lastThinkTick: 0,
+      useLLM: false,
+      llmCooldown: 0,
     });
   }
 
@@ -508,18 +800,21 @@ class UniverseWorker {
   /**
    * Send snapshot to a specific port
    */
-  private async sendSnapshot(port: MessagePort): Promise<void> {
-    const state = this.serializeState();
-    const snapshotId = await this.persistence.createSnapshot(state);
-
-    const snapshot = await this.persistence.loadSnapshot(snapshotId);
-    if (!snapshot) {
-      throw new Error('Failed to load snapshot after creation');
+  private async sendSnapshot(port: MessagePort | undefined): Promise<void> {
+    if (!port) {
+      throw new Error('Port is undefined');
     }
+
+    // Create a snapshot using worldSerializer
+    const universeSnapshot = await worldSerializer.serializeWorld(
+      this.gameLoop.world,
+      this.gameLoop.universeId,
+      'Snapshot'
+    );
 
     // Compress and send
     const encoder = new TextEncoder();
-    const data = encoder.encode(JSON.stringify(snapshot));
+    const data = encoder.encode(JSON.stringify(universeSnapshot));
 
     const message: WorkerToWindowMessage = {
       type: 'snapshot',
@@ -528,6 +823,10 @@ class UniverseWorker {
 
     port.postMessage(message);
   }
+
+  /**
+   * Remove the old loadState method - we now use loadSave
+   */
 }
 
 // Global instance
@@ -540,5 +839,9 @@ universe.init().catch((error) => {
 // @ts-ignore - SharedWorkerGlobalScope
 self.onconnect = (e: MessageEvent) => {
   const port = e.ports[0];
-  universe.addConnection(port);
+  if (port) {
+    universe.addConnection(port);
+  } else {
+    console.error('[UniverseWorker] No port available in connection event');
+  }
 };

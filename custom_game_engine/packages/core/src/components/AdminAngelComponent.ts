@@ -18,6 +18,136 @@ import type { Component } from '../ecs/Component.js';
 // ============================================================================
 
 /**
+ * Individual observation made by the angel - part of its consciousness stream
+ */
+export interface AngelObservation {
+  tick: number;
+  timestamp: number;
+
+  /** Natural language observation */
+  text: string;
+
+  /** Agent this relates to (if any) */
+  agentId?: string;
+  agentName?: string;
+
+  /** Type of observation for filtering/prioritization */
+  type: 'action' | 'state' | 'achievement' | 'concern' | 'atmosphere' | 'relationship';
+
+  /** How interesting/notable this is (affects retention) */
+  salience: number; // 0-1
+}
+
+/**
+ * Angel's current emotional state based on village conditions
+ */
+export type AngelMood =
+  | 'content'      // Village is doing well
+  | 'worried'      // Something concerning
+  | 'curious'      // Something interesting happening
+  | 'excited'      // Achievement or milestone
+  | 'pensive'      // Reflecting on the village
+  | 'protective';  // Agent in danger
+
+/**
+ * Angel's consciousness stream - what it has noticed and is thinking about
+ */
+export interface AngelConsciousness {
+  /**
+   * Rolling buffer of observations - the angel's inner monologue
+   * Oldest observations drop off as new ones are added
+   */
+  observations: AngelObservation[];
+
+  /**
+   * Maximum observations to retain
+   */
+  maxObservations: number; // default 50
+
+  /**
+   * Last tick the angel "thought" about the world
+   */
+  lastThoughtTick: number;
+
+  /**
+   * Current emotional state based on village conditions
+   */
+  mood: AngelMood;
+
+  /**
+   * What the angel is currently pondering (for proactive comments)
+   */
+  currentWonder: string | null;
+}
+
+/**
+ * Notable memory about a specific agent
+ */
+export interface AgentMemory {
+  tick: number;
+  text: string;
+  type: 'achievement' | 'struggle' | 'interaction' | 'quirk';
+}
+
+/**
+ * Angel's relationship tracking for a specific agent
+ */
+export interface AgentFamiliarity {
+  /** Agent entity ID */
+  agentId: string;
+
+  /** Cached name for quick reference */
+  name: string;
+
+  /** When the angel first noticed this agent */
+  firstNoticedTick: number;
+
+  /** How many times player has asked about this agent */
+  playerInteractionCount: number;
+
+  /** Last observed action/state */
+  lastSeenDoing: string;
+  lastSeenTick: number;
+
+  /** Angel's impression of this agent (generated, evolves) */
+  impression: string; // "the builder", "always hungry", "cautious"
+
+  /** Current interest level (decays over time, spikes with events) */
+  interestLevel: number; // 0-1
+
+  /** Notable memories about this agent */
+  memories: AgentMemory[];
+}
+
+/**
+ * Angel's attention focus state - what it's currently watching
+ */
+export interface AngelAttention {
+  /**
+   * Currently focused agent (player said "watch X")
+   * Gets more frequent sampling
+   */
+  focusedAgentId: string | null;
+  focusedAgentName: string | null;
+  focusSinceTick: number | null;
+
+  /**
+   * Recently noticed agents (for varied observations)
+   */
+  recentlyNoticed: string[];
+
+  /**
+   * Ticks until next ambient scan
+   */
+  scanCooldown: number;
+
+  /**
+   * Ticks until next focused agent update (shorter interval)
+   */
+  focusCooldown: number;
+}
+
+/**
  * Player knowledge accumulated over sessions
  */
 export interface PlayerKnowledge {
@@ -116,6 +246,15 @@ export interface AdminAngelMemory {
   relationship: PlayerRelationship;
   tutorialProgress: TutorialProgress;
   conversation: ConversationContext;
+
+  /** Stream of consciousness - what the angel has noticed */
+  consciousness: AngelConsciousness;
+
+  /** Relationship with individual agents */
+  agentFamiliarity: Map<string, AgentFamiliarity>;
+
+  /** Current attention state */
+  attention: AngelAttention;
 }
 
 // ============================================================================
@@ -200,6 +339,22 @@ export function createAdminAngelMemory(): AdminAngelMemory {
       pendingObservations: [],
       lastProactiveTick: 0,
       lastResponseTick: 0,
+    },
+    consciousness: {
+      observations: [],
+      maxObservations: 50,
+      lastThoughtTick: 0,
+      mood: 'content',
+      currentWonder: null,
+    },
+    agentFamiliarity: new Map<string, AgentFamiliarity>(),
+    attention: {
+      focusedAgentId: null,
+      focusedAgentName: null,
+      focusSinceTick: null,
+      recentlyNoticed: [],
+      scanCooldown: 0,
+      focusCooldown: 0,
     },
   };
 }

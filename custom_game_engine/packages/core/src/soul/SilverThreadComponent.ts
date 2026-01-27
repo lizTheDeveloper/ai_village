@@ -86,6 +86,7 @@ export interface SignificantEvent {
  */
 export interface SilverThreadComponent {
   type: ComponentType.SilverThread;
+  version: number;
 
   // Thread segments (one per universe visited)
   segments: ThreadSegment[];
@@ -142,6 +143,7 @@ export function createSilverThreadComponent(params: {
 
   return {
     type: ComponentType.SilverThread,
+    version: 1,
     segments: [initial_segment],
     events: [creation_event],
     head: {

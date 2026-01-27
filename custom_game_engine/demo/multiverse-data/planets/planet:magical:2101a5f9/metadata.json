@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2101a5f9",
+  "name": "Terra Major",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769320486952",
+  "createdAt": 1769320486954,
+  "lastAccessedAt": 1769320486954,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769320486952",
+    "type": "magical"
+  }
+}

@@ -6,7 +6,7 @@
  * cross-player universe access, time travel, and forking.
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type {
   SaveFile,
   SaveMetadata,
@@ -246,7 +246,7 @@ export class SaveLoadService {
   /**
    * Save the current game state.
    */
-  async save(world: World, options: SaveOptions): Promise<void> {
+  async save(world: WorldMutator, options: SaveOptions): Promise<void> {
     if (!this.storageBackend) {
       throw new Error('No storage backend configured. Call setStorage() first.');
     }
@@ -397,7 +397,7 @@ export class SaveLoadService {
   /**
    * Load a saved game.
    */
-  async load(key: string, world: World): Promise<LoadResult> {
+  async load(key: string, world: WorldMutator): Promise<LoadResult> {
     if (!this.storageBackend) {
       throw new Error('No storage backend configured. Call setStorage() first.');
     }
@@ -550,7 +550,7 @@ export class SaveLoadService {
   /**
    * Auto-save (uses a reserved key).
    */
-  async autoSave(world: World): Promise<void> {
+  async autoSave(world: WorldMutator): Promise<void> {
     await this.save(world, {
       name: 'Auto Save',
       description: 'Automatic save',
@@ -561,7 +561,7 @@ export class SaveLoadService {
   /**
    * Quick save (uses numbered quick save slots).
    */
-  async quickSave(world: World, slot: number = 1): Promise<void> {
+  async quickSave(world: WorldMutator, slot: number = 1): Promise<void> {
     if (slot < 1 || slot > 10) {
       throw new Error('Quick save slot must be 1-10');
     }

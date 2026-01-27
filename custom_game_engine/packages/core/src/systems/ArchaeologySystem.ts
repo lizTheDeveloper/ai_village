@@ -24,7 +24,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType as CT_Type } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -140,7 +140,7 @@ export class ArchaeologySystem extends BaseSystem {
   // Reusable working objects - zero allocations in hot path
   private readonly workingPotentialTechs: string[] = [];
 
-  protected onInitialize(world: World, eventBus: EventBus): void {
+  protected onInitialize(world: WorldMutator, eventBus: EventBus): void {
     this.world = world;
 
     // Listen for megastructure collapse events to create archaeological sites

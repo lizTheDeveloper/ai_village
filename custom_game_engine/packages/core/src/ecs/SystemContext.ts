@@ -38,7 +38,7 @@
  */
 
 import type { Entity, EntityImpl } from './Entity.js';
-import type { World } from './World.js';
+import type { World, WorldMutator } from './World.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { GameEventMap, EventType } from '../events/EventMap.js';
@@ -192,8 +192,8 @@ interface CachedQuery {
  * Encapsulates common patterns with type safety and performance optimizations.
  */
 export interface SystemContext {
-  /** Current world */
-  readonly world: World;
+  /** Current world (with mutation capabilities) */
+  readonly world: WorldMutator;
 
   /** Current tick */
   readonly tick: Tick;
@@ -284,7 +284,7 @@ export interface SystemContext {
  * Implementation of SystemContext.
  */
 export class SystemContextImpl implements SystemContext {
-  readonly world: World;
+  readonly world: WorldMutator;
   readonly tick: Tick;
   readonly deltaTime: number;
   readonly events: SystemEventManager;
@@ -296,7 +296,7 @@ export class SystemContextImpl implements SystemContext {
   private chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
   constructor(
-    world: World,
+    world: WorldMutator,
     systemId: SystemId,
     events: SystemEventManager,
     entities: ReadonlyArray<Entity>,
@@ -371,8 +371,9 @@ export class SystemContextImpl implements SystemContext {
 
       for (const entity of entities) {
         const posRaw = entity.getComponent('position');
-        const pos = posRaw as unknown as { x: number; y: number } | undefined;
-        if (!pos) continue;
+        // Type guard: check that position has x and y coordinates
+        if (!posRaw || typeof posRaw !== 'object' || !('x' in posRaw) || !('y' in posRaw)) continue;
+        const pos = posRaw as { x: number; y: number };
 
         const dx = pos.x - center.x;
         const dy = pos.y - center.y;
@@ -402,8 +403,9 @@ export class SystemContextImpl implements SystemContext {
         }
 
         const posRaw = entity.getComponent('position');
-        const pos = posRaw as unknown as { x: number; y: number } | undefined;
-        if (!pos) continue;
+        // Type guard: check that position has x and y coordinates
+        if (!posRaw || typeof posRaw !== 'object' || !('x' in posRaw) || !('y' in posRaw)) continue;
+        const pos = posRaw as { x: number; y: number };
 
         const dx = pos.x - center.x;
         const dy = pos.y - center.y;
@@ -541,7 +543,7 @@ export abstract class BaseSystem implements System {
   readonly metadata?: SystemMetadata;
 
   protected events!: SystemEventManager;
-  protected world!: World;
+  protected world!: WorldMutator;
 
   private lastUpdateTick = -Infinity;
   private chunkSpatialQuery: ChunkSpatialQuery | null = null;
@@ -556,7 +558,7 @@ export abstract class BaseSystem implements System {
    * Called once when system is registered.
    * Override onInitialize() instead of this method.
    */
-  async initialize(world: World, eventBus: EventBus): Promise<void> {
+  async initialize(world: WorldMutator, eventBus: EventBus): Promise<void> {
     this.world = world;
 
     // Import SystemEventManager dynamically to avoid circular deps
@@ -569,13 +571,13 @@ export abstract class BaseSystem implements System {
   /**
    * Override to add custom initialization logic.
    */
-  protected onInitialize?(world: World, eventBus: EventBus): void | Promise<void>;
+  protected onInitialize?(world: WorldMutator, eventBus: EventBus): void | Promise<void>;
 
   /**
    * Main update loop. Creates SystemContext and delegates to onUpdate().
    */
   update(
-    world: World,
+    world: WorldMutator,
     entities: ReadonlyArray<Entity>,
     deltaTime: number
   ): void {
@@ -636,7 +638,7 @@ export abstract class BaseSystem implements System {
  * Use this when migrating existing systems incrementally.
  */
 export async function createSystemContext(
-  world: World,
+  world: WorldMutator,
   systemId: SystemId,
   eventBus: EventBus,
   entities: ReadonlyArray<Entity>,

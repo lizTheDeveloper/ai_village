@@ -115,10 +115,15 @@ export class SpeechToAlienTokensService {
 
       if (translation) {
         // Found alien word - create token with translation
+        // Type guard function to validate wordType
+        const isValidWordType = (type: string | undefined): type is 'noun' | 'verb' | 'adjective' | 'adverb' | 'particle' => {
+          return type === 'noun' || type === 'verb' || type === 'adjective' || type === 'adverb' || type === 'particle';
+        };
+
         tokens.push({
           alien: part,
           english: translation.concept,
-          wordType: translation.wordType,
+          wordType: isValidWordType(translation.wordType) ? translation.wordType : undefined,
         });
       }
       // If no translation found, we skip it (it's likely English text)

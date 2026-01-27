@@ -14,7 +14,7 @@
  * while ensuring only the worker runs the actual simulation.
  */
 
-import { World, WorldImpl, ActionQueue, SystemRegistry, EventBus } from '@ai-village/core';
+import { type World, WorldImpl, ActionQueue, SystemRegistry, EventBus, EventBusImpl } from '@ai-village/core';
 import { UniverseClient } from './universe-client.js';
 import { PathInterpolationSystem } from './PathInterpolationSystem.js';
 import type { UniverseState, SerializedWorld } from './types.js';
@@ -76,7 +76,8 @@ export class GameBridge {
 
   constructor() {
     // Create view-only components (NO SIMULATION)
-    this.viewWorld = new World();
+    const viewEventBus = new EventBusImpl();
+    this.viewWorld = new WorldImpl(viewEventBus);
     this.viewActionQueue = new ActionQueue();
     this.viewSystemRegistry = new SystemRegistry();
     this.universeClient = new UniverseClient();
@@ -223,7 +224,7 @@ export class GameBridge {
     // Need to manually iterate systems and call update
     const systems = Array.from((this.viewSystemRegistry as any).systems?.values() || []);
     for (const entry of systems) {
-      if (entry?.system && entry.enabled) {
+      if (entry && 'system' in entry && 'enabled' in entry && entry.system && entry.enabled) {
         entry.system.update(this.viewWorld);
       }
     }
@@ -308,8 +309,10 @@ export class GameBridge {
       const timeEntities = world.query().with('time').executeEntities();
       if (timeEntities.length > 0) {
         const timeEntity = timeEntities[0];
-        timeEntity.removeComponent('time');
-        timeEntity.addComponent(serializedWorld.globals.time);
+        if (timeEntity) {
+          timeEntity.removeComponent('time');
+          timeEntity.addComponent(serializedWorld.globals.time);
+        }
       } else {
         const timeEntity = world.createEntity();
         timeEntity.addComponent(serializedWorld.globals.time);
@@ -321,8 +324,10 @@ export class GameBridge {
       const weatherEntities = world.query().with('weather').executeEntities();
       if (weatherEntities.length > 0) {
         const weatherEntity = weatherEntities[0];
-        weatherEntity.removeComponent('weather');
-        weatherEntity.addComponent(serializedWorld.globals.weather);
+        if (weatherEntity) {
+          weatherEntity.removeComponent('weather');
+          weatherEntity.addComponent(serializedWorld.globals.weather);
+        }
       } else {
         const weatherEntity = world.createEntity();
         weatherEntity.addComponent(serializedWorld.globals.weather);

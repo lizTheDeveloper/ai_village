@@ -614,7 +614,7 @@ export function getEscortSquadron(world: World, tradeAgreementId: string): strin
 
     const agreement = tradeComp.activeAgreements.find((a) => a.id === tradeAgreementId);
     if (agreement) {
-      const metadata = agreement.crossRealmMetadata as any;
+      const metadata = agreement.crossRealmMetadata;
       return metadata?.escort?.escortSquadronId;
     }
   }

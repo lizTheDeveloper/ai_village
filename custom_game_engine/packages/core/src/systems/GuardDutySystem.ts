@@ -82,7 +82,7 @@ export class GuardDutySystem extends BaseSystem {
       // Validate assignment - remove component if invalid
       if (!this.validateAssignment(duty)) {
         console.warn('[GuardDutySystem] Removing invalid guard_duty component from entity', entity.id);
-        (entity as any).removeComponent('guard_duty');
+        (entity as EntityImpl).removeComponent('guard_duty');
         continue;
       }
 
@@ -496,5 +496,19 @@ export class GuardDutySystem extends BaseSystem {
     const dy = pos1.y - pos2.y;
     const dz = pos1.z - pos2.z;
     return dx * dx + dy * dy + dz * dz;
+  }
+
+  /**
+   * Type guard for CreatorInterventionSystem methods
+   */
+  private hasInterventionMethods(system: unknown): system is {
+    hasMarkOfSinner?: (entityId: string) => boolean;
+    hasDivineSilence?: (entityId: string) => boolean;
+    bannedSpells?: Set<string> | Map<string, unknown>;
+  } {
+    return (
+      typeof system === 'object' &&
+      system !== null
+    );
   }
 }

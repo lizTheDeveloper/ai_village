@@ -49,8 +49,8 @@ async function main() {
       console.log(`   Nation records: ${emp.nationRecords.length || 0}`);
       console.log(`   Treasury: ${emp.economy.imperialTreasury.toLocaleString()}`);
       console.log(`   Total population: ${emp.territory.totalPopulation.toLocaleString()}`);
-      if (emp.nationRecords.length > 0) {
-        console.log(`   First nation: ${emp.nationRecords[0].nationName} (GDP: ${emp.nationRecords[0].gdp?.toLocaleString()})`);
+      if (emp.nationRecords && emp.nationRecords.length > 0) {
+        console.log(`   First nation: ${emp.nationRecords[0]!.nationName} (GDP: ${emp.nationRecords[0]!.gdp?.toLocaleString()})`);
       }
     }
   }
@@ -65,7 +65,7 @@ async function main() {
       console.log(`   Armadas: ${nav.assets.armadaIds.length || 0}`);
       console.log(`   Total ships: ${nav.assets.totalShips || 0}`);
       console.log(`   Total crew: ${nav.assets.totalCrew || 0}`);
-      console.log(`   Budget: ${nav.budget.toLocaleString()}`);
+      console.log(`   Budget: ${nav.economy.annualBudget.toLocaleString()}`);
     }
   }
 
@@ -78,7 +78,7 @@ async function main() {
     if (component && component.type === 'spaceship') {
       const shipComp = component as import('@ai-village/core').SpaceshipComponent;
       console.log(`First ship: ${shipComp.name}`);
-      console.log(`  Type: ${shipComp.shipType}`);
+      console.log(`  Type: ${shipComp.ship_type}`);
       console.log(`  Crew members: ${shipComp.crew.member_ids.length || 0}`);
       console.log(`  Crew coherence: ${shipComp.crew.coherence}`);
     }
@@ -94,8 +94,9 @@ async function main() {
       console.log(`   Category: ${mega.category}`);
       console.log(`   Type: ${mega.structureType}`);
       console.log(`   Operational: ${mega.operational}`);
-      console.log(`   Integrity: ${mega.integrity}`);
-      console.log(`   Workers: ${mega.capabilities.workerIds?.length || 0}`);
+      console.log(`   Efficiency: ${mega.efficiency}`);
+      const workerIds = mega.capabilities?.workerIds;
+      console.log(`   Workers: ${Array.isArray(workerIds) ? workerIds.length : 0}`);
     }
   }
 

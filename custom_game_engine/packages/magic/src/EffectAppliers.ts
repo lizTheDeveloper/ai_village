@@ -6,7 +6,7 @@
  */
 
 import type { Entity } from '@ai-village/core';
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type { NeedsComponent } from '@ai-village/core';
 import type {
   EffectApplier,
@@ -254,7 +254,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
         protectionShields: [],
         activeEffects: [],
       };
-      world.addComponent(target.id, newMagic);
+      (world as WorldMutator).addComponent(target.id, newMagic);
       magic = target.components.get('magic')!;
     }
 

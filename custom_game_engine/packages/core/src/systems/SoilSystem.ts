@@ -153,7 +153,7 @@ export class SoilSystem extends BaseSystem {
 
             // Only apply rain to outdoor tiles
             if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              this.applyRain(world, tile as any, worldX, worldY, intensity);
+              this.applyRain(world, tile as Tile, worldX, worldY, intensity);
             }
           }
         }
@@ -180,7 +180,7 @@ export class SoilSystem extends BaseSystem {
 
             // Only apply snow to outdoor tiles
             if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              this.applySnow(world, tile as any, worldX, worldY, intensity);
+              this.applySnow(world, tile as Tile, worldX, worldY, intensity);
             }
           }
         }
@@ -210,7 +210,7 @@ export class SoilSystem extends BaseSystem {
 
             // Apply decay to outdoor tiles (indoor tiles decay slower)
             if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              this.decayMoisture(world, tile as any, worldX, worldY, temperature);
+              this.decayMoisture(world, tile as Tile, worldX, worldY, temperature);
             }
           }
         }
@@ -222,7 +222,7 @@ export class SoilSystem extends BaseSystem {
    * Check if a tile is indoors (covered by building)
    * Buildings block rain and sun through walls, doors, windows, or roofs
    */
-  private isTileIndoors(tile: any, _world: World, _x: number, _y: number): boolean {
+  private isTileIndoors(tile: unknown, _world: World, _x: number, _y: number): boolean {
     // Per CLAUDE.md: No silent fallbacks - validate tile structure
     if (!tile || typeof tile !== 'object') {
       throw new Error(`isTileIndoors requires valid tile object, got ${typeof tile}`);
@@ -234,10 +234,11 @@ export class SoilSystem extends BaseSystem {
     // - window: Blocks rain, allows light but still provides shelter
     // - roof: Provides overhead coverage (primary rain/sun blocker)
     // Any of these means the tile is covered by a building
-    const hasWall = tile.wall !== undefined && tile.wall !== null;
-    const hasDoor = tile.door !== undefined && tile.door !== null;
-    const hasWindow = tile.window !== undefined && tile.window !== null;
-    const hasRoof = tile.roof !== undefined && tile.roof !== null;
+    const tileObj = tile as {wall?: unknown; door?: unknown; window?: unknown; roof?: unknown};
+    const hasWall = tileObj.wall !== undefined && tileObj.wall !== null;
+    const hasDoor = tileObj.door !== undefined && tileObj.door !== null;
+    const hasWindow = tileObj.window !== undefined && tileObj.window !== null;
+    const hasRoof = tileObj.roof !== undefined && tileObj.roof !== null;
 
     return hasWall || hasDoor || hasWindow || hasRoof;
   }
@@ -249,8 +250,8 @@ export class SoilSystem extends BaseSystem {
     // Try to get temperature from TemperatureSystem singleton
     const tempEntities = world.query().with(CT.Temperature).executeEntities();
     if (tempEntities.length > 0) {
-      const tempComp = tempEntities[0]!.components.get('temperature') as any;
-      if (tempComp && typeof tempComp.currentTemp === 'number') {
+      const tempComp = tempEntities[0]!.components.get('temperature');
+      if (tempComp && 'currentTemp' in tempComp && typeof tempComp.currentTemp === 'number') {
         return tempComp.currentTemp;
       }
     }

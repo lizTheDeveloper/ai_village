@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5b34a64b",
+  "name": "Triton",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769318188619",
+  "createdAt": 1769318188621,
+  "lastAccessedAt": 1769318188621,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769318188619",
+    "type": "magical"
+  }
+}
