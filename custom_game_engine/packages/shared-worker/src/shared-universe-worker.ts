@@ -152,15 +152,15 @@ class UniverseWorker {
       }
 
       // Phase 2: Deserializing
+      const entityCount = saveFile.universes?.[0]?.entities?.length || 0;
       this.broadcastLoadingProgress({
         phase: 'deserializing',
         progress: 30,
         message: 'Deserializing world state...',
-        entityCount: Object.keys(saveFile.universes?.[0]?.world?.entities || {}).length,
+        entityCount,
       });
 
       // Pause simulation during load
-      const wasRunning = this.running;
       this.running = false;
       this.paused = true;
 
@@ -174,18 +174,20 @@ class UniverseWorker {
       if (saveFile.universes && saveFile.universes.length > 0) {
         const universeSnapshot = saveFile.universes[0];
 
-        this.broadcastLoadingProgress({
-          phase: 'deserializing',
-          progress: 50,
-          message: `Loading ${Object.keys(universeSnapshot?.world?.entities || {}).length} entities...`,
-        });
+        if (universeSnapshot) {
+          this.broadcastLoadingProgress({
+            phase: 'deserializing',
+            progress: 50,
+            message: `Loading ${universeSnapshot.entities?.length || 0} entities...`,
+          });
 
-        // Use the worldSerializer to properly deserialize
-        await worldSerializer.deserializeWorld(universeSnapshot, this.gameLoop.world);
+          // Use the worldSerializer to properly deserialize
+          await worldSerializer.deserializeWorld(universeSnapshot, this.gameLoop.world);
 
-        // Update tick from save
-        if (universeSnapshot.time?.tick) {
-          this.tick = universeSnapshot.time.tick;
+          // Update tick from save (universeTick is a serialized bigint string)
+          if (universeSnapshot.time?.universeTick) {
+            this.tick = parseInt(universeSnapshot.time.universeTick, 10) || 0;
+          }
         }
       }
 
@@ -443,7 +445,6 @@ class UniverseWorker {
           formatVersion: 1,
           name: 'Auto-save',
           description: 'SharedWorker auto-save',
-          decayPolicy: { decayAfterTicks: 1728000 },
         },
         multiverse: {
           $schema: 'https://aivillage.dev/schemas/multiverse/v1',
@@ -459,7 +460,7 @@ class UniverseWorker {
         universes: [universeSnapshot],
         passages: [],
         player: undefined,
-        godCraftedQueue: [],
+        godCraftedQueue: { version: 1, entries: [] },
         checksums: {
           overall: '',
           universes: {},

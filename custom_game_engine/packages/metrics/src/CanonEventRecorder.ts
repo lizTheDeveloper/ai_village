@@ -11,7 +11,7 @@
  * This allows universe forking, time travel, and cross-universe comparisons.
  */
 
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { UniverseSnapshot } from '@ai-village/persistence';
 import { worldSerializer } from '@ai-village/persistence';
@@ -474,7 +474,7 @@ export class CanonEventRecorder {
    */
   async recordEvent(
     type: CanonEventType,
-    world: World,
+    world: WorldMutator,
     options: {
       description: string;
       agentIds?: string[];

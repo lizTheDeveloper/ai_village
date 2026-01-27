@@ -364,12 +364,13 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
       if (!pool) {
         // Create pool if it doesn't exist (for cumulative costs)
         if (this.isCumulativeCost(cost.type)) {
-          pool = this.createDefaultPool(cost.type);
           // Note: Type assertion needed due to duplicate ResourcePool interfaces
           // (MagicComponent and ManaPoolsComponent both define ResourcePool).
           // The structures are compatible; only the 'type' field differs slightly.
           // Using 'as unknown as' because TypeScript sees these as incompatible types.
-          caster.resourcePools[cost.type] = pool as unknown as ResourcePool;
+          const newPool = this.createDefaultPool(cost.type) as unknown as ResourcePool;
+          pool = newPool;
+          caster.resourcePools[cost.type] = newPool;
         } else {
           // Can't deduct from non-existent pool
           continue;

@@ -431,6 +431,7 @@ export class UniverseClient {
       case 'init':
         this.connectionId = message.connectionId;
         this.state = message.state;
+        this.workerReady = true;
         this.notifyListeners();
         break;
 
@@ -450,6 +451,34 @@ export class UniverseClient {
 
       case 'snapshot':
         // Handled by requestSnapshot promise
+        break;
+
+      // NEW: Save management messages
+      case 'saves-list':
+        // Handled by listSaves promise
+        break;
+
+      case 'loading-progress':
+        this.notifyLoadingProgress(message.progress);
+        break;
+
+      case 'load-complete':
+        this.notifyLoadComplete({
+          success: message.success,
+          error: message.error,
+          universeId: message.universeId,
+          tick: message.tick,
+        });
+        break;
+
+      case 'worker-ready':
+        this.workerReady = true;
+        this.hasExistingSave = message.hasExistingSave;
+        this.notifyWorkerReady({
+          hasExistingSave: message.hasExistingSave,
+          currentUniverseId: message.currentUniverseId,
+          currentTick: message.currentTick,
+        });
         break;
     }
   }
@@ -478,6 +507,45 @@ export class UniverseClient {
         listener(delta);
       } catch (error) {
         console.error('[UniverseClient] Delta listener error:', error);
+      }
+    }
+  }
+
+  /**
+   * Notify loading progress listeners
+   */
+  private notifyLoadingProgress(progress: LoadingProgress): void {
+    for (const listener of this.loadingProgressListeners) {
+      try {
+        listener(progress);
+      } catch (error) {
+        console.error('[UniverseClient] Loading progress listener error:', error);
+      }
+    }
+  }
+
+  /**
+   * Notify worker ready listeners
+   */
+  private notifyWorkerReady(status: { hasExistingSave: boolean; currentUniverseId?: string; currentTick?: number }): void {
+    for (const listener of this.workerReadyListeners) {
+      try {
+        listener(status);
+      } catch (error) {
+        console.error('[UniverseClient] Worker ready listener error:', error);
+      }
+    }
+  }
+
+  /**
+   * Notify load complete listeners
+   */
+  private notifyLoadComplete(result: { success: boolean; error?: string; universeId?: string; tick?: number }): void {
+    for (const listener of this.loadCompleteListeners) {
+      try {
+        listener(result);
+      } catch (error) {
+        console.error('[UniverseClient] Load complete listener error:', error);
       }
     }
   }

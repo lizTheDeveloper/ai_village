@@ -32,7 +32,14 @@
  * ```
  */
 
-export { UniverseClient, universeClient, type DeltaCallback } from './universe-client.js';
+export {
+  UniverseClient,
+  universeClient,
+  type DeltaCallback,
+  type LoadingProgressCallback,
+  type WorkerReadyCallback,
+  type LoadCompleteCallback,
+} from './universe-client.js';
 export { PersistenceService, UniverseDB } from './persistence.js';
 export { GameBridge, gameBridge, type ViewOnlyGameLoop } from './game-bridge.js';
 export { setupGameSystems, type GameSetupConfig, type GameSetupResult } from './game-setup.js';
@@ -47,6 +54,8 @@ export type {
   WindowToWorkerMessage,
   UniverseDatabase,
   Viewport,
+  SaveMetadata,
+  LoadingProgress,
 } from './types.js';
 export type {
   PathPrediction,

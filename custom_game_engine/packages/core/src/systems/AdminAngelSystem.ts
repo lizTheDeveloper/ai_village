@@ -1139,7 +1139,10 @@ export class AdminAngelSystem extends BaseSystem {
     angel.memory.attention.focusedAgentName = agentName;
     angel.memory.attention.focusSinceTick = Number(world.tick);
 
-    // Ensure familiarity entry exists
+    // Immediately observe what the agent is doing
+    const observation = this.observeAgent(world, agent, angel, { detailed: true });
+
+    // Ensure familiarity entry exists with actual observation
     const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
     const name = identity?.name ?? agentName;
 
@@ -1149,12 +1152,17 @@ export class AdminAngelSystem extends BaseSystem {
         name,
         firstNoticedTick: Number(world.tick),
         playerInteractionCount: 0,
-        lastSeenDoing: 'just noticed them',
+        lastSeenDoing: observation.text,
         lastSeenTick: Number(world.tick),
         impression: 'newly noticed',
         interestLevel: 0.8, // High initial interest when player asks
         memories: []
       });
+    } else {
+      // Update existing familiarity with current observation
+      const familiarity = angel.memory.agentFamiliarity.get(agent.id)!;
+      familiarity.lastSeenDoing = observation.text;
+      familiarity.lastSeenTick = Number(world.tick);
     }
 
     // Increment player interaction count
@@ -1164,7 +1172,8 @@ export class AdminAngelSystem extends BaseSystem {
       familiarity.interestLevel = Math.min(1.0, familiarity.interestLevel + 0.2);
     }
 
-    return `ok ill keep an eye on ${agentName} for u`;
+    // Return with the actual observation
+    return `ok watching ${name}. rn ${observation.text.toLowerCase()}`;
   }
 
   /**

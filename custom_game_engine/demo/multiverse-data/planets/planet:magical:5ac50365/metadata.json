@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5ac50365",
+  "name": "Titan Primus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769481515294",
+  "createdAt": 1769481515354,
+  "lastAccessedAt": 1769481515354,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769481515294",
+    "type": "magical"
+  }
+}

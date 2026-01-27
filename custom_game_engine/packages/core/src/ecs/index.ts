@@ -23,6 +23,7 @@ export {
   type EntityWithDistance,
 } from './SystemContext.js';
 
-// Re-export types explicitly (values already exported via export *)
+// World and WorldImpl are exported via the `export *` above from World.js
+// World is both a value (constructor alias for WorldImpl) and a type (interface)
 export type { Entity } from './Entity.js';
 export type { Component } from './Component.js';

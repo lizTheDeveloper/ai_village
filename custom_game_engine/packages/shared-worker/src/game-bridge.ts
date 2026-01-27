@@ -14,10 +14,10 @@
  * while ensuring only the worker runs the actual simulation.
  */
 
-import { type World, WorldImpl, ActionQueue, SystemRegistry, EventBus, EventBusImpl } from '@ai-village/core';
-import { UniverseClient } from './universe-client.js';
+import { World, WorldImpl, ActionQueue, SystemRegistry, EventBus, EventBusImpl } from '@ai-village/core';
+import { UniverseClient, type LoadingProgressCallback, type WorkerReadyCallback, type LoadCompleteCallback } from './universe-client.js';
 import { PathInterpolationSystem } from './PathInterpolationSystem.js';
-import type { UniverseState, SerializedWorld } from './types.js';
+import type { UniverseState, SerializedWorld, SaveMetadata, LoadingProgress } from './types.js';
 import type { DeltaUpdate } from './path-prediction-types.js';
 
 /**
@@ -393,6 +393,73 @@ export class GameBridge {
    */
   async requestSnapshot(): Promise<Uint8Array> {
     return this.universeClient.requestSnapshot();
+  }
+
+  // ============================================================================
+  // SAVE MANAGEMENT API - Worker-first loading
+  // ============================================================================
+
+  /**
+   * List all available saves from the worker
+   * This allows the main thread to show a save browser without blocking
+   */
+  async listSaves(): Promise<SaveMetadata[]> {
+    return this.universeClient.listSaves();
+  }
+
+  /**
+   * Request the worker to load a specific save
+   * The worker handles deserialization in the background
+   * Subscribe to onLoadingProgress and onLoadComplete for updates
+   */
+  loadSave(saveKey: string): void {
+    this.universeClient.loadSave(saveKey);
+  }
+
+  /**
+   * Request the worker to create a new universe
+   * Subscribe to onLoadComplete for when it's ready
+   */
+  createNewUniverse(config: { name?: string; magicParadigm?: string; scenario?: string } = {}): void {
+    this.universeClient.createNewUniverse(config);
+  }
+
+  /**
+   * Subscribe to loading progress updates
+   * Useful for showing a loading bar while the worker loads a save
+   */
+  onLoadingProgress(callback: LoadingProgressCallback): () => void {
+    return this.universeClient.onLoadingProgress(callback);
+  }
+
+  /**
+   * Subscribe to worker ready status
+   * Called when the worker is initialized and ready to receive commands
+   */
+  onWorkerReady(callback: WorkerReadyCallback): () => void {
+    return this.universeClient.onWorkerReady(callback);
+  }
+
+  /**
+   * Subscribe to load complete events
+   * Called when save loading or new universe creation is complete
+   */
+  onLoadComplete(callback: LoadCompleteCallback): () => void {
+    return this.universeClient.onLoadComplete(callback);
+  }
+
+  /**
+   * Check if the worker is ready (systems initialized)
+   */
+  isWorkerReady(): boolean {
+    return this.universeClient.isWorkerReady();
+  }
+
+  /**
+   * Check if there are existing saves
+   */
+  hasExistingSaves(): boolean {
+    return this.universeClient.hasExistingSaves();
   }
 
   /**
