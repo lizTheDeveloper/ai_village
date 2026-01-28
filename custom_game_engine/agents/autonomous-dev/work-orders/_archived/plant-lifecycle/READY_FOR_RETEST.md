@@ -105,7 +105,7 @@ If you observe "Dispersing 0 seeds" again, please capture:
 
 ### Required Information
 1. **Full entity ID** (e.g., "2dca56b3" not "plant_17")
-2. **Plant species** (grass, wildflower, berry-bush)
+2. **Plant species** (grass, wildflower, blueberry-bush)
 3. **Plant's lifecycle history:**
    - What stage was it created in?
    - What transitions did it go through?

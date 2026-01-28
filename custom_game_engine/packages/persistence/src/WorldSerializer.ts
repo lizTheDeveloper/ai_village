@@ -11,15 +11,16 @@ import type {
   UniverseSnapshot,
   VersionedEntity,
   WorldSnapshot,
+  ZoneType,
 } from './types.js';
 import { componentSerializerRegistry } from './serializers/index.js';
 import { computeChecksumSync } from './utils.js';
-import { chunkSerializer, type TerrainSnapshot } from '@ai-village/world';
+import { chunkSerializer, type TerrainSnapshot, type ChunkManager } from '@ai-village/world';
 import { getZoneManager } from '@ai-village/core';
 
 interface ZoneData {
   id: string;
-  type: string;
+  type: ZoneType;
   priority: number;
   tiles: string[];
   createdAt: number;
@@ -145,7 +146,7 @@ export class WorldSerializer {
     if (snapshot.worldState.terrain) {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as TerrainSnapshot, chunkManager);
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as TerrainSnapshot, chunkManager as ChunkManager);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -294,7 +295,7 @@ export class WorldSerializer {
     const chunkManager = worldImpl.getChunkManager();
 
     const terrain = chunkManager
-      ? chunkSerializer.serializeChunks(chunkManager)
+      ? chunkSerializer.serializeChunks(chunkManager as ChunkManager)
       : null;
 
     // Serialize zones using ZoneManager

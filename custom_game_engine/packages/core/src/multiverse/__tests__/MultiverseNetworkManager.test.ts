@@ -7,29 +7,39 @@ import type {
   PassageHandshakeMessage,
   PassageHandshakeAck,
 } from '../NetworkProtocol.js';
+import type { WorldMutator } from '../../ecs/World.js';
+import type { Entity, EntityId } from '../../ecs/Entity.js';
 
 // Mock WebSocket for testing
-class MockWebSocket {
-  onopen: ((event: any) => void) | null = null;
-  onmessage: ((event: any) => void) | null = null;
-  onclose: (() => void) | null = null;
-  onerror: ((error: any) => void) | null = null;
+interface MessageEvent {
+  data: string;
+}
 
-  private handlers: Map<string, Function> = new Map();
+interface OpenEvent {
+  type: 'open';
+}
+
+class MockWebSocket {
+  onopen: ((event: OpenEvent) => void) | null = null;
+  onmessage: ((event: MessageEvent) => void) | null = null;
+  onclose: (() => void) | null = null;
+  onerror: ((error: Error) => void) | null = null;
+
+  private handlers: Map<string, (...args: unknown[]) => void> = new Map();
+  private sentMessages: string[] = [];
 
   constructor(public url: string) {
     // Simulate connection opening after a delay
     setTimeout(() => {
       if (this.onopen) {
-        this.onopen({});
+        this.onopen({ type: 'open' });
       }
     }, 10);
   }
 
   send(data: string): void {
     // Store sent messages for testing
-    (this as any).sentMessages = (this as any).sentMessages || [];
-    (this as any).sentMessages.push(data);
+    this.sentMessages.push(data);
   }
 
   close(): void {
@@ -38,12 +48,12 @@ class MockWebSocket {
     }
   }
 
-  on(event: string, handler: Function): void {
+  on(event: string, handler: (...args: unknown[]) => void): void {
     this.handlers.set(event, handler);
   }
 
   // Test helper: simulate receiving a message
-  simulateMessage(data: any): void {
+  simulateMessage(data: unknown): void {
     const handler = this.handlers.get('message');
     if (handler) {
       handler(JSON.stringify(data));
@@ -69,22 +79,25 @@ class MockWebSocket {
   }
 
   // Test helper: get sent messages
-  getSentMessages(): any[] {
-    return ((this as any).sentMessages || []).map((msg: string) =>
-      JSON.parse(msg)
-    );
+  getSentMessages(): unknown[] {
+    return this.sentMessages.map((msg: string) => JSON.parse(msg));
   }
 }
 
 // Mock WebSocketServer
+interface WebSocketServerOptions {
+  port?: number;
+  host?: string;
+}
+
 class MockWebSocketServer {
   private connectionHandler: ((ws: MockWebSocket) => void) | null = null;
 
-  constructor(public options: any) {}
+  constructor(public options: WebSocketServerOptions) {}
 
-  on(event: string, handler: any): void {
+  on(event: string, handler: (...args: unknown[]) => void): void {
     if (event === 'connection') {
-      this.connectionHandler = handler;
+      this.connectionHandler = handler as (ws: MockWebSocket) => void;
     }
   }
 
@@ -102,6 +115,76 @@ class MockWebSocketServer {
   }
 }
 
+// Mock World for testing
+function createMockWorld(): WorldMutator {
+  return {
+    entities: new Map(),
+    tick: 0n,
+    update: vi.fn(),
+    getEntity: vi.fn(),
+    destroyEntity: vi.fn(),
+  } as unknown as WorldMutator;
+}
+
+// Type-safe accessors for private NetworkManager internals
+interface NetworkManagerInternals {
+  remotePassages: Map<string, RemotePassage>;
+  activeSubscriptions: Map<string, UniverseSubscription>;
+  calculateUniverseCompatibility: (
+    local: unknown,
+    remote: unknown
+  ) => {
+    compatibilityScore: number;
+    recommended: boolean;
+    warnings: string[];
+    factors: {
+      timeRateCompatibility: number;
+      physicsCompatibility: number;
+      realityStability: number;
+      divergenceLevel: number;
+    };
+    traversalCostMultiplier: number;
+  };
+  calculateForkingDepth: (config: unknown) => number;
+  areRelatedTimelines: (config1: unknown, config2: unknown) => boolean;
+  estimateDivergence: (config1: unknown, config2: unknown) => number;
+}
+
+interface UniverseSubscription {
+  passageId: string;
+  peerId: string;
+  universeId: string;
+  config: {
+    syncFrequency: number;
+    includeEntities: boolean;
+    includeEvents: boolean;
+    includeTerrain: boolean;
+    compressionLevel: number;
+    deltaUpdatesOnly: boolean;
+  };
+  lastSentTick: bigint;
+  updateInterval: ReturnType<typeof setInterval>;
+}
+
+function getNetworkManagerInternals(
+  manager: MultiverseNetworkManager
+): NetworkManagerInternals {
+  return manager as unknown as NetworkManagerInternals;
+}
+
+// Helper to create mock passages for testing
+function createMockPassage(override: Partial<RemotePassage>): RemotePassage {
+  return {
+    id: 'test-passage',
+    type: 'remote',
+    from: { universeId: 'universe-a' },
+    to: { universeId: 'universe-b' },
+    remotePeerId: 'peer-1',
+    connectionState: 'connected',
+    ...override,
+  } as RemotePassage;
+}
+
 describe('MultiverseNetworkManager', () => {
   let coordinator: MultiverseCoordinator;
   let networkManager: MultiverseNetworkManager;
@@ -111,7 +194,7 @@ describe('MultiverseNetworkManager', () => {
     networkManager = new MultiverseNetworkManager(coordinator);
 
     // Mock WebSocket globally
-    (global as any).WebSocket = MockWebSocket;
+    global.WebSocket = MockWebSocket as unknown as typeof WebSocket;
   });
 
   describe('Initialization', () => {
@@ -147,7 +230,7 @@ describe('MultiverseNetworkManager', () => {
         }
       }
 
-      (global as any).WebSocket = TimeoutWebSocket;
+      global.WebSocket = TimeoutWebSocket as unknown as typeof WebSocket;
 
       await expect(
         networkManager.connectToPeer('ws://localhost:8080')
@@ -173,11 +256,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const mockWorld = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorld = createMockWorld();
 
       coordinator.registerUniverse(mockWorld, universeA);
 
@@ -248,11 +327,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const mockWorld = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorld = createMockWorld();
 
       coordinator.registerUniverse(mockWorld, universeA);
 
@@ -314,12 +389,12 @@ describe('MultiverseNetworkManager', () => {
 
     it('should close remote passage', () => {
       // Create a mock passage directly
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'test-passage',
         connectionState: 'connected',
-      };
+      });
 
-      (networkManager as any).remotePassages.set('test-passage', mockPassage);
+      getNetworkManagerInternals(networkManager).remotePassages.set('test-passage', mockPassage);
 
       networkManager.closeRemotePassage('test-passage');
 
@@ -344,23 +419,13 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const mockWorldA = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-        getEntity: vi.fn((id: string) => ({
-          id,
-          components: new Map(),
-        })),
-        destroyEntity: vi.fn(),
-      } as any;
+      const mockWorldA = createMockWorld();
+      (mockWorldA.getEntity as ReturnType<typeof vi.fn>).mockImplementation((id: EntityId) => ({
+        id,
+        components: new Map(),
+      } as unknown as Entity));
 
-      const mockWorldB = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-        _entities: new Map(),
-      } as any;
+      const mockWorldB = createMockWorld();
 
       coordinator.registerUniverse(mockWorldA, universeA);
       coordinator.registerUniverse(mockWorldB, universeB);
@@ -369,20 +434,15 @@ describe('MultiverseNetworkManager', () => {
       const peerId = await networkManager.connectToPeer('ws://localhost:8080');
 
       // Create a mock passage
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'test-passage',
-        type: 'remote',
-        from: {
-          universeId: 'universe-a',
-        },
-        to: {
-          universeId: 'universe-b',
-        },
+        from: { universeId: 'universe-a' },
+        to: { universeId: 'universe-b' },
         remotePeerId: peerId,
         connectionState: 'connected',
-      };
+      });
 
-      (networkManager as any).remotePassages.set('test-passage', mockPassage);
+      getNetworkManagerInternals(networkManager).remotePassages.set('test-passage', mockPassage);
 
       // For this test, we'd need to fully mock the entity transfer protocol
       // For now, verify the method exists and basic validation works
@@ -397,14 +457,13 @@ describe('MultiverseNetworkManager', () => {
     it('should reject transfer through disconnected passage', async () => {
       const peerId = await networkManager.connectToPeer('ws://localhost:8080');
 
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'disconnected-passage',
-        type: 'remote',
         remotePeerId: peerId,
         connectionState: 'disconnected',
-      };
+      });
 
-      (networkManager as any).remotePassages.set(
+      getNetworkManagerInternals(networkManager).remotePassages.set(
         'disconnected-passage',
         mockPassage
       );
@@ -422,32 +481,22 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const mockWorldA = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-        getEntity: vi.fn(() => null), // Entity not found
-        destroyEntity: vi.fn(),
-      } as any;
+      const mockWorldA = createMockWorld();
+      (mockWorldA.getEntity as ReturnType<typeof vi.fn>).mockReturnValue(null); // Entity not found
 
       coordinator.registerUniverse(mockWorldA, universeA);
 
       const peerId = await networkManager.connectToPeer('ws://localhost:8080');
 
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'test-passage',
-        type: 'remote',
-        from: {
-          universeId: 'universe-a',
-        },
-        to: {
-          universeId: 'universe-b',
-        },
+        from: { universeId: 'universe-a' },
+        to: { universeId: 'universe-b' },
         remotePeerId: peerId,
         connectionState: 'connected',
-      };
+      });
 
-      (networkManager as any).remotePassages.set('test-passage', mockPassage);
+      getNetworkManagerInternals(networkManager).remotePassages.set('test-passage', mockPassage);
 
       await expect(
         networkManager.transferEntity('nonexistent-entity', 'test-passage')
@@ -473,7 +522,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         localConfig,
         remoteConfig
       );
@@ -500,7 +549,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         localConfig,
         remoteConfig
       );
@@ -527,7 +576,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         localConfig,
         remoteConfig
       );
@@ -552,7 +601,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         localConfig,
         remoteConfig
       );
@@ -591,18 +640,14 @@ describe('MultiverseNetworkManager', () => {
       };
 
       // Register universes in coordinator
-      const mockWorld = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorld = createMockWorld();
 
       coordinator.registerUniverse(mockWorld, rootConfig);
       coordinator.registerUniverse(mockWorld, child1Config);
 
-      const depth0 = (networkManager as any).calculateForkingDepth(rootConfig);
-      const depth1 = (networkManager as any).calculateForkingDepth(child1Config);
-      const depth2 = (networkManager as any).calculateForkingDepth(child2Config);
+      const depth0 = getNetworkManagerInternals(networkManager).calculateForkingDepth(rootConfig);
+      const depth1 = getNetworkManagerInternals(networkManager).calculateForkingDepth(child1Config);
+      const depth2 = getNetworkManagerInternals(networkManager).calculateForkingDepth(child2Config);
 
       expect(depth0).toBe(0);
       expect(depth1).toBe(1);
@@ -628,7 +673,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const areRelated = (networkManager as any).areRelatedTimelines(
+      const areRelated = getNetworkManagerInternals(networkManager).areRelatedTimelines(
         parentConfig,
         childConfig
       );
@@ -657,7 +702,7 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const areRelated = (networkManager as any).areRelatedTimelines(
+      const areRelated = getNetworkManagerInternals(networkManager).areRelatedTimelines(
         sibling1Config,
         sibling2Config
       );
@@ -694,12 +739,12 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const recentDivergence = (networkManager as any).estimateDivergence(
+      const recentDivergence = getNetworkManagerInternals(networkManager).estimateDivergence(
         parentConfig,
         recentForkConfig
       );
 
-      const oldDivergence = (networkManager as any).estimateDivergence(
+      const oldDivergence = getNetworkManagerInternals(networkManager).estimateDivergence(
         parentConfig,
         oldForkConfig
       );
@@ -718,19 +763,14 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const mockWorldA = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorldA = createMockWorld();
 
       coordinator.registerUniverse(mockWorldA, universeA);
 
       const peerId = await networkManager.connectToPeer('ws://localhost:8080');
 
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'test-passage',
-        type: 'remote',
         from: { universeId: 'universe-b' },
         to: { universeId: 'universe-a' },
         remotePeerId: peerId,
@@ -743,9 +783,9 @@ describe('MultiverseNetworkManager', () => {
           compressionLevel: 6,
           deltaUpdatesOnly: true,
         },
-      };
+      });
 
-      (networkManager as any).remotePassages.set('test-passage', mockPassage);
+      getNetworkManagerInternals(networkManager).remotePassages.set('test-passage', mockPassage);
 
       // Subscribe
       expect(() => {
@@ -754,12 +794,12 @@ describe('MultiverseNetworkManager', () => {
     });
 
     it('should reject subscription to disconnected passage', () => {
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'disconnected-passage',
         connectionState: 'disconnected',
-      };
+      });
 
-      (networkManager as any).remotePassages.set(
+      getNetworkManagerInternals(networkManager).remotePassages.set(
         'disconnected-passage',
         mockPassage
       );
@@ -772,13 +812,13 @@ describe('MultiverseNetworkManager', () => {
     it('should unsubscribe from universe', async () => {
       const peerId = await networkManager.connectToPeer('ws://localhost:8080');
 
-      const mockPassage: any = {
+      const mockPassage = createMockPassage({
         id: 'test-passage',
         remotePeerId: peerId,
         connectionState: 'connected',
-      };
+      });
 
-      (networkManager as any).remotePassages.set('test-passage', mockPassage);
+      getNetworkManagerInternals(networkManager).remotePassages.set('test-passage', mockPassage);
 
       // Unsubscribe should not throw even if not subscribed
       expect(() => {
@@ -794,18 +834,14 @@ describe('MultiverseNetworkManager', () => {
         paused: false,
       };
 
-      const mockWorldA = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorldA = createMockWorld();
 
       coordinator.registerUniverse(mockWorldA, universeA);
 
       const peerId = await networkManager.connectToPeer('ws://localhost:8080');
 
       // Create a subscription manually
-      (networkManager as any).activeSubscriptions.set('test-passage', {
+      const subscription: UniverseSubscription = {
         passageId: 'test-passage',
         peerId,
         universeId: 'universe-a',
@@ -819,14 +855,15 @@ describe('MultiverseNetworkManager', () => {
         },
         lastSentTick: 0n,
         updateInterval: setInterval(() => {}, 1000),
-      });
+      };
+      getNetworkManagerInternals(networkManager).activeSubscriptions.set('test-passage', subscription);
 
       // Disconnect peer
       networkManager.disconnectFromPeer(peerId);
 
       // Subscription should be cleaned up
       expect(
-        (networkManager as any).activeSubscriptions.has('test-passage')
+        getNetworkManagerInternals(networkManager).activeSubscriptions.has('test-passage')
       ).toBe(false);
     });
   });

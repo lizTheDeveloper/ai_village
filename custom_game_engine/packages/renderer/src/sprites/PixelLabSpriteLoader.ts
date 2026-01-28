@@ -47,7 +47,9 @@ type PixelLabMetadata = PixelLabMetadataNested | PixelLabMetadataFlat;
 
 /** Type guard for flat metadata */
 function isFlatMetadata(meta: PixelLabMetadata): meta is PixelLabMetadataFlat {
-  return 'directions' in meta || ('rotations' in meta && Array.isArray(meta.rotations));
+  // Flat format has 'id' at top level; nested format has 'character.id' and 'frames'
+  // Check for flat format indicators (most have 'id' directly, some have 'directions' or 'rotations')
+  return 'id' in meta || 'directions' in meta || ('rotations' in meta && Array.isArray(meta.rotations));
 }
 
 /** Animation state for a PixelLab sprite */
@@ -228,6 +230,17 @@ export class PixelLabSpriteLoader {
     }
 
     // Handle nested metadata format (original expected format)
+    // Validate nested format has required structure
+    if (!metadata.frames?.rotations) {
+      // Clear stale cache and throw descriptive error
+      const cache = getSpriteCache();
+      await cache.clearCharacter(folderId);
+      throw new Error(
+        `Invalid metadata format for ${folderId}: missing 'frames.rotations'. ` +
+        `Metadata has keys: [${Object.keys(metadata).join(', ')}]. Cache cleared - retry should succeed.`
+      );
+    }
+
     const rotationPromises = Object.entries(metadata.frames.rotations).map(
       async ([dirName, path]) => {
         try {

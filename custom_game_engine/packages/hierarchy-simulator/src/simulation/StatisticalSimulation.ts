@@ -144,21 +144,21 @@ function logisticGrowth(
  * Get tech cost from pre-computed table
  */
 function getTechCost(level: number): number {
-  return TECH_COST_TABLE[level | 0]; // Bitwise OR for fast floor
+  return TECH_COST_TABLE[level | 0]!; // Bitwise OR for fast floor
 }
 
 /**
  * Get tech efficiency from pre-computed table
  */
 function getTechEfficiency(level: number): number {
-  return EFFICIENCY_TABLE[level | 0];
+  return EFFICIENCY_TABLE[level | 0]!;
 }
 
 /**
  * Get tech bonus from pre-computed table
  */
 function getTechBonus(level: number): number {
-  return TECH_BONUS_TABLE[level | 0];
+  return TECH_BONUS_TABLE[level | 0]!;
 }
 
 // ============================================================================
@@ -188,7 +188,7 @@ export function simulatePlanetTier(planet: AbstractPlanet, deltaTime: number): v
     (planet.stability.happiness * 0.01) * POPULATION_CONSTANTS.HAPPINESS_MODIFIER_RANGE;
   const intrinsicRate = POPULATION_CONSTANTS.BASE_GROWTH_RATE * happinessModifier;
 
-  const techBonus = TECH_BONUS_TABLE[planet.tech.level];
+  const techBonus = TECH_BONUS_TABLE[planet.tech.level]!;
   const effectiveCapacity = planet.population.carryingCapacity * techBonus;
 
   // Inline logistic growth for hot path
@@ -212,10 +212,10 @@ export function simulatePlanetTier(planet: AbstractPlanet, deltaTime: number): v
 
   // Check for tech level advancement - use lookup table
   const techLevel = planet.tech.level;
-  if (planet.tech.research >= TECH_COST_TABLE[techLevel] && techLevel < 10) {
+  if (planet.tech.research >= TECH_COST_TABLE[techLevel]! && techLevel < 10) {
     planet.tech.level = techLevel + 1;
-    planet.tech.research -= TECH_COST_TABLE[techLevel];
-    planet.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1];
+    planet.tech.research -= TECH_COST_TABLE[techLevel]!;
+    planet.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1]!;
 
     // Update civilization stats
     planet.civilizationStats.avgTechLevel = techLevel + 1;
@@ -270,7 +270,7 @@ export function simulatePlanetTier(planet: AbstractPlanet, deltaTime: number): v
   // Progress megastructure construction
   const megastructures = planet.megastructures;
   for (let i = 0; i < megastructures.length; i++) {
-    const megastructure = megastructures[i];
+    const megastructure = megastructures[i]!;
     if (!megastructure.operational) {
       megastructure.constructionProgress += 0.01 * dt;
       if (megastructure.constructionProgress >= 1.0) {
@@ -321,7 +321,7 @@ export function simulateSystemTier(system: AbstractSystem, deltaTime: number): v
     (system.stability.happiness * 0.01) * POPULATION_CONSTANTS.HAPPINESS_MODIFIER_RANGE;
   const intrinsicRate = POPULATION_CONSTANTS.BASE_GROWTH_RATE * happinessModifier * 0.5; // Slower at system scale
 
-  const techBonus = TECH_BONUS_TABLE[system.tech.level];
+  const techBonus = TECH_BONUS_TABLE[system.tech.level]!;
   const effectiveCapacity = system.population.carryingCapacity * techBonus;
 
   // Inline logistic growth
@@ -343,7 +343,7 @@ export function simulateSystemTier(system: AbstractSystem, deltaTime: number): v
       const typeIndex = (rand * 1000) % 5 | 0;
       const types: Array<'station' | 'shipyard' | 'habitat' | 'refinery' | 'defense_platform'> =
         ['station', 'shipyard', 'habitat', 'refinery', 'defense_platform'];
-      const type = types[typeIndex];
+      const type = types[typeIndex]!;
 
       system.orbitalInfrastructure.push({
         id: `${system.id}_orbital_${system.orbitalInfrastructure.length}`,
@@ -370,17 +370,17 @@ export function simulateSystemTier(system: AbstractSystem, deltaTime: number): v
   const researchOutput = system.population.distribution.researchers * TECH_CONSTANTS.RESEARCH_PER_SCIENTIST;
   system.tech.research += researchOutput * dt;
 
-  if (system.tech.research >= TECH_COST_TABLE[techLevel] && techLevel < 10) {
+  if (system.tech.research >= TECH_COST_TABLE[techLevel]! && techLevel < 10) {
     system.tech.level = techLevel + 1;
-    system.tech.research -= TECH_COST_TABLE[techLevel];
-    system.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1];
+    system.tech.research -= TECH_COST_TABLE[techLevel]!;
+    system.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1]!;
     system.systemStats.maxTechLevel = techLevel + 1;
   }
 
   // 5. Asteroid mining - OPTIMIZED: Cache map lookups
   const asteroidBelts = system.asteroidBelts;
   for (let i = 0; i < asteroidBelts.length; i++) {
-    const belt = asteroidBelts[i];
+    const belt = asteroidBelts[i]!;
     if (techLevel >= 8 && belt.miningStations < 10) {
       // Gradually build mining stations
       if (fastRandom() < 0.02 * dt) {
@@ -409,7 +409,7 @@ export function simulateSystemTier(system: AbstractSystem, deltaTime: number): v
   let defensePlatforms = 0;
   const infrastructure = system.orbitalInfrastructure;
   for (let i = 0; i < infrastructure.length; i++) {
-    if (infrastructure[i].type === 'defense_platform' && infrastructure[i].operational) {
+    if (infrastructure[i]!.type === 'defense_platform' && infrastructure[i]!.operational) {
       defensePlatforms++;
     }
   }
@@ -453,7 +453,7 @@ export function simulateSectorTier(sector: AbstractSector, deltaTime: number): v
     (sector.stability.happiness * 0.01) * POPULATION_CONSTANTS.HAPPINESS_MODIFIER_RANGE;
   const intrinsicRate = POPULATION_CONSTANTS.BASE_GROWTH_RATE * happinessModifier * 0.2; // Much slower
 
-  const techBonus = TECH_BONUS_TABLE[sector.tech.level];
+  const techBonus = TECH_BONUS_TABLE[sector.tech.level]!;
   const effectiveCapacity = sector.population.carryingCapacity * techBonus;
 
   // Inline logistic growth
@@ -468,10 +468,10 @@ export function simulateSectorTier(sector: AbstractSector, deltaTime: number): v
   sector.tech.research += researchOutput * dt;
 
   const techLevel = sector.tech.level;
-  if (sector.tech.research >= TECH_COST_TABLE[techLevel] && techLevel < 10) {
+  if (sector.tech.research >= TECH_COST_TABLE[techLevel]! && techLevel < 10) {
     sector.tech.level = techLevel + 1;
-    sector.tech.research -= TECH_COST_TABLE[techLevel];
-    sector.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1];
+    sector.tech.research -= TECH_COST_TABLE[techLevel]!;
+    sector.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1]!;
     sector.sectorStats.maxTechLevel = techLevel + 1;
     sector.sectorStats.avgTechLevel = techLevel + 1;
   }
@@ -517,8 +517,8 @@ export function simulateSectorTier(sector: AbstractSector, deltaTime: number): v
   const politicalEntities = sector.politicalEntities;
   if (politicalEntities.length > 1 && politicalStability > 0.9 && fastRandom() < 0.001 * dt) {
     // Merge two entities
-    const entity1 = politicalEntities[0];
-    const entity2 = politicalEntities[1];
+    const entity1 = politicalEntities[0]!;
+    const entity2 = politicalEntities[1]!;
     entity1.population += entity2.population;
     entity1.militaryPower += entity2.militaryPower;
     politicalEntities.splice(1, 1);
@@ -533,7 +533,7 @@ export function simulateSectorTier(sector: AbstractSector, deltaTime: number): v
 
   // 7. Update political entities - OPTIMIZED: Single pass
   for (let i = 0; i < politicalEntities.length; i++) {
-    const entity = politicalEntities[i];
+    const entity = politicalEntities[i]!;
     entity.techLevel = sector.tech.level;
     entity.militaryPower = (entity.population * 0.05 * entity.techLevel) | 0;
   }
@@ -596,7 +596,7 @@ export function simulateGalaxyTier(galaxy: AbstractGalaxy, deltaTime: number): v
     (galaxy.stability.happiness * 0.01) * POPULATION_CONSTANTS.HAPPINESS_MODIFIER_RANGE;
   const intrinsicRate = POPULATION_CONSTANTS.BASE_GROWTH_RATE * happinessModifier * 0.05; // Glacial
 
-  const techBonus = TECH_BONUS_TABLE[galaxy.tech.level];
+  const techBonus = TECH_BONUS_TABLE[galaxy.tech.level]!;
   const effectiveCapacity = galaxy.population.carryingCapacity * techBonus;
 
   // Inline logistic growth
@@ -612,7 +612,7 @@ export function simulateGalaxyTier(galaxy: AbstractGalaxy, deltaTime: number): v
   const civs = galaxy.galacticCivilizations;
 
   for (let i = 0; i < civs.length; i++) {
-    const civ = civs[i];
+    const civ = civs[i]!;
 
     // Slow Kardashev progression - inline clamp
     civ.kardashevLevel += 0.001 * dt;
@@ -646,10 +646,10 @@ export function simulateGalaxyTier(galaxy: AbstractGalaxy, deltaTime: number): v
   galaxy.tech.research += researchOutput * dt;
 
   const techLevel = galaxy.tech.level;
-  if (galaxy.tech.research >= TECH_COST_TABLE[techLevel] && techLevel < 10) {
+  if (galaxy.tech.research >= TECH_COST_TABLE[techLevel]! && techLevel < 10) {
     galaxy.tech.level = techLevel + 1;
-    galaxy.tech.research -= TECH_COST_TABLE[techLevel];
-    galaxy.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1];
+    galaxy.tech.research -= TECH_COST_TABLE[techLevel]!;
+    galaxy.tech.efficiency = EFFICIENCY_TABLE[techLevel + 1]!;
     galaxy.galacticStats.maxTechLevel = techLevel + 1;
   }
 
@@ -665,7 +665,7 @@ export function simulateGalaxyTier(galaxy: AbstractGalaxy, deltaTime: number): v
   if (!galaxy.governance && civs.length >= 3 && galaxy.tech.level >= 10 && fastRandom() < 0.0001 * dt) {
     const memberIds: string[] = [];
     for (let i = 0; i < civs.length; i++) {
-      memberIds.push(civs[i].id);
+      memberIds.push(civs[i]!.id);
     }
 
     galaxy.governance = {
@@ -687,7 +687,7 @@ export function simulateGalaxyTier(galaxy: AbstractGalaxy, deltaTime: number): v
 
   // 6. Mega-events - OPTIMIZED: Single random call with switch
   if (fastRandom() < EVENT_CONSTANTS.MEGA_EVENT_CHANCE * dt) {
-    const eventType = MEGA_EVENT_TYPES[(fastRandom() * 6) | 0];
+    const eventType = MEGA_EVENT_TYPES[(fastRandom() * 6) | 0]!;
 
     let description = '';
     let impact: 'local' | 'regional' | 'galactic' | 'cosmic' = 'galactic';

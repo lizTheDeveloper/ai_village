@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:25905d7c",
+  "name": "Nova Titan",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769493103927",
+  "createdAt": 1769493103939,
+  "lastAccessedAt": 1769493103939,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769493103927",
+    "type": "magical"
+  }
+}

@@ -469,26 +469,26 @@ export class HierarchyDOMRenderer {
 
     if (this.populationChart) {
       this.populationChart.data.labels = history.ticks.map(t => Math.floor(t).toString());
-      this.populationChart.data.datasets[0].data = history.population;
+      this.populationChart.data.datasets[0]!.data = history.population;
       this.populationChart.update('none'); // No animation for performance
     }
 
     if (this.productionChart) {
       this.productionChart.data.labels = history.ticks.map(t => Math.floor(t).toString());
-      this.productionChart.data.datasets[0].data = history.production;
-      this.productionChart.data.datasets[1].data = history.consumption;
+      this.productionChart.data.datasets[0]!.data = history.production;
+      this.productionChart.data.datasets[1]!.data = history.consumption;
       this.productionChart.update('none');
     }
 
     if (this.tradeChart) {
       this.tradeChart.data.labels = history.ticks.map(t => Math.floor(t).toString());
-      this.tradeChart.data.datasets[0].data = history.tradeVolume;
+      this.tradeChart.data.datasets[0]!.data = history.tradeVolume;
       this.tradeChart.update('none');
     }
 
     if (this.efficiencyChart) {
       this.efficiencyChart.data.labels = history.ticks.map(t => Math.floor(t).toString());
-      this.efficiencyChart.data.datasets[0].data = history.efficiency;
+      this.efficiencyChart.data.datasets[0]!.data = history.efficiency;
       this.efficiencyChart.update('none');
     }
   }

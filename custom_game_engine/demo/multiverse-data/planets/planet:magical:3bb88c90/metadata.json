@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:3bb88c90",
+  "name": "Quantum Triton",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769498908802",
+  "createdAt": 1769498909007,
+  "lastAccessedAt": 1769498909007,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769498908802",
+    "type": "magical"
+  }
+}

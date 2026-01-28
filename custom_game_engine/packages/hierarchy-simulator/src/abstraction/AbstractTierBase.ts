@@ -123,7 +123,7 @@ export class AbstractTierBase implements AbstractTier {
 
     const numGuilds = 2 + Math.floor(Math.random() * 4);
     for (let i = 0; i < numGuilds; i++) {
-      const field = researchFields[Math.floor(Math.random() * researchFields.length)];
+      const field = researchFields[Math.floor(Math.random() * researchFields.length)]!;
       const count = this.researchGuilds.get(field) || 0;
       this.researchGuilds.set(field, count + 1 + Math.floor(Math.random() * 3));
     }
@@ -140,8 +140,8 @@ export class AbstractTierBase implements AbstractTier {
     // Hard step progression: tier-N requires 100× tier-(N-1)
     const tierProgression = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     for (let i = 1; i < tierProgression.length; i++) {
-      const prevTier = tierProgression[i - 1];
-      const currTier = tierProgression[i];
+      const prevTier = tierProgression[i - 1]!;
+      const currTier = tierProgression[i]!;
       const prevCount = this.scientistPool.get(prevTier) || 0;
 
       // Can only have tier-N if you have 100× tier-(N-1)
@@ -323,8 +323,8 @@ export class AbstractTierBase implements AbstractTier {
 
     for (let i = 0; i < this.children.length; i++) {
       for (let j = i + 1; j < this.children.length; j++) {
-        const childA = this.children[i];
-        const childB = this.children[j];
+        const childA = this.children[i]!;
+        const childB = this.children[j]!;
 
         // Check for complementary shortages/surpluses
         for (const resource of RESOURCE_TYPES) {
@@ -442,7 +442,7 @@ export class AbstractTierBase implements AbstractTier {
       'pandemic'
     ];
 
-    const type = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+    const type = eventTypes[Math.floor(Math.random() * eventTypes.length)]!;
     const severity = 1 + Math.floor(Math.random() * 10);
     this.triggerEvent(type, severity);
   }

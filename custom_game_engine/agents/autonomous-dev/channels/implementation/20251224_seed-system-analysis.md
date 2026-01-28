@@ -67,7 +67,7 @@ export function createSeedItemId(speciesId: string): string
 Updated `addToInventory()` to handle seeds:
 - Seeds have weight 0.1 units (lightweight)
 - Seeds stack up to 100 per slot
-- Seeds use format `"seed:{speciesId}"` (e.g., `"seed:grass"`, `"seed:berry-bush"`)
+- Seeds use format `"seed:{speciesId}"` (e.g., `"seed:grass"`, `"seed:blueberry-bush"`)
 
 Updated `removeFromInventory()` to handle seed removal with correct weight calculation.
 

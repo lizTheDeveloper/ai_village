@@ -11,6 +11,7 @@ import type {
   Memory,
   PositionComponent,
   EventBus,
+  PreparationType,
 } from '@ai-village/core';
 import {
   BaseSystem,
@@ -432,7 +433,11 @@ export class PlantDiscoverySystem extends BaseSystem {
 
     // Check if this plant has medicinal properties that work with this application
     const medicinalPrep = props.medicinal?.preparation;
-    if (props.medicinal && medicinalPrep?.includes(applicationMethod as any)) {
+    // Type guard: Check if applicationMethod is a valid PreparationType
+    const validPreparationTypes = ['raw', 'tea', 'poultice', 'salve', 'tincture', 'powder', 'smoke'];
+    const isValidPreparation = validPreparationTypes.includes(applicationMethod);
+
+    if (props.medicinal && isValidPreparation && medicinalPrep?.includes(applicationMethod as PreparationType)) {
       const appEffectiveness = props.medicinal.effectiveness ?? 0.5;
       effects.push({
         type: 'healing',

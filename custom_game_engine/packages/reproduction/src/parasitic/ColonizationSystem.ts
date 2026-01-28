@@ -141,7 +141,7 @@ export class ColonizationSystem extends BaseSystem {
       if (!colonization) continue;
 
       if (colonization.isColonized) {
-        this.processColonizedHost(ctx.world as any, entity, colonization, currentTick);
+        this.processColonizedHost(ctx.world, entity, colonization, currentTick);
       } else if (colonization.previouslyColonized) {
         this.processRecoveringHost(colonization);
       }

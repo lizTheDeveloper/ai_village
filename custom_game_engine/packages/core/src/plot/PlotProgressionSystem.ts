@@ -298,8 +298,17 @@ export class PlotProgressionSystem extends BaseSystem {
       return;
     }
 
-    // Call assignFollowUpPlot - type assertion since we know it's PlotAssignmentSystem
-    const assignmentSys = assignmentSystem as any;
+    // Call assignFollowUpPlot - check for method existence
+    if (typeof assignmentSystem !== 'object' || assignmentSystem === null) {
+      console.warn('[PlotProgression] PlotAssignmentSystem is not an object');
+      return;
+    }
+
+    type PlotAssignmentSystemWithFollowUp = {
+      assignFollowUpPlot(soul: Entity, completedPlotId: string, world: World): PlotLineInstance | null;
+    };
+
+    const assignmentSys = assignmentSystem as unknown as PlotAssignmentSystemWithFollowUp;
     if (typeof assignmentSys.assignFollowUpPlot !== 'function') {
       console.warn('[PlotProgression] PlotAssignmentSystem.assignFollowUpPlot method not found');
       return;

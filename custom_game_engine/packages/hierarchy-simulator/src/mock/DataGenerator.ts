@@ -133,14 +133,14 @@ export class DataGenerator {
       'The Confluence'
     ];
 
-    return names[Math.floor(Math.random() * names.length)];
+    return names[Math.floor(Math.random() * names.length)]!;
   }
 
   private generateSubsectionName(): string {
     const prefixes = ['Northern', 'Southern', 'Eastern', 'Western', 'Central'];
     const types = ['District', 'Quarter', 'Territory', 'Sector', 'Zone'];
 
-    return `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${types[Math.floor(Math.random() * types.length)]}`;
+    return `${prefixes[Math.floor(Math.random() * prefixes.length)]!} ${types[Math.floor(Math.random() * types.length)]!}`;
   }
 
   private generateRegionName(): string {

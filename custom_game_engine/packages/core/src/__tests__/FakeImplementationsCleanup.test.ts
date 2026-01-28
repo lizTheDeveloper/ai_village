@@ -12,6 +12,7 @@ import { createBuildingComponent } from '../components/BuildingComponent.js';
 import { createAgentComponent } from '../components/AgentComponent.js';
 import { createTimeComponent } from '../systems/TimeSystem.js';
 import { createSkillsComponent } from '../components/SkillsComponent.js';
+import { EntityImpl } from '../ecs/Entity.js';
 
 import { BuildingType } from '../types/BuildingType.js';
 /**
@@ -213,11 +214,11 @@ describe('Fake Implementations Cleanup', () => {
       });
 
       // Create a building entity
-      const building = world.createEntity();
+      const building = world.createEntity() as EntityImpl;
       const buildingComp = createBuildingComponent(BuildingType.Workbench, 1, 99.5);
       buildingComp.ownerId = realAgentId; // Set the real builderId
-      (building as any).addComponent(buildingComp);
-      (building as any).addComponent(createPositionComponent(5, 5));
+      building.addComponent(buildingComp);
+      building.addComponent(createPositionComponent(5, 5));
 
       // Update system to complete construction
       buildingSystem.update(world, [building], 1.0);
@@ -289,11 +290,8 @@ describe('Fake Implementations Cleanup', () => {
       eventBus.flush();
 
       expect(handlerCalled).toHaveBeenCalled();
-      expect(handlerCalled).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'product_ready'
-        })
-      );
+      const callArg = handlerCalled.mock.calls[0][0];
+      expect(callArg.type).toBe('product_ready');
     });
 
     it('should handle housing:dirty event when emitted', () => {
@@ -411,10 +409,10 @@ describe('Fake Implementations Cleanup', () => {
       });
 
       // Create time entity at end of week (day 7, hour 23:00)
-      const timeEntity = world.createEntity();
+      const timeEntity = world.createEntity() as EntityImpl;
       const timeComp = createTimeComponent(23.0, 48, 1);
       timeComp.day = 7; // Last day of week (week 1, days 1-7)
-      (timeEntity as any).addComponent(timeComp);
+      timeEntity.addComponent(timeComp);
 
       // Update to cross midnight into new week (day 8 = week 2, days 8-14)
       // With dayLength=48s and speedMultiplier=1, 1 hour = 2 seconds
@@ -443,17 +441,17 @@ describe('Fake Implementations Cleanup', () => {
       });
 
       // Create agent who has never harvested
-      const agent = world.createEntity();
+      const agent = world.createEntity() as EntityImpl;
       const skills = createSkillsComponent();
       skills.hasHarvested = false; // First time
 
-      (agent as any).addComponent(createAgentComponent('Test Agent'));
-      (agent as any).addComponent(createPositionComponent(5, 5));
-      (agent as any).addComponent(createInventoryComponent(20, 100));
-      (agent as any).addComponent(skills);
+      agent.addComponent(createAgentComponent('Test Agent'));
+      agent.addComponent(createPositionComponent(5, 5));
+      agent.addComponent(createInventoryComponent(20, 100));
+      agent.addComponent(skills);
 
       // Create a harvestable plant
-      const plant = world.createEntity();
+      const plant = world.createEntity() as EntityImpl;
       const plantComp = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 5, y: 6 },
@@ -461,8 +459,8 @@ describe('Fake Implementations Cleanup', () => {
         fruitCount: 5
       });
 
-      (plant as any).addComponent(plantComp);
-      (plant as any).addComponent(createPositionComponent(5, 6));
+      plant.addComponent(plantComp);
+      plant.addComponent(createPositionComponent(5, 6));
 
       // Execute harvest action
       const action = {

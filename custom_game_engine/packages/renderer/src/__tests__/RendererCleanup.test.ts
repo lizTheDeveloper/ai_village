@@ -1,5 +1,19 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ChunkManager, TerrainGenerator } from '@ai-village/world';
+import type { Renderer } from '../Renderer';
+
+/**
+ * Internal Renderer properties accessed by tests.
+ * These are private properties that tests check for memory leak prevention.
+ */
+interface RendererInternal extends Renderer {
+  boundResizeHandler?: (() => void) | null;
+  resizeHandler?: (() => void) | null;
+  handleResize?: (() => void) | null;
+  renderer3D?: unknown | null;
+  was3DActive?: boolean;
+  current3DWorld?: unknown | null;
+}
 
 describe('Renderer Cleanup (Memory Leak Fix)', () => {
   let canvas: HTMLCanvasElement;
@@ -26,7 +40,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       expect(renderer).toHaveProperty('destroy');
-      expect(typeof (renderer as any).destroy).toBe('function');
+      expect(typeof renderer.destroy).toBe('function');
     });
 
     it('should remove resize event listener when destroy() is called', async () => {
@@ -38,8 +52,8 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       // Call destroy
-      if (typeof (renderer as any).destroy === 'function') {
-        (renderer as any).destroy();
+      if (typeof renderer.destroy === 'function') {
+        renderer.destroy();
       }
 
       // Should have removed the 'resize' event listener
@@ -62,8 +76,8 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
         window.dispatchEvent(new Event('resize'));
 
         // Destroy it
-        if (typeof (renderer as any).destroy === 'function') {
-          (renderer as any).destroy();
+        if (typeof renderer.destroy === 'function') {
+          renderer.destroy();
         }
       }
 
@@ -78,11 +92,12 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       // Renderer should maintain a reference to the bound resize handler
       // This ensures we can remove it later with the exact same reference
+      const internal = renderer as RendererInternal;
 
       expect(
-        (renderer as any).boundResizeHandler !== undefined ||
-        (renderer as any).resizeHandler !== undefined ||
-        (renderer as any).handleResize !== undefined
+        internal.boundResizeHandler !== undefined ||
+        internal.resizeHandler !== undefined ||
+        internal.handleResize !== undefined
       ).toBe(true);
     });
 
@@ -93,12 +108,12 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       // First destroy
       expect(() => {
-        (renderer as any).destroy();
+        renderer.destroy();
       }).not.toThrow();
 
       // Second destroy should also not throw
       expect(() => {
-        (renderer as any).destroy();
+        renderer.destroy();
       }).not.toThrow();
     });
 
@@ -114,8 +129,8 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       // Create multiple renderers with cleanup
       for (let i = 0; i < 5; i++) {
         const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
-        if (typeof (renderer as any).destroy === 'function') {
-          (renderer as any).destroy();
+        if (typeof renderer.destroy === 'function') {
+          renderer.destroy();
         }
       }
 
@@ -137,13 +152,14 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       // Renderer uses 2D context, but has a 3D renderer instance that may be created
       // The destroy() method should clean up the 3D renderer if it exists
       expect(() => {
-        (renderer as any).destroy();
+        renderer.destroy();
       }).not.toThrow();
 
       // Verify renderer3D is cleaned up
-      expect((renderer as any).renderer3D).toBeNull();
-      expect((renderer as any).was3DActive).toBe(false);
-      expect((renderer as any).current3DWorld).toBeNull();
+      const internal = renderer as RendererInternal;
+      expect(internal.renderer3D).toBeNull();
+      expect(internal.was3DActive).toBe(false);
+      expect(internal.current3DWorld).toBeNull();
     });
   });
 
@@ -152,6 +168,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       const { Renderer } = await import('../Renderer');
 
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         new Renderer(null as any, chunkManager, terrainGenerator);
       }).toThrow();
     });
@@ -160,6 +177,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       const { Renderer } = await import('../Renderer');
 
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         new Renderer(undefined as any, chunkManager, terrainGenerator);
       }).toThrow();
     });

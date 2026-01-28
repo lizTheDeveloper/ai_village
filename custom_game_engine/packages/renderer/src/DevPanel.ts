@@ -471,7 +471,7 @@ export class DevPanel implements IWindowPanel {
    * Sync local state from world state (read actual game data)
    */
   private syncFromWorld(world: World): void {
-    this.world = world;
+    this.world = world as WorldMutator;
 
     // Sync magic paradigm states from MagicSystemStateManager
     const magicManager = MagicSystemStateManager.getInstance();
@@ -2320,7 +2320,7 @@ export class DevPanel implements IWindowPanel {
             if (angel) {
               const angels = (this.divineResources.get('angels') ?? 0) + 1;
               this.divineResources.set('angels', angels);
-              this.log(`Spawned messenger angel for deity ${deityComp.identity.primaryName} (ID: ${angel.id})`);
+              this.log(`Spawned messenger angel for deity ${deityComp.identity.primaryName} (ID: ${(angel as { id: string }).id})`);
             } else {
               this.log('ERROR: Angel creation failed (insufficient belief or angels disabled in universe)');
             }

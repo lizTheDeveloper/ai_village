@@ -2,9 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "."
+    "rootDir": "./src",
+    "types": ["@webgpu/types"]
   },
-  "include": ["src/**/*", "src/**/*.json", "data/**/*.json"],
+  "include": ["src/**/*", "src/**/*.json"],
   "exclude": [
     "src/**/__tests__/**/*",
     "src/**/*.test.ts",

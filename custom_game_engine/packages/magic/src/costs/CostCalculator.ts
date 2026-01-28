@@ -368,9 +368,10 @@ export abstract class BaseCostCalculator implements ParadigmCostCalculator {
           // (MagicComponent and ManaPoolsComponent both define ResourcePool).
           // The structures are compatible; only the 'type' field differs slightly.
           // Using 'as unknown as' because TypeScript sees these as incompatible types.
-          const newPool = this.createDefaultPool(cost.type) as unknown as ResourcePool;
-          pool = newPool;
-          caster.resourcePools[cost.type] = newPool;
+          const newPool = this.createDefaultPool(cost.type);
+          // Cast through unknown to handle the dual ResourcePool interface issue
+          pool = newPool as unknown as typeof pool;
+          caster.resourcePools[cost.type] = newPool as unknown as (typeof caster.resourcePools)[typeof cost.type];
         } else {
           // Can't deduct from non-existent pool
           continue;

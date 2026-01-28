@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:7bd1fb",
+  "name": "Theia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489458735",
+  "createdAt": 1769489458743,
+  "lastAccessedAt": 1769489458743,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489458735",
+    "type": "magical"
+  }
+}

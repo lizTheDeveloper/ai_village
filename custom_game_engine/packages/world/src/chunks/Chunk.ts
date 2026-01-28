@@ -20,6 +20,13 @@ export interface Chunk {
 
   /** Entities currently in this chunk */
   entities: Set<EntityId>;
+
+  /**
+   * Version counter for cache invalidation.
+   * Incremented whenever tiles are modified.
+   * TerrainRenderer uses this to avoid recomputing tile hashes every frame.
+   */
+  version: number;
 }
 
 /**
@@ -38,6 +45,7 @@ export function createChunk(chunkX: number, chunkY: number): Chunk {
     generated: false,
     tiles,
     entities: new Set(),
+    version: 0,
   };
 }
 
@@ -53,6 +61,7 @@ export function getTileAt(chunk: Chunk, localX: number, localY: number): Tile | 
 
 /**
  * Set tile at local chunk coordinates.
+ * Increments chunk.version for cache invalidation.
  */
 export function setTileAt(
   chunk: Chunk,
@@ -64,7 +73,19 @@ export function setTileAt(
     return false;
   }
   chunk.tiles[localY * CHUNK_SIZE + localX] = tile;
+  chunk.version++;
   return true;
+}
+
+/**
+ * Mark a chunk as dirty (increments version).
+ * Call this when modifying tiles directly instead of through setTileAt.
+ *
+ * PERFORMANCE: This enables O(1) cache validation in TerrainRenderer
+ * instead of O(256) tile hash computation per frame per chunk.
+ */
+export function markChunkDirty(chunk: Chunk): void {
+  chunk.version++;
 }
 
 /**

@@ -417,6 +417,34 @@ export class Camera {
   }
 
   /**
+   * Convert world coordinates to screen coordinates, writing into provided result object.
+   * Zero-allocation version for hot render paths.
+   * @param worldX World X coordinate
+   * @param worldY World Y coordinate
+   * @param worldZ World Z coordinate
+   * @param result Pre-allocated result object to write into
+   * @returns The same result object (for chaining)
+   */
+  worldToScreenInto(
+    worldX: number,
+    worldY: number,
+    worldZ: number,
+    result: { x: number; y: number; parallax: ParallaxTransform | null }
+  ): { x: number; y: number; parallax: ParallaxTransform | null } {
+    if (this.viewMode === ViewMode.TopDown) {
+      result.x = (worldX - this.x) * this.zoom + this.viewportWidth / 2;
+      result.y = (worldY - this.y) * this.zoom + this.viewportHeight / 2;
+      result.parallax = null;
+    } else {
+      const parallax = calculateParallaxTransform(worldZ, this.z, this.parallaxConfig);
+      result.x = (worldX - this.x) * this.zoom * parallax.scale + this.viewportWidth / 2;
+      result.y = (worldY - this.y) * this.zoom * parallax.scale + this.viewportHeight / 2 + parallax.verticalOffset;
+      result.parallax = parallax;
+    }
+    return result;
+  }
+
+  /**
    * Convert screen coordinates to world coordinates.
    * Returns the focus z-level in side-view mode.
    */

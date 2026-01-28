@@ -270,7 +270,7 @@ export class HeadlessCitySimulator {
     worldEntity.addComponent(createTimeComponent());
     worldEntity.addComponent(createWeatherComponent('clear', 0.5, 14400)); // Clear weather, 50% intensity, 1 day duration
     worldEntity.addComponent(createNamedLandmarksComponent());
-    const worldInternal = world as WorldInternal;
+    const worldInternal = world as unknown as WorldInternal;
     world.addEntity(worldEntity);
     worldInternal._worldEntityId = worldEntity.id; // Critical for systems to find world entity
 

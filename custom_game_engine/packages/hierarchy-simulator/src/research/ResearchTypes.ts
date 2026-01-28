@@ -176,9 +176,9 @@ export class PaperTitleGenerator {
   ];
 
   generateTitle(field: ResearchField, tier: number): string {
-    const prefix = this.prefixes[Math.floor(Math.random() * this.prefixes.length)];
-    const topic = this.topics[field][Math.floor(Math.random() * this.topics[field].length)];
-    const suffix = tier > 5 ? this.suffixes[Math.floor(Math.random() * this.suffixes.length)] : '';
+    const prefix = this.prefixes[Math.floor(Math.random() * this.prefixes.length)]!;
+    const topic = this.topics[field]![Math.floor(Math.random() * this.topics[field]!.length)]!;
+    const suffix = tier > 5 ? this.suffixes[Math.floor(Math.random() * this.suffixes.length)]! : '';
 
     if (tier >= 8) {
       return `${prefix} ${topic} ${suffix} (Tier-${tier} Transcendent)`;
@@ -236,7 +236,7 @@ export class PaperTitleGenerator {
     const selected: ResearchField[] = [];
 
     while (selected.length < count && selected.length < fields.length) {
-      const field = fields[Math.floor(Math.random() * fields.length)];
+      const field = fields[Math.floor(Math.random() * fields.length)]!;
       if (!selected.includes(field)) {
         selected.push(field);
       }

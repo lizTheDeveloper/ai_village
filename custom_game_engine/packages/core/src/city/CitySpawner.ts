@@ -15,12 +15,14 @@ import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
-type AgentModule = { createLLMAgent: (world: any, x: number, y: number, speed: number) => string; createWanderingAgent: (world: any, x: number, y: number, speed: number) => string };
+type AgentModule = { createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string; createWanderingAgent: (world: WorldMutator, x: number, y: number, speed: number) => string };
 let _agentModule: AgentModule | null = null;
 async function getAgentModule(): Promise<AgentModule> {
   if (!_agentModule) {
     // Dynamic import to break circular dependency: core -> agents -> core
-    _agentModule = await import('@ai-village/agents');
+    // The agents package exports these functions, so we can safely cast to AgentModule
+    const module = await import('@ai-village/agents');
+    _agentModule = module as AgentModule;
   }
   return _agentModule!;
 }

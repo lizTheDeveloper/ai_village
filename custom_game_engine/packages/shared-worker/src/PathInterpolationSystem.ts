@@ -41,7 +41,7 @@ export class PathInterpolationSystem extends BaseSystem {
     const interpolator = entity.getComponent('path_interpolator') as
       | PathInterpolatorComponent
       | undefined;
-    const position = entity.getComponent('position');
+    const position = entity.getComponent('position') as { x: number; y: number } | undefined;
 
     if (!interpolator || !position) return;
 

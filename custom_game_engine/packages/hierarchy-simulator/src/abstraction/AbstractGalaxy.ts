@@ -162,9 +162,9 @@ export class AbstractGalaxy extends AbstractTierBase {
     let selectedType: 'spiral' | 'elliptical' | 'irregular' | 'ring' = 'spiral';
 
     for (let i = 0; i < types.length; i++) {
-      random -= typeWeights[i];
+      random -= typeWeights[i]!;
       if (random <= 0) {
-        selectedType = types[i];
+        selectedType = types[i]!;
         break;
       }
     }
@@ -198,7 +198,7 @@ export class AbstractGalaxy extends AbstractTierBase {
     ];
 
     for (let i = 0; i < civCount; i++) {
-      const type = civTypes[Math.min(i, civTypes.length - 1)];
+      const type = civTypes[Math.min(i, civTypes.length - 1)]!;
       const popShare = this.population.total / civCount;
 
       const kardashevLevel = type === 'kardashev_ii' ? 2.0 + Math.random() * 0.5
@@ -207,7 +207,7 @@ export class AbstractGalaxy extends AbstractTierBase {
 
       this.galacticCivilizations.push({
         id: `${this.id}_civ_${i}`,
-        name: civNames[i % civNames.length],
+        name: civNames[i % civNames.length]!,
         type,
         controlledSectors: [], // Will be populated when sectors are generated
         population: Math.floor(popShare),
@@ -244,7 +244,7 @@ export class AbstractGalaxy extends AbstractTierBase {
     for (let i = 0; i < count; i++) {
       megastructures.push({
         id: `${this.id}_mega_${civIndex}_${i}`,
-        type: types[Math.floor(Math.random() * types.length)],
+        type: types[Math.floor(Math.random() * types.length)]!,
         location: `sector_${Math.floor(Math.random() * 1000)}`,
         operational: Math.random() > 0.2, // 80% operational
       });

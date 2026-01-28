@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2b755e4",
+  "name": "Nova Triton",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489294682",
+  "createdAt": 1769489294884,
+  "lastAccessedAt": 1769489294884,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489294682",
+    "type": "magical"
+  }
+}

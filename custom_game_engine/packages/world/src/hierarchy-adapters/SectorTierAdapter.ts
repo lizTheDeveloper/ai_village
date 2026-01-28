@@ -11,7 +11,7 @@
  * NOTE: Moved from @ai-village/hierarchy-simulator to break circular dependency.
  */
 
-import { AbstractSector, AbstractSystem } from '@ai-village/hierarchy-simulator';
+import { AbstractSector, AbstractSystem, AbstractPlanet } from '@ai-village/hierarchy-simulator';
 import type { UniversalAddress } from '@ai-village/hierarchy-simulator';
 
 /**
@@ -193,14 +193,14 @@ export class SectorTierAdapter {
           continue;
         }
 
-        const resourceMap = (planet as any).planetaryStats?.resourceAbundance;
-        if (resourceMap) {
-          totalWater += resourceMap.get('water') ?? 0;
-          totalMetals += resourceMap.get('metals') ?? 0;
-          totalRareEarths += resourceMap.get('rare_earths') ?? 0;
-          totalFossilFuels += resourceMap.get('fossil_fuels') ?? 0;
-          totalGeothermalEnergy += resourceMap.get('geothermal_energy') ?? 0;
-        }
+        // Type assertion is safe here - we checked tier === 'planet'
+        const abstractPlanet = planet as AbstractPlanet;
+        const resourceMap = abstractPlanet.planetaryStats.resourceAbundance;
+        totalWater += resourceMap.get('water') ?? 0;
+        totalMetals += resourceMap.get('metals') ?? 0;
+        totalRareEarths += resourceMap.get('rare_earths') ?? 0;
+        totalFossilFuels += resourceMap.get('fossil_fuels') ?? 0;
+        totalGeothermalEnergy += resourceMap.get('geothermal_energy') ?? 0;
       }
 
       // Resources from asteroid belts

@@ -98,11 +98,11 @@ export default defineConfig({
             // Determine API key based on provider URL
             let apiKey = '';
             if (baseUrl.includes('groq.com')) {
-              apiKey = envConfig.GROQ_API_KEY || process.env.GROQ_API_KEY || '';
+              apiKey = envConfig.VITE_GROQ_API_KEY || envConfig.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || process.env.GROQ_API_KEY || '';
             } else if (baseUrl.includes('cerebras.ai')) {
-              apiKey = envConfig.CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY || '';
+              apiKey = envConfig.VITE_CEREBRAS_API_KEY || envConfig.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY || '';
             } else if (baseUrl.includes('api.openai.com')) {
-              apiKey = envConfig.OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+              apiKey = envConfig.VITE_OPENAI_API_KEY || envConfig.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
             }
 
             const headers: Record<string, string> = {};
@@ -155,11 +155,11 @@ export default defineConfig({
               let apiKey = requestData.apiKey || '';
               if (!apiKey) {
                 if (baseUrl.includes('groq.com')) {
-                  apiKey = envConfig.GROQ_API_KEY || process.env.GROQ_API_KEY || '';
+                  apiKey = envConfig.VITE_GROQ_API_KEY || envConfig.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || process.env.GROQ_API_KEY || '';
                 } else if (baseUrl.includes('cerebras.ai')) {
-                  apiKey = envConfig.CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY || '';
+                  apiKey = envConfig.VITE_CEREBRAS_API_KEY || envConfig.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY || '';
                 } else if (baseUrl.includes('api.openai.com')) {
-                  apiKey = envConfig.OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+                  apiKey = envConfig.VITE_OPENAI_API_KEY || envConfig.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
                 }
               }
 

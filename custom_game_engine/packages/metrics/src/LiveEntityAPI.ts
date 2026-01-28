@@ -7,7 +7,7 @@
  * - Live LLM prompt generation using StructuredPromptBuilder
  */
 
-import type { World } from '@ai-village/core';
+import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/core';
@@ -474,9 +474,6 @@ function isNavyComponent(component: unknown): component is NavyComponent {
   return 'type' in component && (component as { type?: string }).type === 'navy';
 }
 
-function hasRuntimeProps(world: World): world is WorldWithRuntimeProps {
-  return true; // All properties are optional
-}
 
 function hasMutator(world: World): world is WorldWithMutator {
   return 'addComponent' in world && typeof (world as WorldWithMutator).addComponent === 'function';
@@ -971,8 +968,8 @@ export class LiveEntityAPI {
 
     try {
       const agentId = shouldUseLLM
-        ? createLLMAgent(this.world, x, y, agentSpeed, undefined, options)
-        : createWanderingAgent(this.world, x, y, agentSpeed, options);
+        ? createLLMAgent(this.world as WorldMutator, x, y, agentSpeed, undefined, options)
+        : createWanderingAgent(this.world as WorldMutator, x, y, agentSpeed, options);
 
       // Optionally set the agent's name if provided
       if (name && typeof name === 'string') {
@@ -1285,7 +1282,7 @@ export class LiveEntityAPI {
     }
 
     // Access speed multiplier on world (if exists)
-    const worldWithRuntime = hasRuntimeProps(this.world) ? this.world : this.world;
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
     if (worldWithRuntime.speedMultiplier !== undefined) {
       worldWithRuntime.speedMultiplier = speed;
     }
@@ -1312,7 +1309,7 @@ export class LiveEntityAPI {
     }
 
     // Access paused state on world (if exists)
-    const worldWithRuntime = hasRuntimeProps(this.world) ? this.world : this.world;
+    const worldWithRuntime = this.world as WorldWithRuntimeProps;
     if (worldWithRuntime.paused !== undefined) {
       worldWithRuntime.paused = paused;
     }
@@ -1370,7 +1367,7 @@ export class LiveEntityAPI {
     }
 
     // Check if already known
-    if (magic.knownSpells.some((s) => s.spellId === spellId)) {
+    if (magic.knownSpells.some((s: any) => s.spellId === spellId)) {
       return {
         requestId: action.requestId,
         success: false,
@@ -1552,15 +1549,15 @@ export class LiveEntityAPI {
 
       plants.push({
         id: entity.id,
-        plantType: plant?.plantType || 'unknown',
-        stage: plant?.stage || 'mature',
+        plantType: (plant?.plantType as string | undefined) || 'unknown',
+        stage: (plant?.stage as string | undefined) || 'mature',
         position: {
           x: position.x ?? 0,
           y: position.y ?? 0,
         },
-        spriteId: renderable.spriteId || 'plant_default',
-        sizeMultiplier: renderable.sizeMultiplier ?? 1.0,
-        alpha: renderable.alpha ?? 1.0,
+        spriteId: (renderable.spriteId as string | undefined) || 'plant_default',
+        sizeMultiplier: (renderable.sizeMultiplier as number | undefined) ?? 1.0,
+        alpha: (renderable.alpha as number | undefined) ?? 1.0,
       });
     }
 
@@ -3719,7 +3716,7 @@ export class LiveEntityAPI {
         opinion = 0;
     }
 
-    empireComp.diplomacy.relations.set(targetEmpireId, {
+    empire.diplomacy!.relations!.set(targetEmpireId, {
       empireId: targetEmpireId,
       empireName: targetName,
       relationship,

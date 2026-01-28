@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:68789f19",
+  "name": "Rhea Gamma",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769499477027",
+  "createdAt": 1769499477133,
+  "lastAccessedAt": 1769499477133,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769499477027",
+    "type": "magical"
+  }
+}

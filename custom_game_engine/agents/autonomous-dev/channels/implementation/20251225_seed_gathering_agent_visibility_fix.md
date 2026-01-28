@@ -249,15 +249,15 @@ When re-testing, expect to see:
 
 1. **Console logs:**
    ```
-   [AISystem:gatherSeedsBehavior] Agent abc12345 requesting seed gathering from berry-bush plant def67890
+   [AISystem:gatherSeedsBehavior] Agent abc12345 requesting seed gathering from blueberry-bush plant def67890
    [Main] Received gather_seeds action request from agent abc12345 for plant def67890
    [Main] Submitted gather_seeds action xyz-uuid for agent abc12345 targeting plant def67890
-   [GatherSeedsActionHandler] Gathered 8 berry-bush seeds
+   [GatherSeedsActionHandler] Gathered 8 blueberry-bush seeds
    ```
 
 2. **Agent inventory:**
    - Seeds should now appear as items
-   - Format: `seed:berry-bush (8)`
+   - Format: `seed:blueberry-bush (8)`
    - Seeds stack by species
 
 3. **Agent behavior:**

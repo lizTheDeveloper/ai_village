@@ -271,6 +271,9 @@ function parseBuildingSpec(spec: string): VoxelBuildingDefinition[] {
   }
 
   const [, category, filterExpr] = match;
+  if (!category) {
+    throw new Error(`Invalid building spec format: ${spec}`);
+  }
   const buildings = categoryMap[category];
 
   if (!buildings) {
@@ -284,7 +287,7 @@ function parseBuildingSpec(spec: string): VoxelBuildingDefinition[] {
 
   // Parse filter expression
   // Support: tier<=1, tier>=3, name~=forge, name~=forge||tier>=2
-  return buildings.filter(b => {
+  return buildings.filter((b: VoxelBuildingDefinition) => {
     // Split on || for OR conditions
     const conditions = filterExpr.split('||');
 
@@ -292,18 +295,32 @@ function parseBuildingSpec(spec: string): VoxelBuildingDefinition[] {
       const trimmed = cond.trim();
 
       // tier<=N
-      if (trimmed.match(/^tier<=(\d+)$/)) {
-        const value = parseInt(trimmed.match(/^tier<=(\d+)$/)![1]);
+      const tierLteMatch = trimmed.match(/^tier<=(\d+)$/);
+      if (tierLteMatch) {
+        const matchedValue = tierLteMatch[1];
+        if (!matchedValue) {
+          throw new Error(`Invalid tier<= filter: ${trimmed}`);
+        }
+        const value = parseInt(matchedValue);
         if (b.tier <= value) return true;
       }
       // tier>=N
-      else if (trimmed.match(/^tier>=(\d+)$/)) {
-        const value = parseInt(trimmed.match(/^tier>=(\d+)$/)![1]);
+      const tierGteMatch = trimmed.match(/^tier>=(\d+)$/);
+      if (tierGteMatch) {
+        const matchedValue = tierGteMatch[1];
+        if (!matchedValue) {
+          throw new Error(`Invalid tier>= filter: ${trimmed}`);
+        }
+        const value = parseInt(matchedValue);
         if (b.tier >= value) return true;
       }
       // name~=value (contains)
-      else if (trimmed.match(/^name~=(.+)$/)) {
-        const value = trimmed.match(/^name~=(.+)$/)![1];
+      const nameMatch = trimmed.match(/^name~=(.+)$/);
+      if (nameMatch) {
+        const value = nameMatch[1];
+        if (!value) {
+          throw new Error(`Invalid name~= filter: ${trimmed}`);
+        }
         if (b.name?.toLowerCase().includes(value.toLowerCase())) return true;
       }
     }
@@ -361,23 +378,48 @@ class SeededRandom {
     const result = [...array];
     for (let i = result.length - 1; i > 0; i--) {
       const j = Math.floor(this.next() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
+      const temp = result[i];
+      const swapVal = result[j];
+      if (temp === undefined || swapVal === undefined) {
+        throw new Error('Array shuffle encountered undefined value');
+      }
+      result[i] = swapVal;
+      result[j] = temp;
     }
     return result;
   }
 
   pick<T>(array: T[]): T {
-    return array[Math.floor(this.next() * array.length)];
+    const index = Math.floor(this.next() * array.length);
+    const value = array[index];
+    if (value === undefined) {
+      throw new Error(`Cannot pick from empty or invalid array at index ${index}`);
+    }
+    return value;
   }
 
   weightedPick<T>(items: T[], weights: number[]): T {
     const totalWeight = weights.reduce((a, b) => a + b, 0);
     let random = this.next() * totalWeight;
     for (let i = 0; i < items.length; i++) {
-      random -= weights[i];
-      if (random <= 0) return items[i];
+      const weight = weights[i];
+      if (weight === undefined) {
+        throw new Error(`Missing weight at index ${i}`);
+      }
+      random -= weight;
+      if (random <= 0) {
+        const item = items[i];
+        if (item === undefined) {
+          throw new Error(`Missing item at index ${i}`);
+        }
+        return item;
+      }
     }
-    return items[items.length - 1];
+    const lastItem = items[items.length - 1];
+    if (lastItem === undefined) {
+      throw new Error('Cannot pick from empty items array');
+    }
+    return lastItem;
   }
 }
 
@@ -408,8 +450,16 @@ function fillRect(
     for (let dx = 0; dx < fw; dx++) {
       const px = fx + dx;
       const py = fy + dy;
-      if (py >= 0 && py < grid.length && px >= 0 && px < grid[0].length) {
-        grid[py][px] = char;
+      const firstRow = grid[0];
+      if (!firstRow) {
+        throw new Error('Grid has no rows');
+      }
+      if (py >= 0 && py < grid.length && px >= 0 && px < firstRow.length) {
+        const row = grid[py];
+        if (!row) {
+          throw new Error(`Grid row ${py} is undefined`);
+        }
+        row[px] = char;
       }
     }
   }
@@ -436,15 +486,31 @@ function strokeRect(
   for (let dx = 0; dx < fw; dx++) {
     const px = fx + dx;
     if (px >= 0 && px < gridW) {
-      if (fy >= 0 && fy < gridH) grid[fy][px] = char;
-      if (fy + fh - 1 >= 0 && fy + fh - 1 < gridH) grid[fy + fh - 1][px] = char;
+      if (fy >= 0 && fy < gridH) {
+        const topRow = grid[fy];
+        if (!topRow) {
+          throw new Error(`Grid row ${fy} is undefined`);
+        }
+        topRow[px] = char;
+      }
+      if (fy + fh - 1 >= 0 && fy + fh - 1 < gridH) {
+        const bottomRow = grid[fy + fh - 1];
+        if (!bottomRow) {
+          throw new Error(`Grid row ${fy + fh - 1} is undefined`);
+        }
+        bottomRow[px] = char;
+      }
     }
   }
   for (let dy = 0; dy < fh; dy++) {
     const py = fy + dy;
     if (py >= 0 && py < gridH) {
-      if (fx >= 0 && fx < gridW) grid[py][fx] = char;
-      if (fx + fw - 1 >= 0 && fx + fw - 1 < gridW) grid[py][fx + fw - 1] = char;
+      const row = grid[py];
+      if (!row) {
+        throw new Error(`Grid row ${py} is undefined`);
+      }
+      if (fx >= 0 && fx < gridW) row[fx] = char;
+      if (fx + fw - 1 >= 0 && fx + fw - 1 < gridW) row[fx + fw - 1] = char;
     }
   }
 }
@@ -473,15 +539,27 @@ function drawLine(
   while (true) {
     // Draw with width
     for (let w = -Math.floor(width / 2); w <= Math.floor(width / 2); w++) {
+      const firstRow = grid[0];
+      if (!firstRow) {
+        throw new Error('Grid has no rows');
+      }
       if (dx > dy) {
         // Horizontal-ish line, expand vertically
-        if (y + w >= 0 && y + w < grid.length && x >= 0 && x < grid[0].length) {
-          grid[y + w][x] = char;
+        if (y + w >= 0 && y + w < grid.length && x >= 0 && x < firstRow.length) {
+          const row = grid[y + w];
+          if (!row) {
+            throw new Error(`Grid row ${y + w} is undefined`);
+          }
+          row[x] = char;
         }
       } else {
         // Vertical-ish line, expand horizontally
-        if (y >= 0 && y < grid.length && x + w >= 0 && x + w < grid[0].length) {
-          grid[y][x + w] = char;
+        if (y >= 0 && y < grid.length && x + w >= 0 && x + w < firstRow.length) {
+          const row = grid[y];
+          if (!row) {
+            throw new Error(`Grid row ${y} is undefined`);
+          }
+          row[x + w] = char;
         }
       }
     }
@@ -715,21 +793,21 @@ function generateGridCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     ].slice(0, gateCount);
 
     for (const gate of gatePositions) {
-      grid[Math.floor(gate.y)][Math.floor(gate.x)] = 'G';
+      grid[Math.floor(gate.y)]![Math.floor(gate.x)]! = 'G';
       // Widen gate
       if (gate.y === 0 || gate.y === height - 1) {
-        grid[Math.floor(gate.y)][Math.floor(gate.x) - 1] = 'G';
-        grid[Math.floor(gate.y)][Math.floor(gate.x) + 1] = 'G';
+        grid[Math.floor(gate.y)]![Math.floor(gate.x) - 1]! = 'G';
+        grid[Math.floor(gate.y)]![Math.floor(gate.x) + 1]! = 'G';
       } else {
-        grid[Math.floor(gate.y) - 1][Math.floor(gate.x)] = 'G';
-        grid[Math.floor(gate.y) + 1][Math.floor(gate.x)] = 'G';
+        grid[Math.floor(gate.y) - 1]![Math.floor(gate.x)]! = 'G';
+        grid[Math.floor(gate.y) + 1]![Math.floor(gate.x)]! = 'G';
       }
     }
   }
 
   // 6. Mark city center
   fillRect(grid, Math.floor(centerX) - 2, Math.floor(centerY) - 2, 5, 5, 'C');
-  grid[Math.floor(centerY)][Math.floor(centerX)] = 'T';  // Town hall / temple
+  grid[Math.floor(centerY)]![Math.floor(centerX)]! = 'T';  // Town hall / temple
 
   // Compile stats
   const districtCounts: Partial<Record<DistrictType, number>> = {};
@@ -738,8 +816,8 @@ function generateGridCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   }
 
   const streetLength = streets.reduce((sum, s) => {
-    const dx = s.points[1].x - s.points[0].x;
-    const dy = s.points[1].y - s.points[0].y;
+    const dx = s.points[1]!.x - s.points[0]!.x;
+    const dy = s.points[1]!.y - s.points[0]!.y;
     return sum + Math.sqrt(dx * dx + dy * dy);
   }, 0);
 
@@ -912,7 +990,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
       for (let i = 0; i < seeds.length; i++) {
         const dist = Math.sqrt(
-          Math.pow(x - seeds[i].x, 2) + Math.pow(y - seeds[i].y, 2)
+          Math.pow(x - seeds[i]!.x, 2) + Math.pow(y - seeds[i]!.y, 2)
         );
         if (dist < minDist) {
           minDist = dist;
@@ -920,24 +998,24 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
         }
       }
 
-      regionMap[y][x] = nearestSeed;
+      regionMap[y]![x]! = nearestSeed;
     }
   }
 
   // 3. Draw region boundaries as streets
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
-      const current = regionMap[y][x];
+      const current = regionMap[y]![x]!;
       const neighbors = [
-        regionMap[y - 1][x],
-        regionMap[y + 1][x],
-        regionMap[y][x - 1],
-        regionMap[y][x + 1],
+        regionMap[y - 1]![x]!,
+        regionMap[y + 1]![x]!,
+        regionMap[y]![x - 1]!,
+        regionMap[y]![x + 1]!,
       ];
 
       // If any neighbor is different, this is a boundary (street)
       if (neighbors.some(n => n !== current)) {
-        grid[y][x] = '~';  // Organic street marker
+        grid[y]![x]! = '~';  // Organic street marker
       }
     }
   }
@@ -945,8 +1023,8 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   // 4. Widen main streets (boundaries between different district types)
   for (let y = 2; y < height - 2; y++) {
     for (let x = 2; x < width - 2; x++) {
-      if (grid[y][x] === '~') {
-        const current = regionMap[y][x];
+      if (grid[y]![x]! === '~') {
+        const current = regionMap[y]![x]!;
         const currentType = seeds[current]?.type;
 
         // Check if this borders a different district TYPE (not just different region)
@@ -965,11 +1043,11 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
         if (bordersDifferentType) {
           // Widen to arterial
-          grid[y][x] = '=';
-          if (grid[y - 1]?.[x] === '.') grid[y - 1][x] = '=';
-          if (grid[y + 1]?.[x] === '.') grid[y + 1][x] = '=';
-          if (grid[y]?.[x - 1] === '.') grid[y][x - 1] = '=';
-          if (grid[y]?.[x + 1] === '.') grid[y][x + 1] = '=';
+          grid[y]![x]! = '=';
+          if (grid[y - 1]?.[x] === '.') grid[y - 1]![x]! = '=';
+          if (grid[y + 1]?.[x] === '.') grid[y + 1]![x]! = '=';
+          if (grid[y]?.[x - 1] === '.') grid[y]![x - 1]! = '=';
+          if (grid[y]?.[x + 1] === '.') grid[y]![x + 1]! = '=';
         }
       }
     }
@@ -996,7 +1074,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const regionCells: Position[] = [];
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        if (regionMap[y][x] === seeds.indexOf(seed)) {
+        if (regionMap[y]![x]! === seeds.indexOf(seed)) {
           regionCells.push({ x, y });
         }
       }
@@ -1021,7 +1099,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
           const checkY = cell.y + dy;
           const checkX = cell.x + dx;
           if (checkY >= height || checkX >= width ||
-              grid[checkY][checkX] === '=' || grid[checkY][checkX] === '~') {
+              grid[checkY]![checkX]! === '=' || grid[checkY]![checkX]! === '~') {
             clear = false;
           }
         }
@@ -1058,7 +1136,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
            squareSize * 2, squareSize * 2, ' ');
   strokeRect(grid, Math.floor(centerX) - squareSize, Math.floor(centerY) - squareSize,
              squareSize * 2, squareSize * 2, 'M');
-  grid[Math.floor(centerY)][Math.floor(centerX)] = 'T';  // Temple/Town hall
+  grid[Math.floor(centerY)]![Math.floor(centerX)]! = 'T';  // Temple/Town hall
 
   // 8. Add walls
   if (spec.wallsEnabled !== false) {
@@ -1069,7 +1147,7 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const wx = Math.floor(centerX + Math.cos(angle) * (wallRadius + wobble));
       const wy = Math.floor(centerY + Math.sin(angle) * (wallRadius + wobble));
       if (wy >= 0 && wy < height && wx >= 0 && wx < width) {
-        grid[wy][wx] = '#';
+        grid[wy]![wx]! = '#';
       }
     }
 
@@ -1079,13 +1157,13 @@ function generateOrganicCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const gx = Math.floor(centerX + Math.cos(angle) * wallRadius);
       const gy = Math.floor(centerY + Math.sin(angle) * wallRadius);
       if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-        grid[gy][gx] = 'G';
+        grid[gy]![gx]! = 'G';
         // Widen gate
         for (let d = -1; d <= 1; d++) {
           const gx2 = Math.floor(centerX + Math.cos(angle + d * 0.05) * wallRadius);
           const gy2 = Math.floor(centerY + Math.sin(angle + d * 0.05) * wallRadius);
           if (gy2 >= 0 && gy2 < height && gx2 >= 0 && gx2 < width) {
-            grid[gy2][gx2] = 'G';
+            grid[gy2]![gx2]! = 'G';
           }
         }
       }
@@ -1166,7 +1244,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   const templeX = Math.floor(centerX);
   const templeY = Math.floor(centerY);
   fillRect(grid, templeX - 3, templeY - 3, 7, 7, '△');  // Spire symbol
-  grid[templeY][templeX] = '▲';  // Peak
+  grid[templeY]![templeX]! = '▲';  // Peak
 
   plots.push({
     id: 'temple_spire',
@@ -1191,7 +1269,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
   // Mark thermals
   for (const thermal of thermals) {
-    grid[thermal.y][thermal.x] = '○';  // Thermal marker
+    grid[thermal.y]![thermal.x]! = '○';  // Thermal marker
   }
 
   // 3. Place buildings in altitude bands
@@ -1255,7 +1333,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
         };
 
         strokeRect(grid, px, py, 6, 6, 'R');
-        grid[py + 2][px + 2] = String(Math.floor(altitude / 10) % 10);
+        grid[py + 2]![px + 2]! = String(Math.floor(altitude / 10) % 10);
 
         plots.push(plot);
       }
@@ -1302,7 +1380,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   const groundY = height - 12;
   fillRect(grid, groundX - 4, groundY, 9, 8, 'G');
   strokeRect(grid, groundX - 4, groundY, 9, 8, '#');
-  grid[groundY + 4][groundX] = 'T';  // Trading post
+  grid[groundY + 4]![groundX]! = 'T';  // Trading post
 
   plots.push({
     id: 'ground_trade',
@@ -1352,8 +1430,8 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
           const lx = Math.floor(x1 + (x2 - x1) * t);
           const ly = Math.floor(y1 + (y2 - y1) * t);
           if (ly >= 0 && ly < height && lx >= 0 && lx < width) {
-            if (grid[ly][lx] === '·') {
-              grid[ly][lx] = '∙';  // Flight lane marker
+            if (grid[ly]![lx]! === '·') {
+              grid[ly]![lx]! = '∙';  // Flight lane marker
             }
           }
         }
@@ -1418,7 +1496,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
            tombSize * 2, tombSize * 2, '▓');
   strokeRect(grid, Math.floor(centerX) - tombSize, Math.floor(centerY) - tombSize,
              tombSize * 2, tombSize * 2, '█');
-  grid[Math.floor(centerY)][Math.floor(centerX)] = '卐';  // Ancient symbol at center
+  grid[Math.floor(centerY)]![Math.floor(centerX)]! = '卐';  // Ancient symbol at center
 
   plots.push({
     id: 'central_tomb',
@@ -1501,7 +1579,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
       path.push({ x, y });
 
       if (y >= 0 && y < height && x >= 0 && x < width) {
-        grid[y][x] = '≈';  // Impossible corridor
+        grid[y]![x]! = '≈';  // Impossible corridor
       }
     }
 
@@ -1510,8 +1588,8 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
     for (const point of path) {
       if (point.y >= 0 && point.y < height && point.x >= 0 && point.x < width) {
         // Use number to indicate phase visibility
-        if (grid[point.y][point.x] === '░') {
-          grid[point.y][point.x] = String(pathPhase % 10);
+        if (grid[point.y]![point.x]! === '░') {
+          grid[point.y]![point.x]! = String(pathPhase % 10);
         }
       }
     }
@@ -1557,7 +1635,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
           const startX = px + Math.floor((structWidth - rowWidth) / 2);
           for (let dx = 0; dx < rowWidth; dx++) {
             if (py + dy < height && startX + dx < width) {
-              grid[py + dy][startX + dx] = phase === 0 ? '▼' : String(phase);
+              grid[py + dy]![startX + dx]! = phase === 0 ? '▼' : String(phase);
             }
           }
         }
@@ -1578,7 +1656,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
           const gx = px + rng.nextInt(1, structWidth - 2);
           const gy = py + rng.nextInt(1, structHeight - 2);
           if (gy < height && gx < width) {
-            grid[gy][gx] = '⌀';  // Void/gap
+            grid[gy]![gx]! = '⌀';  // Void/gap
           }
         }
         break;
@@ -1593,7 +1671,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
             const threshold = (structWidth / 2) * (0.7 + 0.3 * Math.sin(dx * 0.5 + dy * 0.3));
             if (distFromCenter < threshold) {
               if (py + dy < height && px + dx < width) {
-                grid[py + dy][px + dx] = phase === 0 ? '◎' : String(phase);
+                grid[py + dy]![px + dx]! = phase === 0 ? '◎' : String(phase);
               }
             }
           }
@@ -1604,18 +1682,18 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
         // Draw rectangle but with "impossible" markers at corners
         strokeRect(grid, px, py, structWidth, structHeight, phase === 0 ? '▢' : String(phase));
         // Mark corners as angle anomalies
-        if (py < height && px < width) grid[py][px] = '∠';
-        if (py < height && px + structWidth - 1 < width) grid[py][px + structWidth - 1] = '∠';
-        if (py + structHeight - 1 < height && px < width) grid[py + structHeight - 1][px] = '∠';
+        if (py < height && px < width) grid[py]![px]! = '∠';
+        if (py < height && px + structWidth - 1 < width) grid[py]![px + structWidth - 1]! = '∠';
+        if (py + structHeight - 1 < height && px < width) grid[py + structHeight - 1]![px]! = '∠';
         if (py + structHeight - 1 < height && px + structWidth - 1 < width) {
-          grid[py + structHeight - 1][px + structWidth - 1] = '∠';
+          grid[py + structHeight - 1]![px + structWidth - 1]! = '∠';
         }
     }
 
     // Create portal connections to random other structures
     const portalConnections: NonEuclideanPlot['portalConnections'] = [];
     if (rng.next() > 0.4 && plotId > 0) {
-      const targetPlot = plots[rng.nextInt(0, plots.length - 1)];
+      const targetPlot = plots[rng.nextInt(0, plots.length - 1)]!;
       portalConnections.push({
         targetPlotId: targetPlot.id,
         visualDistortion: rng.pick([
@@ -1652,7 +1730,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
     let y = y1;
     while (Math.abs(x - x2) > 1 || Math.abs(y - y2) > 1) {
       if (y >= 0 && y < height && x >= 0 && x < width) {
-        grid[y][x] = '╳';  // Reality tear
+        grid[y]![x]! = '╳';  // Reality tear
       }
       // Jagged movement
       x += (x < x2 ? 1 : -1) + rng.nextInt(-1, 1);
@@ -1676,8 +1754,8 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
 
     for (let step = 0; step < loopLength; step++) {
       if (y >= 0 && y < height && x >= 0 && x < width) {
-        if (grid[y][x] === '░') {
-          grid[y][x] = '∞';  // Infinite loop marker
+        if (grid[y]![x]! === '░') {
+          grid[y]![x]! = '∞';  // Infinite loop marker
         }
       }
 
@@ -1700,11 +1778,11 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
   // (In top-left corner, show phase indicators)
   for (let p = 1; p <= phaseCount; p++) {
     if (p < height) {
-      grid[p][1] = String(p);
-      grid[p][2] = ':';
-      grid[p][3] = 'P';
-      grid[p][4] = 'h';
-      grid[p][5] = String(p);
+      grid[p]![1]! = String(p);
+      grid[p]![2]! = ':';
+      grid[p]![3]! = 'P';
+      grid[p]![4]! = 'h';
+      grid[p]![5]! = String(p);
     }
   }
 
@@ -1781,11 +1859,11 @@ function generateDwarvenCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     for (let x = shaftX; x < shaftX + shaftWidth; x++) {
       // Shaft walls
       if (x === shaftX || x === shaftX + shaftWidth - 1) {
-        grid[y][x] = '║';
+        grid[y]![x]! = '║';
       } else {
         // Stair pattern
         const stairPhase = (y + x) % 4;
-        grid[y][x] = stairPhase < 2 ? '═' : ' ';
+        grid[y]![x]! = stairPhase < 2 ? '═' : ' ';
       }
     }
   }
@@ -1796,22 +1874,22 @@ function generateDwarvenCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
   // Generate each level
   for (let levelIdx = 0; levelIdx < levelsToShow; levelIdx++) {
-    const level = DWARVEN_LEVELS[levelIdx];
+    const level = DWARVEN_LEVELS[levelIdx]!;
     const levelTop = levelIdx * levelHeight;
     const levelBottom = Math.min(levelTop + levelHeight - 1, height - 1);
 
     // Draw level separator (floor/ceiling)
     for (let x = 0; x < width; x++) {
       if (x < shaftX || x >= shaftX + shaftWidth) {
-        grid[levelTop][x] = '━';
+        grid[levelTop]![x]! = '━';
       }
     }
 
     // Level label on left
     const labelY = levelTop + Math.floor(levelHeight / 2);
-    const label = `Z${level.z}`;
+    const label = `Z${level!.z}`;
     for (let i = 0; i < Math.min(label.length, 3); i++) {
-      grid[labelY][i] = label[i];
+      grid[labelY]![i]! = label[i]!;
     }
 
     // Generate rooms on this level
@@ -1828,13 +1906,13 @@ function generateDwarvenCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
       if (rx + rw < shaftX - 1) {
         // Carve room from rock
-        fillRect(grid, rx, ry, rw, rh, level.char);
+        fillRect(grid, rx, ry, rw, rh, level!.char);
         strokeRect(grid, rx, ry, rw, rh, '│');
 
         // Door to corridor
-        grid[ry + Math.floor(rh / 2)][rx + rw] = '▪';
+        grid[ry + Math.floor(rh / 2)]![rx + rw]! = '▪';
 
-        const districtType = rng.pick(level.districts);
+        const districtType = rng.pick(level!.districts);
         const plot: Plot = {
           id: `plot_${plotId++}`,
           bounds: { x: rx, y: ry, width: rw, height: rh },
@@ -1856,7 +1934,7 @@ function generateDwarvenCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
                        districtType === 'residential' ? '☗' :
                        districtType === 'storage' ? '□' :
                        districtType === 'military' ? '⚔' : '◊';
-        grid[ry + 1][rx + 1] = marker[0];
+        grid[ry + 1]![rx + 1]! = marker[0]!;
       }
     }
 
@@ -1868,11 +1946,11 @@ function generateDwarvenCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const rh = Math.max(3, roomHeight - rng.nextInt(0, 2));
 
       if (rx + rw < width - 2) {
-        fillRect(grid, rx, ry, rw, rh, level.char);
+        fillRect(grid, rx, ry, rw, rh, level!.char);
         strokeRect(grid, rx, ry, rw, rh, '│');
-        grid[ry + Math.floor(rh / 2)][rx] = '▪';
+        grid[ry + Math.floor(rh / 2)]![rx]! = '▪';
 
-        const districtType = rng.pick(level.districts);
+        const districtType = rng.pick(level!.districts);
         const plot: Plot = {
           id: `plot_${plotId++}`,
           bounds: { x: rx, y: ry, width: rw, height: rh },
@@ -1893,39 +1971,39 @@ function generateDwarvenCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
                        districtType === 'residential' ? 'R' :
                        districtType === 'storage' ? 'S' :
                        districtType === 'military' ? 'B' : 'X';
-        grid[ry + 1][rx + 1] = marker;
+        grid[ry + 1]![rx + 1]! = marker;
       }
     }
 
     // Horizontal corridor connecting rooms on each level
     const corridorY = levelTop + Math.floor(levelHeight / 2);
     for (let x = 4; x < shaftX - 1; x++) {
-      if (grid[corridorY][x] === '█') {
-        grid[corridorY][x] = '·';
+      if (grid[corridorY]![x]! === '█') {
+        grid[corridorY]![x]! = '·';
       }
     }
     for (let x = shaftX + shaftWidth + 1; x < width - 2; x++) {
-      if (grid[corridorY][x] === '█') {
-        grid[corridorY][x] = '·';
+      if (grid[corridorY]![x]! === '█') {
+        grid[corridorY]![x]! = '·';
       }
     }
   }
 
   // Add fortress entrance at top
   const gateX = Math.floor(width / 2);
-  grid[0][gateX - 2] = '┏';
-  grid[0][gateX - 1] = '━';
-  grid[0][gateX] = '▼';
-  grid[0][gateX + 1] = '━';
-  grid[0][gateX + 2] = '┓';
-  grid[1][gateX] = '│';
+  grid[0]![gateX - 2]! = '┏';
+  grid[0]![gateX - 1]! = '━';
+  grid[0]![gateX]! = '▼';
+  grid[0]![gateX + 1]! = '━';
+  grid[0]![gateX + 2]! = '┓';
+  grid[1]![gateX]! = '│';
 
   // Add magma pool at bottom levels
   const magmaY = height - 3;
   for (let x = 4; x < width - 4; x++) {
     if (rng.next() < 0.3) {
-      grid[magmaY][x] = '~';  // Magma
-      grid[magmaY + 1][x] = rng.next() < 0.5 ? '~' : '≈';
+      grid[magmaY]![x]! = '~';  // Magma
+      grid[magmaY + 1]![x]! = rng.next() < 0.5 ? '~' : '≈';
     }
   }
 
@@ -1978,28 +2056,28 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
 
   // Draw page border (like a book page)
   strokeRect(grid, 2, 2, width - 4, height - 4, '│');
-  grid[2][2] = '┌';
-  grid[2][width - 3] = '┐';
-  grid[height - 3][2] = '└';
-  grid[height - 3][width - 3] = '┘';
+  grid[2]![2]! = '┌';
+  grid[2]![width - 3]! = '┐';
+  grid[height - 3]![2]! = '└';
+  grid[height - 3]![width - 3]! = '┘';
   for (let x = 3; x < width - 3; x++) {
-    grid[2][x] = '─';
-    grid[height - 3][x] = '─';
+    grid[2]![x]! = '─';
+    grid[height - 3]![x]! = '─';
   }
 
   // Left margin - The Margins district
   for (let y = marginTop; y < marginBottom; y++) {
-    grid[y][marginLeft - 1] = '│';
+    grid[y]![marginLeft - 1]! = '│';
     // Marginalia annotations
     if (rng.next() < 0.15) {
       const annotations = ['*', '†', '‡', '§', '¶', '№'];
-      grid[y][marginLeft - 3] = rng.pick(annotations);
+      grid[y]![marginLeft - 3]! = rng.pick(annotations);
     }
   }
 
   // Right margin
   for (let y = marginTop; y < marginBottom; y++) {
-    grid[y][marginRight] = '│';
+    grid[y]![marginRight]! = '│';
   }
 
   // === THE GREAT LIBRARY (Central recursive structure) ===
@@ -2012,28 +2090,28 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   for (let y = libraryY; y < libraryY + libraryHeight; y++) {
     for (let x = libraryX; x < libraryX + libraryWidth; x++) {
       if (y === libraryY || y === libraryY + libraryHeight - 1) {
-        grid[y][x] = '▬';  // Shelf
+        grid[y]![x]! = '▬';  // Shelf
       } else if (x === libraryX || x === libraryX + libraryWidth - 1) {
-        grid[y][x] = '▐';  // Bookcase
+        grid[y]![x]! = '▐';  // Bookcase
       } else {
         // Interior - book patterns
         const pattern = (x + y) % 3;
-        grid[y][x] = pattern === 0 ? '░' : pattern === 1 ? '▒' : ' ';
+        grid[y]![x]! = pattern === 0 ? '░' : pattern === 1 ? '▒' : ' ';
       }
     }
   }
 
   // Add library entrance
   const libDoorX = libraryX + Math.floor(libraryWidth / 2);
-  grid[libraryY][libDoorX] = '⌂';
-  grid[libraryY][libDoorX - 1] = ' ';
-  grid[libraryY][libDoorX + 1] = ' ';
+  grid[libraryY]![libDoorX]! = '⌂';
+  grid[libraryY]![libDoorX - 1]! = ' ';
+  grid[libraryY]![libDoorX + 1]! = ' ';
 
   // Label
   const libLabel = 'LIBRARY';
   for (let i = 0; i < libLabel.length; i++) {
     if (libraryY - 1 >= 0) {
-      grid[libraryY - 1][libraryX + 2 + i] = libLabel[i];
+      grid[libraryY - 1]![libraryX + 2 + i]! = libLabel[i]!;
     }
   }
 
@@ -2056,7 +2134,7 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   const innerLibY = libraryY + Math.floor((libraryHeight - innerLibH) / 2);
 
   strokeRect(grid, innerLibX, innerLibY, innerLibW, innerLibH, '◊');
-  grid[innerLibY + Math.floor(innerLibH / 2)][innerLibX + Math.floor(innerLibW / 2)] = '∞';
+  grid[innerLibY + Math.floor(innerLibH / 2)]![innerLibX + Math.floor(innerLibW / 2)]! = '∞';
 
   // === THE SCRIPTORIUM (Writing area) ===
   const scripX = marginLeft + 2;
@@ -2066,20 +2144,20 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
 
   fillRect(grid, scripX, scripY, scripW, scripH, '.');
   strokeRect(grid, scripX, scripY, scripW, scripH, '─');
-  grid[scripY][scripX] = '╭';
-  grid[scripY][scripX + scripW - 1] = '╮';
-  grid[scripY + scripH - 1][scripX] = '╰';
-  grid[scripY + scripH - 1][scripX + scripW - 1] = '╯';
+  grid[scripY]![scripX]! = '╭';
+  grid[scripY]![scripX + scripW - 1]! = '╮';
+  grid[scripY + scripH - 1]![scripX]! = '╰';
+  grid[scripY + scripH - 1]![scripX + scripW - 1]! = '╯';
 
   // Writing desks
   for (let x = scripX + 2; x < scripX + scripW - 2; x += 3) {
-    grid[scripY + 2][x] = '⊡';  // Desk
-    grid[scripY + 3][x] = '✎';  // Quill
+    grid[scripY + 2]![x]! = '⊡';  // Desk
+    grid[scripY + 3]![x]! = '✎';  // Quill
   }
 
   const scripLabel = 'SCRIPTORIUM';
   for (let i = 0; i < scripLabel.length; i++) {
-    grid[scripY + 1][scripX + 2 + i] = scripLabel[i];
+    grid[scripY + 1]![scripX + 2 + i]! = scripLabel[i]!;
   }
 
   plots.push({
@@ -2094,7 +2172,7 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
 
   // Horizontal line separating footnotes
   for (let x = marginLeft; x < marginRight; x++) {
-    grid[footnotesY][x] = '─';
+    grid[footnotesY]![x]! = '─';
   }
 
   // Footnote markers and text
@@ -2102,12 +2180,12 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   for (let i = 0; i < 5; i++) {
     const fnY = footnotesY + 2 + i;
     if (fnY < marginBottom) {
-      grid[fnY][footnoteLineX] = footnoteMarkers[i];
+      grid[fnY]![footnoteLineX]! = footnoteMarkers[i]!;
 
       // Simulate footnote text
       for (let x = footnoteLineX + 2; x < marginRight - 2; x++) {
         if (rng.next() < 0.7) {
-          grid[fnY][x] = rng.next() < 0.1 ? ' ' : '·';
+          grid[fnY]![x]! = rng.next() < 0.1 ? ' ' : '·';
         }
       }
 
@@ -2130,7 +2208,7 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
 
   const fnLabel = 'THE FOOTNOTES';
   for (let i = 0; i < fnLabel.length; i++) {
-    grid[footnotesY + 1][marginLeft + 2 + i] = fnLabel[i];
+    grid[footnotesY + 1]![marginLeft + 2 + i]! = fnLabel[i]!;
   }
 
   // === THE TYPO VOID (Chaotic corner) ===
@@ -2145,19 +2223,19 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
       if (x < width - 8) {
         const chaos = rng.next();
         if (chaos < 0.2) {
-          grid[y][x] = '?';
+          grid[y]![x]! = '?';
         } else if (chaos < 0.4) {
-          grid[y][x] = '!';
+          grid[y]![x]! = '!';
         } else if (chaos < 0.5) {
-          grid[y][x] = '#';
+          grid[y]![x]! = '#';
         } else if (chaos < 0.6) {
-          grid[y][x] = '@';
+          grid[y]![x]! = '@';
         } else if (chaos < 0.7) {
-          grid[y][x] = '$';
+          grid[y]![x]! = '$';
         } else {
           // Random "misspelled" letters
           const chars = 'abcdefghijklmnopqrstuvwxyz'.split('');
-          grid[y][x] = rng.pick(chars);
+          grid[y]![x]! = rng.pick(chars);
         }
       }
     }
@@ -2166,7 +2244,7 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   // Void label (misspelled of course)
   const typoLabel = 'TYOP VOYD';  // Intentionally misspelled
   for (let i = 0; i < typoLabel.length; i++) {
-    grid[typoY - 1][typoX + i] = typoLabel[i];
+    grid[typoY - 1]![typoX + i]! = typoLabel[i]!;
   }
 
   plots.push({
@@ -2193,16 +2271,16 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   for (let y = textStartY; y < libraryY - 2; y++) {
     // Simulate text lines
     for (let x = marginLeft + 1; x < marginRight - 1; x++) {
-      if (grid[y][x] === '·') {
+      if (grid[y]![x]! === '·') {
         if (rng.next() < 0.85) {
-          grid[y][x] = '─';  // Text line
+          grid[y]![x]! = '─';  // Text line
         }
       }
     }
     // Paragraph breaks
     if (rng.next() < 0.2) {
       for (let x = marginLeft + 1; x < marginLeft + 8; x++) {
-        grid[y][x] = ' ';
+        grid[y]![x]! = ' ';
       }
     }
   }
@@ -2211,7 +2289,7 @@ function generateLiteraryCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   const pageNum = `- ${rng.nextInt(1, 999)} -`;
   const pageNumX = Math.floor((width - pageNum.length) / 2);
   for (let i = 0; i < pageNum.length; i++) {
-    grid[height - 2][pageNumX + i] = pageNum[i];
+    grid[height - 2]![pageNumX + i]! = pageNum[i]!;
   }
 
   // Compile stats
@@ -2254,7 +2332,7 @@ function generateCrystallineCity(spec: CitySpec, rng: SeededRandom): GeneratedCi
   // Crystal lattice background pattern
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      if ((x + y) % 8 === 0) grid[y][x] = '◇';
+      if ((x + y) % 8 === 0) grid[y]![x]! = '◇';
     }
   }
 
@@ -2280,12 +2358,12 @@ function generateCrystallineCity(spec: CitySpec, rng: SeededRandom): GeneratedCi
       if (x >= 0 && x < width && y >= 0 && y < height) {
         const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow((y - centerY) * 1.5, 2));
         if (dist < coreRadius * 0.8) {
-          grid[y][x] = rng.next() < 0.3 ? '✦' : '░';
+          grid[y]![x]! = rng.next() < 0.3 ? '✦' : '░';
         }
       }
     }
   }
-  grid[centerY][centerX] = '☼';  // Light source
+  grid[centerY]![centerX]! = '☼';  // Light source
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -2311,7 +2389,7 @@ function generateCrystallineCity(spec: CitySpec, rng: SeededRandom): GeneratedCi
           const py = cy - ch / 2 + dy;
           const inDiamond = Math.abs(dx - cw / 2) / (cw / 2) + Math.abs(dy - ch / 2) / (ch / 2) <= 1;
           if (inDiamond && px >= 0 && px < width && py >= 0 && py < height) {
-            grid[Math.floor(py)][Math.floor(px)] = '◈';
+            grid[Math.floor(py)]![Math.floor(px)]! = '◈';
           }
         }
       }
@@ -2321,8 +2399,8 @@ function generateCrystallineCity(spec: CitySpec, rng: SeededRandom): GeneratedCi
       for (let s = 0; s < 1; s += 0.1) {
         const lx = Math.floor(centerX + (cx - centerX) * s);
         const ly = Math.floor(centerY + (cy - centerY) * s);
-        if (ly >= 0 && ly < height && lx >= 0 && lx < width && grid[ly][lx] === '·') {
-          grid[ly][lx] = '∙';
+        if (ly >= 0 && ly < height && lx >= 0 && lx < width && grid[ly]![lx]! === '·') {
+          grid[ly]![lx]! = '∙';
         }
       }
 
@@ -2360,9 +2438,9 @@ function generateCrystallineCity(spec: CitySpec, rng: SeededRandom): GeneratedCi
     const lx = rng.nextInt(10, width - 15);
     const ly = rng.nextInt(10, height - 10);
 
-    if (grid[ly][lx] === '·' || grid[ly][lx] === '◇') {
+    if (grid[ly]![lx]! === '·' || grid[ly]![lx]! === '◇') {
       fillRect(grid, lx, ly, 5, 4, '▫');
-      grid[ly + 2][lx + 2] = '⌬';  // Prism symbol
+      grid[ly + 2]![lx + 2]! = '⌬';  // Prism symbol
       plots.push({
         id: `plot_${plotId++}`,
         bounds: { x: lx, y: ly, width: 5, height: 4 },
@@ -2421,16 +2499,16 @@ function generateHiveCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       if (cx > cellW && cx < width - cellW && cy > cellH && cy < height - cellH) {
         // Draw hexagon
         const hexChars = '⬡⬢';
-        const hexChar = hexChars[Math.floor(rng.next() * 2)];
-        grid[Math.floor(cy)][Math.floor(cx)] = hexChar;
+        const hexChar = hexChars[Math.floor(rng.next() * 2)]!;
+        grid[Math.floor(cy)]![Math.floor(cx)]! = hexChar;
 
         // Cell walls
-        grid[Math.floor(cy - 2)][Math.floor(cx)] = '─';
-        grid[Math.floor(cy + 2)][Math.floor(cx)] = '─';
-        grid[Math.floor(cy - 1)][Math.floor(cx - 2)] = '/';
-        grid[Math.floor(cy - 1)][Math.floor(cx + 2)] = '\\';
-        grid[Math.floor(cy + 1)][Math.floor(cx - 2)] = '\\';
-        grid[Math.floor(cy + 1)][Math.floor(cx + 2)] = '/';
+        grid[Math.floor(cy - 2)]![Math.floor(cx)]! = '─';
+        grid[Math.floor(cy + 2)]![Math.floor(cx)]! = '─';
+        grid[Math.floor(cy - 1)]![Math.floor(cx - 2)]! = '/';
+        grid[Math.floor(cy - 1)]![Math.floor(cx + 2)]! = '\\';
+        grid[Math.floor(cy + 1)]![Math.floor(cx - 2)]! = '\\';
+        grid[Math.floor(cy + 1)]![Math.floor(cx + 2)]! = '/';
       }
     }
   }
@@ -2446,12 +2524,12 @@ function generateHiveCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const px = centerX + dx;
       if (px >= 0 && px < width && py >= 0 && py < height) {
         if (Math.abs(dx) + Math.abs(dy) * 1.5 <= royalR) {
-          grid[py][px] = '♛';
+          grid[py]![px]! = '♛';
         }
       }
     }
   }
-  grid[centerY][centerX] = '♕';  // Queen
+  grid[centerY]![centerX]! = '♕';  // Queen
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -2472,11 +2550,11 @@ function generateHiveCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     if (bx > bw && bx < width - bw && by > bh && by < height - bh) {
       for (let dy = 0; dy < bh; dy++) {
         for (let dx = 0; dx < bw; dx++) {
-          grid[by + dy][bx + dx] = rng.next() < 0.3 ? '○' : '◦';
+          grid[by + dy]![bx + dx]! = rng.next() < 0.3 ? '○' : '◦';
         }
       }
       // Larvae symbols
-      grid[by + Math.floor(bh / 2)][bx + Math.floor(bw / 2)] = '◎';
+      grid[by + Math.floor(bh / 2)]![bx + Math.floor(bw / 2)]! = '◎';
 
       plots.push({
         id: `plot_${plotId++}`,
@@ -2512,9 +2590,9 @@ function generateHiveCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const sx = rng.nextInt(10, width - 15);
     const sy = rng.nextInt(10, height - 10);
 
-    if (grid[sy][sx] === ' ') {
+    if (grid[sy]![sx]! === ' ') {
       fillRect(grid, sx, sy, 4, 3, '▓');
-      grid[sy + 1][sx + 2] = '❂';
+      grid[sy + 1]![sx + 2]! = '❂';
       plots.push({
         id: `plot_${plotId++}`,
         bounds: { x: sx, y: sy, width: 4, height: 3 },
@@ -2533,8 +2611,8 @@ function generateHiveCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const px = Math.floor(centerX + (endX - centerX) * t);
       const py = Math.floor(centerY + (endY - centerY) * t);
       if (py >= 0 && py < height && px >= 0 && px < width) {
-        if (grid[py][px] === ' ') {
-          grid[py][px] = '~';
+        if (grid[py]![px]! === ' ') {
+          grid[py]![px]! = '~';
         }
       }
     }
@@ -2592,24 +2670,24 @@ function generateFungalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     // Find 2-3 nearest nodes
     const others = networkNodes
       .filter(n => n !== node)
-      .map(n => ({ node: n, dist: Math.sqrt(Math.pow(n.x - node.x, 2) + Math.pow(n.y - node.y, 2)) }))
+      .map(n => ({ node: n, dist: Math.sqrt(Math.pow(n.x - node!.x, 2) + Math.pow(n.y - node!.y, 2)) }))
       .sort((a, b) => a.dist - b.dist)
       .slice(0, rng.nextInt(2, 4));
 
     for (const other of others) {
       // Draw organic branching line
-      let cx = node.x;
-      let cy = node.y;
-      while (Math.abs(cx - other.node.x) > 1 || Math.abs(cy - other.node.y) > 1) {
+      let cx = node!.x;
+      let cy = node!.y;
+      while (Math.abs(cx - other.node!.x) > 1 || Math.abs(cy - other.node!.y) > 1) {
         if (cy >= 0 && cy < height && cx >= 0 && cx < width) {
-          grid[cy][cx] = rng.next() < 0.3 ? '╌' : '·';
+          grid[cy]![cx]! = rng.next() < 0.3 ? '╌' : '·';
         }
         // Move toward target with some randomness
         if (rng.next() < 0.7) {
-          cx += Math.sign(other.node.x - cx);
+          cx += Math.sign(other.node!.x - cx);
         }
         if (rng.next() < 0.7) {
-          cy += Math.sign(other.node.y - cy);
+          cy += Math.sign(other.node!.y - cy);
         }
         // Random branching
         if (rng.next() < 0.1) {
@@ -2620,11 +2698,11 @@ function generateFungalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     }
 
     // Mark node as mycelium network junction
-    if (node.y >= 0 && node.y < height && node.x >= 0 && node.x < width) {
-      grid[node.y][node.x] = '⊛';
+    if (node!.y >= 0 && node!.y < height && node!.x >= 0 && node!.x < width) {
+      grid[node!.y]![node!.x]! = '⊛';
       plots.push({
         id: `plot_${plotId++}`,
-        bounds: { x: node.x - 2, y: node.y - 2, width: 4, height: 4 },
+        bounds: { x: node!.x - 2, y: node!.y - 2, width: 4, height: 4 },
         districtType: 'mycelium_network',
       });
     }
@@ -2638,29 +2716,29 @@ function generateFungalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
     // Draw tower
     for (let dy = 0; dy < th; dy++) {
-      const py = node.y - dy;
+      const py = node!.y - dy;
       if (py >= 0 && py < height) {
         const twidth = dy < 2 ? 3 : dy < 5 ? 2 : 1;
         for (let dx = -twidth; dx <= twidth; dx++) {
-          const px = node.x + dx;
+          const px = node!.x + dx;
           if (px >= 0 && px < width) {
-            grid[py][px] = dy === th - 1 ? '☁' : dy === th - 2 ? '♠' : '┃';
+            grid[py]![px]! = dy === th - 1 ? '☁' : dy === th - 2 ? '♠' : '┃';
           }
         }
       }
     }
     // Spore cloud at top
-    for (let sy = node.y - th - 2; sy <= node.y - th + 1; sy++) {
-      for (let sx = node.x - 3; sx <= node.x + 3; sx++) {
+    for (let sy = node!.y - th - 2; sy <= node!.y - th + 1; sy++) {
+      for (let sx = node!.x - 3; sx <= node!.x + 3; sx++) {
         if (sy >= 0 && sy < height && sx >= 0 && sx < width && rng.next() < 0.6) {
-          grid[sy][sx] = '∴';
+          grid[sy]![sx]! = '∴';
         }
       }
     }
 
     plots.push({
       id: `plot_${plotId++}`,
-      bounds: { x: node.x - 2, y: node.y - th, width: 4, height: th },
+      bounds: { x: node!.x - 2, y: node!.y - th, width: 4, height: th },
       districtType: 'spore_tower',
     });
   }
@@ -2679,12 +2757,12 @@ function generateFungalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
           const gy = py + dy;
           const gx = px + dx;
           if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-            grid[gy][gx] = dist < pr / 2 ? '▓' : '▒';
+            grid[gy]![gx]! = dist < pr / 2 ? '▓' : '▒';
           }
         }
       }
     }
-    grid[py][px] = '☠';
+    grid[py]![px]! = '☠';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -2700,11 +2778,11 @@ function generateFungalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const fy = rng.nextInt(5, height - 5);
     const mushrooms = ['🍄', '♣', '⌂'];
 
-    if (grid[fy][fx] === '░' || grid[fy][fx] === '·') {
+    if (grid[fy]![fx]! === '░' || grid[fy]![fx]! === '·') {
       const mw = rng.nextInt(3, 6);
       const mh = rng.nextInt(2, 4);
       fillRect(grid, fx, fy, mw, mh, '○');
-      grid[fy][fx + Math.floor(mw / 2)] = rng.pick(mushrooms);
+      grid[fy]![fx + Math.floor(mw / 2)]! = rng.pick(mushrooms);
 
       plots.push({
         id: `plot_${plotId++}`,
@@ -2755,7 +2833,7 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const depthChar = y < height / 3 ? '~' : y < height * 2 / 3 ? '≈' : '▓';
     for (let x = 0; x < width; x++) {
       if (rng.next() < 0.1) {
-        grid[y][x] = depthChar;
+        grid[y]![x]! = depthChar;
       }
     }
   }
@@ -2791,9 +2869,9 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
             const gx = dx + dx2;
             if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
               if (dist > dr - 1.5) {
-                grid[gy][gx] = '◠';  // Dome shell
+                grid[gy]![gx]! = '◠';  // Dome shell
               } else {
-                grid[gy][gx] = ' ';  // Air inside
+                grid[gy]![gx]! = ' ';  // Air inside
               }
             }
           }
@@ -2802,10 +2880,10 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       // Dome base
       for (let bx = dx - dr + 1; bx < dx + dr; bx++) {
         if (bx >= 0 && bx < width && dy >= 0 && dy < height) {
-          grid[dy][bx] = '═';
+          grid[dy]![bx]! = '═';
         }
       }
-      grid[dy][dx] = '⌂';
+      grid[dy]![dx]! = '⌂';
 
       plots.push({
         id: `plot_${plotId++}`,
@@ -2827,8 +2905,8 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const sway = Math.floor(Math.sin(h * 0.5 + i) * 2);
       const px = kx + sway;
       if (py >= 0 && py < height && px >= 0 && px < width) {
-        if (grid[py][px] === '≈' || grid[py][px] === '~') {
-          grid[py][px] = h % 3 === 0 ? '⌇' : '│';
+        if (grid[py]![px]! === '≈' || grid[py]![px]! === '~') {
+          grid[py]![px]! = h % 3 === 0 ? '⌇' : '│';
         }
       }
     }
@@ -2848,9 +2926,9 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     for (let x = 0; x < width; x++) {
       const y = startY + Math.floor(Math.sin(x * 0.1) * 5);
       if (y >= 0 && y < height) {
-        grid[y][x] = direction > 0 ? '→' : '←';
-        if (y + 1 < height) grid[y + 1][x] = '·';
-        if (y - 1 >= 0) grid[y - 1][x] = '·';
+        grid[y]![x]! = direction > 0 ? '→' : '←';
+        if (y + 1 < height) grid[y + 1]![x]! = '·';
+        if (y - 1 >= 0) grid[y - 1]![x]! = '·';
       }
     }
   }
@@ -2869,7 +2947,7 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
     fillRect(grid, lx, ly, 5, 8, '▤');
     strokeRect(grid, lx, ly, 5, 8, '█');
-    grid[ly + 7][lx + 2] = '▼';
+    grid[ly + 7]![lx + 2]! = '▼';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -2884,8 +2962,8 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
   strokeRect(grid, shrineX - 6, shrineY, 12, 6, '▓');
   fillRect(grid, shrineX - 4, shrineY + 1, 8, 4, '░');
-  grid[shrineY + 2][shrineX] = '☆';
-  grid[shrineY + 3][shrineX] = '†';
+  grid[shrineY + 2]![shrineX]! = '☆';
+  grid[shrineY + 3]![shrineX]! = '†';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -2935,7 +3013,7 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   // === PAST ECHO (left zone) ===
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < zoneWidth; x++) {
-      grid[y][x] = rng.next() < 0.1 ? '░' : '·';
+      grid[y]![x]! = rng.next() < 0.1 ? '░' : '·';
     }
   }
 
@@ -2952,12 +3030,12 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
       for (let dx = 0; dx < rw; dx++) {
         if (dy === 0 || dy === rh - 1 || dx === 0 || dx === rw - 1) {
           if (rng.next() < 0.7) {  // Some walls missing
-            grid[ry + dy][rx + dx] = '▪';
+            grid[ry + dy]![rx + dx]! = '▪';
           }
         }
       }
     }
-    grid[ry + Math.floor(rh / 2)][rx + Math.floor(rw / 2)] = '⌘';
+    grid[ry + Math.floor(rh / 2)]![rx + Math.floor(rw / 2)]! = '⌘';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -2969,13 +3047,13 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   // Time zone label
   const pastLabel = '<<<PAST<<<';
   for (let i = 0; i < pastLabel.length; i++) {
-    grid[2][5 + i] = pastLabel[i];
+    grid[2]![5 + i]! = pastLabel[i]!;
   }
 
   // === PRESENT ANCHOR (center zone) ===
   for (let y = 0; y < height; y++) {
     for (let x = zoneWidth; x < zoneWidth * 2; x++) {
-      grid[y][x] = '░';
+      grid[y]![x]! = '░';
     }
   }
 
@@ -2989,7 +3067,7 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
 
     strokeRect(grid, px, py, pw, ph, '█');
     fillRect(grid, px + 1, py + 1, pw - 2, ph - 2, '▒');
-    grid[py + ph - 1][px + Math.floor(pw / 2)] = '⊓';
+    grid[py + ph - 1]![px + Math.floor(pw / 2)]! = '⊓';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3007,11 +3085,11 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
     for (let dx = -nexusR; dx <= nexusR; dx++) {
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < nexusR) {
-        grid[nexusY + dy][nexusX + dx] = '◎';
+        grid[nexusY + dy]![nexusX + dx]! = '◎';
       }
     }
   }
-  grid[nexusY][nexusX] = '⧗';  // Hourglass
+  grid[nexusY]![nexusX]! = '⧗';  // Hourglass
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3021,13 +3099,13 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
 
   const presentLabel = '=NOW=';
   for (let i = 0; i < presentLabel.length; i++) {
-    grid[2][zoneWidth + 10 + i] = presentLabel[i];
+    grid[2]![zoneWidth + 10 + i]! = presentLabel[i]!;
   }
 
   // === FUTURE SHADOW (right zone) ===
   for (let y = 0; y < height; y++) {
     for (let x = zoneWidth * 2; x < width; x++) {
-      grid[y][x] = rng.next() < 0.2 ? '▒' : '·';
+      grid[y]![x]! = rng.next() < 0.2 ? '▒' : '·';
     }
   }
 
@@ -3043,11 +3121,11 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
     for (let dy = 0; dy < fh; dy++) {
       for (let dx = 0; dx < fw; dx++) {
         if (rng.next() < 0.5) {  // Flickering existence
-          grid[fy + dy][fx + dx] = '░';
+          grid[fy + dy]![fx + dx]! = '░';
         }
       }
     }
-    grid[fy + Math.floor(fh / 2)][fx + Math.floor(fw / 2)] = '?';
+    grid[fy + Math.floor(fh / 2)]![fx + Math.floor(fw / 2)]! = '?';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3059,17 +3137,17 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
   const futureLabel = '>>>FUTURE>>>';
   for (let i = 0; i < futureLabel.length; i++) {
     if (zoneWidth * 2 + 5 + i < width) {
-      grid[2][zoneWidth * 2 + 5 + i] = futureLabel[i];
+      grid[2]![zoneWidth * 2 + 5 + i]! = futureLabel[i]!;
     }
   }
 
   // Zone boundaries - temporal rifts
   for (let y = 0; y < height; y++) {
-    grid[y][zoneWidth] = '║';
-    grid[y][zoneWidth * 2] = '║';
+    grid[y]![zoneWidth]! = '║';
+    grid[y]![zoneWidth * 2]! = '║';
     if (rng.next() < 0.1) {
-      grid[y][zoneWidth] = '⚡';
-      grid[y][zoneWidth * 2] = '⚡';
+      grid[y]![zoneWidth]! = '⚡';
+      grid[y]![zoneWidth * 2]! = '⚡';
     }
   }
 
@@ -3085,12 +3163,12 @@ function generateTemporalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity 
           const gy = py + dy;
           const gx = px + dx;
           if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-            grid[gy][gx] = rng.pick(['?', '!', '∞', '⟳', '◇']);
+            grid[gy]![gx]! = rng.pick(['?', '!', '∞', '⟳', '◇']);
           }
         }
       }
     }
-    grid[py][px] = '∞';
+    grid[py]![px]! = '∞';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3139,7 +3217,7 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       if (rng.next() < 0.05) {
-        grid[y][x] = rng.pick(['∘', '°', '˚', '·']);
+        grid[y]![x]! = rng.pick(['∘', '°', '˚', '·']);
       }
     }
   }
@@ -3156,14 +3234,14 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const px = sx + (i % 4) * 3 * direction;
       const py = sy + Math.floor(i / 4) * 3 - (i % 4);
       if (px >= 0 && px < width - 3 && py >= 0 && py < height - 2) {
-        grid[py][px] = '┌';
-        grid[py][px + 1] = '─';
-        grid[py][px + 2] = '┐';
-        grid[py + 1][px] = '│';
-        grid[py + 1][px + 2] = '│';
-        grid[py + 2][px] = '└';
-        grid[py + 2][px + 1] = '─';
-        grid[py + 2][px + 2] = '┘';
+        grid[py]![px]! = '┌';
+        grid[py]![px + 1]! = '─';
+        grid[py]![px + 2]! = '┐';
+        grid[py + 1]![px]! = '│';
+        grid[py + 1]![px + 2]! = '│';
+        grid[py + 2]![px]! = '└';
+        grid[py + 2]![px + 1]! = '─';
+        grid[py + 2]![px + 2]! = '┘';
       }
     }
 
@@ -3183,14 +3261,14 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     for (let dx = -plazaR; dx <= plazaR; dx++) {
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < plazaR) {
-        grid[centerY + dy][centerX + dx] = ' ';
+        grid[centerY + dy]![centerX + dx]! = ' ';
       }
       if (Math.abs(dist - plazaR) < 1) {
-        grid[centerY + dy][centerX + dx] = '○';
+        grid[centerY + dy]![centerX + dx]! = '○';
       }
     }
   }
-  grid[centerY][centerX] = '☼';
+  grid[centerY]![centerX]! = '☼';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3212,11 +3290,11 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
     // Internal pillars
     for (let c = 2; c < pw - 2; c += 3) {
-      grid[py + 2][px + c] = '║';
-      grid[py + ph - 3][px + c] = '║';
+      grid[py + 2]![px + c]! = '║';
+      grid[py + ph - 3]![px + c]! = '║';
     }
 
-    grid[py + Math.floor(ph / 2)][px + Math.floor(pw / 2)] = '⌘';
+    grid[py + Math.floor(ph / 2)]![px + Math.floor(pw / 2)]! = '⌘';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3239,11 +3317,11 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
         const gy = ny + dy;
         const gx = nx + dx + Math.floor(Math.sin(dy * 0.8) * 2);  // Warped
         if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-          grid[gy][gx] = rng.next() < 0.3 ? '▓' : '▒';
+          grid[gy]![gx]! = rng.next() < 0.3 ? '▓' : '▒';
         }
       }
     }
-    grid[ny + Math.floor(nh / 2)][nx + Math.floor(nw / 2)] = '☠';
+    grid[ny + Math.floor(nh / 2)]![nx + Math.floor(nw / 2)]! = '☠';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3254,11 +3332,11 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
   // Waking Edge - boundary with reality
   for (let y = 0; y < height; y++) {
-    grid[y][width - 3] = '│';
-    grid[y][width - 2] = rng.next() < 0.3 ? '░' : '·';
-    grid[y][width - 1] = '│';
+    grid[y]![width - 3]! = '│';
+    grid[y]![width - 2]! = rng.next() < 0.3 ? '░' : '·';
+    grid[y]![width - 1]! = '│';
     if (rng.next() < 0.1) {
-      grid[y][width - 3] = '◇';
+      grid[y]![width - 3]! = '◇';
     }
   }
 
@@ -3273,8 +3351,8 @@ function generateDreamCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const bx = rng.nextInt(5, width - 5);
     const by = rng.nextInt(5, height - 5);
     const thoughts = ['💭', '○', '◯', '◌'];
-    if (grid[by][bx] === '·') {
-      grid[by][bx] = rng.pick(thoughts);
+    if (grid[by]![bx]! === '·') {
+      grid[by]![bx]! = rng.pick(thoughts);
     }
   }
 
@@ -3318,7 +3396,7 @@ function generateVoidCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       if (rng.next() < 0.03) {
-        grid[y][x] = rng.pick(['·', '∙', '✦', '★', '☆']);
+        grid[y]![x]! = rng.pick(['·', '∙', '✦', '★', '☆']);
       }
     }
   }
@@ -3342,7 +3420,7 @@ function generateVoidCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
           const gy = fy + dy;
           const gx = fx + dx;
           if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-            grid[gy][gx] = '░';
+            grid[gy]![gx]! = '░';
           }
         }
       }
@@ -3363,17 +3441,17 @@ function generateVoidCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const f2 = fragments[(i + 1) % fragments.length];
 
     // Draw tether line
-    const x1 = f1.x + f1.w / 2;
-    const y1 = f1.y + f1.h / 2;
-    const x2 = f2.x + f2.w / 2;
-    const y2 = f2.y + f2.h / 2;
+    const x1 = f1!.x + f1!.w / 2;
+    const y1 = f1!.y + f1!.h / 2;
+    const x2 = f2!.x + f2!.w / 2;
+    const y2 = f2!.y + f2!.h / 2;
 
     for (let t = 0; t < 1; t += 0.03) {
       const px = Math.floor(x1 + (x2 - x1) * t);
       const py = Math.floor(y1 + (y2 - y1) * t);
       if (py >= 0 && py < height && px >= 0 && px < width) {
-        if (grid[py][px] === ' ') {
-          grid[py][px] = '─';
+        if (grid[py]![px]! === ' ') {
+          grid[py]![px]! = '─';
         }
       }
     }
@@ -3389,11 +3467,11 @@ function generateVoidCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   const dockCount = Math.floor(size.sectors * 0.2);
   for (let i = 0; i < dockCount && i < fragments.length; i++) {
     const frag = fragments[i];
-    const dx = frag.x + rng.nextInt(2, frag.w - 6);
-    const dy = frag.y + 1;
+    const dx = frag!.x + rng.nextInt(2, frag!.w - 6);
+    const dy = frag!.y + 1;
 
     fillRect(grid, dx, dy, 4, 3, '▓');
-    grid[dy + 1][dx + 2] = '◊';
+    grid[dy + 1]![dx + 2]! = '◊';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3406,13 +3484,13 @@ function generateVoidCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   const gardenCount = Math.floor(size.sectors * 0.3);
   for (let i = 0; i < gardenCount && i < fragments.length; i++) {
     const frag = fragments[fragments.length - 1 - i];
-    const gx = frag.x + rng.nextInt(2, frag.w - 5);
-    const gy = frag.y + rng.nextInt(1, frag.h - 4);
+    const gx = frag!.x + rng.nextInt(2, frag!.w - 5);
+    const gy = frag!.y + rng.nextInt(1, frag!.h - 4);
 
     for (let dy = 0; dy < 3; dy++) {
       for (let dx = 0; dx < 4; dx++) {
         if (gy + dy < height && gx + dx < width) {
-          grid[gy + dy][gx + dx] = rng.pick(['♣', '♠', '✿', '❀', '·']);
+          grid[gy + dy]![gx + dx]! = rng.pick(['♣', '♠', '✿', '❀', '·']);
         }
       }
     }
@@ -3432,14 +3510,14 @@ function generateVoidCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     for (let dx = -6; dx <= 6; dx++) {
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < 5) {
-        grid[centerY + dy][centerX + dx] = '▒';
+        grid[centerY + dy]![centerX + dx]! = '▒';
       }
       if (dist > 4 && dist < 6) {
-        grid[centerY + dy][centerX + dx] = '◇';
+        grid[centerY + dy]![centerX + dx]! = '◇';
       }
     }
   }
-  grid[centerY][centerX] = '☯';
+  grid[centerY]![centerX]! = '☯';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3486,7 +3564,7 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
   // Organic tissue background
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      grid[y][x] = rng.next() < 0.3 ? '░' : '·';
+      grid[y]![x]! = rng.next() < 0.3 ? '░' : '·';
     }
   }
 
@@ -3506,12 +3584,12 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
         const gy = centerY + dy;
         const gx = centerX + dx;
         if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-          grid[gy][gx] = '♥';
+          grid[gy]![gx]! = '♥';
         }
       }
     }
   }
-  grid[centerY][centerX] = '❤';
+  grid[centerY]![centerX]! = '❤';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3531,8 +3609,8 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
       const gx = Math.floor(cx);
       const gy = Math.floor(cy);
       if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-        if (grid[gy][gx] !== '♥' && grid[gy][gx] !== '❤') {
-          grid[gy][gx] = len % 5 === 0 ? '●' : '─';
+        if (grid[gy]![gx]! !== '♥' && grid[gy]![gx]! !== '❤') {
+          grid[gy]![gx]! = len % 5 === 0 ? '●' : '─';
         }
       }
     }
@@ -3551,12 +3629,12 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
         const gx = brainX + dx;
         if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
           // Brain wrinkle pattern
-          grid[gy][gx] = ((dx + dy) % 3 === 0) ? '◉' : '○';
+          grid[gy]![gx]! = ((dx + dy) % 3 === 0) ? '◉' : '○';
         }
       }
     }
   }
-  grid[brainY][brainX] = '✧';
+  grid[brainY]![brainX]! = '✧';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3573,7 +3651,7 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
     for (let dy = 0; dy < tractH; dy++) {
       const gy = tractY + dy + wobble;
       if (gy >= 0 && gy < height) {
-        grid[gy][x] = dy === 0 || dy === tractH - 1 ? '▬' : '▒';
+        grid[gy]![x]! = dy === 0 || dy === tractH - 1 ? '▬' : '▒';
       }
     }
   }
@@ -3586,20 +3664,20 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
 
   // Membrane Quarter - outer protective layer
   for (let y = 0; y < height; y++) {
-    grid[y][0] = '█';
-    grid[y][1] = '▓';
-    grid[y][2] = '▒';
-    grid[y][width - 1] = '█';
-    grid[y][width - 2] = '▓';
-    grid[y][width - 3] = '▒';
+    grid[y]![0]! = '█';
+    grid[y]![1]! = '▓';
+    grid[y]![2]! = '▒';
+    grid[y]![width - 1]! = '█';
+    grid[y]![width - 2]! = '▓';
+    grid[y]![width - 3]! = '▒';
   }
   for (let x = 0; x < width; x++) {
-    grid[0][x] = '█';
-    grid[1][x] = '▓';
-    grid[2][x] = '▒';
-    grid[height - 1][x] = '█';
-    grid[height - 2][x] = '▓';
-    grid[height - 3][x] = '▒';
+    grid[0]![x]! = '█';
+    grid[1]![x]! = '▓';
+    grid[2]![x]! = '▒';
+    grid[height - 1]![x]! = '█';
+    grid[height - 2]![x]! = '▓';
+    grid[height - 3]![x]! = '▒';
   }
 
   plots.push({
@@ -3622,12 +3700,12 @@ function generateSymbioticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity
           const gy = by + dy;
           const gx = bx + dx;
           if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-            grid[gy][gx] = '◌';
+            grid[gy]![gx]! = '◌';
           }
         }
       }
     }
-    grid[by][bx] = '❁';
+    grid[by]![bx]! = '❁';
 
     plots.push({
       id: `plot_${plotId++}`,
@@ -3680,25 +3758,25 @@ function generateFractalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
     // Draw the square outline
     for (let i = 0; i < size; i++) {
-      if (y >= 0 && y < height && x + i >= 0 && x + i < width) grid[y][x + i] = '─';
-      if (y + size - 1 >= 0 && y + size - 1 < height && x + i >= 0 && x + i < width) grid[y + size - 1][x + i] = '─';
+      if (y >= 0 && y < height && x + i >= 0 && x + i < width) grid[y]![x + i]! = '─';
+      if (y + size - 1 >= 0 && y + size - 1 < height && x + i >= 0 && x + i < width) grid[y + size - 1]![x + i]! = '─';
     }
     for (let i = 0; i < size; i++) {
-      if (y + i >= 0 && y + i < height && x >= 0 && x < width) grid[y + i][x] = '│';
-      if (y + i >= 0 && y + i < height && x + size - 1 >= 0 && x + size - 1 < width) grid[y + i][x + size - 1] = '│';
+      if (y + i >= 0 && y + i < height && x >= 0 && x < width) grid[y + i]![x]! = '│';
+      if (y + i >= 0 && y + i < height && x + size - 1 >= 0 && x + size - 1 < width) grid[y + i]![x + size - 1]! = '│';
     }
 
     // Corners
-    if (y >= 0 && y < height && x >= 0 && x < width) grid[y][x] = '┌';
-    if (y >= 0 && y < height && x + size - 1 >= 0 && x + size - 1 < width) grid[y][x + size - 1] = '┐';
-    if (y + size - 1 >= 0 && y + size - 1 < height && x >= 0 && x < width) grid[y + size - 1][x] = '└';
-    if (y + size - 1 >= 0 && y + size - 1 < height && x + size - 1 >= 0 && x + size - 1 < width) grid[y + size - 1][x + size - 1] = '┘';
+    if (y >= 0 && y < height && x >= 0 && x < width) grid[y]![x]! = '┌';
+    if (y >= 0 && y < height && x + size - 1 >= 0 && x + size - 1 < width) grid[y]![x + size - 1]! = '┐';
+    if (y + size - 1 >= 0 && y + size - 1 < height && x >= 0 && x < width) grid[y + size - 1]![x]! = '└';
+    if (y + size - 1 >= 0 && y + size - 1 < height && x + size - 1 >= 0 && x + size - 1 < width) grid[y + size - 1]![x + size - 1]! = '┘';
 
     // Center marker
     const cx = x + Math.floor(size / 2);
     const cy = y + Math.floor(size / 2);
     if (cy >= 0 && cy < height && cx >= 0 && cx < width) {
-      grid[cy][cx] = depth === 1 ? '◇' : '◆';
+      grid[cy]![cx]! = depth === 1 ? '◇' : '◆';
     }
 
     // Recurse into 8 surrounding cells (skip center for Sierpinski-like effect)
@@ -3731,11 +3809,11 @@ function generateFractalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     for (let dx = -seedR; dx <= seedR; dx++) {
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < seedR) {
-        grid[centerY + dy][centerX + dx] = '░';
+        grid[centerY + dy]![centerX + dx]! = '░';
       }
     }
   }
-  grid[centerY][centerX] = '✳';
+  grid[centerY]![centerX]! = '✳';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3750,8 +3828,8 @@ function generateFractalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const px = Math.floor(centerX + Math.cos(angle) * r);
       const py = Math.floor(centerY + Math.sin(angle) * r);
       if (py >= 0 && py < height && px >= 0 && px < width) {
-        if (grid[py][px] === '·') {
-          grid[py][px] = '○';
+        if (grid[py]![px]! === '·') {
+          grid[py]![px]! = '○';
         }
       }
     }
@@ -3770,8 +3848,8 @@ function generateFractalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       const px = Math.floor(centerX + Math.cos(angle) * r);
       const py = Math.floor(centerY + Math.sin(angle) * r);
       if (py >= 0 && py < height && px >= 0 && px < width) {
-        if (grid[py][px] === '·' || grid[py][px] === '░') {
-          grid[py][px] = '═';
+        if (grid[py]![px]! === '·' || grid[py]![px]! === '░') {
+          grid[py]![px]! = '═';
         }
       }
     }
@@ -3785,12 +3863,12 @@ function generateFractalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 
   // Infinity Edge - outer boundary that suggests infinite continuation
   for (let y = 0; y < height; y++) {
-    grid[y][0] = '∞';
-    grid[y][width - 1] = '∞';
+    grid[y]![0]! = '∞';
+    grid[y]![width - 1]! = '∞';
   }
   for (let x = 0; x < width; x++) {
-    grid[0][x] = '∞';
-    grid[height - 1][x] = '∞';
+    grid[0]![x]! = '∞';
+    grid[height - 1]![x]! = '∞';
   }
 
   plots.push({
@@ -3841,7 +3919,7 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     const y = staffSpacing + staff * Math.floor(staffSpacing * 0.8);
     for (let x = 0; x < width; x++) {
       if (y >= 0 && y < height) {
-        grid[y][x] = '─';
+        grid[y]![x]! = '─';
       }
     }
   }
@@ -3850,13 +3928,13 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   const clefX = 5;
   const clefY = staffSpacing + Math.floor(staffSpacing * 0.8) * 2;
   if (clefY - 3 >= 0 && clefY + 3 < height && clefX + 3 < width) {
-    grid[clefY - 3][clefX] = '∫';
-    grid[clefY - 2][clefX + 1] = '╮';
-    grid[clefY - 1][clefX + 2] = '│';
-    grid[clefY][clefX + 1] = '○';
-    grid[clefY + 1][clefX] = '╰';
-    grid[clefY + 2][clefX + 1] = '│';
-    grid[clefY + 3][clefX] = '╯';
+    grid[clefY - 3]![clefX]! = '∫';
+    grid[clefY - 2]![clefX + 1]! = '╮';
+    grid[clefY - 1]![clefX + 2]! = '│';
+    grid[clefY]![clefX + 1]! = '○';
+    grid[clefY + 1]![clefX]! = '╰';
+    grid[clefY + 2]![clefX + 1]! = '│';
+    grid[clefY + 3]![clefX]! = '╯';
   }
 
   // Harmony Hall - central resonance chamber
@@ -3869,14 +3947,14 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     for (let dx = -hallR; dx <= hallR; dx++) {
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < hallR && dy > -hallR / 2) {
-        grid[centerY + dy][centerX + dx] = '░';
+        grid[centerY + dy]![centerX + dx]! = '░';
       }
       if (Math.abs(dist - hallR) < 1.5 && dy > -hallR / 2) {
-        grid[centerY + dy][centerX + dx] = '◠';
+        grid[centerY + dy]![centerX + dx]! = '◠';
       }
     }
   }
-  grid[centerY][centerX] = '♪';
+  grid[centerY]![centerX]! = '♪';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3898,7 +3976,7 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       for (let w = -spireWidth; w <= spireWidth; w++) {
         const px = sx + w;
         if (py >= 0 && py < height && px >= 0 && px < width) {
-          grid[py][px] = h === sh - 1 ? '♫' : '│';
+          grid[py]![px]! = h === sh - 1 ? '♫' : '│';
         }
       }
     }
@@ -3909,7 +3987,7 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       if (wy >= 0) {
         for (let wx = -wave; wx <= wave; wx++) {
           if (sx + wx >= 0 && sx + wx < width) {
-            grid[wy][sx + wx] = '~';
+            grid[wy]![sx + wx]! = '~';
           }
         }
       }
@@ -3932,9 +4010,9 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
       if (py >= 0 && py < height) {
         // Drum-like patterns
         if ((x + dy) % 4 === 0) {
-          grid[py][x] = '●';
+          grid[py]![x]! = '●';
         } else if ((x + dy) % 4 === 2) {
-          grid[py][x] = '○';
+          grid[py]![x]! = '○';
         }
       }
     }
@@ -3950,7 +4028,7 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   for (let y = height - 5; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const wave = Math.sin(x * 0.3 + y * 0.5) > 0;
-      grid[y][x] = wave ? '▓' : '▒';
+      grid[y]![x]! = wave ? '▓' : '▒';
     }
   }
 
@@ -3972,12 +4050,12 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
         const gy = pitY + dy;
         const gx = pitX + dx;
         if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
-          grid[gy][gx] = rng.pick(['♯', '♭', '♮', '?', '!', '#']);
+          grid[gy]![gx]! = rng.pick(['♯', '♭', '♮', '?', '!', '#']);
         }
       }
     }
   }
-  grid[pitY][pitX] = '⚡';
+  grid[pitY]![pitX]! = '⚡';
 
   plots.push({
     id: `plot_${plotId++}`,
@@ -3990,8 +4068,8 @@ function generateMusicalCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
   for (let i = 0; i < 20; i++) {
     const nx = rng.nextInt(10, width - 10);
     const ny = rng.nextInt(5, height - 10);
-    if (grid[ny][nx] === '·') {
-      grid[ny][nx] = rng.pick(notes);
+    if (grid[ny]![nx]! === '·') {
+      grid[ny]![nx]! = rng.pick(notes);
     }
   }
 

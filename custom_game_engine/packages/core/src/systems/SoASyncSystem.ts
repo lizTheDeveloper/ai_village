@@ -13,9 +13,9 @@ import { EntityImpl } from '../ecs/Entity.js';
  * to ensure SoA data is up-to-date before systems use it.
  *
  * Performance:
- * - O(N) where N = entities with Position or Velocity components
- * - Only updates changed components (tracks previous state)
- * - Adds negligible overhead (~0.1-0.2ms for 1000 entities)
+ * - Uses DirtyTracker to only sync CHANGED entities (not all entities)
+ * - O(D) where D = dirty entities this tick (typically << total entities)
+ * - Adds negligible overhead (~0.1-0.2ms for typical gameplay)
  *
  * Purpose:
  * - Enables cache-efficient batch processing in hot path systems
@@ -34,48 +34,114 @@ export class SoASyncSystem extends BaseSystem {
   private trackedPositions = new Set<string>();
   private trackedVelocities = new Set<string>();
 
+  // Flag for initial full sync (first tick after startup/load)
+  private needsFullSync = true;
+
   /**
    * Update SoA storage to match current component state.
-   * This runs every tick to ensure SoA is always in sync.
+   * Uses DirtyTracker for incremental updates - only syncs changed entities.
    */
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
 
-    // Sync Position components
-    this.syncPositions(world);
+    // On first run or after reset, do full sync
+    if (this.needsFullSync) {
+      this.fullSyncPositions(world);
+      this.fullSyncVelocities(world);
+      this.needsFullSync = false;
+      return;
+    }
 
-    // Sync Velocity components
-    this.syncVelocities(world);
+    // Incremental sync - only process dirty entities
+    this.incrementalSyncPositions(world);
+    this.incrementalSyncVelocities(world);
   }
 
   /**
-   * Synchronize Position SoA with Position components.
+   * Full sync of all Position components (used on startup/reset).
    */
-  private syncPositions(world: typeof this.world): void {
+  private fullSyncPositions(world: typeof this.world): void {
     const positionSoA = world.getPositionSoA();
     const positionEntities = world.query().with(CT.Position).executeEntities();
-    const currentPositions = new Set<string>();
+
+    // Clear and rebuild tracking
+    this.trackedPositions.clear();
 
     for (const entity of positionEntities) {
       const impl = entity as EntityImpl;
       const pos = impl.getComponent<PositionComponent>(CT.Position);
       if (!pos) continue;
 
-      currentPositions.add(entity.id);
+      positionSoA.set(entity.id, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
+      this.trackedPositions.add(entity.id);
+    }
+  }
 
-      if (!this.trackedPositions.has(entity.id)) {
-        // New position - add to SoA
-        positionSoA.add(entity.id, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
-        this.trackedPositions.add(entity.id);
-      } else {
-        // Existing position - update SoA
-        positionSoA.set(entity.id, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
+  /**
+   * Full sync of all Velocity components (used on startup/reset).
+   */
+  private fullSyncVelocities(world: typeof this.world): void {
+    const velocitySoA = world.getVelocitySoA();
+    const velocityEntities = world.query().with(CT.Velocity).executeEntities();
+
+    // Clear and rebuild tracking
+    this.trackedVelocities.clear();
+
+    for (const entity of velocityEntities) {
+      const impl = entity as EntityImpl;
+      const vel = impl.getComponent<VelocityComponent>(CT.Velocity);
+      if (!vel) continue;
+
+      velocitySoA.set(entity.id, vel.vx, vel.vy);
+      this.trackedVelocities.add(entity.id);
+    }
+  }
+
+  /**
+   * Incremental sync - only process entities with dirty Position components.
+   */
+  private incrementalSyncPositions(world: typeof this.world): void {
+    const positionSoA = world.getPositionSoA();
+    const dirtyTracker = world.dirtyTracker;
+
+    // Get entities with dirty position components this tick
+    const dirtyPositions = dirtyTracker.getDirtyByComponent(CT.Position);
+
+    // Also check removed entities
+    const removedEntities = dirtyTracker.getRemovedEntities();
+
+    // Process dirty positions
+    for (const entityId of dirtyPositions) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was removed - clean up
+        if (this.trackedPositions.has(entityId)) {
+          positionSoA.remove(entityId);
+          this.trackedPositions.delete(entityId);
+        }
+        continue;
       }
+
+      const impl = entity as EntityImpl;
+      const pos = impl.getComponent<PositionComponent>(CT.Position);
+
+      if (!pos) {
+        // Position component was removed
+        if (this.trackedPositions.has(entityId)) {
+          positionSoA.remove(entityId);
+          this.trackedPositions.delete(entityId);
+        }
+        continue;
+      }
+
+      // Add or update in SoA
+      positionSoA.set(entityId, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
+      this.trackedPositions.add(entityId);
     }
 
-    // Remove deleted positions
-    for (const entityId of this.trackedPositions) {
-      if (!currentPositions.has(entityId)) {
+    // Clean up removed entities
+    for (const entityId of removedEntities) {
+      if (this.trackedPositions.has(entityId)) {
         positionSoA.remove(entityId);
         this.trackedPositions.delete(entityId);
       }
@@ -83,33 +149,50 @@ export class SoASyncSystem extends BaseSystem {
   }
 
   /**
-   * Synchronize Velocity SoA with Velocity components.
+   * Incremental sync - only process entities with dirty Velocity components.
    */
-  private syncVelocities(world: typeof this.world): void {
+  private incrementalSyncVelocities(world: typeof this.world): void {
     const velocitySoA = world.getVelocitySoA();
-    const velocityEntities = world.query().with(CT.Velocity).executeEntities();
-    const currentVelocities = new Set<string>();
+    const dirtyTracker = world.dirtyTracker;
 
-    for (const entity of velocityEntities) {
+    // Get entities with dirty velocity components this tick
+    const dirtyVelocities = dirtyTracker.getDirtyByComponent(CT.Velocity);
+
+    // Also check removed entities
+    const removedEntities = dirtyTracker.getRemovedEntities();
+
+    // Process dirty velocities
+    for (const entityId of dirtyVelocities) {
+      const entity = world.getEntity(entityId);
+      if (!entity) {
+        // Entity was removed - clean up
+        if (this.trackedVelocities.has(entityId)) {
+          velocitySoA.remove(entityId);
+          this.trackedVelocities.delete(entityId);
+        }
+        continue;
+      }
+
       const impl = entity as EntityImpl;
       const vel = impl.getComponent<VelocityComponent>(CT.Velocity);
-      if (!vel) continue;
 
-      currentVelocities.add(entity.id);
-
-      if (!this.trackedVelocities.has(entity.id)) {
-        // New velocity - add to SoA
-        velocitySoA.add(entity.id, vel.vx, vel.vy);
-        this.trackedVelocities.add(entity.id);
-      } else {
-        // Existing velocity - update SoA
-        velocitySoA.set(entity.id, vel.vx, vel.vy);
+      if (!vel) {
+        // Velocity component was removed
+        if (this.trackedVelocities.has(entityId)) {
+          velocitySoA.remove(entityId);
+          this.trackedVelocities.delete(entityId);
+        }
+        continue;
       }
+
+      // Add or update in SoA
+      velocitySoA.set(entityId, vel.vx, vel.vy);
+      this.trackedVelocities.add(entityId);
     }
 
-    // Remove deleted velocities
-    for (const entityId of this.trackedVelocities) {
-      if (!currentVelocities.has(entityId)) {
+    // Clean up removed entities
+    for (const entityId of removedEntities) {
+      if (this.trackedVelocities.has(entityId)) {
         velocitySoA.remove(entityId);
         this.trackedVelocities.delete(entityId);
       }
@@ -122,5 +205,6 @@ export class SoASyncSystem extends BaseSystem {
   protected onShutdown(): void {
     this.trackedPositions.clear();
     this.trackedVelocities.clear();
+    this.needsFullSync = true;
   }
 }

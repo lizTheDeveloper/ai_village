@@ -758,11 +758,11 @@ export class EffectValidationPipeline {
     // Create a minimal mock world for testing
     const entities: Map<string, Entity> = new Map();
 
-    // Note: Type assertion required for mock World. We provide only the subset
-    // of World methods actually used by the EffectInterpreter during validation.
-    // Using 'as unknown as World' because this is a minimal mock implementation.
+    // Create a partial mock that implements only what EffectInterpreter needs
+    // This is safe because validation only exercises a subset of World methods
     const mockWorld = {
       entities,
+      tick: 0,
       getEntity: (id: string) => entities.get(id),
       query: (): IQueryBuilder => {
         const mockBuilder: IQueryBuilder = {
@@ -777,27 +777,16 @@ export class EffectValidationPipeline {
         };
         return mockBuilder;
       },
-    };
+    } as Partial<World>;
 
-    return mockWorld as unknown as World;
+    return mockWorld as World;
   }
 
   private createMockEntity(world: World, id: string, componentStores: Map<string, Map<string, Record<string, unknown>>>): Entity {
     const components = new Map<string, Record<string, unknown>>();
     componentStores.set(id, components);
 
-    // Note: Type assertions are required here because this is a mock implementation.
-    // The Entity interface requires ReadonlyMap<string, Component>, but we need a
-    // mutable Map for the mock. The components we add satisfy the Component interface
-    // (they have type and version fields). Using 'as unknown as' for proper type safety.
-    const entity = {
-      id,
-      components: components as unknown as ReadonlyMap<string, Component>,
-      hasComponent: (type: string) => components.has(type),
-      getComponent: (type: string) => components.get(type) as unknown as Component | undefined,
-    };
-
-    // Add default components (all satisfy Component interface with type and version)
+    // Add default components with proper structure
     components.set('position', {
       type: 'position',
       version: 1,
@@ -821,7 +810,40 @@ export class EffectValidationPipeline {
       faction: 'test',
     });
 
-    return entity as unknown as Entity;
+    // Type guard to check if an object is a valid Component
+    function isComponent(value: unknown): value is Component {
+      if (typeof value !== 'object' || value === null) return false;
+      const obj = value as Record<string, unknown>;
+      return (
+        'type' in obj &&
+        typeof obj.type === 'string' &&
+        'version' in obj &&
+        typeof obj.version === 'number'
+      );
+    }
+
+    // Convert component map with type guard
+    function toComponentMap(map: Map<string, Record<string, unknown>>): ReadonlyMap<string, Component> {
+      const componentMap = new Map<string, Component>();
+      for (const [key, value] of map) {
+        if (isComponent(value)) {
+          componentMap.set(key, value);
+        }
+      }
+      return componentMap;
+    }
+
+    const componentMap = toComponentMap(components);
+
+    // Create a partial mock that implements only what EffectInterpreter needs
+    const entity = {
+      id,
+      components: componentMap,
+      hasComponent: (type: string) => componentMap.has(type),
+      getComponent: (type: string) => componentMap.get(type),
+    } as Partial<Entity>;
+
+    return entity as Entity;
   }
 
   /**

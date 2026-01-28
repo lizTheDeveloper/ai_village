@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:682c3e1",
+  "name": "Oberon Three",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489026604",
+  "createdAt": 1769489026619,
+  "lastAccessedAt": 1769489026619,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489026604",
+    "type": "magical"
+  }
+}

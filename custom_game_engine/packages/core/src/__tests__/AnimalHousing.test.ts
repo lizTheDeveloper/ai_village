@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
-import { createBuildingComponent, type BuildingComponent } from '../components/BuildingComponent.js';
+import { createBuildingComponent, type BuildingComponent, BuildingType } from '../components/BuildingComponent.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 
@@ -17,9 +17,8 @@ describe('Animal Housing - Core Functionality', () => {
     it('should create chicken-coop with correct properties', () => {
       const entity = world.createEntity();
 
-      // This will fail until chicken-coop is added to BuildingType union
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
-      (entity as any).addComponent(chickenCoop);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
+      entity.addComponent(chickenCoop);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -37,8 +36,8 @@ describe('Animal Housing - Core Functionality', () => {
     it('should create kennel with correct properties', () => {
       const entity = world.createEntity();
 
-      const kennel = createBuildingComponent('kennel' as any, 2);
-      (entity as any).addComponent(kennel);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
+      entity.addComponent(kennel);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -53,8 +52,8 @@ describe('Animal Housing - Core Functionality', () => {
     it('should create stable with correct properties', () => {
       const entity = world.createEntity();
 
-      const stable = createBuildingComponent('stable' as any, 2);
-      (entity as any).addComponent(stable);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
+      entity.addComponent(stable);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -69,8 +68,8 @@ describe('Animal Housing - Core Functionality', () => {
     it('should create apiary with correct properties', () => {
       const entity = world.createEntity();
 
-      const apiary = createBuildingComponent('apiary' as any, 2);
-      (entity as any).addComponent(apiary);
+      const apiary = createBuildingComponent(BuildingType.Apiary, 2);
+      entity.addComponent(apiary);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -85,8 +84,8 @@ describe('Animal Housing - Core Functionality', () => {
     it('should create aquarium with correct properties', () => {
       const entity = world.createEntity();
 
-      const aquarium = createBuildingComponent('aquarium' as any, 2);
-      (entity as any).addComponent(aquarium);
+      const aquarium = createBuildingComponent(BuildingType.Aquarium, 2);
+      entity.addComponent(aquarium);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -101,8 +100,8 @@ describe('Animal Housing - Core Functionality', () => {
     it('should include barn for large livestock (Tier 3)', () => {
       const entity = world.createEntity();
 
-      const barn = createBuildingComponent('barn' as any, 3);
-      (entity as any).addComponent(barn);
+      const barn = createBuildingComponent(BuildingType.Barn, 3);
+      entity.addComponent(barn);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -117,7 +116,7 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Acceptance Criterion 2: Animal Capacity System', () => {
     it('should track current occupants in housing', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       housingEntity.addComponent(chickenCoop);
 
       const building = housingEntity.getComponent('building') as BuildingComponent;
@@ -131,7 +130,7 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should enforce capacity limits when assigning animals', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       housingEntity.addComponent(chickenCoop);
 
       // Try to assign 9 chickens to 8-capacity coop
@@ -172,7 +171,7 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should allow animals to be removed from housing', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       housingEntity.addComponent(kennel);
 
       const dogEntity = world.createEntity();
@@ -208,7 +207,7 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Acceptance Criterion 3: Weather Protection', () => {
     it('should provide weatherProtection value between 0.8-1.0', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       housingEntity.addComponent(stable);
 
       const building = housingEntity.getComponent('building') as BuildingComponent;
@@ -223,7 +222,7 @@ describe('Animal Housing - Core Functionality', () => {
       const stableEntity = world.createEntity();
       const stablePos: PositionComponent = { type: 'position', version: 1, x: 10, y: 10 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       stableEntity.addComponent(stable);
 
@@ -263,7 +262,7 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Acceptance Criterion 4: Temperature Comfort', () => {
     it('should provide insulation to keep animals warm', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       housingEntity.addComponent(chickenCoop);
 
       const building = housingEntity.getComponent('building') as BuildingComponent;
@@ -275,7 +274,7 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should provide baseTemperature to warm animals', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       housingEntity.addComponent(stable);
 
       const building = housingEntity.getComponent('building') as BuildingComponent;
@@ -286,7 +285,7 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should have interior space for animals', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent('barn' as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn, 3);
       housingEntity.addComponent(barn);
 
       const building = housingEntity.getComponent('building') as BuildingComponent;
@@ -300,7 +299,7 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Acceptance Criterion 6: Species Restrictions', () => {
     it('should validate species when assigning to housing', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       housingEntity.addComponent(chickenCoop);
 
       const building = housingEntity.getComponent('building') as BuildingComponent;
@@ -312,7 +311,7 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should reject incompatible species assignment', () => {
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennelEntity.addComponent(kennel);
 
       const chickenEntity = world.createEntity();
@@ -347,7 +346,7 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should allow compatible species assignment', () => {
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennelEntity.addComponent(kennel);
 
       const dogEntity = world.createEntity();
@@ -381,7 +380,7 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Acceptance Criterion 7: Building Integration with AnimalComponent', () => {
     it('should track housing building ID in AnimalComponent', () => {
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennelEntity.addComponent(kennel);
 
       const dogEntity = world.createEntity();
@@ -521,7 +520,7 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Building Completion', () => {
     it('should only house animals in completed buildings', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = false; // Under construction
       chickenCoop.progress = 50;
       housingEntity.addComponent(chickenCoop);
@@ -557,11 +556,11 @@ describe('Animal Housing - Core Functionality', () => {
   describe('Multiple Housing Buildings', () => {
     it('should support multiple housing buildings of same type', () => {
       const coop1 = world.createEntity();
-      const building1 = createBuildingComponent('chicken-coop' as any, 2);
+      const building1 = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop1.addComponent(building1);
 
       const coop2 = world.createEntity();
-      const building2 = createBuildingComponent('chicken-coop' as any, 2);
+      const building2 = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop2.addComponent(building2);
 
       // Both should be valid and independent
@@ -570,11 +569,11 @@ describe('Animal Housing - Core Functionality', () => {
 
     it('should track occupants separately per building', () => {
       const kennel1 = world.createEntity();
-      const building1 = createBuildingComponent('kennel' as any, 2);
+      const building1 = createBuildingComponent(BuildingType.Kennel, 2);
       kennel1.addComponent(building1);
 
       const kennel2 = world.createEntity();
-      const building2 = createBuildingComponent('kennel' as any, 2);
+      const building2 = createBuildingComponent(BuildingType.Kennel, 2);
       kennel2.addComponent(building2);
 
       // Assign dogs to kennel1 - kennel2 should remain at 0 occupants

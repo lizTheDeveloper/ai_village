@@ -7,25 +7,47 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import type { MagicComponent } from '../../components/MagicComponent.js';
 import type { ComposedSpell } from '../../components/MagicComponent.js';
 
+// Helper function to create test MagicComponent with defaults
+function createTestCaster(overrides: Partial<MagicComponent> = {}): MagicComponent {
+  return {
+    activeParadigms: [],
+    knownSpells: [],
+    resourcePools: {},
+    sustainedSpells: [],
+    castHistory: [],
+    ...overrides,
+  };
+}
+
+// Helper function to create test ComposedSpell with defaults
+function createTestSpell(overrides: Partial<ComposedSpell> = {}): ComposedSpell {
+  return {
+    id: 'test_spell',
+    name: 'Test Spell',
+    technique: 'create',
+    form: 'fire',
+    source: 'arcane',
+    manaCost: 50,
+    castTime: 5,
+    range: 10,
+    effectId: 'test_effect',
+    ...overrides,
+  };
+}
+
 describe('Resource Depletion Edge Cases', () => {
   it('should handle casting spell that costs exactly all remaining mana', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 50, maximum: 100, regenRate: 0.01, locked: 0 },
       },
-    } as any;
+    });
 
-    const spell: ComposedSpell = {
+    const spell = createTestSpell({
       id: 'exact_cost',
       name: 'Exact Cost',
-      technique: 'create',
-      form: 'fire',
-      source: 'arcane',
       manaCost: 50, // Exact match
-      castTime: 5,
-      range: 10,
-      effectId: 'test',
-    };
+    });
 
     const result = attemptCast(caster, spell);
 
@@ -35,23 +57,18 @@ describe('Resource Depletion Edge Cases', () => {
   });
 
   it('should handle casting when resources hit zero mid-cast', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: -1, locked: 0 }, // Draining!
       },
-    } as any;
+    });
 
-    const spell: ComposedSpell = {
+    const spell = createTestSpell({
       id: 'slow_spell',
       name: 'Slow Spell',
-      technique: 'create',
-      form: 'fire',
-      source: 'arcane',
       manaCost: 50,
       castTime: 100, // Long cast time
-      range: 10,
-      effectId: 'test',
-    };
+    });
 
     // Start cast
     const castState = beginCast(caster, spell);
@@ -68,27 +85,19 @@ describe('Resource Depletion Edge Cases', () => {
   });
 
   it('should handle simultaneous resource drain from multiple sources', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
-    } as any;
+    });
 
     // Lock mana for sustained spell
     caster.resourcePools.mana.locked = 40;
 
     // Try to cast another spell
-    const spell: ComposedSpell = {
-      id: 'test',
-      name: 'Test',
-      technique: 'create',
-      form: 'fire',
-      source: 'arcane',
+    const spell = createTestSpell({
       manaCost: 70, // Would require 110 total (70 + 40 locked)
-      castTime: 5,
-      range: 10,
-      effectId: 'test',
-    };
+    });
 
     const result = attemptCast(caster, spell);
 
@@ -97,11 +106,11 @@ describe('Resource Depletion Edge Cases', () => {
   });
 
   it('should handle locked resources that exceed current after damage', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 50 },
       },
-    } as any;
+    });
 
     // Take damage that reduces max mana
     caster.resourcePools.mana.maximum = 60;
@@ -141,11 +150,11 @@ describe('Numeric Overflow and Accumulation', () => {
   });
 
   it('should handle corruption accumulating to exactly 100 (terminal)', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         corruption: { type: 'corruption', current: 95, maximum: 100, regenRate: 0, locked: 0 },
       },
-    } as any;
+    });
 
     // Cast dark spell that adds 5 corruption
     addCorruption(caster, 5);
@@ -158,11 +167,11 @@ describe('Numeric Overflow and Accumulation', () => {
   });
 
   it('should handle corruption accumulating beyond 100 (overflow protection)', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         corruption: { type: 'corruption', current: 98, maximum: 100, regenRate: 0, locked: 0 },
       },
-    } as any;
+    });
 
     // Cast spell that would add 10 corruption
     addCorruption(caster, 10);
@@ -171,11 +180,11 @@ describe('Numeric Overflow and Accumulation', () => {
   });
 
   it('should handle attention accumulating indefinitely (unbounded growth)', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         attention: { type: 'attention', current: 0, maximum: 100, regenRate: -0.001, locked: 0 },
       },
-    } as any;
+    });
 
     // Cast true name spells thousands of times
     for (let i = 0; i < 10000; i++) {
@@ -192,14 +201,14 @@ describe('Numeric Overflow and Accumulation', () => {
   });
 
   it('should handle breath count going to exactly 1 (Drab threshold)', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         health: { type: 'health', current: 1, maximum: 50000, regenRate: 0, locked: 0 },
       },
       paradigmState: {
         breath: { breathCount: 1, heighteningTier: 0 },
       },
-    } as any;
+    });
 
     const warning = checkDrabWarning(caster);
     expect(warning.isDrabWarning).toBe(true);
@@ -209,12 +218,12 @@ describe('Numeric Overflow and Accumulation', () => {
 
 describe('State Corruption and Invalid Transitions', () => {
   it('should detect orphaned locked resources', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 50 },
       },
       sustainedSpells: [], // No sustained spells!
-    } as any;
+    });
 
     // Locked mana but no sustained spells - orphaned lock
     const issues = detectResourceIssues(caster);
@@ -224,7 +233,7 @@ describe('State Corruption and Invalid Transitions', () => {
   });
 
   it('should detect and fix inconsistent resource pools', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: {
           type: 'mana',
@@ -234,7 +243,7 @@ describe('State Corruption and Invalid Transitions', () => {
           locked: 120, // Exceeds current!
         },
       },
-    } as any;
+    });
 
     const fixed = repairResourcePools(caster);
 
@@ -243,7 +252,7 @@ describe('State Corruption and Invalid Transitions', () => {
   });
 
   it('should handle paradigm being removed while active spell is using it', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       activeParadigms: ['academic'],
       knownSpells: [{ spellId: 'fireball', proficiency: 50, timesCast: 10 }],
       sustainedSpells: [
@@ -253,7 +262,7 @@ describe('State Corruption and Invalid Transitions', () => {
           endTime: 10000,
         },
       ],
-    } as any;
+    });
 
     // Remove paradigm
     caster.activeParadigms = [];
@@ -266,12 +275,12 @@ describe('State Corruption and Invalid Transitions', () => {
   });
 
   it('should handle spell being forgotten while in known spells list', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       knownSpells: [
         { spellId: 'fireball', proficiency: 70, timesCast: 50 },
         { spellId: 'deleted_spell', proficiency: 30, timesCast: 10 },
       ],
-    } as any;
+    });
 
     // Spell registry no longer has 'deleted_spell'
     const spellExists = (id: string) => id !== 'deleted_spell';
@@ -285,24 +294,16 @@ describe('State Corruption and Invalid Transitions', () => {
 
 describe('Timing and Order-of-Operations Issues', () => {
   it('should handle regeneration happening before cost deduction in same tick', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 45, maximum: 100, regenRate: 1.0, locked: 0 },
       },
-    } as any;
+    });
 
     // Spell costs 50 mana, but regen happens first
-    const spell: ComposedSpell = {
-      id: 'test',
-      name: 'Test',
-      technique: 'create',
-      form: 'fire',
-      source: 'arcane',
+    const spell = createTestSpell({
       manaCost: 50,
-      castTime: 5,
-      range: 10,
-      effectId: 'test',
-    };
+    });
 
     // Regen first
     regenerateResources(caster, 1); // +1 mana -> 46
@@ -319,12 +320,12 @@ describe('Timing and Order-of-Operations Issues', () => {
   });
 
   it('should handle terminal effect triggering during another terminal effect', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         corruption: { type: 'corruption', current: 98, maximum: 100, regenRate: 0, locked: 0 },
         sanity: { type: 'sanity', current: 2, maximum: 100, regenRate: 0, locked: 0 },
       },
-    } as any;
+    });
 
     // Cast spell that adds corruption AND costs sanity
     const darkSpell: ComposedSpell = {
@@ -391,13 +392,13 @@ describe('Timing and Order-of-Operations Issues', () => {
 
 describe('Cross-Paradigm Interference', () => {
   it('should detect conflicting paradigm costs on same resource', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       activeParadigms: ['academic', 'divine'],
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
         favor: { type: 'favor', current: 50, maximum: 100, regenRate: 0, locked: 0 },
       },
-    } as any;
+    });
 
     // Hybrid spell that costs both mana AND favor
     const hybridSpell: ComposedSpell = {
@@ -421,7 +422,7 @@ describe('Cross-Paradigm Interference', () => {
   });
 
   it('should prevent paradigm switching while sustained spell is active', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       activeParadigms: ['academic'],
       sustainedSpells: [
         {
@@ -430,7 +431,7 @@ describe('Cross-Paradigm Interference', () => {
           endTime: 10000,
         },
       ],
-    } as any;
+    });
 
     // Try to switch to different paradigm
     const result = switchParadigm(caster, 'pact');
@@ -440,9 +441,9 @@ describe('Cross-Paradigm Interference', () => {
   });
 
   it('should handle paradigm learning creating forbidden combinations', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       activeParadigms: ['divine'],
-    } as any;
+    });
 
     // Try to learn pact (forbidden with divine)
     const result = learnParadigm(caster, 'pact');
@@ -470,14 +471,15 @@ describe('Memory Leaks and Resource Cleanup', () => {
   });
 
   it('should prevent sustained spell list from growing unbounded', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       sustainedSpells: [],
-    } as any;
+    });
 
     // Add many sustained spells
     for (let i = 0; i < 1000; i++) {
-      (caster.sustainedSpells as any[]).push({
+      caster.sustainedSpells.push({
         spellId: `spell_${i}`,
+        paradigm: 'test',
         endTime: i,
       });
     }
@@ -489,13 +491,13 @@ describe('Memory Leaks and Resource Cleanup', () => {
   });
 
   it('should clean up spell history to prevent unbounded growth', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       castHistory: [],
-    } as any;
+    });
 
     // Cast thousands of spells
     for (let i = 0; i < 10000; i++) {
-      (caster.castHistory as any[]).push({
+      caster.castHistory.push({
         spellId: 'test',
         tick: i,
       });
@@ -510,23 +512,17 @@ describe('Memory Leaks and Resource Cleanup', () => {
 
 describe('NaN and Infinity Propagation', () => {
   it('should reject spell costs that result in NaN', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
-    } as any;
+    });
 
-    const spell: ComposedSpell = {
+    const spell = createTestSpell({
       id: 'bad',
       name: 'Bad',
-      technique: 'create',
-      form: 'fire',
-      source: 'arcane',
       manaCost: NaN, // Invalid!
-      castTime: 5,
-      range: 10,
-      effectId: 'test',
-    };
+    });
 
     expect(() => {
       validateSpell(spell);
@@ -544,11 +540,11 @@ describe('NaN and Infinity Propagation', () => {
   });
 
   it('should prevent Infinity from entering resource pools', () => {
-    const caster: MagicComponent = {
+    const caster = createTestCaster({
       resourcePools: {
         mana: { type: 'mana', current: 100, maximum: 100, regenRate: 0.01, locked: 0 },
       },
-    } as any;
+    });
 
     // Try to add infinite mana
     expect(() => {
@@ -565,7 +561,12 @@ describe('NaN and Infinity Propagation', () => {
 });
 
 // Helper functions (these should be implemented)
-function attemptCast(caster: MagicComponent, spell: ComposedSpell): any {
+interface CastResult {
+  success: boolean;
+  failureReason?: string;
+}
+
+function attemptCast(caster: MagicComponent, spell: ComposedSpell): CastResult {
   const available = caster.resourcePools.mana.current - caster.resourcePools.mana.locked;
   if (available < spell.manaCost) {
     return { success: false, failureReason: 'insufficient_available_mana' };
@@ -574,7 +575,16 @@ function attemptCast(caster: MagicComponent, spell: ComposedSpell): any {
   return { success: true };
 }
 
-function beginCast(caster: MagicComponent, spell: ComposedSpell): any {
+interface CastState {
+  spell: ComposedSpell;
+  caster: MagicComponent;
+  ticksElapsed: number;
+  ticksTotal: number;
+  failed: boolean;
+  failureReason?: string;
+}
+
+function beginCast(caster: MagicComponent, spell: ComposedSpell): CastState {
   return {
     spell,
     caster,
@@ -584,9 +594,11 @@ function beginCast(caster: MagicComponent, spell: ComposedSpell): any {
   };
 }
 
-function tickCast(castState: any): void {
+function tickCast(castState: CastState): void {
+  if (castState.failed) return;
   castState.ticksElapsed++;
-  if (castState.caster.resourcePools.mana.current <= 0) {
+  const manaPool = castState.caster.resourcePools.mana;
+  if (manaPool && manaPool.current <= 0) {
     castState.failed = true;
     castState.failureReason = 'resource_depleted_during_cast';
   }
@@ -617,7 +629,12 @@ function addCorruption(caster: MagicComponent, amount: number): void {
   );
 }
 
-function checkTerminalEffects(caster: MagicComponent): any {
+interface TerminalEffectResult {
+  terminal: boolean;
+  type?: string;
+}
+
+function checkTerminalEffects(caster: MagicComponent): TerminalEffectResult {
   if (caster.resourcePools.corruption?.current >= 100) {
     return { terminal: true, type: 'corruption_complete' };
   }
@@ -629,7 +646,12 @@ function addAttention(caster: MagicComponent, amount: number): void {
   caster.resourcePools.attention.current += amount;
 }
 
-function checkAttentionSideEffects(caster: MagicComponent): any {
+interface AttentionSideEffects {
+  beingWatched: boolean;
+  dangerLevel: number;
+}
+
+function checkAttentionSideEffects(caster: MagicComponent): AttentionSideEffects {
   const attention = caster.resourcePools.attention?.current || 0;
   return {
     beingWatched: attention > 100,
@@ -637,7 +659,12 @@ function checkAttentionSideEffects(caster: MagicComponent): any {
   };
 }
 
-function checkDrabWarning(caster: MagicComponent): any {
+interface DrabWarning {
+  isDrabWarning: boolean;
+  message: string;
+}
+
+function checkDrabWarning(caster: MagicComponent): DrabWarning {
   const breathCount = caster.paradigmState?.breath?.breathCount || 0;
   return {
     isDrabWarning: breathCount === 1,
@@ -645,8 +672,13 @@ function checkDrabWarning(caster: MagicComponent): any {
   };
 }
 
-function detectResourceIssues(caster: MagicComponent): any {
-  const sustainedSpellCount = (caster as any).sustainedSpells?.length || 0;
+interface ResourceIssues {
+  orphanedLocks: boolean;
+  recommendations: string[];
+}
+
+function detectResourceIssues(caster: MagicComponent): ResourceIssues {
+  const sustainedSpellCount = caster.sustainedSpells?.length || 0;
   const hasLockedMana = caster.resourcePools.mana?.locked > 0;
 
   return {
@@ -664,13 +696,17 @@ function repairResourcePools(caster: MagicComponent): MagicComponent {
   return fixed;
 }
 
-function validateSustainedSpells(caster: MagicComponent): any {
-  const invalid = ((caster as any).sustainedSpells || []).filter((spell: any) => {
+interface SustainedSpellValidation {
+  invalid: Array<{ spellId: string; paradigm: string; endTime: number; reason: string }>;
+}
+
+function validateSustainedSpells(caster: MagicComponent): SustainedSpellValidation {
+  const invalid = (caster.sustainedSpells || []).filter((spell) => {
     return !caster.activeParadigms.includes(spell.paradigm);
   });
 
   return {
-    invalid: invalid.map((s: any) => ({ ...s, reason: 'paradigm_lost' })),
+    invalid: invalid.map((s) => ({ ...s, reason: 'paradigm_lost' })),
   };
 }
 
@@ -681,25 +717,37 @@ function cleanInvalidSpells(caster: MagicComponent, spellExists: (id: string) =>
   };
 }
 
-function castSpell(caster: MagicComponent, spell: ComposedSpell): any {
-  const terminalEffects: any[] = [];
+interface TerminalEffect {
+  type: string;
+}
 
-  if ((spell as any).costs) {
-    for (const cost of (spell as any).costs) {
+interface CastSpellResult {
+  success: boolean;
+  terminalEffects: TerminalEffect[];
+}
+
+function castSpell(caster: MagicComponent, spell: ComposedSpell): CastSpellResult {
+  const terminalEffects: TerminalEffect[] = [];
+
+  if ('costs' in spell && spell.costs) {
+    for (const cost of spell.costs) {
       // Corruption and attention are cumulative costs that INCREASE
       const isCumulative = cost.type === 'corruption' || cost.type === 'attention';
-      if (isCumulative) {
-        (caster.resourcePools as any)[cost.type].current += cost.amount;
-      } else {
-        (caster.resourcePools as any)[cost.type].current -= cost.amount;
-      }
+      const pool = caster.resourcePools[cost.type];
+      if (pool) {
+        if (isCumulative) {
+          pool.current += cost.amount;
+        } else {
+          pool.current -= cost.amount;
+        }
 
-      // Check for terminal effects after applying cost
-      if (cost.type === 'corruption' && (caster.resourcePools as any)[cost.type].current >= 100) {
-        terminalEffects.push({ type: 'corruption_complete' });
-      }
-      if (cost.type === 'sanity' && (caster.resourcePools as any)[cost.type].current <= 0) {
-        terminalEffects.push({ type: 'sanity_zero' });
+        // Check for terminal effects after applying cost
+        if (cost.type === 'corruption' && pool.current >= 100) {
+          terminalEffects.push({ type: 'corruption_complete' });
+        }
+        if (cost.type === 'sanity' && pool.current <= 0) {
+          terminalEffects.push({ type: 'sanity_zero' });
+        }
       }
     }
   }
@@ -726,21 +774,36 @@ function updateEffects(target: any, currentTick: number): any[] {
   return target.statusEffects;
 }
 
-function calculateMultiParadigmCosts(caster: MagicComponent, spell: ComposedSpell): any {
+interface MultiParadigmCosts {
+  mana: number;
+  favor: number;
+}
+
+function calculateMultiParadigmCosts(caster: MagicComponent, spell: ComposedSpell): MultiParadigmCosts {
   return {
     mana: spell.manaCost * 0.6,
     favor: spell.manaCost * 0.4,
   };
 }
 
-function switchParadigm(caster: MagicComponent, newParadigm: string): any {
-  if ((caster as any).sustainedSpells?.length > 0) {
+interface ParadigmSwitchResult {
+  success: boolean;
+  blockedBy?: string;
+}
+
+function switchParadigm(caster: MagicComponent, newParadigm: string): ParadigmSwitchResult {
+  if (caster.sustainedSpells?.length > 0) {
     return { success: false, blockedBy: 'sustained_spell' };
   }
   return { success: true };
 }
 
-function learnParadigm(caster: MagicComponent, paradigm: string): any {
+interface LearnParadigmResult {
+  success: boolean;
+  reason?: string;
+}
+
+function learnParadigm(caster: MagicComponent, paradigm: string): LearnParadigmResult {
   const forbidden = [
     ['divine', 'pact'],
     ['blood', 'divine'],
@@ -762,15 +825,15 @@ function cleanupExpiredEffects(target: any, currentTick: number): void {
 }
 
 function cleanupSustainedSpells(caster: MagicComponent, currentTick: number): void {
-  (caster as any).sustainedSpells = ((caster as any).sustainedSpells || []).filter((s: any) => {
+  caster.sustainedSpells = (caster.sustainedSpells || []).filter((s) => {
     return s.endTime > currentTick;
   });
 }
 
 function trimCastHistory(caster: MagicComponent, maxSize: number): void {
-  const history = (caster as any).castHistory || [];
+  const history = caster.castHistory || [];
   if (history.length > maxSize) {
-    (caster as any).castHistory = history.slice(-maxSize);
+    caster.castHistory = history.slice(-maxSize);
   }
 }
 

@@ -59,6 +59,26 @@ export interface TrendData {
 }
 
 /**
+ * Economic metrics data structure
+ */
+interface EconomicMetrics {
+  resourcesGathered: Record<string, { totalGathered: number }>;
+  resourcesConsumed: Record<string, { totalConsumed: number }>;
+  stockpiles: Record<string, Array<{ value: number; timestamp: number }>>;
+}
+
+/**
+ * Agent lifecycle metrics data structure
+ */
+interface AgentLifecycleMetrics {
+  [agentId: string]: {
+    causeOfDeath?: string;
+    initialStats?: { intelligence?: number };
+    lifespan?: number;
+  };
+}
+
+/**
  * Recognized pattern
  */
 export interface RecognizedPattern {
@@ -161,15 +181,14 @@ export class MetricsAnalysis {
    * Detect resource shortage
    */
   private detectResourceShortage(): Insight | null {
-    const economicMetrics = this.collector.getMetric('economic_metrics') as any;
+    const economicMetrics = this.collector.getMetric('economic_metrics') as EconomicMetrics;
     if (!economicMetrics?.resourcesGathered) return null;
 
     for (const [resourceType, gathered] of Object.entries(economicMetrics.resourcesGathered)) {
       const consumed = economicMetrics.resourcesConsumed[resourceType];
-      const gatherData = gathered as { totalGathered: number };
 
-      if (consumed && gatherData.totalGathered < consumed.totalConsumed) {
-        const deficit = consumed.totalConsumed - gatherData.totalGathered;
+      if (consumed && gathered.totalGathered < consumed.totalConsumed) {
+        const deficit = consumed.totalConsumed - gathered.totalGathered;
         const deficitPercent = Math.round((deficit / consumed.totalConsumed) * 100);
 
         return {
@@ -254,12 +273,12 @@ export class MetricsAnalysis {
    * Detect primary cause of death
    */
   private detectPrimaryDeathCause(): Insight | null {
-    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as any;
+    const lifecycleMetrics = this.collector.getMetric('agent_lifecycle') as AgentLifecycleMetrics;
     if (!lifecycleMetrics) return null;
     const causes = new Map<string, number>();
     let totalDeaths = 0;
 
-    for (const metrics of Object.values(lifecycleMetrics) as Array<{ causeOfDeath?: string }>) {
+    for (const metrics of Object.values(lifecycleMetrics)) {
       if (metrics.causeOfDeath) {
         causes.set(metrics.causeOfDeath, (causes.get(metrics.causeOfDeath) || 0) + 1);
         totalDeaths++;

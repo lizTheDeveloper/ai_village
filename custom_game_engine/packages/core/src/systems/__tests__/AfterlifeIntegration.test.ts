@@ -45,13 +45,13 @@ describe('Afterlife System Integration', () => {
       const entity = new EntityImpl(entityId, 0);
 
       const currentTick = 1000;
-      (world as any)._tick = currentTick;
+      world.setTick(currentTick);
 
       // Create soul in underworld
-      (entity as any).addComponent(createIdentityComponent('Newly Dead Soul'));
-      (entity as any).addComponent(createPositionComponent(0, 0));
-      (entity as any).addComponent(createRealmLocationComponent('underworld'));
-      (entity as any).addComponent(createAgentComponent('idle', 20, true, 0));
+      entity.addComponent(createIdentityComponent('Newly Dead Soul'));
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRealmLocationComponent('underworld'));
+      entity.addComponent(createAgentComponent('idle', 20, true, 0));
 
       const afterlife = createAfterlifeComponent({
         causeOfDeath: 'old_age',
@@ -61,7 +61,7 @@ describe('Afterlife System Integration', () => {
         descendants: ['child1'],
       });
 
-      (entity as any).addComponent(afterlife);
+      entity.addComponent(afterlife);
       world.addEntity(entity);
 
       // Verify initial state
@@ -118,10 +118,10 @@ describe('Afterlife System Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Fading Soul'));
-      (entity as any).addComponent(createPositionComponent(0, 0));
-      (entity as any).addComponent(createRealmLocationComponent('underworld'));
-      (entity as any).addComponent(createAgentComponent('idle', 20, true, 0));
+      entity.addComponent(createIdentityComponent('Fading Soul'));
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRealmLocationComponent('underworld'));
+      entity.addComponent(createAgentComponent('idle', 20, true, 0));
 
       const afterlife = createAfterlifeComponent({
         causeOfDeath: 'old_age',
@@ -129,7 +129,7 @@ describe('Afterlife System Integration', () => {
         deathLocation: { x: 0, y: 0 },
       });
 
-      (entity as any).addComponent(afterlife);
+      entity.addComponent(afterlife);
       world.addEntity(entity);
 
       const initialCoherence = afterlife.coherence;
@@ -152,18 +152,19 @@ describe('Afterlife System Integration', () => {
 
       // Note: StateMutatorSystem creates a new component object via updateComponent,
       // so we must re-fetch to see updated values
-      const updated = (entity as any).getComponent('afterlife');
-      expect(updated.coherence).toBeLessThan(initialCoherence);
+      const updated = entity.getComponent('afterlife');
+      expect(updated).toBeDefined();
+      expect(updated!.coherence).toBeLessThan(initialCoherence);
     });
 
     it('should eventually become shade with no interaction', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Lonely Soul'));
-      (entity as any).addComponent(createPositionComponent(0, 0));
-      (entity as any).addComponent(createRealmLocationComponent('underworld'));
-      (entity as any).addComponent(createAgentComponent('idle', 20, true, 0));
+      entity.addComponent(createIdentityComponent('Lonely Soul'));
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRealmLocationComponent('underworld'));
+      entity.addComponent(createAgentComponent('idle', 20, true, 0));
 
       const afterlife = createAfterlifeComponent({
         causeOfDeath: 'combat',
@@ -175,7 +176,7 @@ describe('Afterlife System Integration', () => {
       afterlife.coherence = 0.15;
       afterlife.solitude = 0.9;
 
-      (entity as any).addComponent(afterlife);
+      entity.addComponent(afterlife);
       world.addEntity(entity);
 
       expect(afterlife.isShade).toBe(false);
@@ -196,19 +197,20 @@ describe('Afterlife System Integration', () => {
 
       // Note: StateMutatorSystem creates a new component object via updateComponent,
       // so we must re-fetch to see updated values
-      const updated = (entity as any).getComponent('afterlife');
-      expect(updated.coherence).toBeLessThan(0.1);
-      expect(updated.isShade).toBe(true);
+      const updated = entity.getComponent('afterlife');
+      expect(updated).toBeDefined();
+      expect(updated!.coherence).toBeLessThan(0.1);
+      expect(updated!.isShade).toBe(true);
     });
 
     it('should pass on when tether low and peace high', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      (entity as any).addComponent(createIdentityComponent('Peaceful Soul'));
-      (entity as any).addComponent(createPositionComponent(0, 0));
-      (entity as any).addComponent(createRealmLocationComponent('underworld'));
-      (entity as any).addComponent(createAgentComponent('idle', 20, true, 0));
+      entity.addComponent(createIdentityComponent('Peaceful Soul'));
+      entity.addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createRealmLocationComponent('underworld'));
+      entity.addComponent(createAgentComponent('idle', 20, true, 0));
 
       const afterlife = createAfterlifeComponent({
         causeOfDeath: 'old_age',
@@ -221,7 +223,7 @@ describe('Afterlife System Integration', () => {
       afterlife.tether = 0.05; // Almost no connection
       afterlife.peace = 0.9;   // Very peaceful
 
-      (entity as any).addComponent(afterlife);
+      entity.addComponent(afterlife);
       world.addEntity(entity);
 
       expect(afterlife.hasPassedOn).toBe(false);
@@ -238,7 +240,7 @@ describe('Afterlife System Integration', () => {
   describe('remembrance mechanics', () => {
     it('should restore tether and reduce solitude on remembrance', () => {
       const currentTick = 5000;
-      (world as any)._tick = currentTick;
+      world.setTick(currentTick);
 
       const afterlife = createAfterlifeComponent({
         causeOfDeath: 'old_age',
@@ -344,10 +346,10 @@ describe('Afterlife System Integration', () => {
         const entityId = createEntityId();
         const entity = new EntityImpl(entityId, 0);
 
-        (entity as any).addComponent(createIdentityComponent(`Soul ${i}`));
-        (entity as any).addComponent(createPositionComponent(i * 10, i * 10));
-        (entity as any).addComponent(createRealmLocationComponent('underworld'));
-        (entity as any).addComponent(createAgentComponent('idle', 20, true, 0));
+        entity.addComponent(createIdentityComponent(`Soul ${i}`));
+        entity.addComponent(createPositionComponent(i * 10, i * 10));
+        entity.addComponent(createRealmLocationComponent('underworld'));
+        entity.addComponent(createAgentComponent('idle', 20, true, 0));
 
         const afterlife = createAfterlifeComponent({
           causeOfDeath: 'old_age',
@@ -355,7 +357,7 @@ describe('Afterlife System Integration', () => {
           deathLocation: { x: i * 10, y: i * 10 },
         });
 
-        (entity as any).addComponent(afterlife);
+        entity.addComponent(afterlife);
         world.addEntity(entity);
         souls.push(entity);
       }

@@ -104,12 +104,27 @@ function loadMegastructureBlueprints(): Record<string, MegastructureBlueprint> {
 
   for (const [key, blueprint] of Object.entries(data)) {
     // Validate required fields
-    const bp = blueprint as any;
+    if (typeof blueprint !== 'object' || blueprint === null) {
+      throw new Error(`Invalid megastructure blueprint: ${key} - must be an object`);
+    }
+
+    const bp = blueprint as Record<string, unknown>;
     if (!bp.id || !bp.name || !bp.category || !bp.tier) {
       throw new Error(`Invalid megastructure blueprint: ${key} - missing required fields`);
     }
+    if (typeof bp.id !== 'string' || typeof bp.name !== 'string') {
+      throw new Error(`Invalid megastructure blueprint: ${key} - id and name must be strings`);
+    }
 
-    blueprints[key] = bp as MegastructureBlueprint;
+    // Additional validation for required fields
+    const requiredFields = ['techLevelRequired', 'totalMass', 'constructionTimeYears', 'laborRequired', 'resources', 'phases', 'capabilities'];
+    for (const field of requiredFields) {
+      if (!(field in bp)) {
+        throw new Error(`Invalid megastructure blueprint: ${key} - missing required field ${field}`);
+      }
+    }
+
+    blueprints[key] = blueprint as unknown as MegastructureBlueprint;
   }
 
   return blueprints;

@@ -55,8 +55,8 @@ export class AbstractMegasegment extends AbstractTierBase {
     for (let i = 0; i < cultureCount; i++) {
       const popShare = this.population.total / cultureCount;
       cultures.push({
-        name: names[Math.floor(Math.random() * names.length)],
-        language: languages[Math.floor(Math.random() * languages.length)],
+        name: names[Math.floor(Math.random() * names.length)]!,
+        language: languages[Math.floor(Math.random() * languages.length)]!,
         techLevel: this.techLevel + Math.floor(Math.random() * 3) - 1,
         traditions: this.generateTraditions(),
         population: Math.floor(popShare),
@@ -83,7 +83,7 @@ export class AbstractMegasegment extends AbstractTierBase {
     const traditions: string[] = [];
 
     for (let i = 0; i < count; i++) {
-      const tradition = allTraditions[Math.floor(Math.random() * allTraditions.length)];
+      const tradition = allTraditions[Math.floor(Math.random() * allTraditions.length)]!;
       if (!traditions.includes(tradition)) {
         traditions.push(tradition);
       }
@@ -104,7 +104,7 @@ export class AbstractMegasegment extends AbstractTierBase {
       'temporal_anomaly'
     ];
 
-    return phenomena[Math.floor(Math.random() * phenomena.length)];
+    return phenomena[Math.floor(Math.random() * phenomena.length)]!;
   }
 
   protected updateAbstract(deltaTime: number): void {

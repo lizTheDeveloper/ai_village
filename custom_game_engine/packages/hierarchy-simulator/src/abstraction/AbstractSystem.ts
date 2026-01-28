@@ -110,9 +110,9 @@ export class AbstractSystem extends AbstractTierBase {
     let selectedType: 'O' | 'B' | 'A' | 'F' | 'G' | 'K' | 'M' = 'M';
 
     for (let i = 0; i < types.length; i++) {
-      random -= weights[i];
+      random -= weights[i]!;
       if (random <= 0) {
-        selectedType = types[i];
+        selectedType = types[i]!;
         break;
       }
     }
@@ -181,7 +181,7 @@ export class AbstractSystem extends AbstractTierBase {
     ];
 
     for (let i = 0; i < stationCount; i++) {
-      const type = types[Math.floor(Math.random() * types.length)];
+      const type = types[Math.floor(Math.random() * types.length)]!;
 
       this.orbitalInfrastructure.push({
         id: `${this.id}_orbital_${i}`,

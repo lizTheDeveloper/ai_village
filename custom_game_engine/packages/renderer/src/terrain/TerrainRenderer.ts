@@ -53,63 +53,11 @@ interface CachedChunk {
 }
 
 // =============================================================================
-// CHUNK VERSION COMPUTATION
+// CHUNK VERSION - Now uses chunk.version field directly
 // =============================================================================
-
-/**
- * Compute a version hash for a chunk's tiles.
- * This is a simple but effective hash that changes when tile data changes.
- * Uses FNV-1a hash algorithm for speed.
- */
-function computeChunkVersion(chunk: Chunk): number {
-  let hash = 2166136261; // FNV offset basis
-
-  for (const tile of chunk.tiles) {
-    // Hash terrain type
-    hash ^= tile.terrain.charCodeAt(0);
-    hash = Math.imul(hash, 16777619); // FNV prime
-
-    // Hash key tile properties that affect rendering
-    hash ^= (tile.tilled ? 1 : 0) | ((tile.moisture > 60 ? 1 : 0) << 1) | ((tile.fertilized ? 1 : 0) << 2);
-    hash = Math.imul(hash, 16777619);
-
-    // Hash building components if present
-    const tileWithBuilding = tile as typeof tile & {
-      wall?: { material: string; condition: number; constructionProgress?: number };
-      door?: { material: string; state: string; constructionProgress?: number };
-      window?: { material: string; condition: number; constructionProgress?: number };
-      roof?: { material: string; condition: number; constructionProgress?: number };
-    };
-
-    if (tileWithBuilding.wall) {
-      hash ^= tileWithBuilding.wall.material.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-      hash ^= Math.floor(tileWithBuilding.wall.constructionProgress ?? 100);
-      hash = Math.imul(hash, 16777619);
-    }
-
-    if (tileWithBuilding.door) {
-      hash ^= tileWithBuilding.door.material.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-      hash ^= tileWithBuilding.door.state.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-    }
-
-    if (tileWithBuilding.window) {
-      hash ^= Math.floor(tileWithBuilding.window.constructionProgress ?? 100);
-      hash = Math.imul(hash, 16777619);
-    }
-
-    if (tileWithBuilding.roof) {
-      hash ^= tileWithBuilding.roof.material.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-      hash ^= Math.floor(tileWithBuilding.roof.constructionProgress ?? 100);
-      hash = Math.imul(hash, 16777619);
-    }
-  }
-
-  return hash >>> 0; // Convert to unsigned 32-bit integer
-}
+// PERFORMANCE: chunk.version is incremented by setTileAt()/markChunkDirty()
+// This eliminates O(256) tile iteration per frame per chunk for cache validation.
+// With 50+ visible chunks when zoomed out, this saves ~12,800 tile iterations per frame.
 
 /**
  * Handles rendering of terrain chunks in top-down view.
@@ -180,13 +128,17 @@ export class TerrainRenderer {
   /**
    * Create or retrieve a cached off-screen canvas for a chunk.
    * Returns null if cache is invalid and needs re-rendering.
+   *
+   * PERFORMANCE: Uses chunk.version directly instead of computing hash.
+   * This is O(1) instead of O(256) per visible chunk per frame.
    */
   private getCachedChunkCanvas(chunk: Chunk): CachedChunk | null {
     const key = `${chunk.x},${chunk.y}`;
     const cached = this.chunkCache.get(key);
 
-    // Compute current version of chunk data
-    const currentVersion = computeChunkVersion(chunk);
+    // Use chunk.version directly - no expensive hash computation!
+    // chunk.version is incremented by setTileAt()/markChunkDirty()
+    const currentVersion = chunk.version;
 
     // Check if cache is valid
     if (cached && cached.version === currentVersion) {
@@ -264,11 +216,11 @@ export class TerrainRenderer {
     // Render chunk to off-screen canvas (using local coordinates 0-based)
     this.renderChunkToContext(chunk, ctx, 0, 0);
 
-    // Create cache entry
+    // Create cache entry (use chunk.version directly)
     const cached: CachedChunk = {
       canvas,
       ctx,
-      version: computeChunkVersion(chunk),
+      version: chunk.version,
       lastUsed: this.currentTick,
     };
 

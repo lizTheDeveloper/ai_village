@@ -20,8 +20,8 @@ export function SpatialView({
   showTerritories: propShowTerritories,
   showHotspots: propShowHotspots,
   onTrailClick,
-  onRegionSelect,
-  onExport,
+  onRegionSelect: _onRegionSelect,
+  onExport: _onExport,
 }: SpatialViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const storeData = useMetricsStore((state) => state.spatialData);
@@ -34,7 +34,7 @@ export function SpatialView({
   const [showTrails, setShowTrails] = useState(propShowTrails ?? false);
   const [showTerritories, setShowTerritories] = useState(propShowTerritories ?? false);
   const [showHotspots, setShowHotspots] = useState(propShowHotspots ?? false);
-  const [zoom, setZoom] = useState(1);
+  const [_zoom, setZoom] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [hoveredHotspot, setHoveredHotspot] = useState<number | null>(null);
 
@@ -164,11 +164,11 @@ export function SpatialView({
     setZoom((prev) => Math.max(prev - 0.1, 0.5));
   };
 
-  const handleMapMouseDown = (e: React.MouseEvent) => {
+  const handleMapMouseDown = (_e: React.MouseEvent) => {
     // Pan functionality (placeholder)
   };
 
-  const handleMapMouseMove = (e: React.MouseEvent) => {
+  const handleMapMouseMove = (_e: React.MouseEvent) => {
     // Pan functionality (placeholder)
   };
 

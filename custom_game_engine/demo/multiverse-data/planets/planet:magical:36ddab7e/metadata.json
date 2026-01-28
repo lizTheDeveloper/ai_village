@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:36ddab7e",
+  "name": "Gamma-22",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769498652329",
+  "createdAt": 1769498652476,
+  "lastAccessedAt": 1769498652476,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769498652329",
+    "type": "magical"
+  }
+}

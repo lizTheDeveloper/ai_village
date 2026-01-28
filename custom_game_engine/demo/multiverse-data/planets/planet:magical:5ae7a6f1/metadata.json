@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5ae7a6f1",
+  "name": "Oberon II",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769486048791",
+  "createdAt": 1769486048901,
+  "lastAccessedAt": 1769486048901,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769486048791",
+    "type": "magical"
+  }
+}

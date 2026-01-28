@@ -1,20 +1,23 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
+import type { EntityImpl } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { SocialMemoryComponent } from '../SocialMemoryComponent';
 
 describe('SocialMemoryComponent', () => {
   let world: World;
-  let entity: any;
+  let entity: EntityImpl;
 
   beforeEach(() => {
-    world = new World();
-    entity = world.createEntity();
+    const eventBus = new EventBusImpl();
+    world = new World(eventBus);
+    entity = world.createEntity() as EntityImpl;
   });
 
   // Criterion 12: Social Memory Updates
   describe('social memory updates', () => {
     it('should update social memory when interacting with another agent', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'alice-123',
@@ -28,7 +31,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track overall sentiment toward agent', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'bob-456',
@@ -43,7 +46,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should update sentiment based on interactions', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       // Positive interaction
       memory.recordInteraction({
@@ -68,7 +71,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track trust separately from sentiment', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'david-012',
@@ -84,7 +87,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should decrease trust on betrayal', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'eve-345',
@@ -109,7 +112,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should add impression with timestamp', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       const timestamp = Date.now();
       memory.recordInteraction({
@@ -127,7 +130,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should link significant memories to social memory', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'grace-901',
@@ -142,7 +145,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track multiple impressions over time', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'henry-234',
@@ -175,7 +178,7 @@ describe('SocialMemoryComponent', () => {
 
   describe('relationship tracking', () => {
     it('should track relationship type (friend, rival, stranger, etc)', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'iris-567',
@@ -192,7 +195,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track interaction count', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'jack-890',
@@ -214,7 +217,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track last interaction time', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       const timestamp1 = Date.now() - 10000;
       memory.recordInteraction({
@@ -238,7 +241,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track first meeting', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       const firstMeeting = Date.now();
       memory.recordInteraction({
@@ -265,7 +268,7 @@ describe('SocialMemoryComponent', () => {
 
   describe('emotion and sentiment', () => {
     it('should track emotional valence of interactions', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.recordInteraction({
         agentId: 'maya-789',
@@ -280,7 +283,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should differentiate sentiment (long-term) from emotion (immediate)', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       // First interaction: positive
       memory.recordInteraction({
@@ -308,7 +311,7 @@ describe('SocialMemoryComponent', () => {
 
   describe('knowledge about others', () => {
     it('should track known facts about other agents', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.learnAboutAgent({
         agentId: 'olivia-345',
@@ -323,7 +326,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track confidence in knowledge about others', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.learnAboutAgent({
         agentId: 'peter-678',
@@ -337,7 +340,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should track where knowledge came from (source)', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       memory.learnAboutAgent({
         agentId: 'quinn-901',
@@ -354,7 +357,7 @@ describe('SocialMemoryComponent', () => {
   // Error handling - per CLAUDE.md
   describe('error handling', () => {
     it('should throw when required agentId is missing', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       expect(() => {
         memory.recordInteraction({
@@ -366,7 +369,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should throw when required interactionType is missing', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       expect(() => {
         memory.recordInteraction({
@@ -378,7 +381,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should throw when required timestamp is missing', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       expect(() => {
         memory.recordInteraction({
@@ -390,7 +393,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should throw when sentiment is out of range', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       expect(() => {
         memory.recordInteraction({
@@ -403,7 +406,7 @@ describe('SocialMemoryComponent', () => {
     });
 
     it('should NOT use fallback for missing sentiment', () => {
-      const memory = (entity as any).addComponent(SocialMemoryComponent, {});
+      const memory = entity.addComponent(new SocialMemoryComponent());
 
       expect(() => {
         memory.recordInteraction({

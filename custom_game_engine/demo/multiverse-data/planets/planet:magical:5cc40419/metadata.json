@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5cc40419",
+  "name": "Theia Four",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769486172571",
+  "createdAt": 1769486172700,
+  "lastAccessedAt": 1769486172700,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769486172571",
+    "type": "magical"
+  }
+}

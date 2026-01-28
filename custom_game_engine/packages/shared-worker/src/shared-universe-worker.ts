@@ -12,7 +12,7 @@
 
 /// <reference lib="webworker" />
 
-import { GameLoop, worldSerializer, type WorldMutator } from '@ai-village/core';
+import { GameLoop, worldSerializer, type WorldMutator, ComponentType, type EventType, type GameEvent, type Component } from '@ai-village/core';
 import { IndexedDBStorage, type SaveMetadata as PersistenceSaveMetadata, type SaveFile } from '@ai-village/persistence';
 import { setupGameSystems, type GameSetupResult } from './game-setup.js';
 import { PathPredictionSystem } from './PathPredictionSystem.js';
@@ -104,6 +104,35 @@ class UniverseWorker {
       this.deltaSyncSystem.setBroadcastCallback((delta) => this.broadcastDelta(delta));
       this.gameLoop.systemRegistry.register(this.deltaSyncSystem);
     }
+
+    // Listen for chat:message_sent events and forward them to all connected windows
+    // This is needed because delta sync only sends position updates, not chat messages
+    this.gameLoop.world.eventBus.on('chat:message_sent', (event) => {
+      const data = event.data as {
+        roomId: string;
+        messageId?: string;
+        senderId: string;
+        senderName?: string;
+        content?: string;
+        timestamp?: number;
+      };
+      console.log('[UniverseWorker] chat:message_sent received, forwarding to windows:', {
+        roomId: data.roomId,
+        senderId: data.senderId,
+        senderName: data.senderName,
+        content: data.content?.substring(0, 50),
+        connections: this.connections.size,
+      });
+      this.broadcastChatMessage({
+        roomId: data.roomId,
+        messageId: data.messageId || crypto.randomUUID(),
+        senderId: data.senderId,
+        senderName: data.senderName || 'Unknown',
+        content: data.content || '',
+        timestamp: data.timestamp || Date.now(),
+        tick: this.tick,
+      });
+    });
 
     this.initialized = true;
     console.log('[UniverseWorker] Systems initialized, waiting for load-save or create-new-universe command');
@@ -198,6 +227,15 @@ class UniverseWorker {
         message: 'Initializing systems...',
       });
 
+      // Initialize all systems (this is what GameLoop.start() normally does)
+      // This sets up event listeners, spawns the admin angel if not in save, etc.
+      console.log('[UniverseWorker] Initializing systems after load...');
+      const systems = this.gameLoop.systemRegistry.getSorted();
+      for (const system of systems) {
+        system.initialize?.(this.gameLoop.world, this.gameLoop.world.eventBus);
+      }
+      console.log(`[UniverseWorker] Initialized ${systems.length} systems`);
+
       this.currentSaveKey = saveKey;
 
       // Phase 4: Ready
@@ -214,6 +252,10 @@ class UniverseWorker {
         this.running = true;
         this.loop();
       }
+
+      // Send full initial state to all connected windows so they have complete entity data
+      // (including renderable components needed for rendering)
+      this.broadcastInitialState();
 
       this.broadcastLoadComplete(true, undefined, this.gameLoop.universeId, this.tick);
 
@@ -265,6 +307,33 @@ class UniverseWorker {
         } catch {
           // Ignore errors
         }
+      }
+    }
+  }
+
+  /**
+   * Broadcast full initial state to all connections
+   * Called after loading a save or creating a new universe to ensure
+   * all windows have complete entity state (including renderable components)
+   */
+  private broadcastInitialState(): void {
+    if (this.connections.size === 0) return;
+
+    const state = this.serializeState();
+
+    for (const [id, conn] of this.connections) {
+      if (!conn.connected) continue;
+
+      try {
+        const initMessage: WorkerToWindowMessage = {
+          type: 'init',
+          connectionId: id,
+          state,
+          tick: this.tick,
+        };
+        conn.port.postMessage(initMessage);
+      } catch (error) {
+        console.warn(`[UniverseWorker] Failed to send initial state to connection ${id}:`, error);
       }
     }
   }
@@ -418,6 +487,33 @@ class UniverseWorker {
   }
 
   /**
+   * Broadcast chat message to all connected windows
+   * This is needed because delta sync only sends position updates, not component changes
+   */
+  private broadcastChatMessage(chatMessage: {
+    roomId: string;
+    messageId: string;
+    senderId: string;
+    senderName: string;
+    content: string;
+    timestamp: number;
+    tick: number;
+  }): void {
+    const message: WorkerToWindowMessage = {
+      type: 'chat-message',
+      ...chatMessage,
+    };
+
+    for (const conn of this.connections.values()) {
+      try {
+        conn.port.postMessage(message);
+      } catch {
+        // Ignore send errors
+      }
+    }
+  }
+
+  /**
    * Persist current state to IndexedDB using the same format as saveLoadService
    */
   private async persist(): Promise<void> {
@@ -460,7 +556,6 @@ class UniverseWorker {
         universes: [universeSnapshot],
         passages: [],
         player: undefined,
-        godCraftedQueue: { version: 1, entries: [] },
         checksums: {
           overall: '',
           universes: {},
@@ -468,7 +563,11 @@ class UniverseWorker {
         },
       };
 
-      await this.storage.save(this.currentSaveKey, saveFile);
+      // Add optional godCraftedQueue (typed properly using intersection)
+      const saveFileWithQueue: SaveFile & { godCraftedQueue?: { version: number; entries: unknown[] } } = saveFile;
+      saveFileWithQueue.godCraftedQueue = { version: 1, entries: [] };
+
+      await this.storage.save(this.currentSaveKey, saveFileWithQueue);
     } catch (error) {
       console.error('[UniverseWorker] Failed to persist:', error);
     }
@@ -661,6 +760,18 @@ class UniverseWorker {
           console.error('[UniverseWorker] Failed to send status:', error);
         });
         break;
+
+      case 'emit-event':
+        // Forward event from main thread to worker's eventBus
+        // This allows DivineChatPanel to send messages that ChatRoomSystem can receive
+        // Type assertion needed: event comes from window thread with runtime type,
+        // which TypeScript can't verify at compile time across thread boundaries
+        // Use emitImmediate() for window-originated events to avoid tick-based delays
+        // (emit() queues events for end-of-tick, causing 1-2 tick delays for chat)
+        this.gameLoop.world.eventBus.emitImmediate(
+          message.event as Omit<GameEvent<EventType>, 'tick' | 'timestamp'>
+        );
+        break;
     }
   }
 
@@ -703,6 +814,15 @@ class UniverseWorker {
     this.tick = 0;
     this.currentSaveKey = null;
 
+    // Initialize all systems (this is what GameLoop.start() normally does)
+    // This spawns the admin angel, creates chat rooms, etc.
+    console.log('[UniverseWorker] Initializing systems...');
+    const systems = this.gameLoop.systemRegistry.getSorted();
+    for (const system of systems) {
+      system.initialize?.(this.gameLoop.world, this.gameLoop.world.eventBus);
+    }
+    console.log(`[UniverseWorker] Initialized ${systems.length} systems`);
+
     // Start simulation loop if not already running
     if (!this.running) {
       this.running = true;
@@ -715,6 +835,10 @@ class UniverseWorker {
       progress: 100,
       message: 'Universe ready!',
     });
+
+    // Send full initial state to all connected windows so they have complete entity data
+    // (including renderable components needed for rendering)
+    this.broadcastInitialState();
 
     this.broadcastLoadComplete(true, undefined, this.gameLoop.universeId, 0);
   }
@@ -749,22 +873,22 @@ class UniverseWorker {
 
     // Add basic components for agent using world.addComponent
     this.gameLoop.world.addComponent(agent.id, {
-      type: 'identity',
+      type: 'identity' as ComponentType,
       version: 1,
       name: name || `Agent ${Array.from(this.gameLoop.world.entities.values()).length}`,
       age: 18,
       species: 'human',
-    });
+    } as Component);
 
     this.gameLoop.world.addComponent(agent.id, {
-      type: 'position',
+      type: 'position' as ComponentType,
       version: 1,
       x,
       y,
-    });
+    } as Component);
 
     this.gameLoop.world.addComponent(agent.id, {
-      type: 'agent',
+      type: 'agent' as ComponentType,
       version: 1,
       behavior: 'wander',
       behaviorState: {},
@@ -772,7 +896,7 @@ class UniverseWorker {
       lastThinkTick: 0,
       useLLM: false,
       llmCooldown: 0,
-    });
+    } as Component);
   }
 
   /**

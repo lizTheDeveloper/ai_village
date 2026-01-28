@@ -147,6 +147,16 @@ export type WorkerToWindowMessage =
       hasExistingSave: boolean;
       currentUniverseId?: string;
       currentTick?: number;
+    }
+  | {
+      type: 'chat-message';
+      roomId: string;
+      messageId: string;
+      senderId: string;
+      senderName: string;
+      content: string;
+      timestamp: number;
+      tick: number;
     };
 
 /**
@@ -195,6 +205,14 @@ export type WindowToWorkerMessage =
     }
   | {
       type: 'get-status';
+    }
+  | {
+      type: 'emit-event';
+      event: {
+        type: string;
+        source: string;
+        data: unknown;
+      };
     };
 
 /**

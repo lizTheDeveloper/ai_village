@@ -54,20 +54,31 @@ export class ManaRegenerationManager {
       }
     }
 
-    // Build a temporary magic-like object for CostRecoveryManager compatibility
-    const tempMagic = {
-      manaPools: updatedPools.manaPools,
-      resourcePools: updatedPools.resourcePools,
-    };
+    // Apply passive regeneration directly (instead of via CostRecoveryManager)
+    // This avoids type assertion issues while maintaining identical logic
 
-    // Apply passive regeneration via CostRecoveryManager
-    // Cast to any here because tempMagic is a partial MagicComponent-like object
-    // that only contains the fields needed for passive regeneration
-    costRecoveryManager.applyPassiveRegeneration(tempMagic as any, deltaTime);
+    // Regenerate resource pools
+    for (const key of Object.keys(updatedPools.resourcePools)) {
+      const pool = updatedPools.resourcePools[key as keyof typeof updatedPools.resourcePools];
+      if (pool && pool.regenRate !== 0) {
+        const regen = pool.regenRate * deltaTime;
+        if (regen > 0) {
+          // Positive regen: recover towards maximum
+          pool.current = Math.min(pool.maximum, pool.current + regen);
+        } else {
+          // Negative regen: decay towards zero (e.g., attention)
+          pool.current = Math.max(0, pool.current + regen);
+        }
+      }
+    }
 
-    // Copy back the regenerated values
-    updatedPools.manaPools = tempMagic.manaPools;
-    updatedPools.resourcePools = tempMagic.resourcePools;
+    // Regenerate mana pools
+    for (const manaPool of updatedPools.manaPools) {
+      if (manaPool.regenRate > 0) {
+        const regen = manaPool.regenRate * deltaTime;
+        manaPool.current = Math.min(manaPool.maximum, manaPool.current + regen);
+      }
+    }
 
     // Check if anything changed
     const manaChanged = manaPools.manaPools.some((pool, i) =>

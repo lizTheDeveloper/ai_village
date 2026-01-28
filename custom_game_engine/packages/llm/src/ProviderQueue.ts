@@ -47,14 +47,26 @@ export class ProviderQueue {
   private rateLimited: boolean = false;
   private rateLimitUntil: number = 0;
   private processing: boolean = false;
+  private maxRequestAgeMs: number;
+  private expiredCount: number = 0;
 
-  constructor(provider: LLMProvider, maxConcurrent: number = 2) {
+  /**
+   * @param provider - LLM provider instance
+   * @param maxConcurrent - Maximum concurrent requests (default 2)
+   * @param maxRequestAgeMs - Maximum age for a request before expiring (default 30s)
+   */
+  constructor(
+    provider: LLMProvider,
+    maxConcurrent: number = 2,
+    maxRequestAgeMs: number = 30_000
+  ) {
     if (maxConcurrent < 1) {
       throw new Error('maxConcurrent must be at least 1');
     }
 
     this.provider = provider;
     this.semaphore = new Semaphore(maxConcurrent);
+    this.maxRequestAgeMs = maxRequestAgeMs;
   }
 
   /**
@@ -131,6 +143,28 @@ export class ProviderQueue {
 
       // Get next request
       const queuedRequest = this.queue.shift()!;
+
+      // Check if request has expired
+      const requestAge = Date.now() - queuedRequest.enqueuedAt;
+      if (requestAge > this.maxRequestAgeMs) {
+        this.expiredCount++;
+        const ageSeconds = (requestAge / 1000).toFixed(1);
+        console.warn(
+          `[ProviderQueue:${this.provider.getProviderId()}] Request expired for agent ${queuedRequest.agentId} ` +
+            `(age: ${ageSeconds}s > max: ${this.maxRequestAgeMs / 1000}s). Total expired: ${this.expiredCount}`
+        );
+        queuedRequest.reject(
+          new Error(`LLM request expired after ${ageSeconds}s in queue`)
+        );
+
+        // Release semaphore and continue to next request
+        this.semaphore.release();
+        this.processing = false;
+        if (this.queue.length > 0) {
+          this.processNext();
+        }
+        return;
+      }
 
       // Process request
       try {
@@ -267,6 +301,8 @@ export class ProviderQueue {
     rateLimitWaitMs: number;
     semaphoreStats: ReturnType<Semaphore['getStats']>;
     providerId: string;
+    expiredCount: number;
+    maxRequestAgeMs: number;
   } {
     return {
       queueLength: this.queue.length,
@@ -274,6 +310,8 @@ export class ProviderQueue {
       rateLimitWaitMs: this.getRateLimitWaitTime(),
       semaphoreStats: this.semaphore.getStats(),
       providerId: this.provider.getProviderId(),
+      expiredCount: this.expiredCount,
+      maxRequestAgeMs: this.maxRequestAgeMs,
     };
   }
 

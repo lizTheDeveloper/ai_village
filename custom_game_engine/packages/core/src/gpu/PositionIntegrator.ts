@@ -1,3 +1,5 @@
+/// <reference types="@webgpu/types" />
+
 /**
  * GPU Position Integrator - Massively parallel position updates using WebGPU compute shaders
  *

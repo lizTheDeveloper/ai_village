@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:4797029",
+  "name": "Titan V",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489186173",
+  "createdAt": 1769489186184,
+  "lastAccessedAt": 1769489186184,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489186173",
+    "type": "magical"
+  }
+}

@@ -1,3 +1,5 @@
+/// <reference types="@webgpu/types" />
+
 /**
  * WebGPU Manager - Manages GPU device initialization and lifecycle
  *

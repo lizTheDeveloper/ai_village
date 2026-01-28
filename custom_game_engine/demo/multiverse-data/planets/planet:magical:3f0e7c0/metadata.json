@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:3f0e7c0",
+  "name": "Galactic Ariel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489662911",
+  "createdAt": 1769489662918,
+  "lastAccessedAt": 1769489662918,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489662911",
+    "type": "magical"
+  }
+}

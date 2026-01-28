@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:5fb2336c",
+  "name": "Quantum Mundo",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769494425770",
+  "createdAt": 1769494425795,
+  "lastAccessedAt": 1769494425795,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769494425770",
+    "type": "magical"
+  }
+}

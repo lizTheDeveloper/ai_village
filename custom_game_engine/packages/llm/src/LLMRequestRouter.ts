@@ -71,10 +71,8 @@ export class LLMRequestRouter {
   private providerMappings: Map<string, ProviderMapping>;
   private defaultModel: string = 'qwen-3-32b';
 
-  // Load balancing: weighted counter for distributing across providers
-  // Groq gets ~97% of requests (1000 RPM), Cerebras ~3% (30 RPM) as fallback
+  // Load balancing: round-robin counter for distributing across available models in a tier
   private requestCounter: number = 0;
-  private loadBalanceProviders: string[] = ['groq']; // Groq primary; Cerebras only as fallback due to 30 RPM limit
 
   // Cost and metrics tracking
   public costTracker: CostTracker;
@@ -100,56 +98,42 @@ export class LLMRequestRouter {
 
   /**
    * Initialize model → provider mappings
+   *
+   * NOTE: Queue names must match the naming convention used by the server:
+   * modelId.replace(/\//g, '_') - slashes replaced with underscores
    */
   private initializeProviderMappings(): void {
-    // Groq models
-    this.providerMappings.set('qwen/qwen3-32b', {
-      provider: 'groq',
-      queue: 'groq',
-      fallbackChain: [], // Temporarily disabled until Cerebras is configured
-    });
+    // Build mappings from MODEL_CONFIGS for consistency
+    for (const modelConfig of MODEL_CONFIGS) {
+      const queueName = modelConfig.id.replace(/\//g, '_');
+
+      // Build fallback chain: same tier models on other providers
+      const fallbackChain = MODEL_CONFIGS
+        .filter(m =>
+          m.tier === modelConfig.tier &&
+          m.id !== modelConfig.id &&
+          m.provider !== 'ollama'
+        )
+        .map(m => m.id.replace(/\//g, '_'));
+
+      this.providerMappings.set(modelConfig.id, {
+        provider: modelConfig.provider,
+        queue: queueName,
+        fallbackChain,
+      });
+    }
+
+    // Legacy model aliases for backwards compatibility
+    // These map old model names to current model queues
     this.providerMappings.set('llama-3.3-70b-versatile', {
       provider: 'groq',
-      queue: 'groq',
-      fallbackChain: [], // Temporarily disabled until Cerebras is configured
+      queue: 'qwen_qwen3-32b', // Map to available Groq model
+      fallbackChain: ['qwen-3-32b'], // Cerebras fallback
     });
-
-    // Cerebras models (will be enabled when API key is configured)
     this.providerMappings.set('llama-3.3-70b', {
       provider: 'cerebras',
-      queue: 'cerebras',
-      fallbackChain: [], // Temporarily disabled
-    });
-    this.providerMappings.set('qwen-3-32b', {
-      provider: 'cerebras',
-      queue: 'cerebras',
-      fallbackChain: [], // Temporarily disabled
-    });
-
-    // OpenAI models
-    this.providerMappings.set('gpt-4-turbo', {
-      provider: 'openai',
-      queue: 'openai',
-      fallbackChain: [],
-    });
-    this.providerMappings.set('gpt-4o', {
-      provider: 'openai',
-      queue: 'openai',
-      fallbackChain: [],
-    });
-
-    // Anthropic models
-    this.providerMappings.set('claude-3-5-sonnet-20241022', {
-      provider: 'anthropic',
-      queue: 'anthropic',
-      fallbackChain: [],
-    });
-
-    // Ollama (local)
-    this.providerMappings.set('qwen3:4b', {
-      provider: 'ollama',
-      queue: 'ollama',
-      fallbackChain: [],
+      queue: 'qwen-3-32b', // Map to available Cerebras model
+      fallbackChain: ['qwen_qwen3-32b'], // Groq fallback
     });
   }
 
@@ -361,11 +345,26 @@ export class LLMRequestRouter {
       };
     }
 
-    // Ultimate fallback to old provider-based routing
-    const fallbackProvider = this.loadBalanceProviders.find(p => this.poolManager.hasProvider(p));
+    // Ultimate fallback: try any available queue
+    // First, try to find any queue that exists in the pool
+    for (const modelConfig of MODEL_CONFIGS) {
+      if (modelConfig.provider === 'ollama') continue;
+      const queueName = modelConfig.id.replace(/\//g, '_');
+      if (this.poolManager.hasProvider(queueName)) {
+        return {
+          provider: modelConfig.provider,
+          queueName,
+          selectedModel: modelConfig.id,
+        };
+      }
+    }
+
+    // Final fallback with error-friendly message
+    // This will fail but with a clear message about what's wrong
+    const defaultQueueName = this.defaultModel.replace(/\//g, '_');
     return {
-      provider: fallbackProvider || 'groq',
-      queueName: fallbackProvider || 'groq',
+      provider: 'unknown',
+      queueName: defaultQueueName,
       selectedModel: this.defaultModel,
     };
   }

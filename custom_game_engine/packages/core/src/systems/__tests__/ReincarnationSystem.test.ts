@@ -50,8 +50,8 @@ describe('ReincarnationSystem', () => {
     it('should queue soul on reincarnation_queued event', () => {
       const entityId = 'test-entity-1';
       const entity = new EntityImpl(entityId, 0);
-      (entity as any).addComponent(createIdentityComponent('Test Entity'));
-      (entity as any).addComponent(createPositionComponent(10, 20));
+      entity.addComponent(createIdentityComponent('Test Entity'));
+      entity.addComponent(createPositionComponent(10, 20));
       world.addEntity(entity);
 
       // Emit reincarnation queued event

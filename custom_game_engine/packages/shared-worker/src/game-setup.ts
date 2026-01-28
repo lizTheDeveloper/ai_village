@@ -105,7 +105,10 @@ export async function setupGameSystems(
   });
 
   // 3. Set up plant species lookup (injected from world package)
-  result.plantSystem.setSpeciesLookup(getPlantSpecies);
+  // PlantSystem has setSpeciesLookup method but it's not in the System interface
+  if ('setSpeciesLookup' in result.plantSystem && typeof result.plantSystem.setSpeciesLookup === 'function') {
+    result.plantSystem.setSpeciesLookup(getPlantSpecies);
+  }
 
   // 4. Register action handlers (these are separate from systems)
   gameLoop.actionRegistry.register(new TillActionHandler(result.soilSystem));

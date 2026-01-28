@@ -3,7 +3,7 @@
     {
       "id": "bone_scythe",
       "name": "Bone Scythe of the Harvester",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 800,
@@ -33,7 +33,7 @@
     {
       "id": "tentacle_whip",
       "name": "Abyssal Tentacle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 600,
@@ -62,7 +62,7 @@
     {
       "id": "living_blade",
       "name": "Symbiotic Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 1200,
@@ -94,7 +94,7 @@
     {
       "id": "tooth_dagger",
       "name": "Dragon Tooth Dagger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 900,
@@ -123,7 +123,7 @@
     {
       "id": "swarm_orb",
       "name": "Hive Orb",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 750,
@@ -154,7 +154,7 @@
     {
       "id": "fungal_staff",
       "name": "Mycelium Staff",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 650,
@@ -187,7 +187,7 @@
     {
       "id": "blade_of_unmaking",
       "name": "Blade of Unmaking",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.1,
       "stackSize": 1,
       "baseValue": 5000,
@@ -217,7 +217,7 @@
     {
       "id": "memory_dagger",
       "name": "Blade of Forgotten Names",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 2000,
@@ -245,7 +245,7 @@
     {
       "id": "paradox_bow",
       "name": "Bow of Temporal Paradox",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 3500,
@@ -275,7 +275,7 @@
     {
       "id": "echo_hammer",
       "name": "Hammer of Reverberating Doom",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 8.0,
       "stackSize": 1,
       "baseValue": 1500,
@@ -306,7 +306,7 @@
     {
       "id": "silence_knife",
       "name": "Knife of Utter Silence",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.4,
       "stackSize": 1,
       "baseValue": 1800,
@@ -337,7 +337,7 @@
     {
       "id": "dream_staff",
       "name": "Staff of Waking Dreams",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 2200,
@@ -369,7 +369,7 @@
     {
       "id": "gravity_mace",
       "name": "Singularity Mace",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 50.0,
       "stackSize": 1,
       "baseValue": 4000,
@@ -401,7 +401,7 @@
     {
       "id": "war_horn",
       "name": "Dreadhorn of the Ancients",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 600,
@@ -431,7 +431,7 @@
     {
       "id": "sonic_lute",
       "name": "Lute of Shattering Chords",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 800,
@@ -461,7 +461,7 @@
     {
       "id": "death_whistle",
       "name": "Aztec Death Whistle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.2,
       "stackSize": 1,
       "baseValue": 400,
@@ -491,7 +491,7 @@
     {
       "id": "thunder_drums",
       "name": "War Drums of the Storm Giant",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 15.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -523,7 +523,7 @@
     {
       "id": "resonance_blade",
       "name": "Tuning Fork Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 700,
@@ -551,7 +551,7 @@
     {
       "id": "whip_sword",
       "name": "Urumi - Flexible Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 500,
@@ -573,7 +573,7 @@
     {
       "id": "gunblade",
       "name": "Gunblade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 900,
@@ -594,7 +594,7 @@
     {
       "id": "sawcleaver",
       "name": "Saw Cleaver",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 700,
@@ -617,7 +617,7 @@
     {
       "id": "threaded_cane",
       "name": "Threaded Cane",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.8,
       "stackSize": 1,
       "baseValue": 650,
@@ -641,7 +641,7 @@
     {
       "id": "blade_fan",
       "name": "Iron War Fan - Tessen",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 400,
@@ -665,7 +665,7 @@
     {
       "id": "chain_sickle",
       "name": "Kusarigama",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 450,
@@ -688,7 +688,7 @@
     {
       "id": "shield_blade",
       "name": "Lantern Shield",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 6.0,
       "stackSize": 1,
       "baseValue": 550,
@@ -710,7 +710,7 @@
     {
       "id": "frost_breath_vial",
       "name": "Bottled Blizzard",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 3,
       "baseValue": 300,
@@ -732,7 +732,7 @@
     {
       "id": "storm_jar",
       "name": "Jar of Captive Lightning",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 3,
       "baseValue": 400,
@@ -755,7 +755,7 @@
     {
       "id": "magma_heart",
       "name": "Heart of the Volcano",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 1500,
@@ -787,7 +787,7 @@
     {
       "id": "wind_fan",
       "name": "Tempest Fan",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 600,
@@ -817,7 +817,7 @@
     {
       "id": "quicksand_pouch",
       "name": "Pouch of Hungry Earth",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 5,
       "baseValue": 250,
@@ -847,7 +847,7 @@
     {
       "id": "aurora_prism",
       "name": "Prism of the Northern Lights",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 1800,
@@ -877,7 +877,7 @@
     {
       "id": "betrayer_blade",
       "name": "Blade of the Betrayer",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 1,
@@ -910,7 +910,7 @@
     {
       "id": "hungry_axe",
       "name": "The Famished",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 7.0,
       "stackSize": 1,
       "baseValue": 1,
@@ -942,7 +942,7 @@
     {
       "id": "mirror_shield",
       "name": "Shield of Reflected Sins",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 8.0,
       "stackSize": 1,
       "baseValue": 1,
@@ -973,7 +973,7 @@
     {
       "id": "puppet_strings",
       "name": "Strings of the Puppeteer",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.1,
       "stackSize": 1,
       "baseValue": 1,
@@ -1003,7 +1003,7 @@
     {
       "id": "doom_bell",
       "name": "Bell of the Final Hour",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 1,
@@ -1037,7 +1037,7 @@
     {
       "id": "shrink_ray",
       "name": "Miniaturization Ray",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 2000,
@@ -1067,7 +1067,7 @@
     {
       "id": "tesla_glove",
       "name": "Tesla Gauntlet",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 800,
@@ -1092,7 +1092,7 @@
     {
       "id": "probability_gun",
       "name": "Probability Manipulator",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 3000,
@@ -1120,7 +1120,7 @@
     {
       "id": "portal_gun",
       "name": "Dimensional Aperture Device",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 5000,
@@ -1152,7 +1152,7 @@
     {
       "id": "gravity_boots",
       "name": "Graviton Boots",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -1185,7 +1185,7 @@
     {
       "id": "freeze_ray",
       "name": "Absolute Zero Projector",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 1800,
@@ -1211,7 +1211,7 @@
     {
       "id": "frying_pan",
       "name": "Cast Iron Skillet of Justice",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 50,
@@ -1232,7 +1232,7 @@
     {
       "id": "broken_bottle",
       "name": "Broken Bottle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 1,
@@ -1253,7 +1253,7 @@
     {
       "id": "sock_of_coins",
       "name": "Coin-Filled Sock",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 100,
@@ -1274,7 +1274,7 @@
     {
       "id": "chair_leg",
       "name": "Trusty Chair Leg",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 5,
@@ -1292,7 +1292,7 @@
     {
       "id": "bag_of_rats",
       "name": "Sack of Angry Rats",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 30,
@@ -1315,7 +1315,7 @@
     {
       "id": "beehive",
       "name": "Portable Beehive",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 80,
@@ -1339,7 +1339,7 @@
     {
       "id": "hot_soup",
       "name": "Scalding Hot Soup",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 3,
       "baseValue": 15,
@@ -1362,7 +1362,7 @@
     {
       "id": "gungnir",
       "name": "Gungnir - Spear of Odin",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 10000,
@@ -1394,7 +1394,7 @@
     {
       "id": "mjolnir",
       "name": "Mjolnir - Hammer of Thor",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 100.0,
       "stackSize": 1,
       "baseValue": 10000,
@@ -1427,7 +1427,7 @@
     {
       "id": "kusanagi",
       "name": "Kusanagi-no-Tsurugi",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 8000,
@@ -1458,7 +1458,7 @@
     {
       "id": "gae_bolg",
       "name": "G\u00e1e Bolg - Spear of Mortal Pain",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 7000,
@@ -1490,7 +1490,7 @@
     {
       "id": "ruyi_jingu_bang",
       "name": "Ruyi Jingu Bang - Monkey King Staff",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 9000,
@@ -1521,7 +1521,7 @@
     {
       "id": "excalibur",
       "name": "Excalibur",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 10000,
@@ -1551,7 +1551,7 @@
     {
       "id": "trident_of_poseidon",
       "name": "Trident of the Sea God",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 9000,
@@ -1584,7 +1584,7 @@
     {
       "id": "club_wood",
       "name": "Wooden Club",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 5,
@@ -1603,7 +1603,7 @@
     {
       "id": "stone_axe_weapon",
       "name": "Stone Handaxe",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 8,
@@ -1622,7 +1622,7 @@
     {
       "id": "flint_spear",
       "name": "Flint Spear",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.8,
       "stackSize": 1,
       "baseValue": 10,
@@ -1641,7 +1641,7 @@
     {
       "id": "bone_knife",
       "name": "Bone Knife",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 6,
@@ -1662,7 +1662,7 @@
     {
       "id": "iron_sword",
       "name": "Iron Sword",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 50,
@@ -1683,7 +1683,7 @@
     {
       "id": "steel_sword",
       "name": "Steel Sword",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 100,
@@ -1704,7 +1704,7 @@
     {
       "id": "greatsword_iron",
       "name": "Iron Greatsword",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 80,
@@ -1726,7 +1726,7 @@
     {
       "id": "greatsword_steel",
       "name": "Steel Greatsword",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 150,
@@ -1748,7 +1748,7 @@
     {
       "id": "rapier",
       "name": "Rapier",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 120,
@@ -1769,7 +1769,7 @@
     {
       "id": "scimitar",
       "name": "Scimitar",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 110,
@@ -1793,7 +1793,7 @@
     {
       "id": "iron_spear",
       "name": "Iron Spear",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 40,
@@ -1812,7 +1812,7 @@
     {
       "id": "pike",
       "name": "Pike",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 60,
@@ -1832,7 +1832,7 @@
     {
       "id": "halberd",
       "name": "Halberd",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 120,
@@ -1855,7 +1855,7 @@
     {
       "id": "glaive",
       "name": "Glaive",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.5,
       "stackSize": 1,
       "baseValue": 100,
@@ -1878,7 +1878,7 @@
     {
       "id": "battleaxe_iron",
       "name": "Iron Battleaxe",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 70,
@@ -1899,7 +1899,7 @@
     {
       "id": "battleaxe_steel",
       "name": "Steel Battleaxe",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 130,
@@ -1920,7 +1920,7 @@
     {
       "id": "greataxe",
       "name": "Greataxe",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 6.0,
       "stackSize": 1,
       "baseValue": 160,
@@ -1945,7 +1945,7 @@
     {
       "id": "mace_iron",
       "name": "Iron Mace",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 55,
@@ -1967,7 +1967,7 @@
     {
       "id": "morningstar",
       "name": "Morningstar",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 90,
@@ -1991,7 +1991,7 @@
     {
       "id": "warhammer_iron",
       "name": "Iron Warhammer",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 80,
@@ -2015,7 +2015,7 @@
     {
       "id": "maul",
       "name": "Steel Maul",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 7.0,
       "stackSize": 1,
       "baseValue": 140,
@@ -2041,7 +2041,7 @@
     {
       "id": "iron_dagger",
       "name": "Iron Dagger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 25,
@@ -2062,7 +2062,7 @@
     {
       "id": "steel_dagger",
       "name": "Steel Dagger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 50,
@@ -2083,7 +2083,7 @@
     {
       "id": "stiletto",
       "name": "Stiletto",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 70,
@@ -2107,7 +2107,7 @@
     {
       "id": "brass_knuckles",
       "name": "Brass Knuckles",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 30,
@@ -2129,7 +2129,7 @@
     {
       "id": "cestus",
       "name": "Cestus",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 40,
@@ -2150,7 +2150,7 @@
     {
       "id": "spiked_gauntlet",
       "name": "Spiked Gauntlet",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 80,
@@ -2174,7 +2174,7 @@
     {
       "id": "leather_whip",
       "name": "Leather Whip",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 35,
@@ -2196,7 +2196,7 @@
     {
       "id": "chain_whip",
       "name": "Chain Whip",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 70,
@@ -2218,7 +2218,7 @@
     {
       "id": "flail",
       "name": "Flail",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 100,
@@ -2244,7 +2244,7 @@
     {
       "id": "flintlock_pistol",
       "name": "Flintlock Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.2,
       "stackSize": 1,
       "baseValue": 150,
@@ -2262,7 +2262,7 @@
     {
       "id": "musket",
       "name": "Musket",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.5,
       "stackSize": 1,
       "baseValue": 200,
@@ -2281,7 +2281,7 @@
     {
       "id": "blunderbuss",
       "name": "Blunderbuss",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 180,
@@ -2300,7 +2300,7 @@
     {
       "id": "revolver",
       "name": "Revolver",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 250,
@@ -2318,7 +2318,7 @@
     {
       "id": "revolver_magnum",
       "name": "Magnum Revolver",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 400,
@@ -2336,7 +2336,7 @@
     {
       "id": "pistol_auto",
       "name": "Automatic Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.9,
       "stackSize": 1,
       "baseValue": 300,
@@ -2354,7 +2354,7 @@
     {
       "id": "pistol_heavy",
       "name": "Heavy Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.3,
       "stackSize": 1,
       "baseValue": 350,
@@ -2372,7 +2372,7 @@
     {
       "id": "machine_pistol",
       "name": "Machine Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.1,
       "stackSize": 1,
       "baseValue": 450,
@@ -2390,7 +2390,7 @@
     {
       "id": "rifle_bolt",
       "name": "Bolt-Action Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 350,
@@ -2409,7 +2409,7 @@
     {
       "id": "rifle_lever",
       "name": "Lever-Action Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 300,
@@ -2428,7 +2428,7 @@
     {
       "id": "rifle_semi",
       "name": "Semi-Auto Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 450,
@@ -2447,7 +2447,7 @@
     {
       "id": "rifle_auto",
       "name": "Automatic Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 550,
@@ -2466,7 +2466,7 @@
     {
       "id": "rifle_sniper",
       "name": "Sniper Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 700,
@@ -2486,7 +2486,7 @@
     {
       "id": "rifle_anti_material",
       "name": "Anti-Material Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 12.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -2506,7 +2506,7 @@
     {
       "id": "shotgun_double",
       "name": "Double-Barrel Shotgun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 280,
@@ -2525,7 +2525,7 @@
     {
       "id": "shotgun_pump",
       "name": "Pump Shotgun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.8,
       "stackSize": 1,
       "baseValue": 350,
@@ -2544,7 +2544,7 @@
     {
       "id": "shotgun_semi",
       "name": "Semi-Auto Shotgun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 500,
@@ -2563,7 +2563,7 @@
     {
       "id": "shotgun_auto",
       "name": "Automatic Shotgun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.5,
       "stackSize": 1,
       "baseValue": 700,
@@ -2582,7 +2582,7 @@
     {
       "id": "shotgun_sawed",
       "name": "Sawed-Off Shotgun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 200,
@@ -2601,7 +2601,7 @@
     {
       "id": "smg_compact",
       "name": "Compact SMG",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 400,
@@ -2620,7 +2620,7 @@
     {
       "id": "smg",
       "name": "Submachine Gun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 450,
@@ -2639,7 +2639,7 @@
     {
       "id": "smg_tactical",
       "name": "Tactical SMG",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 550,
@@ -2658,7 +2658,7 @@
     {
       "id": "lmg",
       "name": "Light Machine Gun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 8.0,
       "stackSize": 1,
       "baseValue": 800,
@@ -2677,7 +2677,7 @@
     {
       "id": "minigun",
       "name": "Minigun",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 15.0,
       "stackSize": 1,
       "baseValue": 1500,
@@ -2696,7 +2696,7 @@
     {
       "id": "grenade_launcher",
       "name": "Grenade Launcher",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 900,
@@ -2717,7 +2717,7 @@
     {
       "id": "rocket_launcher",
       "name": "Rocket Launcher",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 8.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -2740,7 +2740,7 @@
     {
       "id": "oak_staff",
       "name": "Oak Staff",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 50,
@@ -2765,7 +2765,7 @@
     {
       "id": "ash_staff",
       "name": "Ash Staff",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 100,
@@ -2790,7 +2790,7 @@
     {
       "id": "arcane_staff",
       "name": "Arcane Staff",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 300,
@@ -2814,7 +2814,7 @@
     {
       "id": "fire_staff",
       "name": "Staff of Flames",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 400,
@@ -2841,7 +2841,7 @@
     {
       "id": "frost_staff",
       "name": "Staff of Winter",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 400,
@@ -2868,7 +2868,7 @@
     {
       "id": "lightning_staff",
       "name": "Staff of Storms",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 400,
@@ -2895,7 +2895,7 @@
     {
       "id": "staff_archmage",
       "name": "Archmage Staff",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 1000,
@@ -2919,7 +2919,7 @@
     {
       "id": "staff_elements",
       "name": "Staff of the Elements",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -2948,7 +2948,7 @@
     {
       "id": "wand_basic",
       "name": "Wand",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 80,
@@ -2971,7 +2971,7 @@
     {
       "id": "wand_fire",
       "name": "Wand of Fire",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 200,
@@ -2993,7 +2993,7 @@
     {
       "id": "wand_frost",
       "name": "Wand of Frost",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 200,
@@ -3015,7 +3015,7 @@
     {
       "id": "wand_lightning",
       "name": "Wand of Lightning",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 200,
@@ -3037,7 +3037,7 @@
     {
       "id": "wand_death",
       "name": "Wand of Death",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 500,
@@ -3059,7 +3059,7 @@
     {
       "id": "wand_master",
       "name": "Master Wand",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.4,
       "stackSize": 1,
       "baseValue": 800,
@@ -3082,7 +3082,7 @@
     {
       "id": "crystal_orb",
       "name": "Crystal Orb",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 150,
@@ -3105,7 +3105,7 @@
     {
       "id": "orb_fire",
       "name": "Orb of Flame",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 300,
@@ -3131,7 +3131,7 @@
     {
       "id": "orb_shadow",
       "name": "Shadow Orb",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 400,
@@ -3154,7 +3154,7 @@
     {
       "id": "orb_chaos",
       "name": "Orb of Chaos",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.2,
       "stackSize": 1,
       "baseValue": 700,
@@ -3177,7 +3177,7 @@
     {
       "id": "orb_souls",
       "name": "Orb of Souls",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 900,
@@ -3203,7 +3203,7 @@
     {
       "id": "grimoire_apprentice",
       "name": "Apprentice Grimoire",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 200,
@@ -3230,7 +3230,7 @@
     {
       "id": "grimoire_fire",
       "name": "Grimoire of Pyromancy",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 500,
@@ -3261,7 +3261,7 @@
     {
       "id": "grimoire_necromancy",
       "name": "Grimoire of the Dead",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 800,
@@ -3290,7 +3290,7 @@
     {
       "id": "grimoire_summoning",
       "name": "Grimoire of Summoning",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 700,
@@ -3318,7 +3318,7 @@
     {
       "id": "grimoire_forbidden",
       "name": "Forbidden Grimoire",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 5000,
@@ -3349,7 +3349,7 @@
     {
       "id": "energy_blade",
       "name": "Energy Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 2000,
@@ -3374,7 +3374,7 @@
     {
       "id": "energy_blade_dual",
       "name": "Dual Energy Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 3500,
@@ -3400,7 +3400,7 @@
     {
       "id": "energy_blade_great",
       "name": "Great Energy Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 4000,
@@ -3426,7 +3426,7 @@
     {
       "id": "energy_dagger",
       "name": "Energy Dagger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.2,
       "stackSize": 1,
       "baseValue": 1500,
@@ -3451,7 +3451,7 @@
     {
       "id": "force_hammer",
       "name": "Force Hammer",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 1800,
@@ -3479,7 +3479,7 @@
     {
       "id": "force_lance",
       "name": "Force Lance",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 1500,
@@ -3504,7 +3504,7 @@
     {
       "id": "force_gauntlets",
       "name": "Force Gauntlets",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -3529,7 +3529,7 @@
     {
       "id": "force_blade",
       "name": "Force Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 2000,
@@ -3557,7 +3557,7 @@
     {
       "id": "psionic_blade",
       "name": "Psionic Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.1,
       "stackSize": 1,
       "baseValue": 2500,
@@ -3582,7 +3582,7 @@
     {
       "id": "mind_lash",
       "name": "Mind Lash",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.0,
       "stackSize": 1,
       "baseValue": 2000,
@@ -3607,7 +3607,7 @@
     {
       "id": "thought_spike",
       "name": "Thought Spike",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.0,
       "stackSize": 1,
       "baseValue": 3000,
@@ -3629,7 +3629,7 @@
     {
       "id": "soul_reaver",
       "name": "Soul Reaver",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 3000,
@@ -3655,7 +3655,7 @@
     {
       "id": "death_scythe",
       "name": "Death Scythe",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 4000,
@@ -3685,7 +3685,7 @@
     {
       "id": "soul_drinker",
       "name": "Soul Drinker Dagger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 1,
       "baseValue": 2500,
@@ -3713,7 +3713,7 @@
     {
       "id": "wraith_blade",
       "name": "Wraith Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 3500,
@@ -3740,7 +3740,7 @@
     {
       "id": "blessed_blade",
       "name": "Blessed Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 2000,
@@ -3765,7 +3765,7 @@
     {
       "id": "holy_avenger",
       "name": "Holy Avenger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 4000,
@@ -3794,7 +3794,7 @@
     {
       "id": "dawn_mace",
       "name": "Dawn Mace",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 2500,
@@ -3820,7 +3820,7 @@
     {
       "id": "celestial_spear",
       "name": "Celestial Spear",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 3000,
@@ -3846,7 +3846,7 @@
     {
       "id": "void_dagger",
       "name": "Void Dagger",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 1,
       "baseValue": 5000,
@@ -3874,7 +3874,7 @@
     {
       "id": "entropy_blade",
       "name": "Entropy Blade",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 6000,
@@ -3903,7 +3903,7 @@
     {
       "id": "oblivion_hammer",
       "name": "Oblivion Hammer",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 6.0,
       "stackSize": 1,
       "baseValue": 7000,
@@ -3933,7 +3933,7 @@
     {
       "id": "null_lance",
       "name": "Null Lance",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 5500,
@@ -3962,7 +3962,7 @@
     {
       "id": "shortbow_wood",
       "name": "Wooden Shortbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 30,
@@ -3982,7 +3982,7 @@
     {
       "id": "hunting_bow",
       "name": "Hunting Bow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.2,
       "stackSize": 1,
       "baseValue": 50,
@@ -4002,7 +4002,7 @@
     {
       "id": "longbow_yew",
       "name": "Yew Longbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 100,
@@ -4022,7 +4022,7 @@
     {
       "id": "composite_bow",
       "name": "Composite Bow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.2,
       "stackSize": 1,
       "baseValue": 150,
@@ -4041,7 +4041,7 @@
     {
       "id": "recurve_bow",
       "name": "Recurve Bow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.3,
       "stackSize": 1,
       "baseValue": 180,
@@ -4060,7 +4060,7 @@
     {
       "id": "warbow",
       "name": "War Bow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 200,
@@ -4080,7 +4080,7 @@
     {
       "id": "crossbow_light",
       "name": "Light Crossbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 80,
@@ -4100,7 +4100,7 @@
     {
       "id": "crossbow_hunting",
       "name": "Hunting Crossbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 120,
@@ -4120,7 +4120,7 @@
     {
       "id": "crossbow_heavy",
       "name": "Heavy Crossbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 200,
@@ -4140,7 +4140,7 @@
     {
       "id": "repeating_crossbow",
       "name": "Repeating Crossbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 300,
@@ -4159,7 +4159,7 @@
     {
       "id": "hand_crossbow",
       "name": "Hand Crossbow",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.5,
       "stackSize": 1,
       "baseValue": 100,
@@ -4179,7 +4179,7 @@
     {
       "id": "sling_leather",
       "name": "Leather Sling",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.2,
       "stackSize": 1,
       "baseValue": 10,
@@ -4198,7 +4198,7 @@
     {
       "id": "staff_sling",
       "name": "Staff Sling",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 25,
@@ -4218,7 +4218,7 @@
     {
       "id": "throwing_knife",
       "name": "Throwing Knife",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.3,
       "stackSize": 10,
       "baseValue": 15,
@@ -4237,7 +4237,7 @@
     {
       "id": "throwing_axe",
       "name": "Throwing Axe",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 5,
       "baseValue": 25,
@@ -4256,7 +4256,7 @@
     {
       "id": "javelin",
       "name": "Javelin",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 5,
       "baseValue": 20,
@@ -4275,7 +4275,7 @@
     {
       "id": "javelin_iron",
       "name": "Iron Javelin",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.2,
       "stackSize": 5,
       "baseValue": 40,
@@ -4294,7 +4294,7 @@
     {
       "id": "shuriken",
       "name": "Shuriken",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.1,
       "stackSize": 20,
       "baseValue": 10,
@@ -4313,7 +4313,7 @@
     {
       "id": "bolas",
       "name": "Bolas",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.5,
       "stackSize": 5,
       "baseValue": 30,
@@ -4332,7 +4332,7 @@
     {
       "id": "chakram",
       "name": "Chakram",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.4,
       "stackSize": 3,
       "baseValue": 80,
@@ -4353,7 +4353,7 @@
     {
       "id": "laser_pistol",
       "name": "Laser Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 0.8,
       "stackSize": 1,
       "baseValue": 500,
@@ -4373,7 +4373,7 @@
     {
       "id": "laser_carbine",
       "name": "Laser Carbine",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.0,
       "stackSize": 1,
       "baseValue": 700,
@@ -4394,7 +4394,7 @@
     {
       "id": "laser_rifle",
       "name": "Laser Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 2.5,
       "stackSize": 1,
       "baseValue": 900,
@@ -4415,7 +4415,7 @@
     {
       "id": "laser_sniper",
       "name": "Laser Sniper Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 1500,
@@ -4437,7 +4437,7 @@
     {
       "id": "laser_cannon",
       "name": "Laser Cannon",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 8.0,
       "stackSize": 1,
       "baseValue": 2000,
@@ -4462,7 +4462,7 @@
     {
       "id": "plasma_pistol",
       "name": "Plasma Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.2,
       "stackSize": 1,
       "baseValue": 600,
@@ -4483,7 +4483,7 @@
     {
       "id": "plasma_rifle",
       "name": "Plasma Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 4.0,
       "stackSize": 1,
       "baseValue": 1000,
@@ -4505,7 +4505,7 @@
     {
       "id": "plasma_repeater",
       "name": "Plasma Repeater",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 1400,
@@ -4527,7 +4527,7 @@
     {
       "id": "plasma_cannon",
       "name": "Plasma Cannon",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 12.0,
       "stackSize": 1,
       "baseValue": 2500,
@@ -4553,7 +4553,7 @@
     {
       "id": "plasma_caster",
       "name": "Plasma Caster",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 15.0,
       "stackSize": 1,
       "baseValue": 3500,
@@ -4579,7 +4579,7 @@
     {
       "id": "particle_pistol",
       "name": "Particle Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 800,
@@ -4599,7 +4599,7 @@
     {
       "id": "particle_rifle",
       "name": "Particle Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.5,
       "stackSize": 1,
       "baseValue": 1200,
@@ -4620,7 +4620,7 @@
     {
       "id": "particle_accelerator",
       "name": "Particle Accelerator",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 10.0,
       "stackSize": 1,
       "baseValue": 3000,
@@ -4644,7 +4644,7 @@
     {
       "id": "ion_pistol",
       "name": "Ion Pistol",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 1.0,
       "stackSize": 1,
       "baseValue": 600,
@@ -4664,7 +4664,7 @@
     {
       "id": "ion_rifle",
       "name": "Ion Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 3.0,
       "stackSize": 1,
       "baseValue": 900,
@@ -4685,7 +4685,7 @@
     {
       "id": "ion_cannon",
       "name": "Ion Cannon",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 8.0,
       "stackSize": 1,
       "baseValue": 1800,
@@ -4710,7 +4710,7 @@
     {
       "id": "beam_rifle",
       "name": "Continuous Beam Rifle",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 5.0,
       "stackSize": 1,
       "baseValue": 1200,
@@ -4732,7 +4732,7 @@
     {
       "id": "plasma_beam",
       "name": "Plasma Beam Projector",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 7.0,
       "stackSize": 1,
       "baseValue": 1800,
@@ -4758,7 +4758,7 @@
     {
       "id": "particle_beam",
       "name": "Particle Beam Cannon",
-      "category": "equipment",
+      "category": "weapon",
       "weight": 12.0,
       "stackSize": 1,
       "baseValue": 4000,

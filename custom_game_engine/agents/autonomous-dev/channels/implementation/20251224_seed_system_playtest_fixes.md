@@ -154,7 +154,7 @@ Created Wildflower (mature, progress=90%) at (-8.1, 6.5) - seedsProduced=8
 ```
 [PlantSystem] abc12345: Dispersing 2 seeds in 3-tile radius
 [PlantSystem] abc12345: Dispersed seed at (12.3, 15.7)
-[AISystem.gatherBehavior] Agent def67890 gathered 3 seed-berry-bush from plant abc12345
+[AISystem.gatherBehavior] Agent def67890 gathered 3 seed-blueberry-bush from plant abc12345
 ```
 
 ### Agent Inventories (Press 'I')

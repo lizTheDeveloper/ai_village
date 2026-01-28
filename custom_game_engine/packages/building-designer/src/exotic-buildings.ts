@@ -563,14 +563,14 @@ function generateHive(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
   // Add entrance
   const entranceY = size - 2;
   const entranceX = center;
-  layout[entranceY] = replaceAt(layout[entranceY], entranceX, TILE_SYMBOLS.DOOR);
+  layout[entranceY] = replaceAt(layout[entranceY]!, entranceX, TILE_SYMBOLS.DOOR);
 
   // Add some egg chambers (storage)
   for (let i = 0; i < cells; i++) {
     const rx = 2 + Math.floor(Math.random() * (size - 4));
     const ry = 2 + Math.floor(Math.random() * (size - 4));
     if (layout[ry]?.[rx] === TILE_SYMBOLS.FLOOR) {
-      layout[ry] = replaceAt(layout[ry], rx, TILE_SYMBOLS.STORAGE);
+      layout[ry] = replaceAt(layout[ry]!, rx, TILE_SYMBOLS.STORAGE);
     }
   }
 
@@ -671,10 +671,10 @@ function generateSpireFloor(width: number): string[] {
   }
 
   // Add stairs
-  layout[center] = replaceAt(layout[center], center, TILE_SYMBOLS.STAIRS_BOTH);
+  layout[center] = replaceAt(layout[center]!, center, TILE_SYMBOLS.STAIRS_BOTH);
 
   // Add entrance on bottom floor
-  layout[width - 1] = replaceAt(layout[width - 1], center, TILE_SYMBOLS.DOOR);
+  layout[width - 1] = replaceAt(layout[width - 1]!, center, TILE_SYMBOLS.DOOR);
 
   return layout;
 }
@@ -709,10 +709,10 @@ function generateTesseract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
 
   // Add stairs to "inner dimension"
   const center = Math.floor(size / 2);
-  outerLayout[center] = replaceAt(outerLayout[center], center, TILE_SYMBOLS.STAIRS_UP);
+  outerLayout[center] = replaceAt(outerLayout[center]!, center, TILE_SYMBOLS.STAIRS_UP);
 
   // Add entrance
-  outerLayout[size - 1] = replaceAt(outerLayout[size - 1], center, TILE_SYMBOLS.DOOR);
+  outerLayout[size - 1] = replaceAt(outerLayout[size - 1]!, center, TILE_SYMBOLS.DOOR);
 
   // Inner cube (floor 1) - same physical space, different dimension
   const innerLayout: string[] = [];
@@ -737,7 +737,7 @@ function generateTesseract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
   ];
 
   // Stairs back
-  paddedInner[center] = replaceAt(paddedInner[center], center, TILE_SYMBOLS.STAIRS_DOWN);
+  paddedInner[center] = replaceAt(paddedInner[center]!, center, TILE_SYMBOLS.STAIRS_DOWN);
 
   return {
     id: `tesseract_${spec.material}`,
@@ -845,11 +845,11 @@ function generatePenteract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
     const entranceX = center + Math.round(Math.cos(entranceAngle) * (center - 1));
     const entranceY = center + Math.round(Math.sin(entranceAngle) * (center - 1));
     if (layout[entranceY]) {
-      layout[entranceY] = replaceAt(layout[entranceY], entranceX, TILE_SYMBOLS.DOOR);
+      layout[entranceY] = replaceAt(layout[entranceY]!, entranceX, TILE_SYMBOLS.DOOR);
     }
 
     // Central stairs to higher dimension
-    layout[center] = replaceAt(layout[center], center, TILE_SYMBOLS.STAIRS_BOTH);
+    layout[center] = replaceAt(layout[center]!, center, TILE_SYMBOLS.STAIRS_BOTH);
 
     // Phase-specific furniture
     const furnitureAngle = rotation;
@@ -857,9 +857,9 @@ function generatePenteract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
       const angle = furnitureAngle + (i * Math.PI * 2) / (phase + 2);
       const fx = center + Math.round(Math.cos(angle) * (center / 2));
       const fy = center + Math.round(Math.sin(angle) * (center / 2));
-      const furniture = [TILE_SYMBOLS.TABLE, TILE_SYMBOLS.STORAGE, TILE_SYMBOLS.WORKSTATION][i % 3];
+      const furniture = [TILE_SYMBOLS.TABLE, TILE_SYMBOLS.STORAGE, TILE_SYMBOLS.WORKSTATION][i % 3]!;
       if (layout[fy]?.[fx] === TILE_SYMBOLS.FLOOR) {
-        layout[fy] = replaceAt(layout[fy], fx, furniture);
+        layout[fy] = replaceAt(layout[fy]!, fx, furniture);
       }
     }
 
@@ -873,7 +873,7 @@ function generatePenteract(spec: ExoticBuildingSpec): HigherDimensionalBuilding 
     category: 'research',
     tier: 5,
     species: 'medium',
-    layout: phaseLayouts[0], // Current visible layout
+    layout: phaseLayouts[0]!, // Current visible layout
     materials: {
       wall: 'glass',
       floor: 'tile',
@@ -971,10 +971,10 @@ function generateHexeract(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
 
     // State-specific entrance (uncertainty in where doors are)
     const entranceX = center + Math.floor((stateSeed - 0.5) * 4);
-    layout[size - 2] = replaceAt(layout[size - 2], Math.max(1, Math.min(size - 2, entranceX)), TILE_SYMBOLS.DOOR);
+    layout[size - 2] = replaceAt(layout[size - 2]!, Math.max(1, Math.min(size - 2, entranceX)), TILE_SYMBOLS.DOOR);
 
     // Central observation point
-    layout[center] = replaceAt(layout[center], center, TILE_SYMBOLS.STAIRS_BOTH);
+    layout[center] = replaceAt(layout[center]!, center, TILE_SYMBOLS.STAIRS_BOTH);
 
     // Probability furniture - more in stable states
     const furnitureCount = Math.floor((1 - chaos) * 8) + 2;
@@ -990,8 +990,8 @@ function generateHexeract(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
           TILE_SYMBOLS.STORAGE,
           TILE_SYMBOLS.WORKSTATION,
           TILE_SYMBOLS.BED,
-        ][i % 4];
-        layout[fy] = replaceAt(layout[fy], fx, furniture);
+        ][i % 4]!;
+        layout[fy] = replaceAt(layout[fy]!, fx, furniture);
       }
     }
 
@@ -1009,7 +1009,7 @@ function generateHexeract(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
     category: 'research',
     tier: 5,
     species: 'medium',
-    layout: stateLayouts[0], // Most probable state shown by default
+    layout: stateLayouts[0]!, // Most probable state shown by default
     materials: {
       wall: 'glass',
       floor: 'tile',
@@ -1083,14 +1083,14 @@ function generateInfiniteRoom(spec: ExoticBuildingSpec): HigherDimensionalBuildi
 
   // Stairs down in center
   const center = Math.floor(interiorSize / 2);
-  interior[center] = replaceAt(interior[center], center, TILE_SYMBOLS.STAIRS_DOWN);
+  interior[center] = replaceAt(interior[center]!, center, TILE_SYMBOLS.STAIRS_DOWN);
 
   // Add furniture throughout
   for (let i = 0; i < interiorSize; i += 5) {
     for (let j = 0; j < interiorSize; j += 5) {
       if (interior[i]?.[j] === TILE_SYMBOLS.FLOOR) {
-        const furniture = [TILE_SYMBOLS.TABLE, TILE_SYMBOLS.STORAGE, TILE_SYMBOLS.BED][Math.floor(Math.random() * 3)];
-        interior[i] = replaceAt(interior[i], j, furniture);
+        const furniture = [TILE_SYMBOLS.TABLE, TILE_SYMBOLS.STORAGE, TILE_SYMBOLS.BED][Math.floor(Math.random() * 3)]!;
+        interior[i] = replaceAt(interior[i]!, j, furniture);
       }
     }
   }
@@ -1182,7 +1182,7 @@ function generateUniverseGate(spec: ExoticBuildingSpec): HigherDimensionalBuildi
   }
 
   // Entrance
-  layout[size - 2] = replaceAt(layout[size - 2], center, TILE_SYMBOLS.DOOR);
+  layout[size - 2] = replaceAt(layout[size - 2]!, center, TILE_SYMBOLS.DOOR);
 
   // Control stations around portal
   const controlPositions = [
@@ -1193,7 +1193,7 @@ function generateUniverseGate(spec: ExoticBuildingSpec): HigherDimensionalBuildi
   ];
   for (const pos of controlPositions) {
     if (layout[pos.y]?.[pos.x] === TILE_SYMBOLS.FLOOR) {
-      layout[pos.y] = replaceAt(layout[pos.y], pos.x, TILE_SYMBOLS.WORKSTATION);
+      layout[pos.y] = replaceAt(layout[pos.y]!, pos.x, TILE_SYMBOLS.WORKSTATION);
     }
   }
 
@@ -1281,7 +1281,7 @@ function generateNexus(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
 
     // Create void portal
     if (layout[portalY]) {
-      layout[portalY] = replaceAt(layout[portalY], portalX, TILE_SYMBOLS.VOID);
+      layout[portalY] = replaceAt(layout[portalY]!, portalX, TILE_SYMBOLS.VOID);
     }
 
     const visualEffects: Array<'swirling_void' | 'starfield' | 'prismatic' | 'shadow_gate'> =
@@ -1296,15 +1296,15 @@ function generateNexus(spec: ExoticBuildingSpec): HigherDimensionalBuilding {
       anchored: false,
       traversalCost: 500,
       traversable: false,
-      visualEffect: visualEffects[i % 4],
+      visualEffect: visualEffects[i % 4]!,
     });
   }
 
   // Central control hub
-  layout[center] = replaceAt(layout[center], center, TILE_SYMBOLS.WORKSTATION);
+  layout[center] = replaceAt(layout[center]!, center, TILE_SYMBOLS.WORKSTATION);
 
   // Entrance
-  layout[size - 2] = replaceAt(layout[size - 2], center, TILE_SYMBOLS.DOOR);
+  layout[size - 2] = replaceAt(layout[size - 2]!, center, TILE_SYMBOLS.DOOR);
 
   return {
     id: `nexus_${spec.material}`,
@@ -1374,13 +1374,13 @@ function generatePocketCabin(spec: ExoticBuildingSpec): HigherDimensionalBuildin
   }
 
   // Add cozy furniture
-  interior[2] = replaceAt(interior[2], 2, TILE_SYMBOLS.BED);
-  interior[2] = replaceAt(interior[2], 3, TILE_SYMBOLS.BED);
-  interior[2] = replaceAt(interior[2], interiorSize - 3, TILE_SYMBOLS.STORAGE);
-  interior[7] = replaceAt(interior[7], 7, TILE_SYMBOLS.TABLE);
-  interior[interiorSize - 3] = replaceAt(interior[interiorSize - 3], 2, TILE_SYMBOLS.COUNTER);
-  interior[interiorSize - 3] = replaceAt(interior[interiorSize - 3], 3, TILE_SYMBOLS.COUNTER);
-  interior[Math.floor(interiorSize / 2)] = replaceAt(interior[Math.floor(interiorSize / 2)], Math.floor(interiorSize / 2), TILE_SYMBOLS.STAIRS_DOWN);
+  interior[2] = replaceAt(interior[2]!, 2, TILE_SYMBOLS.BED);
+  interior[2] = replaceAt(interior[2]!, 3, TILE_SYMBOLS.BED);
+  interior[2] = replaceAt(interior[2]!, interiorSize - 3, TILE_SYMBOLS.STORAGE);
+  interior[7] = replaceAt(interior[7]!, 7, TILE_SYMBOLS.TABLE);
+  interior[interiorSize - 3] = replaceAt(interior[interiorSize - 3]!, 2, TILE_SYMBOLS.COUNTER);
+  interior[interiorSize - 3] = replaceAt(interior[interiorSize - 3]!, 3, TILE_SYMBOLS.COUNTER);
+  interior[Math.floor(interiorSize / 2)] = replaceAt(interior[Math.floor(interiorSize / 2)]!, Math.floor(interiorSize / 2), TILE_SYMBOLS.STAIRS_DOWN);
 
   return {
     id: `pocket_cabin_${spec.material}`,
@@ -1463,13 +1463,13 @@ function generatePocketManor(spec: ExoticBuildingSpec): HigherDimensionalBuildin
   }
 
   // Add doors between sections
-  interior[20] = replaceAt(interior[20], 10, TILE_SYMBOLS.DOOR);
-  interior[20] = replaceAt(interior[20], 30, TILE_SYMBOLS.DOOR);
-  interior[10] = replaceAt(interior[10], 20, TILE_SYMBOLS.DOOR);
-  interior[30] = replaceAt(interior[30], 20, TILE_SYMBOLS.DOOR);
+  interior[20] = replaceAt(interior[20]!, 10, TILE_SYMBOLS.DOOR);
+  interior[20] = replaceAt(interior[20]!, 30, TILE_SYMBOLS.DOOR);
+  interior[10] = replaceAt(interior[10]!, 20, TILE_SYMBOLS.DOOR);
+  interior[30] = replaceAt(interior[30]!, 20, TILE_SYMBOLS.DOOR);
 
   // Stairs in center
-  interior[20] = replaceAt(interior[20], 20, TILE_SYMBOLS.STAIRS_DOWN);
+  interior[20] = replaceAt(interior[20]!, 20, TILE_SYMBOLS.STAIRS_DOWN);
 
   return {
     id: `pocket_manor_${spec.material}`,
@@ -1561,16 +1561,16 @@ function generatePocketRealm(spec: ExoticBuildingSpec): HigherDimensionalBuildin
     for (let y = s.y; y < s.y + s.h; y++) {
       for (let x = s.x; x < s.x + s.w; x++) {
         if (x === s.x || x === s.x + s.w - 1 || y === s.y || y === s.y + s.h - 1) {
-          interior[y] = replaceAt(interior[y], x, TILE_SYMBOLS.WALL);
+          interior[y] = replaceAt(interior[y]!, x, TILE_SYMBOLS.WALL);
         }
       }
     }
     // Door on each structure
-    interior[s.y + s.h - 1] = replaceAt(interior[s.y + s.h - 1], s.x + Math.floor(s.w / 2), TILE_SYMBOLS.DOOR);
+    interior[s.y + s.h - 1] = replaceAt(interior[s.y + s.h - 1]!, s.x + Math.floor(s.w / 2), TILE_SYMBOLS.DOOR);
   }
 
   // Exit portal in center
-  interior[50] = replaceAt(interior[50], 50, TILE_SYMBOLS.STAIRS_DOWN);
+  interior[50] = replaceAt(interior[50]!, 50, TILE_SYMBOLS.STAIRS_DOWN);
 
   return {
     id: `pocket_realm_${spec.material}`,
@@ -1657,7 +1657,7 @@ function generateShell(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
   }
 
   // Entrance
-  layout[size - 2] = replaceAt(layout[size - 2], center, TILE_SYMBOLS.DOOR);
+  layout[size - 2] = replaceAt(layout[size - 2]!, center, TILE_SYMBOLS.DOOR);
 
   return createExoticBuilding(spec, layout, 'A spiraling shell structure that winds inward.');
 }
@@ -1680,7 +1680,7 @@ function generateFractal(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
     for (let dy = third; dy < third * 2; dy++) {
       for (let dx = third; dx < third * 2; dx++) {
         if (layout[y + dy]) {
-          layout[y + dy][x + dx] = TILE_SYMBOLS.WALL;
+          layout[y + dy]![x + dx] = TILE_SYMBOLS.WALL;
         }
       }
     }
@@ -1696,19 +1696,19 @@ function generateFractal(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
 
   // Add outer walls
   for (let y = 0; y < size; y++) {
-    layout[y][0] = TILE_SYMBOLS.WALL;
-    layout[y][size - 1] = TILE_SYMBOLS.WALL;
+    layout[y]![0] = TILE_SYMBOLS.WALL;
+    layout[y]![size - 1] = TILE_SYMBOLS.WALL;
   }
   for (let x = 0; x < size; x++) {
-    layout[0][x] = TILE_SYMBOLS.WALL;
-    layout[size - 1][x] = TILE_SYMBOLS.WALL;
+    layout[0]![x] = TILE_SYMBOLS.WALL;
+    layout[size - 1]![x] = TILE_SYMBOLS.WALL;
   }
 
   carve(0, 0, size);
 
   // Entrance
   const center = Math.floor(size / 2);
-  layout[size - 1][center] = TILE_SYMBOLS.DOOR;
+  layout[size - 1]![center] = TILE_SYMBOLS.DOOR;
 
   return createExoticBuilding(spec, layout.map(r => r.join('')), 'A self-similar fractal structure, the same pattern at every scale.');
 }
@@ -1741,7 +1741,7 @@ function generateBubble(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
   }
 
   // Entrance at bottom
-  layout[size - 2] = replaceAt(layout[size - 2], center, TILE_SYMBOLS.DOOR);
+  layout[size - 2] = replaceAt(layout[size - 2]!, center, TILE_SYMBOLS.DOOR);
 
   return createExoticBuilding(spec, layout, 'A perfect spherical bubble floating in space.');
 }
@@ -1774,7 +1774,7 @@ function generateStalactite(spec: ExoticBuildingSpec): VoxelBuildingDefinition {
   }
 
   // Entrance at top (it hangs from ceiling)
-  layout[0] = replaceAt(layout[0], center, TILE_SYMBOLS.DOOR);
+  layout[0] = replaceAt(layout[0]!, center, TILE_SYMBOLS.DOOR);
 
   return createExoticBuilding(spec, layout, 'A structure hanging from above, tapering to a point.');
 }
@@ -1794,7 +1794,7 @@ function generateWebStructure(spec: ExoticBuildingSpec): VoxelBuildingDefinition
     for (let r = 0; r < center; r++) {
       const x = center + Math.round(Math.cos(angle) * r);
       const y = center + Math.round(Math.sin(angle) * r);
-      if (layout[y]) layout[y][x] = TILE_SYMBOLS.WALL;
+      if (layout[y]) layout[y]![x] = TILE_SYMBOLS.WALL;
     }
   }
 
@@ -1803,7 +1803,7 @@ function generateWebStructure(spec: ExoticBuildingSpec): VoxelBuildingDefinition
     for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
       const x = center + Math.round(Math.cos(angle) * r);
       const y = center + Math.round(Math.sin(angle) * r);
-      if (layout[y]) layout[y][x] = TILE_SYMBOLS.WALL;
+      if (layout[y]) layout[y]![x] = TILE_SYMBOLS.WALL;
     }
   }
 
@@ -1814,17 +1814,17 @@ function generateWebStructure(spec: ExoticBuildingSpec): VoxelBuildingDefinition
       const dy = y - center;
       const distSq = dx * dx + dy * dy;
       const centerMinus1Sq = (center - 1) * (center - 1);
-      if (distSq < centerMinus1Sq && layout[y][x] === ' ') {
-        layout[y][x] = TILE_SYMBOLS.FLOOR;
+      if (distSq < centerMinus1Sq && layout[y]![x] === ' ') {
+        layout[y]![x] = TILE_SYMBOLS.FLOOR;
       }
     }
   }
 
   // Center chamber
-  layout[center][center] = TILE_SYMBOLS.STORAGE;
+  layout[center]![center] = TILE_SYMBOLS.STORAGE;
 
   // Entrance
-  layout[size - 2][center] = TILE_SYMBOLS.DOOR;
+  layout[size - 2]![center] = TILE_SYMBOLS.DOOR;
 
   return createExoticBuilding(spec, layout.map(r => r.join('')), 'A web-like structure with radial symmetry.');
 }
@@ -1847,7 +1847,7 @@ function generateGenericExotic(spec: ExoticBuildingSpec): VoxelBuildingDefinitio
   }
 
   const center = Math.floor(size / 2);
-  layout[size - 1] = replaceAt(layout[size - 1], center, TILE_SYMBOLS.DOOR);
+  layout[size - 1] = replaceAt(layout[size - 1]!, center, TILE_SYMBOLS.DOOR);
 
   return createExoticBuilding(spec, layout, `An exotic ${spec.archetype} structure.`);
 }

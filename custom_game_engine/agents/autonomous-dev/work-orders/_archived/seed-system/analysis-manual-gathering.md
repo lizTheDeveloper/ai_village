@@ -298,7 +298,7 @@ case 'produce_seeds': {
 3. **Observe for 5+ game hours** (not just 2)
 4. **Check for LLM decisions containing "pick seeds" or "gather seeds"**
 5. **Monitor console for "seed:gathered" events**
-6. **Inspect agent inventories** - look for items like "seed-berry-bush", "seed-grass"
+6. **Inspect agent inventories** - look for items like "seed-blueberry-bush", "seed-grass"
 
 **Expected result:** Seeds will appear in agent inventories once:
 - Agents have satisfied immediate needs (food, shelter)

@@ -132,7 +132,7 @@ npx tsx scripts/view-bug-reports.ts --help
   "details": {
     "reason": "Missing position field",
     "plantData": {
-      "speciesId": "berry-bush",
+      "speciesId": "blueberry-bush",
       "stage": "mature",
       "health": 85
     }
@@ -279,7 +279,7 @@ Error:     Corrupted plant entity: Missing position field
 Details:   {
              "reason": "Missing position field",
              "plantData": {
-               "speciesId": "berry-bush",
+               "speciesId": "blueberry-bush",
                "stage": "mature",
                "health": 85
              }

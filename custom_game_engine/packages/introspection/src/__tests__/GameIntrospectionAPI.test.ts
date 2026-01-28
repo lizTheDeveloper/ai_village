@@ -87,12 +87,14 @@ const TestAgentSchema = defineComponent<TestAgentComponent>({
   },
 
   validate: (data): data is TestAgentComponent => {
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+    const candidate = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'test_agent' &&
-      typeof (data as any).name === 'string' &&
-      typeof (data as any).level === 'number'
+      candidate.type === 'test_agent' &&
+      typeof candidate.name === 'string' &&
+      typeof candidate.level === 'number'
     );
   },
 
@@ -144,13 +146,15 @@ const TestNeedsSchema = defineComponent<TestNeedsComponent>({
   },
 
   validate: (data): data is TestNeedsComponent => {
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+    const candidate = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'test_needs' &&
-      typeof (data as any).hunger === 'number' &&
-      typeof (data as any).thirst === 'number' &&
-      typeof (data as any).energy === 'number'
+      candidate.type === 'test_needs' &&
+      typeof candidate.hunger === 'number' &&
+      typeof candidate.thirst === 'number' &&
+      typeof candidate.energy === 'number'
     );
   },
 
@@ -199,12 +203,14 @@ const TestPositionSchema = defineComponent<TestPositionComponent>({
   },
 
   validate: (data): data is TestPositionComponent => {
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+    const candidate = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'test_position' &&
-      typeof (data as any).x === 'number' &&
-      typeof (data as any).y === 'number'
+      candidate.type === 'test_position' &&
+      typeof candidate.x === 'number' &&
+      typeof candidate.y === 'number'
     );
   },
 
@@ -228,7 +234,7 @@ function createMockEntity(id?: string): EntityImpl {
 function createMockWorld(): World {
   const entities = new Map<string, EntityImpl>();
 
-  return {
+  const mockWorld: Partial<World> = {
     tick: 100,
     timeEntity: null,
     eventBus: {
@@ -252,7 +258,9 @@ function createMockWorld(): World {
     simulationScheduler: {
       filterActiveEntities: vi.fn((entities) => entities),
     },
-  } as unknown as World;
+  };
+
+  return mockWorld as World;
 }
 
 // Mock GameIntrospectionAPI for now
@@ -273,7 +281,16 @@ class MockGameIntrospectionAPI {
       visibility?: 'full' | 'llm' | 'player';
       includeMetadata?: boolean;
     }
-  ): Promise<any> {
+  ): Promise<{
+    id: string;
+    components: Record<string, unknown>;
+    schemas?: Record<string, unknown>;
+    metadata: {
+      simulationMode: string;
+      lastUpdate: number;
+      cacheHit: boolean;
+    };
+  }> {
     const entity = this.world.getEntity?.(entityId);
     if (!entity) {
       throw new Error(`Entity ${entityId} not found`);
@@ -282,19 +299,22 @@ class MockGameIntrospectionAPI {
     const cacheKey = `${entityId}:${JSON.stringify(options)}`;
     if (this.cache.has(cacheKey)) {
       this.cacheStats.hits++;
-      return this.cache.get(cacheKey);
+      return this.cache.get(cacheKey)!;
     }
 
     this.cacheStats.misses++;
 
     // Build result from entity components
-    const components: Record<string, any> = {};
-    const schemas: Record<string, any> = {};
+    const components: Record<string, unknown> = {};
+    const schemas: Record<string, unknown> = {};
 
-    const entity_any = entity as any;
+    const entityWithComponents = entity as unknown as {
+      hasComponent: (type: string) => boolean;
+      getComponent: (type: string) => unknown;
+    };
     for (const compType of ['test_agent', 'test_needs', 'test_position']) {
-      if (entity_any.hasComponent(compType)) {
-        const comp = entity_any.getComponent(compType);
+      if (entityWithComponents.hasComponent(compType)) {
+        const comp = entityWithComponents.getComponent(compType);
         if (!options?.components || options.components.includes(compType)) {
           components[compType] = comp;
           schemas[compType] = ComponentRegistry.get(compType);
@@ -342,15 +362,32 @@ class MockGameIntrospectionAPI {
     return filtered;
   }
 
-  async mutateField(mutation: any): Promise<any> {
+  async mutateField(mutation: {
+    entityId: string;
+    componentType: string;
+    field: string;
+    value: unknown;
+  }): Promise<{
+    success: boolean;
+    oldValue?: unknown;
+    newValue?: unknown;
+    validationErrors?: string[];
+    undoId?: string;
+    metrics: {
+      latency: number;
+      cacheInvalidations: number;
+    };
+  }> {
     const entity = this.world.getEntity?.(mutation.entityId);
     if (!entity) {
       throw new Error(`Entity ${mutation.entityId} not found`);
     }
 
     // Get old value before mutation
-    const entity_any = entity as any;
-    const component = entity_any.getComponent(mutation.componentType);
+    const entityWithComponents = entity as unknown as {
+      getComponent: (type: string) => Record<string, unknown> | undefined;
+    };
+    const component = entityWithComponents.getComponent(mutation.componentType);
     const oldValue = component ? component[mutation.field] : undefined;
 
     const result = MutationService.mutate(
@@ -362,7 +399,7 @@ class MockGameIntrospectionAPI {
 
     // Get new value after mutation (if successful)
     const newValue = result.success
-      ? entity_any.getComponent(mutation.componentType)?.[mutation.field]
+      ? entityWithComponents.getComponent(mutation.componentType)?.[mutation.field]
       : undefined;
 
     // Invalidate cache
@@ -466,9 +503,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
 
     // Create test entity with components
     testEntity = createMockEntity('test-entity-1');
-    (testEntity as any).addComponent(TestAgentSchema.createDefault());
-    (testEntity as any).addComponent(TestNeedsSchema.createDefault());
-    (testEntity as any).addComponent(TestPositionSchema.createDefault());
+    (testEntity as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestAgentSchema.createDefault());
+    (testEntity as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestNeedsSchema.createDefault());
+    (testEntity as unknown as { addComponent: (comp: unknown) => void }).addComponent(TestPositionSchema.createDefault());
 
     // Add entity to world
     world.addEntity?.(testEntity);
@@ -651,7 +688,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
         expect(result.undoId).toBeDefined();
 
         // Verify mutation applied
-        const entity = world.getEntity?.('test-entity-1') as any;
+        const entity = world.getEntity?.('test-entity-1') as unknown as {
+          getComponent: (type: string) => Record<string, unknown> | undefined;
+        };
         const agent = entity?.getComponent('test_agent');
         expect(agent.name).toBe('Alice');
       });
@@ -766,7 +805,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
         expect(result.results.every((r: any) => r.success)).toBe(true);
 
         // Verify both mutations applied
-        const entity = world.getEntity?.('test-entity-1') as any;
+        const entity = world.getEntity?.('test-entity-1') as unknown as {
+          getComponent: (type: string) => Record<string, unknown> | undefined;
+        };
         expect(entity?.getComponent('test_agent').name).toBe('Bob');
         expect(entity?.getComponent('test_needs').hunger).toBe(0.8);
       });
@@ -806,7 +847,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
           value: 'David',
         });
 
-        const entity = world.getEntity?.('test-entity-1') as any;
+        const entity = world.getEntity?.('test-entity-1') as unknown as {
+          getComponent: (type: string) => Record<string, unknown> | undefined;
+        };
         expect(entity?.getComponent('test_agent').name).toBe('David');
 
         // Undo
@@ -827,7 +870,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
         // Undo
         await api.undo();
 
-        const entity = world.getEntity?.('test-entity-1') as any;
+        const entity = world.getEntity?.('test-entity-1') as unknown as {
+          getComponent: (type: string) => Record<string, unknown> | undefined;
+        };
         expect(entity?.getComponent('test_agent').name).toBe('Unknown');
 
         // Redo
@@ -854,7 +899,9 @@ describe('GameIntrospectionAPI Phase 1', () => {
         // Undo both
         await api.undo(2);
 
-        const entity = world.getEntity?.('test-entity-1') as any;
+        const entity = world.getEntity?.('test-entity-1') as unknown as {
+          getComponent: (type: string) => Record<string, unknown> | undefined;
+        };
         expect(entity?.getComponent('test_agent').name).toBe('Unknown');
         expect(entity?.getComponent('test_agent').level).toBe(1);
       });

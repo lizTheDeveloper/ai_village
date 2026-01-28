@@ -165,7 +165,7 @@ actions.push('pick - Get/collect anything: wood, stone, food, berries, seeds, cr
 3. **Look for "pick" actions in console**
    - Search for: `[AISystem.gatherBehavior] Agent ... gathered ... seed-`
 4. **Check inventory after agents gather**
-   - Seeds should appear as "seed-wheat", "seed-berry-bush", etc.
+   - Seeds should appear as "seed-wheat", "seed-blueberry-bush", etc.
 5. **Verify natural systems**
    - Plants dispersing seeds (already confirmed working)
    - Seeds germinating (already confirmed working)

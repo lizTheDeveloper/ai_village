@@ -420,9 +420,9 @@ export interface PlantSystemsConfig {
   /** PlantDiscoverySystem class constructor */
   PlantDiscoverySystem: new () => System;
   /** PlantDiseaseSystem class constructor */
-  PlantDiseaseSystem: new (eventBus: EventBus) => System;
+  PlantDiseaseSystem: new (config?: any) => System;
   /** WildPlantPopulationSystem class constructor */
-  WildPlantPopulationSystem: new (eventBus: EventBus) => System;
+  WildPlantPopulationSystem: new (config?: any) => System;
 }
 
 /**

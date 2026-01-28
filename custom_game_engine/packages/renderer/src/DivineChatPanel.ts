@@ -16,6 +16,7 @@
 import type { World, DeityComponent, IdentityComponent } from '@ai-village/core';
 import { ComponentType as CT } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
+import { gameBridge } from '@ai-village/shared-worker';
 
 // ============================================================================
 // Types (compatible with both old and new ChatRoom systems)
@@ -147,6 +148,109 @@ export class DivineChatPanel implements IWindowPanel {
   // Auto-scroll tracking
   private lastMessageCount = 0;
 
+  // Local cache of messages for immediate display
+  // Used in both SharedWorker mode (forwarded messages) and direct mode (event subscription)
+  private localMessageCache: ChatMessage[] = [];
+  private chatMessageUnsubscribe: (() => void) | null = null;
+  private eventBusUnsubscribe: (() => void) | null = null;
+
+  constructor() {
+    // Subscribe to chat messages from the GameBridge
+    // These are forwarded from the SharedWorker when path prediction is enabled
+    this.chatMessageUnsubscribe = gameBridge.onChatMessage((msg) => {
+      console.log('[DivineChatPanel] Received chat message from gameBridge:', {
+        roomId: msg.roomId,
+        senderId: msg.senderId,
+        senderName: msg.senderName,
+        content: msg.content?.substring(0, 50),
+      });
+      // Only add divine_chat messages to this panel
+      if (msg.roomId === 'divine_chat') {
+        this.addMessageToCache({
+          id: msg.messageId,
+          roomId: msg.roomId,
+          senderId: msg.senderId,
+          senderName: msg.senderName,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          tick: msg.tick,
+          type: 'message',
+        });
+      }
+    });
+  }
+
+  /**
+   * Add a message to the local cache for immediate display
+   */
+  private addMessageToCache(msg: ChatMessage): void {
+    // Check if message already exists
+    const exists = this.localMessageCache.some(m => m.id === msg.id);
+    if (!exists) {
+      console.log('[DivineChatPanel] Adding message to cache:', {
+        id: msg.id,
+        senderName: msg.senderName,
+        content: msg.content?.substring(0, 50),
+        cacheSize: this.localMessageCache.length + 1,
+      });
+      this.localMessageCache.push(msg);
+      // Keep messages sorted by timestamp
+      this.localMessageCache.sort((a, b) => a.timestamp - b.timestamp);
+      // Limit cache size to prevent memory issues
+      if (this.localMessageCache.length > 200) {
+        this.localMessageCache = this.localMessageCache.slice(-100);
+      }
+      // Messages will be rendered on next tick (render happens at 20 TPS = 50ms)
+    }
+  }
+
+  /**
+   * Subscribe to eventBus for direct GameLoop mode
+   * This ensures messages appear immediately when sent
+   */
+  private subscribeToEventBus(world: World): void {
+    // Only subscribe once
+    if (this.eventBusUnsubscribe) return;
+
+    this.eventBusUnsubscribe = world.eventBus.on('chat:message_sent', (event) => {
+      const data = event.data as {
+        roomId: string;
+        messageId: string;
+        senderId: string;
+        senderName: string;
+        content: string;
+      };
+
+      // Only add messages for divine_chat room
+      if (data.roomId === 'divine_chat') {
+        this.addMessageToCache({
+          id: data.messageId,
+          roomId: data.roomId,
+          senderId: data.senderId,
+          senderName: data.senderName,
+          content: data.content,
+          timestamp: Date.now(),
+          tick: world.tick,
+          type: 'message',
+        });
+      }
+    });
+  }
+
+  /**
+   * Cleanup subscriptions
+   */
+  destroy(): void {
+    if (this.chatMessageUnsubscribe) {
+      this.chatMessageUnsubscribe();
+      this.chatMessageUnsubscribe = null;
+    }
+    if (this.eventBusUnsubscribe) {
+      this.eventBusUnsubscribe();
+      this.eventBusUnsubscribe = null;
+    }
+  }
+
   /**
    * Refresh chat state from the World
    * PERFORMANCE: Uses ECS query to get divine chat room
@@ -154,6 +258,9 @@ export class DivineChatPanel implements IWindowPanel {
   private refreshFromWorld(world: World): void {
     this.world = world;
     this.chatRoomComponent = null;
+
+    // Subscribe to eventBus for direct GameLoop mode (immediate message updates)
+    this.subscribeToEventBus(world);
 
     // Find divine chat entity (new chat_room component)
     const chatEntity = this.findChatEntity(world);
@@ -326,52 +433,25 @@ export class DivineChatPanel implements IWindowPanel {
     }
 
     // Draw messages and notifications
-    if (this.chatRoomComponent && world) {
-      currentY = this.renderMessages(ctx, panelX, currentY, panelWidth, panelHeight - (currentY - panelY) - SIZES.inputHeight - SIZES.padding, world);
-    } else {
-      // No chat room - show message
-      ctx.fillStyle = COLORS.textMuted;
-      ctx.font = `${SIZES.fontSize}px monospace`;
-      ctx.fillText('No divine chat active', panelX + SIZES.padding, currentY + 20);
-      ctx.fillText('(waiting for deities)', panelX + SIZES.padding, currentY + 40);
+    // Always render messages - this includes localMessageCache even if chatRoomComponent is null
+    // Reserve space for input area at bottom: inputHeight + padding between messages and input + bottom padding
+    if (world) {
+      const messageAreaMaxHeight = panelHeight - (currentY - panelY) - SIZES.inputHeight - SIZES.padding * 2;
+      currentY = this.renderMessages(ctx, panelX, currentY, panelWidth, messageAreaMaxHeight, world);
     }
 
-    // Draw input area - always show it but indicate status
+    // Draw input area at the bottom
     const inputY = panelY + panelHeight - SIZES.inputHeight - SIZES.padding;
 
-    // Chat is available if the room exists and is active
-    const canChat = this.chatRoomComponent && this.chatRoomComponent.isActive;
-
-    if (canChat) {
-      this.renderInput(ctx, panelX, inputY, panelWidth);
-      // Store input bounds for click detection
-      this.inputBounds = {
-        x: panelX + SIZES.padding,
-        y: inputY,
-        width: panelWidth - SIZES.padding * 2,
-        height: SIZES.inputHeight
-      };
-    } else {
-      // Show disabled input with explanation
-      ctx.fillStyle = 'rgba(40, 40, 60, 0.8)';
-      ctx.fillRect(panelX + SIZES.padding, inputY, panelWidth - SIZES.padding * 2, SIZES.inputHeight);
-
-      ctx.strokeStyle = 'rgba(80, 80, 100, 0.5)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(panelX + SIZES.padding, inputY, panelWidth - SIZES.padding * 2, SIZES.inputHeight);
-
-      ctx.fillStyle = COLORS.textDim;
-      ctx.font = `${SIZES.fontSize}px monospace`;
-
-      // Show specific reason why chat is disabled
-      let reason = 'Chat unavailable';
-      if (!this.chatRoomComponent) {
-        reason = 'No divine chat room exists';
-      } else if (!this.chatRoomComponent.isActive) {
-        reason = 'Chat inactive (waiting for angels)';
-      }
-      ctx.fillText(reason, panelX + SIZES.padding * 2, inputY + SIZES.inputHeight / 2 + 4);
-    }
+    // Always render input - chat always available via optimistic updates
+    this.renderInput(ctx, panelX, inputY, panelWidth);
+    // Store input bounds for click detection
+    this.inputBounds = {
+      x: panelX + SIZES.padding,
+      y: inputY,
+      width: panelWidth - SIZES.padding * 2,
+      height: SIZES.inputHeight
+    };
   }
 
   /**
@@ -439,14 +519,42 @@ export class DivineChatPanel implements IWindowPanel {
    * Render messages and notifications
    */
   private renderMessages(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, maxHeight: number, _world: World): number {
-    if (!this.chatRoomComponent) return y;
-
     const messageAreaHeight = maxHeight;
 
+    // Merge messages from component and local cache, deduplicating by ID
+    // The local cache receives messages immediately via eventBus subscription
+    // The component messages are the authoritative source (loaded from localStorage)
+    // IMPORTANT: Show cached messages even if chatRoomComponent is null
+    const componentMessages = this.chatRoomComponent?.messages ?? [];
+    const seenIds = new Set<string>();
+    const allMessages: ChatMessage[] = [];
+
+    // Add component messages first (authoritative)
+    for (const msg of componentMessages) {
+      if (!seenIds.has(msg.id)) {
+        seenIds.add(msg.id);
+        allMessages.push(msg);
+      }
+    }
+
+    // Add cached messages (may include messages not yet in component due to timing)
+    for (const msg of this.localMessageCache) {
+      if (!seenIds.has(msg.id)) {
+        seenIds.add(msg.id);
+        allMessages.push(msg);
+      }
+    }
+
+    // Early return only if there are no messages at all (neither cached nor from component)
+    if (allMessages.length === 0 && (!this.chatRoomComponent || this.chatRoomComponent.pendingNotifications.length === 0)) {
+      return y;
+    }
+
     // Combine messages and notifications, sorted by timestamp
+    const pendingNotifications = this.chatRoomComponent?.pendingNotifications ?? [];
     const items: Array<{ type: 'message' | 'notification', data: ChatMessage | ChatNotification }> = [
-      ...this.chatRoomComponent.messages.map(m => ({ type: 'message' as const, data: m })),
-      ...this.chatRoomComponent.pendingNotifications.map(n => ({ type: 'notification' as const, data: n })),
+      ...allMessages.map(m => ({ type: 'message' as const, data: m })),
+      ...pendingNotifications.map(n => ({ type: 'notification' as const, data: n })),
     ].sort((a, b) => {
       const aTime = a.data.timestamp;
       const bTime = b.data.timestamp;
@@ -906,18 +1014,41 @@ export class DivineChatPanel implements IWindowPanel {
       return;
     }
 
-    // Emit event for ChatRoomSystem to handle
-    // Include player name so it's persisted in the message
-    this.world.eventBus.emit({
-      type: 'chat:send_message',
+    const messageContent = this.inputText.trim();
+    const senderName = this.getPlayerName();
+    const messageId = `player_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+    // OPTIMISTIC UPDATE: Add message to local cache immediately for instant display
+    // This ensures the message appears right away, regardless of event routing
+    this.addMessageToCache({
+      id: messageId,
+      roomId: 'divine_chat',
+      senderId: this.playerId,
+      senderName: senderName,
+      content: messageContent,
+      timestamp: Date.now(),
+      tick: this.world.tick,
+      type: 'message',
+    });
+
+    const event = {
+      type: 'chat:send_message' as const,
       source: 'divine_chat_panel',
       data: {
         roomId: 'divine_chat',
         senderId: this.playerId,
-        senderName: this.getPlayerName(), // Guaranteed to exist now
-        message: this.inputText.trim(),
+        senderName: senderName,
+        message: messageContent,
       },
-    });
+    };
+
+    // Also send to ChatRoomSystem for persistence and routing to other systems
+    if (gameBridge.isConnected()) {
+      gameBridge.emitEvent(event);
+    } else {
+      // Direct mode: emit to local eventBus
+      this.world.eventBus.emitImmediate(event);
+    }
 
     this.inputText = '';
   }

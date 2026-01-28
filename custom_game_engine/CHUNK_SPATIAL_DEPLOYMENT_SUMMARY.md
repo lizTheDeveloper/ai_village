@@ -109,7 +109,7 @@ From console warnings, typical tick composition:
 
 ### Pre-existing Issues (Unrelated)
 - Courtship system errors (reproduction package)
-- Missing plant species (berry-bush)
+- Missing plant species (blueberry-bush)
 - Missing sprite files (normal for development)
 - These existed before optimization and are not related
 

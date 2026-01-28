@@ -39,6 +39,8 @@ export class GameLoop {
   private tickCount = 0;
   private avgTickTime = 0;
   private maxTickTime = 0;
+  // EMA smoothing factor: 0.05 = ~60 samples (~3s at 20 TPS)
+  private readonly EMA_ALPHA = 0.05;
 
   // Query cache - invalidated when archetypeVersion changes
   private queryCache = new Map<string, ReadonlyArray<Entity>>();
@@ -353,6 +355,10 @@ export class GameLoop {
       });
     }
 
+    // Clear dirty tracking state for next tick
+    // This must happen before tick-end so systems can still see dirty state during the tick
+    this._world.dirtyTracker.clearTick();
+
     // Emit tick end event
     this.eventBus.emit({
       type: 'world:tick:end',
@@ -370,12 +376,18 @@ export class GameLoop {
     // Keep last 5000 ticks of history, prune every 1000 ticks
     if (this._world.tick % 1000 === 0) {
       this.eventBus.pruneHistory(this._world.tick - 5000);
+      // Decay maxTickTime so it reflects recent performance (not ancient spikes)
+      this.maxTickTime *= 0.5;
     }
 
-    // Update stats
+    // Update stats using exponential moving average for responsiveness
     const tickTime = performance.now() - tickStart;
     this.tickCount++;
-    this.avgTickTime = (this.avgTickTime * (this.tickCount - 1) + tickTime) / this.tickCount;
+    // EMA: weights recent ticks more heavily (reflects ~last 3 seconds)
+    // First tick uses actual value, then blends with EMA
+    this.avgTickTime = this.tickCount === 1
+      ? tickTime
+      : this.EMA_ALPHA * tickTime + (1 - this.EMA_ALPHA) * this.avgTickTime;
     this.maxTickTime = Math.max(this.maxTickTime, tickTime);
 
     // Record tick time in profiler if enabled

@@ -9,7 +9,7 @@
  * - Paradigm teaching (transfer paradigm knowledge)
  */
 
-import type { Entity, MagicComponent } from '@ai-village/core';
+import type { Entity, MagicComponent, MagicChannelType, MagicRisk } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type {
   ParadigmEffect,
@@ -334,23 +334,53 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
       return result;
     }
 
-    // Add adaptation
-    const additionalChannels = Array.isArray(effect.parameters.additionalChannels)
+    // Type guard to check if value is a valid MagicChannelType
+    function isMagicChannelType(value: string): value is MagicChannelType {
+      const validTypes: MagicChannelType[] = [
+        'verbal', 'somatic', 'material', 'focus', 'glyph', 'musical', 'dance',
+        'will', 'true_name', 'prayer', 'blood', 'emotion', 'meditation', 'dream',
+        'consumption', 'touch', 'link', 'tattoo', 'breath', 'ritual', 'offering',
+        'purity', 'binding', 'rhythm', 'instrument', 'daemon', 'symbols', 'sleep'
+      ];
+      return validTypes.includes(value as MagicChannelType);
+    }
+
+    // Type guard to check if object is a complete MagicRisk
+    function isMagicRisk(obj: unknown): obj is MagicRisk {
+      if (typeof obj !== 'object' || obj === null) return false;
+      const risk = obj as Record<string, unknown>;
+      return (
+        'trigger' in risk &&
+        'consequence' in risk &&
+        'severity' in risk &&
+        'probability' in risk &&
+        typeof risk.probability === 'number' &&
+        'mitigatable' in risk &&
+        typeof risk.mitigatable === 'boolean'
+      );
+    }
+
+    // Extract channel types - validate they are valid MagicChannelType values
+    const additionalChannels: MagicChannelType[] | undefined = Array.isArray(effect.parameters.additionalChannels)
       ? effect.parameters.additionalChannels.map((c: unknown) => {
           if (typeof c === 'object' && c !== null && 'type' in c) {
-            return (c as ChannelData).type as string;
+            const channelType = (c as ChannelData).type;
+            if (isMagicChannelType(channelType)) {
+              return channelType;
+            }
           }
           return undefined;
-        }).filter((t): t is string => t !== undefined) as string[]
+        }).filter((t): t is MagicChannelType => t !== undefined)
       : undefined;
 
-    const additionalRisks = Array.isArray(effect.parameters.additionalRisks)
+    // Extract risks - validate they are complete MagicRisk objects
+    const additionalRisks: MagicRisk[] | undefined = Array.isArray(effect.parameters.additionalRisks)
       ? effect.parameters.additionalRisks.map((r: unknown) => {
-          if (typeof r === 'object' && r !== null && 'type' in r) {
-            return (r as RiskData).type as string;
+          if (isMagicRisk(r)) {
+            return r;
           }
           return undefined;
-        }).filter((t): t is string => t !== undefined) as string[]
+        }).filter((t): t is MagicRisk => t !== undefined)
       : undefined;
 
     targetMagic.adaptations.push({
@@ -358,8 +388,8 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
       adaptationType,
       modifications: {
         costModifier: effect.parameters.costModifier as number | undefined,
-        additionalChannels: additionalChannels as any,
-        additionalRisks: additionalRisks as any,
+        additionalChannels: additionalChannels,
+        additionalRisks: additionalRisks,
       },
     });
 

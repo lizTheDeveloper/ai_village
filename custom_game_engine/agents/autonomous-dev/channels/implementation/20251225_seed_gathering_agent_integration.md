@@ -306,8 +306,8 @@ Agents will now:
 [AISystem:gatherSeedsBehavior] Agent abc12345 requesting seed gathering from plant def67890
 [Main] gather_seeds:requested - actor: abc12345, plant: def67890, position: (12, 5)
 [ActionQueue] Enqueued action: gather_seeds for actor abc12345
-[GatherSeedsActionHandler] Gathered 8 berry-bush seeds
-[InventoryComponent] Added 8 × seed:berry-bush to agent abc12345 inventory
+[GatherSeedsActionHandler] Gathered 8 blueberry-bush seeds
+[InventoryComponent] Added 8 × seed:blueberry-bush to agent abc12345 inventory
 ```
 
 ---

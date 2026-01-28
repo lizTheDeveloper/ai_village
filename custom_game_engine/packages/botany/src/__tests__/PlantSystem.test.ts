@@ -6,6 +6,7 @@ import {
   PlantComponent,
   createPositionComponent,
   ComponentType,
+  EntityImpl,
   type PlantSpecies,
 } from '@ai-village/core';
 import { PlantSystem } from '../systems/PlantSystem.js';
@@ -70,12 +71,11 @@ describe('PlantSystem', () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
-    // Create and register StateMutatorSystem (needed to apply mutations in tests)
+    // Create StateMutatorSystem (needed to apply mutations in tests)
+    // Note: World doesn't have addSystem - we call system.update directly in tests
     stateMutator = new StateMutatorSystem();
-    world.addSystem(stateMutator);
 
     system = new PlantSystem(eventBus);
-    world.addSystem(system);
     // Configure species lookup for all tests
     system.setSpeciesLookup(createMockSpeciesLookup());
   });
@@ -120,7 +120,7 @@ describe('PlantSystem', () => {
 
   describe('update - plant lifecycle', () => {
     it('should process entities with plant component', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -129,8 +129,8 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      (entity as any).addComponent(plant);
-      (entity as any).addComponent(createPositionComponent(10, 10));
+      entity.addComponent(plant);
+      entity.addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -139,15 +139,17 @@ describe('PlantSystem', () => {
     });
 
     it('should skip plant missing position field without throwing', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
       });
 
       // Remove position to trigger error - must set private _position to bypass setter
-      (plant as any)._position = undefined;
-      (entity as any).addComponent(plant);
+      // This deliberately corrupts the plant component for testing error handling
+      type MutablePlantComponent = PlantComponent & { _position: { x: number; y: number } | undefined };
+      (plant as MutablePlantComponent)._position = undefined;
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -160,7 +162,7 @@ describe('PlantSystem', () => {
     });
 
     it('should accumulate time and update hourly', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -170,7 +172,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -182,7 +184,7 @@ describe('PlantSystem', () => {
     });
 
     it('should decrease hydration over time', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -192,7 +194,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         planted: true, // Ensure plant is always simulated (not filtered by visibility)
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const initialHydration = plant.hydration;
       const entities = world.query().with(ComponentType.Plant).executeEntities();
@@ -216,7 +218,7 @@ describe('PlantSystem', () => {
 
   describe('error handling - validation', () => {
     it('should skip plant missing health field without throwing', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -226,8 +228,10 @@ describe('PlantSystem', () => {
       });
 
       // Remove health to trigger error - must set private _health to bypass setter clamping
-      (plant as any)._health = undefined;
-      (entity as any).addComponent(plant);
+      // This deliberately corrupts the plant component for testing error handling
+      type MutablePlantComponent = PlantComponent & { _health: number | undefined };
+      (plant as MutablePlantComponent)._health = undefined;
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -236,7 +240,7 @@ describe('PlantSystem', () => {
     });
 
     it('should skip plant missing hydration field without throwing', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -246,8 +250,10 @@ describe('PlantSystem', () => {
       });
 
       // Remove hydration to trigger error - must set private _hydration to bypass setter clamping
-      (plant as any)._hydration = undefined;
-      (entity as any).addComponent(plant);
+      // This deliberately corrupts the plant component for testing error handling
+      type MutablePlantComponent = PlantComponent & { _hydration: number | undefined };
+      (plant as MutablePlantComponent)._hydration = undefined;
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -256,7 +262,7 @@ describe('PlantSystem', () => {
     });
 
     it('should skip plant missing nutrition field without throwing', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -266,8 +272,10 @@ describe('PlantSystem', () => {
       });
 
       // Remove nutrition to trigger error - must set private _nutrition to bypass setter clamping
-      (plant as any)._nutrition = undefined;
-      (entity as any).addComponent(plant);
+      // This deliberately corrupts the plant component for testing error handling
+      type MutablePlantComponent = PlantComponent & { _nutrition: number | undefined };
+      (plant as MutablePlantComponent)._nutrition = undefined;
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -278,7 +286,7 @@ describe('PlantSystem', () => {
 
   describe('plant health and damage', () => {
     it('should damage plant when hydration is low', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -288,7 +296,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         planted: true, // Ensure plant is always simulated
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -306,7 +314,7 @@ describe('PlantSystem', () => {
     });
 
     it('should damage plant when nutrition is low', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -316,7 +324,7 @@ describe('PlantSystem', () => {
         nutrition: 15, // Below 30 threshold
         planted: true, // Ensure plant is always simulated
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -335,7 +343,7 @@ describe('PlantSystem', () => {
       const diedHandler = vi.fn();
       eventBus.subscribe('plant:died', diedHandler);
 
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -344,7 +352,7 @@ describe('PlantSystem', () => {
         health: 1,
         nutrition: 0,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -363,7 +371,7 @@ describe('PlantSystem', () => {
     // TODO: This test fails with batched updates. The plant doesn't reach death state.
     // This may require investigation into how death state is triggered with StateMutatorSystem.
     it.skip('should set stage to dead when health reaches zero', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -373,7 +381,7 @@ describe('PlantSystem', () => {
         nutrition: 0,
         planted: true, // Ensure plant is always simulated
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -392,7 +400,7 @@ describe('PlantSystem', () => {
     });
 
     it('should clamp health between 0 and 100 when using setter', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -400,7 +408,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       // Setter should clamp high values to 100
       plant.health = 150;
@@ -414,7 +422,7 @@ describe('PlantSystem', () => {
 
   describe('weather effects', () => {
     it('should increase hydration when rain event occurs', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -425,7 +433,7 @@ describe('PlantSystem', () => {
         isIndoors: false,
         planted: true, // Ensure plant is always simulated
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -449,7 +457,7 @@ describe('PlantSystem', () => {
     });
 
     it('should not increase hydration for indoor plants during rain', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -459,7 +467,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         isIndoors: true,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       // Emit rain event
       eventBus.emit({
@@ -476,7 +484,7 @@ describe('PlantSystem', () => {
     });
 
     it('should damage plant during frost', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -494,7 +502,7 @@ describe('PlantSystem', () => {
           mutations: [],
         },
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const initialHealth = plant.health;
 
@@ -517,7 +525,7 @@ describe('PlantSystem', () => {
     // TODO: This test fails with batched updates. Stage progress doesn't advance.
     // This may require investigation into how stage progression works with StateMutatorSystem timing.
     it.skip('should advance stageProgress over time', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -528,7 +536,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         planted: true, // Ensure plant is always simulated
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -549,7 +557,7 @@ describe('PlantSystem', () => {
       const stageHandler = vi.fn();
       eventBus.subscribe('plant:stageChanged', stageHandler);
 
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -559,7 +567,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -575,7 +583,7 @@ describe('PlantSystem', () => {
     });
 
     it('should reset stageProgress after transition', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -585,7 +593,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
       // Use deltaTime=30 to trigger at least 1 game hour (30/600*24 = 1.2 hours)
@@ -631,7 +639,7 @@ describe('PlantSystem', () => {
 
   describe('fruit regeneration at midnight', () => {
     it('should regenerate fruit for mature plants when day changes', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -641,7 +649,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         fruitCount: 5,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const initialFruit = plant.fruitCount;
 
@@ -660,7 +668,7 @@ describe('PlantSystem', () => {
     });
 
     it('should not regenerate fruit for unhealthy plants', () => {
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -670,7 +678,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         fruitCount: 5,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const initialFruit = plant.fruitCount;
 
@@ -692,7 +700,7 @@ describe('PlantSystem', () => {
       const fruitHandler = vi.fn();
       eventBus.subscribe('plant:fruitRegenerated', fruitHandler);
 
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'wheat',
         position: { x: 10, y: 10 },
@@ -702,7 +710,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         fruitCount: 0, // Start with 0 fruit so regeneration triggers
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       // Emit day changed event
       eventBus.emit({
@@ -762,7 +770,7 @@ describe('PlantSystem', () => {
       const lookupSpy = vi.fn().mockReturnValue(mockSpecies);
       system.setSpeciesLookup(lookupSpy);
 
-      const entity = world.createEntity();
+      const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
         speciesId: 'test-plant',
         position: { x: 10, y: 10 },
@@ -770,7 +778,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      (entity as any).addComponent(plant);
+      entity.addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
       system.update(world, entities, 1.0);

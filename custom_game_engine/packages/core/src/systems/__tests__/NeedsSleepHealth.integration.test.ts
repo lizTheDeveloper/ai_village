@@ -58,12 +58,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
   it('should sleep recover energy in NeedsSystem', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true;
-    (circadian as any).sleepDrive = 100;
-    (circadian as any).sleepQuality = 0.5; // Ground sleep
+    const circadian: Partial<ReturnType<typeof createCircadianComponent>> = createCircadianComponent();
+    circadian.isSleeping = true;
+    circadian.sleepDrive = 100;
+    circadian.sleepQuality = 0.5; // Ground sleep
 
-    agent.addComponent(circadian);
+    agent.addComponent(circadian as ReturnType<typeof createCircadianComponent>);
     agent.addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 0.2,
@@ -82,7 +82,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     // Only pass entities with circadian component
     const entities = harness.world.query().with(ComponentType.Circadian).executeEntities();
 
-    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs);
+    if (!initialNeeds) throw new Error('Missing needs component');
     const initialEnergy = initialNeeds.energy;
 
     // Sleep for several hours
@@ -92,7 +93,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       stateMutator.update(harness.world, entities, 2.0); // Apply energy deltas
     }
 
-    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs);
+    if (!finalNeeds) throw new Error('Missing needs component');
 
     // Energy should have increased during sleep
     expect(finalNeeds.energy).toBeGreaterThan(initialEnergy);
@@ -101,12 +103,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
   it('should hunger not decay during sleep', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true;
-    (circadian as any).sleepDrive = 100;
-    (circadian as any).sleepQuality = 0.5;
+    const circadian: Partial<ReturnType<typeof createCircadianComponent>> = createCircadianComponent();
+    circadian.isSleeping = true;
+    circadian.sleepDrive = 100;
+    circadian.sleepQuality = 0.5;
 
-    agent.addComponent(circadian);
+    agent.addComponent(circadian as ReturnType<typeof createCircadianComponent>);
     agent.addComponent(new NeedsComponent({
     hunger: 0.8,
     energy: 0.5,
@@ -125,7 +127,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     // Only pass entities with 'needs' component to NeedsSystem
     const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
 
-    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs);
+    if (!initialNeeds) throw new Error('Missing needs component');
     const initialHunger = initialNeeds.hunger;
 
     // Update needs system while sleeping
@@ -136,7 +139,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       stateMutator.update(harness.world, entitiesWithNeeds, 60);
     }
 
-    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs);
+    if (!finalNeeds) throw new Error('Missing needs component');
 
     // Hunger should not have decayed significantly during sleep (0-1 scale)
     expect(finalNeeds.hunger).toBeGreaterThanOrEqual(initialHunger - 0.05); // Allow small decay
@@ -187,7 +191,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs);
+    if (!initialNeeds) throw new Error('Missing needs component');
     const initialHealth = initialNeeds.health;
 
     // Expose agent to cold for several game minutes
@@ -199,7 +204,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       stateMutator.update(harness.world, entities, 60); // Apply deltas
     }
 
-    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs);
+    if (!finalNeeds) throw new Error('Missing needs component');
 
     // Health should have decreased due to dangerous temperature
     // HEALTH_DAMAGE_RATE = 0.5/sec → -30/game minute
@@ -212,17 +218,17 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 20, y: 20 });
 
-    const circadian1 = createCircadianComponent();
-    (circadian1 as any).isSleeping = true;
-    (circadian1 as any).sleepDrive = 100;
-    (circadian1 as any).sleepQuality = 1.0; // Perfect sleep (bed)
+    const circadian1: Partial<ReturnType<typeof createCircadianComponent>> = createCircadianComponent();
+    circadian1.isSleeping = true;
+    circadian1.sleepDrive = 100;
+    circadian1.sleepQuality = 1.0; // Perfect sleep (bed)
 
-    const circadian2 = createCircadianComponent();
-    (circadian2 as any).isSleeping = true;
-    (circadian2 as any).sleepDrive = 100;
-    (circadian2 as any).sleepQuality = 0.3; // Poor sleep (ground)
+    const circadian2: Partial<ReturnType<typeof createCircadianComponent>> = createCircadianComponent();
+    circadian2.isSleeping = true;
+    circadian2.sleepDrive = 100;
+    circadian2.sleepQuality = 0.3; // Poor sleep (ground)
 
-    agent1.addComponent(circadian1);
+    agent1.addComponent(circadian1 as ReturnType<typeof createCircadianComponent>);
     agent1.addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 0.85, // Start near full to measure difference before cap
@@ -231,7 +237,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   }));
 
-    agent2.addComponent(circadian2);
+    agent2.addComponent(circadian2 as ReturnType<typeof createCircadianComponent>);
     agent2.addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 0.85, // Start near full
@@ -260,8 +266,9 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     harness.world.setTick(harness.world.tick + 10);
     stateMutator.update(harness.world, entities, 0.01); // Apply small delta
 
-    const needs1 = agent1.getComponent(ComponentType.Needs) as any;
-    const needs2 = agent2.getComponent(ComponentType.Needs) as any;
+    const needs1 = agent1.getComponent(ComponentType.Needs);
+    const needs2 = agent2.getComponent(ComponentType.Needs);
+    if (!needs1 || !needs2) throw new Error('Missing needs components');
 
     // Agent with better sleep quality should have recovered more energy
     // Both started at 0.85, quality difference should show even in small time
@@ -271,12 +278,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
   it('should full energy recovery trigger wake condition', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    const circadian = createCircadianComponent();
-    (circadian as any).isSleeping = true;
-    (circadian as any).sleepDrive = 50; // Moderate sleep drive
-    (circadian as any).sleepQuality = 1.0; // Good sleep
+    const circadian: Partial<ReturnType<typeof createCircadianComponent>> = createCircadianComponent();
+    circadian.isSleeping = true;
+    circadian.sleepDrive = 50; // Moderate sleep drive
+    circadian.sleepQuality = 1.0; // Good sleep
 
-    agent.addComponent(circadian);
+    agent.addComponent(circadian as ReturnType<typeof createCircadianComponent>);
     agent.addComponent(new NeedsComponent({
     hunger: 1.0,
     energy: 0.9,
@@ -302,8 +309,10 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       stateMutator.update(harness.world, entitiesWithCircadian, 2.0); // Apply energy deltas
     }
 
-    const finalCircadian = agent.getComponent(ComponentType.Circadian) as any;
-    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const finalCircadian = agent.getComponent(ComponentType.Circadian);
+    if (!finalCircadian) throw new Error('Missing circadian component');
+    const finalNeeds = agent.getComponent(ComponentType.Needs);
+    if (!finalNeeds) throw new Error('Missing needs component');
 
     // Agent should have recovered energy (0-1 scale)
     expect(finalNeeds.energy).toBeGreaterThanOrEqual(0.90);
@@ -356,7 +365,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     const entitiesWithTemperature = harness.world.query().with(ComponentType.Temperature).executeEntities();
     const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
 
-    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs);
+    if (!initialNeeds) throw new Error('Missing needs component');
     const initialEnergy = initialNeeds.energy;
 
     // Update both systems over several game minutes
@@ -367,7 +377,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       stateMutator.update(harness.world, entitiesWithNeeds, 60); // Apply deltas
     }
 
-    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs);
+    if (!finalNeeds) throw new Error('Missing needs component');
 
     // Energy/needs should decay faster in extreme temperatures
     // (Exact values depend on implementation)

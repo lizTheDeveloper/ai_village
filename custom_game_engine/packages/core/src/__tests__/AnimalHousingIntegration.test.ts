@@ -37,13 +37,13 @@ describe('Animal Housing - Integration Tests', () => {
       const stableEntity = world.createEntity();
       const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       stable.insulation = 0.7; // 70% insulation
       stable.baseTemperature = 10; // +10°C
       stable.interior = true;
       stable.interiorRadius = 3;
-      stableEntity.addComponent(stable);
+      stableEntity.addComponent(stable as BuildingComponent);
 
       // Create horse inside stable
       const horseEntity = world.createEntity();
@@ -109,13 +109,13 @@ describe('Animal Housing - Integration Tests', () => {
       const stableEntity = world.createEntity();
       const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       stable.insulation = 0.8;
       stable.baseTemperature = 12;
       stable.interior = true;
       stable.interiorRadius = 3;
-      stableEntity.addComponent(stable);
+      stableEntity.addComponent(stable as BuildingComponent);
 
       const housedHorseEntity = world.createEntity();
       const housedPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
@@ -208,12 +208,12 @@ describe('Animal Housing - Integration Tests', () => {
       const coopEntity = world.createEntity();
       const coopPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 30, y: 30 };
       coopEntity.addComponent(coopPos);
-      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop.isComplete = true;
       coop.weatherProtection = 0.9; // 90% protection
       coop.interior = true;
       coop.interiorRadius = 2;
-      coopEntity.addComponent(coop);
+      coopEntity.addComponent(coop as BuildingComponent);
 
       // Create chicken inside coop
       const chickenEntity = world.createEntity();
@@ -264,13 +264,13 @@ describe('Animal Housing - Integration Tests', () => {
       const barnEntity = world.createEntity();
       const barnPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       barnEntity.addComponent(barnPos);
-      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
+      const barn: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Barn, 3);
       barn.isComplete = true;
       barn.insulation = 0.8;
       barn.baseTemperature = 15;
       barn.interior = true;
       barn.interiorRadius = 3; // 3 tiles radius
-      barnEntity.addComponent(barn);
+      barnEntity.addComponent(barn as BuildingComponent);
 
       // Create cow FAR from barn (outside radius)
       const cowEntity = world.createEntity();
@@ -320,13 +320,13 @@ describe('Animal Housing - Integration Tests', () => {
     it('should reduce housed animal stress from cleanliness penalty', () => {
       // Create dirty kennel
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
-      kennelEntity.addComponent(kennel);
+      kennel.cleanliness = 25; // Very dirty
+      kennel.currentOccupants = 6;
+      kennelEntity.addComponent(kennel as BuildingComponent);
 
-      const building = kennelEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 25; // Very dirty
-      (building as any).currentOccupants = 6;
+      const building = kennelEntity.getComponent(ComponentType.Building);
 
       // Create dog in kennel
       const dogEntity = world.createEntity();
@@ -367,13 +367,13 @@ describe('Animal Housing - Integration Tests', () => {
     it('should improve animal mood when housing is cleaned', () => {
       // Create dirty chicken coop
       const coopEntity = world.createEntity();
-      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop.isComplete = true;
-      coopEntity.addComponent(coop);
+      coop.cleanliness = 20; // Very dirty
+      coop.currentOccupants = 8;
+      coopEntity.addComponent(coop as BuildingComponent);
 
-      const building = coopEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 20; // Very dirty
-      (building as any).currentOccupants = 8;
+      const building = coopEntity.getComponent(ComponentType.Building);
 
       // Create chicken
       const chickenEntity = world.createEntity();
@@ -403,7 +403,10 @@ describe('Animal Housing - Integration Tests', () => {
       const moodBefore = chicken.mood;
 
       // Clean the coop
-      (building as any).cleanliness = 100;
+      if (building) {
+        const updatedCoop: Partial<BuildingComponent> = { ...building, cleanliness: 100 };
+        coopEntity.updateComponent(ComponentType.Building, () => updatedCoop as BuildingComponent);
+      }
 
       // Stress penalty removed, stress decays, mood should improve
       animalSystem.update(world, [chickenEntity], 1.0);
@@ -415,12 +418,12 @@ describe('Animal Housing - Integration Tests', () => {
     it('should handle animal lifecycle events while housed', () => {
       // Create stable
       const stableEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
-      stableEntity.addComponent(stable);
+      stable.currentOccupants = 1;
+      stableEntity.addComponent(stable as BuildingComponent);
 
-      const building = stableEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).currentOccupants = 1;
+      const building = stableEntity.getComponent(ComponentType.Building);
 
       // Create very old horse near death
       const horseEntity = world.createEntity();
@@ -459,9 +462,9 @@ describe('Animal Housing - Integration Tests', () => {
   describe('Event-Driven Integration', () => {
     it('should emit animal_housed event when animal assigned to housing', () => {
       const coopEntity = world.createEntity();
-      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop.isComplete = true;
-      coopEntity.addComponent(coop);
+      coopEntity.addComponent(coop as BuildingComponent);
 
       const chickenEntity = world.createEntity();
       const chickenData = {
@@ -497,9 +500,9 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should emit animal_unhoused event when animal removed from housing', () => {
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
-      kennelEntity.addComponent(kennel);
+      kennelEntity.addComponent(kennel as BuildingComponent);
 
       const dogEntity = world.createEntity();
       const dogData = {
@@ -536,13 +539,13 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should listen to new_day event and decay cleanliness', () => {
       const barnEntity = world.createEntity();
-      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
+      const barn: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Barn, 3);
       barn.isComplete = true;
-      barnEntity.addComponent(barn);
+      barn.cleanliness = 100;
+      barn.currentOccupants = 12; // Full
+      barnEntity.addComponent(barn as BuildingComponent);
 
-      const building = barnEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 100;
-      (building as any).currentOccupants = 12; // Full
+      const building = barnEntity.getComponent(ComponentType.Building);
 
       // Emit new_day event
       eventBus.emit({
@@ -559,9 +562,9 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should listen to tick event for system updates', () => {
       const stableEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
-      stableEntity.addComponent(stable);
+      stableEntity.addComponent(stable as BuildingComponent);
 
       // Emit tick event
       eventBus.emit({
@@ -583,18 +586,18 @@ describe('Animal Housing - Integration Tests', () => {
       const stableEntity = world.createEntity();
       const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       stable.insulation = 0.8;
       stable.baseTemperature = 12;
       stable.weatherProtection = 0.9;
       stable.interior = true;
       stable.interiorRadius = 3;
-      stableEntity.addComponent(stable);
+      stable.cleanliness = 60; // Moderately clean
+      stable.currentOccupants = 2;
+      stableEntity.addComponent(stable as BuildingComponent);
 
-      const building = stableEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 60; // Moderately clean
-      (building as any).currentOccupants = 2;
+      const building = stableEntity.getComponent(ComponentType.Building);
 
       // Create horse
       const horseEntity = world.createEntity();
@@ -657,13 +660,13 @@ describe('Animal Housing - Integration Tests', () => {
   describe('Capacity and Assignment Edge Cases', () => {
     it('should reject assignment when housing is at capacity', () => {
       const coopEntity = world.createEntity();
-      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const coop: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       coop.isComplete = true;
-      coopEntity.addComponent(coop);
+      coop.animalCapacity = 8;
+      coop.currentOccupants = 8; // Full
+      coopEntity.addComponent(coop as BuildingComponent);
 
-      const building = coopEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).animalCapacity = 8;
-      (building as any).currentOccupants = 8; // Full
+      const building = coopEntity.getComponent(ComponentType.Building);
 
       const chickenEntity = world.createEntity();
       const chickenData = {
@@ -694,14 +697,15 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should allow reassignment from one housing to another', () => {
       const coop1 = world.createEntity();
-      const building1 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const building1: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       building1.isComplete = true;
-      coop1.addComponent(building1);
+      building1.currentOccupants = 1;
+      coop1.addComponent(building1 as BuildingComponent);
 
       const coop2 = world.createEntity();
-      const building2 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const building2: Partial<BuildingComponent> = createBuildingComponent(BuildingType.ChickenCoop, 2);
       building2.isComplete = true;
-      coop2.addComponent(building2);
+      coop2.addComponent(building2 as BuildingComponent);
 
       const chickenEntity = world.createEntity();
       const chickenData = {
@@ -728,7 +732,6 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Assign to coop1
       chicken.housingBuildingId = coop1.id;
-      (building1 as any).currentOccupants = 1;
 
       // Reassign to coop2
       // Should decrease coop1 occupants, increase coop2 occupants

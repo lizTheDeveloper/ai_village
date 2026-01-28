@@ -137,9 +137,23 @@ export class WorldSerializer {
       const chunkManager = world.getChunkManager();
       if (chunkManager) {
         // Dynamic import to break circular dependency: core -> world -> reproduction -> core
-        // Type assertion: We trust the serialized terrain data structure matches what chunkSerializer expects
         const { chunkSerializer } = await import('@ai-village/world');
-        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain as any, chunkManager as any);
+
+        // Validate terrain data structure
+        if (typeof snapshot.worldState.terrain !== 'object' || snapshot.worldState.terrain === null) {
+          throw new Error('Invalid terrain data: must be an object');
+        }
+
+        // Import with proper types
+        type ChunkSerializer = {
+          deserializeChunks(data: unknown, chunkManager: unknown): Promise<void>;
+        };
+        type ChunkManager = unknown;
+
+        await (chunkSerializer as ChunkSerializer).deserializeChunks(
+          snapshot.worldState.terrain,
+          chunkManager as ChunkManager
+        );
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -297,10 +311,17 @@ export class WorldSerializer {
     const chunkManager = world.getChunkManager();
 
     // Dynamic import to break circular dependency: core -> world -> reproduction -> core
-    let terrain = null;
+    let terrain: import('./types.js').TerrainSnapshot | null = null;
     if (chunkManager) {
       const { chunkSerializer } = await import('@ai-village/world');
-      terrain = chunkSerializer.serializeChunks(chunkManager as any);
+
+      // Type for chunk serializer
+      type ChunkSerializer = {
+        serializeChunks(chunkManager: unknown): import('./types.js').TerrainSnapshot;
+      };
+      type ChunkManager = unknown;
+
+      terrain = (chunkSerializer as ChunkSerializer).serializeChunks(chunkManager as ChunkManager);
     }
 
     // Serialize zones using ZoneManager

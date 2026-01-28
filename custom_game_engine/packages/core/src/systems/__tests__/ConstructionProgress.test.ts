@@ -53,8 +53,8 @@ describe('Construction Progress System - Phase 7', () => {
     it('should advance construction progress based on time elapsed', () => {
       // Create a building under construction
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
+      entity.addComponent(createPositionComponent(0, 0));
 
       // Advance time by 1 second
       buildingSystem.update(world, [entity], 1);
@@ -91,8 +91,8 @@ describe('Construction Progress System - Phase 7', () => {
     it('should clamp progress to 100% maximum', () => {
       // Create building at 99%
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      entity.addComponent(createPositionComponent(0, 0));
 
       // Advance by a large amount of time
       buildingSystem.update(world, [entity], 1000);
@@ -107,8 +107,8 @@ describe('Construction Progress System - Phase 7', () => {
     it('should skip completed buildings', () => {
       // Create completed building
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
+      entity.addComponent(createPositionComponent(0, 0));
 
       // Advance time
       buildingSystem.update(world, [entity], 10);
@@ -148,8 +148,8 @@ describe('Construction Progress System - Phase 7', () => {
   describe('Construction Completion', () => {
     it('should mark building as complete when progress reaches 100%', () => {
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      entity.addComponent(createPositionComponent(0, 0));
 
       // Advance enough to complete
       buildingSystem.update(world, [entity], 10);
@@ -165,8 +165,8 @@ describe('Construction Progress System - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      (entity as any).addComponent(createPositionComponent(16, 32));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      entity.addComponent(createPositionComponent(16, 32));
 
       // Complete construction
       buildingSystem.update(world, [entity], 10);
@@ -188,8 +188,8 @@ describe('Construction Progress System - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Campfire, 1, 99));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 99));
+      entity.addComponent(createPositionComponent(0, 0));
 
       buildingSystem.update(world, [entity], 10);
       eventBus.flush();
@@ -205,8 +205,8 @@ describe('Construction Progress System - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      entity.addComponent(createPositionComponent(0, 0));
 
       // First update completes construction
       buildingSystem.update(world, [entity], 10);
@@ -250,7 +250,7 @@ describe('Construction Progress System - Phase 7', () => {
   describe('Error Handling per CLAUDE.md', () => {
     it('should throw when entity missing BuildingComponent', () => {
       const entity = createTestEntity();
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createPositionComponent(0, 0));
       // Missing building component
 
       expect(() => {
@@ -260,7 +260,7 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should throw when entity missing PositionComponent', () => {
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
       // Missing position component
 
       expect(() => {
@@ -271,11 +271,11 @@ describe('Construction Progress System - Phase 7', () => {
     it('should throw when building type is unknown', () => {
       const entity = createTestEntity();
       // Create building with invalid type (bypass type checking for test)
-      const invalidBuilding = createBuildingComponent(BuildingType.Tent, 1, 0);
-      (invalidBuilding as any).buildingType = 'invalid-building-type';
+      const invalidBuilding: Partial<BuildingComponent> = createBuildingComponent(BuildingType.Tent, 1, 0);
+      invalidBuilding.buildingType = 'invalid-building-type' as BuildingType;
 
-      (entity as any).addComponent(invalidBuilding);
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(invalidBuilding as BuildingComponent);
+      entity.addComponent(createPositionComponent(0, 0));
 
       expect(() => {
         buildingSystem.update(world, [entity], 1);
@@ -286,8 +286,8 @@ describe('Construction Progress System - Phase 7', () => {
   describe('Edge Cases', () => {
     it('should handle construction at exactly 100% progress', () => {
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
+      entity.addComponent(createPositionComponent(0, 0));
 
       const building = getBuildingComponent(entity);
 
@@ -305,8 +305,8 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should handle progress from 99% to 101% (clamped to 100%)', () => {
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      entity.addComponent(createPositionComponent(0, 0));
 
       // Large deltaTime that would push past 100%
       buildingSystem.update(world, [entity], 1000);
@@ -318,8 +318,8 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should handle zero deltaTime', () => {
       const entity = createTestEntity();
-      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 50));
-      (entity as any).addComponent(createPositionComponent(0, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 50));
+      entity.addComponent(createPositionComponent(0, 0));
 
       buildingSystem.update(world, [entity], 0);
 
@@ -353,8 +353,8 @@ describe('Construction Progress System - Phase 7', () => {
 
       for (const [buildingType, expectedTime] of Object.entries(buildTimes)) {
         const entity = createTestEntity();
-        (entity as any).addComponent(createBuildingComponent(buildingType as any, 1, 0));
-        (entity as any).addComponent(createPositionComponent(0, 0));
+        entity.addComponent(createBuildingComponent(buildingType as BuildingType, 1, 0));
+        entity.addComponent(createPositionComponent(0, 0));
 
         // Advance 1 second
         buildingSystem.update(world, [entity], 1);

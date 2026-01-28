@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:6758d01",
+  "name": "Rhea IX",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489034854",
+  "createdAt": 1769489039182,
+  "lastAccessedAt": 1769489039182,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489034854",
+    "type": "magical"
+  }
+}

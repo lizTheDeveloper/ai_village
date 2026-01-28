@@ -25,6 +25,9 @@ import { diagnosticsHarness } from '../diagnostics/DiagnosticsHarness.js';
 import { SpatialGrid } from './SpatialGrid.js';
 import { QueryCache } from './QueryCache.js';
 import { PositionSoA, VelocitySoA } from './SoAStorage.js';
+import { DirtyTracker } from './DirtyTracker.js';
+import { ChunkTickScheduler } from './ChunkTickScheduler.js';
+import { UpdatePropagation } from './UpdatePropagation.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createPhysicsComponent } from '../components/PhysicsComponent.js';
 
@@ -418,6 +421,18 @@ export interface World {
    * - Memory overhead: ~10-50 KB (100 entries)
    */
   readonly queryCache: QueryCache;
+
+  /**
+   * Minecraft-style dirty tracker for incremental change detection.
+   * Tracks which entities/components changed this tick.
+   *
+   * Performance:
+   * - getDirtyByComponent: O(1) lookup for changed entities
+   * - Enables incremental sync instead of full iteration
+   *
+   * Used by SoASyncSystem to only update changed entities.
+   */
+  readonly dirtyTracker: DirtyTracker;
 
   /**
    * Structure-of-Arrays storage for Position components.
@@ -890,6 +905,11 @@ export class WorldImpl implements WorldMutator {
   private _positionSoA = new PositionSoA(1000);
   private _velocitySoA = new VelocitySoA(1000);
 
+  // Minecraft-style optimization systems
+  private _dirtyTracker = new DirtyTracker();
+  private _chunkTickScheduler = new ChunkTickScheduler();
+  private _updatePropagation = new UpdatePropagation();
+
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
@@ -952,6 +972,21 @@ export class WorldImpl implements WorldMutator {
 
   get spatialGrid(): SpatialGrid {
     return this._spatialGrid;
+  }
+
+  /** Minecraft-style dirty tracker for change detection */
+  get dirtyTracker(): DirtyTracker {
+    return this._dirtyTracker;
+  }
+
+  /** Minecraft-style chunk tick scheduler for budgeted updates */
+  get chunkTickScheduler(): ChunkTickScheduler {
+    return this._chunkTickScheduler;
+  }
+
+  /** Minecraft-style update propagation (redstone-like signals) */
+  get updatePropagation(): UpdatePropagation {
+    return this._updatePropagation;
   }
 
   get queryCache(): QueryCache {
@@ -1078,12 +1113,12 @@ export class WorldImpl implements WorldMutator {
     // Add test helper methods to entity
     // Type-safe: We're adding methods to EntityImpl, which is the concrete type
     const entityImpl = entity as EntityImpl;
-    const testEntity = entity as unknown as TestEntity;
 
     // Store original addComponent from EntityImpl
     const originalAddComponent = entityImpl.addComponent.bind(entity);
 
-    testEntity.addComponent = (ComponentClassOrInstance: ComponentClassOrString, data?: Record<string, unknown>): Component => {
+    // Create the enhanced addComponent function
+    const enhancedAddComponent = (ComponentClassOrInstance: ComponentClassOrString, data?: Record<string, unknown>): Component => {
       // If it's already a component instance, use it directly
       if (typeof ComponentClassOrInstance === 'object' && ComponentClassOrInstance !== null && 'type' in ComponentClassOrInstance && 'version' in ComponentClassOrInstance) {
         // Type guard: checked that it has 'type' and 'version' properties, so it's a Component
@@ -1114,9 +1149,9 @@ export class WorldImpl implements WorldMutator {
       }
     };
 
-    // Add convenience getComponent that works with classes
+    // Create the enhanced getComponent function
     const originalGetComponent = entity.getComponent.bind(entity);
-    testEntity.getComponent = <T extends Component = Component>(ComponentClass: ComponentClassOrString): T | undefined => {
+    const enhancedGetComponent = <T extends Component = Component>(ComponentClass: ComponentClassOrString): T | undefined => {
       // If it's a string, try as-is first, then try snake_case conversion
       if (typeof ComponentClass === 'string') {
         // Try the string as-is first (for lowercase_with_underscores like 'steering', 'position')
@@ -1148,6 +1183,20 @@ export class WorldImpl implements WorldMutator {
       return originalGetComponent<T>(String(ComponentClass));
     };
 
+    // Use Object.defineProperty to bypass TypeScript's signature checking
+    // This is safe because we're augmenting the object with compatible behavior
+    Object.defineProperty(entityImpl, 'addComponent', {
+      value: enhancedAddComponent,
+      writable: true,
+      configurable: true,
+    });
+
+    Object.defineProperty(entityImpl, 'getComponent', {
+      value: enhancedGetComponent,
+      writable: true,
+      configurable: true,
+    });
+
     this._entities.set(id, entity);
     this._archetypeVersion++; // Invalidate query cache
 
@@ -1158,7 +1207,8 @@ export class WorldImpl implements WorldMutator {
       data: { entityId: id, archetype: archetype || null },
     });
 
-    return testEntity;
+    // Return the entity with augmented methods (type-safe cast)
+    return entity as Entity;
   }
 
   /**
@@ -1247,6 +1297,9 @@ export class WorldImpl implements WorldMutator {
       }
     }
 
+    // Mark entity as dirty for change tracking
+    this._dirtyTracker.markDirty(entityId, component.type, 'add');
+
     this._eventBus.emit({
       type: 'entity:component:added',
       source: 'world',
@@ -1266,6 +1319,9 @@ export class WorldImpl implements WorldMutator {
 
     const entityImpl = entity as EntityImpl;
     entityImpl.updateComponent(componentType, updater);
+
+    // Mark entity as dirty for change tracking
+    this._dirtyTracker.markDirty(entityId, componentType, 'update');
   }
 
   removeComponent(entityId: EntityId, componentType: ComponentType): void {
@@ -1299,6 +1355,9 @@ export class WorldImpl implements WorldMutator {
         this._componentTypeCounts.set(componentType, currentCount - 1);
       }
     }
+
+    // Mark entity as dirty for change tracking
+    this._dirtyTracker.markDirty(entityId, componentType, 'remove');
 
     this._eventBus.emit({
       type: 'entity:component:removed',

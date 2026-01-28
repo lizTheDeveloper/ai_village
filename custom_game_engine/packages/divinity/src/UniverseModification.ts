@@ -606,12 +606,12 @@ function applyChangesToParadigm(
       } else if (intent.operation === 'remove' && sourceChanges.sourceId) {
         modified = {
           ...modified,
-          sources: modified.sources.filter(s => s.id !== sourceChanges.sourceId),
+          sources: modified.sources.filter((s: MagicSource) => s.id !== sourceChanges.sourceId),
         };
       } else if (intent.operation === 'modify' && sourceChanges.sourceId && sourceChanges.changes) {
         modified = {
           ...modified,
-          sources: modified.sources.map(s =>
+          sources: modified.sources.map((s: MagicSource) =>
             s.id === sourceChanges.sourceId ? { ...s, ...sourceChanges.changes } : s
           ),
         };
@@ -629,7 +629,7 @@ function applyChangesToParadigm(
       } else if (intent.operation === 'remove' && costChanges.costType) {
         modified = {
           ...modified,
-          costs: modified.costs.filter(c => c.type !== costChanges.costType),
+          costs: modified.costs.filter((c: MagicCost) => c.type !== costChanges.costType),
         };
       }
       break;
@@ -645,7 +645,7 @@ function applyChangesToParadigm(
       } else if (intent.operation === 'remove' && channelChanges.channelType) {
         modified = {
           ...modified,
-          channels: modified.channels.filter(c => c.type !== channelChanges.channelType),
+          channels: modified.channels.filter((c: MagicChannel) => c.type !== channelChanges.channelType),
         };
       }
       break;
@@ -661,12 +661,12 @@ function applyChangesToParadigm(
       } else if (intent.operation === 'remove' && lawChanges.lawId) {
         modified = {
           ...modified,
-          laws: modified.laws.filter(l => l.id !== lawChanges.lawId),
+          laws: modified.laws.filter((l: MagicLaw) => l.id !== lawChanges.lawId),
         };
       } else if (intent.operation === 'modify' && lawChanges.lawId && lawChanges.changes) {
         modified = {
           ...modified,
-          laws: modified.laws.map(l =>
+          laws: modified.laws.map((l: MagicLaw) =>
             l.id === lawChanges.lawId ? { ...l, ...lawChanges.changes } : l
           ),
         };
@@ -706,7 +706,7 @@ function applyChangesToParadigm(
       } else if (intent.operation === 'remove' && techChanges.technique) {
         modified = {
           ...modified,
-          availableTechniques: modified.availableTechniques.filter(t => t !== techChanges.technique),
+          availableTechniques: modified.availableTechniques.filter((t: MagicTechnique) => t !== techChanges.technique),
         };
       }
       break;
@@ -722,7 +722,7 @@ function applyChangesToParadigm(
       } else if (intent.operation === 'remove' && formChanges.form) {
         modified = {
           ...modified,
-          availableForms: modified.availableForms.filter(f => f !== formChanges.form),
+          availableForms: modified.availableForms.filter((f: MagicForm) => f !== formChanges.form),
         };
       }
       break;

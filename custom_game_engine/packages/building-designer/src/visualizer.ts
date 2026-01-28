@@ -188,8 +188,8 @@ export function visualizePathfinding(building: VoxelBuildingDefinition): string 
 
   // Mark entrances with 'E'
   for (const entrance of result.pathfinding.entrances) {
-    if (grid[entrance.y] && grid[entrance.y][entrance.x]) {
-      grid[entrance.y][entrance.x] = 'E';
+    if (grid[entrance.y] && grid[entrance.y]![entrance.x]) {
+      grid[entrance.y]![entrance.x] = 'E';
     }
   }
 
@@ -197,7 +197,7 @@ export function visualizePathfinding(building: VoxelBuildingDefinition): string 
   for (const deadEnd of result.pathfinding.deadEnds) {
     const tile = layout[deadEnd.y]?.[deadEnd.x];
     if (tile === '.' || tile === 'D') {
-      grid[deadEnd.y][deadEnd.x] = 'x';
+      grid[deadEnd.y]![deadEnd.x] = 'x';
     }
   }
 
@@ -216,7 +216,7 @@ export function visualizePathfinding(building: VoxelBuildingDefinition): string 
 
   for (let y = 0; y < height; y++) {
     const rowNum = y.toString().padStart(2, ' ');
-    lines.push(`${rowNum} │${grid[y].join('')}│`);
+    lines.push(`${rowNum} │${grid[y]!.join('')}│`);
   }
 
   lines.push('   └' + '─'.repeat(width) + '┘');
@@ -224,7 +224,7 @@ export function visualizePathfinding(building: VoxelBuildingDefinition): string 
 
   // Explain the path
   if (result.pathfinding.entrances.length > 0) {
-    const entrance = result.pathfinding.entrances[0];
+    const entrance = result.pathfinding.entrances[0]!;
     lines.push(`Agent enters at position (${entrance.x}, ${entrance.y})`);
     lines.push(`Can reach ${result.rooms.reduce((sum, r) => sum + r.area, 0)} walkable tiles`);
   } else {
@@ -357,8 +357,8 @@ export function visualizeFloor(
 function findTiles(layout: string[], symbols: string[]): Array<{ x: number; y: number }> {
   const positions: Array<{ x: number; y: number }> = [];
   for (let y = 0; y < layout.length; y++) {
-    for (let x = 0; x < layout[y].length; x++) {
-      if (symbols.includes(layout[y][x])) {
+    for (let x = 0; x < layout[y]!.length; x++) {
+      if (symbols.includes(layout[y]![x]!)) {
         positions.push({ x, y });
       }
     }
@@ -383,7 +383,7 @@ export function visualizeAllFloors(building: VoxelBuildingDefinition): string {
 
   // Show floors from top to bottom (like looking at a building)
   for (let i = totalFloors - 1; i >= 0; i--) {
-    const floor = floors[i];
+    const floor = floors[i]!;
     lines.push(visualizeFloor(building, floor.level));
     if (i > 0) {
       lines.push('        │ (vertical connection) │');
@@ -410,7 +410,7 @@ export function visualizeCrossSection(
 
   // Build the cross-section from top floor to bottom
   for (let floorIdx = floors.length - 1; floorIdx >= 0; floorIdx--) {
-    const floor = floors[floorIdx];
+    const floor = floors[floorIdx]!;
     const ceilingHeight = floor.ceilingHeight || getDefaultCeilingHeight(building);
 
     lines.push(`─── Floor ${floor.level}: ${floor.name || ''} (${ceilingHeight}v ceiling) ───`);

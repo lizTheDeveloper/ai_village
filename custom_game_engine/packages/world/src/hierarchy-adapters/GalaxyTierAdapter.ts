@@ -11,7 +11,7 @@
  * NOTE: Moved from @ai-village/hierarchy-simulator to break circular dependency.
  */
 
-import { AbstractGalaxy, AbstractSector } from '@ai-village/hierarchy-simulator';
+import { AbstractGalaxy, AbstractSector, AbstractSystem, AbstractPlanet } from '@ai-village/hierarchy-simulator';
 import type { UniversalAddress } from '@ai-village/hierarchy-simulator';
 
 /**
@@ -196,27 +196,24 @@ export class GalaxyTierAdapter {
           }
 
           // Aggregate resources from systems
-          const system = sectorChild as any;
-          if (system.children) {
-            for (const planet of system.children) {
-              if (planet.tier === 'planet') {
-                const resourceMap = (planet as any).planetaryStats?.resourceAbundance;
-                if (resourceMap) {
-                  totalWater += resourceMap.get('water') ?? 0;
-                  totalMetals += resourceMap.get('metals') ?? 0;
-                  totalRareEarths += resourceMap.get('rare_earths') ?? 0;
-                }
-              }
+          // Type assertion is safe here - we checked tier === 'system'
+          const system = sectorChild as AbstractSystem;
+          for (const planet of system.children) {
+            if (planet.tier === 'planet') {
+              // Type assertion is safe here - we checked tier === 'planet'
+              const abstractPlanet = planet as AbstractPlanet;
+              const resourceMap = abstractPlanet.planetaryStats.resourceAbundance;
+              totalWater += resourceMap.get('water') ?? 0;
+              totalMetals += resourceMap.get('metals') ?? 0;
+              totalRareEarths += resourceMap.get('rare_earths') ?? 0;
             }
+          }
 
-            // Resources from asteroid belts
-            if (system.asteroidBelts) {
-              for (const belt of system.asteroidBelts) {
-                totalMetals += belt.resourceYield.get('metals') ?? 0;
-                totalRareEarths += belt.resourceYield.get('rare_minerals') ?? 0;
-                totalWater += belt.resourceYield.get('water_ice') ?? 0;
-              }
-            }
+          // Resources from asteroid belts
+          for (const belt of system.asteroidBelts) {
+            totalMetals += belt.resourceYield.get('metals') ?? 0;
+            totalRareEarths += belt.resourceYield.get('rare_minerals') ?? 0;
+            totalWater += belt.resourceYield.get('water_ice') ?? 0;
           }
         }
       }

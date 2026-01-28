@@ -14,9 +14,9 @@
     "category": "plants"
   },
   {
-    "id": "berry-bush",
+    "id": "blueberry-bush",
     "type": "map_object",
-    "description": "Berry Bush plant, pixel art, top-down view",
+    "description": "Blueberry Bush plant, pixel art, top-down view",
     "size": 32,
     "category": "plants"
   },

@@ -99,14 +99,15 @@ describe('Combat UI System Integration', () => {
       });
 
       // Start combat
-      eventBus.emit({
-        type: 'conflict:started' as any,
+      eventBus.emit<'conflict:started'>({
+        type: 'conflict:started',
         source: 'test',
         data: {
           conflictId: 'combat-1',
-          type: 'agent_combat',
-          participants: [attacker.id, defender.id],
-          threatLevel: 'medium',
+          conflictType: 'agent_combat',
+          initiator: attacker.id,
+          target: defender.id,
+          location: { x: 100, y: 100, z: 0 },
         },
       });
 
@@ -271,21 +272,22 @@ describe('Combat UI System Integration', () => {
       entity.addComponent({ type: 'agent', version: 1, name: 'FallenWarrior' });
 
       // Add to a conflict first
-      eventBus.emit({
-        type: 'conflict:started' as any,
+      eventBus.emit<'conflict:started'>({
+        type: 'conflict:started',
         source: 'test',
         data: {
           conflictId: 'death-conflict',
-          type: 'agent_combat',
-          participants: [entity.id, 'enemy'],
-          threatLevel: 'high',
+          conflictType: 'agent_combat',
+          initiator: 'enemy',
+          target: entity.id,
+          location: { x: 100, y: 100, z: 0 },
         },
       });
       eventBus.flush();
 
       // Emit death event
-      eventBus.emit({
-        type: 'death:occurred' as any,
+      eventBus.emit<'combat:death'>({
+        type: 'combat:death',
         source: 'test',
         data: {
           entityId: entity.id,
@@ -302,14 +304,15 @@ describe('Combat UI System Integration', () => {
     });
 
     it('should handle conflict resolution', () => {
-      eventBus.emit({
-        type: 'conflict:started' as any,
+      eventBus.emit<'conflict:started'>({
+        type: 'conflict:started',
         source: 'test',
         data: {
           conflictId: 'combat-1',
-          type: 'agent_combat',
-          participants: ['warrior', 'enemy'],
-          threatLevel: 'medium',
+          conflictType: 'agent_combat',
+          initiator: 'warrior',
+          target: 'enemy',
+          location: { x: 100, y: 100, z: 0 },
         },
       });
       eventBus.flush();
@@ -317,14 +320,14 @@ describe('Combat UI System Integration', () => {
       // Combat HUD should be visible
       expect(combatHUDPanel.isVisible()).toBe(true);
 
-      eventBus.emit({
-        type: 'conflict:resolved' as any,
+      eventBus.emit<'conflict:resolved'>({
+        type: 'conflict:resolved',
         source: 'test',
         data: {
           conflictId: 'combat-1',
+          conflictType: 'agent_combat',
           outcome: 'victory',
-          winner: 'warrior',
-          loser: 'enemy',
+          participants: ['warrior', 'enemy'],
         },
       });
       eventBus.flush();
@@ -387,7 +390,7 @@ describe('Combat UI System Integration', () => {
       });
 
       const behaviorHandler = vi.fn();
-      eventBus.on('ui:stance:changed' as any, behaviorHandler);
+      eventBus.subscribe<'ui:stance:changed'>('ui:stance:changed', behaviorHandler);
 
       stanceControls.setSelectedEntities([entity]);
       stanceControls.setStance('flee');
@@ -520,7 +523,7 @@ describe('Combat UI System Integration', () => {
       }
 
       const handler = vi.fn();
-      eventBus.on('ui:stance:changed' as any, handler);
+      eventBus.subscribe<'ui:stance:changed'>('ui:stance:changed', handler);
 
       stanceControls.setSelectedEntities(entities);
       stanceControls.setStance('aggressive');
@@ -588,14 +591,15 @@ describe('Combat UI System Integration', () => {
 
       // Start all conflicts
       for (let i = 0; i < 10; i++) {
-        eventBus.emit({
-          type: 'conflict:started' as any,
+        eventBus.emit<'conflict:started'>({
+          type: 'conflict:started',
           source: 'test',
           data: {
             conflictId: `combat-${i}`,
-            type: 'agent_combat',
-            participants: [combatants[i * 2].id, combatants[i * 2 + 1].id],
-            threatLevel: 'medium',
+            conflictType: 'agent_combat',
+            initiator: combatants[i * 2].id,
+            target: combatants[i * 2 + 1].id,
+            location: { x: i * 50, y: i * 50, z: 0 },
           },
         });
       }
@@ -754,55 +758,60 @@ describe('Combat UI System Integration', () => {
       const injuryHandler = vi.fn();
       const deathHandler = vi.fn();
 
-      eventBus.on('conflict:started' as any, conflictHandler);
-      eventBus.on('combat:damage' as any, damageHandler);
-      eventBus.on('injury:inflicted' as any, injuryHandler);
-      eventBus.on('death:occurred' as any, deathHandler);
+      eventBus.subscribe<'conflict:started'>('conflict:started', conflictHandler);
+      eventBus.subscribe<'combat:damage'>('combat:damage', damageHandler);
+      eventBus.subscribe<'injury:inflicted'>('injury:inflicted', injuryHandler);
+      eventBus.subscribe<'combat:death'>('combat:death', deathHandler);
 
       // Execute full combat sequence
-      eventBus.emit({
-        type: 'conflict:started' as any,
+      eventBus.emit<'conflict:started'>({
+        type: 'conflict:started',
         source: 'test',
         data: {
           conflictId: 'battle-1',
-          type: 'agent_combat',
-          participants: [attacker.id, defender.id],
-          threatLevel: 'high',
+          conflictType: 'agent_combat',
+          initiator: attacker.id,
+          target: defender.id,
+          location: { x: 100, y: 100, z: 0 },
         },
       });
 
-      eventBus.emit({
-        type: 'combat:damage' as any,
+      eventBus.emit<'combat:damage'>({
+        type: 'combat:damage',
         source: 'test',
         data: {
+          entityId: defender.id,
           attackerId: attacker.id,
-          defenderId: defender.id,
-          damage: 30,
+          amount: 30,
+          damageType: 'slashing',
         },
       });
 
-      eventBus.emit({
-        type: 'injury:inflicted' as any,
+      eventBus.emit<'injury:inflicted'>({
+        type: 'injury:inflicted',
         source: 'test',
         data: {
           entityId: defender.id,
           injuryType: 'laceration',
-          severity: 'moderate',
+          severity: 'major',
+          location: 'arms',
+          cause: 'combat',
         },
       });
 
-      eventBus.emit({
-        type: 'combat:damage' as any,
+      eventBus.emit<'combat:damage'>({
+        type: 'combat:damage',
         source: 'test',
         data: {
+          entityId: defender.id,
           attackerId: attacker.id,
-          defenderId: defender.id,
-          damage: 70,
+          amount: 70,
+          damageType: 'slashing',
         },
       });
 
-      eventBus.emit({
-        type: 'death:occurred' as any,
+      eventBus.emit<'combat:death'>({
+        type: 'combat:death',
         source: 'test',
         data: {
           entityId: defender.id,
@@ -849,26 +858,29 @@ describe('Combat UI System Integration', () => {
         ticksAtZeroHunger: 0,
       });
 
-      eventBus.emit({
-        type: 'conflict:started' as any,
+      eventBus.emit<'conflict:started'>({
+        type: 'conflict:started',
         source: 'test',
         data: {
           conflictId: 'combat-1',
-          type: 'agent_combat',
-          participants: [entity.id, 'enemy'],
-          threatLevel: 'medium',
+          conflictType: 'agent_combat',
+          initiator: entity.id,
+          target: 'enemy',
+          location: { x: 100, y: 100, z: 0 },
         },
       });
       eventBus.flush();
 
       expect(combatHUDPanel.isVisible()).toBe(true);
 
-      eventBus.emit({
-        type: 'conflict:resolved' as any,
+      eventBus.emit<'conflict:resolved'>({
+        type: 'conflict:resolved',
         source: 'test',
         data: {
           conflictId: 'combat-1',
+          conflictType: 'agent_combat',
           outcome: 'victory',
+          participants: [entity.id, 'enemy'],
         },
       });
       eventBus.flush();
@@ -888,7 +900,7 @@ describe('Combat UI System Integration', () => {
       const testStanceControls = new StanceControls(testEventBus);
 
       const handler = vi.fn();
-      testEventBus.on('conflict:started' as any, handler);
+      testEventBus.subscribe<'conflict:started'>('conflict:started', handler);
 
       // Cleanup components
       testThreatRenderer.cleanup();
@@ -896,14 +908,15 @@ describe('Combat UI System Integration', () => {
       testStanceControls.cleanup();
 
       // Emit event after cleanup
-      testEventBus.emit({
-        type: 'conflict:started' as any,
+      testEventBus.emit<'conflict:started'>({
+        type: 'conflict:started',
         source: 'test',
         data: {
           conflictId: 'test',
-          type: 'agent_combat',
-          participants: ['a', 'b'],
-          threatLevel: 'low',
+          conflictType: 'agent_combat',
+          initiator: 'a',
+          target: 'b',
+          location: { x: 0, y: 0, z: 0 },
         },
       });
       testEventBus.flush();
@@ -936,7 +949,7 @@ describe('Combat UI System Integration', () => {
       });
 
       const handler = vi.fn();
-      eventBus.on('ui:stance:changed' as any, handler);
+      eventBus.subscribe<'ui:stance:changed'>('ui:stance:changed', handler);
 
       stanceControls.setSelectedEntities([entity]);
 
@@ -960,7 +973,7 @@ describe('Combat UI System Integration', () => {
       stanceControls.setSelectedEntities([]);
 
       const handler = vi.fn();
-      eventBus.on('ui:stance:changed' as any, handler);
+      eventBus.subscribe<'ui:stance:changed'>('ui:stance:changed', handler);
 
       // Press 'M' for memory (existing shortcut) - should not trigger stance change
       const memoryKey = new KeyboardEvent('keydown', { key: 'M' });
@@ -1012,17 +1025,18 @@ describe('Combat UI System Integration', () => {
       const defender = world.createEntity();
       defender.addComponent({ type: 'position', version: 1, x: 250, y: 250 });
 
-      eventBus.emit({
-        type: 'combat:attack' as any,
+      eventBus.emit<'combat:attack'>({
+        type: 'combat:attack',
         source: 'test',
         data: {
           attackerId: attacker.id,
-          defenderId: defender.id,
+          targetId: defender.id,
+          attackType: 'melee',
         },
       });
 
       const focusHandler = vi.fn();
-      eventBus.on('camera:focus' as any, focusHandler);
+      eventBus.subscribe<'camera:focus'>('camera:focus', focusHandler);
 
       eventBus.flush();
 
@@ -1078,14 +1092,15 @@ describe('Combat UI System Integration', () => {
 
     it('should handle multiple simultaneous conflicts without HUD overflow', () => {
       for (let i = 0; i < 20; i++) {
-        eventBus.emit({
-          type: 'conflict:started' as any,
+        eventBus.emit<'conflict:started'>({
+          type: 'conflict:started',
           source: 'test',
           data: {
             conflictId: `conflict-${i}`,
-            type: 'agent_combat',
-            participants: [`entity-${i * 2}`, `entity-${i * 2 + 1}`],
-            threatLevel: i % 2 === 0 ? 'medium' : 'high',
+            conflictType: 'agent_combat',
+            initiator: `entity-${i * 2}`,
+            target: `entity-${i * 2 + 1}`,
+            location: { x: i * 10, y: i * 10, z: 0 },
           },
         });
       }
@@ -1104,13 +1119,14 @@ describe('Combat UI System Integration', () => {
     it('should handle combat log with 100+ rapid events', () => {
       // Combat HUD panel limits events to MAX_RECENT_EVENTS (3)
       for (let i = 0; i < 150; i++) {
-        eventBus.emit({
-          type: 'combat:damage' as any,
+        eventBus.emit<'combat:damage'>({
+          type: 'combat:damage',
           source: 'test',
           data: {
+            entityId: 'defender',
             attackerId: 'attacker',
-            defenderId: 'defender',
-            damage: i,
+            amount: i,
+            damageType: 'slashing',
           },
         });
       }

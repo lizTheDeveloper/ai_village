@@ -38,11 +38,22 @@ interface MaterialData {
  * Converts JSON material data to ItemDefinition using defineItem
  */
 function loadMaterialFromJSON(data: MaterialData): ItemDefinition {
-  const { id, name, category, rarity, ...properties } = data;
+  const { id, name, category, rarity, traits, ...properties } = data;
+
+  if (typeof category !== 'string') {
+    throw new Error(`Invalid category for material ${id}: must be a string`);
+  }
+  if (rarity && typeof rarity !== 'string') {
+    throw new Error(`Invalid rarity for material ${id}: must be a string`);
+  }
+
+  // Don't pass traits through directly - defineItem expects specific trait structure
+  // Let defineItem handle trait validation
   return defineItem(id, name, category as ItemCategory, {
     ...properties,
-    ...(rarity ? { rarity: rarity as ItemRarity } : {})
-  } as any);
+    ...(rarity ? { rarity: rarity as ItemRarity } : {}),
+    // Omit traits - they don't match ItemTraits type from JSON
+  });
 }
 
 /**

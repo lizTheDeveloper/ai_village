@@ -128,10 +128,10 @@ npm run build
 [PlantSystem] 4896ae39: Dispersed seed at (10.0, 3.0)
 [PlantSystem] 4896ae39: Placed 2/2 seeds in 2-tile radius
 
-[Main] Seed dispersed at (12, 5): berry-bush
-[Main] Created plant entity 33538711 from dispersed berry-bush seed at (12, 5)
-[Main] Seed dispersed at (10, 3): berry-bush
-[Main] Created plant entity 6ae136ad from dispersed berry-bush seed at (10, 3)
+[Main] Seed dispersed at (12, 5): blueberry-bush
+[Main] Created plant entity 33538711 from dispersed blueberry-bush seed at (12, 5)
+[Main] Seed dispersed at (10, 3): blueberry-bush
+[Main] Created plant entity 6ae136ad from dispersed blueberry-bush seed at (10, 3)
 ```
 
 **Errors:** ZERO TypeErrors (previously 24+ per session)

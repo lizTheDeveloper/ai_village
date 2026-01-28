@@ -34,7 +34,7 @@
 
 1. **Stage Transitions** - Now logs with full context:
    ```
-   [PlantSystem] abc12345: berry-bush stage vegetative → flowering (age=15.3d, health=92)
+   [PlantSystem] abc12345: blueberry-bush stage vegetative → flowering (age=15.3d, health=92)
    ```
 
 2. **Seed Dispersal** - Now logs each seed:

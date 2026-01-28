@@ -14,8 +14,9 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { ChatRoomComponent } from '../communication/ChatRoom.js';
 import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import {
   type AdminAngelComponent,
@@ -458,12 +459,13 @@ export class AdminAngelSystem extends BaseSystem {
 
   /**
    * Initialize or get the admin angel entity
+   * Creates the angel if it doesn't exist - ensures player always has a helper
    */
   private getOrCreateAngel(world: World): Entity | null {
     // Check cache
     if (this.angelEntityId) {
       const existing = world.getEntity(this.angelEntityId);
-      if (existing) return existing;
+      if (existing && existing.hasComponent(CT.AdminAngel)) return existing;
       this.angelEntityId = null;
     }
 
@@ -474,8 +476,13 @@ export class AdminAngelSystem extends BaseSystem {
       return angels[0]!;
     }
 
-    // Don't auto-create - let the game create it when ready
-    return null;
+    // Auto-create the angel if it doesn't exist
+    // This ensures the player always has a helper even if initialization was missed
+    const angelName = getStableAngelName();
+    const angelId = spawnAdminAngel(world, angelName);
+    this.angelEntityId = angelId;
+    console.log(`[AdminAngelSystem] Auto-spawned admin angel '${angelName}' (${angelId})`);
+    return world.getEntity(angelId) ?? null;
   }
 
   /**
@@ -667,7 +674,9 @@ export class AdminAngelSystem extends BaseSystem {
       const messages = this.splitIntoMessages(cleanResponse);
 
       for (const msg of messages) {
-        world.eventBus.emit({
+        // Use emitImmediate so the message is processed synchronously
+        // This ensures the message reaches the UI without tick-based delays
+        world.eventBus.emitImmediate({
           type: 'chat:send_message',
           data: {
             roomId: 'divine_chat',
@@ -1425,10 +1434,20 @@ export class AdminAngelSystem extends BaseSystem {
         if (behavior) {
           switch (behavior) {
             case 'build':
-              text = `${name} is building something`;
+            case 'tile_build': {
+              // Get what they're building from behaviorState
+              const buildingType = agentComp.behaviorState?.buildingType as string | undefined;
+              if (buildingType) {
+                // Convert building type to readable name (e.g., 'storage-chest' -> 'storage chest')
+                const readableName = buildingType.replace(/-/g, ' ').replace(/_/g, ' ');
+                text = `${name} is building a ${readableName}`;
+              } else {
+                text = `${name} is building something`;
+              }
               type = 'action';
               salience = 0.7;
               break;
+            }
             case 'gather':
               text = `${name} is gathering resources`;
               type = 'action';
@@ -1645,11 +1664,34 @@ export class AdminAngelSystem extends BaseSystem {
    * Called when the system is initialized by the game loop.
    */
   protected onInitialize(world: World): void {
+    // Get stable name first (persists across reloads)
+    const angelName = getStableAngelName();
+
+    // Clean up orphan entities: entities with angel's name but missing admin_angel component
+    // This can happen when save/load doesn't properly serialize the admin_angel component
+    const entitiesWithIdentity = world.query().with(CT.Identity).executeEntities();
+    for (const entity of entitiesWithIdentity) {
+      const identity = entity.getComponent(CT.Identity) as { name?: string } | undefined;
+      if (identity?.name === angelName && !entity.hasComponent(CT.AdminAngel)) {
+        console.log(`[AdminAngelSystem] Cleaning up orphan angel entity: ${entity.id}`);
+        // Also remove from divine_chat room if present
+        const divineChatRooms = world.query().with(CT.ChatRoom).executeEntities();
+        for (const roomEntity of divineChatRooms) {
+          const room = roomEntity.getComponent(CT.ChatRoom) as { config: { id: string; membership: { members: string[] } } } | undefined;
+          if (room?.config.id === 'divine_chat') {
+            const memberIndex = room.config.membership.members.indexOf(entity.id);
+            if (memberIndex !== -1) {
+              room.config.membership.members.splice(memberIndex, 1);
+            }
+          }
+        }
+        (world as WorldMutator).destroyEntity(entity.id, 'orphan_angel_cleanup');
+      }
+    }
+
     // Auto-spawn the admin angel if none exists
     const existingAngels = world.query().with(CT.AdminAngel).executeEntities();
     if (existingAngels.length === 0) {
-      // Get stable name from localStorage (persists across reloads)
-      const angelName = getStableAngelName();
       const angelId = spawnAdminAngel(world, angelName);
       this.angelEntityId = angelId;
       console.log(`[AdminAngelSystem] Spawned admin angel '${angelName}' (${angelId})`);
@@ -1667,6 +1709,9 @@ export class AdminAngelSystem extends BaseSystem {
 
       // Ignore our own messages
       if (data.senderId === this.angelEntityId) return;
+
+      // Guard against undefined content
+      if (!data.content) return;
 
       this.handlePlayerMessage(angel, data.content, world);
     });

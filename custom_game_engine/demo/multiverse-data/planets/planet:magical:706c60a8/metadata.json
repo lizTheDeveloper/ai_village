@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:706c60a8",
+  "name": "Epsilon Mundo",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769487004247",
+  "createdAt": 1769487004280,
+  "lastAccessedAt": 1769487004280,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769487004247",
+    "type": "magical"
+  }
+}

@@ -72,7 +72,7 @@ export class MetricsAPIClient {
   }
 
   // Aliases for test compatibility
-  async fetchNetworkData(options?: { force?: boolean }) {
+  async fetchNetworkData(_options?: { force?: boolean }) {
     return this.getNetworkMetrics();
   }
 

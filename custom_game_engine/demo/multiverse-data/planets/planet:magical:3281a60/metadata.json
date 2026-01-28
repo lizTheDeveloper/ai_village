@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:3281a60",
+  "name": "Alpha Oberon",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489214408",
+  "createdAt": 1769489214417,
+  "lastAccessedAt": 1769489214417,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489214408",
+    "type": "magical"
+  }
+}

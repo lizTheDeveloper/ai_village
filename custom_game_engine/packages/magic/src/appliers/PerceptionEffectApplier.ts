@@ -83,13 +83,19 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
   ): EffectApplicationResult {
     const appliedValues: Record<string, number> = {};
 
-    // Check if target has perception component
-    const perceptionRaw = target.components.get('perception');
-    let perception: PerceptionComponent | undefined;
-    if (perceptionRaw && typeof perceptionRaw === 'object' && 'type' in perceptionRaw && (perceptionRaw as { type: unknown }).type === 'perception') {
-      perception = perceptionRaw as unknown as PerceptionComponent;
+    // Check if target has perception component with type guard
+    function isPerceptionComponent(comp: unknown): comp is PerceptionComponent {
+      return (
+        comp !== null &&
+        comp !== undefined &&
+        typeof comp === 'object' &&
+        'type' in comp &&
+        comp.type === 'perception'
+      );
     }
-    if (!perception) {
+
+    const perceptionRaw = target.components.get('perception');
+    if (!perceptionRaw || !isPerceptionComponent(perceptionRaw)) {
       return {
         success: false,
         effectId: effect.id,
@@ -102,6 +108,7 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
         spellId: context.spell.id,
       };
     }
+    const perception = perceptionRaw;
 
     // Ensure perception component has required arrays
     if (!perception.detectionTypes) {
@@ -316,12 +323,23 @@ class PerceptionEffectApplier implements EffectApplier<PerceptionEffect> {
     target: Entity,
     _world: World
   ): void {
+    // Type guard for perception component
+    function isPerceptionComponent(comp: unknown): comp is PerceptionComponent {
+      return (
+        comp !== null &&
+        comp !== undefined &&
+        typeof comp === 'object' &&
+        'type' in comp &&
+        comp.type === 'perception'
+      );
+    }
+
     // Clean up perception state when effect expires or is dispelled
     const perceptionRaw = target.components.get('perception');
-    if (!perceptionRaw || typeof perceptionRaw !== 'object' || !('type' in perceptionRaw) || (perceptionRaw as { type: unknown }).type !== 'perception') {
+    if (!perceptionRaw || !isPerceptionComponent(perceptionRaw)) {
       return;
     }
-    const perception = perceptionRaw as unknown as PerceptionComponent;
+    const perception = perceptionRaw;
 
     // Remove the specific perception entry
     if (perception.activePerceptions) {

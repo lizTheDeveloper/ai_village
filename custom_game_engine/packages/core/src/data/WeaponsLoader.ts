@@ -5,14 +5,14 @@
  * Provides type-safe access to weapon definitions.
  */
 
-import type { ItemDefinition } from '../items/ItemDefinition.js';
+import type { ItemDefinition, ItemCategory } from '../items/ItemDefinition.js';
 import { defineItem } from '../items/ItemDefinition.js';
 import weaponsData from './weapons.json';
 
 /**
  * Convert JSON weapon data to ItemDefinition
  */
-function jsonToWeapon(data: any): ItemDefinition {
+function jsonToWeapon(data: Record<string, unknown>): ItemDefinition {
   const {
     id,
     name,
@@ -28,24 +28,38 @@ function jsonToWeapon(data: any): ItemDefinition {
     magical,
   } = data;
 
-  const traits: any = {};
+  if (typeof id !== 'string' || typeof name !== 'string' || typeof category !== 'string') {
+    throw new Error('Weapon data must have string id, name, and category');
+  }
 
-  if (weapon) {
-    traits.weapon = { ...weapon };
+  // Map category to valid ItemCategory (weapons map to 'equipment')
+  const validCategories: ItemCategory[] = ['resource', 'food', 'seed', 'tool', 'material', 'consumable', 'equipment', 'ammo', 'misc'];
+  // Map 'weapon', 'armor' to 'equipment', others to 'misc' if not valid
+  const categoryMap: Record<string, ItemCategory> = {
+    weapon: 'equipment',
+    armor: 'equipment',
+  };
+  const mappedCategory: ItemCategory = categoryMap[category] ?? (validCategories.includes(category as ItemCategory) ? category as ItemCategory : 'misc');
+
+  const traits: Record<string, unknown> = {};
+
+  if (weapon && typeof weapon === 'object' && weapon !== null) {
+    traits.weapon = { ...weapon as object };
     // Convert ammo and projectile if present
-    if (weapon.ammo) {
-      traits.weapon.ammo = { ...weapon.ammo };
+    const weaponObj = weapon as Record<string, unknown>;
+    if (weaponObj.ammo && typeof weaponObj.ammo === 'object') {
+      (traits.weapon as Record<string, unknown>).ammo = { ...weaponObj.ammo as object };
     }
-    if (weapon.projectile) {
-      traits.weapon.projectile = { ...weapon.projectile };
+    if (weaponObj.projectile && typeof weaponObj.projectile === 'object') {
+      (traits.weapon as Record<string, unknown>).projectile = { ...weaponObj.projectile as object };
     }
   }
 
-  if (magical) {
-    traits.magical = { ...magical };
+  if (magical && typeof magical === 'object' && magical !== null) {
+    traits.magical = { ...magical as object };
   }
 
-  const options: any = {
+  const options: Record<string, unknown> = {
     weight,
     stackSize,
     baseValue,
@@ -57,30 +71,44 @@ function jsonToWeapon(data: any): ItemDefinition {
   if (clarketechTier) options.clarketechTier = clarketechTier;
   if (researchRequired) options.researchRequired = researchRequired;
 
-  return defineItem(id, name, category, options);
+  return defineItem(id, name, mappedCategory, options);
 }
 
 /**
  * Load all weapons from a category
  */
-function loadWeaponCategory(categoryData: any): ItemDefinition[] {
+function loadWeaponCategory(categoryData: unknown): ItemDefinition[] {
   if (!categoryData) return [];
 
   // If categoryData is directly an array of weapons, convert them
   if (Array.isArray(categoryData)) {
-    return categoryData.map(jsonToWeapon);
+    return categoryData.map((item) => {
+      if (typeof item !== 'object' || item === null) {
+        throw new Error('Weapon item must be an object');
+      }
+      return jsonToWeapon(item as Record<string, unknown>);
+    });
+  }
+
+  if (typeof categoryData !== 'object' || categoryData === null) {
+    return [];
   }
 
   const weapons: ItemDefinition[] = [];
 
   // Handle nested subcategories
   for (const key of Object.keys(categoryData)) {
-    const data = categoryData[key];
+    const data = (categoryData as Record<string, unknown>)[key];
 
     if (Array.isArray(data)) {
       // Subcategory array
-      weapons.push(...data.map(jsonToWeapon));
-    } else if (typeof data === 'object') {
+      weapons.push(...data.map((item) => {
+        if (typeof item !== 'object' || item === null) {
+          throw new Error('Weapon item must be an object');
+        }
+        return jsonToWeapon(item as Record<string, unknown>);
+      }));
+    } else if (typeof data === 'object' && data !== null) {
       // Nested object - recurse
       weapons.push(...loadWeaponCategory(data));
     }
@@ -104,7 +132,7 @@ export class WeaponsLoader {
       this._allWeapons = [];
 
       for (const categoryKey of Object.keys(weaponsData)) {
-        const categoryWeapons = loadWeaponCategory((weaponsData as any)[categoryKey]);
+        const categoryWeapons = loadWeaponCategory((weaponsData as Record<string, unknown>)[categoryKey]);
         this._allWeapons.push(...categoryWeapons);
         this._byCategory.set(categoryKey, categoryWeapons);
       }

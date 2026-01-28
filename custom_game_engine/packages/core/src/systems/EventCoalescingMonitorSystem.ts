@@ -3,6 +3,8 @@
  *
  * Monitors EventBus coalescing effectiveness and logs statistics periodically.
  * Useful for tracking performance impact of event deduplication.
+ *
+ * Uses throttleInterval for zero-overhead tick skipping (no SystemContext created).
  */
 
 import { BaseSystem } from '../ecs/SystemContext.js';
@@ -13,14 +15,10 @@ export class EventCoalescingMonitorSystem extends BaseSystem {
   readonly priority = 998; // Run late, after most systems
   readonly requiredComponents = []; // No entity processing
 
-  private readonly LOG_INTERVAL = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)
-  private lastLog = 0;
+  // Use throttleInterval for efficient skip (avoids SystemContext creation)
+  protected readonly throttleInterval = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)
 
   protected onUpdate(ctx: SystemContext): void {
-    // Throttle logging
-    if (ctx.tick - this.lastLog < this.LOG_INTERVAL) return;
-    this.lastLog = ctx.tick;
-
     // Get coalescing statistics from EventBus
     const stats = ctx.world.eventBus.getCoalescingStats();
 

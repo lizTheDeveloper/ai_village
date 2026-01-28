@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:12b794d",
+  "name": "Titan Four",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489367196",
+  "createdAt": 1769489367415,
+  "lastAccessedAt": 1769489367415,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489367196",
+    "type": "magical"
+  }
+}

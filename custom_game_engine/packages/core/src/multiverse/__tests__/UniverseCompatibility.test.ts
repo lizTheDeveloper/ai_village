@@ -1,6 +1,47 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MultiverseCoordinator } from '../MultiverseCoordinator.js';
 import { MultiverseNetworkManager } from '../MultiverseNetworkManager.js';
+import type { WorldMutator } from '../../ecs/World.js';
+import { vi } from 'vitest';
+
+// Mock World for testing
+function createMockWorld(): WorldMutator {
+  return {
+    entities: new Map(),
+    tick: 0n,
+    update: vi.fn(),
+    getEntity: vi.fn(),
+    destroyEntity: vi.fn(),
+  } as unknown as WorldMutator;
+}
+
+// Type-safe accessors for private NetworkManager internals
+interface NetworkManagerInternals {
+  calculateUniverseCompatibility: (
+    local: unknown,
+    remote: unknown
+  ) => {
+    compatibilityScore: number;
+    recommended: boolean;
+    warnings: string[];
+    factors: {
+      timeRateCompatibility: number;
+      physicsCompatibility: number;
+      realityStability: number;
+      divergenceLevel: number;
+    };
+    traversalCostMultiplier: number;
+  };
+  calculateForkingDepth: (config: unknown) => number;
+  areRelatedTimelines: (config1: unknown, config2: unknown) => boolean;
+  estimateDivergence: (config1: unknown, config2: unknown) => number;
+}
+
+function getNetworkManagerInternals(
+  manager: MultiverseNetworkManager
+): NetworkManagerInternals {
+  return manager as unknown as NetworkManagerInternals;
+}
 
 /**
  * Tests for universe compatibility calculation
@@ -35,7 +76,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         config1,
         config2
       );
@@ -65,7 +106,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         config1,
         config2
       );
@@ -92,7 +133,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         config1,
         config2
       );
@@ -118,7 +159,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: true,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         config1,
         config2
       );
@@ -139,7 +180,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const depth = (networkManager as any).calculateForkingDepth(rootConfig);
+      const depth = getNetworkManagerInternals(networkManager).calculateForkingDepth(rootConfig);
       expect(depth).toBe(0);
     });
 
@@ -163,15 +204,11 @@ describe('Universe Compatibility Calculation', () => {
       };
 
       // Register parent so it can be found
-      const mockWorld = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorld = createMockWorld();
 
       coordinator.registerUniverse(mockWorld, parentConfig);
 
-      const depth = (networkManager as any).calculateForkingDepth(childConfig);
+      const depth = getNetworkManagerInternals(networkManager).calculateForkingDepth(childConfig);
       expect(depth).toBe(1);
     });
 
@@ -204,16 +241,12 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const mockWorld = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorld = createMockWorld();
 
       coordinator.registerUniverse(mockWorld, root);
       coordinator.registerUniverse(mockWorld, child1);
 
-      const depth = (networkManager as any).calculateForkingDepth(child2);
+      const depth = getNetworkManagerInternals(networkManager).calculateForkingDepth(child2);
       expect(depth).toBe(2);
     });
 
@@ -236,11 +269,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const mockWorld = {
-        entities: new Map(),
-        tick: 0,
-        update: () => {},
-      } as any;
+      const mockWorld = createMockWorld();
 
       // Create a chain of 6 parent universes to simulate depth > 5
       for (let i = 0; i < 6; i++) {
@@ -269,12 +298,12 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         parent,
         veryDeepChild
       );
 
-      const depth = (networkManager as any).calculateForkingDepth(veryDeepChild);
+      const depth = getNetworkManagerInternals(networkManager).calculateForkingDepth(veryDeepChild);
       expect(depth).toBeGreaterThan(5);
       expect(compatibility.warnings.some((w: string) => w.includes('Deep timeline nesting'))).toBe(true);
     });
@@ -300,7 +329,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const areRelated = (networkManager as any).areRelatedTimelines(parent, child);
+      const areRelated = getNetworkManagerInternals(networkManager).areRelatedTimelines(parent, child);
       expect(areRelated).toBe(true);
     });
 
@@ -325,7 +354,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const areRelated = (networkManager as any).areRelatedTimelines(sibling1, sibling2);
+      const areRelated = getNetworkManagerInternals(networkManager).areRelatedTimelines(sibling1, sibling2);
       expect(areRelated).toBe(true);
     });
 
@@ -346,7 +375,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const areRelated = (networkManager as any).areRelatedTimelines(universe1, universe2);
+      const areRelated = getNetworkManagerInternals(networkManager).areRelatedTimelines(universe1, universe2);
       expect(areRelated).toBe(false);
     });
   });
@@ -369,7 +398,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const divergence = (networkManager as any).estimateDivergence(config1, config2);
+      const divergence = getNetworkManagerInternals(networkManager).estimateDivergence(config1, config2);
       expect(divergence).toBe(0);
     });
 
@@ -402,8 +431,8 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const recentDivergence = (networkManager as any).estimateDivergence(parent, recentFork);
-      const oldDivergence = (networkManager as any).estimateDivergence(parent, oldFork);
+      const recentDivergence = getNetworkManagerInternals(networkManager).estimateDivergence(parent, recentFork);
+      const oldDivergence = getNetworkManagerInternals(networkManager).estimateDivergence(parent, oldFork);
 
       expect(recentDivergence).toBeLessThan(oldDivergence);
       expect(recentDivergence).toBeCloseTo(0.001, 3); // 100/100000
@@ -429,7 +458,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const divergence = (networkManager as any).estimateDivergence(parent, ancientFork);
+      const divergence = getNetworkManagerInternals(networkManager).estimateDivergence(parent, ancientFork);
       expect(divergence).toBeLessThanOrEqual(1.0);
     });
   });
@@ -452,7 +481,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         config1,
         config2
       );
@@ -477,7 +506,7 @@ describe('Universe Compatibility Calculation', () => {
         paused: false,
       };
 
-      const compatibility = (networkManager as any).calculateUniverseCompatibility(
+      const compatibility = getNetworkManagerInternals(networkManager).calculateUniverseCompatibility(
         config1,
         config2
       );

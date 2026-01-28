@@ -141,7 +141,6 @@ export function NetworkView({
       ],
       layout: {
         name: 'cose-bilkent',
-        animate: true,
         animationDuration: 1000,
         nodeRepulsion: 4500,
         idealEdgeLength: 100,
@@ -150,7 +149,7 @@ export function NetworkView({
         gravity: 0.25,
         numIter: 2500,
         tile: true,
-      } satisfies { name: string; [key: string]: unknown },
+      } as any,
     });
 
     cy.on('tap', 'node', (event) => {

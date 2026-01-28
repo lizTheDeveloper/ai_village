@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:71dc67ee",
+  "name": "Celestial--934",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769490587832",
+  "createdAt": 1769490588008,
+  "lastAccessedAt": 1769490588008,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769490587832",
+    "type": "magical"
+  }
+}

@@ -18,18 +18,18 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Acceptance Criterion 5: Cleanliness Tracking', () => {
     it('should initialize cleanliness to 100 for new housing', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       housingEntity.addComponent(chickenCoop);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
 
       // New housing should be clean
-      expect((building as any).cleanliness).toBe(100);
+      expect(building.cleanliness).toBe(100);
     });
 
     it('should decrease cleanliness daily based on occupancy', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
@@ -62,7 +62,7 @@ describe('Animal Housing - Cleanliness System', () => {
 
       // Get building before decay
       const buildingBefore = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      const cleanlinessBefore = (buildingBefore as any).cleanliness;
+      const cleanlinessBefore = buildingBefore.cleanliness;
 
       // Simulate one day passing
       // AnimalHousingSystem should process cleanliness decay
@@ -75,16 +75,16 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should decay cleanliness faster with more animals', () => {
       const coopFull = world.createEntity();
-      const building1 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const building1 = createBuildingComponent(BuildingType.ChickenCoop, 2);
       building1.isComplete = true;
       coopFull.addComponent(building1);
-      (building1 as any).currentOccupants = 8; // Full
+      building1.currentOccupants = 8; // Full
 
       const coopHalf = world.createEntity();
-      const building2 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const building2 = createBuildingComponent(BuildingType.ChickenCoop, 2);
       building2.isComplete = true;
       coopHalf.addComponent(building2);
-      (building2 as any).currentOccupants = 4; // Half full
+      building2.currentOccupants = 4; // Half full
 
       // After 1 day:
       // Full coop: 100 - (8 * 5) = 60% cleanliness
@@ -95,29 +95,29 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not decay cleanliness below 0', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn, 3);
       barn.isComplete = true;
       housingEntity.addComponent(barn);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 10; // Nearly dirty
-      (building as any).currentOccupants = 12; // Full barn
+      building.cleanliness = 10; // Nearly dirty
+      building.currentOccupants = 12; // Full barn
 
       // Simulate 1 day: 12 * 5 = 60% decay
       // 10 - 60 = -50, but should clamp to 0
 
-      expect((building as any).cleanliness).toBeGreaterThanOrEqual(0);
+      expect(building.cleanliness).toBeGreaterThanOrEqual(0);
     });
 
     it('should not decay cleanliness in empty housing', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 100;
-      (building as any).currentOccupants = 0; // Empty
+      building.cleanliness = 100;
+      building.currentOccupants = 0; // Empty
 
       // After 1 day, cleanliness should remain 100
       // dailyDecay = 0 * 5 = 0
@@ -127,7 +127,7 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should emit housing_dirty event when cleanliness drops below 30', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
@@ -135,10 +135,10 @@ describe('Animal Housing - Cleanliness System', () => {
       eventBus.subscribe('housing_dirty', eventListener);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 35; // Above threshold
+      building.cleanliness = 35; // Above threshold
 
       // Simulate cleanliness dropping to 25
-      (building as any).cleanliness = 25;
+      building.cleanliness = 25;
 
       // AnimalHousingSystem should emit 'housing_dirty' event
       // This will fail until event emission is implemented
@@ -146,12 +146,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should track cleanliness over multiple days', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).currentOccupants = 6; // Full kennel
+      building.currentOccupants = 6; // Full kennel
 
       // Day 0: 100%
       // Day 1: 100 - 30 = 70%
@@ -166,12 +166,12 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Cleanliness Effects on Animals', () => {
     it('should increase animal stress in dirty housing', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 20; // Very dirty
+      building.cleanliness = 20; // Very dirty
 
       const chickenEntity = world.createEntity();
       const chickenData = {
@@ -210,12 +210,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should reduce animal mood in dirty housing', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 10; // Extremely dirty
+      building.cleanliness = 10; // Extremely dirty
 
       const horseEntity = world.createEntity();
       const horseData = {
@@ -249,12 +249,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not penalize animals in clean housing (cleanliness >= 50)', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 80; // Clean
+      building.cleanliness = 80; // Clean
 
       const dogEntity = world.createEntity();
       const dogData = {
@@ -288,12 +288,12 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Cleaning Actions', () => {
     it('should restore cleanliness to 100 when cleaned', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 25; // Dirty
+      building.cleanliness = 25; // Dirty
 
       // Execute CleanHousingAction
       // Should set cleanliness to 100
@@ -303,7 +303,7 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should emit housing_cleaned event when cleaned', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
@@ -311,7 +311,7 @@ describe('Animal Housing - Cleanliness System', () => {
       eventBus.subscribe('housing_cleaned', eventListener);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 30;
+      building.cleanliness = 30;
 
       // Execute CleanHousingAction
       // Should emit 'housing_cleaned' event with housing ID
@@ -321,12 +321,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should reduce animal stress after cleaning', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn, 3);
       barn.isComplete = true;
       housingEntity.addComponent(barn);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 15; // Very dirty
+      building.cleanliness = 15; // Very dirty
 
       const cowEntity = world.createEntity();
       const cowData = {
@@ -361,14 +361,14 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should allow multiple cleanings in succession', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Clean once
-      (building as any).cleanliness = 50;
+      building.cleanliness = 50;
       // Execute CleanHousingAction → 100
 
       // Clean again immediately (should be idempotent)
@@ -377,23 +377,23 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not allow cleaning to exceed 100', () => {
       const housingEntity = world.createEntity();
-      const apiary = createBuildingComponent(BuildingType.Apiary as any, 2);
+      const apiary = createBuildingComponent(BuildingType.Apiary, 2);
       apiary.isComplete = true;
       housingEntity.addComponent(apiary);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 95;
+      building.cleanliness = 95;
 
       // Execute CleanHousingAction
       // Should cap at 100, not go above
-      expect((building as any).cleanliness).toBeLessThanOrEqual(100);
+      expect(building.cleanliness).toBeLessThanOrEqual(100);
     });
   });
 
   describe('Event Emissions', () => {
     it('should emit housing_dirty event only once when crossing threshold', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
@@ -401,14 +401,14 @@ describe('Animal Housing - Cleanliness System', () => {
       eventBus.subscribe('housing_dirty', eventListener);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 35;
+      building.cleanliness = 35;
 
       // First drop below 30 - should emit
-      (building as any).cleanliness = 28;
+      building.cleanliness = 28;
       // AnimalHousingSystem processes
 
       // Second update, still below 30 - should NOT emit again
-      (building as any).cleanliness = 25;
+      building.cleanliness = 25;
       // AnimalHousingSystem processes
 
       // Expect only 1 emission
@@ -417,7 +417,7 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should emit housing_full event when reaching capacity', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
@@ -425,10 +425,10 @@ describe('Animal Housing - Cleanliness System', () => {
       eventBus.subscribe('housing_full', eventListener);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).currentOccupants = 5; // Not full
+      building.currentOccupants = 5; // Not full
 
       // Assign 6th dog - reaches capacity
-      (building as any).currentOccupants = 6;
+      building.currentOccupants = 6;
 
       // Should emit 'housing_full' event
       // This will fail until event emission is implemented
@@ -436,7 +436,7 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should include building ID and cleanliness in housing_dirty event', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
@@ -444,7 +444,7 @@ describe('Animal Housing - Cleanliness System', () => {
       eventBus.subscribe('housing_dirty', eventListener);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 25;
+      building.cleanliness = 25;
 
       // AnimalHousingSystem emits event
       // Event data should include: { buildingId, cleanliness, buildingType }
@@ -456,7 +456,7 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Edge Cases', () => {
     it('should handle cleanliness decay when building is destroyed', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
@@ -495,12 +495,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should handle animal death while housed', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).currentOccupants = 3;
+      building.currentOccupants = 3;
 
       const dogEntity = world.createEntity();
       const dogData = {
@@ -535,12 +535,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should handle concurrent cleaning attempts', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn, 3);
       barn.isComplete = true;
       housingEntity.addComponent(barn);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).cleanliness = 40;
+      building.cleanliness = 40;
 
       // Agent 1 starts cleaning
       // Agent 2 starts cleaning simultaneously
@@ -550,16 +550,16 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should maintain cleanliness at 100 for newly built housing', () => {
       const housingEntity = world.createEntity();
-      const aquarium = createBuildingComponent(BuildingType.Aquarium as any, 2);
+      const aquarium = createBuildingComponent(BuildingType.Aquarium, 2);
       aquarium.progress = 100;
       aquarium.isComplete = true;
       housingEntity.addComponent(aquarium);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      expect((building as any).cleanliness).toBe(100);
+      expect(building.cleanliness).toBe(100);
 
       // Even after update ticks, should remain 100 if no animals
-      (building as any).currentOccupants = 0;
+      building.currentOccupants = 0;
       // After system update, cleanliness should still be 100
     });
   });
@@ -570,7 +570,7 @@ describe('Animal Housing - Cleanliness System', () => {
       const housingBuildings = [];
       for (let i = 0; i < 20; i++) {
         const housingEntity = world.createEntity();
-        const building = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
+        const building = createBuildingComponent(BuildingType.ChickenCoop, 2);
         building.isComplete = true;
         housingEntity.addComponent(building);
         housingBuildings.push(housingEntity);
@@ -582,13 +582,13 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should only decay cleanliness once per day, not per tick', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
       const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
-      (building as any).currentOccupants = 4;
-      (building as any).cleanliness = 100;
+      building.currentOccupants = 4;
+      building.cleanliness = 100;
 
       // Process 100 ticks within the same day
       // Cleanliness should NOT decay 100 times

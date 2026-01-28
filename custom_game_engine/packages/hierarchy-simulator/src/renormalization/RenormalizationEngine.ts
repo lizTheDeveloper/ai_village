@@ -683,7 +683,7 @@ export class RenormalizationEngine {
       totalBelievers,
       beliefDensity: tier.population.total > 0 ? totalBelievers / tier.population.total : 0,
       byDeity,
-      dominantDeity: byDeity.size > 0 ? Array.from(byDeity.keys())[0] : null,
+      dominantDeity: byDeity.size > 0 ? Array.from(byDeity.keys())[0]! : null,
       temples: new Map(Array.from(byDeity.entries()).map(([id, s]) => [id, s.temples])),
       recentMiracles: new Map(),
     };

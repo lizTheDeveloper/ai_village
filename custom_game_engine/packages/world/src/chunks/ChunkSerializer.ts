@@ -403,6 +403,7 @@ export class ChunkSerializer {
       generated: serialized.generated,
       tiles,
       entities: new Set(entityIds),
+      version: 0, // Freshly loaded chunks start at version 0
     };
   }
 
@@ -521,6 +522,7 @@ export class ChunkSerializer {
       generated: true,
       tiles,
       entities: new Set(),
+      version: 0, // Corrupted chunks start at version 0
     };
   }
 }

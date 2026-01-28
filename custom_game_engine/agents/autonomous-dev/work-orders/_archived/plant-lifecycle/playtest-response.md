@@ -415,7 +415,7 @@ In browser dev tools: **Cmd+Shift+R** (Mac) or **Ctrl+Shift+R** (Windows/Linux)
 
 #### Test C: Verify genetics
 - Check console logs for "Plant genetics: {...}"
-- **Expected:** yieldAmount matches species (grass: 0.5, wildflower: 0.8, berry-bush: 1.3)
+- **Expected:** yieldAmount matches species (grass: 0.5, wildflower: 0.8, blueberry-bush: 1.3)
 - **Expected:** Seed counts calculated correctly using species genetics
 
 #### Test D: Verify seed dispersal

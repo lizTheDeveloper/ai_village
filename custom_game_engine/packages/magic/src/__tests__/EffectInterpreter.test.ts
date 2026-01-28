@@ -62,10 +62,10 @@ function createMockEntity(overrides: Partial<any> = {}): Entity {
     components,
     hasComponent: (type: string) => components.has(type),
     getComponent: (type: string) => components.get(type),
-    addComponent: vi.fn((comp: any) => components.set(comp.type, comp)),
+    addComponent: vi.fn((comp) => components.set(comp.type, comp)),
     updateComponent: vi.fn(),
     removeComponent: vi.fn((type: string) => components.delete(type))
-  } as any;
+  };
 }
 
 function createMockWorld(entities: Entity[] = []): World {
@@ -87,7 +87,7 @@ function createMockWorld(entities: Entity[] = []): World {
       }
     }),
     tick: 0
-  } as any;
+  };
 }
 
 function createMockContext(overrides: Partial<EffectContext> = {}): EffectContext {
@@ -1588,7 +1588,7 @@ describe('EffectInterpreter - Control Flow', () => {
           op: '>',
           left: 'caster.health',
           right: 50
-        } as any,
+        } as Condition,
         then: [{ op: 'heal', amount: 10 }],
         else: [{ op: 'heal', amount: 50 }]
       }],
@@ -1613,7 +1613,7 @@ describe('EffectInterpreter - Control Flow', () => {
           op: '>',
           left: 'caster.health',
           right: 50
-        } as any,
+        } as Condition,
         then: [{ op: 'heal', amount: 10 }],
         else: [{ op: 'heal', amount: 50 }]
       }],
@@ -1629,7 +1629,7 @@ describe('EffectInterpreter - Control Flow', () => {
       target: { type: 'self' },
       operations: [{
         op: 'conditional',
-        condition: { op: '==', left: 1, right: 1 } as any,
+        condition: { op: '==', left: 1, right: 1 } as Condition,
         then: [{ op: 'heal', amount: 5 }]
       }],
       timing: { type: 'immediate' }
@@ -1709,10 +1709,10 @@ describe('EffectInterpreter - Control Flow', () => {
       target: { type: 'self' },
       operations: [{
         op: 'conditional',
-        condition: { op: '>', left: 'caster.health', right: 50 } as any,
+        condition: { op: '>', left: 'caster.health', right: 50 } as Condition,
         then: [{
           op: 'conditional',
-          condition: { op: '>', left: 'caster.health', right: 75 } as any,
+          condition: { op: '>', left: 'caster.health', right: 75 } as Condition,
           then: [{ op: 'heal', amount: 5 }],
           else: [{ op: 'heal', amount: 10 }]
         }],
@@ -1852,7 +1852,7 @@ describe('EffectInterpreter - Conditions', () => {
         op: '>',
         left: 'caster.health',
         right: 0
-      } as any]
+      } as Condition]
     };
 
     const result = interpreter.execute(effect, context);
@@ -1868,7 +1868,7 @@ describe('EffectInterpreter - Conditions', () => {
         op: '<',
         left: 'caster.health',
         right: 0
-      } as any]
+      } as Condition]
     };
 
     const result = interpreter.execute(effect, context);
@@ -1882,8 +1882,8 @@ describe('EffectInterpreter - Conditions', () => {
       operations: [{ op: 'heal', amount: 10 }],
       timing: { type: 'immediate' },
       conditions: [
-        { op: '>', left: 'caster.health', right: 50 } as any,
-        { op: '<=', left: 'caster.health', right: 100 } as any
+        { op: '>', left: 'caster.health', right: 50 } as Condition,
+        { op: '<=', left: 'caster.health', right: 100 } as Condition
       ]
     };
 
@@ -1908,7 +1908,7 @@ describe('EffectInterpreter - Conditions', () => {
           left: 'caster.health',
           right: 100
         }
-      } as any]
+      } as Condition]
     };
 
     const result = interpreter.execute(effect, context);
@@ -1932,7 +1932,7 @@ describe('EffectInterpreter - Conditions', () => {
           left: 'caster.health',
           right: 75
         }
-      } as any]
+      } as Condition]
     };
 
     const result = interpreter.execute(effect, context);
@@ -1947,7 +1947,7 @@ describe('EffectInterpreter - Conditions', () => {
       conditions: [{
         fn: 'has_status',
         args: ['burning']
-      } as any]
+      } as Condition]
     };
 
     const result = interpreter.execute(effect, context);
@@ -1963,7 +1963,7 @@ describe('EffectInterpreter - Conditions', () => {
         op: '>',
         left: 'invalid.path.xyz',
         right: 0
-      } as any]
+      } as Condition]
     };
 
     expect(() => interpreter.execute(effect, context)).toThrow();
@@ -2105,7 +2105,7 @@ describe('EffectInterpreter - Security Limits', () => {
     for (let i = 0; i < 20; i++) {
       nestedOp = {
         op: 'conditional',
-        condition: { op: '==', left: 1, right: 1 } as any,
+        condition: { op: '==', left: 1, right: 1 } as Condition,
         then: [nestedOp]
       };
     }
@@ -2170,11 +2170,12 @@ describe('EffectInterpreter - Security Limits', () => {
   });
 
   it('should reject malicious payloads in expressions', () => {
+    const maliciousAmount: number = '__proto__.polluted' as never;
     const effect: EffectExpression = {
       target: { type: 'self' },
       operations: [{
         op: 'heal',
-        amount: '__proto__.polluted' as any
+        amount: maliciousAmount
       }],
       timing: { type: 'immediate' }
     };
@@ -2183,11 +2184,12 @@ describe('EffectInterpreter - Security Limits', () => {
   });
 
   it('should prevent code injection in variable references', () => {
+    const maliciousCode: number = 'process.exit(1)' as never;
     const effect: EffectExpression = {
       target: { type: 'self' },
       operations: [{
         op: 'heal',
-        amount: 'process.exit(1)' as any
+        amount: maliciousCode
       }],
       timing: { type: 'immediate' }
     };
@@ -2299,7 +2301,7 @@ describe('EffectInterpreter - Integration', () => {
           op: '<',
           left: 'target.health',
           right: 50
-        } as any,
+        } as Condition,
         then: [{ op: 'heal', amount: 40 }],
         else: [{ op: 'heal', amount: 20 }]
       }],
@@ -2411,7 +2413,7 @@ describe('EffectInterpreter - Integration', () => {
           condition: {
             fn: 'has_status',
             args: ['burning']
-          } as any,
+          } as Condition,
           then: [
             { op: 'deal_damage', damageType: 'fire', amount: 50 },
             { op: 'emit_event', eventType: 'combo_triggered', payload: {} }

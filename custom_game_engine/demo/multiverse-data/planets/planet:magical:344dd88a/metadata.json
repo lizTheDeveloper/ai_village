@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:344dd88a",
+  "name": "Lunar--938",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769488479246",
+  "createdAt": 1769488479253,
+  "lastAccessedAt": 1769488479253,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769488479246",
+    "type": "magical"
+  }
+}

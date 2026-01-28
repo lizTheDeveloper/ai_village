@@ -1416,7 +1416,11 @@ export class MultiverseNetworkManager {
         reject(new Error('Acknowledgment timeout'));
       }, this.ACK_TIMEOUT_MS);
 
-      this.pendingAcks.set(key, { resolve: resolve as any, reject: reject as any, timeout });
+      this.pendingAcks.set(key, {
+        resolve: resolve as unknown as (value: unknown) => void,
+        reject: reject as (error: Error) => void,
+        timeout
+      });
     });
   }
 
@@ -1435,7 +1439,11 @@ export class MultiverseNetworkManager {
         reject(new Error('Response timeout'));
       }, this.ACK_TIMEOUT_MS);
 
-      this.pendingAcks.set(key, { resolve: resolve as any, reject: reject as any, timeout });
+      this.pendingAcks.set(key, {
+        resolve: resolve as unknown as (value: unknown) => void,
+        reject: reject as (error: Error) => void,
+        timeout
+      });
     });
   }
 

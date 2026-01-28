@@ -158,7 +158,7 @@ export class ChatRoomSystem extends BaseSystem {
    * Get or create a chat room
    */
   getOrCreateRoom(world: World, config: ChatRoomConfig): ChatRoomComponent {
-    // Check if room already exists
+    // Check if room already exists in our runtime map
     const existingEntityId = this.roomEntities.get(config.id);
     if (existingEntityId) {
       const entity = world.getEntity(existingEntityId);
@@ -168,7 +168,21 @@ export class ChatRoomSystem extends BaseSystem {
       }
     }
 
-    // Create new room
+    // Check if room exists in the world (e.g., from a loaded save)
+    // This handles the case where roomEntities map is empty after load
+    const chatEntities = world.query().with(ComponentType.ChatRoom).executeEntities();
+    for (const existingEntity of chatEntities) {
+      const existingRoom = existingEntity.components.get(ComponentType.ChatRoom) as ChatRoomComponent;
+      if (existingRoom && existingRoom.config.id === config.id) {
+        // Found existing room from save - register it in our map and return
+        this.roomEntities.set(config.id, existingEntity.id);
+        this.knownMembers.set(config.id, new Set(existingRoom.config.membership.members));
+        console.log(`[ChatRoomSystem] Found existing room from save: ${config.name} (${existingRoom.messages.length} messages)`);
+        return existingRoom;
+      }
+    }
+
+    // Create new room (no existing one found)
     const entity = world.createEntity();
     const room = createChatRoomComponent(config, world.tick);
     // Cast required: world.createEntity() returns Entity interface,
@@ -468,7 +482,8 @@ export class ChatRoomSystem extends BaseSystem {
 
     // Emit event for UI and other systems (e.g., AdminAngelSystem)
     // Must use world.eventBus so other systems can receive it
-    world.eventBus.emit({
+    // Use emitImmediate() for chat messages so they're broadcast to windows without tick delay
+    world.eventBus.emitImmediate({
       type: 'chat:message_sent',
       source: 'chat_room_system',
       data: {

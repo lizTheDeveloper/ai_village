@@ -89,8 +89,9 @@ export class StatisticalModeManager extends BaseSystem {
   public readonly id: SystemId = 'statistical_mode_manager';
   public readonly priority: number = 6; // After TimeCompressionSystem, before gameplay
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
-  public readonly activationComponents = [] as const; // Always run to check mode
-  protected readonly throttleInterval = 0; // EVERY_TICK - critical for mode management
+  public readonly activationComponents = [CT.TimeCompression] as const; // Only run when time compression exists
+  // PERF: Mode transitions are rare - check every 10 ticks (0.5s delay is fine)
+  protected readonly throttleInterval = 10;
 
   /**
    * Systems that must run before this one.

@@ -1,5 +1,6 @@
 import type {
   World,
+  WorldMutator,
   Entity,
   PositionComponent,
   RenderableComponent,
@@ -96,6 +97,10 @@ export class Renderer {
   // Position cache for sorting - avoids repeated component lookups during sort comparator
   // Format: [entity_index, y, z, entity_index, y, z, ...] - parallel with _sortedEntities
   private _sortPositionCache: Float32Array = new Float32Array(1024 * 3);
+  // Reusable Map for entity index lookup during sorting (avoids O(n) Map allocation per frame)
+  private _sortEntityToIndex: Map<Entity, number> = new Map();
+  // Reusable screen position for worldToScreen calls (avoids object allocation per entity)
+  private _screenPos: { x: number; y: number; parallax: import('./Camera.js').ParallaxTransform | null } = { x: 0, y: 0, parallax: null };
 
   // Query result caching to avoid expensive ECS queries every frame
   // Buildings rarely change, so cache for 60 frames (~3 seconds at 20 TPS)
@@ -440,7 +445,7 @@ export class Renderer {
             `This indicates camera scrolled faster than background generation. ` +
             `Consider increasing BackgroundChunkGenerator throttle or adding more predictive loading.`
           );
-          this.terrainGenerator.generateChunk(chunk, world);
+          this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
         }
 
         this.terrainRenderer.renderChunk(chunk, this.camera);
@@ -582,7 +587,7 @@ export class Renderer {
       // Cache positions once (O(n) component lookups instead of O(n log n))
       const posCache = this._sortPositionCache;
       for (let i = 0; i < count; i++) {
-        const pos = entitiesArray[i].components.get('position') as PositionComponent | undefined;
+        const pos = entitiesArray[i]!.components.get('position') as PositionComponent | undefined;
         const idx = i * 2;
         posCache[idx] = pos?.y ?? 0;
         posCache[idx + 1] = pos?.z ?? 0;
@@ -591,13 +596,14 @@ export class Renderer {
       // Copy to sorted array
       this._sortedEntities.length = 0;
       for (let i = 0; i < count; i++) {
-        this._sortedEntities.push(entitiesArray[i]);
+        this._sortedEntities.push(entitiesArray[i]!);
       }
 
-      // Sort using WeakMap for O(1) index lookup
-      const entityToIndex = new Map<Entity, number>();
+      // Sort using reusable Map for O(1) index lookup (cleared and reused to avoid GC)
+      const entityToIndex = this._sortEntityToIndex;
+      entityToIndex.clear();
       for (let i = 0; i < count; i++) {
-        entityToIndex.set(entitiesArray[i], i);
+        entityToIndex.set(entitiesArray[i]!, i);
       }
 
       this._sortedEntities.sort((a, b) => {
@@ -605,11 +611,11 @@ export class Renderer {
         const idxB = entityToIndex.get(b)! * 2;
 
         // Primary sort by Y (lower Y renders first - back to front)
-        const yDiff = posCache[idxA] - posCache[idxB];
+        const yDiff = posCache[idxA]! - posCache[idxB]!;
         if (yDiff !== 0) return yDiff;
 
         // Secondary sort by Z
-        return posCache[idxA + 1] - posCache[idxB + 1];
+        return posCache[idxA + 1]! - posCache[idxB + 1]!;
       });
       entities = this._sortedEntities;
     }
@@ -626,8 +632,8 @@ export class Renderer {
       const worldX = pos.x * this.tileSize;
       const worldY = pos.y * this.tileSize;
 
-      // Convert world coordinates to screen coordinates
-      const screen = this.camera.worldToScreen(worldX, worldY, entityZ);
+      // Convert world coordinates to screen coordinates (zero-allocation path)
+      const screen = this.camera.worldToScreenInto(worldX, worldY, entityZ, this._screenPos);
 
       // Check if this is a building under construction
       const building = entity.components.get('building') as BuildingComponent | undefined;
@@ -886,15 +892,15 @@ export class Renderer {
 
       if (!pos) continue;
 
-      // Convert world position to screen position
+      // Convert world position to screen position (zero-allocation path)
       const worldX = pos.x * this.tileSize + this.tileSize / 2;
       const worldY = pos.y * this.tileSize;
-      const screen = this.camera.worldToScreen(worldX, worldY);
+      this.camera.worldToScreenInto(worldX, worldY, 0, this._screenPos);
 
       agentData.push({
         id: entity.id,
-        x: screen.x,
-        y: screen.y,
+        x: this._screenPos.x,
+        y: this._screenPos.y,
         name: this.showAgentNames ? identity?.name : undefined
       });
     }

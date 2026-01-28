@@ -29,11 +29,12 @@ interface CascadeNode {
   children: CascadeNode[];
 }
 
-interface CascadeTree {
-  behavior: string;
-  root: string;
-  children: CascadeNode[];
-}
+// CascadeTree interface for documentation purposes
+// interface _CascadeTree {
+//   behavior: string;
+//   root: string;
+//   children: CascadeNode[];
+// }
 
 export function CulturalDiffusionView({
   data: propData,
@@ -41,12 +42,12 @@ export function CulturalDiffusionView({
   showCascades = false,
   showAdoption = false,
   showTransmissionRates = false,
-  filterBehavior,
+  filterBehavior: _filterBehavior,
 }: CulturalDiffusionViewProps) {
   const sankeyRef = useRef<SVGSVGElement>(null);
   const storeData = useMetricsStore((state) => state.culturalData);
   const storeLoading = useMetricsStore((state) => state.isLoading);
-  const [hoveredLink, setHoveredLink] = useState<number | null>(null);
+  const [_hoveredLink, setHoveredLink] = useState<number | null>(null);
   const [expandedCascades, setExpandedCascades] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
@@ -99,7 +100,8 @@ export function CulturalDiffusionView({
         })),
       };
 
-      const { nodes, links } = sankeyGenerator(graph);
+      const sankeyResult = sankeyGenerator(graph as any);
+      const { nodes, links } = sankeyResult;
 
       const g = svg.append('g');
 
@@ -151,7 +153,7 @@ export function CulturalDiffusionView({
         })
         .attr('stroke-width', (d: any) => Math.max(1, d.width))
         .attr('opacity', 0.5)
-        .on('mouseenter', function(event: MouseEvent, d: any) {
+        .on('mouseenter', function(_event: any, d: any) {
           const linkIndex = links.indexOf(d);
           setHoveredLink(linkIndex);
 
@@ -160,7 +162,13 @@ export function CulturalDiffusionView({
             (l) => nodeMap.get(l.source) === d.source.index && nodeMap.get(l.target) === d.target.index
           );
 
-          d3.select(this.parentNode as Element)
+          // Use d3.select(this) to avoid typing issues with 'this.parentNode'
+          const element = d3.select(this);
+          const node = element.node();
+          const parentElement = node && 'parentNode' in node ? node.parentNode : null;
+          if (!parentElement) return;
+
+          d3.select(parentElement as Element)
             .append('text')
             .attr('class', 'link-tooltip')
             .attr('x', (d.source.x1 + d.target.x0) / 2)
@@ -171,7 +179,11 @@ export function CulturalDiffusionView({
         })
         .on('mouseleave', function() {
           setHoveredLink(null);
-          d3.select(this.parentNode as Element).selectAll('.link-tooltip').remove();
+          const element = d3.select(this);
+          const node = element.node();
+          const parentElement = node && 'parentNode' in node ? node.parentNode : null;
+          if (!parentElement) return;
+          d3.select(parentElement as Element).selectAll('.link-tooltip').remove();
         });
 
       setError(null);
@@ -346,12 +358,6 @@ export function CulturalDiffusionView({
             <h3>Cascade Trees</h3>
             <div data-testid="cascade-tree">
               {data.cascadeTrees.map((cascade) => {
-                // Create a root node that wraps the cascade children
-                const rootNode: CascadeNode = {
-                  agent: cascade.root,
-                  timestamp: 0, // Root doesn't have a timestamp
-                  children: cascade.children,
-                };
                 const rootKey = 'root';
                 const isExpanded = expandedCascades.has(rootKey);
 

@@ -215,6 +215,18 @@ export class NeedsComponent extends ComponentBase {
     // Apply overrides
     if (options) {
       Object.assign(this, options);
+
+      // Re-hydrate Set from serialized data (could be array or plain object)
+      if (options.starvationDayMemoriesIssued !== undefined) {
+        if (options.starvationDayMemoriesIssued instanceof Set) {
+          this.starvationDayMemoriesIssued = options.starvationDayMemoriesIssued;
+        } else if (Array.isArray(options.starvationDayMemoriesIssued)) {
+          this.starvationDayMemoriesIssued = new Set(options.starvationDayMemoriesIssued);
+        } else {
+          // Unknown format, create empty Set
+          this.starvationDayMemoriesIssued = new Set<number>();
+        }
+      }
     }
   }
 

@@ -104,12 +104,14 @@ const IdentitySchema = defineComponent<IdentityComponent>({
   },
 
   validate: (data): data is IdentityComponent => {
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+    const candidate = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'identity' &&
-      typeof (data as any).name === 'string' &&
-      typeof (data as any).age === 'number'
+      candidate.type === 'identity' &&
+      typeof candidate.name === 'string' &&
+      typeof candidate.age === 'number'
     );
   },
 
@@ -150,12 +152,14 @@ const HealthSchema = defineComponent<HealthComponent>({
   },
 
   validate: (data): data is HealthComponent => {
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+    const candidate = data as Record<string, unknown>;
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      (data as any).type === 'health' &&
-      typeof (data as any).current === 'number' &&
-      typeof (data as any).max === 'number'
+      candidate.type === 'health' &&
+      typeof candidate.current === 'number' &&
+      typeof candidate.max === 'number'
     );
   },
 
@@ -185,7 +189,7 @@ describe('Phase 2B: Mutation Layer', () => {
   describe('ValidationService', () => {
     it('should validate correct types', () => {
       const result = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'name',
         'Bob',
         false
@@ -195,7 +199,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
     it('should reject incorrect types', () => {
       const result = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'name',
         123,
         false
@@ -205,21 +209,21 @@ describe('Phase 2B: Mutation Layer', () => {
     });
 
     it('should validate number ranges', () => {
-      const valid = ValidationService.validate(IdentitySchema as any, 'age', 50, false);
+      const valid = ValidationService.validate(IdentitySchema, 'age', 50, false);
       expect(valid.valid).toBe(true);
 
-      const tooLow = ValidationService.validate(IdentitySchema as any, 'age', -5, false);
+      const tooLow = ValidationService.validate(IdentitySchema, 'age', -5, false);
       expect(tooLow.valid).toBe(false);
       expect(tooLow.error).toContain('must be between 0 and 10000');
 
-      const tooHigh = ValidationService.validate(IdentitySchema as any, 'age', 20000, false);
+      const tooHigh = ValidationService.validate(IdentitySchema, 'age', 20000, false);
       expect(tooHigh.valid).toBe(false);
     });
 
     it('should validate enum values', () => {
       // Use isDev=true to bypass mutability check (species is immutable)
       const valid = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'species',
         'elf',
         true // Dev mode to bypass mutability
@@ -227,7 +231,7 @@ describe('Phase 2B: Mutation Layer', () => {
       expect(valid.valid).toBe(true);
 
       const invalid = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'species',
         'orc',
         true // Dev mode to bypass mutability
@@ -237,11 +241,11 @@ describe('Phase 2B: Mutation Layer', () => {
     });
 
     it('should validate string max length', () => {
-      const valid = ValidationService.validate(IdentitySchema as any, 'name', 'Bob', false);
+      const valid = ValidationService.validate(IdentitySchema, 'name', 'Bob', false);
       expect(valid.valid).toBe(true);
 
       const tooLong = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'name',
         'A'.repeat(100),
         false
@@ -252,7 +256,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
     it('should protect immutable fields', () => {
       const result = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'species',
         'elf',
         false
@@ -263,7 +267,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
     it('should allow dev to mutate immutable fields', () => {
       const result = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'species',
         'elf',
         true
@@ -273,7 +277,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
     it('should reject mutations to non-existent fields', () => {
       const result = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'nonexistent',
         'value',
         false
@@ -284,7 +288,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
     it('should reject null for required fields', () => {
       const result = ValidationService.validate(
-        IdentitySchema as any,
+        IdentitySchema,
         'name',
         null,
         false
@@ -301,7 +305,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
       const command = {
         entityId: 'test',
-        componentType: 'test' as any,
+        componentType: 'test',
         fieldName: 'value',
         oldValue: 10,
         newValue: 20,
@@ -324,7 +328,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
       const command = {
         entityId: 'test',
-        componentType: 'test' as any,
+        componentType: 'test',
         fieldName: 'value',
         oldValue: 10,
         newValue: 20,
@@ -351,7 +355,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
       const command = {
         entityId: 'test',
-        componentType: 'test' as any,
+        componentType: 'test',
         fieldName: 'value',
         oldValue: 10,
         newValue: 20,
@@ -378,7 +382,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
       const command1 = {
         entityId: 'test',
-        componentType: 'test' as any,
+        componentType: 'test',
         fieldName: 'value',
         oldValue: 10,
         newValue: 20,
@@ -392,7 +396,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
       const command2 = {
         entityId: 'test',
-        componentType: 'test' as any,
+        componentType: 'test',
         fieldName: 'value',
         oldValue: 20,
         newValue: 30,
@@ -419,7 +423,7 @@ describe('Phase 2B: Mutation Layer', () => {
 
       const makeCommand = (n: number) => ({
         entityId: 'test',
-        componentType: 'test' as any,
+        componentType: 'test',
         fieldName: 'value',
         oldValue: n - 1,
         newValue: n,

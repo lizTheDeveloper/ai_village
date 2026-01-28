@@ -11,7 +11,7 @@
 
 import type { World, Entity } from '@ai-village/core';
 import { EntityImpl, BaseSystem, type SystemContext } from '@ai-village/core';
-import type { DeltaUpdate } from './path-prediction-types.js';
+import type { DeltaUpdate, PathPrediction } from './path-prediction-types.js';
 
 /**
  * Callback type for broadcasting delta updates
@@ -100,7 +100,7 @@ export class DeltaSyncSystem extends BaseSystem {
     const isNew = dirtyData && dirtyData.reason === 'new';
 
     const posData = position as { x: number; y: number } | undefined;
-    const predictionData = pathPrediction as { prediction: unknown } | undefined;
+    const predictionData = pathPrediction as { prediction: PathPrediction } | undefined;
 
     const update: DeltaUpdate['updates'][0] = {
       entityId: entity.id,
@@ -127,6 +127,7 @@ export class DeltaSyncSystem extends BaseSystem {
     // Essential components for all entities
     const essentialTypes = [
       'position',
+      'renderable',  // CRITICAL: Needed for entity rendering
       'velocity',
       'sprite',
       'identity',

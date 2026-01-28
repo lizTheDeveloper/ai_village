@@ -115,11 +115,11 @@ export class ParasiticReproductionSystem extends BaseSystem {
       const collective = entity.getComponent<CollectiveMindComponent>('collective_mind');
       if (!collective) continue;
 
-      this.processCollective(ctx.world as any, entity.id, collective, currentTick);
+      this.processCollective(ctx.world, entity.id, collective, currentTick);
     }
 
     // Process scheduled colonizations
-    this.processScheduledColonizations(ctx.world as any, currentTick);
+    this.processScheduledColonizations(ctx.world, currentTick);
   }
 
   private processCollective(

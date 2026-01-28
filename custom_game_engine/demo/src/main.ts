@@ -1284,14 +1284,14 @@ function setupWindowManager(
     minWidth: 350,
     minHeight: 400,
     showInWindowList: true,
-    keyboardShortcut: 'G',
+    keyboardShortcut: 'O',
     menuCategory: 'social',
     contentChecker: hasGovernance,
   });
 
   // Register governance keyboard shortcut
   keyboardRegistry.register('toggle_governance', {
-    key: 'G',
+    key: 'O',
     description: 'Toggle governance dashboard',
     category: 'Windows',
     handler: () => {
@@ -3905,6 +3905,8 @@ async function main() {
         loadedCheckpoint = true;
         universeSelection = { type: 'load', checkpointKey: browserResult.saveKey };
         console.log('[Main] Save loaded successfully via SharedWorker');
+        // Clear any stale creation state since we successfully loaded
+        await creationStateManager.clearCreationState();
       } else {
         console.error(`[Demo] Failed to load checkpoint via worker: ${loadResult.error}`);
         // Fall back to showing universe creation screen
@@ -3981,6 +3983,39 @@ async function main() {
       universeConfigScreen.show((config) => {
         universeConfig = config;
         resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+      });
+    });
+  }
+
+  // In SharedWorker mode, tell the worker to start the simulation
+  // This is needed when creating a NEW universe (not loading from save)
+  if (isSharedWorkerMode && sharedWorkerBridge && universeSelection.type === 'new' && !workerAlreadyRunning) {
+    console.log('[Main] Starting SharedWorker simulation for new universe...');
+
+    // Wait for worker to be ready, then tell it to create a new universe
+    await new Promise<void>((resolve) => {
+      const unsubProgress = sharedWorkerBridge!.onLoadingProgress((progress) => {
+        console.log(`[Main] Worker loading: ${progress.message} (${progress.progress}%)`);
+      });
+
+      const unsub = sharedWorkerBridge!.onLoadComplete(async (result) => {
+        unsub();
+        unsubProgress();
+        if (result.success) {
+          console.log('[Main] SharedWorker started successfully');
+          // Clear creation state since SharedWorker now owns the universe
+          // This prevents the "resuming creation" loop on next page load
+          await creationStateManager.clearCreationState();
+          console.log('[Main] Cleared creation state (SharedWorker handles persistence)');
+        } else {
+          console.error('[Main] SharedWorker failed to start:', result.error);
+        }
+        resolve();
+      });
+
+      sharedWorkerBridge!.createNewUniverse({
+        name: universeConfig?.universeName,
+        magicParadigm: universeSelection.magicParadigm,
       });
     });
   }
@@ -4474,60 +4509,70 @@ async function main() {
   setupVisualEventHandlers(gameContext, uiContext);
   setupInputHandlers(gameContext, uiContext, inputHandler);
 
-  // Render loop
+  // Render loop with error handling to prevent silent failures
+  let renderLoopStarted = false;
   function renderLoop() {
-    inputHandler.update();
+    try {
+      inputHandler.update();
 
-    const selectedEntity = panels.agentInfoPanel.getSelectedEntity() || panels.animalInfoPanel.getSelectedEntity();
-    renderer.render(gameLoop.world, selectedEntity);
-    placementUI.render(renderer.getContext());
+      const selectedEntity = panels.agentInfoPanel.getSelectedEntity() || panels.animalInfoPanel.getSelectedEntity();
+      renderer.render(gameLoop.world, selectedEntity);
+      placementUI.render(renderer.getContext());
 
-    const selectedAgentId = panels.agentInfoPanel.getSelectedEntityId();
-    if (selectedAgentId) {
-      const selectedAgentEntity = gameLoop.world.getEntity(selectedAgentId);
-      if (selectedAgentEntity) {
-        const inventory = selectedAgentEntity.getComponent('inventory');
-        if (inventory && inventory.type === 'inventory') {
-          panels.inventoryUI.setPlayerInventory(inventory);
+      const selectedAgentId = panels.agentInfoPanel.getSelectedEntityId();
+      if (selectedAgentId) {
+        const selectedAgentEntity = gameLoop.world.getEntity(selectedAgentId);
+        if (selectedAgentEntity) {
+          const inventory = selectedAgentEntity.getComponent('inventory');
+          if (inventory && inventory.type === 'inventory') {
+            panels.inventoryUI.setPlayerInventory(inventory);
+          }
+        }
+      } else {
+        const agents = gameLoop.world.query().with('agent').with('inventory').executeEntities();
+        if (agents.length > 0) {
+          const inventory = agents[0].getComponent('inventory');
+          if (inventory && inventory.type === 'inventory') {
+            panels.inventoryUI.setPlayerInventory(inventory);
+          }
         }
       }
-    } else {
-      const agents = gameLoop.world.query().with('agent').with('inventory').executeEntities();
-      if (agents.length > 0) {
-        const inventory = agents[0].getComponent('inventory');
-        if (inventory && inventory.type === 'inventory') {
-          panels.inventoryUI.setPlayerInventory(inventory);
-        }
+
+      const ctx = renderer.getContext();
+
+      // Update city manager panel and widget
+      panels.cityManagerPanel.update(gameLoop.world);
+      panels.cityStatsWidget.update(gameLoop.world);
+
+      windowManager.render(ctx, gameLoop.world);
+      panels.shopPanel.render(ctx, gameLoop.world);
+
+      // Render city stats widget
+      panels.cityStatsWidget.render(ctx, canvas.width, canvas.height);
+
+      menuBar.render(ctx);
+
+      // Hover info panel (shows entity tooltips on hover)
+      panels.hoverInfoPanel.render(ctx, canvas.width, canvas.height);
+
+      // Update speech bubble positions when camera moves
+      speechBubbleOverlay.updatePositions((agentId) => {
+        const entity = gameLoop.world.getEntity(agentId);
+        if (!entity) return null;
+        const position = entity.components.get('position') as any;
+        if (!position) return null;
+        const camera = renderer.getCamera();
+        const screenPos = camera.worldToScreen(position.x, position.y, position.z || 0);
+        return { x: screenPos.x, y: screenPos.y - 40 };
+      });
+
+      if (!renderLoopStarted) {
+        renderLoopStarted = true;
+        console.log('[RenderLoop] Started successfully');
       }
+    } catch (error) {
+      console.error('[RenderLoop] Error (continuing anyway):', error);
     }
-
-    const ctx = renderer.getContext();
-
-    // Update city manager panel and widget
-    panels.cityManagerPanel.update(gameLoop.world);
-    panels.cityStatsWidget.update(gameLoop.world);
-
-    windowManager.render(ctx, gameLoop.world);
-    panels.shopPanel.render(ctx, gameLoop.world);
-
-    // Render city stats widget
-    panels.cityStatsWidget.render(ctx, canvas.width, canvas.height);
-
-    menuBar.render(ctx);
-
-    // Hover info panel (shows entity tooltips on hover)
-    panels.hoverInfoPanel.render(ctx, canvas.width, canvas.height);
-
-    // Update speech bubble positions when camera moves
-    speechBubbleOverlay.updatePositions((agentId) => {
-      const entity = gameLoop.world.getEntity(agentId);
-      if (!entity) return null;
-      const position = entity.components.get('position') as any;
-      if (!position) return null;
-      const camera = renderer.getCamera();
-      const screenPos = camera.worldToScreen(position.x, position.y, position.z || 0);
-      return { x: screenPos.x, y: screenPos.y - 40 };
-    });
 
     requestAnimationFrame(renderLoop);
   }
@@ -5151,11 +5196,26 @@ async function main() {
   // Game loop already started before soul creation
 
   // Start render loop immediately - don't block on soul creation
+  console.log('[Main] Starting render loop...');
   renderLoop();
+  console.log('[Main] Render loop initiated (first frame scheduled)');
 
   // Wait for soul creation to complete before hiding loading screen and taking snapshot
+  // Use a timeout to prevent hanging forever if LLM calls fail
   if (!loadedCheckpoint && soulCreationPromise) {
-    await soulCreationPromise;
+    const SOUL_CREATION_TIMEOUT_MS = 30000; // 30 seconds
+    try {
+      await Promise.race([
+        soulCreationPromise,
+        new Promise<void>((_, reject) =>
+          setTimeout(() => reject(new Error('Soul creation timed out')), SOUL_CREATION_TIMEOUT_MS)
+        )
+      ]);
+      console.log('[Main] Soul creation completed successfully');
+    } catch (error) {
+      console.warn('[Main] Soul creation did not complete in time (LLM may be unavailable):', error);
+      console.warn('[Main] Proceeding with genesis save anyway - souls can be created later');
+    }
 
     // === INCREMENTAL PERSISTENCE: Phase 4 - Souls Created ===
     try {

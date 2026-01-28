@@ -147,7 +147,7 @@ export class AbstractPlanet extends AbstractTierBase {
     for (let i = 0; i < this.planetaryStats.continentCount; i++) {
       this.namedFeatures.push({
         id: `${this.id}_continent_${i}`,
-        name: continentNames[i % continentNames.length],
+        name: continentNames[i % continentNames.length]!,
         type: 'continent',
         location: {
           lat: (Math.random() - 0.5) * 180,
@@ -161,7 +161,7 @@ export class AbstractPlanet extends AbstractTierBase {
     for (let i = 0; i < oceanCount; i++) {
       this.namedFeatures.push({
         id: `${this.id}_ocean_${i}`,
-        name: oceanNames[i % oceanNames.length],
+        name: oceanNames[i % oceanNames.length]!,
         type: 'ocean',
         location: {
           lat: (Math.random() - 0.5) * 180,
@@ -196,14 +196,14 @@ export class AbstractPlanet extends AbstractTierBase {
       const popShare = this.population.total / civCount;
       this.majorCivilizations.push({
         id: `${this.id}_civ_${i}`,
-        name: civNames[i % civNames.length],
+        name: civNames[i % civNames.length]!,
         population: Math.floor(popShare * (0.8 + Math.random() * 0.4)),
         capital: {
           lat: (Math.random() - 0.5) * 180,
           lon: (Math.random() - 0.5) * 360,
         },
         techLevel: this.civilizationStats.avgTechLevel + Math.floor(Math.random() * 3) - 1,
-        culturalIdentity: ['Democratic', 'Authoritarian', 'Technocratic', 'Theocratic'][i % 4],
+        culturalIdentity: ['Democratic', 'Authoritarian', 'Technocratic', 'Theocratic'][i % 4]!,
         activeWars: [],
       });
     }

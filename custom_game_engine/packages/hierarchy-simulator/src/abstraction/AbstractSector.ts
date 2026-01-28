@@ -134,7 +134,7 @@ export class AbstractSector extends AbstractTierBase {
       'perseus', 'orion', 'sagittarius', 'scutum_centaurus'
     ];
     const spiralArm = distanceFromCore < 50000
-      ? spiralArms[Math.floor((angle + Math.PI) / (2 * Math.PI) * 4)]
+      ? spiralArms[Math.floor((angle + Math.PI) / (2 * Math.PI) * 4)]!
       : 'outer';
 
     // Stellar density (higher near core)
@@ -166,12 +166,12 @@ export class AbstractSector extends AbstractTierBase {
     ];
 
     for (let i = 0; i < entityCount; i++) {
-      const type = entityTypes[Math.floor(Math.random() * entityTypes.length)];
+      const type = entityTypes[Math.floor(Math.random() * entityTypes.length)]!;
       const popShare = this.population.total / entityCount;
 
       this.politicalEntities.push({
         id: `${this.id}_entity_${i}`,
-        name: entityNames[i % entityNames.length],
+        name: entityNames[i % entityNames.length]!,
         type,
         controlledSystems: [], // Will be populated when systems are generated
         population: Math.floor(popShare),
@@ -186,9 +186,9 @@ export class AbstractSector extends AbstractTierBase {
       const stances: Array<'ally' | 'neutral' | 'rival' | 'war'> = ['ally', 'neutral', 'rival', 'war'];
       for (let i = 0; i < this.politicalEntities.length; i++) {
         for (let j = i + 1; j < this.politicalEntities.length; j++) {
-          const stance = stances[Math.floor(Math.random() * stances.length)];
-          this.politicalEntities[i].diplomaticStance.set(this.politicalEntities[j].id, stance);
-          this.politicalEntities[j].diplomaticStance.set(this.politicalEntities[i].id, stance);
+          const stance = stances[Math.floor(Math.random() * stances.length)]!;
+          this.politicalEntities[i]!.diplomaticStance.set(this.politicalEntities[j]!.id, stance);
+          this.politicalEntities[j]!.diplomaticStance.set(this.politicalEntities[i]!.id, stance);
 
           if (stance === 'war') {
             this.sectorStats.activeWars++;
@@ -260,8 +260,8 @@ export class AbstractSector extends AbstractTierBase {
     if (this.politicalEntities.length > 1 && this.sectorStats.politicalStability > 0.9) {
       if (Math.random() < 0.0001 * deltaTime) {
         // Merge two entities
-        const entity1 = this.politicalEntities[0];
-        const entity2 = this.politicalEntities[1];
+        const entity1 = this.politicalEntities[0]!;
+        const entity2 = this.politicalEntities[1]!;
         entity1.population += entity2.population;
         entity1.militaryPower += entity2.militaryPower;
         this.politicalEntities.splice(1, 1);

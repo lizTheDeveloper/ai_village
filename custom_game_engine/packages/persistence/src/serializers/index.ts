@@ -34,6 +34,9 @@ import { SpatialMemorySerializer } from './SpatialMemorySerializer.js';
 import { JournalSerializer } from './JournalSerializer.js';
 import { CourtshipSerializer } from './CourtshipSerializer.js';
 
+// Admin Angel serializer (handles Map in AdminAngelMemory.agentFamiliarity)
+import { AdminAngelSerializer } from './AdminAngelSerializer.js';
+
 /**
  * Register all component serializers.
  * Called automatically when this module is imported.
@@ -70,6 +73,9 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('spatial_memory', new SpatialMemorySerializer());
   componentSerializerRegistry.register('journal', new JournalSerializer());
   componentSerializerRegistry.register('courtship', new CourtshipSerializer());
+
+  // Register admin_angel serializer (handles Map in AdminAngelMemory.agentFamiliarity)
+  componentSerializerRegistry.register('admin_angel', new AdminAngelSerializer());
 
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
@@ -244,3 +250,4 @@ export * from './PlantSerializer.js';
 export * from './SpatialMemorySerializer.js';
 export * from './JournalSerializer.js';
 export * from './CourtshipSerializer.js';
+export * from './AdminAngelSerializer.js';

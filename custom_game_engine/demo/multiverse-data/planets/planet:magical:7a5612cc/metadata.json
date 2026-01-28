@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:7a5612cc",
+  "name": "Alpha Gaia",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769490098983",
+  "createdAt": 1769490099252,
+  "lastAccessedAt": 1769490099252,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769490098983",
+    "type": "magical"
+  }
+}

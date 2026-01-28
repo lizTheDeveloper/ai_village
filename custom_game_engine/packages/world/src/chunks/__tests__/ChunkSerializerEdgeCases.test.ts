@@ -24,7 +24,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.tiles[100]!.plantId = 'non_existent_plant_12345';
       chunk.tiles[200]!.plantId = 'another_missing_plant_67890';
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.tiles[100]!.plantId).toBe('non_existent_plant_12345');
@@ -37,7 +37,7 @@ describe('ChunkSerializer Edge Cases', () => {
 
       chunk.tiles[0]!.plantId = null;
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.tiles[0]!.plantId).toBe(null);
@@ -52,7 +52,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.entities.add('non_existent_entity_2');
       chunk.entities.add('deleted_entity_3');
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.entities.size).toBe(3);
@@ -66,7 +66,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.generated = true;
       chunk.entities.clear();
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.entities.size).toBe(0);
@@ -78,18 +78,28 @@ describe('ChunkSerializer Edge Cases', () => {
       const chunk = createChunk(0, 0);
       chunk.generated = true;
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
 
       // Add future fields that don't exist yet
-      (serialized.tiles.data as any)[0].tile.futureField1 = 'unknown_value';
-      (serialized.tiles.data as any)[0].tile.futureField2 = 12345;
-      (serialized as any).futureChunkField = 'some_future_data';
+      type MutableSerializedChunk = {
+        -readonly [K in keyof SerializedChunk]: SerializedChunk[K];
+      };
+      const mutableSerialized = serialized as MutableSerializedChunk & { futureChunkField?: string };
+
+      if ('data' in mutableSerialized.tiles && Array.isArray(mutableSerialized.tiles.data)) {
+        const firstRun = mutableSerialized.tiles.data[0];
+        if (firstRun && 'tile' in firstRun) {
+          (firstRun.tile as unknown as Record<string, unknown>).futureField1 = 'unknown_value';
+          (firstRun.tile as unknown as Record<string, unknown>).futureField2 = 12345;
+        }
+      }
+      mutableSerialized.futureChunkField = 'some_future_data';
 
       // Should not throw when deserializing
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
-      expect(deserialized.tiles[0]!).toBeDefined();
-      expect((deserialized.tiles[0]! as any).futureField1).toBeUndefined();
+      expect(deserialized.tiles[0]).toBeDefined();
+      expect((deserialized.tiles[0] as Record<string, unknown>).futureField1).toBeUndefined();
     });
 
     it('should handle extra fields in tile data gracefully', () => {
@@ -244,7 +254,7 @@ describe('ChunkSerializer Edge Cases', () => {
         tiles: {
           encoding: 'full',
           data: Array(CHUNK_SIZE * CHUNK_SIZE).fill(null).map(() => ({
-            terrain: 'invalid_terrain_type' as any,
+            terrain: 'invalid_terrain_type',
             elevation: 0,
             moisture: 50,
             fertility: 50,
@@ -257,7 +267,7 @@ describe('ChunkSerializer Edge Cases', () => {
             lastTilled: 0,
             composted: false,
             plantId: null,
-          })),
+          } as any)),
         },
         entityIds: [],
       };
@@ -288,7 +298,7 @@ describe('ChunkSerializer Edge Cases', () => {
             lastTilled: 0,
             composted: false,
             plantId: null,
-          })),
+          } as any)),
         },
         entityIds: [],
       };
@@ -400,17 +410,17 @@ describe('ChunkSerializer Edge Cases', () => {
         constructedAt: 5000,
       };
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
-      const wall = deserialized.tiles[100]!.wall;
+      const wall = deserialized.tiles[100]!.wall!;
       expect(wall).toBeDefined();
-      expect(wall!.material).toBe('stone');
-      expect(wall!.condition).toBe(85);
-      expect(wall!.insulation).toBe(80);
-      expect(wall!.constructionProgress).toBe(100);
-      expect(wall!.builderId).toBe('builder_entity_123');
-      expect(wall!.constructedAt).toBe(5000);
+      expect(wall.material).toBe('stone');
+      expect(wall.condition).toBe(85);
+      expect(wall.insulation).toBe(80);
+      expect(wall.constructionProgress).toBe(100);
+      expect(wall.builderId).toBe('builder_entity_123');
+      expect(wall.constructedAt).toBe(5000);
     });
 
     it('should serialize and deserialize doors', () => {
@@ -425,16 +435,16 @@ describe('ChunkSerializer Edge Cases', () => {
         constructedAt: 2500,
       };
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
-      const door = deserialized.tiles[200]!.door;
+      const door = deserialized.tiles[200]!.door!;
       expect(door).toBeDefined();
-      expect(door!.material).toBe('wood');
-      expect(door!.state).toBe('open');
-      expect(door!.lastOpened).toBe(3000);
-      expect(door!.builderId).toBe('builder_entity_456');
-      expect(door!.constructedAt).toBe(2500);
+      expect(door.material).toBe('wood');
+      expect(door.state).toBe('open');
+      expect(door.lastOpened).toBe(3000);
+      expect(door.builderId).toBe('builder_entity_456');
+      expect(door.constructedAt).toBe(2500);
     });
 
     it('should serialize and deserialize windows', () => {
@@ -449,16 +459,16 @@ describe('ChunkSerializer Edge Cases', () => {
         constructedAt: 4000,
       };
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
-      const window = deserialized.tiles[300]!.window;
+      const window = deserialized.tiles[300]!.window!;
       expect(window).toBeDefined();
-      expect(window!.material).toBe('glass');
-      expect(window!.condition).toBe(90);
-      expect(window!.lightsThrough).toBe(true);
-      expect(window!.builderId).toBe('builder_entity_789');
-      expect(window!.constructedAt).toBe(4000);
+      expect(window.material).toBe('glass');
+      expect(window.condition).toBe(90);
+      expect(window.lightsThrough).toBe(true);
+      expect(window.builderId).toBe('builder_entity_789');
+      expect(window.constructedAt).toBe(4000);
     });
 
     it('should handle tiles with multiple building elements', () => {
@@ -477,7 +487,7 @@ describe('ChunkSerializer Edge Cases', () => {
         lightsThrough: true,
       };
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.tiles[0]!.wall).toBeDefined();
@@ -501,36 +511,38 @@ describe('ChunkSerializer Edge Cases', () => {
         lastUpdate: 1000,
       };
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
-      const fluid = deserialized.tiles[100]!.fluid;
+      const fluid = deserialized.tiles[100]!.fluid!;
       expect(fluid).toBeDefined();
-      expect(fluid!.type).toBe('water');
-      expect(fluid!.depth).toBe(5);
-      expect(fluid!.pressure).toBe(3);
-      expect(fluid!.temperature).toBe(20);
-      expect(fluid!.flowDirection).toEqual({ x: 1, y: 0 });
-      expect(fluid!.flowVelocity).toBe(0.5);
-      expect(fluid!.stagnant).toBe(false);
-      expect(fluid!.lastUpdate).toBe(1000);
+      expect(fluid.type).toBe('water');
+      expect(fluid.depth).toBe(5);
+      expect(fluid.pressure).toBe(3);
+      expect(fluid.temperature).toBe(20);
+      expect(fluid.flowDirection).toEqual({ x: 1, y: 0 });
+      expect(fluid.flowVelocity).toBe(0.5);
+      expect(fluid.stagnant).toBe(false);
+      expect(fluid.lastUpdate).toBe(1000);
     });
 
     it('should handle missing fluid fields gracefully', () => {
       const chunk = createChunk(0, 0);
       chunk.generated = true;
 
-      // Minimal fluid (old save format)
-      chunk.tiles[100]!.fluid = {
+      // Minimal fluid (old save format) - using Partial type for missing optional fields
+      type PartialFluid = Partial<NonNullable<typeof chunk.tiles[0]['fluid']>>;
+      const minimalFluid: PartialFluid = {
         type: 'water',
         depth: 3,
         pressure: 2,
         temperature: 15,
         stagnant: true,
         lastUpdate: 500,
-      } as any;
+      };
+      chunk.tiles[100]!.fluid = minimalFluid as NonNullable<typeof chunk.tiles[0]['fluid']>;
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.tiles[100]!.fluid).toBeDefined();
@@ -603,11 +615,13 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.generated = true;
 
       // All tiles are default (from createDefaultTile)
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
 
       // Should use RLE (highly uniform)
       expect(serialized.tiles.encoding).toBe('rle');
-      expect(serialized.tiles.data.length).toBe(1); // Single run
+      if ('data' in serialized.tiles && Array.isArray(serialized.tiles.data)) {
+        expect(serialized.tiles.data.length).toBe(1); // Single run
+      }
     });
 
     it('should handle chunk with no entities', () => {
@@ -615,7 +629,7 @@ describe('ChunkSerializer Edge Cases', () => {
       chunk.generated = true;
       chunk.entities.clear();
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.entities.size).toBe(0);
@@ -635,7 +649,7 @@ describe('ChunkSerializer Edge Cases', () => {
         tile.plantId = null;
       });
 
-      const serialized = (serializer as any).serializeChunk(chunk);
+      const serialized = serializer.serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
 
       expect(deserialized.tiles[0]!.biome).toBeUndefined();

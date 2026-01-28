@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { AgentInfoPanel } from '../AgentInfoPanel';
 import type { Entity } from '@ai-village/core';
 import type { InventoryComponent } from '@ai-village/core';
@@ -52,15 +52,15 @@ describe('AgentInfoPanel - Inventory Display', () => {
    * Helper to create a mock entity with specified components.
    */
   function createMockEntity(components: Record<string, any>): Entity {
-    const entity: Entity = {
+    const entity: Partial<Entity> = {
       id: 'test-agent-12345678',
       components: new Map(Object.entries(components)),
       addComponent: vi.fn(),
       removeComponent: vi.fn(),
       getComponent: vi.fn((type: string) => components[type]),
       hasComponent: vi.fn((type: string) => type in components),
-    } as any;
-    return entity;
+    };
+    return entity as Entity;
   }
 
   /**
@@ -125,9 +125,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify "INVENTORY" header is rendered
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const inventoryHeaderCall = fillTextCalls.find(
-        (call: any[]) => call[0] === 'INVENTORY'
+        (call: unknown[]) => call[0] === 'INVENTORY'
       );
 
       expect(inventoryHeaderCall).toBeDefined();
@@ -144,7 +144,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify divider lines are drawn (should have multiple dividers)
-      const strokeCalls = (mockCtx.stroke as any).mock.calls;
+      const strokeCalls = (mockCtx.stroke as Mock).mock.calls;
       expect(strokeCalls.length).toBeGreaterThan(0);
     });
 
@@ -158,9 +158,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify "INVENTORY" header is NOT rendered
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const inventoryHeaderCall = fillTextCalls.find(
-        (call: any[]) => call[0] === 'INVENTORY'
+        (call: unknown[]) => call[0] === 'INVENTORY'
       );
 
       expect(inventoryHeaderCall).toBeUndefined();
@@ -178,9 +178,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const woodLineCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('🪵') && call[0].includes('12')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('🪵') && call[0].includes('12')
       );
 
       expect(woodLineCall).toBeDefined();
@@ -195,9 +195,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const stoneLineCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('🪨') && call[0].includes('5')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('🪨') && call[0].includes('5')
       );
 
       expect(stoneLineCall).toBeDefined();
@@ -212,9 +212,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const foodLineCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('🍎') && call[0].includes('3')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('🍎') && call[0].includes('3')
       );
 
       expect(foodLineCall).toBeDefined();
@@ -230,9 +230,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const waterLineCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('💧') && call[0].includes('7')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('💧') && call[0].includes('7')
       );
 
       expect(waterLineCall).toBeDefined();
@@ -253,19 +253,19 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
 
       // Check each resource appears
-      expect(fillTextCalls.some((call: any[]) =>
+      expect(fillTextCalls.some((call: unknown[]) =>
         typeof call[0] === 'string' && call[0].includes('🪵')
       )).toBe(true);
-      expect(fillTextCalls.some((call: any[]) =>
+      expect(fillTextCalls.some((call: unknown[]) =>
         typeof call[0] === 'string' && call[0].includes('🪨')
       )).toBe(true);
-      expect(fillTextCalls.some((call: any[]) =>
+      expect(fillTextCalls.some((call: unknown[]) =>
         typeof call[0] === 'string' && call[0].includes('🍎')
       )).toBe(true);
-      expect(fillTextCalls.some((call: any[]) =>
+      expect(fillTextCalls.some((call: unknown[]) =>
         typeof call[0] === 'string' && call[0].includes('💧')
       )).toBe(true);
     });
@@ -280,16 +280,16 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
 
       // Wood should appear
-      expect(fillTextCalls.some((call: any[]) =>
+      expect(fillTextCalls.some((call: unknown[]) =>
         typeof call[0] === 'string' && call[0].includes('🪵')
       )).toBe(true);
 
       // Stone should NOT appear (quantity 0)
       const stoneLineCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('🪨') && call[0].includes('Stone')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('🪨') && call[0].includes('Stone')
       );
       expect(stoneLineCall).toBeUndefined();
     });
@@ -305,7 +305,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const emptyStateCall = fillTextCalls.find(
         (call: any[]) => call[0] === '(empty)'
       );
@@ -322,9 +322,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const capacityCall = fillTextCalls.find(
-        (call: any[]) =>
+        (call: unknown[]) =>
           typeof call[0] === 'string' &&
           call[0].includes('Weight: 0/100') &&
           call[0].includes('Slots: 0/8')
@@ -344,11 +344,11 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
 
       // Weight: (10 wood * 2) + (5 stone * 3) = 20 + 15 = 35
       const capacityCall = fillTextCalls.find(
-        (call: any[]) =>
+        (call: unknown[]) =>
           typeof call[0] === 'string' && call[0].includes('Weight: 35/100')
       );
 
@@ -364,11 +364,11 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
 
       // 3 resources = 3 slots used
       const capacityCall = fillTextCalls.find(
-        (call: any[]) =>
+        (call: unknown[]) =>
           typeof call[0] === 'string' && call[0].includes('Slots: 3/8')
       );
 
@@ -386,9 +386,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const capacityCall = fillTextCalls.find(
-        (call: any[]) =>
+        (call: unknown[]) =>
           typeof call[0] === 'string' && call[0].includes('Weight: 44/100')
       );
 
@@ -425,9 +425,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       // After rendering, check if yellow was used
       // We need to check the sequence of fillStyle changes
       // This is a simplified check - yellow should be set at some point
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Weight:')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Weight:')
       );
 
       // The test will pass if implementation sets fillStyle to #FFFF00 before capacity text
@@ -444,9 +444,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Weight: 100/100')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Weight: 100/100')
       );
 
       // The test will pass if implementation sets fillStyle to #FF0000 before capacity text
@@ -474,9 +474,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Slots: 7/8')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Slots: 7/8')
       );
 
       expect(capacityIndex).toBeGreaterThan(-1);
@@ -504,9 +504,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       registerEntity(entity);
       panel.render(mockCtx, 1024, 768, mockWorld);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Slots: 8/8')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Slots: 8/8')
       );
 
       expect(capacityIndex).toBeGreaterThan(-1);
@@ -525,9 +525,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify initial wood count
-      let fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      let fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       let woodCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('🪵') && call[0].includes('5')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('🪵') && call[0].includes('5')
       );
       expect(woodCall).toBeDefined();
 
@@ -544,9 +544,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify updated wood count
-      fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       woodCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('🪵') && call[0].includes('10')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('🪵') && call[0].includes('10')
       );
       expect(woodCall).toBeDefined();
     });
@@ -561,9 +561,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify initial capacity
-      let fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      let fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       let capacityCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Weight: 20/100')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Weight: 20/100')
       );
       expect(capacityCall).toBeDefined();
 
@@ -577,9 +577,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify updated capacity
-      fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       capacityCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Weight: 50/100')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Weight: 50/100')
       );
       expect(capacityCall).toBeDefined();
     });
@@ -604,8 +604,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify empty state
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const emptyCall = fillTextCalls.find((call: any[]) => call[0] === '(empty)');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const emptyCall = fillTextCalls.find((call: unknown[]) => call[0] === '(empty)');
       expect(emptyCall).toBeDefined();
     });
   });
@@ -757,8 +757,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
       }).not.toThrow();
 
       // Should show empty state
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const emptyCall = fillTextCalls.find((call: any[]) => call[0] === '(empty)');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const emptyCall = fillTextCalls.find((call: unknown[]) => call[0] === '(empty)');
       expect(emptyCall).toBeDefined();
     });
 
@@ -787,9 +787,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       }).not.toThrow();
 
       // Should show 2 slots used
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const slotsCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('Slots: 2/')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('Slots: 2/')
       );
       expect(slotsCall).toBeDefined();
     });
@@ -808,9 +808,9 @@ describe('AgentInfoPanel - Inventory Display', () => {
       }).not.toThrow();
 
       // Verify large numbers are displayed
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       const woodCall = fillTextCalls.find(
-        (call: any[]) => typeof call[0] === 'string' && call[0].includes('999')
+        (call: unknown[]) => typeof call[0] === 'string' && call[0].includes('999')
       );
       expect(woodCall).toBeDefined();
     });

@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:a5a787",
+  "name": "Mundo",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489487809",
+  "createdAt": 1769489487818,
+  "lastAccessedAt": 1769489487818,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489487809",
+    "type": "magical"
+  }
+}

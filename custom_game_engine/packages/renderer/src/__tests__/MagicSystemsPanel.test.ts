@@ -6,7 +6,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 import { MagicSystemsPanel } from '../MagicSystemsPanel.js';
 import { MagicSystemStateManager } from '@ai-village/magic';
 import type { MagicParadigm } from '@ai-village/magic';
@@ -136,8 +136,8 @@ describe('MagicSystemsPanel', () => {
       panel.render(mockCtx, 0, 0, 500, 650);
 
       // Check that fillText was called with all paradigm names
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Academic Magic');
       expect(textContent).toContain('Pact Magic');
@@ -148,8 +148,8 @@ describe('MagicSystemsPanel', () => {
     it('should render header with title', () => {
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('MAGIC SYSTEMS');
     });
@@ -160,8 +160,8 @@ describe('MagicSystemsPanel', () => {
 
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('1 active');
       expect(textContent).toContain('2 enabled');
@@ -175,8 +175,8 @@ describe('MagicSystemsPanel', () => {
 
       emptyPanel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('No magic paradigms registered');
     });
@@ -188,8 +188,8 @@ describe('MagicSystemsPanel', () => {
 
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('DISABLED');
       expect(textContent).toContain('ENABLED');
@@ -200,7 +200,7 @@ describe('MagicSystemsPanel', () => {
       panel.render(mockCtx, 0, 0, 500, 650);
 
       // Check that roundRect was called for toggle buttons (E and A)
-      const fillRectCalls = (mockCtx.fillRect as any).mock.calls;
+      const fillRectCalls = (mockCtx.fillRect as Mock).mock.calls;
 
       // Should have multiple rectangles (background, header, sections, toggles)
       expect(fillRectCalls.length).toBeGreaterThan(0);
@@ -209,8 +209,8 @@ describe('MagicSystemsPanel', () => {
     it('should render expand/collapse indicators', () => {
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       // All paradigms start collapsed
       const collapseCount = (textContent.match(/▶/g) || []).length;
@@ -221,8 +221,8 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       // Should have one ▼ (expanded) and three ▶ (collapsed)
       const expandCount = (textContent.match(/▼/g) || []).length;
@@ -235,8 +235,8 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Structured spellcasting');
     });
@@ -251,8 +251,8 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Agents: 5');
       expect(textContent).toContain('Proficiency: 75%');
@@ -267,8 +267,8 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Mishaps: 3');
     });
@@ -277,8 +277,8 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Sources: mana');
     });
@@ -398,8 +398,8 @@ describe('MagicSystemsPanel', () => {
 
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('ENABLED');
       expect(textContent).toContain('1 enabled');
@@ -589,8 +589,8 @@ describe('MagicSystemsPanel', () => {
 
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Test Magic');
     });
@@ -602,8 +602,8 @@ describe('MagicSystemsPanel', () => {
 
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('ENABLED');
     });
@@ -616,8 +616,8 @@ describe('MagicSystemsPanel', () => {
 
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      const textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      const textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
 
       expect(textContent).toContain('Agents: 15');
     });
@@ -628,15 +628,15 @@ describe('MagicSystemsPanel', () => {
       stateManager.setPlayerProficiency('academic', 25);
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      let fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      let textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      let fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      let textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
       expect(textContent).toContain('Proficiency: 25%');
 
       stateManager.setPlayerProficiency('academic', 75);
       panel.render(mockCtx, 0, 0, 500, 650);
 
-      fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
       expect(textContent).toContain('Proficiency: 75%');
     });
 
@@ -644,16 +644,16 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
 
       panel.render(mockCtx, 0, 0, 500, 650);
-      let fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      let textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      let fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      let textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
       expect(textContent).toContain('Casts: 0');
 
       stateManager.recordSpellCast('academic');
       stateManager.recordSpellCast('academic');
 
       panel.render(mockCtx, 0, 0, 500, 650);
-      fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
       expect(textContent).toContain('Casts: 2');
     });
 
@@ -661,15 +661,15 @@ describe('MagicSystemsPanel', () => {
       panel.toggleExpanded('academic');
 
       panel.render(mockCtx, 0, 0, 500, 650);
-      let fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      let textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      let fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      let textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
       expect(textContent).not.toContain('Mishaps:');
 
       stateManager.recordMishap('academic');
 
       panel.render(mockCtx, 0, 0, 500, 650);
-      fillTextCalls = (mockCtx.fillText as any).mock.calls;
-      textContent = fillTextCalls.map((call: any) => call[0]).join(' ');
+      fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
+      textContent = fillTextCalls.map((call: unknown[]) => call[0]).join(' ');
       expect(textContent).toContain('Mishaps: 1');
     });
   });
@@ -728,7 +728,7 @@ describe('MagicSystemsPanel', () => {
         panel.render(mockCtx, 0, 0, 500, 650);
       }).not.toThrow();
 
-      const fillTextCalls = (mockCtx.fillText as any).mock.calls;
+      const fillTextCalls = (mockCtx.fillText as Mock).mock.calls;
       expect(fillTextCalls.length).toBeGreaterThan(0);
     });
 

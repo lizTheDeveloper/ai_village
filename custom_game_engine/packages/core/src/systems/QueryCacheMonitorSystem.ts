@@ -14,19 +14,17 @@ import type { World } from '../ecs/World.js';
  * Only logs if there has been query activity to avoid spam.
  *
  * Priority: 990 (late utility)
+ * Uses throttleInterval for zero-overhead tick skipping (no SystemContext created).
  */
 export class QueryCacheMonitorSystem extends BaseSystem {
   readonly id = 'query_cache_monitor' as const;
   readonly priority = 990; // Late utility
   readonly requiredComponents = [] as const; // No entity filtering needed
 
-  private readonly LOG_INTERVAL = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)
-  private lastLog = 0;
+  // Use throttleInterval for efficient skip (avoids SystemContext creation)
+  protected readonly throttleInterval = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)
 
   protected onUpdate(ctx: { world: World }): void {
-    if (ctx.world.tick - this.lastLog < this.LOG_INTERVAL) return;
-    this.lastLog = ctx.world.tick;
-
     const stats = ctx.world.queryCache.getStats();
 
     // Only log if there's meaningful activity

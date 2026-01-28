@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:12b7a69",
+  "name": "Oberon Four",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769489367101",
+  "createdAt": 1769489367108,
+  "lastAccessedAt": 1769489367108,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769489367101",
+    "type": "magical"
+  }
+}

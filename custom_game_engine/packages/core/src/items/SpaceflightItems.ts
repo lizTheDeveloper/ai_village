@@ -16,7 +16,7 @@
  * raw_resource -> refined_material -> component -> advanced_component -> ship_part
  */
 
-import { defineItem, type ItemDefinition } from './ItemDefinition.js';
+import { defineItem, type ItemDefinition, type ItemCategory, type ItemRarity } from './ItemDefinition.js';
 import itemsData from '../../data/items/spaceflight.json';
 
 function loadSpaceflightItems(): ItemDefinition[] {
@@ -25,11 +25,24 @@ function loadSpaceflightItems(): ItemDefinition[] {
   }
 
   return itemsData.map((item) => {
-    return defineItem(item.id, item.name, item.type as any, {
+    if (typeof item.type !== 'string') {
+      throw new Error(`Invalid item type for ${item.id}: must be a string`);
+    }
+    if (item.rarity && typeof item.rarity !== 'string') {
+      throw new Error(`Invalid rarity for ${item.id}: must be a string`);
+    }
+
+    // Note: JSON data may contain types not in ItemCategory; using 'misc' as fallback
+    const validCategories: ItemCategory[] = ['resource', 'food', 'seed', 'tool', 'material', 'consumable', 'equipment', 'ammo', 'misc'];
+    const category: ItemCategory = validCategories.includes(item.type as ItemCategory)
+      ? (item.type as ItemCategory)
+      : 'misc';
+
+    return defineItem(item.id, item.name, category, {
       weight: item.weight,
       stackSize: item.stackSize,
       baseValue: item.baseValue,
-      rarity: item.rarity as any,
+      rarity: item.rarity as ItemRarity,
       craftedFrom: item.craftedFrom,
       researchRequired: item.researchRequired,
       clarketechTier: item.clarketechTier,

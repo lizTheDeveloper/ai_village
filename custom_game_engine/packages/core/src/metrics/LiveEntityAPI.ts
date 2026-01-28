@@ -64,6 +64,27 @@ interface WorldWithMutator extends World {
 }
 
 /**
+ * Interface for the @ai-village/agents module exports
+ */
+interface AgentsModule {
+  createLLMAgent: (
+    world: WorldMutator,
+    x: number,
+    y: number,
+    speed: number,
+    name?: string,
+    options?: { believedDeity?: string }
+  ) => string;
+  createWanderingAgent: (
+    world: WorldMutator,
+    x: number,
+    y: number,
+    speed: number,
+    options?: { believedDeity?: string }
+  ) => string;
+}
+
+/**
  * LiveEntityAPI connects the game's World to the metrics dashboard
  */
 export class LiveEntityAPI {
@@ -426,7 +447,8 @@ export class LiveEntityAPI {
 
     try {
       // Dynamic import to break circular dependency: core -> agents -> reproduction -> core
-      const { createLLMAgent, createWanderingAgent } = await import('@ai-village/agents');
+      const agentModule = (await import('@ai-village/agents')) as AgentsModule;
+      const { createLLMAgent, createWanderingAgent } = agentModule;
       const agentId = shouldUseLLM
         ? createLLMAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, undefined, options)
         : createWanderingAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, options);

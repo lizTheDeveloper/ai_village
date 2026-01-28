@@ -23,8 +23,18 @@ import type {
 import type { NationContext } from './GovernorContextBuilders.js';
 
 // Import LLM infrastructure - use dynamic import to avoid circular dependencies
-let llmDecisionQueue: any = null;
-let governorPromptBuilder: any = null;
+interface LLMDecisionQueue {
+  requestDecision(entityId: string, prompt: string, config?: unknown): Promise<string>;
+}
+
+interface GovernorPromptBuilder {
+  buildVotePrompt(governor: Entity, proposal: Proposal, context: NationContext, world: World): string;
+  buildDirectivePrompt(governor: Entity, directive: DelegationChain, tier: PoliticalTier, world: World): string;
+  buildCrisisPrompt(governor: Entity, crisis: Crisis, tier: PoliticalTier, world: World): string;
+}
+
+let llmDecisionQueue: LLMDecisionQueue | null = null;
+let governorPromptBuilder: GovernorPromptBuilder | null = null;
 
 /**
  * Initialize LLM integration (call once at startup)
@@ -32,9 +42,12 @@ let governorPromptBuilder: any = null;
 export async function initializeGovernorLLM(world: World): Promise<void> {
   try {
     // Dynamic import to avoid circular dependencies
-    const { LLMDecisionQueue } = await import('@ai-village/llm');
-    const { GovernorPromptBuilder } = await import('@ai-village/llm');
-    const { OpenAICompatProvider } = await import('@ai-village/llm');
+    const llmModule = await import('@ai-village/llm') as {
+      LLMDecisionQueue: new (provider: unknown, maxConcurrent: number) => LLMDecisionQueue;
+      GovernorPromptBuilder: new () => GovernorPromptBuilder;
+      OpenAICompatProvider: new (model: string, baseUrl: string, apiKey: string) => unknown;
+    };
+    const { LLMDecisionQueue, GovernorPromptBuilder, OpenAICompatProvider } = llmModule;
 
     // Get LLM config from world settings
     const baseUrl = process.env.LLM_BASE_URL || 'http://localhost:11434/v1';
@@ -333,7 +346,7 @@ export function generateFallbackVote(
 /**
  * Get custom LLM config for a governor (if they have custom provider settings)
  */
-function getCustomLLMConfig(governor: Entity): any {
+function getCustomLLMConfig(governor: Entity): unknown {
   const customLLM = governor.components?.get('custom_llm') as
     | {
         baseUrl?: string;
@@ -445,10 +458,10 @@ export function addCrisisToGovernorQueue(
     CT.EmpireGovernance,
     CT.GalacticCouncil,
   ]) {
-    const governance = governor.components?.get(componentType) as any;
-    if (governance) {
+    const governance = governor.components?.get(componentType);
+    if (governance && typeof governance === 'object' && governance !== null) {
       // Add crisis to queue if the component has a crisis array
-      if (Array.isArray(governance.activeCrises)) {
+      if ('activeCrises' in governance && Array.isArray(governance.activeCrises)) {
         governance.activeCrises.push(crisis);
         return;
       }
@@ -486,8 +499,8 @@ function updateGovernanceComponentWithDirective(
   ];
 
   for (const componentType of governanceComponentTypes) {
-    const governance = governor.components?.get(componentType) as any;
-    if (!governance) continue;
+    const governance = governor.components?.get(componentType);
+    if (!governance || typeof governance !== 'object' || governance === null) continue;
 
     // Create directive record
     const directiveRecord = {
@@ -502,11 +515,12 @@ function updateGovernanceComponentWithDirective(
     };
 
     // Update component with directive - different components may have different structures
-    if (Array.isArray(governance.activeDirectives)) {
+    if ('activeDirectives' in governance && Array.isArray(governance.activeDirectives)) {
       governance.activeDirectives.push(directiveRecord);
-    } else if (governance.currentPriorities && typeof governance.currentPriorities === 'object') {
+    } else if ('currentPriorities' in governance && governance.currentPriorities && typeof governance.currentPriorities === 'object') {
       // For components using priority-based structure
-      governance.currentPriorities[directive.directive] = {
+      const priorities = governance.currentPriorities as Record<string, unknown>;
+      priorities[directive.directive] = {
         priority: 'high',
         source: directive.origin,
         plan: interpretation.implementation_plan,
@@ -514,7 +528,7 @@ function updateGovernanceComponentWithDirective(
       };
     } else {
       // Generic fallback: add to a pendingActions array if exists
-      if (Array.isArray(governance.pendingActions)) {
+      if ('pendingActions' in governance && Array.isArray(governance.pendingActions)) {
         governance.pendingActions.push({
           type: 'directive',
           content: directive.directive,

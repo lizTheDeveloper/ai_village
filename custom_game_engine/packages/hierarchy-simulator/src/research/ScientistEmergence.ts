@@ -338,7 +338,7 @@ export class ScientistEmergenceSystem {
 
     const selected: string[] = [];
     while (selected.length < count) {
-      const spec = available[Math.floor(Math.random() * available.length)];
+      const spec = available[Math.floor(Math.random() * available.length)]!;
       if (!selected.includes(spec)) {
         selected.push(spec);
       }

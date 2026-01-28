@@ -39,7 +39,7 @@ export function TimeSeriesView({
   selectedMetrics: propSelectedMetrics,
   showCorrelation: propShowCorrelation = false,
   onExport: propOnExport,
-  timeWindow: propTimeWindow,
+  timeWindow: _propTimeWindow,
 }: TimeSeriesViewProps) {
   const storeData = useMetricsStore((state) => state.timeSeriesData);
   const storeLoading = useMetricsStore((state) => state.isLoading);

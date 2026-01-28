@@ -162,7 +162,7 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
           </span>
         ))}
       </div>
-      {data.innovations && data.innovations.map((innovation, idx) => (
+      {data.innovations && data.innovations.map((_innovation, idx) => (
         <div
           key={idx}
           data-testid="innovation-marker"

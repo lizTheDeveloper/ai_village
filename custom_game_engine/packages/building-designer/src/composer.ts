@@ -73,16 +73,16 @@ function addConnectionDoor(
 
   switch (direction) {
     case 'north':
-      layout[0] = replaceAt(layout[0], midX, TILE_SYMBOLS.DOOR);
+      layout[0] = replaceAt(layout[0]!, midX, TILE_SYMBOLS.DOOR);
       break;
     case 'south':
-      layout[height - 1] = replaceAt(layout[height - 1], midX, TILE_SYMBOLS.DOOR);
+      layout[height - 1] = replaceAt(layout[height - 1]!, midX, TILE_SYMBOLS.DOOR);
       break;
     case 'east':
-      layout[midY] = replaceAt(layout[midY], width - 1, TILE_SYMBOLS.DOOR);
+      layout[midY] = replaceAt(layout[midY]!, width - 1, TILE_SYMBOLS.DOOR);
       break;
     case 'west':
-      layout[midY] = replaceAt(layout[midY], 0, TILE_SYMBOLS.DOOR);
+      layout[midY] = replaceAt(layout[midY]!, 0, TILE_SYMBOLS.DOOR);
       break;
   }
 }
@@ -102,44 +102,44 @@ function addModuleFurniture(
   switch (type) {
     case 'bedroom':
       // Place bed in corner
-      layout[1] = replaceAt(layout[1], 1, TILE_SYMBOLS.BED);
-      layout[1] = replaceAt(layout[1], 2, TILE_SYMBOLS.BED);
-      layout[2] = replaceAt(layout[2], 1, TILE_SYMBOLS.BED);
-      layout[2] = replaceAt(layout[2], 2, TILE_SYMBOLS.BED);
+      layout[1] = replaceAt(layout[1]!, 1, TILE_SYMBOLS.BED);
+      layout[1] = replaceAt(layout[1]!, 2, TILE_SYMBOLS.BED);
+      layout[2] = replaceAt(layout[2]!, 1, TILE_SYMBOLS.BED);
+      layout[2] = replaceAt(layout[2]!, 2, TILE_SYMBOLS.BED);
       // Storage chest
       if (width > 4) {
-        layout[1] = replaceAt(layout[1], width - 2, TILE_SYMBOLS.STORAGE);
+        layout[1] = replaceAt(layout[1]!, width - 2, TILE_SYMBOLS.STORAGE);
       }
       break;
 
     case 'storage_room':
       // Storage along walls
       for (let x = 1; x < width - 1; x++) {
-        layout[1] = replaceAt(layout[1], x, TILE_SYMBOLS.STORAGE);
+        layout[1] = replaceAt(layout[1]!, x, TILE_SYMBOLS.STORAGE);
         if (height > 4) {
-          layout[height - 2] = replaceAt(layout[height - 2], x, TILE_SYMBOLS.STORAGE);
+          layout[height - 2] = replaceAt(layout[height - 2]!, x, TILE_SYMBOLS.STORAGE);
         }
       }
       break;
 
     case 'workshop':
       // Workstations
-      layout[1] = replaceAt(layout[1], 1, TILE_SYMBOLS.WORKSTATION);
-      layout[1] = replaceAt(layout[1], 2, TILE_SYMBOLS.WORKSTATION);
+      layout[1] = replaceAt(layout[1]!, 1, TILE_SYMBOLS.WORKSTATION);
+      layout[1] = replaceAt(layout[1]!, 2, TILE_SYMBOLS.WORKSTATION);
       // Storage for materials
       if (width > 4) {
-        layout[1] = replaceAt(layout[1], width - 2, TILE_SYMBOLS.STORAGE);
+        layout[1] = replaceAt(layout[1]!, width - 2, TILE_SYMBOLS.STORAGE);
       }
       break;
 
     case 'kitchen':
       // Counter along one wall
       for (let x = 1; x < Math.min(width - 1, 5); x++) {
-        layout[1] = replaceAt(layout[1], x, TILE_SYMBOLS.COUNTER);
+        layout[1] = replaceAt(layout[1]!, x, TILE_SYMBOLS.COUNTER);
       }
       // Storage
       if (height > 4) {
-        layout[height - 2] = replaceAt(layout[height - 2], 1, TILE_SYMBOLS.STORAGE);
+        layout[height - 2] = replaceAt(layout[height - 2]!, 1, TILE_SYMBOLS.STORAGE);
       }
       break;
 
@@ -149,9 +149,9 @@ function addModuleFurniture(
       const tableEndX = Math.floor((width * 3) / 4);
       const tableY = Math.floor(height / 2);
       for (let x = tableStartX; x <= tableEndX; x++) {
-        layout[tableY] = replaceAt(layout[tableY], x, TILE_SYMBOLS.TABLE);
+        layout[tableY] = replaceAt(layout[tableY]!, x, TILE_SYMBOLS.TABLE);
         if (height > 5) {
-          layout[tableY - 1] = replaceAt(layout[tableY - 1], x, TILE_SYMBOLS.TABLE);
+          layout[tableY - 1] = replaceAt(layout[tableY - 1]!, x, TILE_SYMBOLS.TABLE);
         }
       }
       break;
@@ -159,29 +159,29 @@ function addModuleFurniture(
     case 'library':
       // Bookshelves (storage) along walls
       for (let y = 1; y < height - 1; y += 2) {
-        layout[y] = replaceAt(layout[y], 1, TILE_SYMBOLS.STORAGE);
+        layout[y] = replaceAt(layout[y]!, 1, TILE_SYMBOLS.STORAGE);
         if (width > 5) {
-          layout[y] = replaceAt(layout[y], width - 2, TILE_SYMBOLS.STORAGE);
+          layout[y] = replaceAt(layout[y]!, width - 2, TILE_SYMBOLS.STORAGE);
         }
       }
       // Reading table in center
       if (width > 5 && height > 5) {
         const centerY = Math.floor(height / 2);
         const centerX = Math.floor(width / 2);
-        layout[centerY] = replaceAt(layout[centerY], centerX, TILE_SYMBOLS.TABLE);
+        layout[centerY] = replaceAt(layout[centerY]!, centerX, TILE_SYMBOLS.TABLE);
       }
       break;
 
     case 'entrance_hall':
       // Main entrance on south side
-      layout[height - 1] = replaceAt(layout[height - 1], Math.floor(width / 2), 'E');
+      layout[height - 1] = replaceAt(layout[height - 1]!, Math.floor(width / 2), 'E');
       break;
 
     case 'stairwell':
       // Stairs in center
       const centerY = Math.floor(height / 2);
       const centerX = Math.floor(width / 2);
-      layout[centerY] = replaceAt(layout[centerY], centerX, TILE_SYMBOLS.STAIRS_BOTH);
+      layout[centerY] = replaceAt(layout[centerY]!, centerX, TILE_SYMBOLS.STAIRS_BOTH);
       break;
 
     case 'hallway':
@@ -192,7 +192,7 @@ function addModuleFurniture(
       // Mark interior as exterior (no roof)
       for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
-          layout[y] = replaceAt(layout[y], x, TILE_SYMBOLS.EMPTY);
+          layout[y] = replaceAt(layout[y]!, x, TILE_SYMBOLS.EMPTY);
         }
       }
       break;
@@ -260,16 +260,16 @@ function overlayModule(
     const targetY = startY + y;
     if (targetY < 0 || targetY >= mainLayout.length) continue;
 
-    for (let x = 0; x < moduleLayout[y].length; x++) {
+    for (let x = 0; x < moduleLayout[y]!.length; x++) {
       const targetX = startX + x;
-      if (targetX < 0 || targetX >= mainLayout[targetY].length) continue;
+      if (targetX < 0 || targetX >= mainLayout[targetY]!.length) continue;
 
-      const moduleTile = moduleLayout[y][x];
-      const existingTile = mainLayout[targetY][targetX];
+      const moduleTile = moduleLayout[y]![x]!;
+      const existingTile = mainLayout[targetY]![targetX]!;
 
       // Merge tiles intelligently
       const mergedTile = mergeTiles(existingTile, moduleTile);
-      mainLayout[targetY] = replaceAt(mainLayout[targetY], targetX, mergedTile);
+      mainLayout[targetY] = replaceAt(mainLayout[targetY]!, targetX, mergedTile);
     }
   }
 }

@@ -14,11 +14,38 @@
  * while ensuring only the worker runs the actual simulation.
  */
 
-import { World, WorldImpl, ActionQueue, SystemRegistry, EventBus, EventBusImpl } from '@ai-village/core';
-import { UniverseClient, type LoadingProgressCallback, type WorkerReadyCallback, type LoadCompleteCallback } from './universe-client.js';
+import { World, WorldImpl, SystemRegistry, EventBusImpl, type IActionQueue, type Action, type Tick, type EntityId, ComponentType, type Component } from '@ai-village/core';
+import { UniverseClient, type LoadingProgressCallback, type WorkerReadyCallback, type LoadCompleteCallback, type ChatMessageCallback, type ChatMessageData } from './universe-client.js';
 import { PathInterpolationSystem } from './PathInterpolationSystem.js';
 import type { UniverseState, SerializedWorld, SaveMetadata, LoadingProgress } from './types.js';
 import type { DeltaUpdate } from './path-prediction-types.js';
+
+/**
+ * View-only action queue that doesn't process actions locally.
+ * Actions are forwarded to the SharedWorker for processing.
+ */
+class ViewOnlyActionQueue implements IActionQueue {
+  submit(_action: Omit<Action, 'id' | 'status' | 'createdAt'>): string {
+    // View-only: actions should be dispatched via GameBridge.dispatchAction
+    console.warn('[ViewOnlyActionQueue] submit() called - use GameBridge.dispatchAction() instead');
+    return '';
+  }
+  getPending(_entityId: EntityId): ReadonlyArray<Action> {
+    return [];
+  }
+  getExecuting(_entityId: EntityId): Action | undefined {
+    return undefined;
+  }
+  cancel(_actionId: string, _reason: string): boolean {
+    return false;
+  }
+  process(_world: any): void {
+    // No-op: worker handles action processing
+  }
+  getHistory(_since?: Tick): ReadonlyArray<Action> {
+    return [];
+  }
+}
 
 /**
  * GameLoop-compatible interface for view-only windows
@@ -31,7 +58,7 @@ export interface ViewOnlyGameLoop {
   readonly world: World;
 
   /** Action queue (forwards to worker) */
-  readonly actionQueue: ActionQueue;
+  readonly actionQueue: IActionQueue;
 
   /** System registry (empty - systems run in worker) */
   readonly systemRegistry: SystemRegistry;
@@ -50,6 +77,15 @@ export interface ViewOnlyGameLoop {
 
   /** Set simulation speed (dispatches to worker) */
   setSpeed(speed: number): void;
+
+  /** Get stats (returns stub values for view-only mode) */
+  getStats(): {
+    tickCount: number;
+    currentTick: number;
+    avgTickTimeMs: number;
+    maxTickTimeMs: number;
+    systemStats: Record<string, any>;
+  };
 }
 
 /**
@@ -68,7 +104,7 @@ export class GameBridge {
 
   private readonly universeClient: UniverseClient;
   private readonly viewWorld: WorldImpl;
-  private readonly viewActionQueue: ActionQueue;
+  private readonly viewActionQueue: IActionQueue;
   private readonly viewSystemRegistry: SystemRegistry;
   private unsubscribe: (() => void) | null = null;
   private currentTick: number = 0;
@@ -78,7 +114,7 @@ export class GameBridge {
     // Create view-only components (NO SIMULATION)
     const viewEventBus = new EventBusImpl();
     this.viewWorld = new WorldImpl(viewEventBus);
-    this.viewActionQueue = new ActionQueue();
+    this.viewActionQueue = new ViewOnlyActionQueue();
     this.viewSystemRegistry = new SystemRegistry();
     this.universeClient = new UniverseClient();
 
@@ -92,7 +128,7 @@ export class GameBridge {
       get world(): WorldImpl {
         return self.viewWorld;
       },
-      get actionQueue(): ActionQueue {
+      get actionQueue(): IActionQueue {
         return self.viewActionQueue;
       },
       get systemRegistry(): SystemRegistry {
@@ -112,6 +148,16 @@ export class GameBridge {
       },
       setSpeed(speed: number): void {
         self.setSpeed(speed);
+      },
+      getStats() {
+        // Return stub stats for view-only mode (real stats are in worker)
+        return {
+          tickCount: self.currentTick,
+          currentTick: self.currentTick,
+          avgTickTimeMs: 0,
+          maxTickTimeMs: 0,
+          systemStats: {},
+        };
       },
     };
   }
@@ -187,27 +233,29 @@ export class GameBridge {
         entity = this.viewWorld.createEntity(update.entityId);
       }
 
-      // Update position (correction from worker)
-      entity.addComponent({
-        type: 'position',
-        ...update.position,
-      });
+      // Update position (correction from worker) - use World.addComponent
+      this.viewWorld.addComponent(entity.id, {
+        type: 'position' as ComponentType,
+        version: 1,
+        x: update.position.x,
+        y: update.position.y,
+      } as Component);
 
       // Update path interpolator if prediction changed
       if (update.prediction) {
-        entity.addComponent({
-          type: 'path_interpolator',
+        this.viewWorld.addComponent(entity.id, {
+          type: 'path_interpolator' as ComponentType,
           version: 1,
           prediction: update.prediction,
           basePosition: update.position,
           baseTick: delta.tick,
-        });
+        } as Component);
       }
 
       // Update full components if this is a new entity
       if (update.components) {
-        for (const [type, component] of Object.entries(update.components)) {
-          entity.addComponent(component);
+        for (const [, component] of Object.entries(update.components)) {
+          this.viewWorld.addComponent(entity.id, component);
         }
       }
     }
@@ -215,16 +263,20 @@ export class GameBridge {
     // Remove deleted entities
     if (delta.removed) {
       for (const entityId of delta.removed) {
-        this.viewWorld.removeEntity(entityId);
+        this.viewWorld.destroyEntity(entityId, 'delta_sync_removed');
       }
     }
 
     // Run path interpolation system to update positions
-    // TODO: SystemRegistry doesn't have executeAll method
-    // Need to manually iterate systems and call update
-    const systems = Array.from((this.viewSystemRegistry as any).systems?.values() || []);
+    // SystemRegistry internally has a private systems Map
+    // We need to access it through reflection for now until a proper API is added
+    interface SystemRegistryInternal {
+      systems?: Map<string, { system: { update(world: World): void }; enabled: boolean }>;
+    }
+    const registryInternal = this.viewSystemRegistry as unknown as SystemRegistryInternal;
+    const systems = Array.from(registryInternal.systems?.values() || []);
     for (const entry of systems) {
-      if (entry && 'system' in entry && 'enabled' in entry && entry.system && entry.enabled) {
+      if (entry && entry.system && entry.enabled) {
         entry.system.update(this.viewWorld);
       }
     }
@@ -251,7 +303,7 @@ export class GameBridge {
     // Remove entities that no longer exist
     for (const entity of world.getAllEntities()) {
       if (!serializedIds.has(entity.id)) {
-        world.removeEntity(entity.id);
+        world.destroyEntity(entity.id, 'sync_removed');
       }
     }
 
@@ -264,28 +316,21 @@ export class GameBridge {
         entity = world.createEntity(entityId);
       }
 
-      // Update components
+      // Update components - get current types from entity.components Map
       const currentComponentTypes = new Set(
-        Array.from(entity.getAllComponents()).map(([type]) => type)
+        Array.from(entity.components.keys())
       );
 
       // Remove components that no longer exist
       for (const type of currentComponentTypes) {
         if (!(type in components)) {
-          entity.removeComponent(type);
+          world.removeComponent(entity.id, type);
         }
       }
 
-      // Add/update components
-      for (const [type, component] of Object.entries(components)) {
-        if (currentComponentTypes.has(type)) {
-          // Update existing component
-          entity.removeComponent(type);
-          entity.addComponent(component);
-        } else {
-          // Add new component
-          entity.addComponent(component);
-        }
+      // Add/update components - World.addComponent handles both add and update
+      for (const [, component] of Object.entries(components)) {
+        world.addComponent(entity.id, component);
       }
     }
   }
@@ -293,11 +338,10 @@ export class GameBridge {
   /**
    * Sync tiles from serialized state to local world
    */
-  private syncTiles(serializedWorld: SerializedWorld, world: WorldImpl): void {
-    // Sync tiles (simplified - could be optimized with dirty tracking)
-    for (const tile of serializedWorld.tiles) {
-      world.setTile(tile.x, tile.y, tile.type, tile.data);
-    }
+  private syncTiles(_serializedWorld: SerializedWorld, _world: WorldImpl): void {
+    // Tiles are managed by ChunkManager, not synced via SharedWorker state
+    // The worker serialization sends empty tiles array anyway
+    // Future: Could sync visible chunks here if needed
   }
 
   /**
@@ -310,12 +354,12 @@ export class GameBridge {
       if (timeEntities.length > 0) {
         const timeEntity = timeEntities[0];
         if (timeEntity) {
-          timeEntity.removeComponent('time');
-          timeEntity.addComponent(serializedWorld.globals.time);
+          // World.addComponent handles update if component already exists
+          world.addComponent(timeEntity.id, serializedWorld.globals.time);
         }
       } else {
         const timeEntity = world.createEntity();
-        timeEntity.addComponent(serializedWorld.globals.time);
+        world.addComponent(timeEntity.id, serializedWorld.globals.time);
       }
     }
 
@@ -325,12 +369,11 @@ export class GameBridge {
       if (weatherEntities.length > 0) {
         const weatherEntity = weatherEntities[0];
         if (weatherEntity) {
-          weatherEntity.removeComponent('weather');
-          weatherEntity.addComponent(serializedWorld.globals.weather);
+          world.addComponent(weatherEntity.id, serializedWorld.globals.weather);
         }
       } else {
         const weatherEntity = world.createEntity();
-        weatherEntity.addComponent(serializedWorld.globals.weather);
+        world.addComponent(weatherEntity.id, serializedWorld.globals.weather);
       }
     }
   }
@@ -344,6 +387,16 @@ export class GameBridge {
       domain,
       payload,
     });
+  }
+
+  /**
+   * Emit an event to the SharedWorker's eventBus
+   *
+   * Use this for events that need to reach systems in the worker,
+   * such as chat messages from DivineChatPanel.
+   */
+  emitEvent(event: { type: string; source: string; data: unknown }): void {
+    this.universeClient.emitEvent(event);
   }
 
   /**
@@ -460,6 +513,14 @@ export class GameBridge {
    */
   hasExistingSaves(): boolean {
     return this.universeClient.hasExistingSaves();
+  }
+
+  /**
+   * Subscribe to chat messages from the worker
+   * These are chat:message_sent events forwarded from the SharedWorker
+   */
+  onChatMessage(callback: ChatMessageCallback): () => void {
+    return this.universeClient.onChatMessage(callback);
   }
 
   /**

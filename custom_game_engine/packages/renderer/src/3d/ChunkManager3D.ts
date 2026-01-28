@@ -11,6 +11,7 @@
 import * as THREE from 'three';
 import { ChunkMesh, type ChunkMeshConfig } from './ChunkMesh.js';
 import { OcclusionCuller } from './OcclusionCuller.js';
+import { MeshWorkerPool } from './MeshWorkerPool.js';
 
 /** Chunk manager configuration */
 export interface ChunkManager3DConfig {
@@ -24,6 +25,10 @@ export interface ChunkManager3DConfig {
   enableFrustumCulling: boolean;
   /** Block size in world units */
   blockSize: number;
+  /** Whether to use worker threads for meshing (default true) */
+  useWorkerThreads: boolean;
+  /** Number of worker threads (default: navigator.hardwareConcurrency) */
+  workerPoolSize: number;
 }
 
 const DEFAULT_CONFIG: ChunkManager3DConfig = {
@@ -32,6 +37,8 @@ const DEFAULT_CONFIG: ChunkManager3DConfig = {
   useGreedyMeshing: true,
   enableFrustumCulling: true,
   blockSize: 1,
+  useWorkerThreads: true,
+  workerPoolSize: typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 4 : 4,
 };
 
 /** Chunk state */
@@ -63,6 +70,12 @@ export class ChunkManager3D {
 
   /** Whether occlusion culling is enabled */
   private occlusionEnabled = true;
+
+  /** Worker pool for offloading mesh generation */
+  private workerPool: MeshWorkerPool | null = null;
+
+  /** Chunks currently being rebuilt by workers (to avoid double-submission) */
+  private inFlightRebuilds: Set<string> = new Set();
 
   /** Current camera chunk position */
   private cameraChunkX = 0;
@@ -97,6 +110,16 @@ export class ChunkManager3D {
 
     // Create occlusion culler
     this.occlusionCuller = new OcclusionCuller();
+
+    // Create worker pool if enabled
+    if (this.config.useWorkerThreads) {
+      try {
+        this.workerPool = new MeshWorkerPool(this.config.workerPoolSize);
+      } catch (e) {
+        console.warn('[ChunkManager3D] Failed to create worker pool, falling back to main thread:', e);
+        this.workerPool = null;
+      }
+    }
   }
 
   /**
@@ -233,14 +256,15 @@ export class ChunkManager3D {
   /**
    * Rebuild dirty chunks with rate limiting to prevent frame drops
    * Prioritizes chunks closest to camera
+   * Uses worker threads when available for off-main-thread meshing
    */
   private rebuildDirtyChunks(): void {
     this.stats.rebuildCount = 0;
 
-    // Collect dirty chunks and sort by distance (closest first)
+    // Collect dirty chunks (excluding in-flight) and sort by distance (closest first)
     const dirtyChunks: ChunkEntry[] = [];
-    this.chunks.forEach((entry) => {
-      if (entry.chunk.isDirty()) {
+    this.chunks.forEach((entry, key) => {
+      if (entry.chunk.isDirty() && !this.inFlightRebuilds.has(key)) {
         dirtyChunks.push(entry);
       }
     });
@@ -253,17 +277,54 @@ export class ChunkManager3D {
     for (let i = 0; i < rebuildCount; i++) {
       // Safe: i < rebuildCount <= dirtyChunks.length guarantees valid index
       const entry = dirtyChunks[i]!;
-      entry.chunk.rebuild();
+      const key = `${entry.chunk.chunkX},${entry.chunk.chunkZ}`;
 
-      // Update occlusion data when chunk changes
-      if (this.occlusionEnabled) {
-        this.occlusionCuller.analyzeChunk(
-          entry.chunk.chunkX,
-          entry.chunk.chunkZ,
-          (x, y, z) => entry.chunk.getBlock(x, y, z)?.type ?? 0,
-          this.config.chunkSize,
-          64
-        );
+      // Use worker pool if available, otherwise fall back to sync
+      if (this.workerPool) {
+        // Mark as in-flight to prevent double-submission
+        this.inFlightRebuilds.add(key);
+        entry.chunk.clearDirty();
+
+        // Get block data and submit to worker
+        const blockData = entry.chunk.getBlockData();
+        this.workerPool
+          .buildMesh(entry.chunk.chunkX, entry.chunk.chunkZ, blockData)
+          .then((meshData) => {
+            // Apply mesh data on main thread
+            entry.chunk.applyMeshData(meshData);
+            this.inFlightRebuilds.delete(key);
+
+            // Update occlusion data when chunk changes
+            if (this.occlusionEnabled) {
+              this.occlusionCuller.analyzeChunk(
+                entry.chunk.chunkX,
+                entry.chunk.chunkZ,
+                (x, y, z) => entry.chunk.getBlock(x, y, z)?.type ?? 0,
+                this.config.chunkSize,
+                64
+              );
+            }
+          })
+          .catch((err) => {
+            console.warn(`[ChunkManager3D] Worker mesh failed for ${key}:`, err);
+            this.inFlightRebuilds.delete(key);
+            // Mark dirty again for retry via sync path
+            entry.chunk.markDirty();
+          });
+      } else {
+        // Synchronous fallback
+        entry.chunk.rebuild();
+
+        // Update occlusion data when chunk changes
+        if (this.occlusionEnabled) {
+          this.occlusionCuller.analyzeChunk(
+            entry.chunk.chunkX,
+            entry.chunk.chunkZ,
+            (x, y, z) => entry.chunk.getBlock(x, y, z)?.type ?? 0,
+            this.config.chunkSize,
+            64
+          );
+        }
       }
 
       this.stats.rebuildCount++;
@@ -390,6 +451,13 @@ export class ChunkManager3D {
   dispose(): void {
     this.clear();
     this.material.dispose();
+
+    // Clean up worker pool
+    if (this.workerPool) {
+      this.workerPool.dispose();
+      this.workerPool = null;
+    }
+    this.inFlightRebuilds.clear();
   }
 
   /**

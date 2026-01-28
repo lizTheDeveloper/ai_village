@@ -61,8 +61,8 @@ function parseLayout(layout: string[]): ParsedLayout {
  */
 function getTile(tiles: string[][], x: number, y: number): string {
   if (y < 0 || y >= tiles.length) return ' ';
-  if (x < 0 || x >= tiles[y].length) return ' ';
-  return tiles[y][x];
+  if (x < 0 || x >= tiles[y]!.length) return ' ';
+  return tiles[y]![x]!;
 }
 
 /**
@@ -312,7 +312,9 @@ function checkPathfinding(
   // Find dead ends (walkable tiles with only one exit)
   const deadEnds: Position[] = [];
   for (const posKey of reachable) {
-    const [x, y] = posKey.split(',').map(Number);
+    const [xStr, yStr] = posKey.split(',');
+    const x = Number(xStr);
+    const y = Number(yStr);
     const tile = getTile(tiles, x, y);
 
     if (!isWalkable(tile)) continue;
@@ -426,7 +428,7 @@ function findFloatingWalls(tiles: string[][], width: number, height: number): Po
 
   // If no exterior walls found, use first wall as anchor
   if (exteriorWalls.length === 0 && wallTiles.length > 0) {
-    exteriorWalls.push(wallTiles[0]);
+    exteriorWalls.push(wallTiles[0]!);
   }
 
   // Flood fill from exterior walls to find all connected structural walls
@@ -701,7 +703,7 @@ export function validateBuilding(building: VoxelBuildingDefinition): ValidationR
         type: 'unreachable_room',
         severity: 'error',
         message: `Room ${room.id} (${room.area} tiles) cannot be reached from any entrance`,
-        location: room.tiles[0],
+        location: room.tiles[0]!,
         suggestion: 'Add a door connecting this room to the rest of the building',
       });
     }
@@ -763,7 +765,7 @@ export function validateBuilding(building: VoxelBuildingDefinition): ValidationR
         type: 'structural_issue',
         severity: 'info',
         message: `Room ${room.id} has no windows (${room.area} tiles)`,
-        location: room.tiles[0],
+        location: room.tiles[0]!,
         suggestion: 'Consider adding windows (W) for light and aesthetics',
       });
     }
@@ -776,7 +778,7 @@ export function validateBuilding(building: VoxelBuildingDefinition): ValidationR
         type: 'room_too_small',
         severity: 'warning',
         message: `Room ${room.id} is very small (${room.area} tiles)`,
-        location: room.tiles[0],
+        location: room.tiles[0]!,
         suggestion: 'Consider expanding or removing this room',
       });
     }
@@ -786,7 +788,7 @@ export function validateBuilding(building: VoxelBuildingDefinition): ValidationR
         type: 'room_too_large',
         severity: 'info',
         message: `Room ${room.id} is very large (${room.area} tiles)`,
-        location: room.tiles[0],
+        location: room.tiles[0]!,
       });
     }
 
@@ -795,7 +797,7 @@ export function validateBuilding(building: VoxelBuildingDefinition): ValidationR
         type: 'structural_issue',
         severity: 'warning',
         message: `Room ${room.id} is not fully enclosed`,
-        location: room.tiles[0],
+        location: room.tiles[0]!,
         suggestion: 'Add walls or doors to fully enclose the room',
       });
     }

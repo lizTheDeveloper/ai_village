@@ -73,8 +73,19 @@ export async function queueBiosphereSprites(
       continue;
     }
 
-    // Determine sprite size from size class
-    const size = getSpriteSize((species as any).sizeClass);
+    // Biosphere species is mapped through nicheFilling, we can look up the niche from there
+    let nicheId = 'unknown';
+    for (const [nId, speciesIds] of Object.entries(biosphere.nicheFilling)) {
+      if (speciesIds.includes(species.id)) {
+        nicheId = nId;
+        break;
+      }
+    }
+
+    // Get size class from the niche
+    const niche = biosphere.niches.find(n => n.id === nicheId);
+    const sizeClass = niche?.sizeClass ?? 'medium';
+    const size = getSpriteSize(sizeClass);
 
     // Create queue entry
     const entry: SpriteQueueEntry = {
@@ -90,7 +101,7 @@ export async function queueBiosphereSprites(
         planetId: biosphere.planet.id,
         planetName: biosphere.planet.name,
         artStyle: biosphere.artStyle,
-        nicheId: (species as any).nicheId || 'unknown',
+        nicheId,
         speciesName: species.name,
         scientificName: species.scientificName,
       },

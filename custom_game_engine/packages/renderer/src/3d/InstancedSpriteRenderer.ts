@@ -109,9 +109,11 @@ export class InstancedSpriteRenderer {
   private freeIndices: number[] = [];
   private instanceCount = 0;
 
-  /** Reusable matrix for transforms */
+  /** Reusable objects for transforms (avoid per-call allocation) */
   private _tempMatrix = new THREE.Matrix4();
   private _tempQuaternion = new THREE.Quaternion();
+  private _tempScale = new THREE.Vector3();
+  private _tempRotationMatrix = new THREE.Matrix4();
 
   /** Camera reference for billboarding */
   private camera: THREE.Camera | null = null;
@@ -233,15 +235,16 @@ export class InstancedSpriteRenderer {
     // Update visibility
     this.instanceVisible[index] = 1;
 
-    // Update transform matrix
+    // Update transform matrix (reuse cached objects to avoid allocation)
     this._tempMatrix.makeTranslation(x, z, y); // Note: y/z swap for Three.js
-    this._tempMatrix.scale(new THREE.Vector3(scale, scale, 1));
+    this._tempScale.set(scale, scale, 1);
+    this._tempMatrix.scale(this._tempScale);
 
     // Apply billboarding if enabled and camera available
     if (this.config.billboard && this.camera) {
       this.camera.getWorldQuaternion(this._tempQuaternion);
-      const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(this._tempQuaternion);
-      this._tempMatrix.multiply(rotationMatrix);
+      this._tempRotationMatrix.makeRotationFromQuaternion(this._tempQuaternion);
+      this._tempMatrix.multiply(this._tempRotationMatrix);
     }
 
     this.mesh!.setMatrixAt(index, this._tempMatrix);
@@ -291,9 +294,10 @@ export class InstancedSpriteRenderer {
       const index = this.instanceMap.get(id);
       if (index === undefined) continue;
 
-      // Only update position, keep existing scale/rotation
+      // Only update position, keep existing scale/rotation (reuse cached vector)
       this._tempMatrix.makeTranslation(x, z, y); // Note: y/z swap for Three.js
-      this._tempMatrix.scale(new THREE.Vector3(this.config.defaultScale, this.config.defaultScale, 1));
+      this._tempScale.set(this.config.defaultScale, this.config.defaultScale, 1);
+      this._tempMatrix.scale(this._tempScale);
       this.mesh!.setMatrixAt(index, this._tempMatrix);
     }
     this.needsUpdate = true;

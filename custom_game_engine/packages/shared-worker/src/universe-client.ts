@@ -43,6 +43,24 @@ export type WorkerReadyCallback = (status: { hasExistingSave: boolean; currentUn
 export type LoadCompleteCallback = (result: { success: boolean; error?: string; universeId?: string; tick?: number }) => void;
 
 /**
+ * Chat message data forwarded from worker
+ */
+export interface ChatMessageData {
+  roomId: string;
+  messageId: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  timestamp: number;
+  tick: number;
+}
+
+/**
+ * Callback for chat messages
+ */
+export type ChatMessageCallback = (message: ChatMessageData) => void;
+
+/**
  * Client for connecting to the Universe SharedWorker
  */
 export class UniverseClient {
@@ -53,6 +71,7 @@ export class UniverseClient {
   private loadingProgressListeners: Set<LoadingProgressCallback> = new Set();
   private workerReadyListeners: Set<WorkerReadyCallback> = new Set();
   private loadCompleteListeners: Set<LoadCompleteCallback> = new Set();
+  private chatMessageListeners: Set<ChatMessageCallback> = new Set();
   private state: UniverseState | null = null;
   private connectionId: string | null = null;
   private connected = false;
@@ -248,6 +267,27 @@ export class UniverseClient {
   }
 
   /**
+   * Emit an event to the worker's eventBus
+   *
+   * This forwards events from the main thread to the SharedWorker,
+   * allowing UI components like DivineChatPanel to send events that
+   * systems like ChatRoomSystem can receive.
+   */
+  emitEvent(event: { type: string; source: string; data: unknown }): void {
+    if (!this.port) {
+      console.warn('[UniverseClient] Not connected, cannot emit event');
+      return;
+    }
+
+    const message: WindowToWorkerMessage = {
+      type: 'emit-event',
+      event,
+    };
+
+    this.port.postMessage(message);
+  }
+
+  /**
    * Set viewport for spatial culling
    *
    * Only entities within the viewport (plus margin) will be synchronized.
@@ -325,7 +365,7 @@ export class UniverseClient {
       const message: WindowToWorkerMessage = {
         type: 'list-saves',
       };
-      this.port.postMessage(message);
+      this.port?.postMessage(message);
     });
   }
 
@@ -485,6 +525,25 @@ export class UniverseClient {
           currentTick: message.currentTick,
         });
         break;
+
+      case 'chat-message':
+        console.log('[UniverseClient] Received chat-message from worker:', {
+          roomId: message.roomId,
+          senderId: message.senderId,
+          senderName: message.senderName,
+          content: message.content?.substring(0, 50),
+          listenerCount: this.chatMessageListeners.size,
+        });
+        this.notifyChatMessageListeners({
+          roomId: message.roomId,
+          messageId: message.messageId,
+          senderId: message.senderId,
+          senderName: message.senderName,
+          content: message.content,
+          timestamp: message.timestamp,
+          tick: message.tick,
+        });
+        break;
     }
   }
 
@@ -553,6 +612,29 @@ export class UniverseClient {
         console.error('[UniverseClient] Load complete listener error:', error);
       }
     }
+  }
+
+  /**
+   * Notify chat message listeners
+   */
+  private notifyChatMessageListeners(message: ChatMessageData): void {
+    for (const listener of this.chatMessageListeners) {
+      try {
+        listener(message);
+      } catch (error) {
+        console.error('[UniverseClient] Chat message listener error:', error);
+      }
+    }
+  }
+
+  /**
+   * Subscribe to chat message updates from the worker
+   */
+  onChatMessage(callback: ChatMessageCallback): () => void {
+    this.chatMessageListeners.add(callback);
+    return () => {
+      this.chatMessageListeners.delete(callback);
+    };
   }
 }
 

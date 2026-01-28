@@ -54,7 +54,7 @@ Addressed playtest feedback to improve plant lifecycle system observability and 
 ```typescript
 // P - Spawn test plant at advanced stage (for testing)
 if (key === 'p' || key === 'P') {
-  // Spawns berry-bush at mature/seeding/senescence stage
+  // Spawns blueberry-bush at mature/seeding/senescence stage
   // Spawns at camera center position
   // Shows notification
 }

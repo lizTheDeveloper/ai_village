@@ -188,11 +188,12 @@ export class PersistenceService {
     const data = encoder.encode(json);
 
     // Use CompressionStream if available (modern browsers)
+    // CompressionStream is a newer Web API not in all TypeScript lib versions
     if ('CompressionStream' in globalThis) {
-      const stream = new Blob([data])
-        .stream()
-        .pipeThrough(new CompressionStream('gzip'));
-      const compressed = await new Response(stream).arrayBuffer();
+      const blobStream = new Blob([data as BlobPart]).stream();
+      const CompressionStreamConstructor = (globalThis as { CompressionStream: new (format: string) => ReadableWritablePair<Uint8Array, Uint8Array> }).CompressionStream;
+      const compressedStream = blobStream.pipeThrough(new CompressionStreamConstructor('gzip'));
+      const compressed = await new Response(compressedStream).arrayBuffer();
       return new Uint8Array(compressed);
     }
 
@@ -205,11 +206,12 @@ export class PersistenceService {
    */
   private async decompressState(data: Uint8Array): Promise<UniverseState> {
     // Use DecompressionStream if available
+    // DecompressionStream is a newer Web API not in all TypeScript lib versions
     if ('DecompressionStream' in globalThis) {
-      const stream = new Blob([data])
-        .stream()
-        .pipeThrough(new DecompressionStream('gzip'));
-      const decompressed = await new Response(stream).arrayBuffer();
+      const blobStream = new Blob([data as BlobPart]).stream();
+      const DecompressionStreamConstructor = (globalThis as { DecompressionStream: new (format: string) => ReadableWritablePair<Uint8Array, Uint8Array> }).DecompressionStream;
+      const decompressedStream = blobStream.pipeThrough(new DecompressionStreamConstructor('gzip'));
+      const decompressed = await new Response(decompressedStream).arrayBuffer();
       const decoder = new TextDecoder();
       const json = decoder.decode(decompressed);
       return JSON.parse(json);

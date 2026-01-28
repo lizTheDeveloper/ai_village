@@ -205,21 +205,21 @@ When playtest agent tests the game now, they should observe:
 ### ✅ Criterion 1: Seed Gathering from Wild Plants
 
 - Agents with `gather_seeds` behavior will approach plants
-- Seeds will be added to agent inventories as item IDs like `seed-berry-bush`, `seed-grass`
+- Seeds will be added to agent inventories as item IDs like `seed-blueberry-bush`, `seed-grass`
 - Console will show `seed:gathered` events
 - Plant `seedsProduced` counters will decrease
 
 ### ✅ Criterion 5: Seed Inventory Management
 
 - Seeds will appear in inventory panel (press 'I')
-- Seeds will stack by species (e.g., `seed-berry-bush: 15`)
+- Seeds will stack by species (e.g., `seed-blueberry-bush: 15`)
 
 ### Example Expected Console Output
 
 ```
-[AISystem] Agent 66a8cd04 requesting gather_seeds from berry-bush plant 85a1459d (5 candidates)
-[AISystem.gatherBehavior] Agent 66a8cd04 gathered 6 seed-berry-bush from 85a1459d
-seed:gathered event { agentId: '66a8cd04', plantId: '85a1459d', speciesId: 'berry-bush', seedCount: 6, sourceType: 'wild' }
+[AISystem] Agent 66a8cd04 requesting gather_seeds from blueberry-bush plant 85a1459d (5 candidates)
+[AISystem.gatherBehavior] Agent 66a8cd04 gathered 6 seed-blueberry-bush from 85a1459d
+seed:gathered event { agentId: '66a8cd04', plantId: '85a1459d', speciesId: 'blueberry-bush', seedCount: 6, sourceType: 'wild' }
 ```
 
 ---

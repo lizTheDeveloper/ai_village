@@ -109,7 +109,7 @@ The seed gathering system should now work end-to-end:
 7. Verify seeds appear in inventory with counts
 
 **Expected Inventory Items:**
-- `berry-bush-seed` (stacked by species)
+- `blueberry-bush-seed` (stacked by species)
 - `grass-seed` (stacked by species)
 - `wildflower-seed` (stacked by species)
 

@@ -13,6 +13,9 @@ export * from './QueryBuilder.js';
 export * from './World.js';
 export * from './SimulationScheduler.js';
 export * from './CachedQuery.js';
+export * from './DirtyTracker.js';
+export * from './ChunkTickScheduler.js';
+export * from './UpdatePropagation.js';
 export {
   type SystemContext,
   SystemContextImpl,

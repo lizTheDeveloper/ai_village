@@ -29,6 +29,8 @@ export class SpiritualResponseSystem extends BaseSystem {
   public readonly requiredComponents = [] as const;
   // PERF: Skip entirely when no spiritual agents exist
   public readonly activationComponents = ['spiritual'] as const;
+  // NOTE: Event-driven system - onUpdate is no-op. Cannot use throttleInterval
+  // because event subscription in onInit() captures ctx.tick at init time.
 
   private prayerIdCounter: number = 0;
   private recentPrayers = new Map<string, number>(); // agentId -> last prayer tick

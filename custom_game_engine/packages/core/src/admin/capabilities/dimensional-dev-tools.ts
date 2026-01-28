@@ -123,8 +123,21 @@ const dimensionalDevTools = defineCapability({
 capabilityRegistry.register(dimensionalDevTools);
 
 // Browser console helpers
+interface DimensionalDevToolsAPI {
+  spawnBuilding: (buildingId: string, x: number, y: number) => Promise<unknown>;
+  spawnRift: (x: number, y: number, targetDim?: number) => Promise<unknown>;
+  listBuildings: () => Promise<unknown>;
+  grantMagic: (agentId: string, powerLevel?: number) => Promise<unknown>;
+}
+
+declare global {
+  interface Window {
+    dimensional?: DimensionalDevToolsAPI;
+  }
+}
+
 if (typeof window !== 'undefined') {
-  (window as any).dimensional = {
+  window.dimensional = {
     spawnBuilding: async (buildingId: string, x: number, y: number) => {
       const response = await fetch('/admin/actions/spawn_dimensional_building', {
         method: 'POST',

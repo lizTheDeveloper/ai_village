@@ -25,17 +25,17 @@ describe('Idle Behaviors Integration', () => {
   describe('idle behavior variety over time', () => {
     it('should exhibit less than 30% pure idle behavior', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent(new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.6,
         conscientiousness: 0.6,
         extraversion: 0.6,
         agreeableness: 0.6,
         neuroticism: 0.4
       }));
-      (entity as any).addComponent(new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       const behaviors: string[] = [];
       for (let i = 0; i < 100; i++) {
@@ -56,17 +56,17 @@ describe('Idle Behaviors Integration', () => {
 
     it('should use at least 4 different idle behaviors', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent(new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.6,
         conscientiousness: 0.6,
         extraversion: 0.6,
         agreeableness: 0.6,
         neuroticism: 0.4
       }));
-      (entity as any).addComponent(new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       const behaviors = new Set<string>();
       for (let i = 0; i < 100; i++) {
@@ -86,17 +86,17 @@ describe('Idle Behaviors Integration', () => {
   describe('reflection frequency', () => {
     it.skip('should reflect 1-3 times per game day when idle (reflection system not fully implemented)', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.7,
         conscientiousness: 0.7,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       let reflectionCount = 0;
       const eventHandler = vi.fn(() => reflectionCount++);
@@ -122,17 +122,17 @@ describe('Idle Behaviors Integration', () => {
     it('should not spam reflection too frequently', () => {
       const entity = world.createEntity();
       const memory = new MemoryComponent(entity.id);
-      (entity as any).addComponent( memory);
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(memory);
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.5,
         neuroticism: 0.5
       }));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       // Trigger reflection
       reflectionSystem.update(world, 1);
@@ -152,17 +152,17 @@ describe('Idle Behaviors Integration', () => {
       const agents = [];
       for (let i = 0; i < 20; i++) {
         const entity = world.createEntity();
-        (entity as any).addComponent(new NeedsComponent());
-        (entity as any).addComponent( new PersonalityComponent({
+        entity.addComponent(new NeedsComponent());
+        entity.addComponent(new PersonalityComponent({
           openness: Math.random(),
           conscientiousness: Math.random(),
           extraversion: Math.random(),
           agreeableness: Math.random(),
           neuroticism: Math.random()
         }));
-        (entity as any).addComponent( new MemoryComponent(entity.id));
-        (entity as any).addComponent(new GoalsComponent());
-        (entity as any).addComponent(new ActionQueue(entity.id));
+        entity.addComponent(new MemoryComponent(entity.id));
+        entity.addComponent(new GoalsComponent());
+        entity.addComponent(new ActionQueue(entity.id));
         agents.push(entity);
       }
 
@@ -194,17 +194,17 @@ describe('Idle Behaviors Integration', () => {
 
     it('should align goal categories with personality traits', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.9,
         conscientiousness: 0.9,
         extraversion: 0.2,
         agreeableness: 0.5,
         neuroticism: 0.2
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       // Force multiple reflections
       for (let i = 0; i < 50; i++) {
@@ -302,15 +302,15 @@ describe('Idle Behaviors Integration', () => {
   describe('goal progress tracking', () => {
     it.skip('should update goal progress when completing relevant actions (progress tracking not implemented)', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.7,
         conscientiousness: 0.7,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
 
       const goals = new GoalsComponent();
       goals.addGoal({
@@ -325,8 +325,8 @@ describe('Idle Behaviors Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 7
       });
-      (entity as any).addComponent(goals);
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(goals);
+      entity.addComponent(new ActionQueue(entity.id));
 
       // Emit action completion event
       world.eventBus.emit('agent:action_complete', {
@@ -344,15 +344,15 @@ describe('Idle Behaviors Integration', () => {
 
     it.skip('should emit milestone completion events (event emission not implemented)', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.5,
         neuroticism: 0.5
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
 
       const goals = new GoalsComponent();
       goals.addGoal({
@@ -368,7 +368,7 @@ describe('Idle Behaviors Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 7
       });
-      (entity as any).addComponent(goals);
+      entity.addComponent(goals);
 
       const eventHandler = vi.fn();
       world.eventBus.subscribe('agent:goal_milestone', eventHandler);
@@ -392,7 +392,7 @@ describe('Idle Behaviors Integration', () => {
         createdAt: Date.now(),
         targetCompletionDays: 7
       });
-      (entity as any).addComponent(goals);
+      entity.addComponent(goals);
 
       const eventHandler = vi.fn();
       world.eventBus.subscribe('agent:goal_completed', eventHandler);
@@ -407,17 +407,17 @@ describe('Idle Behaviors Integration', () => {
   describe('internal monologue during idle behaviors', () => {
     it.skip('should generate internal monologue for reflection (monologue not implemented)', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.7,
         conscientiousness: 0.6,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       let monologue = '';
       world.eventBus.subscribe('agent:internal_monologue', (event: any) => {
@@ -432,22 +432,22 @@ describe('Idle Behaviors Integration', () => {
 
     it('should have event bus available for monologues', () => {
       const entity = world.createEntity();
-      (entity as any).addComponent(new NeedsComponent());
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(new NeedsComponent());
+      entity.addComponent(new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.3,
         agreeableness: 0.6,
         neuroticism: 0.2
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
       const queue = new ActionQueue(entity.id);
       queue.enqueue({
         type: 'sit_quietly',
         priority: 0.2
       });
-      (entity as any).addComponent(queue);
+      entity.addComponent(queue);
 
       // Verify event infrastructure exists
       expect(world.eventBus).toBeDefined();
@@ -461,17 +461,17 @@ describe('Idle Behaviors Integration', () => {
       const entity = world.createEntity();
       const needs = new NeedsComponent();
       needs.social = 0.2; // Lonely
-      (entity as any).addComponent(needs);
-      (entity as any).addComponent( new PersonalityComponent({
+      entity.addComponent(needs);
+      entity.addComponent(new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.7, // Extraverted
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      (entity as any).addComponent( new MemoryComponent(entity.id));
-      (entity as any).addComponent(new GoalsComponent());
-      (entity as any).addComponent(new ActionQueue(entity.id));
+      entity.addComponent(new MemoryComponent(entity.id));
+      entity.addComponent(new GoalsComponent());
+      entity.addComponent(new ActionQueue(entity.id));
 
       const behaviors: string[] = [];
       for (let i = 0; i < 50; i++) {

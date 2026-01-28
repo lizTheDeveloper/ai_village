@@ -17,36 +17,60 @@ import type { World, Entity } from '@ai-village/core';
 // Mock Setup
 // ============================================================================
 
+// Type definitions for test entities
+interface BehaviorQueueItem {
+  behavior: string;
+  behaviorState: Record<string, unknown>;
+  priority?: string;
+  label?: string;
+  startedAt?: number;
+}
+
+interface AgentComponent {
+  behaviorQueue: BehaviorQueueItem[];
+  currentQueueIndex: number;
+  behaviorCompleted: boolean;
+}
+
 // Mock World
 function createMockWorld(): World {
   const entities = new Map<string, Entity>();
 
-  const world = {
+  const world: Partial<World> = {
     tick: 100,
     getEntity: (id: string) => entities.get(id),
     query: () => ({
       with: () => ({ executeEntities: () => [] }),
       executeEntities: () => [],
     }),
-  } as any;
+  };
 
-  return world;
+  return world as World;
 }
 
 // Mock Entity
-function createMockEntity(id: string, components: Map<string, any>): Entity {
-  return {
+interface MockEntity extends Partial<Entity> {
+  id: string;
+  components: Map<string, unknown>;
+  hasComponent(type: string): boolean;
+  getComponent<T = unknown>(type: string): T | undefined;
+  updateComponent<T = unknown>(type: string, updater: (current: T) => T): void;
+}
+
+function createMockEntity(id: string, components: Map<string, unknown>): Entity {
+  const mockEntity: MockEntity = {
     id,
     components,
     hasComponent: (type: string) => components.has(type),
-    getComponent: (type: string) => components.get(type),
-    updateComponent: (type: string, updater: (current: any) => any) => {
+    getComponent: <T = unknown>(type: string): T | undefined => components.get(type) as T | undefined,
+    updateComponent: <T = unknown>(type: string, updater: (current: T) => T) => {
       const current = components.get(type);
-      if (current) {
-        components.set(type, updater(current));
+      if (current !== undefined) {
+        components.set(type, updater(current as T));
       }
     },
-  } as any;
+  };
+  return mockEntity as Entity;
 }
 
 // ============================================================================
@@ -114,7 +138,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Grant 50 XP
       const result = await api.grantSkillXP(entityId, 'farming', 50);
@@ -139,7 +163,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Grant 100 XP (should level up to 1)
       const result = await api.grantSkillXP(entityId, 'combat', 100);
@@ -162,7 +186,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Grant 350 XP (should level up to level 2)
       // Thresholds: 0->1: 100, 1->2: 300
@@ -186,7 +210,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Grant 50 XP, but with 2.0 affinity = 100 actual XP
       const result = await api.grantSkillXP(entityId, 'cooking', 50);
@@ -210,7 +234,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         ['position', { x: 0, y: 0 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.grantSkillXP(entityId, 'farming', 100);
 
@@ -229,7 +253,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.grantSkillXP(entityId, 'non-existent-skill', 100);
 
@@ -248,7 +272,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.grantSkillXP(entityId, 'farming', -100);
 
@@ -267,10 +291,10 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Spy on cache invalidation
-      const invalidateSpy = vi.spyOn((api as any).cache, 'invalidate');
+      const invalidateSpy = vi.spyOn((api as { cache: { invalidate: (id: string) => void } }).cache, 'invalidate');
 
       await api.grantSkillXP(entityId, 'farming', 100);
 
@@ -289,7 +313,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Grant 1500 XP (should reach level 4)
       // Thresholds: 0->1: 100, 1->2: 300, 2->3: 700, 3->4: 1500
@@ -311,7 +335,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Grant 3000 XP (should reach level 5)
       const result = await api.grantSkillXP(entityId, 'woodcutting', 3000);
@@ -341,7 +365,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const skills = await api.getSkills(entityId);
 
@@ -362,7 +386,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const skills = await api.getSkills(entityId);
 
@@ -381,7 +405,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         ['position', { x: 0, y: 0 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       await expect(api.getSkills(entityId)).rejects.toThrow('no skills component');
     });
@@ -396,7 +420,7 @@ describe('GameIntrospectionAPI - Skills & Progression', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const skills = await api.getSkills(entityId);
 
@@ -431,7 +455,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.triggerBehavior({
         entityId,
@@ -454,7 +478,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const params = { targetId: 'target-123', range: 10 };
       const result = await api.triggerBehavior({
@@ -467,7 +491,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       expect(result.state.behaviorState).toEqual(params);
 
       // Check that agent component was updated with params
-      const agent = entity.getComponent('agent') as any;
+      const agent = entity.getComponent<AgentComponent>('agent');
       expect(agent.behaviorQueue[0].behaviorState).toEqual(params);
     });
 
@@ -484,7 +508,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       await api.triggerBehavior({
         entityId,
@@ -492,7 +516,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
       });
 
       // Queue should be cleared and replaced with new behavior
-      const agent = entity.getComponent('agent') as any;
+      const agent = entity.getComponent<AgentComponent>('agent');
       expect(agent.behaviorQueue).toHaveLength(1);
       expect(agent.behaviorQueue[0].behavior).toBe('gather');
       expect(agent.currentQueueIndex).toBe(0);
@@ -514,7 +538,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         ['position', { x: 0, y: 0 }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.triggerBehavior({
         entityId,
@@ -535,7 +559,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.triggerBehavior({
         entityId,
@@ -556,7 +580,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const result = await api.triggerBehavior({
         entityId,
@@ -578,10 +602,10 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       // Spy on cache invalidation
-      const invalidateSpy = vi.spyOn((api as any).cache, 'invalidate');
+      const invalidateSpy = vi.spyOn((api as { cache: { invalidate: (id: string) => void } }).cache, 'invalidate');
 
       await api.triggerBehavior({
         entityId,
@@ -601,7 +625,7 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       const commonBehaviors = [
         'wander', 'idle', 'gather', 'harvest', 'explore', 'rest',
@@ -629,14 +653,14 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       await api.triggerBehavior({
         entityId,
         behavior: 'gather',
       });
 
-      const agent = entity.getComponent('agent') as any;
+      const agent = entity.getComponent<AgentComponent>('agent');
       expect(agent.behaviorQueue[0].priority).toBe('high');
     });
 
@@ -650,14 +674,14 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       await api.triggerBehavior({
         entityId,
         behavior: 'hunt',
       });
 
-      const agent = entity.getComponent('agent') as any;
+      const agent = entity.getComponent<AgentComponent>('agent');
       expect(agent.behaviorQueue[0].label).toContain('Manually triggered');
       expect(agent.behaviorQueue[0].label).toContain('hunt');
     });
@@ -672,16 +696,16 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
-      (world as any).tick = 500;
+      (world as Partial<World>).tick = 500;
 
       await api.triggerBehavior({
         entityId,
         behavior: 'explore',
       });
 
-      const agent = entity.getComponent('agent') as any;
+      const agent = entity.getComponent<AgentComponent>('agent');
       expect(agent.behaviorQueue[0].startedAt).toBe(500);
     });
 
@@ -695,14 +719,14 @@ describe('GameIntrospectionAPI - Behavioral Control', () => {
         }],
       ]);
       const entity = createMockEntity(entityId, components);
-      (world as any).getEntity = (id: string) => id === entityId ? entity : undefined;
+      (world as Partial<World>).getEntity = (id: string) => id === entityId ? entity : undefined;
 
       await api.triggerBehavior({
         entityId,
         behavior: 'wander',
       });
 
-      const agent = entity.getComponent('agent') as any;
+      const agent = entity.getComponent<AgentComponent>('agent');
       expect(agent.behaviorCompleted).toBe(false);
     });
   });

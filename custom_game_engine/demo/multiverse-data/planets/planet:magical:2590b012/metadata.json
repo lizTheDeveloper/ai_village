@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:2590b012",
+  "name": "Cosmic-250",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769493104027",
+  "createdAt": 1769493104257,
+  "lastAccessedAt": 1769493104257,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769493104027",
+    "type": "magical"
+  }
+}

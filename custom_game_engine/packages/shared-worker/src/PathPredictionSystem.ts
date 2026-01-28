@@ -74,7 +74,7 @@ export class PathPredictionSystem extends BaseSystem {
       ticksElapsed
     );
 
-    const positionData = position as { x: number; y: number };
+    const positionData = position as unknown as { x: number; y: number };
     const deviation = calculateDeviation(positionData, predictedPos);
 
     if (deviation > prediction.deviationThreshold) {

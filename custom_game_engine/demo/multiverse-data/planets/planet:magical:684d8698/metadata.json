@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:684d8698",
+  "name": "Quantum Ariel",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769499445643",
+  "createdAt": 1769499445818,
+  "lastAccessedAt": 1769499445818,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769499445643",
+    "type": "magical"
+  }
+}

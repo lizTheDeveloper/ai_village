@@ -1,0 +1,15 @@
+{
+  "id": "planet:magical:637cacb0",
+  "name": "Galactic Proteus",
+  "type": "magical",
+  "seed": "universe:main:homeworld:1769494691490",
+  "createdAt": 1769494691492,
+  "lastAccessedAt": 1769494691492,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1769494691490",
+    "type": "magical"
+  }
+}
