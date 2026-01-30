@@ -2,8 +2,9 @@
   "id": "narwhal",
   "category": "objects",
   "size": 48,
-  "description": "narwhal with mottled grey skin, spiral tusk, pixel art, game sprite, 48x48",
+  "description": "narwhal",
   "original_description": "narwhal with mottled grey skin, spiral tusk, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:04:33.541Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.624Z"
 }

@@ -243,7 +243,7 @@ export class DivineChatPanel implements IWindowPanel {
   }
 
   /**
-   * Cleanup subscriptions
+   * Cleanup subscriptions and hidden input
    */
   destroy(): void {
     if (this.chatMessageUnsubscribe) {
@@ -253,6 +253,10 @@ export class DivineChatPanel implements IWindowPanel {
     if (this.eventBusUnsubscribe) {
       this.eventBusUnsubscribe();
       this.eventBusUnsubscribe = null;
+    }
+    if (this.hiddenInput && this.hiddenInput.parentNode) {
+      this.hiddenInput.parentNode.removeChild(this.hiddenInput);
+      this.hiddenInput = null;
     }
   }
 
@@ -1067,20 +1071,10 @@ export class DivineChatPanel implements IWindowPanel {
 
     const messageContent = this.inputText.trim();
     const senderName = this.getPlayerName();
-    const messageId = `player_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
-    // OPTIMISTIC UPDATE: Add message to local cache immediately for instant display
-    // This ensures the message appears right away, regardless of event routing
-    this.addMessageToCache({
-      id: messageId,
-      roomId: 'divine_chat',
-      senderId: this.playerId,
-      senderName: senderName,
-      content: messageContent,
-      timestamp: Date.now(),
-      tick: this.world.tick,
-      type: 'message',
-    });
+    // NOTE: We do NOT add an optimistic update here. The message will be added
+    // via the chat:message_sent event from ChatRoomSystem. Adding an optimistic
+    // update with a different ID causes duplicates since deduplication is by ID.
 
     const event = {
       type: 'chat:send_message' as const,
@@ -1102,6 +1096,10 @@ export class DivineChatPanel implements IWindowPanel {
     }
 
     this.inputText = '';
+    // Also clear hidden input
+    if (this.hiddenInput) {
+      this.hiddenInput.value = '';
+    }
   }
 
   /**
@@ -1201,24 +1199,6 @@ export class DivineChatPanel implements IWindowPanel {
   private blurHiddenInput(): void {
     if (this.hiddenInput) {
       this.hiddenInput.blur();
-    }
-  }
-
-  /**
-   * Cleanup the hidden input when panel is destroyed
-   */
-  destroy(): void {
-    if (this.chatMessageUnsubscribe) {
-      this.chatMessageUnsubscribe();
-      this.chatMessageUnsubscribe = null;
-    }
-    if (this.eventBusUnsubscribe) {
-      this.eventBusUnsubscribe();
-      this.eventBusUnsubscribe = null;
-    }
-    if (this.hiddenInput && this.hiddenInput.parentNode) {
-      this.hiddenInput.parentNode.removeChild(this.hiddenInput);
-      this.hiddenInput = null;
     }
   }
 }

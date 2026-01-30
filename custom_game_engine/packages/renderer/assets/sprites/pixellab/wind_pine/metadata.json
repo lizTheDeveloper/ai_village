@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "emergence plant, pixel art, top-down view",
+  "description": "pine wind",
   "generated_at": "2026-01-03T22:01:29.504Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "emergence plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.676Z"
 }

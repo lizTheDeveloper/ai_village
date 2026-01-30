@@ -3,7 +3,9 @@
   "category": "humanoids",
   "type": "character",
   "size": 48,
-  "description": "Sturdy humanoid character, simple clothing, pixel art",
+  "description": "default sturdy",
   "generated_at": "2026-01-03T22:08:48.316Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Sturdy humanoid character, simple clothing, pixel art",
+  "enriched_at": "2026-01-30T00:40:22.656Z"
 }

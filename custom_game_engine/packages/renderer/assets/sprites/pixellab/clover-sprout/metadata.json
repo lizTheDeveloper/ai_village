@@ -2,8 +2,9 @@
   "id": "clover-sprout",
   "category": "objects",
   "size": 48,
-  "description": "Young clover seedling with first trifoliate leaves, pixel art, top-down view, transparent background",
+  "description": "clover-sprout",
   "original_description": "Young clover seedling with first trifoliate leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:53:25.904Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.573Z"
 }

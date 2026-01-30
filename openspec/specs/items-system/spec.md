@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The items system manages all objects in the game with procedural generation capabilities, maintaining game balance through scaling laws, deduplication, and power distribution.
+
 ## Overview
 
 The items system manages all objects in the game: tools, materials, produce, artifacts, and crafted goods. A key feature is the ability to generate new item types procedurally while maintaining game balance through scaling laws, deduplication, and power distribution.
@@ -89,7 +93,7 @@ type ItemCategory =
 
 ## Requirements
 
-### REQ-ITM-001: Inventory Management
+### Requirement: Inventory Management
 
 Agents and containers SHALL maintain inventories:
 
@@ -111,7 +115,7 @@ interface InventorySlot {
 }
 ```
 
-### REQ-ITM-002: Item Usage
+### Requirement: Item Usage
 
 Items SHALL have defined use actions:
 
@@ -126,7 +130,7 @@ type UseAction =
   | { type: "gift"; socialBonus: number };
 ```
 
-### REQ-ITM-003: Item Effects
+### Requirement: Item Effects
 
 Items SHALL provide effects when used/equipped:
 
@@ -163,7 +167,7 @@ type ItemEffect =
 
 ## Crafting System
 
-### REQ-ITM-004: Recipe Structure
+### Requirement: Recipe Structure
 
 Items SHALL be craftable via recipes:
 
@@ -200,13 +204,13 @@ interface ItemStack {
 }
 ```
 
-### REQ-ITM-005: Crafting Execution
+### Requirement: Crafting Execution
 
 Crafting SHALL follow this process:
 
-```
-WHEN an agent attempts to craft
-THEN the system SHALL:
+#### Scenario: Agent attempts to craft
+- **WHEN** an agent attempts to craft
+- **THEN** the system SHALL:
   1. Verify all ingredients available
   2. Verify required tools present
   3. Verify at correct station (if required)
@@ -222,13 +226,12 @@ THEN the system SHALL:
      - Create output items
      - Grant skill XP
      - IF exceptional roll, chance for bonus output
-```
 
 ---
 
 ## Generative Item System
 
-### REQ-ITM-006: Item Generation Framework
+### Requirement: Item Generation Framework
 
 The system SHALL generate new items via LLM:
 
@@ -254,7 +257,7 @@ type GenerationTrigger =
   | "building_output";      // Special building creates
 ```
 
-### REQ-ITM-007: Generation Constraints (Balance)
+### Requirement: Generation Constraints (Balance)
 
 Generated items SHALL respect power constraints:
 
@@ -282,7 +285,7 @@ interface GenerationConstraints {
 }
 ```
 
-### REQ-ITM-008: Scaling Laws
+### Requirement: Scaling Laws
 
 Generated items SHALL follow scaling laws:
 
@@ -344,7 +347,7 @@ const scalingLaws: ScalingLaws = {
 };
 ```
 
-### REQ-ITM-009: Deduplication System
+### Requirement: Deduplication System
 
 Generated items SHALL be checked for uniqueness:
 
@@ -364,10 +367,11 @@ interface DeduplicationSystem {
   variationThreshold: number;     // 0.70 - similar, force variation
   acceptanceThreshold: number;    // 0.50 - different enough
 }
+```
 
-// Deduplication process
-WHEN generating a new item
-THEN the system SHALL:
+#### Scenario: Deduplication process
+- **WHEN** generating a new item
+- **THEN** the system SHALL:
   1. Generate initial item concept via LLM
   2. Calculate similarity scores against all items in category
   3. IF maxSimilarity > rejectionThreshold
@@ -378,9 +382,8 @@ THEN the system SHALL:
   6. IF effect fingerprint exists
      - Modify effects to create unique combination
   7. Register new item in deduplication index
-```
 
-### REQ-ITM-010: Power Distribution
+### Requirement: Power Distribution
 
 The system SHALL maintain balanced power distribution:
 
@@ -403,23 +406,23 @@ interface PowerDistribution {
     discouragedEffects: string[];
   };
 }
+```
 
-// Distribution rules
-WHEN generating a new item
-THEN the system SHALL:
+#### Scenario: Distribution rules
+- **WHEN** generating a new item
+- **THEN** the system SHALL:
   1. Check current power distribution
   2. Calculate category saturation percentages
   3. Bias generation toward categories < 70% saturation
   4. Penalize categories > 90% saturation
   5. Ensure no single effect type exceeds 20% of all effects
   6. Prefer effects with < 5% representation
-```
 
 ---
 
 ## Item Persistence
 
-### REQ-ITM-011: Generated Item Storage
+### Requirement: Generated Item Storage
 
 Generated items SHALL be permanently stored:
 

@@ -3,8 +3,12 @@
 
 import constantsData from '../data/constants.json';
 
-// Hunger thresholds (0-1 scale)
+// Hunger thresholds (0-1 scale) - HYSTERESIS
+// HUNGER_THRESHOLD_SEEK_FOOD: Start seeking food when hunger drops below this (50%)
+// HUNGER_THRESHOLD_WELL_FED: Only complete seek_food when hunger reaches this (85%)
+// Gap of 35% prevents ping-pong behavior switching
 export const HUNGER_THRESHOLD_SEEK_FOOD = constantsData.needs.hungerThresholdSeekFood;
+export const HUNGER_THRESHOLD_WELL_FED = constantsData.needs.hungerThresholdWellFed;
 export const HUNGER_RESTORED_DEFAULT = constantsData.needs.hungerRestoredDefault;
 
 // Energy thresholds (0-1 scale)
@@ -13,6 +17,13 @@ export const ENERGY_LOW = constantsData.needs.energyLow;
 export const ENERGY_MODERATE = constantsData.needs.energyModerate;
 export const ENERGY_HIGH = constantsData.needs.energyHigh;
 export const ENERGY_FULL = constantsData.needs.energyFull;
+
+// Energy thresholds (0-1 scale) - HYSTERESIS
+// ENERGY_THRESHOLD_SEEK_SLEEP: Start seeking sleep when energy drops below this (25%)
+// ENERGY_THRESHOLD_WELL_RESTED: Only complete sleep when energy reaches this (90%)
+// Gap of 65% prevents agents from waking up and immediately going back to sleep
+export const ENERGY_THRESHOLD_SEEK_SLEEP = constantsData.needs.energyThresholdSeekSleep;
+export const ENERGY_THRESHOLD_WELL_RESTED = constantsData.needs.energyThresholdWellRested;
 
 // Energy work multipliers
 export const WORK_SPEED_CRITICAL = constantsData.needs.workSpeedCritical;

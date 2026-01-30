@@ -33,6 +33,7 @@ export interface UniverseConfig {
   spectrumEffects?: SpectrumEffects;  // Resolved effects from spectrum
   planetType?: string;  // Selected planet type for homeworld
   planetId?: string;  // ID of existing planet from registry (if reusing)
+  artStyle?: string;  // Console-era art style for sprites (snes, genesis, etc.)
   scenarioPresetId: string;  // The first memory / intro scenario
   customScenarioText?: string;  // Custom text when scenarioPresetId is 'custom'
   universeName?: string;
@@ -92,12 +93,34 @@ export class UniverseConfigScreen {
   private container: HTMLElement;
   private selectedPlanetType: string = 'terrestrial';
   private selectedPlanetId: string | undefined = undefined;
+  private selectedArtStyle: string = 'snes';  // Default art style
   private selectedScenario: string = 'cooperative-survival';
   private customScenarioText: string = '';
-  private currentStep: 'magic' | 'planet' | 'scenario' | 'naming' | 'souls' = 'magic';  // Magic → planet → scenario → naming → souls
+  private currentStep: 'magic' | 'planet' | 'artstyle' | 'scenario' | 'naming' | 'souls' = 'magic';  // Magic → planet → artstyle → scenario → naming → souls
   private universeName: string = '';
   private fateSuffix: string = '';
   private options: UniverseConfigScreenOptions = {};
+
+  // Art style configurations - determines the visual aesthetic of all sprites
+  private static readonly ART_STYLES: Record<string, { name: string; era: string; description: string; icon: string; category: string }> = {
+    // Classic Console Era
+    nes: { name: 'NES Classic', era: '1985-1990', description: 'Chunky pixels, limited palette, Super Mario Bros style', icon: '🎮', category: 'Classic' },
+    snes: { name: 'SNES Golden Age', era: '1991-1996', description: 'Detailed sprites, rich colors, Chrono Trigger style', icon: '🎨', category: 'Classic' },
+    genesis: { name: 'Sega Genesis', era: '1988-1997', description: 'Bold colors, dithered gradients, Sonic style', icon: '💙', category: 'Classic' },
+    gameboy: { name: 'Game Boy', era: '1989-1998', description: 'Monochrome green, 4-shade palette, Pokemon style', icon: '🟢', category: 'Classic' },
+    gba: { name: 'GBA', era: '2001-2008', description: 'Bright colors, clean outlines, Golden Sun style', icon: '🌟', category: 'Classic' },
+    // 32-bit Era
+    ps1: { name: 'PS1/Saturn', era: '1995-2000', description: 'Pre-rendered 3D, Final Fantasy Tactics style', icon: '💿', category: '32-bit' },
+    neogeo: { name: 'Neo Geo Arcade', era: '1990-2004', description: 'Massive detailed sprites, Metal Slug style', icon: '🕹️', category: '32-bit' },
+    n64: { name: 'N64 Era', era: '1996-2002', description: 'Pre-rendered sprites, Paper Mario style', icon: '📺', category: '32-bit' },
+    // Modern Indie
+    stardew: { name: 'Stardew Style', era: '2016', description: 'Cozy farming aesthetic, warm colors', icon: '🌾', category: 'Modern' },
+    celeste: { name: 'Celeste Style', era: '2018', description: 'Modern pixel art, smooth animation', icon: '🏔️', category: 'Modern' },
+    undertale: { name: 'Undertale Style', era: '2015', description: 'Minimalist sprites, indie charm', icon: '❤️', category: 'Modern' },
+    // Retro Computer
+    c64: { name: 'Commodore 64', era: '1982-1994', description: '16-color palette, classic C64 aesthetic', icon: '💾', category: 'Retro' },
+    amiga: { name: 'Amiga', era: '1985-1996', description: 'Rich palette, European computer style', icon: '🖥️', category: 'Retro' },
+  };
 
   // Planet type configurations
   private static readonly PLANET_TYPES: Record<string, { name: string; description: string; icon: string }> = {
@@ -253,8 +276,8 @@ export class UniverseConfigScreen {
     // Determine which steps to show based on options
     const skipPlanet = this.options.skipPlanetStep;
     const steps = skipPlanet
-      ? ['magic', 'scenario', 'naming', 'souls'] as const
-      : ['magic', 'planet', 'scenario', 'naming', 'souls'] as const;
+      ? ['magic', 'artstyle', 'scenario', 'naming', 'souls'] as const
+      : ['magic', 'planet', 'artstyle', 'scenario', 'naming', 'souls'] as const;
 
     // Step indicator
     const stepIndicator = document.createElement('div');
@@ -263,6 +286,7 @@ export class UniverseConfigScreen {
     const stepLabels: Record<string, string> = {
       magic: 'Magic System',
       planet: 'Choose Planet',
+      artstyle: 'Art Style',
       scenario: 'Your Story',
       naming: 'Name Your Universe',
       souls: 'Soul Ceremonies',
@@ -296,6 +320,8 @@ export class UniverseConfigScreen {
       this.renderMagicStep();
     } else if (this.currentStep === 'planet') {
       this.renderPlanetStep();
+    } else if (this.currentStep === 'artstyle') {
+      this.renderArtStyleStep();
     } else if (this.currentStep === 'scenario') {
       this.renderScenarioStep();
     } else if (this.currentStep === 'naming') {
@@ -387,8 +413,8 @@ export class UniverseConfigScreen {
         this.selectedPlanetType = planetId === 'random' ? this.getRandomPlanetType() : planetId;
         this.selectedPlanetId = undefined; // Clear existing planet selection
         if (planetId === 'random') {
-          // For random, immediately proceed to next step
-          this.currentStep = 'scenario';
+          // For random, immediately proceed to art style step
+          this.currentStep = 'artstyle';
         }
         this.render();
       };
@@ -419,10 +445,10 @@ export class UniverseConfigScreen {
     backButton.onclick = () => { this.currentStep = 'magic'; this.render(); };
 
     const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next: Choose Your Story';
+    nextButton.textContent = 'Next: Choose Art Style';
     nextButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer;';
     nextButton.onclick = () => {
-      this.currentStep = 'scenario';
+      this.currentStep = 'artstyle';
       this.render();
     };
 
@@ -436,32 +462,163 @@ export class UniverseConfigScreen {
     return planetTypes[Math.floor(Math.random() * planetTypes.length)] || 'terrestrial';
   }
 
-  private renderScenarioStep(): void {
+  private renderArtStyleStep(): void {
     // Show selected magic and planet summaries
     const spectrum = this.getCurrentSpectrum();
     const effects = resolveSpectrum(spectrum);
     const presetInfo = this.getSpectrumPresetInfo(this.selectedSpectrumPreset);
-    const planetInfo = UniverseConfigScreen.PLANET_TYPES[this.selectedPlanetType] || UniverseConfigScreen.PLANET_TYPES.terrestrial;
+    const planetInfo = UniverseConfigScreen.PLANET_TYPES[this.selectedPlanetType] ?? UniverseConfigScreen.PLANET_TYPES['terrestrial']!;
 
     const summaryContainer = document.createElement('div');
     summaryContainer.style.cssText = 'display: flex; gap: 15px; max-width: 800px; margin-bottom: 20px; flex-wrap: wrap;';
 
     const magicSummary = document.createElement('div');
-    magicSummary.style.cssText = 'flex: 1; min-width: 250px; background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 12px;';
+    magicSummary.style.cssText = 'background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 12px 15px; flex: 1; min-width: 200px;';
+    magicSummary.innerHTML = `
+      <div style="color: #4CAF50; font-size: 11px; margin-bottom: 3px;">MAGIC</div>
+      <div style="color: #fff; font-size: 14px;">${presetInfo.icon} ${presetInfo.name}</div>
+    `;
+    summaryContainer.appendChild(magicSummary);
+
+    const planetSummary = document.createElement('div');
+    planetSummary.style.cssText = 'background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px 15px; flex: 1; min-width: 200px;';
+    planetSummary.innerHTML = `
+      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">PLANET</div>
+      <div style="color: #fff; font-size: 14px;">${planetInfo!.icon} ${planetInfo!.name}</div>
+    `;
+    summaryContainer.appendChild(planetSummary);
+    this.container.appendChild(summaryContainer);
+
+    const subtitle = document.createElement('p');
+    subtitle.innerHTML = 'Choose the <strong>visual style</strong> for all creatures and sprites on this planet.<br><small style="color: #888;">This determines how everything looks - like choosing a console generation for your world.</small>';
+    subtitle.style.cssText = 'margin: 0 0 20px 0; font-size: 14px; text-align: center; color: #aaa;';
+    this.container.appendChild(subtitle);
+
+    // Group art styles by category
+    const categories: Record<string, string[]> = {};
+    for (const [styleId, styleInfo] of Object.entries(UniverseConfigScreen.ART_STYLES)) {
+      if (!categories[styleInfo.category]) {
+        categories[styleInfo.category] = [];
+      }
+      categories[styleInfo.category]!.push(styleId);
+    }
+
+    for (const [category, styleIds] of Object.entries(categories)) {
+      const categorySection = document.createElement('div');
+      categorySection.style.cssText = 'max-width: 1200px; width: 100%; margin-bottom: 25px;';
+
+      const categoryLabel = document.createElement('div');
+      categoryLabel.style.cssText = 'color: #888; font-size: 12px; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px;';
+      categoryLabel.textContent = category.toUpperCase();
+      categorySection.appendChild(categoryLabel);
+
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;';
+
+      for (const styleId of styleIds) {
+        const styleInfo = UniverseConfigScreen.ART_STYLES[styleId];
+        if (!styleInfo) continue;
+
+        const isSelected = this.selectedArtStyle === styleId;
+        const card = document.createElement('div');
+        card.style.cssText = `background: ${isSelected ? 'linear-gradient(135deg, #2a3a5a 0%, #1a2a4a 100%)' : 'rgba(30, 30, 50, 0.8)'}; border: 2px solid ${isSelected ? '#58a6ff' : '#3a3a5a'}; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s; position: relative;`;
+        card.onclick = () => {
+          this.selectedArtStyle = styleId;
+          this.render();
+        };
+
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 24px;">${styleInfo.icon}</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; color: ${isSelected ? '#58a6ff' : '#fff'};">${styleInfo.name}</h3>
+              <div style="color: #666; font-size: 11px;">${styleInfo.era}</div>
+            </div>
+          </div>
+          <p style="margin: 0; font-size: 12px; color: #999;">${styleInfo.description}</p>
+        `;
+
+        if (isSelected) {
+          card.innerHTML += '<div style="position: absolute; top: 10px; right: 10px; background: #58a6ff; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: bold;">Selected</div>';
+        }
+
+        grid.appendChild(card);
+      }
+      categorySection.appendChild(grid);
+      this.container.appendChild(categorySection);
+    }
+
+    // Custom sprite import hint
+    const importHint = document.createElement('div');
+    importHint.style.cssText = 'max-width: 800px; background: rgba(100, 100, 150, 0.1); border: 1px dashed #555; border-radius: 8px; padding: 15px; margin-top: 10px; text-align: center;';
+    importHint.innerHTML = `
+      <div style="color: #888; font-size: 13px;">
+        <strong>Custom Sprites?</strong> You can import your own sprite sets after planet creation.<br>
+        <small style="color: #666;">Access the Sprite Gallery from the planet management screen to upload custom assets.</small>
+      </div>
+    `;
+    this.container.appendChild(importHint);
+
+    // Buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = 'display: flex; gap: 20px; margin-top: 25px;';
+
+    const backButton = document.createElement('button');
+    backButton.textContent = 'Back to Planet';
+    backButton.style.cssText = 'padding: 15px 30px; font-size: 16px; font-family: monospace; background: #333; color: #aaa; border: 1px solid #555; border-radius: 8px; cursor: pointer;';
+    backButton.onclick = () => {
+      this.currentStep = this.options.skipPlanetStep ? 'magic' : 'planet';
+      this.render();
+    };
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next: Choose Your Story';
+    nextButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #3a7bd5 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer;';
+    nextButton.onclick = () => {
+      this.currentStep = 'scenario';
+      this.render();
+    };
+
+    buttonContainer.appendChild(backButton);
+    buttonContainer.appendChild(nextButton);
+    this.container.appendChild(buttonContainer);
+  }
+
+  private renderScenarioStep(): void {
+    // Show selected magic, planet, and art style summaries
+    const spectrum = this.getCurrentSpectrum();
+    const effects = resolveSpectrum(spectrum);
+    const presetInfo = this.getSpectrumPresetInfo(this.selectedSpectrumPreset);
+    const planetInfo = UniverseConfigScreen.PLANET_TYPES[this.selectedPlanetType] ?? UniverseConfigScreen.PLANET_TYPES['terrestrial']!;
+    const artStyleInfo = UniverseConfigScreen.ART_STYLES[this.selectedArtStyle] ?? UniverseConfigScreen.ART_STYLES['snes']!;
+
+    const summaryContainer = document.createElement('div');
+    summaryContainer.style.cssText = 'display: flex; gap: 15px; max-width: 900px; margin-bottom: 20px; flex-wrap: wrap;';
+
+    const magicSummary = document.createElement('div');
+    magicSummary.style.cssText = 'flex: 1; min-width: 180px; background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 12px;';
     magicSummary.innerHTML = `
       <div style="color: #4CAF50; font-size: 11px; margin-bottom: 3px;">MAGIC</div>
       <div style="color: #fff; font-size: 14px;">${this.showAdvancedSpectrum ? 'Custom' : presetInfo.icon + ' ' + presetInfo.name}</div>
     `;
 
     const planetSummary = document.createElement('div');
-    planetSummary.style.cssText = 'flex: 1; min-width: 250px; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px;';
+    planetSummary.style.cssText = 'flex: 1; min-width: 180px; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px;';
     planetSummary.innerHTML = `
       <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">PLANET</div>
-      <div style="color: #fff; font-size: 14px;">${planetInfo!.icon} ${planetInfo!.name}</div>
+      <div style="color: #fff; font-size: 14px;">${planetInfo.icon} ${planetInfo.name}</div>
+    `;
+
+    const artStyleSummary = document.createElement('div');
+    artStyleSummary.style.cssText = 'flex: 1; min-width: 180px; background: rgba(88, 166, 255, 0.1); border: 1px solid #58a6ff; border-radius: 8px; padding: 12px;';
+    artStyleSummary.innerHTML = `
+      <div style="color: #58a6ff; font-size: 11px; margin-bottom: 3px;">ART STYLE</div>
+      <div style="color: #fff; font-size: 14px;">${artStyleInfo.icon} ${artStyleInfo.name}</div>
     `;
 
     summaryContainer.appendChild(magicSummary);
     summaryContainer.appendChild(planetSummary);
+    summaryContainer.appendChild(artStyleSummary);
     this.container.appendChild(summaryContainer);
 
     const subtitle = document.createElement('p');
@@ -488,11 +645,9 @@ export class UniverseConfigScreen {
     buttonContainer.style.cssText = 'display: flex; gap: 20px; margin-top: 20px;';
 
     const backButton = document.createElement('button');
-    const backStep = this.options.skipPlanetStep ? 'magic' : 'planet';
-    const backLabel = this.options.skipPlanetStep ? 'Back to Magic System' : 'Back to Planet';
-    backButton.textContent = backLabel;
+    backButton.textContent = 'Back to Art Style';
     backButton.style.cssText = 'padding: 15px 30px; font-size: 16px; font-family: monospace; background: #333; color: #aaa; border: 1px solid #555; border-radius: 8px; cursor: pointer;';
-    backButton.onclick = () => { this.currentStep = backStep; this.render(); };
+    backButton.onclick = () => { this.currentStep = 'artstyle'; this.render(); };
 
     const createButton = document.createElement('button');
     createButton.textContent = 'Begin Soul Ceremonies';
@@ -513,6 +668,7 @@ export class UniverseConfigScreen {
         spectrumEffects: effects,
         planetType: this.selectedPlanetType,
         planetId: this.selectedPlanetId,
+        artStyle: this.selectedArtStyle,
         scenarioPresetId: this.selectedScenario,
         universeName: fullUniverseName,
         seed: Date.now(),
@@ -534,35 +690,44 @@ export class UniverseConfigScreen {
     const effects = resolveSpectrum(spectrum);
     const presetInfo = this.getSpectrumPresetInfo(this.selectedSpectrumPreset);
     const scenarioPreset = SCENARIO_PRESETS.find(s => s.id === this.selectedScenario);
-    const planetInfo = UniverseConfigScreen.PLANET_TYPES[this.selectedPlanetType] || UniverseConfigScreen.PLANET_TYPES.terrestrial;
+    const planetInfo = UniverseConfigScreen.PLANET_TYPES[this.selectedPlanetType] ?? UniverseConfigScreen.PLANET_TYPES['terrestrial']!;
+    const artStyleInfo = UniverseConfigScreen.ART_STYLES[this.selectedArtStyle] ?? UniverseConfigScreen.ART_STYLES['snes']!;
 
     // Summary of previous choices
     const summary = document.createElement('div');
-    summary.style.cssText = 'display: flex; gap: 15px; max-width: 800px; margin-bottom: 30px; flex-wrap: wrap;';
+    summary.style.cssText = 'display: flex; gap: 12px; max-width: 900px; margin-bottom: 30px; flex-wrap: wrap;';
 
     const magicSummary = document.createElement('div');
-    magicSummary.style.cssText = 'flex: 1; min-width: 200px; background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 12px;';
+    magicSummary.style.cssText = 'flex: 1; min-width: 150px; background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 10px;';
     magicSummary.innerHTML = `
-      <div style="color: #4CAF50; font-size: 11px; margin-bottom: 3px;">MAGIC</div>
-      <div style="color: #fff; font-size: 14px;">${this.showAdvancedSpectrum ? 'Custom' : presetInfo.icon + ' ' + presetInfo.name}</div>
+      <div style="color: #4CAF50; font-size: 10px; margin-bottom: 3px;">MAGIC</div>
+      <div style="color: #fff; font-size: 13px;">${this.showAdvancedSpectrum ? 'Custom' : presetInfo.icon + ' ' + presetInfo.name}</div>
     `;
 
     const planetSummary = document.createElement('div');
-    planetSummary.style.cssText = 'flex: 1; min-width: 200px; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 12px;';
+    planetSummary.style.cssText = 'flex: 1; min-width: 150px; background: rgba(255, 152, 0, 0.1); border: 1px solid #ff9800; border-radius: 8px; padding: 10px;';
     planetSummary.innerHTML = `
-      <div style="color: #ff9800; font-size: 11px; margin-bottom: 3px;">PLANET</div>
-      <div style="color: #fff; font-size: 14px;">${planetInfo!.icon} ${planetInfo!.name}</div>
+      <div style="color: #ff9800; font-size: 10px; margin-bottom: 3px;">PLANET</div>
+      <div style="color: #fff; font-size: 13px;">${planetInfo.icon} ${planetInfo.name}</div>
+    `;
+
+    const artStyleSummary = document.createElement('div');
+    artStyleSummary.style.cssText = 'flex: 1; min-width: 150px; background: rgba(88, 166, 255, 0.1); border: 1px solid #58a6ff; border-radius: 8px; padding: 10px;';
+    artStyleSummary.innerHTML = `
+      <div style="color: #58a6ff; font-size: 10px; margin-bottom: 3px;">ART STYLE</div>
+      <div style="color: #fff; font-size: 13px;">${artStyleInfo.icon} ${artStyleInfo.name}</div>
     `;
 
     const scenarioSummary = document.createElement('div');
-    scenarioSummary.style.cssText = 'flex: 1; min-width: 200px; background: rgba(156, 39, 176, 0.1); border: 1px solid #9c27b0; border-radius: 8px; padding: 12px;';
+    scenarioSummary.style.cssText = 'flex: 1; min-width: 150px; background: rgba(156, 39, 176, 0.1); border: 1px solid #9c27b0; border-radius: 8px; padding: 10px;';
     scenarioSummary.innerHTML = `
-      <div style="color: #9c27b0; font-size: 11px; margin-bottom: 3px;">STORY</div>
-      <div style="color: #fff; font-size: 14px;">${scenarioPreset?.name || 'Unknown'}</div>
+      <div style="color: #9c27b0; font-size: 10px; margin-bottom: 3px;">STORY</div>
+      <div style="color: #fff; font-size: 13px;">${scenarioPreset?.name || 'Unknown'}</div>
     `;
 
     summary.appendChild(magicSummary);
     summary.appendChild(planetSummary);
+    summary.appendChild(artStyleSummary);
     summary.appendChild(scenarioSummary);
     this.container.appendChild(summary);
 
@@ -748,6 +913,7 @@ export class UniverseConfigScreen {
         spectrumEffects: effects,
         planetType: this.selectedPlanetType,
         planetId: this.selectedPlanetId,
+        artStyle: this.selectedArtStyle,
         scenarioPresetId: this.selectedScenario,
         universeName: fullUniverseName,
         seed: Date.now(),

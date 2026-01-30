@@ -2,8 +2,9 @@
   "id": "moth_emperor",
   "category": "objects",
   "size": 48,
-  "description": "emperor moth with eyespots on brown wings, pixel art, game sprite, 48x48",
+  "description": "emperor moth",
   "original_description": "emperor moth with eyespots on brown wings, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:18:14.984Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.621Z"
 }

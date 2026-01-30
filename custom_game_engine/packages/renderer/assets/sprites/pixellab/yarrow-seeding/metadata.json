@@ -2,8 +2,9 @@
   "id": "yarrow-seeding",
   "category": "objects",
   "size": 48,
-  "description": "Yarrow dispersing seeds from dried flower clusters, pixel art, top-down view, transparent background",
+  "description": "yarrow-seeding",
   "original_description": "Yarrow dispersing seeds from dried flower clusters, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:03:40.928Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.679Z"
 }

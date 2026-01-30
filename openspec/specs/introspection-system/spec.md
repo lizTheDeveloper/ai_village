@@ -7,6 +7,10 @@
 
 ---
 
+## Purpose
+
+A unified introspection layer that automatically generates UI, prompts, and debug tools from component schemas, serving as one source of truth for Player, LLM, Agent, User, and Developer consumers.
+
 ## Overview
 
 A unified introspection layer that automatically generates UI, prompts, and debug tools from component schemas. One source of truth serves five consumers: **Player**, **LLM**, **Agent**, **User**, and **Developer**.

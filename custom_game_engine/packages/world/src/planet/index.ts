@@ -42,3 +42,18 @@ export {
   initializePlanet,
   generateRandomPlanetConfig,
 } from './PlanetInitializer.js';
+
+// Planet sprite manifest
+export type { SpriteEntry, PlanetSpriteManifest } from './PlanetSpriteManifest.js';
+export {
+  createPlanetSpriteManifest,
+  addSpriteToManifest,
+  updateSpriteStatus,
+  removeSpriteFromManifest,
+  getSpritesByCategory,
+  getSpritesByStatus,
+  buildManifestFromBiosphere,
+  mergeManifests,
+  serializeManifest,
+  deserializeManifest,
+} from './PlanetSpriteManifest.js';

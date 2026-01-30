@@ -2,8 +2,9 @@
   "id": "clover-mature",
   "category": "objects",
   "size": 48,
-  "description": "Mature healthy clover patch with full green leaves, pixel art, top-down view, transparent background",
+  "description": "clover-mature",
   "original_description": "Mature healthy clover patch with full green leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:54:46.306Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.572Z"
 }

@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The construction system enables agents to build and upgrade village structures, with procedural generation creating unique architectural variations while maintaining game balance.
+
 ## Overview
 
 The construction system enables agents to build and upgrade structures in the village. Buildings provide functionality (crafting stations, storage, shops), shelter, and community spaces. Advanced buildings can be designed procedurally, creating unique architectural variations while maintaining game balance.
@@ -65,13 +69,13 @@ interface BuildingDefinition {
 
 ## Requirements
 
-### REQ-CON-001: Construction Process
+### Requirement: Construction Process
 
 Buildings SHALL be constructed over time:
 
-```
-WHEN an agent initiates construction
-THEN the system SHALL:
+#### Scenario: Agent initiates construction
+- **WHEN** an agent initiates construction
+- **THEN** the system SHALL:
   1. Verify location is valid:
      - All tiles are buildable terrain
      - No overlapping buildings
@@ -81,15 +85,15 @@ THEN the system SHALL:
   4. Create construction site object
   5. Track progress (0-100%)
 
-WHEN construction progress reaches 100%
-THEN the system SHALL:
+#### Scenario: Construction progress reaches 100%
+- **WHEN** construction progress reaches 100%
+- **THEN** the system SHALL:
   1. Replace construction site with building
   2. Initialize building state
   3. Emit "building:complete" event
   4. Update pathfinding grid
-```
 
-### REQ-CON-002: Construction Progress
+### Requirement: Construction Progress
 
 Construction SHALL advance with agent work:
 
@@ -107,7 +111,7 @@ function calculateConstructionProgress(
 }
 ```
 
-### REQ-CON-003: Building Functionality
+### Requirement: Building Functionality
 
 Buildings SHALL provide specific functions:
 
@@ -123,7 +127,7 @@ type BuildingFunction =
   | { type: "automation"; tasks: AutoTask[] };
 ```
 
-### REQ-CON-004: Building Upgrades
+### Requirement: Building Upgrades
 
 Buildings SHALL support upgrades:
 
@@ -146,15 +150,14 @@ interface BuildingUpgrade {
 }
 ```
 
-```
-WHEN an agent upgrades a building
-THEN the building SHALL:
+#### Scenario: Agent upgrades a building
+- **WHEN** an agent upgrades a building
+- **THEN** the building SHALL:
   - Remain functional during upgrade (optional)
   - Apply bonuses upon completion
   - Increment upgrade level
   - Update visual appearance
   - Maintain previous functionality
-```
 
 ---
 
@@ -226,7 +229,7 @@ THEN the building SHALL:
 
 ## Procedural Building Generation
 
-### REQ-CON-005: Generated Buildings
+### Requirement: Generated Buildings
 
 The system SHALL support procedurally generated building designs:
 
@@ -257,7 +260,7 @@ interface GeneratedBuilding {
 }
 ```
 
-### REQ-CON-006: Architectural Styles
+### Requirement: Architectural Styles
 
 Generated buildings SHALL follow style constraints:
 
@@ -277,7 +280,7 @@ type ArchitecturalStyle =
 
 ## Balance Constraints
 
-### REQ-CON-007: Building Power Budget
+### Requirement: Building Power Budget
 
 Generated buildings SHALL respect power limits:
 
@@ -300,13 +303,13 @@ interface BuildingBalanceConstraints {
 }
 ```
 
-### REQ-CON-008: Building Deduplication
+### Requirement: Building Deduplication
 
 The system SHALL prevent duplicate generated buildings:
 
-```
-WHEN a new building is generated
-THEN the system SHALL:
+#### Scenario: New building is generated
+- **WHEN** a new building is generated
+- **THEN** the system SHALL:
   1. Calculate similarity hash from:
      - Base building type
      - Primary functions
@@ -316,19 +319,18 @@ THEN the system SHALL:
      - Reject or force significant variation
   4. Track function distribution
   5. Bias generation toward underrepresented functions
-```
 
 ---
 
 ## Maintenance and Decay
 
-### REQ-CON-009: Building Maintenance
+### Requirement: Building Maintenance
 
 Buildings SHALL require upkeep:
 
-```
-WHEN a new day begins
-THEN for each building:
+#### Scenario: New day begins
+- **WHEN** a new day begins
+- **THEN** for each building:
   - Check maintenance supplies
   - IF supplies insufficient
     - Reduce building condition by 5
@@ -337,7 +339,6 @@ THEN for each building:
   - IF condition <= 0
     - Building becomes "ruined"
     - Requires repair before use
-```
 
 ---
 

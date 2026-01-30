@@ -2,6 +2,8 @@
   "id": "goat",
   "category": "animals.livestock",
   "size": 32,
-  "description": "Brown and white goat, short horns, beard, standing pose, top-down farm animal",
-  "generated_at": "2026-01-04T21:24:25.824Z"
+  "description": "goat, agile goat with beard, rectangular pupils, curved horns, domesticated farm animal, healthy well-fed appearance",
+  "generated_at": "2026-01-04T21:24:25.824Z",
+  "original_description": "Brown and white goat, short horns, beard, standing pose, top-down farm animal",
+  "enriched_at": "2026-01-30T00:40:22.598Z"
 }

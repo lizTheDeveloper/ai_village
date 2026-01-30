@@ -2,8 +2,9 @@
   "id": "raven",
   "category": "objects",
   "size": 48,
-  "description": "common raven with glossy black plumage, heavy bill, shaggy throat feathers, pixel art, game sprite, 48x48",
+  "description": "raven",
   "original_description": "common raven with glossy black plumage, heavy bill, shaggy throat feathers, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:43:26.471Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.638Z"
 }

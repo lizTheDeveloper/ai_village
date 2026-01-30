@@ -21,6 +21,7 @@ import type { ThreatDetectionComponent } from '../components/ThreatDetectionComp
 import type { MoodComponent } from '../components/MoodComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { isCriticalThreat } from '../components/ThreatDetectionComponent.js';
+import { HUNGER_THRESHOLD_SEEK_FOOD, ENERGY_THRESHOLD_SEEK_SLEEP } from '../constants/NeedsConstants.js';
 
 /**
  * Result of autonomic check
@@ -122,11 +123,10 @@ export class AutonomicSystem {
       };
     }
 
-    // Low energy threshold: < 0.15 (15%) energy = seek sleep
-    // Lowered from 0.3 to allow agents to stay awake 48-72 hours before collapse
-    // At working rate of 4.8 energy/hour, this gives ~3 hours buffer before collapse
+    // Low energy threshold: energy = seek sleep (hysteresis start threshold)
+    // Uses ENERGY_THRESHOLD_SEEK_SLEEP constant for consistent behavior
     // Most sleep will be triggered by circadian bedtime logic instead
-    if (needs.energy < 0.15) {
+    if (needs.energy < ENERGY_THRESHOLD_SEEK_SLEEP) {
       return {
         behavior: 'seek_sleep',
         priority: 85,
@@ -230,8 +230,9 @@ export class AutonomicSystem {
     // Note: Removed high sleepDrive trigger - sleep is purely energy-based now
 
     // Moderate hunger: seek food (but not urgent enough to interrupt sleep)
-    // Threshold: 60% (0.6) matches documented priority scale in README.md
-    if (needs.hunger < 0.6) {
+    // Uses HUNGER_THRESHOLD_SEEK_FOOD constant (hysteresis start threshold)
+    // Agents will continue seeking food until they reach HUNGER_THRESHOLD_WELL_FED
+    if (needs.hunger < HUNGER_THRESHOLD_SEEK_FOOD) {
       return {
         behavior: 'seek_food',
         priority: 40,

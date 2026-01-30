@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The economy system manages currency, trading, shops, and dynamic pricing that adapts to supply and demand, enabling player-agents and AI to participate in a living market.
+
 ## Overview
 
 The economy system manages currency, trading, shops, pricing, and economic simulation. Agents (including the player-agent) can buy, sell, trade, and run shops. The economy adapts dynamically to supply and demand, including for procedurally generated items.
@@ -67,7 +71,7 @@ function calculateItemValue(item: Item, market: MarketState): number {
 
 ## Requirements
 
-### REQ-ECO-001: Shop System
+### Requirement: Shop System
 
 Shops SHALL enable buying and selling:
 
@@ -111,13 +115,13 @@ type ShopType =
   | "player_shop";    // Player-run, any type
 ```
 
-### REQ-ECO-002: Trading Transactions
+### Requirement: Trading Transactions
 
 Trading SHALL follow this process:
 
-```
-WHEN an agent buys from a shop
-THEN the system SHALL:
+#### Scenario: Agent buys from a shop
+- **WHEN** an agent buys from a shop
+- **THEN** the system SHALL:
   1. Verify shop is open
   2. Verify item in stock
   3. Calculate price (base * quality * markup)
@@ -130,8 +134,9 @@ THEN the system SHALL:
   8. Update market statistics
   9. Emit "trade:complete" event
 
-WHEN an agent sells to a shop
-THEN the system SHALL:
+#### Scenario: Agent sells to a shop
+- **WHEN** an agent sells to a shop
+- **THEN** the system SHALL:
   1. Verify shop is open
   2. Verify shop buys this item type
   3. Calculate price (base * quality * markdown)
@@ -140,15 +145,14 @@ THEN the system SHALL:
   6. Transfer item seller → shop
   7. Transfer currency shop → seller
   8. Update market statistics
-```
 
-### REQ-ECO-003: Player Shop Ownership
+### Requirement: Player Shop Ownership
 
 The player-agent SHALL be able to run shops:
 
-```
-WHEN the player owns a shop building
-THEN the player SHALL be able to:
+#### Scenario: Player owns a shop building
+- **WHEN** the player owns a shop building
+- **THEN** the player SHALL be able to:
   - Set stock from personal inventory
   - Set custom prices per item
   - Set markup/markdown percentages
@@ -157,18 +161,18 @@ THEN the player SHALL be able to:
   - View sales history
   - Collect profits
 
-WHEN the player is offline/not controlling
-THEN AI agents MAY:
+#### Scenario: Player is offline/not controlling
+- **WHEN** the player is offline/not controlling
+- **THEN** AI agents MAY:
   - Run the shop according to set rules
   - Restock from designated storage
   - Adjust prices within set bounds
-```
 
 ---
 
 ## Market Simulation
 
-### REQ-ECO-004: Supply and Demand
+### Requirement: Supply and Demand
 
 The market SHALL simulate supply/demand:
 
@@ -212,13 +216,13 @@ function getSupplyPenalty(stats: ItemStats): number {
 }
 ```
 
-### REQ-ECO-005: Price Discovery for Generated Items
+### Requirement: Price Discovery for Generated Items
 
 Generated items SHALL have prices determined dynamically:
 
-```
-WHEN a new item is generated
-THEN the economy system SHALL:
+#### Scenario: New item is generated
+- **WHEN** a new item is generated
+- **THEN** the economy system SHALL:
   1. Calculate base value from:
      - Sum of input material values
      - Crafting complexity bonus
@@ -229,7 +233,6 @@ THEN the economy system SHALL:
   4. Track first N transactions
   5. Stabilize price based on actual market behavior
   6. Update similar items' valuations
-```
 
 ```typescript
 interface GeneratedItemPricing {
@@ -249,7 +252,7 @@ interface GeneratedItemPricing {
 
 ## Agent-to-Agent Trading
 
-### REQ-ECO-006: Direct Trading
+### Requirement: Direct Trading
 
 Agents SHALL trade directly with each other:
 

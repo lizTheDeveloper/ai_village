@@ -2,8 +2,9 @@
   "id": "desert_hare",
   "category": "objects",
   "size": 48,
-  "description": "desert cottontail with grey-brown fur, short ears, pixel art, game sprite, 48x48",
+  "description": "hare desert",
   "original_description": "desert cottontail with grey-brown fur, short ears, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:34:21.777Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.582Z"
 }

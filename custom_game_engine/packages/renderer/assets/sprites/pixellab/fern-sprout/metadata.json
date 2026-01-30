@@ -2,8 +2,9 @@
   "id": "fern-sprout",
   "category": "objects",
   "size": 48,
-  "description": "Young fern fiddlehead unfurling, coiled green frond, pixel art, top-down view, transparent background",
+  "description": "fern-sprout",
   "original_description": "Young fern fiddlehead unfurling, coiled green frond, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:12:00.870Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.592Z"
 }

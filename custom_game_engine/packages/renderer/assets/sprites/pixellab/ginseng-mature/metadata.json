@@ -2,8 +2,9 @@
   "id": "ginseng-mature",
   "category": "objects",
   "size": 48,
-  "description": "Mature ginseng plant with full compound leaves and cluster of red berries at center, pixel art, top-down view, transparent background",
+  "description": "ginseng-mature",
   "original_description": "Mature ginseng plant with full compound leaves and cluster of red berries at center, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:31:12.999Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.596Z"
 }

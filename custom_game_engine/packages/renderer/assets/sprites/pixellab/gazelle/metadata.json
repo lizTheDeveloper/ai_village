@@ -2,8 +2,9 @@
   "id": "gazelle",
   "category": "objects",
   "size": 48,
-  "description": "thomson gazelle with tan coat, black side stripe, pixel art, game sprite, 48x48",
+  "description": "gazelle",
   "original_description": "thomson gazelle with tan coat, black side stripe, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:57:07.995Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.596Z"
 }

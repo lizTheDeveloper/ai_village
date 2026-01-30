@@ -3,7 +3,9 @@
   "category": "animals",
   "type": "map_object",
   "size": 48,
-  "description": "Realistic rabbit as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+  "description": "rabbit, fluffy bunny with long ears, cotton tail, twitching nose, wild untamed creature, alert natural posture, earthy brown and golden tones, grass-stained",
   "generated_at": "2026-01-03T22:06:51.745Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Realistic rabbit as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.636Z"
 }

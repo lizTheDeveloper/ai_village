@@ -2,8 +2,9 @@
   "id": "blueberry-bush-fruiting",
   "category": "objects",
   "size": 48,
-  "description": "Blueberry bush with green berries developing, pixel art, top-down view, transparent background",
+  "description": "blueberry-bush-fruiting",
   "original_description": "Blueberry bush with green berries developing, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:43:33.317Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.550Z"
 }

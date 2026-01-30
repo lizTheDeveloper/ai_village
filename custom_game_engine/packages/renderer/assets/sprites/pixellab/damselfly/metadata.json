@@ -2,8 +2,9 @@
   "id": "damselfly",
   "category": "objects",
   "size": 48,
-  "description": "blue damselfly with slender body, wings at rest, pixel art, game sprite, 48x48",
+  "description": "damselfly",
   "original_description": "blue damselfly with slender body, wings at rest, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:30:23.972Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.581Z"
 }

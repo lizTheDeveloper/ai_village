@@ -27,6 +27,9 @@ export interface PlanetInitializationOptions {
   /** Max species to generate in the biosphere. Limits LLM calls. Default: 8 */
   maxSpecies?: number;
 
+  /** Console-era art style for all sprites on this planet (snes, genesis, gba, etc.). If not provided, determined from planet seed. */
+  artStyle?: string;
+
   /** Whether to queue sprite generation (default: true) */
   queueSprites?: boolean;
 
@@ -50,6 +53,7 @@ export async function initializePlanet(
     generateBiosphere = true,
     existingBiosphere,
     maxSpecies = 8,
+    artStyle,
     queueSprites = true,
     spriteQueuePath,
     onProgress,
@@ -83,7 +87,7 @@ export async function initializePlanet(
         foodWeb: existingBiosphere.foodWeb || { relationships: [], trophicLevels: [] },
         nicheFilling: existingBiosphere.nicheFilling || {},
         sapientSpecies: sapientList,
-        artStyle: existingBiosphere.artStyle || 'pixel',
+        artStyle: artStyle || existingBiosphere.artStyle || 'pixel',
         metadata: existingBiosphere.metadata || {
           generatedAt: existingBiosphere.generatedAt || Date.now(),
           generationTimeMs: existingBiosphere.generationDurationMs || 0,
@@ -115,7 +119,10 @@ export async function initializePlanet(
     reportProgress(`🌿 Beginning biosphere generation...`);
 
     try {
-      const biosphereGenerator = new BiosphereGenerator(llmProvider, config, onProgress, { maxSpecies });
+      const biosphereGenerator = new BiosphereGenerator(llmProvider, config, onProgress, {
+        maxSpecies,
+        artStyle: artStyle as any,  // Cast to ArtStyle type (validated at runtime by BiosphereGenerator)
+      });
       const biosphere = await biosphereGenerator.generateBiosphere();
 
       planet.setBiosphere(biosphere);

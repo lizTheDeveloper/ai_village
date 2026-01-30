@@ -2,8 +2,9 @@
   "id": "corn-withered",
   "category": "objects",
   "size": 48,
-  "description": "Withered dead corn stalks, brown and dried, pixel art, top-down view, transparent background",
+  "description": "corn-withered",
   "original_description": "Withered dead corn stalks, brown and dried, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:36:17.799Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.578Z"
 }

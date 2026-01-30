@@ -2,8 +2,9 @@
   "id": "blackberry-bush",
   "category": "objects",
   "size": 32,
-  "description": "blackberry bush, pixel art, top-down view, transparent background",
+  "description": "blackberry-bush",
   "original_description": "blackberry bush, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-25T05:08:14.352Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.548Z"
 }

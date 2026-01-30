@@ -2,8 +2,9 @@
   "id": "goldcrest",
   "category": "objects",
   "size": 48,
-  "description": "goldcrest with yellow-orange crown stripe, pixel art, game sprite, 48x48",
+  "description": "goldcrest",
   "original_description": "goldcrest with yellow-orange crown stripe, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:12:35.435Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.598Z"
 }

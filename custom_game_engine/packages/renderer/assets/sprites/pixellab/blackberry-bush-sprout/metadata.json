@@ -2,8 +2,9 @@
   "id": "blackberry-bush-sprout",
   "category": "objects",
   "size": 48,
-  "description": "Young blackberry bush seedling with first compound leaves, pixel art, top-down view, transparent background",
+  "description": "blackberry-bush-sprout",
   "original_description": "Young blackberry bush seedling with first compound leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:47:40.446Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.549Z"
 }

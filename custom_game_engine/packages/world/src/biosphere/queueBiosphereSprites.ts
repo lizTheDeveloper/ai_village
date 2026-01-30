@@ -6,6 +6,12 @@
  */
 
 import type { BiosphereData, SizeClass } from './BiosphereTypes.js';
+import {
+  type PlanetSpriteManifest,
+  createPlanetSpriteManifest,
+  addSpriteToManifest,
+  serializeManifest,
+} from '../planet/PlanetSpriteManifest.js';
 
 interface SpriteQueueEntry {
   folderId: string;
@@ -32,15 +38,58 @@ interface SpriteQueue {
 
 /**
  * Queue all species from a biosphere for sprite generation
+ * Also creates a PlanetSpriteManifest for tracking per-planet sprites.
+ *
+ * @returns The created PlanetSpriteManifest (in browser mode returns a manifest but doesn't write queue)
  */
 export async function queueBiosphereSprites(
   biosphere: BiosphereData,
   queuePath?: string
-): Promise<void> {
+): Promise<PlanetSpriteManifest> {
+  // Create the planet sprite manifest regardless of environment
+  const manifest = createPlanetSpriteManifest(
+    biosphere.planet.id,
+    biosphere.planet.name,
+    biosphere.artStyle
+  );
+
+  console.log(`[queueBiosphereSprites] Processing ${biosphere.species.length} species sprites...`);
+
+  // Build manifest entries for all species
+  for (const species of biosphere.species) {
+    // Find which niche this species fills
+    let nicheId = 'unknown';
+    for (const [nId, speciesIds] of Object.entries(biosphere.nicheFilling)) {
+      if (speciesIds.includes(species.id)) {
+        nicheId = nId;
+        break;
+      }
+    }
+
+    // Get size class from the niche
+    const niche = biosphere.niches.find(n => n.id === nicheId);
+    const sizeClass = niche?.sizeClass ?? 'medium';
+    const size = getSpriteSize(sizeClass);
+
+    // Add to manifest
+    addSpriteToManifest(manifest, {
+      folderId: species.id,
+      name: species.name,
+      category: 'species',
+      status: 'queued',
+      size,
+      metadata: {
+        nicheId,
+        scientificName: species.scientificName,
+        description: species.spritePrompt,
+      },
+    });
+  }
+
   // Browser compatibility: Skip file system operations in browser
   if (typeof window !== 'undefined') {
-    console.log('[queueBiosphereSprites] Skipping in browser mode - daemon handles sprite generation');
-    return;
+    console.log('[queueBiosphereSprites] Browser mode - returning manifest without file writes');
+    return manifest;
   }
 
   // Dynamic imports for Node.js modules (only in server environment)
@@ -49,8 +98,6 @@ export async function queueBiosphereSprites(
 
   // Use default path in Node.js environment
   const finalPath = queuePath || path.join(process.cwd(), 'sprite-generation-queue.json');
-
-  console.log(`[queueBiosphereSprites] Queuing ${biosphere.species.length} species sprites...`);
 
   // Load existing queue
   let queue: SpriteQueue;
@@ -114,8 +161,15 @@ export async function queueBiosphereSprites(
   // Save updated queue
   fs.writeFileSync(finalPath, JSON.stringify(queue, null, 2));
 
+  // Save planet sprite manifest alongside queue
+  const manifestPath = path.join(path.dirname(finalPath), `planet-sprites-${biosphere.planet.id}.json`);
+  fs.writeFileSync(manifestPath, serializeManifest(manifest));
+
   console.log(`[queueBiosphereSprites] Added ${addedCount} new species to sprite queue`);
   console.log(`[queueBiosphereSprites] Total queue size: ${queue.sprites.length}`);
+  console.log(`[queueBiosphereSprites] Manifest saved: ${manifestPath}`);
+
+  return manifest;
 }
 
 /**
@@ -132,6 +186,71 @@ function getSpriteSize(sizeClass: SizeClass): number {
   };
 
   return sizeMap[sizeClass] ?? 48;
+}
+
+/**
+ * Load a planet sprite manifest from file
+ */
+export async function loadPlanetSpriteManifest(
+  planetId: string,
+  basePath?: string
+): Promise<PlanetSpriteManifest | null> {
+  // Browser compatibility: Return null in browser
+  if (typeof window !== 'undefined') {
+    console.log('[loadPlanetSpriteManifest] Not available in browser mode');
+    return null;
+  }
+
+  const fs = await import('fs');
+  const path = await import('path');
+
+  const finalBasePath = basePath || process.cwd();
+  const manifestPath = path.join(finalBasePath, `planet-sprites-${planetId}.json`);
+
+  try {
+    const data = fs.readFileSync(manifestPath, 'utf8');
+    const { deserializeManifest } = await import('../planet/PlanetSpriteManifest.js');
+    return deserializeManifest(data);
+  } catch (error) {
+    console.log(`[loadPlanetSpriteManifest] No manifest found for planet ${planetId}`);
+    return null;
+  }
+}
+
+/**
+ * List all planet sprite manifests
+ */
+export async function listPlanetSpriteManifests(
+  basePath?: string
+): Promise<Array<{ planetId: string; path: string }>> {
+  // Browser compatibility: Return empty array in browser
+  if (typeof window !== 'undefined') {
+    return [];
+  }
+
+  const fs = await import('fs');
+  const path = await import('path');
+
+  const finalBasePath = basePath || process.cwd();
+
+  try {
+    const files = fs.readdirSync(finalBasePath);
+    const manifests: Array<{ planetId: string; path: string }> = [];
+
+    for (const file of files) {
+      const match = file.match(/^planet-sprites-(.+)\.json$/);
+      if (match) {
+        manifests.push({
+          planetId: match[1]!,
+          path: path.join(finalBasePath, file),
+        });
+      }
+    }
+
+    return manifests;
+  } catch (error) {
+    return [];
+  }
 }
 
 /**

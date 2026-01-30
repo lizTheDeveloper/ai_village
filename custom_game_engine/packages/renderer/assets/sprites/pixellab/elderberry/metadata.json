@@ -2,8 +2,9 @@
   "id": "elderberry",
   "category": "objects",
   "size": 32,
-  "description": "Elderberry bush with dark purple berries in clusters, pixel art, top-down view, transparent background",
+  "description": "elderberry",
   "original_description": "Elderberry bush with dark purple berries in clusters, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-25T05:09:28.886Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.588Z"
 }

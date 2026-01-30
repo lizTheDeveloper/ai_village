@@ -2,8 +2,9 @@
   "id": "elderberry-withered",
   "category": "objects",
   "size": 48,
-  "description": "Withered elderberry bush with brown dead leaves and bare branches, pixel art, top-down view, transparent background",
+  "description": "elderberry-withered",
   "original_description": "Withered elderberry bush with brown dead leaves and bare branches, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:34:05.561Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.590Z"
 }

@@ -2,8 +2,9 @@
   "id": "mosquito",
   "category": "objects",
   "size": 48,
-  "description": "mosquito with long proboscis, transparent wings, pixel art, game sprite, 48x48",
+  "description": "mosquito",
   "original_description": "mosquito with long proboscis, transparent wings, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:29:44.349Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.620Z"
 }

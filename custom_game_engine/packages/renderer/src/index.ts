@@ -1,7 +1,27 @@
 /**
- * @ai-village/renderer - 2D Canvas renderer
+ * @ai-village/renderer - 2D/WebGPU renderer
+ *
+ * Supports multiple backends:
+ * - WebGPU (via PixiJS v8) - best performance
+ * - WebGL (via PixiJS v8) - wide compatibility
+ * - Canvas2D (legacy) - fallback
+ *
+ * Usage:
+ * ```typescript
+ * import { createRenderer } from '@ai-village/renderer';
+ *
+ * const renderer = await createRenderer(canvas, chunkManager, terrainGenerator, {
+ *   preference: 'auto', // or 'webgpu', 'webgl', 'canvas2d'
+ * });
+ * ```
  */
 
+// Renderer Interface & Factory (preferred API)
+export * from './IRenderer.js';
+export * from './RendererFactory.js';
+export * from './PixiJSRenderer.js';
+
+// Legacy Canvas2D Renderer (still works, now behind factory)
 export * from './ViewMode.js';
 export * from './Camera.js';
 export * from './Renderer.js';
@@ -39,6 +59,13 @@ export * from './EconomyPanel.js';
 export * from './ShopPanel.js';
 export * from './TimelinePanel.js';
 export * from './UniverseConfigScreen.js';
+export * from './CosmicHubScreen.js';
+export * from './UniverseCreationScreen.js';
+export * from './PlanetCreationScreen.js';
+export * from './CosmicHubManager.js';
+export * from './UniverseGalleryScreen.js';
+export * from './PlanetListScreen.js';
+export * from './LivePlanetCreationScreen.js';
 export * from './UniverseBrowserScreen.js';
 export * from './UniversePlanetsScreen.js';
 export * from './MultiverseTimelineView.js';
@@ -64,6 +91,7 @@ export * from './NotificationHelpers.js';
 export * from './AgentCreationCards.js';
 export * from './ResearchLibraryPanel.js';
 export * from './TechTreePanel.js';
+export * from './SpriteGalleryPanel.js';
 
 export * from './ui/InventoryUI.js';
 export * from './ui/DragDropSystem.js';

@@ -1,7 +1,7 @@
 {
   "id": "chicken_brown",
   "base_species": "chicken",
-  "description": "brown hen",
+  "description": "brown chicken, plump hen with red comb, feathered body, scratching feet, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
   "size": 48,
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "east",
     "southeast"
   ],
-  "regenerated_at": "2026-01-19T02:46:47.729Z"
+  "regenerated_at": "2026-01-19T02:46:47.729Z",
+  "original_description": "brown hen",
+  "enriched_at": "2026-01-30T00:40:22.567Z"
 }

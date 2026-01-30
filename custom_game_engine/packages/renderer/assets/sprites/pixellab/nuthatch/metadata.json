@@ -2,8 +2,9 @@
   "id": "nuthatch",
   "category": "objects",
   "size": 48,
-  "description": "white-breasted nuthatch with grey back, black cap, pixel art, game sprite, 48x48",
+  "description": "nuthatch",
   "original_description": "white-breasted nuthatch with grey back, black cap, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:51:40.963Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.624Z"
 }

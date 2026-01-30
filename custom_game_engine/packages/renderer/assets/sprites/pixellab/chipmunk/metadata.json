@@ -2,8 +2,9 @@
   "id": "chipmunk",
   "category": "objects",
   "size": 48,
-  "description": "chipmunk with brown striped back, cheek pouches, pixel art, game sprite, 48x48",
+  "description": "chipmunk",
   "original_description": "chipmunk with brown striped back, cheek pouches, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:49:32.305Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.568Z"
 }

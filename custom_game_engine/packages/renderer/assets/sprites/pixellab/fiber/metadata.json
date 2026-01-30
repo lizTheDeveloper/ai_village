@@ -2,6 +2,8 @@
   "id": "fiber",
   "category": "map_objects",
   "size": 48,
-  "description": "Small scattered plant fibers on ground, mostly transparent, thin wispy strands, subtle gray with faint green and brown tinges, barely visible, delicate natural fibers",
-  "generated_at": "2026-01-04T21:44:54.784Z"
+  "description": "fiber",
+  "generated_at": "2026-01-04T21:44:54.784Z",
+  "original_description": "Small scattered plant fibers on ground, mostly transparent, thin wispy strands, subtle gray with faint green and brown tinges, barely visible, delicate natural fibers",
+  "enriched_at": "2026-01-30T00:40:22.593Z"
 }

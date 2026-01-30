@@ -2,8 +2,9 @@
   "id": "ginseng-seed",
   "category": "objects",
   "size": 48,
-  "description": "Red ginseng berry seed on forest floor, pixel art, top-down view, transparent background",
+  "description": "ginseng-seed",
   "original_description": "Red ginseng berry seed on forest floor, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:28:49.373Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.596Z"
 }

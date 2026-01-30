@@ -2,8 +2,9 @@
   "id": "blackberry-bush-mature",
   "category": "objects",
   "size": 48,
-  "description": "Mature blackberry bush with ripe dark purple-black berries, pixel art, top-down view, transparent background",
+  "description": "blackberry-bush-mature",
   "original_description": "Mature blackberry bush with ripe dark purple-black berries, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:48:42.382Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.549Z"
 }

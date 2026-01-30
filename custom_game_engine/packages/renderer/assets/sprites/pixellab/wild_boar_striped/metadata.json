@@ -2,8 +2,9 @@
   "id": "wild_boar_striped",
   "category": "objects",
   "size": 48,
-  "description": "wild boar with dark bristly fur, tusks, pixel art, game sprite, 48x48",
+  "description": "boar striped wild",
   "original_description": "wild boar with dark bristly fur, tusks, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:05:06.419Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.674Z"
 }

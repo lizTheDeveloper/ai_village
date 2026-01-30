@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "Tree plant, pixel art, top-down view",
+  "description": "tree",
   "generated_at": "2026-01-03T21:57:01.003Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Tree plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.664Z"
 }

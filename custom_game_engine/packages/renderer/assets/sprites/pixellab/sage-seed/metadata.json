@@ -2,8 +2,9 @@
   "id": "sage-seed",
   "category": "objects",
   "size": 48,
-  "description": "Small sage seed on soil, pixel art, top-down view, transparent background",
+  "description": "sage-seed",
   "original_description": "Small sage seed on soil, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:57:56.213Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.641Z"
 }

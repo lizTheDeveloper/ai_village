@@ -546,11 +546,26 @@ export class BehaviorContextImpl implements BehaviorContext {
   }
 
   setVelocity(vx: number, vy: number): void {
+    // Update MovementComponent (legacy, for backward compatibility)
     this.entity.updateComponent<MovementComponent>(CT.Movement, (current) => ({
       ...current,
       velocityX: vx,
       velocityY: vy,
     }));
+
+    // CRITICAL: Also update VelocityComponent if it exists
+    // MovementSystem uses VelocityComponent via SoA batch processing for entities with Velocity,
+    // so we must update VelocityComponent for behaviors to take effect
+    if (this.entity.hasComponent(CT.Velocity)) {
+      this.entity.updateComponent<import('../components/VelocityComponent.js').VelocityComponent>(
+        CT.Velocity,
+        (current) => ({
+          ...current,
+          vx,
+          vy,
+        })
+      );
+    }
   }
 
   stopMovement(): void {

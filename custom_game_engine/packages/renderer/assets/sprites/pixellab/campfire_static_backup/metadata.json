@@ -2,6 +2,8 @@
   "id": "campfire",
   "category": "map_objects",
   "size": 32,
-  "description": "Small campfire with flames and smoke, top-down view",
-  "generated_at": "2026-01-04T21:34:31.744Z"
+  "description": "campfire",
+  "generated_at": "2026-01-04T21:34:31.744Z",
+  "original_description": "Small campfire with flames and smoke, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.556Z"
 }

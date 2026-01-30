@@ -2,8 +2,9 @@
   "id": "limestone",
   "category": "objects",
   "size": 32,
-  "description": "limestone, pixel art, top-down view, transparent background",
+  "description": "limestone",
   "original_description": "limestone, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-25T05:08:29.332Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.615Z"
 }

@@ -2,8 +2,9 @@
   "id": "carrot-vegetative",
   "category": "objects",
   "size": 48,
-  "description": "Growing carrot plant with lacy green foliage, pixel art, top-down view, transparent background",
+  "description": "carrot-vegetative",
   "original_description": "Growing carrot plant with lacy green foliage, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:30:35.505Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.559Z"
 }

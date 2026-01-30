@@ -2,8 +2,9 @@
   "id": "clownfish",
   "category": "objects",
   "size": 48,
-  "description": "clownfish with orange body, white stripes, pixel art, game sprite, 48x48",
+  "description": "clownfish",
   "original_description": "clownfish with orange body, white stripes, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:09:22.138Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.574Z"
 }

@@ -2,7 +2,7 @@
   "id": "cat_grey",
   "base_species": "cat",
   "variant": "grey_tabby",
-  "description": "grey tabby cat",
+  "description": "grey cat, graceful feline with whiskers, pointed ears, swishing tail, woodland earth tones, dappled sunlight, leaf-covered",
   "size": 48,
   "directions": [
     "south",
@@ -14,5 +14,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-04T00:28:31.314Z"
+  "generated_at": "2026-01-04T00:28:31.314Z",
+  "original_description": "grey tabby cat",
+  "enriched_at": "2026-01-30T00:40:22.561Z"
 }

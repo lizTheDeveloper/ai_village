@@ -3,7 +3,9 @@
   "category": "animals",
   "type": "map_object",
   "size": 64,
-  "description": "Realistic horse as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+  "description": "horse, majestic horse with flowing mane, muscular build, earthy brown and golden tones, grass-stained",
   "generated_at": "2026-01-03T22:05:57.887Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Realistic horse as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.607Z"
 }

@@ -2,8 +2,9 @@
   "id": "grass-vegetative",
   "category": "objects",
   "size": 48,
-  "description": "Growing grass with several green blades, pixel art, top-down view, transparent background",
+  "description": "grass-vegetative",
   "original_description": "Growing grass with several green blades, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:37:34.389Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.602Z"
 }

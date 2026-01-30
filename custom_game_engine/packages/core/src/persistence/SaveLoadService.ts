@@ -601,6 +601,112 @@ export class SaveLoadService {
     const currentSessionTime = (Date.now() - this.playStartTime) / 1000;
     return this.totalPlayTime + currentSessionTime;
   }
+
+  /**
+   * Sync all existing local saves to the multiverse server.
+   * This uploads any local saves that haven't been synced yet.
+   *
+   * @returns Summary of sync results
+   */
+  async syncAllLocalSavesToServer(options?: {
+    onProgress?: (current: number, total: number, saveName: string) => void;
+  }): Promise<{ synced: number; failed: number; skipped: number; errors: string[] }> {
+    if (!this.storageBackend) {
+      throw new Error('No storage backend configured. Call setStorage() first.');
+    }
+
+    if (!this.serverSyncEnabled) {
+      throw new Error('Server sync not enabled. Call enableServerSync() first.');
+    }
+
+    const isAvailable = await this.checkServerAvailable();
+    if (!isAvailable) {
+      throw new Error('Multiverse server not available');
+    }
+
+    const saves = await this.listSaves();
+    const results = {
+      synced: 0,
+      failed: 0,
+      skipped: 0,
+      errors: [] as string[],
+    };
+
+    for (let i = 0; i < saves.length; i++) {
+      const saveMeta = saves[i];
+      if (!saveMeta) continue;
+
+      options?.onProgress?.(i + 1, saves.length, saveMeta.name);
+
+      try {
+        // Load the full save file
+        const saveFile = await this.storageBackend.load(saveMeta.key);
+        if (!saveFile) {
+          results.skipped++;
+          continue;
+        }
+
+        // Get universe info from save
+        const universeSnapshot = saveFile.universes[0];
+        if (!universeSnapshot) {
+          results.skipped++;
+          results.errors.push(`${saveMeta.name}: No universe data`);
+          continue;
+        }
+
+        const universeId = universeSnapshot.identity.id;
+        const universeName = universeSnapshot.identity.name;
+
+        // Ensure universe exists on server
+        let serverUniverseId = universeId;
+        const existingUniverse = await multiverseClient.getUniverse(universeId);
+        if (!existingUniverse) {
+          const created = await multiverseClient.createUniverse({
+            name: universeName,
+            isPublic: true,
+            id: universeId,
+          });
+          serverUniverseId = created.id;
+          console.log(`[SaveLoad] Created universe on server: ${serverUniverseId}`);
+        }
+
+        // Upload snapshot to server
+        await multiverseClient.uploadSnapshot(serverUniverseId, saveFile, {
+          type: 'manual',
+        });
+
+        results.synced++;
+        console.log(`[SaveLoad] Synced save "${saveMeta.name}" to server`);
+      } catch (error) {
+        results.failed++;
+        const errorMsg = `${saveMeta.name}: ${(error as Error).message}`;
+        results.errors.push(errorMsg);
+        console.error(`[SaveLoad] Failed to sync save "${saveMeta.name}":`, error);
+      }
+    }
+
+    console.log(
+      `[SaveLoad] Bulk sync complete: ${results.synced} synced, ` +
+      `${results.failed} failed, ${results.skipped} skipped`
+    );
+
+    return results;
+  }
+
+  /**
+   * Get the multiverse client for direct server operations.
+   * Use with caution - prefer using SaveLoadService methods when possible.
+   */
+  getMultiverseClient(): MultiverseClient {
+    return multiverseClient;
+  }
+
+  /**
+   * Check if server sync is currently available.
+   */
+  async isServerAvailable(): Promise<boolean> {
+    return this.checkServerAvailable();
+  }
 }
 
 // Global singleton

@@ -2,8 +2,9 @@
   "id": "yarrow-vegetative",
   "category": "objects",
   "size": 48,
-  "description": "Growing yarrow plant with fern-like feathery green leaves, pixel art, top-down view, transparent background",
+  "description": "yarrow-vegetative",
   "original_description": "Growing yarrow plant with fern-like feathery green leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:01:52.797Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.679Z"
 }

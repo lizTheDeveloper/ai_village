@@ -1,5 +1,9 @@
 # Equipment System Specification
 
+## Purpose
+
+The Equipment System provides armor, weapons, and clothing for agents using Phase 29's Material and Trait systems, affecting combat performance, temperature regulation, and social status.
+
 ## Overview
 
 The Equipment System leverages Phase 29's Material and Trait systems to provide armor, weapons, and clothing for agents. Equipment affects combat, temperature regulation, social status, and agent capabilities.

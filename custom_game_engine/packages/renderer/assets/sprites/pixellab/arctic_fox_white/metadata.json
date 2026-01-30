@@ -2,8 +2,9 @@
   "id": "arctic_fox_white",
   "category": "objects",
   "size": 48,
-  "description": "arctic fox in white winter coat, pixel art, game sprite, 48x48",
+  "description": "fox white arctic",
   "original_description": "arctic fox in white winter coat, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:43:10.645Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.544Z"
 }

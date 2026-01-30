@@ -11,9 +11,9 @@
  *
  * Implementation notes:
  * - Grid cells are fixed size (default 10 units)
- * - Uses Map<string, Set<string>> for cell storage (cell key → entity IDs)
+ * - Uses Map<number, Set<string>> for cell storage (cell key → entity IDs)
  * - Uses Map<string, {x, y, cellKey}> for entity position tracking
- * - Zero allocations in hot paths (reuses arrays)
+ * - Zero allocations in hot paths (reuses arrays, numeric hash instead of string concat)
  * - Returns entity IDs only (caller fetches components as needed)
  */
 
@@ -21,10 +21,10 @@ export class SpatialGrid {
   private readonly cellSize: number;
 
   // Grid storage: cell key → entity IDs in that cell
-  private readonly cells: Map<string, Set<string>> = new Map();
+  private readonly cells: Map<number, Set<string>> = new Map();
 
   // Entity tracking: entity ID → {x, y, cellKey}
-  private readonly entities: Map<string, { x: number; y: number; cellKey: string }> = new Map();
+  private readonly entities: Map<string, { x: number; y: number; cellKey: number }> = new Map();
 
   // Working arrays for queries (reused to avoid allocations)
   private readonly workingResults: string[] = [];
@@ -149,7 +149,7 @@ export class SpatialGrid {
       for (let dy = -cellRadius; dy <= cellRadius; dy++) {
         const cx = centerCx + dx;
         const cy = centerCy + dy;
-        const cellKey = `${cx},${cy}`;
+        const cellKey = (cx << 16) | (cy & 0xFFFF);
 
         const cell = this.cells.get(cellKey);
         if (!cell) continue;
@@ -184,7 +184,7 @@ export class SpatialGrid {
     // Check all cells in bounds
     for (let cx = minCx; cx <= maxCx; cx++) {
       for (let cy = minCy; cy <= maxCy; cy++) {
-        const cellKey = `${cx},${cy}`;
+        const cellKey = (cx << 16) | (cy & 0xFFFF);
         const cell = this.cells.get(cellKey);
         if (!cell) continue;
 
@@ -216,11 +216,12 @@ export class SpatialGrid {
 
   /**
    * Get cell key for world coordinates.
-   * Format: "cx,cy" where cx/cy are grid coordinates.
+   * Uses numeric hash: (cx << 16) | (cy & 0xFFFF)
+   * Supports cell coordinates in range [-32768, 32767] (32K tiles in each direction).
    */
-  private getCellKey(x: number, y: number): string {
+  private getCellKey(x: number, y: number): number {
     const cx = Math.floor(x / this.cellSize);
     const cy = Math.floor(y / this.cellSize);
-    return `${cx},${cy}`;
+    return (cx << 16) | (cy & 0xFFFF);
   }
 }

@@ -2,8 +2,9 @@
   "id": "weasel",
   "category": "objects",
   "size": 48,
-  "description": "weasel with long slender brown body, white belly, pixel art, game sprite, 48x48",
+  "description": "weasel",
   "original_description": "weasel with long slender brown body, white belly, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:47:15.416Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.668Z"
 }

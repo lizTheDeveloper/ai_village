@@ -22,4 +22,12 @@ export { BiosphereGenerator } from './BiosphereGenerator.js';
 export { EcologicalNicheIdentifier } from './EcologicalNicheIdentifier.js';
 
 // Sprite integration
-export { queueBiosphereSprites, getQueueStats } from './queueBiosphereSprites.js';
+export {
+  queueBiosphereSprites,
+  getQueueStats,
+  loadPlanetSpriteManifest,
+  listPlanetSpriteManifests,
+} from './queueBiosphereSprites.js';
+
+// Re-export manifest types from planet module for convenience
+export type { PlanetSpriteManifest, SpriteEntry } from '../planet/PlanetSpriteManifest.js';

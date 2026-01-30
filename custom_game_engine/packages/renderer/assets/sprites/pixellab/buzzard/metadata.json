@@ -2,8 +2,9 @@
   "id": "buzzard",
   "category": "objects",
   "size": 48,
-  "description": "common buzzard with brown mottled plumage, broad wings, pixel art, game sprite, 48x48",
+  "description": "buzzard",
   "original_description": "common buzzard with brown mottled plumage, broad wings, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:08:03.169Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.554Z"
 }

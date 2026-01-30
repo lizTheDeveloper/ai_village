@@ -2,8 +2,9 @@
   "id": "baboon",
   "category": "objects",
   "size": 48,
-  "description": "olive baboon with grey-brown fur, dog-like face, pixel art, game sprite, 48x48",
+  "description": "baboon",
   "original_description": "olive baboon with grey-brown fur, dog-like face, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:54:50.209Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.546Z"
 }

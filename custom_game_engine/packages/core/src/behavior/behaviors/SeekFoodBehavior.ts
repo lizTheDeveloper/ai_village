@@ -25,7 +25,7 @@ import { itemRegistry } from '../../items/index.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { eatFromStorage, eatFromPlant, type InteractionResult } from '../../services/InteractionAPI.js';
 import { isEdibleSpecies } from '../../services/TargetingAPI.js';
-import { HUNGER_THRESHOLD_SEEK_FOOD, HUNGER_RESTORED_DEFAULT } from '../../constants/index.js';
+import { HUNGER_THRESHOLD_SEEK_FOOD, HUNGER_THRESHOLD_WELL_FED, HUNGER_RESTORED_DEFAULT } from '../../constants/index.js';
 import { ComponentType, ComponentType as CT } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
 import { CHUNK_SIZE } from '../../types.js';
@@ -62,13 +62,14 @@ export class SeekFoodBehavior extends BaseBehavior {
       // Eat food from inventory
       this.eatFood(entity, world, foodSlot.slotIndex, foodSlot.itemId, needs);
 
-      // Check if still hungry
-      if (needs.hunger < HUNGER_THRESHOLD_SEEK_FOOD) {
-        // Still hungry, continue seeking food
+      // Check if well-fed (hysteresis: complete only when hunger reaches WELL_FED threshold)
+      // This prevents ping-pong between eat→satisfied→hungry→eat cycles
+      if (needs.hunger < HUNGER_THRESHOLD_WELL_FED) {
+        // Not well-fed yet, continue seeking food until properly full
         return;
       } else {
-        // Hunger satisfied, behavior complete
-        return { complete: true, reason: 'Hunger satisfied' };
+        // Well-fed, behavior complete
+        return { complete: true, reason: 'Well-fed (hunger satisfied)' };
       }
     }
 
@@ -78,24 +79,24 @@ export class SeekFoodBehavior extends BaseBehavior {
     // First try eating from nearby plants (berry bushes, etc.)
     const plantResult = this.tryEatFromNearbyPlant(entity, world);
     if (plantResult?.success) {
-      // Check if still hungry
+      // Check if well-fed (hysteresis)
       const updatedNeeds = entity.getComponent(ComponentType.Needs);
-      if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
-        return { complete: true, reason: 'Hunger satisfied from plant' };
+      if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_WELL_FED) {
+        return { complete: true, reason: 'Well-fed from plant' };
       }
-      // Still hungry, continue (will try again next tick)
+      // Not well-fed yet, continue eating
       return;
     }
 
     // Then try eating from nearby storage
     const storageResult = this.tryEatFromNearbyStorage(entity, world);
     if (storageResult?.success) {
-      // Check if still hungry
+      // Check if well-fed (hysteresis)
       const updatedNeeds = entity.getComponent(ComponentType.Needs);
-      if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
-        return { complete: true, reason: 'Hunger satisfied from storage' };
+      if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_WELL_FED) {
+        return { complete: true, reason: 'Well-fed from storage' };
       }
-      // Still hungry, continue (will try again next tick)
+      // Not well-fed yet, continue eating
       return;
     }
 
@@ -577,14 +578,14 @@ export function seekFoodBehaviorWithContext(ctx: BehaviorContext): ContextBehavi
     // Eat food from inventory
     eatFoodFromInventory(ctx, foodSlot.slotIndex, foodSlot.itemId);
 
-    // Check if still hungry
+    // Check if well-fed (hysteresis: complete only when hunger reaches WELL_FED threshold)
     const updatedNeeds = ctx.getComponent<NeedsComponent>(CT.Needs);
-    if (updatedNeeds && updatedNeeds.hunger < HUNGER_THRESHOLD_SEEK_FOOD) {
-      // Still hungry, continue seeking food
+    if (updatedNeeds && updatedNeeds.hunger < HUNGER_THRESHOLD_WELL_FED) {
+      // Not well-fed yet, continue seeking food until properly full
       return;
     } else {
-      // Hunger satisfied
-      return ctx.complete('Hunger satisfied');
+      // Well-fed
+      return ctx.complete('Well-fed (hunger satisfied)');
     }
   }
 
@@ -592,8 +593,8 @@ export function seekFoodBehaviorWithContext(ctx: BehaviorContext): ContextBehavi
   const plantResult = tryEatFromNearbyPlant(ctx);
   if (plantResult?.success) {
     const updatedNeeds = ctx.getComponent<NeedsComponent>(CT.Needs);
-    if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
-      return ctx.complete('Hunger satisfied from plant');
+    if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_WELL_FED) {
+      return ctx.complete('Well-fed from plant');
     }
     return;
   }
@@ -601,8 +602,8 @@ export function seekFoodBehaviorWithContext(ctx: BehaviorContext): ContextBehavi
   const storageResult = tryEatFromNearbyStorage(ctx);
   if (storageResult?.success) {
     const updatedNeeds = ctx.getComponent<NeedsComponent>(CT.Needs);
-    if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
-      return ctx.complete('Hunger satisfied from storage');
+    if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_WELL_FED) {
+      return ctx.complete('Well-fed from storage');
     }
     return;
   }

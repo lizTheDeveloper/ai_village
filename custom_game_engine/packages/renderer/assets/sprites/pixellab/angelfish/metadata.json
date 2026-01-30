@@ -2,8 +2,9 @@
   "id": "angelfish",
   "category": "objects",
   "size": 48,
-  "description": "queen angelfish with blue and yellow scales, pixel art, game sprite, 48x48",
+  "description": "angelfish",
   "original_description": "queen angelfish with blue and yellow scales, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:09:37.893Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.542Z"
 }

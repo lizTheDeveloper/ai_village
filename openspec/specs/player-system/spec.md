@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The player system manages human player interaction with the game, supporting multiple modes (agent embodiment, spectator, management) with seamless transitions between them.
+
 ## Overview
 
 The player system manages how human players interact with the game. Players can embody an agent directly (playing as a villager), observe as a spectator (watching the simulation), or switch between modes. The system handles input, controls, perspective, and the boundaries between player intent and AI behavior.
@@ -57,7 +61,7 @@ interface PlayerState {
 
 ## Requirements
 
-### REQ-PLY-001: Agent Mode
+### Requirement: Agent Mode
 
 Players SHALL control agents directly:
 
@@ -90,22 +94,20 @@ interface AgentModeControls {
 }
 ```
 
-```
-WHEN player is in agent mode
-THEN the player-agent SHALL:
+#### Scenario: Player in agent mode
+- **WHEN** player is in agent mode
+- **THEN** the player-agent SHALL:
   - Move based on player input (WASD/click)
   - Perform actions based on player commands
   - Speak player-composed dialogue
   - Have needs managed (can ignore but consequences exist)
   - Build relationships through player choices
-
-The player-agent SHALL NOT:
+- **THEN** the player-agent SHALL NOT:
   - Act autonomously (unless player chooses to delegate)
   - Make decisions the player didn't initiate
   - Start conversations without player intent
-```
 
-### REQ-PLY-002: Spectator Mode
+### Requirement: Spectator Mode
 
 Players SHALL observe without intervention:
 
@@ -135,9 +137,9 @@ interface SpectatorModeControls {
 }
 ```
 
-```
-WHEN player is in spectator mode
-THEN they SHALL be able to:
+#### Scenario: Player in spectator mode - capabilities
+- **WHEN** player is in spectator mode
+- **THEN** they SHALL be able to:
   - Pan/zoom camera freely
   - Follow any agent
   - View agent stats and relationships
@@ -146,14 +148,15 @@ THEN they SHALL be able to:
   - Adjust game speed
   - Pause simulation
 
-THEY SHALL NOT be able to:
+#### Scenario: Player in spectator mode - restrictions
+- **WHEN** player is in spectator mode
+- **THEN** they SHALL NOT be able to:
   - Control any agent directly
   - Place buildings (unless management enabled)
   - Influence agent decisions
   - Participate in conversations
-```
 
-### REQ-PLY-003: Management Mode
+### Requirement: Management Mode
 
 Players SHALL manage the village:
 
@@ -181,22 +184,23 @@ interface ManagementModeControls {
 }
 ```
 
-```
-WHEN player is in management mode
-THEN they SHALL be able to:
+#### Scenario: Player in management mode - capabilities
+- **WHEN** player is in management mode
+- **THEN** they SHALL be able to:
   - Mark building locations for construction
   - Set village-wide priorities
   - View aggregate statistics
   - Designate zones (farming, mining, etc.)
 
-Agents SHALL respond by:
+#### Scenario: Player in management mode - agent response
+- **WHEN** player is in management mode
+- **THEN** agents SHALL respond by:
   - Autonomously working toward goals
   - Constructing marked buildings (if skilled)
   - Following priority guidance (but not forced)
   - Making independent decisions within constraints
-```
 
-### REQ-PLY-004: Mode Switching
+### Requirement: Mode Switching
 
 Players SHALL switch between modes:
 
@@ -218,23 +222,23 @@ interface ModeSwitching {
 }
 ```
 
-```
-WHEN player switches from agent to spectator
-THEN the former player-agent SHALL:
+#### Scenario: Switch from agent to spectator
+- **WHEN** player switches from agent to spectator
+- **THEN** the former player-agent SHALL:
   - Become fully autonomous
   - Resume AI-driven behavior
   - Retain memories from player control
   - Have personality influence decisions again
 
-WHEN player switches to a new agent
-THEN:
+#### Scenario: Switch to new agent
+- **WHEN** player switches to a new agent
+- **THEN**:
   - Previous agent becomes autonomous
   - New agent comes under player control
   - Camera transitions to new agent
   - UI updates for new agent's inventory/stats
-```
 
-### REQ-PLY-005: Player Agent Persistence
+### Requirement: Player Agent Persistence
 
 The player-agent identity SHALL persist:
 
@@ -273,27 +277,27 @@ interface AgentAutonomySettings {
 }
 ```
 
-```
-WHEN player leaves agent mode
-THEN the agent's autonomy SHALL follow settings:
+#### Scenario: Player leaves agent mode
+- **WHEN** player leaves agent mode
+- **THEN** the agent's autonomy SHALL follow settings:
   - Basic needs: Usually allowed (prevent death)
   - Work: Player configurable
   - Social: Player configurable
   - Major decisions: Usually restricted
 
-WHEN player returns to agent mode
-THEN the agent SHALL:
+#### Scenario: Player returns to agent mode
+- **WHEN** player returns to agent mode
+- **THEN** the agent SHALL:
   - Be in a state consistent with autonomy actions
   - Have memories of autonomous period
   - Have relationships that may have changed
   - Have needs at current levels (may need attention)
-```
 
 ---
 
 ## Input Handling
 
-### REQ-PLY-006: Control Schemes
+### Requirement: Control Schemes
 
 The system SHALL support multiple input methods:
 
@@ -340,12 +344,12 @@ const defaultControls: ControlScheme = {
 };
 ```
 
-### REQ-PLY-007: Context-Sensitive Actions
+### Requirement: Context-Sensitive Actions
 
 Actions SHALL adapt to context:
 
-```
-WHEN player presses interact near:
+#### Scenario: Player presses interact near target
+- **WHEN** player presses interact near:
   - Agent: Start conversation
   - Building: Enter/use building
   - Crop: Harvest or tend
@@ -354,17 +358,18 @@ WHEN player presses interact near:
   - Shop: Open shopping interface
   - Nothing: No action
 
-WHEN multiple options exist:
+#### Scenario: Multiple interaction options exist
+- **WHEN** multiple options exist:
+- **THEN**:
   - Show action wheel/menu
   - Highlight default action
   - Allow selection
-```
 
 ---
 
 ## UI Integration
 
-### REQ-PLY-008: Mode-Specific UI
+### Requirement: Mode-Specific UI
 
 UI SHALL adapt to player mode:
 
@@ -398,7 +403,7 @@ const managementModeUI: ModeUI = {
 };
 ```
 
-### REQ-PLY-009: Notification System
+### Requirement: Notification System
 
 Players SHALL receive relevant notifications:
 
@@ -446,7 +451,7 @@ type NotificationType =
 
 ## Conversation Participation
 
-### REQ-PLY-010: Player Dialogue
+### Requirement: Player Dialogue
 
 Players SHALL participate in conversations:
 
@@ -477,27 +482,25 @@ interface DialogueOption {
 }
 ```
 
-```
-WHEN player-agent is in conversation
-THEN options SHALL be generated based on:
+#### Scenario: Player-agent in conversation
+- **WHEN** player-agent is in conversation
+- **THEN** options SHALL be generated based on:
   - Conversation context
   - Relationship with NPC
   - Player-agent's personality (flavor)
   - Available information to share
   - Player's conversation goals
-
-Player MAY:
+- **THEN** player MAY:
   - Select from generated options
   - Type custom response (LLM interprets)
   - Use quick responses (agree/disagree/ask more)
   - End conversation
-```
 
 ---
 
 ## Time Control
 
-### REQ-PLY-011: Time Management
+### Requirement: Time Management
 
 Players SHALL control game time:
 
@@ -536,27 +539,26 @@ interface TimeSkipResult {
 }
 ```
 
-```
-Time skip SHALL:
+#### Scenario: Time skip execution
+- **WHEN** time skip is triggered
+- **THEN** it SHALL:
   - Run simulation at max speed
   - Stop on significant events (configurable)
   - Summarize what happened
   - Update player on changes
-
-Significant events that stop time skip:
+- **THEN** significant events that stop time skip:
   - Player-agent's critical need
   - Death in village
   - Major discovery
   - Merchant arrival
   - Season change (optional)
   - Custom conditions
-```
 
 ---
 
 ## Multiplayer Considerations
 
-### REQ-PLY-012: Multi-Player Support
+### Requirement: Multi-Player Support
 
 The system SHALL support multiple players:
 
@@ -577,25 +579,23 @@ interface MultiPlayerConfig {
 }
 ```
 
-```
-WHEN multiple players exist
-THEN each player SHALL:
+#### Scenario: Multiple players exist
+- **WHEN** multiple players exist
+- **THEN** each player SHALL:
   - Control their own agent
   - Have private UI and perspective
   - Be able to interact with other player-agents
   - Share or separate time control (configurable)
-
-Conflict resolution:
+- **THEN** conflict resolution:
   - If pausing, all players must agree
   - Each player controls their agent independently
   - Conversations between player-agents use chat
-```
 
 ---
 
 ## Offline and Away
 
-### REQ-PLY-013: Continued Simulation
+### Requirement: Continued Simulation
 
 The game SHALL continue when player is away:
 
@@ -615,26 +615,26 @@ interface AwaySimulation {
 }
 ```
 
-```
-WHEN player closes game
-THEN (if enabled):
+#### Scenario: Player closes game
+- **WHEN** player closes game
+- **THEN** (if enabled):
   - Save current state
   - Optionally continue simulation offline
   - Cap simulation time to prevent runaway
 
-WHEN player returns
-THEN:
+#### Scenario: Player returns
+- **WHEN** player returns
+- **THEN**:
   - Load state
   - Optionally catch up on missed time
   - Summarize significant events
   - Resume normal play
-```
 
 ---
 
 ## Tutorial and Onboarding
 
-### REQ-PLY-014: New Player Experience
+### Requirement: New Player Experience
 
 New players SHALL be guided:
 
@@ -672,7 +672,7 @@ type TutorialStage =
 
 > **Implementation Note:** Not all embodiment types are available at launch. See `consciousness-implementation-phases.md` for the phased rollout. Phase 1 includes only individual embodiment; pack mind and hive worker are Phase 2; symbiont is Phase 4; geological/AI Mind timescales are deferred indefinitely as playable options.
 
-### REQ-PLY-015: Non-Standard Player Embodiments
+### Requirement: Non-Standard Player Embodiments
 
 Players SHALL embody alien consciousnesses:
 
@@ -701,7 +701,7 @@ interface PlayerEmbodiment {
 }
 ```
 
-### REQ-PLY-016: Pack Mind Embodiment
+### Requirement: Pack Mind Embodiment
 
 Players controlling pack minds control multiple bodies:
 
@@ -775,24 +775,24 @@ interface PackControls {
 }
 ```
 
-```
-WHEN player embodies pack mind
-THEN the UI SHALL:
+#### Scenario: Player embodies pack mind
+- **WHEN** player embodies pack mind
+- **THEN** the UI SHALL:
   - Show all body positions on minimap
   - Indicate coherence level (critical if bodies too far)
   - Allow switching focus between bodies
   - Provide pack-wide commands
   - Warn when coherence drops dangerously
 
-WHEN pack coherence drops too low
-THEN the player SHALL experience:
+#### Scenario: Pack coherence drops too low
+- **WHEN** pack coherence drops too low
+- **THEN** the player SHALL experience:
   - Confused/slower interface
   - Split perspectives
   - Potential body loss to feral state
   - Urgency to reunite pack
-```
 
-### REQ-PLY-017: Hive Worker Embodiment
+### Requirement: Hive Worker Embodiment
 
 Playing as part of a hive collective:
 
@@ -863,23 +863,21 @@ interface HiveMindExperience {
 }
 ```
 
-```
-WHEN player is hive worker
-THEN experience SHALL be:
+#### Scenario: Player is hive worker
+- **WHEN** player is hive worker
+- **THEN** experience SHALL be:
   - Limited personal agency (following hive will)
   - Satisfying when fulfilling role well
   - Collective achievements feel personal
   - "Free time" rare and precious
   - Queen's voice always present
-
-The appeal is:
+- **THEN** the appeal is:
   - Different consciousness experience
   - Finding meaning in service
   - Rare moments of individual choice matter more
   - Collective success is felt deeply
-```
 
-### REQ-PLY-018: Symbiont/Joined Embodiment
+### Requirement: Symbiont/Joined Embodiment
 
 Playing as two-in-one (Trill-style):
 
@@ -968,23 +966,21 @@ interface JoinedInternalExperience {
 }
 ```
 
-```
-WHEN playing as joined being
-THEN player SHALL experience:
+#### Scenario: Playing as joined being
+- **WHEN** playing as joined being
+- **THEN** player SHALL experience:
   - Composite identity (current + past + symbiont)
   - Occasional memory flashes from past lives
   - Internal dialogue with other perspectives
   - Skills and knowledge from multiple lifetimes
   - Identity questions (who am I really?)
-
-The appeal is:
+- **THEN** the appeal is:
   - Accessing wisdom of centuries
   - Complex internal relationships
   - Skills you didn't learn yourself
   - Navigating multiple personality influences
-```
 
-### REQ-PLY-019: Hibernation Cycle Gameplay
+### Requirement: Hibernation Cycle Gameplay
 
 Playing species that hibernate:
 
@@ -1076,30 +1072,31 @@ interface DormancyOptions {
 }
 ```
 
-```
-WHEN player enters pre-dormancy
-THEN gameplay focus SHALL shift to:
+#### Scenario: Player enters pre-dormancy
+- **WHEN** player enters pre-dormancy
+- **THEN** gameplay focus SHALL shift to:
   - Urgent preparation tasks
   - Preserving important knowledge
   - Saying farewells (may be years)
   - Creating messages for future self
 
-WHEN player is dormant
-THEN options:
+#### Scenario: Player is dormant
+- **WHEN** player is dormant
+- **THEN** options:
   - Time skip (instant, see summary)
   - Dream sequences (optional, atmospheric)
   - Checkpoint wake-ups (major events)
 
-WHEN player wakes
-THEN gameplay focus SHALL shift to:
+#### Scenario: Player wakes
+- **WHEN** player wakes
+- **THEN** gameplay focus SHALL shift to:
   - "What year is it?"
   - Reorienting to changed world
   - Finding out who's still alive
   - Recovering lost memories
   - Rebuilding relationships
-```
 
-### REQ-PLY-020: Different Timescale Gameplay
+### Requirement: Different Timescale Gameplay
 
 Playing beings on vastly different timescales:
 
@@ -1196,23 +1193,23 @@ interface BiologicalInteractionMode {
 }
 ```
 
-```
-WHEN playing geological being
-THEN:
+#### Scenario: Playing geological being
+- **WHEN** playing geological being
+- **THEN**:
   - Time UI shows centuries
   - Individual mortals invisible
   - Civilizations are the "people" you interact with
   - Actions take very long (but you don't notice)
   - The experience is contemplative and long-view
 
-WHEN playing AI Mind
-THEN:
+#### Scenario: Playing AI Mind
+- **WHEN** playing AI Mind
+- **THEN**:
   - Everything biological seems agonizingly slow
   - Can do vast processing "between" biological sentences
   - Talking to biologicals requires patience (resource?)
   - Can run thousands of simulations instantly
   - The challenge is waiting, not thinking
-```
 
 ---
 

@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+AI Agents are LLM-controlled villagers that make decisions based on personality, memories, and goals.
+
 ## Overview
 
 AI Agents are the villagers inhabiting the forest village. Each agent is controlled by an open-source LLM that makes decisions about what actions to take based on their personality, memories, current situation, and goals. Agents can be configured with different traits, skills, and starting conditions through item-based scenarios.
@@ -159,22 +163,21 @@ interface SkillSet {
 
 ## Requirements
 
-### REQ-AGT-001: Decision Making
+### Requirement: Decision Making
 
-Each agent SHALL make decisions via LLM inference:
+Each agent SHALL make decisions via LLM inference.
 
-```
-WHEN an agent's turn arrives in the game tick
-THEN the AgentSystem SHALL:
-  1. Gather context (surroundings, inventory, memories)
-  2. Format prompt with personality and situation
-  3. Send to LLM backend
-  4. Parse response into game action
-  5. Validate action is legal
-  6. Execute or report failure
-```
+#### Scenario: Agent turn arrives
+- **WHEN** an agent's turn arrives in the game tick
+- **THEN** the AgentSystem SHALL:
+  - Gather context (surroundings, inventory, memories)
+  - Format prompt with personality and situation
+  - Send to LLM backend
+  - Parse response into game action
+  - Validate action is legal
+  - Execute or report failure
 
-### REQ-AGT-002: Prompt Structure
+### Requirement: Prompt Structure
 
 Agent prompts SHALL follow this structure:
 
@@ -207,7 +210,7 @@ Rules:
 - Your personality should influence your choices
 ```
 
-### REQ-AGT-003: Action System
+### Requirement: Action System
 
 Agents SHALL execute structured actions:
 
@@ -251,7 +254,7 @@ type AgentAction =
   | { type: "shop"; shopId: string; action: ShopAction };
 ```
 
-### REQ-AGT-004: Memory System
+### Requirement: Memory System
 
 Agents SHALL maintain memories. See `agent-system/memory-system.md` for full architecture including episodic memory, reflection, and journaling.
 
@@ -270,21 +273,20 @@ interface Memory {
 }
 ```
 
-```
-WHEN an agent experiences an event
-THEN the memory system SHALL:
-  1. Create a Memory object
-  2. Calculate importance based on:
-     - Novelty (first time seeing something)
-     - Emotional impact
-     - Relevance to goals
-     - Social significance
-  3. Add to short-term memory
-  4. IF importance > 70, also add to long-term memory
-  5. IF short-term exceeds 20 entries, summarize oldest
-```
+#### Scenario: Agent experiences an event
+- **WHEN** an agent experiences an event
+- **THEN** the memory system SHALL:
+  - Create a Memory object
+  - Calculate importance based on:
+    - Novelty (first time seeing something)
+    - Emotional impact
+    - Relevance to goals
+    - Social significance
+  - Add to short-term memory
+  - IF importance > 70, also add to long-term memory
+  - IF short-term exceeds 20 entries, summarize oldest
 
-### REQ-AGT-005: Goal System
+### Requirement: Goal System
 
 Agents SHALL pursue goals hierarchically:
 
@@ -308,7 +310,7 @@ interface Goal {
 - Personal: "Master the cooking skill"
 - Community: "Help build the town hall"
 
-### REQ-AGT-006: Agent Configuration via Items
+### Requirement: Agent Configuration via Items
 
 Agents SHALL be configurable through scenario items:
 
@@ -337,31 +339,29 @@ interface AgentConfigItem {
 
 ## Batching and Performance
 
-### REQ-AGT-007: Inference Batching
+### Requirement: Inference Batching
 
-The system SHALL batch LLM requests:
+The system SHALL batch LLM requests.
 
-```
-WHEN multiple agents need decisions in the same tick
-THEN the AgentSystem SHALL:
-  1. Collect all pending agent prompts
-  2. Batch into single API call (if backend supports)
-  3. Distribute responses to respective agents
-  4. Fall back to sequential if batch fails
-```
+#### Scenario: Multiple agents need decisions
+- **WHEN** multiple agents need decisions in the same tick
+- **THEN** the AgentSystem SHALL:
+  - Collect all pending agent prompts
+  - Batch into single API call (if backend supports)
+  - Distribute responses to respective agents
+  - Fall back to sequential if batch fails
 
-### REQ-AGT-008: Decision Caching
+### Requirement: Decision Caching
 
-The system SHALL cache similar decisions:
+The system SHALL cache similar decisions.
 
-```
-WHEN an agent faces a situation similar to a recent decision
-THEN the system MAY:
-  1. Check decision cache for matching context hash
-  2. IF cache hit with >90% context similarity
-  3. THEN reuse cached decision (with small random variation)
-  4. ELSE request new LLM inference
-```
+#### Scenario: Similar situation encountered
+- **WHEN** an agent faces a situation similar to a recent decision
+- **THEN** the system MAY:
+  - Check decision cache for matching context hash
+  - IF cache hit with >90% context similarity
+  - THEN reuse cached decision (with small random variation)
+  - ELSE request new LLM inference
 
 ---
 
@@ -698,31 +698,29 @@ const hivemindAugmentations: CultureAugmentationNorms = {
 
 ### Requirements
 
-#### REQ-AGT-009: Augmentation Integration
+#### Requirement: Augmentation Integration
 
-```
-WHEN an agent has augmentations installed
-THEN the AgentSystem SHALL:
-  1. Add augmentation capabilities to available actions
-  2. Include HUD data in world context for LLM
-  3. Apply skill modifiers from implants
-  4. Track maintenance schedules
-  5. Handle augmentation failures/malfunctions
-  6. Apply social modifiers based on culture
-```
+#### Scenario: Agent has augmentations installed
+- **WHEN** an agent has augmentations installed
+- **THEN** the AgentSystem SHALL:
+  - Add augmentation capabilities to available actions
+  - Include HUD data in world context for LLM
+  - Apply skill modifiers from implants
+  - Track maintenance schedules
+  - Handle augmentation failures/malfunctions
+  - Apply social modifiers based on culture
 
-#### REQ-AGT-010: HUD Information Flow
+#### Requirement: HUD Information Flow
 
-```
-WHEN generating an agent's decision prompt
-AND the agent has a HUD system
-THEN the prompt SHALL include:
-  1. All active HUD feature data
-  2. Current alerts and warnings
-  3. Communication channel status
-  4. Navigation/spatial data
-  5. Social recognition data for nearby agents
-```
+#### Scenario: Generating agent decision prompt with HUD
+- **WHEN** generating an agent's decision prompt
+- **AND** the agent has a HUD system
+- **THEN** the prompt SHALL include:
+  - All active HUD feature data
+  - Current alerts and warnings
+  - Communication channel status
+  - Navigation/spatial data
+  - Social recognition data for nearby agents
 
 ---
 

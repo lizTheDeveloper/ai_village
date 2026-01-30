@@ -2,8 +2,9 @@
   "id": "sage-vegetative",
   "category": "objects",
   "size": 48,
-  "description": "Growing sage plant with silvery-green aromatic leaves, pixel art, top-down view, transparent background",
+  "description": "sage-vegetative",
   "original_description": "Growing sage plant with silvery-green aromatic leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:58:40.455Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.641Z"
 }

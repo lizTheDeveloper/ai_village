@@ -2,8 +2,9 @@
   "id": "whale_humpback",
   "category": "objects",
   "size": 48,
-  "description": "humpback whale with dark body, white flippers, barnacles, pixel art, game sprite, 48x48",
+  "description": "humpback whale",
   "original_description": "humpback whale with dark body, white flippers, barnacles, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:04:02.369Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.669Z"
 }

@@ -2,8 +2,9 @@
   "id": "grass-fruiting",
   "category": "objects",
   "size": 48,
-  "description": "Grass with developed seed heads, pixel art, top-down view, transparent background",
+  "description": "grass-fruiting",
   "original_description": "Grass with developed seed heads, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:38:04.342Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.601Z"
 }

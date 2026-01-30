@@ -301,7 +301,8 @@ export class SystemContextImpl implements SystemContext {
     events: SystemEventManager,
     entities: ReadonlyArray<Entity>,
     deltaTime: number,
-    chunkSpatialQuery?: ChunkSpatialQuery
+    chunkSpatialQuery?: ChunkSpatialQuery,
+    skipSimulationFiltering: boolean = false
   ) {
     this.world = world;
     this.systemId = systemId;
@@ -310,15 +311,20 @@ export class SystemContextImpl implements SystemContext {
     this.deltaTime = deltaTime;
     this.chunkSpatialQuery = chunkSpatialQuery ?? null;
 
-    // Apply SimulationScheduler filtering
-    const scheduler = world.simulationScheduler;
-    if (scheduler?.filterActiveEntities) {
-      this.activeEntities = scheduler.filterActiveEntities(
-        entities,
-        world.tick
-      ) as EntityImpl[];
-    } else {
+    // Apply SimulationScheduler filtering (unless explicitly skipped)
+    // Systems that iterate dirtyTracker directly should skip this for performance
+    if (skipSimulationFiltering) {
       this.activeEntities = entities as EntityImpl[];
+    } else {
+      const scheduler = world.simulationScheduler;
+      if (scheduler?.filterActiveEntities) {
+        this.activeEntities = scheduler.filterActiveEntities(
+          entities,
+          world.tick
+        ) as EntityImpl[];
+      } else {
+        this.activeEntities = entities as EntityImpl[];
+      }
     }
   }
 
@@ -555,6 +561,15 @@ export abstract class BaseSystem implements System {
   protected readonly throttleInterval: number = 0;
 
   /**
+   * Skip SimulationScheduler filtering in SystemContext.
+   * Set to true for systems that don't use ctx.activeEntities
+   * (e.g., systems that iterate dirtyTracker directly).
+   * This avoids O(entities * components * agents) filtering overhead.
+   * Default: false
+   */
+  protected readonly skipSimulationFiltering: boolean = false;
+
+  /**
    * Called once when system is registered.
    * Override onInitialize() instead of this method.
    */
@@ -581,6 +596,11 @@ export abstract class BaseSystem implements System {
     entities: ReadonlyArray<Entity>,
     deltaTime: number
   ): void {
+    // Skip updates until initialize() has completed (events is set asynchronously)
+    if (!this.events) {
+      return;
+    }
+
     // Throttling
     if (this.throttleInterval > 0) {
       if (world.tick - this.lastUpdateTick < this.throttleInterval) {
@@ -596,7 +616,8 @@ export abstract class BaseSystem implements System {
       this.events,
       entities,
       deltaTime,
-      this.chunkSpatialQuery ?? undefined
+      this.chunkSpatialQuery ?? undefined,
+      this.skipSimulationFiltering
     );
 
     // Delegate to subclass
@@ -643,7 +664,8 @@ export async function createSystemContext(
   eventBus: EventBus,
   entities: ReadonlyArray<Entity>,
   deltaTime: number,
-  chunkSpatialQuery?: ChunkSpatialQuery
+  chunkSpatialQuery?: ChunkSpatialQuery,
+  skipSimulationFiltering: boolean = false
 ): Promise<SystemContext> {
   const { SystemEventManager } = await import('../events/TypedEventEmitter.js');
   const events = new SystemEventManager(eventBus, systemId);
@@ -654,6 +676,7 @@ export async function createSystemContext(
     events,
     entities,
     deltaTime,
-    chunkSpatialQuery
+    chunkSpatialQuery,
+    skipSimulationFiltering
   );
 }

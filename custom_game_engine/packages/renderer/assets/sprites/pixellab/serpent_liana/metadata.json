@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "seed plant, pixel art, top-down view",
+  "description": "liana serpent",
   "generated_at": "2026-01-03T22:03:48.152Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "seed plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.644Z"
 }

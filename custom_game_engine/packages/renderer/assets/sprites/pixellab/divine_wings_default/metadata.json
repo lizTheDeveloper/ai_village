@@ -3,7 +3,9 @@
   "category": "humanoids",
   "type": "character",
   "size": 48,
-  "description": "Divine Wings humanoid character, simple clothing, pixel art",
+  "description": "wings default divine",
   "generated_at": "2026-01-03T22:10:04.555Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Divine Wings humanoid character, simple clothing, pixel art",
+  "enriched_at": "2026-01-30T00:40:22.583Z"
 }

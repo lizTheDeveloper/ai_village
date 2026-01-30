@@ -3,7 +3,9 @@
   "category": "humanoids",
   "type": "character",
   "size": 48,
-  "description": "Adaptable humanoid character, simple clothing, pixel art",
+  "description": "default adaptable",
   "generated_at": "2026-01-03T22:08:02.012Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Adaptable humanoid character, simple clothing, pixel art",
+  "enriched_at": "2026-01-30T00:40:22.539Z"
 }

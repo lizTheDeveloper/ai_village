@@ -2,6 +2,8 @@
   "id": "cat_white",
   "category": "animals.pets",
   "size": 32,
-  "description": "White cat, fluffy fur, sitting pose, top-down view",
-  "generated_at": "2026-01-04T21:27:05.587Z"
+  "description": "white cat, graceful feline with whiskers, pointed ears, swishing tail, woodland earth tones, dappled sunlight, leaf-covered",
+  "generated_at": "2026-01-04T21:27:05.587Z",
+  "original_description": "White cat, fluffy fur, sitting pose, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.563Z"
 }

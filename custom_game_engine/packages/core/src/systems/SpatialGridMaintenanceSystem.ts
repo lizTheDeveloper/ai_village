@@ -31,6 +31,9 @@ export class SpatialGridMaintenanceSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   protected readonly throttleInterval = 0; // EVERY_TICK - spatial must stay in sync
   public readonly activationComponents = [CT.Position] as const;
+  // PERF: Skip SimulationScheduler filtering - this system iterates dirtyTracker directly
+  // and doesn't use ctx.activeEntities, so filtering is pure overhead
+  protected readonly skipSimulationFiltering = true;
 
   // Track previous positions to detect actual changes (not just dirty flags)
   private entityPositions = new Map<string, { x: number; y: number }>();

@@ -2,8 +2,9 @@
   "id": "potato-vegetative",
   "category": "objects",
   "size": 48,
-  "description": "Growing potato plant with bushy green leaves spreading outward, pixel art, top-down view, transparent background",
+  "description": "potato-vegetative",
   "original_description": "Growing potato plant with bushy green leaves spreading outward, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:27:29.952Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.634Z"
 }

@@ -36,6 +36,7 @@ export class ChatPanel implements IWindowPanel {
   private inputFocused: boolean = false;
   private scrollY: number = 0;
   private autoScroll: boolean = true;
+  private lastMessageCount: number = 0; // Track message count for auto-scroll reset
 
   // Display settings
   private readonly MESSAGE_HEIGHT = 50;
@@ -163,8 +164,16 @@ export class ChatPanel implements IWindowPanel {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('No messages yet', x + width / 2, y + height / 2);
+      this.lastMessageCount = 0;
       return;
     }
+
+    // Reset auto-scroll when new messages arrive (this is the key fix!)
+    // Even if user scrolled up, new messages will snap back to bottom
+    if (messages.length > this.lastMessageCount) {
+      this.autoScroll = true;
+    }
+    this.lastMessageCount = messages.length;
 
     // Auto-scroll to bottom
     if (this.autoScroll) {
@@ -498,9 +507,10 @@ export class ChatPanel implements IWindowPanel {
       Math.min(contentHeight - viewHeight, this.scrollY + deltaY * 0.5)
     );
 
-    // Disable auto-scroll when manually scrolling
-    const isAtBottom = this.scrollY >= contentHeight - viewHeight - 5;
-    this.autoScroll = isAtBottom;
+    // Re-enable auto-scroll when near bottom (generous threshold of 50px)
+    // This allows auto-scroll to kick back in when user scrolls close to bottom
+    const isNearBottom = this.scrollY >= contentHeight - viewHeight - 50;
+    this.autoScroll = isNearBottom;
   }
 
   // ============================================================================

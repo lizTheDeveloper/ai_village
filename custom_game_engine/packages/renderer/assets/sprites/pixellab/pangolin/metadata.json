@@ -2,8 +2,9 @@
   "id": "pangolin",
   "category": "objects",
   "size": 48,
-  "description": "pangolin with overlapping brown scales, curled body, pixel art, game sprite, 48x48",
+  "description": "pangolin",
   "original_description": "pangolin with overlapping brown scales, curled body, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:03:17.287Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.629Z"
 }

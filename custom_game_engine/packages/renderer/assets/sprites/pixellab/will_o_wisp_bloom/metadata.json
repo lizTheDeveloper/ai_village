@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "Snap-Maw plant, pixel art, top-down view",
+  "description": "o wisp bloom will",
   "generated_at": "2026-01-03T22:03:07.395Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Snap-Maw plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.676Z"
 }

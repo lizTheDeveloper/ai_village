@@ -2,8 +2,9 @@
   "id": "hornbill",
   "category": "objects",
   "size": 48,
-  "description": "great hornbill with black and white plumage, yellow casque, pixel art, game sprite, 48x48",
+  "description": "hornbill",
   "original_description": "great hornbill with black and white plumage, yellow casque, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:59:05.645Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.606Z"
 }

@@ -2,8 +2,9 @@
   "id": "test_sprite",
   "category": "objects",
   "size": 48,
-  "description": "blue wizard",
+  "description": "sprite test",
   "original_description": "blue wizard",
   "generated_at": "2026-01-05T03:17:22.139Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.657Z"
 }

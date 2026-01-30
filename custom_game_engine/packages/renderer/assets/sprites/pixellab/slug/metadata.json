@@ -2,8 +2,9 @@
   "id": "slug",
   "category": "objects",
   "size": 48,
-  "description": "leopard slug with grey spotted body, pixel art, game sprite, 48x48",
+  "description": "slug",
   "original_description": "leopard slug with grey spotted body, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:18:56.916Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.650Z"
 }

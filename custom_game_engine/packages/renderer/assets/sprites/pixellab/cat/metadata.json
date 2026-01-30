@@ -3,7 +3,9 @@
   "category": "animals",
   "type": "map_object",
   "size": 48,
-  "description": "Realistic cat as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+  "description": "cat, graceful feline with whiskers, pointed ears, swishing tail, woodland earth tones, dappled sunlight, leaf-covered",
   "generated_at": "2026-01-03T22:06:33.558Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Realistic cat as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.560Z"
 }

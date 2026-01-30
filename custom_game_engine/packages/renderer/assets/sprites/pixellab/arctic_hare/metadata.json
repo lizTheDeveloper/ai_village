@@ -2,8 +2,9 @@
   "id": "arctic_hare",
   "category": "objects",
   "size": 48,
-  "description": "arctic hare with white fur, black ear tips, pixel art, game sprite, 48x48",
+  "description": "hare arctic",
   "original_description": "arctic hare with white fur, black ear tips, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:43:54.247Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.545Z"
 }

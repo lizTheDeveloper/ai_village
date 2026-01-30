@@ -2,7 +2,7 @@
   "id": "tree_pine",
   "category": "regeneration",
   "size": 48,
-  "description": "Tall pine/conifer tree, triangular shape, top-down view",
+  "description": "pine tree",
   "generated_at": "2026-01-05T01:42:57.193Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "Tall pine/conifer tree, triangular shape, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.664Z"
 }

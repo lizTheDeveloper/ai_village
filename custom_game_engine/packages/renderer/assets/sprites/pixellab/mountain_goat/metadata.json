@@ -2,8 +2,9 @@
   "id": "mountain_goat",
   "category": "objects",
   "size": 48,
-  "description": "mountain goat with white shaggy fur, black curved horns, nimble hooves, pixel art, game sprite, 48x48",
+  "description": "goat mountain",
   "original_description": "mountain goat with white shaggy fur, black curved horns, nimble hooves, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:34:47.960Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.621Z"
 }

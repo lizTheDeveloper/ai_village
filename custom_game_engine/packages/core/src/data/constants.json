@@ -82,13 +82,16 @@
     "hydrationThreshold": 50
   },
   "needs": {
-    "hungerThresholdSeekFood": 0.7,
+    "hungerThresholdSeekFood": 0.5,
+    "hungerThresholdWellFed": 0.85,
     "hungerRestoredDefault": 0.25,
     "energyCritical": 0.1,
     "energyLow": 0.3,
     "energyModerate": 0.5,
     "energyHigh": 0.7,
     "energyFull": 1.0,
+    "energyThresholdSeekSleep": 0.25,
+    "energyThresholdWellRested": 0.9,
     "workSpeedCritical": 0.5,
     "workSpeedLow": 0.75,
     "workSpeedModerate": 0.9,

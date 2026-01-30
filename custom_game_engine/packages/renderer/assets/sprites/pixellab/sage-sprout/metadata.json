@@ -2,8 +2,9 @@
   "id": "sage-sprout",
   "category": "objects",
   "size": 48,
-  "description": "Young sage seedling with first fuzzy grey-green leaves, pixel art, top-down view, transparent background",
+  "description": "sage-sprout",
   "original_description": "Young sage seedling with first fuzzy grey-green leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:58:16.679Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.641Z"
 }

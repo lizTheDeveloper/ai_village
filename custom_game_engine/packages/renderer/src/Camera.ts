@@ -129,8 +129,10 @@ export class Camera {
   private targetZ: number = 0;
   private targetZoom: number = ZoomPreset.Default;
 
-  // Smoothing
+  // Smoothing (position/pan smoothing - slower for cinematic feel)
   private smoothing: number = 0.1;
+  // Zoom smoothing (faster for responsive feel)
+  private zoomSmoothing: number = 0.4;
 
   // View mode state
   public viewMode: ViewMode = ViewMode.TopDown;
@@ -349,12 +351,12 @@ export class Camera {
       this.z += dzTarget * this.smoothing;
     }
 
-    // Smooth zoom with deadzone
+    // Smooth zoom with deadzone (uses faster zoomSmoothing for responsiveness)
     const dZoomTarget = this.targetZoom - this.zoom;
     if (Math.abs(dZoomTarget) < DEADZONE * 0.1) {
       this.zoom = this.targetZoom;
     } else {
-      this.zoom += dZoomTarget * this.smoothing;
+      this.zoom += dZoomTarget * this.zoomSmoothing;
     }
 
     // Smooth vertical offset with deadzone

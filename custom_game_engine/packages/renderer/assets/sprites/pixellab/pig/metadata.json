@@ -2,6 +2,8 @@
   "id": "pig",
   "category": "animals.livestock",
   "size": 32,
-  "description": "Pink farm pig, round body, curly tail, standing pose, top-down farm animal",
-  "generated_at": "2026-01-04T21:24:10.532Z"
+  "description": "pig, round pink pig with curly tail, floppy ears, snout, domesticated farm animal, healthy well-fed appearance, woodland earth tones, dappled sunlight, leaf-covered",
+  "generated_at": "2026-01-04T21:24:10.532Z",
+  "original_description": "Pink farm pig, round body, curly tail, standing pose, top-down farm animal",
+  "enriched_at": "2026-01-30T00:40:22.629Z"
 }

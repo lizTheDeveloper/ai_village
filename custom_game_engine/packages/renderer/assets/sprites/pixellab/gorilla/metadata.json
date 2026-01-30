@@ -2,8 +2,9 @@
   "id": "gorilla",
   "category": "objects",
   "size": 48,
-  "description": "silverback gorilla with black fur, grey back, pixel art, game sprite, 48x48",
+  "description": "gorilla",
   "original_description": "silverback gorilla with black fur, grey back, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:53:53.036Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.599Z"
 }

@@ -2,24 +2,30 @@
  * UniverseBrowserScreen - Browse, create, and load universes
  *
  * This screen appears before the main game to allow players to:
- * - Create a new universe
+ * - Create a new universe (via CosmicHubScreen flow)
  * - Load an existing local save
  * - Browse universes from the multiverse server
  * - Time travel to specific snapshots
  *
- * This is the "Launch Game" entry point that precedes UniverseConfigScreen.
+ * This is the "Launch Game" entry point that precedes universe/planet creation.
  */
 
 import { saveLoadService } from '@ai-village/core';
 import type { PersistenceSaveMetadata as SaveMetadata } from '@ai-village/core';
 import { MultiverseTimelineView, type TimelineUniverse, type TimelineSnapshot } from './MultiverseTimelineView.js';
 import { getPlayerId } from './utils/GameStateHelpers.js';
+import { CosmicHubManager, createLocalStorageCallbacks, type GameStartConfig } from './CosmicHubManager.js';
+import { UniverseGalleryScreen, type ServerUniverseInfo } from './UniverseGalleryScreen.js';
+import { PlanetListScreen } from './PlanetListScreen.js';
+import { LivePlanetCreationScreen } from './LivePlanetCreationScreen.js';
 
 export interface UniverseBrowserResult {
-  action: 'create_new' | 'load_local' | 'load_server';
+  action: 'create_new' | 'load_local' | 'load_server' | 'cosmic_start' | 'join_universe';
   saveKey?: string;  // For local loads
   universeId?: string;  // For server loads
   snapshotTick?: number;  // For time travel
+  cosmicConfig?: GameStartConfig;  // For cosmic creation flow
+  planetId?: string;  // For joining a specific planet
 }
 
 interface ServerUniverse {
@@ -248,10 +254,13 @@ export class UniverseBrowserScreen {
 
     // Main content container
     const mainContent = document.createElement('div');
-    mainContent.style.cssText = 'display: flex; gap: 40px; max-width: 1400px; width: 100%;';
+    mainContent.style.cssText = 'display: flex; gap: 30px; max-width: 1600px; width: 100%; flex-wrap: wrap; justify-content: center;';
 
-    // Left panel - Create New
+    // Left panel - Create New Universe
     mainContent.appendChild(this.renderCreateNewPanel());
+
+    // Middle panel - Join Universe
+    mainContent.appendChild(this.renderJoinUniversePanel());
 
     // Right panel - Load Existing (tabbed)
     mainContent.appendChild(this.renderLoadPanel());
@@ -259,10 +268,172 @@ export class UniverseBrowserScreen {
     this.container.appendChild(mainContent);
   }
 
+  private renderJoinUniversePanel(): HTMLElement {
+    const panel = document.createElement('div');
+    panel.style.cssText = `
+      flex: 0 0 320px;
+      background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 87, 34, 0.1) 100%);
+      border: 2px solid rgba(255, 152, 0, 0.5);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    `;
+
+    const icon = document.createElement('div');
+    icon.textContent = '🌌';
+    icon.style.cssText = 'font-size: 64px; margin-bottom: 20px;';
+    panel.appendChild(icon);
+
+    const header = document.createElement('h2');
+    header.textContent = 'Join Universe';
+    header.style.cssText = 'margin: 0 0 15px 0; font-size: 24px; color: #fff; text-align: center;';
+    panel.appendChild(header);
+
+    const description = document.createElement('p');
+    description.textContent = 'Browse existing universes on the multiverse server. Join a planet or create a new world in someone else\'s universe.';
+    description.style.cssText = 'margin: 0 0 30px 0; font-size: 14px; color: #aaa; text-align: center; line-height: 1.6;';
+    panel.appendChild(description);
+
+    const features = document.createElement('ul');
+    features.style.cssText = 'list-style: none; padding: 0; margin: 0 0 30px 0; text-align: left; width: 100%;';
+    const featureItems = [
+      '🔍 Browse all universes',
+      '🪐 Join existing planets',
+      '🌍 Create planets in any universe',
+      '👥 Play with other deities',
+    ];
+    for (const item of featureItems) {
+      const li = document.createElement('li');
+      li.textContent = item;
+      li.style.cssText = 'padding: 8px 0; font-size: 14px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.1);';
+      features.appendChild(li);
+    }
+    panel.appendChild(features);
+
+    const joinButton = document.createElement('button');
+    joinButton.textContent = '🌌 Browse Universes';
+    joinButton.style.cssText = `
+      padding: 18px 35px;
+      font-size: 18px;
+      font-family: monospace;
+      font-weight: bold;
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+    `;
+    joinButton.onmouseover = () => {
+      joinButton.style.transform = 'translateY(-2px)';
+      joinButton.style.boxShadow = '0 8px 25px rgba(255, 152, 0, 0.4)';
+    };
+    joinButton.onmouseout = () => {
+      joinButton.style.transform = 'translateY(0)';
+      joinButton.style.boxShadow = 'none';
+    };
+    joinButton.onclick = () => this.showUniverseGallery();
+    panel.appendChild(joinButton);
+
+    return panel;
+  }
+
+  private async showUniverseGallery(): Promise<void> {
+    this.hide();
+
+    const galleryScreen = new UniverseGalleryScreen('universe-gallery-screen', {
+      onSelectUniverse: (universeId: string) => {
+        galleryScreen.hide();
+        this.showPlanetList(universeId);
+      },
+      onCreateUniverse: async () => {
+        galleryScreen.hide();
+        // Launch cosmic creation flow, then return to gallery with new universe
+        const manager = new CosmicHubManager(createLocalStorageCallbacks());
+        try {
+          const cosmicConfig = await manager.showAndWaitForGameStart();
+          if (this._onSelect) {
+            this._onSelect({ action: 'cosmic_start', cosmicConfig });
+          }
+        } catch (error) {
+          console.error('[UniverseBrowser] Cosmic creation cancelled:', error);
+          galleryScreen.show();
+        } finally {
+          manager.destroy();
+        }
+      },
+      onBack: () => {
+        galleryScreen.hide();
+        galleryScreen.destroy();
+        this.show(this._onSelect!);
+      },
+    });
+
+    await galleryScreen.show();
+  }
+
+  private async showPlanetList(universeId: string): Promise<void> {
+    // Fetch universe name for display
+    let universeName = 'Unknown Universe';
+    try {
+      const response = await fetch(`http://localhost:3001/api/multiverse/universe/${universeId}`);
+      if (response.ok) {
+        const data = await response.json();
+        universeName = data.universe?.name || 'Unknown Universe';
+      }
+    } catch {
+      // Use default name
+    }
+
+    const planetScreen = new PlanetListScreen('planet-list-screen', {
+      onJoinPlanet: (planetId: string) => {
+        planetScreen.hide();
+        planetScreen.destroy();
+        if (this._onSelect) {
+          this._onSelect({ action: 'join_universe', universeId, planetId });
+        }
+      },
+      onCreatePlanet: (uId: string) => {
+        planetScreen.hide();
+        planetScreen.destroy();
+        this.showLivePlanetCreation(uId, universeName);
+      },
+      onBack: () => {
+        planetScreen.hide();
+        planetScreen.destroy();
+        this.showUniverseGallery();
+      },
+    });
+
+    await planetScreen.show(universeId);
+  }
+
+  private showLivePlanetCreation(universeId: string, universeName: string): void {
+    const creationScreen = new LivePlanetCreationScreen('live-planet-creation-screen', {
+      onPlanetReady: (planetId: string) => {
+        creationScreen.hide();
+        creationScreen.destroy();
+        if (this._onSelect) {
+          this._onSelect({ action: 'join_universe', universeId, planetId });
+        }
+      },
+      onCancel: () => {
+        creationScreen.hide();
+        creationScreen.destroy();
+        this.showPlanetList(universeId);
+      },
+    });
+
+    creationScreen.show(universeId, universeName);
+  }
+
   private renderCreateNewPanel(): HTMLElement {
     const panel = document.createElement('div');
     panel.style.cssText = `
-      flex: 0 0 350px;
+      flex: 0 0 320px;
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
       border: 2px solid rgba(102, 126, 234, 0.5);
       border-radius: 16px;
@@ -283,17 +454,17 @@ export class UniverseBrowserScreen {
     panel.appendChild(header);
 
     const description = document.createElement('p');
-    description.textContent = 'Begin a fresh journey. Configure magic systems, choose your starting scenario, and birth new souls.';
+    description.textContent = 'Shape the cosmos from the void. Create universes with unique magic laws, then populate them with planets where life can evolve.';
     description.style.cssText = 'margin: 0 0 30px 0; font-size: 14px; color: #aaa; text-align: center; line-height: 1.6;';
     panel.appendChild(description);
 
     const features = document.createElement('ul');
     features.style.cssText = 'list-style: none; padding: 0; margin: 0 0 30px 0; text-align: left; width: 100%;';
     const featureItems = [
-      '🎭 Choose magic paradigm',
-      '📖 Select starting scenario',
-      '👥 Create initial souls',
-      '🌍 Generate unique world',
+      '🌌 Create universes with magic laws',
+      '⚖️ Spawn cosmic deities (Fates, Death)',
+      '🪐 Design planets with unique biospheres',
+      '👁️ Become a deity and guide mortals',
     ];
     for (const item of featureItems) {
       const li = document.createElement('li');
@@ -304,7 +475,7 @@ export class UniverseBrowserScreen {
     panel.appendChild(features);
 
     const createButton = document.createElement('button');
-    createButton.textContent = '🚀 Create New Universe';
+    createButton.textContent = '✨ Enter the Cosmic Void';
     createButton.style.cssText = `
       padding: 18px 35px;
       font-size: 18px;
@@ -326,10 +497,21 @@ export class UniverseBrowserScreen {
       createButton.style.transform = 'translateY(0)';
       createButton.style.boxShadow = 'none';
     };
-    createButton.onclick = () => {
+    createButton.onclick = async () => {
       if (this._onSelect) {
         this.hide();
-        this._onSelect({ action: 'create_new' });
+        // Launch the cosmic creation flow
+        const manager = new CosmicHubManager(createLocalStorageCallbacks());
+        try {
+          const cosmicConfig = await manager.showAndWaitForGameStart();
+          this._onSelect({ action: 'cosmic_start', cosmicConfig });
+        } catch (error) {
+          console.error('[UniverseBrowser] Cosmic creation cancelled or failed:', error);
+          // Return to browser screen
+          this.show(this._onSelect);
+        } finally {
+          manager.destroy();
+        }
       }
     };
     panel.appendChild(createButton);

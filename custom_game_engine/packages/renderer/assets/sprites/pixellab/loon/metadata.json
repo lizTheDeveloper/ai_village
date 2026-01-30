@@ -2,8 +2,9 @@
   "id": "loon",
   "category": "objects",
   "size": 48,
-  "description": "common loon with black and white checkered back, red eye, pixel art, game sprite, 48x48",
+  "description": "loon",
   "original_description": "common loon with black and white checkered back, red eye, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:47:51.876Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.616Z"
 }

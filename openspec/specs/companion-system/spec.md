@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The Ophanim Companion is a celestial guide that helps players navigate AI Village's complexity through a relationship-driven tutorial system with evolving emotions, memories, and personality.
+
 ## Overview
 
 The Ophanim Companion is a celestial wheel-angel entity that serves as the player's guide, advisor, and friend throughout their journey in AI Village. Ae is not just a tutorial system—ae is a fully realized character with aer own emotions, memories, needs, and evolving relationship with the player.

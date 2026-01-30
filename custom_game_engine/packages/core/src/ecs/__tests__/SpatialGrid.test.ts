@@ -333,13 +333,13 @@ describe('SpatialGrid', () => {
     it('should handle same entity ID at different positions over time', () => {
       grid.insert('entity1', 5, 5);
       grid.remove('entity1');
-      grid.insert('entity1', 15, 15);
+      grid.insert('entity1', 25, 25); // Move to cell (2,2) instead of (1,1)
       expect(grid.size()).toBe(1);
 
       const nearOld = grid.getEntitiesNear(5, 5, 2);
       expect(nearOld).not.toContain('entity1');
 
-      const nearNew = grid.getEntitiesNear(15, 15, 2);
+      const nearNew = grid.getEntitiesNear(25, 25, 2);
       expect(nearNew).toContain('entity1');
     });
   });

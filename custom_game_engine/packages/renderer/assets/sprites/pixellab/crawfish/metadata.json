@@ -2,8 +2,9 @@
   "id": "crawfish",
   "category": "objects",
   "size": 48,
-  "description": "red crawfish with segmented body, small claws, pixel art, game sprite, 48x48",
+  "description": "crawfish",
   "original_description": "red crawfish with segmented body, small claws, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:12:11.465Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.579Z"
 }

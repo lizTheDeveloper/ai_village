@@ -2,8 +2,9 @@
   "id": "lemur",
   "category": "objects",
   "size": 48,
-  "description": "ring-tailed lemur with grey fur, striped black and white tail, pixel art, game sprite, 48x48",
+  "description": "lemur",
   "original_description": "ring-tailed lemur with grey fur, striped black and white tail, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:55:22.112Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.615Z"
 }

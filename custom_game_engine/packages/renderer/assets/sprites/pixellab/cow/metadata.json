@@ -2,6 +2,8 @@
   "id": "cow",
   "category": "animals.livestock",
   "size": 32,
-  "description": "Large dairy cow, brown and white spotted hide, standing pose, top-down farm animal",
-  "generated_at": "2026-01-04T21:23:36.215Z"
+  "description": "cow, large bovine with spotted or solid coat, sturdy build, gentle eyes, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
+  "generated_at": "2026-01-04T21:23:36.215Z",
+  "original_description": "Large dairy cow, brown and white spotted hide, standing pose, top-down farm animal",
+  "enriched_at": "2026-01-30T00:40:22.578Z"
 }

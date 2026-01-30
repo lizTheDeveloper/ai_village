@@ -2,8 +2,9 @@
   "id": "manta_ray",
   "category": "objects",
   "size": 48,
-  "description": "manta ray with wide flat body, horn-like fins, pixel art, game sprite, 48x48",
+  "description": "ray manta",
   "original_description": "manta ray with wide flat body, horn-like fins, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:08:19.088Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.618Z"
 }

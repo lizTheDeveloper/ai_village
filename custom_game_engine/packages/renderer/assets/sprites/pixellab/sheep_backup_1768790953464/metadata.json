@@ -2,6 +2,8 @@
   "id": "sheep",
   "category": "animals.livestock",
   "size": 32,
-  "description": "Woolly sheep, white fluffy wool coat, black face, standing pose, top-down farm animal",
-  "generated_at": "2026-01-04T21:23:55.731Z"
+  "description": "sheep, woolly sheep with fluffy white coat, gentle face, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
+  "generated_at": "2026-01-04T21:23:55.731Z",
+  "original_description": "Woolly sheep, white fluffy wool coat, black face, standing pose, top-down farm animal",
+  "enriched_at": "2026-01-30T00:40:22.645Z"
 }

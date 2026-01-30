@@ -2,7 +2,7 @@
   "id": "tree_oak_large",
   "category": "regeneration",
   "size": 48,
-  "description": "Large oak tree with full green canopy, thick trunk, top-down view",
+  "description": "oak large tree",
   "generated_at": "2026-01-05T01:43:19.274Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "Large oak tree with full green canopy, thick trunk, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.664Z"
 }

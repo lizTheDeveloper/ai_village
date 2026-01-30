@@ -2,8 +2,9 @@
   "id": "eel",
   "category": "objects",
   "size": 48,
-  "description": "moray eel with green mottled body, gaping mouth, pixel art, game sprite, 48x48",
+  "description": "eel",
   "original_description": "moray eel with green mottled body, gaping mouth, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:10:15.693Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.588Z"
 }

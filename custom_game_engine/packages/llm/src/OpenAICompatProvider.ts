@@ -30,6 +30,7 @@ export class OpenAICompatProvider implements LLMProvider {
   private profile: ModelProfile | null = null;
   private discoveredCapabilities: DiscoveredCapabilities | null = null;
   private needsDiscovery: boolean = false;
+  private isDiscoveringCapabilities: boolean = false; // Prevents infinite recursion during probing
 
   // Shared file logger instance for all providers
   private static fileLogger: LLMRequestFileLogger = new LLMRequestFileLogger();
@@ -136,11 +137,22 @@ export class OpenAICompatProvider implements LLMProvider {
    * Ensure capabilities are known (run discovery if needed)
    */
   private async ensureCapabilitiesKnown(): Promise<void> {
+    // Skip if we're already discovering capabilities (prevents infinite recursion)
+    // This happens when probing calls generate() which would call ensureCapabilitiesKnown() again
+    if (this.isDiscoveringCapabilities) {
+      return;
+    }
+
     if (this.needsDiscovery && !this.discoveredCapabilities) {
-      this.discoveredCapabilities = await modelCapabilityDiscovery.getOrDiscoverCapabilities(
-        this,
-        this.model
-      );
+      this.isDiscoveringCapabilities = true;
+      try {
+        this.discoveredCapabilities = await modelCapabilityDiscovery.getOrDiscoverCapabilities(
+          this,
+          this.model
+        );
+      } finally {
+        this.isDiscoveringCapabilities = false;
+      }
     }
   }
 

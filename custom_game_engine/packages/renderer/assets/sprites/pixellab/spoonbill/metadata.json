@@ -2,8 +2,9 @@
   "id": "spoonbill",
   "category": "objects",
   "size": 48,
-  "description": "roseate spoonbill with pink plumage, spoon-shaped bill, pixel art, game sprite, 48x48",
+  "description": "spoonbill",
   "original_description": "roseate spoonbill with pink plumage, spoon-shaped bill, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:21:52.828Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.654Z"
 }

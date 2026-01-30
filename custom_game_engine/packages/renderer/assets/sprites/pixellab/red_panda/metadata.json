@@ -2,8 +2,9 @@
   "id": "red_panda",
   "category": "objects",
   "size": 48,
-  "description": "red panda with rusty fur, ringed tail, white face markings, pixel art, game sprite, 48x48",
+  "description": "panda red",
   "original_description": "red panda with rusty fur, ringed tail, white face markings, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:50:11.649Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.638Z"
 }

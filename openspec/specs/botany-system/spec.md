@@ -5,6 +5,10 @@
 > **Status:** In Progress
 > **Last Updated:** 2026-01-02
 
+## Purpose
+
+Procedural herbal system where latitude, biome, and soil affect plant distribution and medicinal chemotypes.
+
 ## Overview
 
 Procedural herbal system where latitude, biome, and soil affect plant distribution and medicinal properties. Same species in different regions produces different chemotypes (chemical variations). Includes aquatic ecosystems with depth-based zonation.
@@ -13,7 +17,7 @@ Procedural herbal system where latitude, biome, and soil affect plant distributi
 
 ## Core Requirements
 
-### Requirement 1: Latitudinal Flora Distribution
+### Requirement: Latitudinal Flora Distribution
 
 Plants distribute by latitude zones:
 - **Polar** (60°-90°) - Lichen, moss, dwarf shrubs, 2-3 month growing season
@@ -24,7 +28,7 @@ Plants distribute by latitude zones:
 
 Temperature modifier calculated from latitude using cosine distribution (warmest at equator, coldest at poles).
 
-### Requirement 2: Biome-Specific Herbology
+### Requirement: Biome-Specific Herbology
 
 Each biome has unique medicinal plants:
 - **Forest Understory** - Shade-tolerant, nurse log dependent, mycorrhizal partners (Shadowcap mushroom)
@@ -32,7 +36,7 @@ Each biome has unique medicinal plants:
 - **Wetland** - Flood-tolerant, aerenchyma tissue, high tannins (Swamp Willow)
 - **Desert** - CAM photosynthesis, water storage, volatile oils, long seed dormancy (Desert Sage)
 
-### Requirement 3: Aquatic Ecosystems
+### Requirement: Aquatic Ecosystems
 
 Depth-based plant zonation:
 - **Emergent Zone** (0-1 tiles) - Stems in water, leaves in air (Reeds, Cattails)
@@ -42,7 +46,7 @@ Depth-based plant zonation:
 
 Salinity tolerance: freshwater, brackish, marine.
 
-### Requirement 4: Regional Chemotypes
+### Requirement: Regional Chemotypes
 
 Same species, different soil → different medicinal properties:
 - **Mountain Chamomile** - Volcanic soil → high anti-inflammatory

@@ -3,7 +3,9 @@
   "category": "humanoids",
   "type": "character",
   "size": 48,
-  "description": "Compound Eyes humanoid character, simple clothing, pixel art",
+  "description": "eyes default compound",
   "generated_at": "2026-01-03T22:09:31.132Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Compound Eyes humanoid character, simple clothing, pixel art",
+  "enriched_at": "2026-01-30T00:40:22.576Z"
 }

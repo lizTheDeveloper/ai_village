@@ -148,6 +148,11 @@ import {
 
 // Admin module for unified dashboard
 import { createAdminRouter } from '../packages/core/src/admin/index.js';
+import {
+  buildEnrichedSpriteRequest,
+  ART_STYLE_PROMPTS,
+  parseSpriteId,
+} from './sprite-description-builder.js';
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
@@ -8292,8 +8297,30 @@ ENDPOINTS:
     return;
   }
 
+  // Get available art styles for sprite generation
+  if (pathname === '/api/pixellab/art-styles' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Return art styles with display-friendly info
+    const styles = Object.entries(ART_STYLE_PROMPTS).map(([key, config]) => ({
+      id: key,
+      era: config.era,
+      description: config.prompt.split(',')[0], // First part of prompt as short description
+      size: config.size,
+      shading: config.shadingStyle,
+      outline: config.outlineStyle,
+    }));
+
+    res.end(JSON.stringify({
+      styles,
+      default: 'snes',
+    }));
+    return;
+  }
+
   // CORS preflight for pixellab endpoints
-  if ((pathname === '/api/pixellab/regenerate' || pathname === '/api/pixellab/clear-queue' || pathname === '/api/pixellab/animation' || pathname.startsWith('/api/pixellab/daemon/')) && req.method === 'OPTIONS') {
+  if ((pathname === '/api/pixellab/regenerate' || pathname === '/api/pixellab/clear-queue' || pathname === '/api/pixellab/animation' || pathname === '/api/pixellab/art-styles' || pathname.startsWith('/api/pixellab/daemon/')) && req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'content-type, Content-Type');
@@ -8302,7 +8329,7 @@ ENDPOINTS:
     return;
   }
 
-  // Regenerate sprite (version old folder, queue new generation)
+  // Regenerate sprite (version old folder, queue new generation with rich description)
   if (pathname === '/api/pixellab/regenerate' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -8314,7 +8341,7 @@ ENDPOINTS:
 
     req.on('end', () => {
       try {
-        const { folderId, description } = JSON.parse(body);
+        const { folderId, description, artStyle, biome, category, customDetails } = JSON.parse(body);
 
         if (!folderId) {
           res.statusCode = 400;
@@ -8331,15 +8358,33 @@ ENDPOINTS:
           return;
         }
 
-        // Get existing metadata for description if not provided
+        // Build enriched sprite request with art style
+        // If artStyle is provided, use the rich description builder
+        // Otherwise fall back to provided description or metadata
         let spriteDescription = description;
-        const metadataPath = path.join(folderPath, 'metadata.json');
-        if (!spriteDescription && fs.existsSync(metadataPath)) {
-          try {
-            const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
-            spriteDescription = metadata.description;
-          } catch {
-            // Ignore
+        let spriteTraits: Record<string, unknown> = {};
+
+        if (artStyle) {
+          // Use the rich description builder
+          const enrichedRequest = buildEnrichedSpriteRequest(folderId, artStyle, {
+            biome,
+            category,
+            customDetails,
+          });
+          spriteDescription = enrichedRequest.description;
+          spriteTraits = enrichedRequest.traits;
+          console.log(`[Regenerate] Using art style '${artStyle}' for ${folderId}`);
+          console.log(`[Regenerate] Rich description: ${spriteDescription}`);
+        } else {
+          // Fall back to provided description or metadata
+          const metadataPath = path.join(folderPath, 'metadata.json');
+          if (!spriteDescription && fs.existsSync(metadataPath)) {
+            try {
+              const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+              spriteDescription = metadata.description;
+            } catch {
+              // Ignore
+            }
           }
         }
 
@@ -8365,14 +8410,16 @@ ENDPOINTS:
         const versionedPath = path.join(SPRITES_DIR, versionedName);
         fs.renameSync(folderPath, versionedPath);
 
-        // Queue new generation with original folderId
-        queueSpriteGeneration(folderId, spriteDescription, {});
+        // Queue new generation with enriched description and traits
+        queueSpriteGeneration(folderId, spriteDescription, spriteTraits);
 
         res.end(JSON.stringify({
           success: true,
           versionedAs: versionedName,
           queuedNew: folderId,
-          message: `Old version saved as ${versionedName}, new generation queued`,
+          artStyle: artStyle || 'default',
+          description: spriteDescription,
+          message: `Old version saved as ${versionedName}, new generation queued with ${artStyle ? `art style '${artStyle}'` : 'default description'}`,
         }));
       } catch (error) {
         res.statusCode = 500;

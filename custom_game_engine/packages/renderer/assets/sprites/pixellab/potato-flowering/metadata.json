@@ -2,8 +2,9 @@
   "id": "potato-flowering",
   "category": "objects",
   "size": 48,
-  "description": "Potato plant with white or purple flowers blooming above green foliage, pixel art, top-down view, transparent background",
+  "description": "potato-flowering",
   "original_description": "Potato plant with white or purple flowers blooming above green foliage, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:27:47.621Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.633Z"
 }

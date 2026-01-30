@@ -2,6 +2,8 @@
   "id": "bush_berry",
   "category": "map_objects",
   "size": 32,
-  "description": "Green bush with red berries, top-down view",
-  "generated_at": "2026-01-04T21:33:26.613Z"
+  "description": "berry bush",
+  "generated_at": "2026-01-04T21:33:26.613Z",
+  "original_description": "Green bush with red berries, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.552Z"
 }

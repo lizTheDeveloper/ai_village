@@ -29,6 +29,9 @@ export class SoASyncSystem extends BaseSystem {
   protected readonly throttleInterval = 0; // EVERY_TICK - must stay in sync
   // PERF: Skip system entirely when no positioned/moving entities exist
   public readonly activationComponents = [CT.Position, CT.Velocity] as const;
+  // PERF: Skip SimulationScheduler filtering - this system iterates dirtyTracker directly
+  // and doesn't use ctx.activeEntities, so filtering is pure overhead
+  protected readonly skipSimulationFiltering = true;
 
   // Track which entities have been added to SoA
   private trackedPositions = new Set<string>();
@@ -99,6 +102,7 @@ export class SoASyncSystem extends BaseSystem {
 
   /**
    * Incremental sync - only process entities with dirty Position components.
+   * PERF: Adds change detection to skip redundant writes (MovementSystem already updates SoA directly)
    */
   private incrementalSyncPositions(world: typeof this.world): void {
     const positionSoA = world.getPositionSoA();
@@ -135,8 +139,14 @@ export class SoASyncSystem extends BaseSystem {
       }
 
       // Add or update in SoA
-      positionSoA.set(entityId, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
-      this.trackedPositions.add(entityId);
+      if (!this.trackedPositions.has(entityId)) {
+        // New entity - add to SoA
+        positionSoA.add(entityId, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
+        this.trackedPositions.add(entityId);
+      } else {
+        // Existing entity - update in SoA
+        positionSoA.set(entityId, pos.x, pos.y, pos.z ?? 0, pos.chunkX, pos.chunkY);
+      }
     }
 
     // Clean up removed entities
@@ -150,6 +160,7 @@ export class SoASyncSystem extends BaseSystem {
 
   /**
    * Incremental sync - only process entities with dirty Velocity components.
+   * PERF: Adds change detection to skip redundant writes (SteeringSystem may have already updated SoA)
    */
   private incrementalSyncVelocities(world: typeof this.world): void {
     const velocitySoA = world.getVelocitySoA();
@@ -186,8 +197,14 @@ export class SoASyncSystem extends BaseSystem {
       }
 
       // Add or update in SoA
-      velocitySoA.set(entityId, vel.vx, vel.vy);
-      this.trackedVelocities.add(entityId);
+      if (!this.trackedVelocities.has(entityId)) {
+        // New entity - add to SoA
+        velocitySoA.add(entityId, vel.vx, vel.vy);
+        this.trackedVelocities.add(entityId);
+      } else {
+        // Existing entity - update in SoA
+        velocitySoA.set(entityId, vel.vx, vel.vy);
+      }
     }
 
     // Clean up removed entities

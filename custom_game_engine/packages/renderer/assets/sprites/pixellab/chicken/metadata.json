@@ -1,7 +1,7 @@
 {
   "id": "chicken",
   "base_species": "chicken",
-  "description": "white chicken",
+  "description": "chicken, plump hen with red comb, feathered body, scratching feet, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
   "size": 48,
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "east",
     "southeast"
   ],
-  "regenerated_at": "2026-01-19T02:41:25.238Z"
+  "regenerated_at": "2026-01-19T02:41:25.238Z",
+  "original_description": "white chicken",
+  "enriched_at": "2026-01-30T00:40:22.566Z"
 }

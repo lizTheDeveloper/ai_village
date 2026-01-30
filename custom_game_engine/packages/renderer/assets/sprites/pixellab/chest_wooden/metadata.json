@@ -2,6 +2,8 @@
   "id": "chest_wooden",
   "category": "map_objects",
   "size": 32,
-  "description": "Wooden treasure chest with iron bands, top-down view",
-  "generated_at": "2026-01-04T21:33:47.460Z"
+  "description": "wooden chest",
+  "generated_at": "2026-01-04T21:33:47.460Z",
+  "original_description": "Wooden treasure chest with iron bands, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.566Z"
 }

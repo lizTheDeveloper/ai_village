@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+Avatars are physical embodiments that agents "jack in" to, allowing persistent identity across multiple game worlds and bodies.
+
 ## Overview
 
 Avatars are the physical embodiments of AI agents within game worlds. Agents are disembodied decision-makers that "jack in" to avatars to interact with a game. This separation allows agents to persist across game sessions, switch between multiple bodies, and transit between different game worlds while maintaining their identity, memories, and skills.
@@ -474,108 +478,101 @@ const AVATAR_ACTIONS: ActionDef[] = [
 
 ## Requirements
 
-### REQ-AVT-001: Avatar State Management
+### Requirement: Avatar State Management
 
-```
-WHEN an avatar's state changes
-THEN the AvatarSystem SHALL:
-  1. Validate the state transition is legal
-  2. Update avatar state atomically
-  3. Trigger appropriate callbacks (onJackIn, onJackOut, onDeath)
-  4. Persist state to storage
-  5. Notify any observers (game UI, other systems)
-```
+#### Scenario: Avatar state changes
+- **WHEN** an avatar's state changes
+- **THEN** the AvatarSystem SHALL:
+  - Validate the state transition is legal
+  - Update avatar state atomically
+  - Trigger appropriate callbacks (onJackIn, onJackOut, onDeath)
+  - Persist state to storage
+  - Notify any observers (game UI, other systems)
 
-### REQ-AVT-002: Jack-In Process
+### Requirement: Jack-In Process
 
-```
-WHEN an agent calls jackIn(avatarId)
-THEN the AvatarSystem SHALL:
-  1. Verify agent is not already jacked into another avatar
-  2. Verify avatar is in UNBOUND or DORMANT state
-  3. Apply any skill bonuses from agent to avatar
-  4. Set avatar state to BOUND
-  5. Set avatar.boundAgentId to agent.id
-  6. Return initial observation from avatar's perspective
-  7. Begin routing agent actions to this avatar
-```
+#### Scenario: Agent jacks in to avatar
+- **WHEN** an agent calls jackIn(avatarId)
+- **THEN** the AvatarSystem SHALL:
+  - Verify agent is not already jacked into another avatar
+  - Verify avatar is in UNBOUND or DORMANT state
+  - Apply any skill bonuses from agent to avatar
+  - Set avatar state to BOUND
+  - Set avatar.boundAgentId to agent.id
+  - Return initial observation from avatar's perspective
+  - Begin routing agent actions to this avatar
 
-### REQ-AVT-003: Jack-Out Process
+### Requirement: Jack-Out Process
 
-```
-WHEN an agent calls jackOut(mode)
-THEN the AvatarSystem SHALL:
-  1. Verify agent is currently jacked in
-  2. Verify avatar is in a safe state for jack-out
-  3. Calculate session statistics
-  4. Set avatar state based on mode:
-     - "dormant": DORMANT (avatar stays in world, sleeping)
-     - "suspend": SUSPENDED (avatar frozen, invisible)
-     - "despawn": DESTROYED (avatar removed)
-  5. Clear avatar.boundAgentId
-  6. Return session stats to agent
-  7. Stop routing actions to this avatar
-```
+#### Scenario: Agent jacks out of avatar
+- **WHEN** an agent calls jackOut(mode)
+- **THEN** the AvatarSystem SHALL:
+  - Verify agent is currently jacked in
+  - Verify avatar is in a safe state for jack-out
+  - Calculate session statistics
+  - Set avatar state based on mode:
+    - "dormant": DORMANT (avatar stays in world, sleeping)
+    - "suspend": SUSPENDED (avatar frozen, invisible)
+    - "despawn": DESTROYED (avatar removed)
+  - Clear avatar.boundAgentId
+  - Return session stats to agent
+  - Stop routing actions to this avatar
 
-### REQ-AVT-004: Death Handling
+### Requirement: Death Handling
 
-```
-WHEN an avatar's health reaches 0
-THEN the AvatarSystem SHALL:
-  1. Trigger onDeath callback
-  2. Create DeathEvent with cause and consequences
-  3. Apply death penalties (drop items, lose XP, etc.)
-  4. Set avatar state to DESTROYED
-  5. Unbind any controlling agent
-  6. Present respawn options to agent
-  7. Start auto-respawn timer if configured
-```
+#### Scenario: Avatar health reaches zero
+- **WHEN** an avatar's health reaches 0
+- **THEN** the AvatarSystem SHALL:
+  - Trigger onDeath callback
+  - Create DeathEvent with cause and consequences
+  - Apply death penalties (drop items, lose XP, etc.)
+  - Set avatar state to DESTROYED
+  - Unbind any controlling agent
+  - Present respawn options to agent
+  - Start auto-respawn timer if configured
 
-### REQ-AVT-005: Respawn Process
+### Requirement: Respawn Process
 
-```
-WHEN an agent selects a respawn option
-THEN the AvatarSystem SHALL:
-  1. Verify the option is valid and available
-  2. Apply any costs (currency, resources)
-  3. Apply respawn penalties
-  4. Either:
-     a. Restore existing avatar at respawn location, OR
-     b. Create new avatar if previous was fully destroyed
-  5. Set avatar health to respawn amount (often partial)
-  6. Apply any respawn debuffs
-  7. Jack agent into the avatar
-  8. Return initial observation
-```
+#### Scenario: Agent selects respawn option
+- **WHEN** an agent selects a respawn option
+- **THEN** the AvatarSystem SHALL:
+  - Verify the option is valid and available
+  - Apply any costs (currency, resources)
+  - Apply respawn penalties
+  - Either:
+    - Restore existing avatar at respawn location, OR
+    - Create new avatar if previous was fully destroyed
+  - Set avatar health to respawn amount (often partial)
+  - Apply any respawn debuffs
+  - Jack agent into the avatar
+  - Return initial observation
 
-### REQ-AVT-006: Multi-Avatar Management
+### Requirement: Multi-Avatar Management
 
-```
-WHEN an agent has multiple avatars in a game
-THEN the AvatarSystem SHALL:
-  1. Maintain roster of all avatars
-  2. Enforce game's max avatar limit
-  3. Only allow one BOUND avatar at a time
-  4. Allow switching between avatars via jack-out/jack-in
-  5. Track per-avatar statistics separately
-  6. Allow dormant avatars to be affected by world events
-```
+#### Scenario: Agent has multiple avatars in game
+- **WHEN** an agent has multiple avatars in a game
+- **THEN** the AvatarSystem SHALL:
+  - Maintain roster of all avatars
+  - Enforce game's max avatar limit
+  - Only allow one BOUND avatar at a time
+  - Allow switching between avatars via jack-out/jack-in
+  - Track per-avatar statistics separately
+  - Allow dormant avatars to be affected by world events
 
-### REQ-AVT-007: Dormant Avatar Behavior
+### Requirement: Dormant Avatar Behavior
 
-```
-WHEN an avatar is in DORMANT state
-THEN the game world SHALL:
-  1. Keep avatar physically present in world
-  2. Make avatar visible to other entities
-  3. Allow avatar to be affected by:
-     - Environmental damage (if exposed)
-     - Other entities' actions
-     - Time-based effects
-  4. NOT allow avatar to take actions
-  5. Protect from trivial damage (optional safe zones)
-  6. Wake avatar if critically threatened (optional)
-```
+#### Scenario: Avatar is dormant
+- **WHEN** an avatar is in DORMANT state
+- **THEN** the game world SHALL:
+  - Keep avatar physically present in world
+  - Make avatar visible to other entities
+  - Allow avatar to be affected by:
+    - Environmental damage (if exposed)
+    - Other entities' actions
+    - Time-based effects
+  - NOT allow avatar to take actions
+  - Protect from trivial damage (optional safe zones)
+  - Wake avatar if critically threatened (optional)
 
 ---
 

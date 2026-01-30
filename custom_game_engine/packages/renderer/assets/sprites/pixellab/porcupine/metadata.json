@@ -2,8 +2,9 @@
   "id": "porcupine",
   "category": "objects",
   "size": 48,
-  "description": "north american porcupine with black quills, small face, pixel art, game sprite, 48x48",
+  "description": "porcupine",
   "original_description": "north american porcupine with black quills, small face, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:48:00.794Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.633Z"
 }

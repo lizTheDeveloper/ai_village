@@ -2,8 +2,9 @@
   "id": "stingray",
   "category": "objects",
   "size": 48,
-  "description": "southern stingray with flat disc body, whip tail, pixel art, game sprite, 48x48",
+  "description": "stingray",
   "original_description": "southern stingray with flat disc body, whip tail, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:08:35.493Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.654Z"
 }

@@ -2,8 +2,9 @@
   "id": "aardvark",
   "category": "objects",
   "size": 48,
-  "description": "aardvark with pig-like body, long ears, tubular snout, pixel art, game sprite, 48x48",
+  "description": "aardvark",
   "original_description": "aardvark with pig-like body, long ears, tubular snout, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:02:57.428Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.537Z"
 }

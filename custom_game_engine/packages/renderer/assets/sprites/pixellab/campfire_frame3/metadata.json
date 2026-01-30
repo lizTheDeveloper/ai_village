@@ -2,6 +2,8 @@
   "id": "campfire_frame3",
   "category": "map_objects",
   "size": 48,
-  "description": "Animated campfire frame 3: tall flames at peak height, intense yellow-orange fire, smoke wisps, top-down view, 32x32",
-  "generated_at": "2026-01-04T22:12:50.655Z"
+  "description": "frame3 campfire",
+  "generated_at": "2026-01-04T22:12:50.655Z",
+  "original_description": "Animated campfire frame 3: tall flames at peak height, intense yellow-orange fire, smoke wisps, top-down view, 32x32",
+  "enriched_at": "2026-01-30T00:40:22.556Z"
 }

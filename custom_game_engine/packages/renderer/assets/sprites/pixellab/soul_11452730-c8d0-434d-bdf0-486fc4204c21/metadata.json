@@ -2,7 +2,7 @@
   "id": "soul_11452730-c8d0-434d-bdf0-486fc4204c21",
   "category": "animals",
   "size": 48,
-  "description": "human character named North",
+  "description": "11452730-c8d0-434d-bdf0-486fc4204c21 soul",
   "generated_at": "2026-01-05T02:00:10.432Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "human character named North",
+  "enriched_at": "2026-01-30T00:40:22.651Z"
 }

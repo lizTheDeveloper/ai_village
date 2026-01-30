@@ -2,8 +2,9 @@
   "id": "thistle-withered",
   "category": "objects",
   "size": 48,
-  "description": "Withered dead thistle with brown dried stalks and spines, pixel art, top-down view, transparent background",
+  "description": "thistle-withered",
   "original_description": "Withered dead thistle with brown dried stalks and spines, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:07:14.250Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.661Z"
 }

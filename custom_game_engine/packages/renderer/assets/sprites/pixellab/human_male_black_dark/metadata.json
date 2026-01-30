@@ -14,6 +14,18 @@
     "shading": "basic shading",
     "detail": "medium detail"
   },
-  "rotations": ["south", "south-west", "west", "north-west", "north", "north-east", "east", "south-east"],
-  "animations": {}
+  "rotations": [
+    "south",
+    "south-west",
+    "west",
+    "north-west",
+    "north",
+    "north-east",
+    "east",
+    "south-east"
+  ],
+  "animations": {},
+  "description": "male black dark human",
+  "enriched_at": "2026-01-30T00:40:22.608Z",
+  "original_description": "male black dark human, detailed pixels, rich 256-color palette, smooth gradient shading like Chrono Trigger or Secret of Mana, high top-down perspective, transparent background, pixel art"
 }

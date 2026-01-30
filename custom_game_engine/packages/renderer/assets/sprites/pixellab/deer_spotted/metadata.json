@@ -15,6 +15,8 @@
   "generated_at": "2026-01-05T11:09:07.297Z",
   "generation_method": "reference_workflow",
   "notes": "South first, east with south ref, west flipped from east, others with south ref",
-  "description": "spotted fawn",
-  "category": "animal"
+  "description": "spotted deer, graceful deer with slender legs, alert ears, doe eyes, wild untamed creature, alert natural posture, woodland earth tones, dappled sunlight, leaf-covered",
+  "category": "animal",
+  "original_description": "spotted fawn",
+  "enriched_at": "2026-01-30T00:40:22.582Z"
 }

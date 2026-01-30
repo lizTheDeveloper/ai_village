@@ -2,8 +2,9 @@
   "id": "owl_burrowing",
   "category": "objects",
   "size": 48,
-  "description": "burrowing owl with long legs, yellow eyes, pixel art, game sprite, 48x48",
+  "description": "burrowing owl, wise owl with large round eyes, rotating head, silent flight",
   "original_description": "burrowing owl with long legs, yellow eyes, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:38:05.975Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.628Z"
 }

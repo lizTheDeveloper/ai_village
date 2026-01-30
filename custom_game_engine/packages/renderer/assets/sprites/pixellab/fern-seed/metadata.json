@@ -2,8 +2,9 @@
   "id": "fern-seed",
   "category": "objects",
   "size": 48,
-  "description": "Fern spore on forest floor, tiny brown dot, pixel art, top-down view, transparent background",
+  "description": "fern-seed",
   "original_description": "Fern spore on forest floor, tiny brown dot, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:11:39.427Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.592Z"
 }

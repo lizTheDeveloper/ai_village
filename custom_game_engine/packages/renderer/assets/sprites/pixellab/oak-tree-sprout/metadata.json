@@ -2,8 +2,9 @@
   "id": "oak-tree-sprout",
   "category": "objects",
   "size": 48,
-  "description": "Young oak sapling with first lobed leaves, pixel art, top-down view, transparent background",
+  "description": "oak-tree-sprout",
   "original_description": "Young oak sapling with first lobed leaves, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:23:55.108Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.625Z"
 }

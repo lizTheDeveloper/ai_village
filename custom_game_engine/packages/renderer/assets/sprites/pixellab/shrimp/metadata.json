@@ -2,8 +2,9 @@
   "id": "shrimp",
   "category": "objects",
   "size": 48,
-  "description": "pink shrimp with segmented body, antennae, pixel art, game sprite, 48x48",
+  "description": "shrimp",
   "original_description": "pink shrimp with segmented body, antennae, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:11:36.917Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.648Z"
 }

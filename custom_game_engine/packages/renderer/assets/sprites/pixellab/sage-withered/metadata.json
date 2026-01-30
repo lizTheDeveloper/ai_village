@@ -2,8 +2,9 @@
   "id": "sage-withered",
   "category": "objects",
   "size": 48,
-  "description": "Withered dead sage with brown dried stems, pixel art, top-down view, transparent background",
+  "description": "sage-withered",
   "original_description": "Withered dead sage with brown dried stems, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:00:45.558Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.642Z"
 }

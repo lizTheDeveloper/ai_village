@@ -2,8 +2,9 @@
   "id": "grebe",
   "category": "objects",
   "size": 48,
-  "description": "pied-billed grebe with brown plumage, striped bill, pixel art, game sprite, 48x48",
+  "description": "grebe",
   "original_description": "pied-billed grebe with brown plumage, striped bill, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:25:02.439Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.603Z"
 }

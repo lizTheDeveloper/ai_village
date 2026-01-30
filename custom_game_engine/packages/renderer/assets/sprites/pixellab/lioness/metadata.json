@@ -2,8 +2,9 @@
   "id": "lioness",
   "category": "objects",
   "size": 48,
-  "description": "female lioness with tawny fur, muscular build, pixel art, game sprite, 48x48",
+  "description": "lioness",
   "original_description": "female lioness with tawny fur, muscular build, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:50:48.792Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.615Z"
 }

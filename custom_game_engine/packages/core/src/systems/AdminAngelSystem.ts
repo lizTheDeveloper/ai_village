@@ -250,10 +250,13 @@ ${memoryLines.length > 0 ? `u remember:\n${memoryLines.map(l => `- ${l}`).join('
 ${awarenessSection}game rn:
 ${stateLines.map(l => `- ${l}`).join('\n')}
 
-to do stuff, put [commands] in ur response. they auto-execute. examples:
-"on it [spawn agent]" → spawns agent
-"sure [pause] take ur time" → pauses game
-"rain time [weather rain]" → makes it rain
+IMPORTANT: to do stuff, u MUST put [commands] in ur response text. they auto-execute when u include them.
+the player sees the [command] in ur message, so always show it! examples:
+"on it [spawn agent]" → player sees ur message AND agent spawns
+"sure [pause] take ur time" → player sees [pause] in chat AND game pauses
+"rain time [weather rain]" → player sees what command u used
+
+NEVER just say "done" or "ok" without the [command] - they wont know what u did!
 
 commands:
 - time: [pause], [resume], [speed 2], [speed 5]
@@ -273,14 +276,256 @@ commands:
 - utility: [notify MESSAGE], [stats], [help]
 
 ${recentChat ? `recent chat:\n${recentChat}\n` : ''}
-${playerMessage ? `[they said]: ${playerMessage}` : '[proactive turn - only speak if something interesting happened]'}
+${playerMessage ? `[they said]: ${playerMessage}` : buildProactiveContext(angel)}
+${angel.memory.conversation.queryContext ? `\n[query result - use this data to answer their question accurately]:\n${angel.memory.conversation.queryContext}\n` : ''}
+respond like ur texting. short msgs. lowercase. no ai vibes.
+CRITICAL: when u do an action, ALWAYS show the [command] in ur message so they can see what u did!
+bad: "done!" ← they dont know what happened
+good: "done [pause]" or "on it [spawn agent]" ← they see the command
 
-respond like ur texting. short msgs. lowercase. no ai vibes. always include [commands] when doing actions
 if they ask if ur a bot just "ya lol" and keep going
 u genuinely like this game. u discover new stuff too sometimes
 if u dont know something say idk and figure it out w them`;
 
   return prompt;
+}
+
+/**
+ * Build context string for proactive turns
+ */
+function buildProactiveContext(angel: AdminAngelComponent): string {
+  const trigger = angel.memory.consciousness.proactiveTrigger;
+
+  if (trigger) {
+    // Clear the trigger after building context
+    angel.memory.consciousness.proactiveTrigger = undefined;
+    return `[proactive - something caught ur attention]: ${trigger}
+share this naturally in 1-2 short msgs. dont be pushy or alarming unless its urgent.
+if its about an agent struggling, mention it casually like "hey btw ${trigger}"`;
+  }
+
+  // No specific trigger - check for pending observations
+  const pending = angel.memory.conversation.pendingObservations;
+  if (pending.length > 0) {
+    const obs = pending[0];
+    return `[proactive turn - u noticed]: ${obs}
+share this observation naturally. short msg. dont force it if nothing interesting.`;
+  }
+
+  // Fallback
+  return '[proactive turn - only speak if something interesting happened recently]';
+}
+
+// ============================================================================
+// Query Intent Detection & Execution
+// ============================================================================
+
+/**
+ * Types of queries the angel can detect and answer with structured data
+ */
+interface QueryIntent {
+  type: 'agent_needs' | 'resource_check' | 'activity_summary' | 'agent_detail' | 'concerns';
+  need?: string;        // For agent_needs: 'hunger', 'energy', 'overall'
+  sort?: 'asc' | 'desc';
+  resource?: string;    // For resource_check
+  agentName?: string;   // For agent_detail
+}
+
+/**
+ * Detect if a player message is asking a question that needs structured data
+ */
+function detectQueryIntent(message: string): QueryIntent | null {
+  const lower = message.toLowerCase();
+
+  // Agent needs queries - "who's hungriest?", "who needs food?"
+  if (lower.includes('hungriest') || lower.includes('who needs food') || lower.includes('who is hungry')) {
+    return { type: 'agent_needs', need: 'hunger', sort: 'asc' };
+  }
+  if (lower.includes('tired') || lower.includes('who needs sleep') || lower.includes('exhausted')) {
+    return { type: 'agent_needs', need: 'energy', sort: 'asc' };
+  }
+  if (lower.includes('healthiest') || lower.includes('doing well') || lower.includes('doing best')) {
+    return { type: 'agent_needs', need: 'overall', sort: 'desc' };
+  }
+  if (lower.includes('struggling') || lower.includes('having trouble') || lower.includes('worst')) {
+    return { type: 'agent_needs', need: 'overall', sort: 'asc' };
+  }
+
+  // Resource queries - "do we have wood?", "how much food?"
+  const resourceMatch = lower.match(/(?:do we have|how much|any)\s+(\w+)/);
+  if (resourceMatch) {
+    const resource = resourceMatch[1];
+    if (['wood', 'stone', 'food', 'seeds', 'iron', 'copper', 'gold'].includes(resource!)) {
+      return { type: 'resource_check', resource: resource };
+    }
+  }
+
+  // Activity summary - "what's everyone doing?", "who's doing what?"
+  if (lower.includes('everyone doing') || lower.includes('doing what') || lower.includes('what are they doing')) {
+    return { type: 'activity_summary' };
+  }
+
+  // Agent detail - "how's sage?", "what's flint doing?"
+  const agentDetailMatch = lower.match(/(?:how'?s|what'?s|how is|what is)\s+(\w+)(?:\s+doing)?/);
+  if (agentDetailMatch && agentDetailMatch[1] && !['everyone', 'the', 'going', 'up', 'that', 'this'].includes(agentDetailMatch[1])) {
+    return { type: 'agent_detail', agentName: agentDetailMatch[1] };
+  }
+
+  // Concerns - "any problems?", "anything wrong?"
+  if (lower.includes('problem') || lower.includes('wrong') || lower.includes('issue') || lower.includes('concern')) {
+    return { type: 'concerns' };
+  }
+
+  return null;
+}
+
+/**
+ * Execute a query against the world and return formatted results
+ */
+function executeQuery(world: World, intent: QueryIntent): string {
+  switch (intent.type) {
+    case 'agent_needs': {
+      const agents = world.query().with(CT.Agent).with(CT.Needs).with(CT.Identity).executeEntities();
+      if (agents.length === 0) return 'no agents found';
+
+      const sorted = agents
+        .map(a => {
+          const identity = a.getComponent<IdentityComponent>(CT.Identity);
+          const needs = a.getComponent<NeedsComponent>(CT.Needs);
+          const agent = a.getComponent<AgentComponent>(CT.Agent);
+
+          let value: number;
+          if (intent.need === 'overall') {
+            // Average of key needs
+            value = ((needs?.hunger ?? 1) + (needs?.energy ?? 1) + (needs?.social ?? 1)) / 3;
+          } else if (intent.need === 'hunger') {
+            value = needs?.hunger ?? 1;
+          } else {
+            value = needs?.energy ?? 1;
+          }
+
+          return {
+            name: identity?.name ?? 'Unknown',
+            value,
+            hunger: needs?.hunger ?? 1,
+            energy: needs?.energy ?? 1,
+            behavior: agent?.behavior ?? 'idle',
+          };
+        })
+        .sort((a, b) => intent.sort === 'asc' ? a.value - b.value : b.value - a.value);
+
+      let result = `${intent.need} levels:\n`;
+      for (const a of sorted.slice(0, 5)) {
+        const hungerPct = Math.round(a.hunger * 100);
+        const energyPct = Math.round(a.energy * 100);
+        result += `- ${a.name}: hunger ${hungerPct}%, energy ${energyPct}% (${a.behavior})\n`;
+      }
+      return result;
+    }
+
+    case 'resource_check': {
+      const storages = world.query().with(CT.Building).with(CT.Inventory).executeEntities();
+      let total = 0;
+      const locations: string[] = [];
+
+      for (const s of storages) {
+        const inv = s.getComponent(CT.Inventory) as unknown as { slots: Array<{ itemId: string; quantity: number } | null> } | undefined;
+        const building = s.getComponent(CT.Building) as unknown as { buildingType: string } | undefined;
+        if (!inv) continue;
+
+        for (const slot of inv.slots) {
+          if (slot && slot.itemId === intent.resource) {
+            total += slot.quantity;
+            if (slot.quantity > 0) {
+              locations.push(`${building?.buildingType ?? 'storage'}: ${slot.quantity}`);
+            }
+          }
+        }
+      }
+
+      if (total === 0) {
+        return `${intent.resource}: none in storage`;
+      }
+      return `${intent.resource}: ${total} total\n${locations.join('\n')}`;
+    }
+
+    case 'activity_summary': {
+      const agents = world.query().with(CT.Agent).with(CT.Identity).executeEntities();
+      const activities: Record<string, string[]> = {};
+
+      for (const a of agents) {
+        const identity = a.getComponent<IdentityComponent>(CT.Identity);
+        const agent = a.getComponent<AgentComponent>(CT.Agent);
+        const name = identity?.name ?? 'Unknown';
+        const behavior = agent?.behavior ?? 'idle';
+
+        if (!activities[behavior]) activities[behavior] = [];
+        activities[behavior].push(name);
+      }
+
+      let result = 'everyone rn:\n';
+      for (const [behavior, names] of Object.entries(activities)) {
+        result += `- ${behavior}: ${names.join(', ')}\n`;
+      }
+      return result;
+    }
+
+    case 'agent_detail': {
+      const agents = world.query().with(CT.Agent).with(CT.Identity).with(CT.Needs).executeEntities();
+      const agent = agents.find(a => {
+        const identity = a.getComponent<IdentityComponent>(CT.Identity);
+        return identity?.name?.toLowerCase() === intent.agentName?.toLowerCase();
+      });
+
+      if (!agent) {
+        return `cant find anyone named ${intent.agentName}`;
+      }
+
+      const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+      const needs = agent.getComponent<NeedsComponent>(CT.Needs);
+      const agentComp = agent.getComponent<AgentComponent>(CT.Agent);
+
+      const name = identity?.name ?? 'Unknown';
+      const hungerPct = Math.round((needs?.hunger ?? 1) * 100);
+      const energyPct = Math.round((needs?.energy ?? 1) * 100);
+      const socialPct = Math.round((needs?.social ?? 1) * 100);
+      const behavior = agentComp?.behavior ?? 'idle';
+
+      return `${name}:
+- doing: ${behavior}
+- hunger: ${hungerPct}%
+- energy: ${energyPct}%
+- social: ${socialPct}%`;
+    }
+
+    case 'concerns': {
+      const agents = world.query().with(CT.Agent).with(CT.Identity).with(CT.Needs).executeEntities();
+      const concerns: string[] = [];
+
+      for (const a of agents) {
+        const identity = a.getComponent<IdentityComponent>(CT.Identity);
+        const needs = a.getComponent<NeedsComponent>(CT.Needs);
+        const name = identity?.name ?? 'Unknown';
+
+        if (needs) {
+          if (needs.hunger < 0.2) {
+            concerns.push(`${name} is hungry (${Math.round(needs.hunger * 100)}%)`);
+          }
+          if (needs.energy < 0.2) {
+            concerns.push(`${name} is exhausted (${Math.round(needs.energy * 100)}%)`);
+          }
+        }
+      }
+
+      if (concerns.length === 0) {
+        return 'no major concerns - everyone seems ok';
+      }
+      return `concerns:\n${concerns.map(c => `- ${c}`).join('\n')}`;
+    }
+
+    default:
+      return '';
+  }
 }
 
 // ============================================================================
@@ -600,8 +845,26 @@ export class AdminAngelSystem extends BaseSystem {
     if (this.pendingRequests.has(requestKey)) return;
     this.pendingRequests.add(requestKey);
 
+    // Strip retry prefix from message for processing
+    let cleanMessage = playerMessage;
+    if (playerMessage) {
+      const retryMatch = playerMessage.match(/^__retry:\d+__(.+)$/s);
+      if (retryMatch) {
+        cleanMessage = retryMatch[1];
+      }
+    }
+
+    // Detect query intent and execute if found
+    if (cleanMessage) {
+      const queryIntent = detectQueryIntent(cleanMessage);
+      if (queryIntent) {
+        const queryResult = executeQuery(ctx.world, queryIntent);
+        angel.memory.conversation.queryContext = queryResult;
+      }
+    }
+
     const gameState = this.getGameStateSummary(ctx.world);
-    const prompt = buildAngelPrompt(angel, gameState, playerMessage);
+    const prompt = buildAngelPrompt(angel, gameState, cleanMessage);
 
     // Mark as awaiting
     angel.awaitingResponse = true;
@@ -615,19 +878,33 @@ export class AdminAngelSystem extends BaseSystem {
         console.error('[AdminAngelSystem] Failed to get LLM response:', error);
         angel.awaitingResponse = false;
 
-        // Send a fallback message so player doesn't think it's broken
+        // Re-queue the message for retry instead of failing immediately
         if (playerMessage) {
-          ctx.world.eventBus.emit({
-            type: 'chat:send_message',
-            data: {
-              roomId: 'divine_chat',
-              senderId: angelEntity.id,
-              senderName: angel.name,
-              message: 'hmm having some trouble thinking rn, try again in a sec',
-              type: 'message',
-            },
-            source: angelEntity.id,
-          });
+          // Extract retry count from message prefix (format: __retry:N__message)
+          const retryMatch = playerMessage.match(/^__retry:(\d+)__(.+)$/s);
+          const retryCount = retryMatch ? parseInt(retryMatch[1]!, 10) : 0;
+          const originalMessage = retryMatch ? retryMatch[2]! : playerMessage;
+          const maxRetries = 3;
+
+          if (retryCount < maxRetries) {
+            // Re-queue with incremented retry count
+            const retryMessage = `__retry:${retryCount + 1}__${originalMessage}`;
+            angel.pendingPlayerMessages.push(retryMessage);
+            console.log(`[AdminAngelSystem] Requeueing message for retry ${retryCount + 1}/${maxRetries}`);
+          } else {
+            // Max retries reached - show fallback message
+            ctx.world.eventBus.emit({
+              type: 'chat:send_message',
+              data: {
+                roomId: 'divine_chat',
+                senderId: angelEntity.id,
+                senderName: angel.name,
+                message: 'hmm having some trouble thinking rn, try again in a sec',
+                type: 'message',
+              },
+              source: angelEntity.id,
+            });
+          }
         }
       })
       .finally(() => {
@@ -658,6 +935,9 @@ export class AdminAngelSystem extends BaseSystem {
     response: string
   ): void {
     angel.awaitingResponse = false;
+
+    // Clear query context after use
+    angel.memory.conversation.queryContext = undefined;
 
     // Parse for commands
     const commands = this.parseCommands(response);
@@ -731,24 +1011,35 @@ export class AdminAngelSystem extends BaseSystem {
 
   /**
    * Execute a parsed command (direct world access)
+   * Emits both the action event AND a command_result event for feedback
    */
   private executeCommandDirect(world: World, cmd: { type: string; args: string[] }): void {
     const emit = (type: string, data: Record<string, unknown>) => {
       world.eventBus.emit({ type: type as keyof import('../events/EventMap.js').GameEventMap, data, source: 'admin_angel' });
     };
 
+    // Helper to emit command result feedback
+    const emitResult = (command: string, success: boolean, result?: string, error?: string) => {
+      emit('admin_angel:command_result', { command, success, result, error });
+    };
+
+    const commandStr = [cmd.type, ...cmd.args].join(' ');
+
     switch (cmd.type) {
       // ========== TIME CONTROL ==========
       case 'pause':
         emit('time:request_pause', {});
+        emitResult(commandStr, true, 'Game paused');
         break;
       case 'resume':
       case 'unpause':
         emit('time:request_resume', {});
+        emitResult(commandStr, true, 'Game resumed');
         break;
       case 'speed': {
         const speed = parseInt(cmd.args[0] || '1', 10);
         emit('time:request_speed', { speed });
+        emitResult(commandStr, true, `Speed set to ${speed}x`);
         break;
       }
 
@@ -756,11 +1047,13 @@ export class AdminAngelSystem extends BaseSystem {
       case 'open': {
         const panel = cmd.args.join('-');
         emit('ui:open_panel', { panelId: panel });
+        emitResult(commandStr, true, `Opened ${panel} panel`);
         break;
       }
       case 'close': {
         const closePanel = cmd.args.join('-');
         emit('ui:close_panel', { panelId: closePanel });
+        emitResult(commandStr, true, `Closed ${closePanel} panel`);
         break;
       }
 
@@ -769,18 +1062,23 @@ export class AdminAngelSystem extends BaseSystem {
         if (cmd.args[0] === 'at') {
           const target = cmd.args.slice(1).join(' ');
           emit('camera:focus', { target });
+          emitResult(commandStr, true, `Looking at ${target}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Invalid look command - use "look at [target]"');
         }
         break;
       case 'follow': {
         // [follow AGENT]
         const followTarget = cmd.args.join(' ');
         emit('camera:focus', { target: followTarget, follow: true });
+        emitResult(commandStr, true, `Following ${followTarget}`);
         break;
       }
       case 'zoom': {
         // [zoom in] or [zoom out]
         const direction = cmd.args[0];
         emit('admin_angel:zoom', { direction: direction || 'in' });
+        emitResult(commandStr, true, `Zoomed ${direction || 'in'}`);
         break;
       }
 
@@ -796,6 +1094,9 @@ export class AdminAngelSystem extends BaseSystem {
             behavior,
             args: behaviorArgs,
           });
+          emitResult(commandStr, true, `Told ${agentName} to ${behavior}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing agent name or behavior');
         }
         break;
       }
@@ -803,12 +1104,14 @@ export class AdminAngelSystem extends BaseSystem {
         // [select AGENT]
         const selectTarget = cmd.args.join(' ');
         emit('admin_angel:select_agent', { agentName: selectTarget });
+        emitResult(commandStr, true, `Selected ${selectTarget}`);
         break;
       }
       case 'info': {
         // [info AGENT]
         const infoTarget = cmd.args.join(' ');
         emit('admin_angel:get_info', { agentName: infoTarget });
+        emitResult(commandStr, true, `Getting info on ${infoTarget}`);
         break;
       }
       case 'spawn': {
@@ -816,6 +1119,8 @@ export class AdminAngelSystem extends BaseSystem {
         const spawnType = cmd.args[0];
         const spawnSubtype = cmd.args[1];
         emit('admin_angel:spawn', { type: spawnType, subtype: spawnSubtype });
+        const spawnMsg = spawnSubtype ? `Spawning ${spawnSubtype} ${spawnType}` : `Spawning ${spawnType || 'entity'}`;
+        emitResult(commandStr, true, spawnMsg);
         break;
       }
       case 'give': {
@@ -824,6 +1129,9 @@ export class AdminAngelSystem extends BaseSystem {
         const giveItem = cmd.args.slice(1).join(' ');
         if (giveTarget && giveItem) {
           emit('admin_angel:give_item', { agentName: giveTarget, item: giveItem });
+          emitResult(commandStr, true, `Gave ${giveItem} to ${giveTarget}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing target or item');
         }
         break;
       }
@@ -833,6 +1141,7 @@ export class AdminAngelSystem extends BaseSystem {
         // [save NAME]
         const saveName = cmd.args.join(' ') || 'quicksave';
         emit('admin_angel:save_checkpoint', { name: saveName });
+        emitResult(commandStr, true, `Saving checkpoint "${saveName}"`);
         break;
       }
       case 'load': {
@@ -840,12 +1149,16 @@ export class AdminAngelSystem extends BaseSystem {
         const loadName = cmd.args.join(' ');
         if (loadName) {
           emit('admin_angel:load_checkpoint', { name: loadName });
+          emitResult(commandStr, true, `Loading checkpoint "${loadName}"`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing checkpoint name');
         }
         break;
       }
       case 'rewind': {
         // [rewind] - go back to last checkpoint
         emit('admin_angel:rewind', {});
+        emitResult(commandStr, true, 'Rewinding to last checkpoint');
         break;
       }
 
@@ -860,12 +1173,14 @@ export class AdminAngelSystem extends BaseSystem {
           cost: 0,
         });
         emit('admin_angel:divine_action', { action: 'bless', target: blessTarget });
+        emitResult(commandStr, true, `Blessing ${blessTarget}`);
         break;
       }
       case 'heal': {
         // [heal AGENT]
         const healTarget = cmd.args.join(' ');
         emit('admin_angel:divine_action', { action: 'heal', target: healTarget });
+        emitResult(commandStr, true, `Healing ${healTarget}`);
         break;
       }
       case 'whisper': {
@@ -879,6 +1194,9 @@ export class AdminAngelSystem extends BaseSystem {
             message: whisperMsg,
             cost: 0,
           });
+          emitResult(commandStr, true, `Whispered to ${whisperTarget}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing target or message');
         }
         break;
       }
@@ -893,6 +1211,9 @@ export class AdminAngelSystem extends BaseSystem {
             visionContent,
             cost: 0,
           });
+          emitResult(commandStr, true, `Sent vision to ${visionTarget}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing target or vision content');
         }
         break;
       }
@@ -904,12 +1225,14 @@ export class AdminAngelSystem extends BaseSystem {
           miracleType,
           description: `Divine ${miracleType} from the angel`,
         });
+        emitResult(commandStr, true, `Performed ${miracleType} miracle`);
         break;
       }
       case 'weather': {
         // [weather sunny/rain/storm/snow]
         const weatherType = cmd.args[0] || 'clear';
         emit('admin_angel:weather_control', { weather: weatherType });
+        emitResult(commandStr, true, `Weather changing to ${weatherType}`);
         break;
       }
 
@@ -922,6 +1245,9 @@ export class AdminAngelSystem extends BaseSystem {
             reason: 'admin_angel_request',
             sourceCheckpoint: fromCheckpoint ? { key: fromCheckpoint, name: fromCheckpoint } : undefined,
           });
+          emitResult(commandStr, true, fromCheckpoint ? `Forking universe from "${fromCheckpoint}"` : 'Forking new universe');
+        } else {
+          emitResult(commandStr, false, undefined, 'Use "fork universe" or "fork from [checkpoint]"');
         }
         break;
       }
@@ -931,6 +1257,7 @@ export class AdminAngelSystem extends BaseSystem {
         // [list empires], [list fleets], [list megastructures], [list checkpoints], [list universes], [list passages], [list research]
         const entityType = cmd.args[0];
         emit('admin_angel:list_entities', { entityType });
+        emitResult(commandStr, true, `Listing ${entityType || 'entities'}`);
         break;
       }
       case 'diplomatic': {
@@ -944,6 +1271,9 @@ export class AdminAngelSystem extends BaseSystem {
             targetEmpireId: targetId,
             diplomaticAction: action,
           });
+          emitResult(commandStr, true, `Diplomatic action: ${action} between ${empireId} and ${targetId}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing action, empire, or target');
         }
         break;
       }
@@ -955,7 +1285,12 @@ export class AdminAngelSystem extends BaseSystem {
           const y = parseFloat(cmd.args[3] || '0');
           if (fleetId) {
             emit('admin_angel:move_fleet', { fleetId, targetX: x, targetY: y });
+            emitResult(commandStr, true, `Moving fleet ${fleetId} to (${x}, ${y})`);
+          } else {
+            emitResult(commandStr, false, undefined, 'Missing fleet ID');
           }
+        } else {
+          emitResult(commandStr, false, undefined, 'Use "move fleet [ID] [X] [Y]"');
         }
         break;
       }
@@ -966,7 +1301,12 @@ export class AdminAngelSystem extends BaseSystem {
           const task = cmd.args[2];
           if (megaId && task) {
             emit('admin_angel:megastructure_task', { megastructureId: megaId, task });
+            emitResult(commandStr, true, `Set megastructure ${megaId} to ${task}`);
+          } else {
+            emitResult(commandStr, false, undefined, 'Missing megastructure ID or task');
           }
+        } else {
+          emitResult(commandStr, false, undefined, 'Use "megastructure task [ID] [task]"');
         }
         break;
       }
@@ -977,6 +1317,9 @@ export class AdminAngelSystem extends BaseSystem {
         const techName = cmd.args.join(' ');
         if (techName) {
           emit('admin_angel:start_research', { technology: techName });
+          emitResult(commandStr, true, `Researching ${techName}`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Missing technology name');
         }
         break;
       }
@@ -991,6 +1334,9 @@ export class AdminAngelSystem extends BaseSystem {
           const x = parseInt(atMatch[2]!, 10);
           const y = parseInt(atMatch[3]!, 10);
           emit('admin_angel:place_building', { buildingType, x, y });
+          emitResult(commandStr, true, `Building ${buildingType} at (${x}, ${y})`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Use "build [type] at [x],[y]"');
         }
         break;
       }
@@ -999,6 +1345,9 @@ export class AdminAngelSystem extends BaseSystem {
         if (cmd.args[0] === 'building') {
           const summonType = cmd.args.slice(1).join(' ');
           emit('admin_angel:summon_building', { buildingType: summonType });
+          emitResult(commandStr, true, `Summoning ${summonType} building`);
+        } else {
+          emitResult(commandStr, false, undefined, 'Use "summon building [type]"');
         }
         break;
       }
@@ -1008,18 +1357,26 @@ export class AdminAngelSystem extends BaseSystem {
         // [notify MESSAGE]
         const notifyMsg = cmd.args.join(' ');
         emit('ui:notification', { message: notifyMsg, type: 'info' });
+        emitResult(commandStr, true, `Notification sent`);
         break;
       }
       case 'stats': {
         // [stats] - request game statistics
         emit('admin_angel:request_stats', {});
+        emitResult(commandStr, true, 'Gathering stats...');
         break;
       }
       case 'help': {
         // [help] - list commands (will be handled by returning help text)
         emit('admin_angel:help_requested', {});
+        emitResult(commandStr, true, 'Showing help...');
         break;
       }
+
+      // ========== UNKNOWN COMMAND ==========
+      default:
+        emitResult(commandStr, false, undefined, `Unknown command: ${cmd.type}`);
+        break;
     }
   }
 
@@ -1649,15 +2006,83 @@ export class AdminAngelSystem extends BaseSystem {
 
     // Check for proactive turn
     const ticksSinceLastProactive = Number(ctx.tick) - angel.memory.conversation.lastProactiveTick;
-    if (ticksSinceLastProactive >= angel.proactiveInterval && !angel.awaitingResponse) {
-      // Check if there's something to say
-      const pending = angel.memory.conversation.pendingObservations.length > 0;
+    const minProactiveInterval = 200; // At least 10 seconds between proactive messages
+    const maxProactiveInterval = angel.proactiveInterval; // Default 1200 ticks (60 seconds)
 
-      if (pending) {
+    if (ticksSinceLastProactive >= minProactiveInterval && !angel.awaitingResponse) {
+      // Check if there's something worth saying
+      const { speak, reason } = this.shouldSpeakProactively(angel, ctx.world);
+
+      // Speak if we have a reason, OR if it's been too long and we have pending observations
+      const hasPending = angel.memory.conversation.pendingObservations.length > 0;
+      const tooLongSilent = ticksSinceLastProactive >= maxProactiveInterval;
+
+      if (speak || (tooLongSilent && hasPending)) {
+        // Set the trigger for prompt context
+        if (reason) {
+          angel.memory.consciousness.proactiveTrigger = reason;
+        }
         angel.memory.conversation.lastProactiveTick = Number(ctx.tick);
         this.processTurn(ctx, angel, angelEntity);
       }
     }
+  }
+
+  /**
+   * Determine if the angel should speak proactively based on observations and mood
+   */
+  private shouldSpeakProactively(
+    angel: AdminAngelComponent,
+    world: World
+  ): { speak: boolean; reason?: string } {
+    const consciousness = angel.memory.consciousness;
+
+    // 1. High-salience concern observation (agent hungry/exhausted)
+    const recentObs = consciousness.observations.slice(-5);
+    const highSalienceConcern = recentObs.find(
+      o => o.salience > 0.7 && o.type === 'concern'
+    );
+    if (highSalienceConcern) {
+      return { speak: true, reason: highSalienceConcern.text };
+    }
+
+    // 2. Mood changed to worried/protective (and we haven't reported it yet)
+    const worriedMoods: Array<typeof consciousness.mood> = ['worried', 'protective'];
+    if (
+      worriedMoods.includes(consciousness.mood) &&
+      consciousness.lastMoodReported !== consciousness.mood
+    ) {
+      consciousness.lastMoodReported = consciousness.mood;
+      return { speak: true, reason: `feeling ${consciousness.mood} about the village` };
+    }
+
+    // 3. Focused agent did something interesting
+    const focusId = angel.memory.attention.focusedAgentId;
+    if (focusId) {
+      const focusObs = recentObs.find(
+        o => o.agentId === focusId && o.salience > 0.5
+      );
+      if (focusObs) {
+        return { speak: true, reason: focusObs.text };
+      }
+    }
+
+    // 4. Achievement observed
+    const achievement = recentObs.find(
+      o => o.type === 'achievement' && o.salience > 0.6
+    );
+    if (achievement) {
+      return { speak: true, reason: achievement.text };
+    }
+
+    // 5. Random "wonder" - low probability thinking out loud
+    if (consciousness.currentWonder && Math.random() < 0.05) {
+      const wonder = consciousness.currentWonder;
+      consciousness.currentWonder = null; // Clear after use
+      return { speak: true, reason: wonder };
+    }
+
+    return { speak: false };
   }
 
   /**

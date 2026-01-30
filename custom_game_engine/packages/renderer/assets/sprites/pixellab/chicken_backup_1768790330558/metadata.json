@@ -2,6 +2,8 @@
   "id": "chicken",
   "category": "animals.livestock",
   "size": 32,
-  "description": "Small farm chicken, red-brown feathers, red comb, yellow beak, pecking pose, top-down farm animal",
-  "generated_at": "2026-01-04T21:23:15.652Z"
+  "description": "chicken, plump hen with red comb, feathered body, scratching feet, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
+  "generated_at": "2026-01-04T21:23:15.652Z",
+  "original_description": "Small farm chicken, red-brown feathers, red comb, yellow beak, pecking pose, top-down farm animal",
+  "enriched_at": "2026-01-30T00:40:22.567Z"
 }

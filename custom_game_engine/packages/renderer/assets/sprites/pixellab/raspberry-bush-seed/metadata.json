@@ -2,8 +2,9 @@
   "id": "raspberry-bush-seed",
   "category": "objects",
   "size": 48,
-  "description": "Small raspberry seed on soil, pixel art, top-down view, transparent background",
+  "description": "raspberry-bush-seed",
   "original_description": "Small raspberry seed on soil, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:44:45.811Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.637Z"
 }

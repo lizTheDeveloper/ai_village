@@ -2,8 +2,9 @@
   "id": "oak-tree-flowering",
   "category": "objects",
   "size": 48,
-  "description": "Oak tree with spring catkins hanging from branches, pixel art, top-down view, transparent background",
+  "description": "oak-tree-flowering",
   "original_description": "Oak tree with spring catkins hanging from branches, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:25:19.242Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.625Z"
 }

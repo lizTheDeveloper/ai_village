@@ -2,7 +2,7 @@
   "id": "soul_a3a844b9-3acd-4de2-a653-48aead3495a5",
   "category": "animals",
   "size": 48,
-  "description": "human character named Pine",
+  "description": "a3a844b9-3acd-4de2-a653-48aead3495a5 soul",
   "generated_at": "2026-01-05T01:58:35.594Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "human character named Pine",
+  "enriched_at": "2026-01-30T00:40:22.653Z"
 }

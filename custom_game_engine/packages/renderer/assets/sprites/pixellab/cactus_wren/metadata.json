@@ -2,8 +2,9 @@
   "id": "cactus_wren",
   "category": "objects",
   "size": 48,
-  "description": "cactus wren with streaked brown plumage, white eyebrow, pixel art, game sprite, 48x48",
+  "description": "wren cactus",
   "original_description": "cactus wren with streaked brown plumage, white eyebrow, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:38:38.086Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.554Z"
 }

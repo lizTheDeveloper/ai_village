@@ -825,6 +825,35 @@ export interface MiscEvents {
     task: string; // maintenance, research, production, defense, idle
   };
 
+  /** Admin angel command execution result */
+  'admin_angel:command_result': {
+    command: string;       // The command that was executed (e.g., "weather rain")
+    success: boolean;      // Whether the command executed successfully
+    result?: string;       // Human-readable result message
+    error?: string;        // Error message if failed
+  };
+
+  /** Admin angel weather control */
+  'admin_angel:weather_control': {
+    weather: string;       // sunny, rain, storm, snow, clear
+  };
+
+  /** Admin angel spawn request */
+  'admin_angel:spawn': {
+    type?: string;         // agent, animal
+    subtype?: string;      // for animals: chicken, sheep, etc.
+  };
+
+  /** Admin angel select agent */
+  'admin_angel:select_agent': {
+    agentName: string;
+  };
+
+  /** Admin angel zoom */
+  'admin_angel:zoom': {
+    direction: string;     // in, out
+  };
+
   'agent:needs_critical': {
     agentId?: EntityId;
     agentName?: string;

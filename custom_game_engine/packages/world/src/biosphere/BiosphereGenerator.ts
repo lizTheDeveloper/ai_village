@@ -28,6 +28,8 @@ export type ProgressCallback = (message: string) => void;
 export interface BiosphereGeneratorOptions {
   /** Max total species to generate. Limits LLM calls to 2*maxSpecies. Default: unlimited. */
   maxSpecies?: number;
+  /** Override art style selection. If not provided, art style is selected deterministically from planet seed. */
+  artStyle?: ArtStyle;
 }
 
 export class BiosphereGenerator {
@@ -36,6 +38,7 @@ export class BiosphereGenerator {
   private planet: PlanetConfig;
   private progressCallback?: ProgressCallback;
   private maxSpecies: number;
+  private configuredArtStyle?: ArtStyle;
 
   constructor(llmProvider: LLMProvider, planet: PlanetConfig, progressCallback?: ProgressCallback, options?: BiosphereGeneratorOptions) {
     this.nicheIdentifier = new EcologicalNicheIdentifier();
@@ -43,6 +46,7 @@ export class BiosphereGenerator {
     this.planet = planet;
     this.progressCallback = progressCallback;
     this.maxSpecies = options?.maxSpecies ?? Infinity;
+    this.configuredArtStyle = options?.artStyle;
   }
 
   private reportProgress(message: string): void {
@@ -101,9 +105,9 @@ export class BiosphereGenerator {
 
     this.reportProgress(`🧠 Discovered ${sapientSpecies.length} intelligent species`);
 
-    // Phase 6: Choose art style deterministically
-    const artStyle = this.selectArtStyle(this.planet.seed);
-    this.reportProgress(`🎨 Choosing artistic style: ${artStyle}`);
+    // Phase 6: Choose art style (use configured style, or fall back to seed-based selection)
+    const artStyle = this.configuredArtStyle ?? this.selectArtStyle(this.planet.seed);
+    this.reportProgress(`🎨 ${this.configuredArtStyle ? 'Using configured art style' : 'Choosing art style from seed'}: ${artStyle}`);
 
     const endTime = Date.now();
     const generationTimeMs = endTime - startTime;

@@ -2,8 +2,9 @@
   "id": "waxwing",
   "category": "objects",
   "size": 48,
-  "description": "cedar waxwing with crested head, waxy red wing tips, pixel art, game sprite, 48x48",
+  "description": "waxwing",
   "original_description": "cedar waxwing with crested head, waxy red wing tips, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:12:18.783Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.668Z"
 }

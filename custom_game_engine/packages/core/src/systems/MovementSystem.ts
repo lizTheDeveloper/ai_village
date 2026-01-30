@@ -287,16 +287,20 @@ export class MovementSystem extends BaseSystem {
         const newChunkX = Math.floor(newX / 32);
         const newChunkY = Math.floor(newY / 32);
 
-        // Sync to component
+        // Sync to component - only if position actually changed
         const entity = ctx.world.getEntity(entityId);
         if (entity) {
-          (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
-            ...current,
-            x: newX,
-            y: newY,
-            chunkX: newChunkX,
-            chunkY: newChunkY,
-          }));
+          const posComp = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+          if (posComp && (posComp.x !== newX || posComp.y !== newY ||
+              posComp.chunkX !== newChunkX || posComp.chunkY !== newChunkY)) {
+            (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
+              ...current,
+              x: newX,
+              y: newY,
+              chunkX: newChunkX,
+              chunkY: newChunkY,
+            }));
+          }
         }
       }
     } else if (useWASMSIMDPath) {
@@ -342,15 +346,20 @@ export class MovementSystem extends BaseSystem {
           positionSoA.set(entityId, adjustedX, adjustedY, pos.z, newChunkX, newChunkY);
 
           // Sync back to component (for backward compatibility with systems not using SoA yet)
+          // Only update if position actually changed
           const entity = ctx.world.getEntity(entityId);
           if (entity) {
-            (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
-              ...current,
-              x: adjustedX,
-              y: adjustedY,
-              chunkX: newChunkX,
-              chunkY: newChunkY,
-            }));
+            const posComp = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+            if (posComp && (posComp.x !== adjustedX || posComp.y !== adjustedY ||
+                posComp.chunkX !== newChunkX || posComp.chunkY !== newChunkY)) {
+              (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
+                ...current,
+                x: adjustedX,
+                y: adjustedY,
+                chunkX: newChunkX,
+                chunkY: newChunkY,
+              }));
+            }
           }
         } else {
           // Collision - try perpendicular slide (handled in main loop)
@@ -398,15 +407,20 @@ export class MovementSystem extends BaseSystem {
           positionSoA.set(entityId, adjustedX, adjustedY, pos.z, newChunkX, newChunkY);
 
           // Sync back to component (for backward compatibility with systems not using SoA yet)
+          // Only update if position actually changed
           const entity = ctx.world.getEntity(entityId);
           if (entity) {
-            (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
-              ...current,
-              x: adjustedX,
-              y: adjustedY,
-              chunkX: newChunkX,
-              chunkY: newChunkY,
-            }));
+            const posComp = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+            if (posComp && (posComp.x !== adjustedX || posComp.y !== adjustedY ||
+                posComp.chunkX !== newChunkX || posComp.chunkY !== newChunkY)) {
+              (entity as EntityImpl).updateComponent<PositionComponent>(CT.Position, (current) => ({
+                ...current,
+                x: adjustedX,
+                y: adjustedY,
+                chunkX: newChunkX,
+                chunkY: newChunkY,
+              }));
+            }
           }
         } else {
           // Collision - try perpendicular slide (handled in main loop)

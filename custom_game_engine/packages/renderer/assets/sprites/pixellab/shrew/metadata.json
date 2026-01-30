@@ -2,8 +2,9 @@
   "id": "shrew",
   "category": "objects",
   "size": 48,
-  "description": "common shrew with pointed snout, brown fur, pixel art, game sprite, 48x48",
+  "description": "shrew",
   "original_description": "common shrew with pointed snout, brown fur, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:10:22.371Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.648Z"
 }

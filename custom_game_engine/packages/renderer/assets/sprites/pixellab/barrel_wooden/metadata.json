@@ -2,6 +2,8 @@
   "id": "barrel_wooden",
   "category": "map_objects",
   "size": 32,
-  "description": "Wooden barrel with metal bands, top-down view",
-  "generated_at": "2026-01-04T21:34:03.283Z"
+  "description": "wooden barrel",
+  "generated_at": "2026-01-04T21:34:03.283Z",
+  "original_description": "Wooden barrel with metal bands, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.547Z"
 }

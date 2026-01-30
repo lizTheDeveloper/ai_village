@@ -1,5 +1,24 @@
 {
-  "sprites": [],
+  "sprites": [
+    {
+      "folderId": "rabbit_white",
+      "characterId": "",
+      "status": "failed",
+      "queuedAt": 1769717782873,
+      "description": "white rabbit",
+      "traits": {},
+      "error": "API 401: {\"detail\":\"Invalid API token\"}"
+    },
+    {
+      "folderId": "rabbit_white_v1",
+      "characterId": "",
+      "status": "failed",
+      "queuedAt": 1769717790015,
+      "description": "white rabbit",
+      "traits": {},
+      "error": "API 401: {\"detail\":\"Invalid API token\"}"
+    }
+  ],
   "animations": [],
   "soul_sprites": []
 }

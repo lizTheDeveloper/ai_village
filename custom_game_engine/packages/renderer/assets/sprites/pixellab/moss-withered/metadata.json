@@ -2,8 +2,9 @@
   "id": "moss-withered",
   "category": "objects",
   "size": 48,
-  "description": "Dried dead moss, brown and crispy texture, pixel art, top-down view, transparent background",
+  "description": "moss-withered",
   "original_description": "Dried dead moss, brown and crispy texture, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:20:11.360Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.620Z"
 }

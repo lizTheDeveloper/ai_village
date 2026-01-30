@@ -2,8 +2,9 @@
   "id": "grasshopper",
   "category": "objects",
   "size": 48,
-  "description": "grasshopper with green body, strong hind legs, pixel art, game sprite, 48x48",
+  "description": "grasshopper",
   "original_description": "grasshopper with green body, strong hind legs, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:02:59.283Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.602Z"
 }

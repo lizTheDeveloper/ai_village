@@ -149,7 +149,8 @@ export class WildPlantPopulationSystem extends BaseSystem {
   private registerEventListeners(): void {
     // Listen for seed dispersal events
     this.events.subscribe('seed:dispersed', (event: unknown) => {
-      const e = event as { data: { speciesId: string; position?: { x: number; y: number } } };
+      const e = event as { data?: { speciesId: string; position?: { x: number; y: number } } };
+      if (!e.data) return; // Guard against undefined data
       const { speciesId, position } = e.data;
       if (position) {
         this.addToSeedBank(speciesId, position);

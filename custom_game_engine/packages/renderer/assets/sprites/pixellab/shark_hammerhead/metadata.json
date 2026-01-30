@@ -2,8 +2,9 @@
   "id": "shark_hammerhead",
   "category": "objects",
   "size": 48,
-  "description": "hammerhead shark with distinctive hammer-shaped head, pixel art, game sprite, 48x48",
+  "description": "hammerhead shark",
   "original_description": "hammerhead shark with distinctive hammer-shaped head, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:08:02.172Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.645Z"
 }

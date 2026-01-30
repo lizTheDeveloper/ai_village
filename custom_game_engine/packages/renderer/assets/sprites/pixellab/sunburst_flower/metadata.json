@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "Sunburst Flower plant, pixel art, top-down view",
+  "description": "flower sunburst",
   "generated_at": "2026-01-03T21:59:26.856Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Sunburst Flower plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.656Z"
 }

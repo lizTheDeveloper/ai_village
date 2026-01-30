@@ -2,8 +2,9 @@
   "id": "nightjar",
   "category": "objects",
   "size": 48,
-  "description": "european nightjar with cryptic brown plumage, pixel art, game sprite, 48x48",
+  "description": "nightjar",
   "original_description": "european nightjar with cryptic brown plumage, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:08:59.349Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.624Z"
 }

@@ -2,8 +2,9 @@
   "id": "wolverine",
   "category": "objects",
   "size": 48,
-  "description": "wolverine with dark brown fur, lighter side stripes, pixel art, game sprite, 48x48",
+  "description": "wolverine",
   "original_description": "wolverine with dark brown fur, lighter side stripes, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:42:31.742Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.677Z"
 }

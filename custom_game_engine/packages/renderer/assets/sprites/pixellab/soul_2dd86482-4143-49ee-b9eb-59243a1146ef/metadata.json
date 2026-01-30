@@ -2,7 +2,7 @@
   "id": "soul_2dd86482-4143-49ee-b9eb-59243a1146ef",
   "category": "animals",
   "size": 48,
-  "description": "human character named Hazel",
+  "description": "2dd86482-4143-49ee-b9eb-59243a1146ef soul",
   "generated_at": "2026-01-05T02:01:21.577Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "human character named Hazel",
+  "enriched_at": "2026-01-30T00:40:22.652Z"
 }

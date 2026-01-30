@@ -2,8 +2,9 @@
   "id": "ermine_white",
   "category": "objects",
   "size": 48,
-  "description": "ermine in white winter coat, black-tipped tail, small body, pixel art, game sprite, 48x48",
+  "description": "white ermine",
   "original_description": "ermine in white winter coat, black-tipped tail, small body, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:41:17.732Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.591Z"
 }

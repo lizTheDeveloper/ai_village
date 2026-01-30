@@ -2,8 +2,9 @@
   "id": "oak-tree-fruiting",
   "category": "objects",
   "size": 48,
-  "description": "Oak tree with developing acorns on branches, pixel art, top-down view, transparent background",
+  "description": "oak-tree-fruiting",
   "original_description": "Oak tree with developing acorns on branches, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:25:35.303Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.625Z"
 }

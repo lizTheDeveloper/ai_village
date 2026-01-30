@@ -2,8 +2,9 @@
   "id": "pufferfish",
   "category": "objects",
   "size": 48,
-  "description": "porcupine pufferfish with spines, inflated round, pixel art, game sprite, 48x48",
+  "description": "pufferfish",
   "original_description": "porcupine pufferfish with spines, inflated round, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:09:53.696Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.635Z"
 }

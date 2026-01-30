@@ -2,8 +2,9 @@
   "id": "robin",
   "category": "objects",
   "size": 48,
-  "description": "american robin with grey back, orange-red breast, pixel art, game sprite, 48x48",
+  "description": "robin",
   "original_description": "american robin with grey back, orange-red breast, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:50:54.510Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.639Z"
 }

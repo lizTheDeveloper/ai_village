@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+Animals are living entities that can be wild, tamed, bred, and traded, with unique properties varying by planet type.
+
 ## Overview
 
 Animals are living entities that inhabit the world alongside agents. They can be wild, tamed, bred, traded, and in some cases befriended. Different planets have different fauna - realistic worlds have familiar animals; fantasy and alien worlds have generated creatures with unique properties.

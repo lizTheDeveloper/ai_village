@@ -1,7 +1,7 @@
 {
   "id": "horse_brown",
   "name": "brown horse",
-  "description": "brown horse",
+  "description": "brown horse, majestic horse with flowing mane, muscular build, earthy brown and golden tones, grass-stained",
   "category": "animal",
   "size": 64,
   "directions": [
@@ -16,5 +16,7 @@
   ],
   "generated_at": "2026-01-13T02:17:11.165Z",
   "generation_method": "reference_workflow",
-  "notes": "South first, east with south ref, west flipped from east, others with south ref"
+  "notes": "South first, east with south ref, west flipped from east, others with south ref",
+  "original_description": "brown horse",
+  "enriched_at": "2026-01-30T00:40:22.607Z"
 }

@@ -2,8 +2,9 @@
   "id": "salmon",
   "category": "objects",
   "size": 48,
-  "description": "atlantic salmon with silver scales, pink flesh showing, pixel art, game sprite, 48x48",
+  "description": "salmon",
   "original_description": "atlantic salmon with silver scales, pink flesh showing, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:05:31.207Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.642Z"
 }

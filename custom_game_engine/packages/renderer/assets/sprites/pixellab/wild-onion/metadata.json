@@ -2,8 +2,9 @@
   "id": "wild-onion",
   "category": "objects",
   "size": 32,
-  "description": "Wild onion plant with thin green stalks, pixel art, top-down view, transparent background",
+  "description": "wild-onion",
   "original_description": "Wild onion plant with thin green stalks, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-25T05:11:45.715Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.672Z"
 }

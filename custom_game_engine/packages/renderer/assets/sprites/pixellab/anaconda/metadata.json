@@ -2,8 +2,9 @@
   "id": "anaconda",
   "category": "objects",
   "size": 48,
-  "description": "green anaconda with olive green body, black spots, pixel art, game sprite, 48x48",
+  "description": "anaconda",
   "original_description": "green anaconda with olive green body, black spots, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:00:05.222Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.541Z"
 }

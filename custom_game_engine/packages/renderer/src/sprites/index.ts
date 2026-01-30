@@ -143,3 +143,17 @@ export type {
   SpriteTraits,
   SpriteMapping,
 } from './SpriteRegistry';
+
+// Sprite Importer - Import custom sprites for planets
+export {
+  validateSprite,
+  generateFolderId,
+  importSpriteToManifest,
+  importSpriteBatch,
+  createSpriteMetadataJson,
+} from './SpriteImporter';
+export type {
+  ImportedSpriteMetadata,
+  SpriteValidationResult,
+  ImportOptions,
+} from './SpriteImporter';

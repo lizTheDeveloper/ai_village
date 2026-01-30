@@ -2,6 +2,8 @@
   "id": "well",
   "category": "map_objects",
   "size": 48,
-  "description": "Stone well with wooden bucket, top-down view",
-  "generated_at": "2026-01-04T21:34:58.595Z"
+  "description": "well",
+  "generated_at": "2026-01-04T21:34:58.595Z",
+  "original_description": "Stone well with wooden bucket, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.669Z"
 }

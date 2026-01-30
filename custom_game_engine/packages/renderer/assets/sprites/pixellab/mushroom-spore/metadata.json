@@ -2,8 +2,9 @@
   "id": "mushroom-spore",
   "category": "objects",
   "size": 48,
-  "description": "Mushroom spore on forest floor, barely visible dot, pixel art, top-down view, transparent background",
+  "description": "mushroom-spore",
   "original_description": "Mushroom spore on forest floor, barely visible dot, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:14:14.930Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.622Z"
 }

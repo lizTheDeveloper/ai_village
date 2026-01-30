@@ -2,8 +2,9 @@
   "id": "yak",
   "category": "objects",
   "size": 48,
-  "description": "yak with long shaggy dark brown fur, curved horns, sturdy build for cold, pixel art, game sprite, 48x48",
+  "description": "yak",
   "original_description": "yak with long shaggy dark brown fur, curved horns, sturdy build for cold, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:38:02.634Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.677Z"
 }

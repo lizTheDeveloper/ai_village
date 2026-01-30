@@ -2,6 +2,8 @@
   "id": "campfire_frame4",
   "category": "map_objects",
   "size": 48,
-  "description": "Animated campfire frame 4: flames receding, orange fire settling down, red-orange embers visible, top-down view, 32x32",
-  "generated_at": "2026-01-04T22:13:06.189Z"
+  "description": "frame4 campfire",
+  "generated_at": "2026-01-04T22:13:06.189Z",
+  "original_description": "Animated campfire frame 4: flames receding, orange fire settling down, red-orange embers visible, top-down view, 32x32",
+  "enriched_at": "2026-01-30T00:40:22.556Z"
 }

@@ -1,7 +1,7 @@
 {
   "id": "sheep_black",
   "base_species": "sheep",
-  "description": "black sheep with wool",
+  "description": "black sheep, woolly sheep with fluffy white coat, gentle face, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
   "size": 48,
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "east",
     "southeast"
   ],
-  "regenerated_at": "2026-01-19T02:09:35.759Z"
+  "regenerated_at": "2026-01-19T02:09:35.759Z",
+  "original_description": "black sheep with wool",
+  "enriched_at": "2026-01-30T00:40:22.645Z"
 }

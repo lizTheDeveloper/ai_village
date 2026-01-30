@@ -2,8 +2,9 @@
   "id": "kestrel",
   "category": "objects",
   "size": 48,
-  "description": "american kestrel with rusty back, spotted breast, pixel art, game sprite, 48x48",
+  "description": "kestrel",
   "original_description": "american kestrel with rusty back, spotted breast, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:07:45.521Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.614Z"
 }

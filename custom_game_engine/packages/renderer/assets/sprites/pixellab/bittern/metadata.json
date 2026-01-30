@@ -2,8 +2,9 @@
   "id": "bittern",
   "category": "objects",
   "size": 48,
-  "description": "american bittern with brown streaked plumage, pixel art, game sprite, 48x48",
+  "description": "bittern",
   "original_description": "american bittern with brown streaked plumage, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:21:20.895Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.548Z"
 }

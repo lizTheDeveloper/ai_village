@@ -32,6 +32,7 @@ import { DivineAnalyticsPanel } from '../divine/DivineAnalyticsPanel';
 import { SacredGeographyPanel } from '../divine/SacredGeographyPanel';
 import { AngelManagementPanel } from '../divine/AngelManagementPanel';
 import { PrayerPanel } from '../divine/PrayerPanel';
+import { SpriteGalleryPanel } from '../SpriteGalleryPanel';
 
 // Import adapter factory functions from index
 import {
@@ -58,6 +59,7 @@ import {
 import type { EventBus } from '@ai-village/core';
 import type { Camera } from '../Camera';
 import type { ChunkManager } from '@ai-village/world';
+import type { PixelLabSpriteLoader } from '../sprites/PixelLabSpriteLoader';
 
 /**
  * Panel factory context - dependencies needed by some panel factories
@@ -359,5 +361,17 @@ export function createPrayerPanelFactory(): () => IWindowPanel {
       }
     );
     return createPrayerPanelAdapter(panel);
+  };
+}
+
+/**
+ * Factory for SpriteGalleryPanel
+ * Requires a PixelLabSpriteLoader to track which sprites are loaded in-game
+ */
+export function createSpriteGalleryPanelFactory(spriteLoader: PixelLabSpriteLoader): () => IWindowPanel {
+  return () => {
+    const panel = new SpriteGalleryPanel();
+    panel.setSpriteLoader(spriteLoader);
+    return panel;
   };
 }

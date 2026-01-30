@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "Sky Edelweiss plant, pixel art, top-down view",
+  "description": "edelweiss sky",
   "generated_at": "2026-01-03T21:59:56.712Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "Sky Edelweiss plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.649Z"
 }

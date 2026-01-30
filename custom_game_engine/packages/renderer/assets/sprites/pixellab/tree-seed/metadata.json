@@ -2,8 +2,9 @@
   "id": "tree-seed",
   "category": "objects",
   "size": 48,
-  "description": "Tree seed or acorn on forest floor, pixel art, top-down view, transparent background",
+  "description": "tree-seed",
   "original_description": "Tree seed or acorn on forest floor, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:49:33.680Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.663Z"
 }

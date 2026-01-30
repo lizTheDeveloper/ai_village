@@ -2,7 +2,7 @@
   "id": "soul_ef367e29-3e8e-4e9b-b0c4-9df9063e928b",
   "category": "animals",
   "size": 48,
-  "description": "human character named Finn",
+  "description": "ef367e29-3e8e-4e9b-b0c4-9df9063e928b soul",
   "generated_at": "2026-01-05T01:57:36.669Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "human character named Finn",
+  "enriched_at": "2026-01-30T00:40:22.653Z"
 }

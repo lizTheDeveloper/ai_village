@@ -78,6 +78,17 @@ export interface AngelConsciousness {
    * What the angel is currently pondering (for proactive comments)
    */
   currentWonder: string | null;
+
+  /**
+   * What triggered the current proactive turn (if any)
+   * Set before LLM call, cleared after response
+   */
+  proactiveTrigger?: string;
+
+  /**
+   * Last mood that was reported to player (avoid duplicate mood messages)
+   */
+  lastMoodReported?: AngelMood;
 }
 
 /**
@@ -236,6 +247,9 @@ export interface ConversationContext {
 
   /** Last tick the angel responded to player */
   lastResponseTick: number;
+
+  /** Structured query result to include in prompt (cleared after use) */
+  queryContext?: string;
 }
 
 /**

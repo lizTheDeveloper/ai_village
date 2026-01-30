@@ -2,7 +2,7 @@
   "id": "soul_f1c3036e-e9e6-4134-afae-79b2955593af",
   "category": "animals",
   "size": 48,
-  "description": "human character named Ash",
+  "description": "f1c3036e-e9e6-4134-afae-79b2955593af soul",
   "generated_at": "2026-01-05T01:57:06.070Z",
   "directions": [
     "south",
@@ -13,5 +13,7 @@
     "northeast",
     "east",
     "southeast"
-  ]
+  ],
+  "original_description": "human character named Ash",
+  "enriched_at": "2026-01-30T00:40:22.653Z"
 }

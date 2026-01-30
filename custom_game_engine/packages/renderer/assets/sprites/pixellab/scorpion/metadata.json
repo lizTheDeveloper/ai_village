@@ -2,8 +2,9 @@
   "id": "scorpion",
   "category": "objects",
   "size": 48,
-  "description": "desert scorpion with tan body, curved stinger tail, pixel art, game sprite, 48x48",
+  "description": "scorpion",
   "original_description": "desert scorpion with tan body, curved stinger tail, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T05:39:13.786Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.643Z"
 }

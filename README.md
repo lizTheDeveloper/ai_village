@@ -1,5 +1,7 @@
 # Multiverse: The End of Eternity
 
+*A village, briefly, under these particular stars.*
+
 ## 🔥 Release: "Still Burnin'" 🔥
 
 An open-source simulation game where AI agents live, work, and build communities together.

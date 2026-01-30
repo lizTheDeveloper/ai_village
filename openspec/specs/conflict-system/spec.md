@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The conflict system handles hostile interactions through skill-based resolution and narrative generation, creating meaningful consequences from hunting, combat, and dominance challenges.
+
 ## Overview
 
 The conflict system handles all hostile interactions: hunting wild animals, defending against predators, agent-vs-agent combat, and dominance challenges. For LLM agents, conflict is resolved through skill checks and narrative generation, not frame-by-frame combat simulation.
@@ -76,7 +80,7 @@ type ConflictType =
 
 ## Requirements
 
-### REQ-CON-001: Hunting System
+### Requirement: Hunting System
 
 Agents SHALL hunt wild animals for food and resources:
 
@@ -131,9 +135,9 @@ interface HuntingOutcome {
 }
 ```
 
-```
-WHEN an agent attempts to hunt
-THEN the system SHALL:
+#### Scenario: Agent attempts to hunt
+- **WHEN** an agent attempts to hunt
+- **THEN** the system SHALL:
   1. Calculate tracking success:
      - Base: hunting skill / 100
      - Bonus: stealth skill / 200
@@ -148,9 +152,8 @@ THEN the system SHALL:
      - Failed hunt of predator = potential injury
   4. Generate narrative via LLM
   5. Apply outcomes (resources, injuries, memories)
-```
 
-### REQ-CON-002: Predator Attacks
+### Requirement: Predator Attacks
 
 Wild predators SHALL attack agents:
 
@@ -195,9 +198,9 @@ interface PredatorAttackOutcome {
 }
 ```
 
-```
-WHEN a predator encounters an agent
-THEN the system SHALL:
+#### Scenario: Predator encounters an agent
+- **WHEN** a predator encounters an agent
+- **THEN** the system SHALL:
   1. Check if predator attacks (based on trigger conditions)
   2. If agent has stealth, check if spotted
   3. If attack proceeds:
@@ -207,9 +210,8 @@ THEN the system SHALL:
      d. Agent death if injury + low health
   4. Create trauma memory if near-death
   5. Alert nearby agents (may trigger rescue)
-```
 
-### REQ-CON-003: Agent Combat
+### Requirement: Agent Combat
 
 Agents MAY fight other agents:
 
@@ -266,9 +268,9 @@ interface CombatOutcome {
 }
 ```
 
-```
-WHEN agents enter combat
-THEN the system SHALL:
+#### Scenario: Agents enter combat
+- **WHEN** agents enter combat
+- **THEN** the system SHALL:
   1. Compare combat skills + equipment
   2. Apply modifiers (surprise, terrain, injuries)
   3. Roll outcome with skill-weighted probability
@@ -282,13 +284,12 @@ THEN the system SHALL:
      - Relationships change
      - Reputation affected
   7. Check for legal consequences if village has laws
-```
 
 ---
 
 ## Dominance Systems
 
-### REQ-CON-004: Dominance Challenges
+### Requirement: Dominance Challenges
 
 Species with dominance psychology SHALL have formal challenge mechanics:
 
@@ -351,9 +352,9 @@ interface CascadeEffect {
 }
 ```
 
-```
-WHEN a dominance challenge occurs (Kif-style species)
-THEN the system SHALL:
+#### Scenario: Dominance challenge occurs
+- **WHEN** a dominance challenge occurs (Kif-style species)
+- **THEN** the system SHALL:
   1. Verify both are dominance-based species
   2. Check challenge is valid (can challenge above)
   3. Resolve based on method:
@@ -367,17 +368,16 @@ THEN the system SHALL:
      - Failed challenge = vulnerability
   6. Update all dominance relationships
 
-IMPORTANT: For dominance species, this IS their politics.
+**IMPORTANT:** For dominance species, this IS their politics.
   - No voting exists
   - No negotiation exists
   - Only strength determines hierarchy
-```
 
 ---
 
 ## Alien Combat Modes
 
-### REQ-CON-005: Pack Mind Combat
+### Requirement: Pack Mind Combat
 
 Pack minds fight as single entities across multiple bodies:
 
@@ -429,9 +429,9 @@ interface PackCombatOutcome {
 }
 ```
 
-```
-WHEN engaging a pack mind in combat
-THEN the system SHALL:
+#### Scenario: Engaging a pack mind in combat
+- **WHEN** engaging a pack mind in combat
+- **THEN** the system SHALL:
   1. Track all bodies as single combatant
   2. Apply pack bonuses (coordination, angles)
   3. Check coherence maintenance:
@@ -441,9 +441,8 @@ THEN the system SHALL:
      - Each body lost = capability loss
      - Below minimum bodies = pack dies or splits
   5. Body capture is possible (very bad for victim)
-```
 
-### REQ-CON-006: Hive Warfare
+### Requirement: Hive Warfare
 
 Hive minds fight with expendable workers:
 
@@ -486,9 +485,9 @@ interface HiveWarfareOutcome {
 }
 ```
 
-```
-WHEN hives go to war
-THEN the system SHALL:
+#### Scenario: Hives go to war
+- **WHEN** hives go to war
+- **THEN** the system SHALL:
   1. Calculate worker ratios
   2. Worker deaths are statistics, not individuals
   3. Queen protection is primary concern:
@@ -499,9 +498,8 @@ THEN the system SHALL:
      - Workers become feral or die
      - Resources up for grabs
      - Potential successor queens may fight
-```
 
-### REQ-CON-007: Man'chi Combat
+### Requirement: Man'chi Combat
 
 Man'chi species fight for their lord, not themselves:
 
@@ -533,9 +531,9 @@ interface ManchiCombatEffects {
 }
 ```
 
-```
-WHEN man'chi agents fight
-THEN the system SHALL:
+#### Scenario: Man'chi agents fight
+- **WHEN** man'chi agents fight
+- **THEN** the system SHALL:
   1. Apply man'chi bonuses:
      - Near lord: +20% combat effectiveness
      - Lord threatened: +50% combat, ignore injuries
@@ -544,13 +542,12 @@ THEN the system SHALL:
      - High man'chi: berserk rage or collapse
      - May need to find new lord immediately
   4. Betrayal almost never happens (biological loyalty)
-```
 
 ---
 
 ## Injuries and Death
 
-### REQ-CON-008: Injury System
+### Requirement: Injury System
 
 Combat SHALL cause injuries:
 
@@ -599,7 +596,7 @@ interface InjuryEffects {
 }
 ```
 
-### REQ-CON-009: Death
+### Requirement: Death
 
 Death SHALL be permanent:
 
@@ -645,9 +642,9 @@ interface DeathEffects {
 }
 ```
 
-```
-WHEN an agent dies
-THEN the system SHALL:
+#### Scenario: Agent dies
+- **WHEN** an agent dies
+- **THEN** the system SHALL:
   1. Mark agent as dead (not deleted - history preserved)
   2. Drop inventory at location
   3. Notify all agents with relationship
@@ -659,13 +656,12 @@ THEN the system SHALL:
   7. Create death memory for witnesses
   8. For pack minds: recalculate pack coherence
   9. For hives: if queen, trigger collapse
-```
 
 ---
 
 ## Defense and Protection
 
-### REQ-CON-010: Guard Duty
+### Requirement: Guard Duty
 
 Agents SHALL protect locations and people:
 
@@ -711,9 +707,9 @@ interface ThreatDetection {
 }
 ```
 
-```
-WHEN a guard is on duty
-THEN the system SHALL:
+#### Scenario: Guard is on duty
+- **WHEN** a guard is on duty
+- **THEN** the system SHALL:
   1. Periodically check for threats in radius
   2. Detection chance = guard alertness + stealth penalty
   3. On detection:
@@ -722,9 +718,8 @@ THEN the system SHALL:
   4. Alertness decays over time:
      - Long shifts = less effective
      - Rotation needed for sustained protection
-```
 
-### REQ-CON-011: Village Defense
+### Requirement: Village Defense
 
 Villages SHALL have collective defense:
 
@@ -764,7 +759,7 @@ interface RaidDefense {
 
 ## LLM Integration
 
-### REQ-CON-012: Combat Narration
+### Requirement: Combat Narration
 
 Combat SHALL be narrated by LLM:
 
@@ -805,7 +800,7 @@ The tone should match the severity: {severity}
 `;
 ```
 
-### REQ-CON-013: Hunting Narration
+### Requirement: Hunting Narration
 
 Hunting SHALL create stories:
 

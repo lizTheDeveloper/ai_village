@@ -2,8 +2,9 @@
   "id": "thistle-mature",
   "category": "objects",
   "size": 48,
-  "description": "Mature thistle with full spiny foliage, pixel art, top-down view, transparent background",
+  "description": "thistle-mature",
   "original_description": "Mature thistle with full spiny foliage, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T04:06:08.821Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.659Z"
 }

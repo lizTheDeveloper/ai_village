@@ -83,6 +83,7 @@ import {
 } from '@ai-village/botany';
 import {
   Renderer,
+  createRenderer,
   InputHandler,
   KeyboardRegistry,
   BuildingPlacementUI,
@@ -90,6 +91,7 @@ import {
   AgentRosterPanel,
   ResearchLibraryPanel,
   TechTreePanel,
+  SpriteGalleryPanel,
   AnimalInfoPanel,
   AnimalRosterPanel,
   TileInspectorPanel,
@@ -134,6 +136,7 @@ import {
   UniverseConfigScreen,
   UniverseBrowserScreen,
   type UniverseBrowserResult,
+  type GameStartConfig,
   SCENARIO_PRESETS,
   type UniverseConfig,
   createGovernanceDashboardPanelAdapter,
@@ -197,6 +200,7 @@ import {
   createSacredGeographyPanelFactory,
   createAngelManagementPanelFactory,
   createPrayerPanelFactory,
+  createSpriteGalleryPanelFactory,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -1561,6 +1565,21 @@ function setupWindowManager(
     },
   });
 
+  // Sprite Gallery Panel - LAZY
+  windowManager.registerWindow('sprite-gallery', null, {
+    defaultX: 100,
+    defaultY: 80,
+    defaultWidth: 800,
+    defaultHeight: 600,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 600,
+    minHeight: 400,
+    showInWindowList: true,
+    menuCategory: 'dev',
+    factory: createSpriteGalleryPanelFactory(renderer.pixelLabLoader),
+  });
+
   // Divine Analytics Panel - LAZY
   windowManager.registerWindow('divine-analytics', null, {
     defaultX: 250,
@@ -2136,17 +2155,18 @@ function setupVisualEventHandlers(
   const { gameLoop, renderer, chunkManager } = gameContext;
   const { tileInspectorPanel } = uiContext;
   const CHUNK_SIZE = 32;
-  const floatingTextRenderer = renderer.getFloatingTextRenderer();
-  const particleRenderer = renderer.getParticleRenderer();
+  // Get Canvas2D-specific renderers (may not be available with PixiJS renderer)
+  const floatingTextRenderer = 'getFloatingTextRenderer' in renderer ? (renderer as any).getFloatingTextRenderer() : null;
+  const particleRenderer = 'getParticleRenderer' in renderer ? (renderer as any).getParticleRenderer() : null;
 
   // Soil events
   gameLoop.world.eventBus.subscribe('soil:tilled', (event: any) => {
     const { position } = event.data;
-    floatingTextRenderer.add('Tilled', position.x * 16, position.y * 16, '#8B4513', 1500);
+    floatingTextRenderer?.add('Tilled', position.x * 16, position.y * 16, '#8B4513', 1500);
 
     const tileCenterX = position.x * 16 + 8;
     const tileCenterY = position.y * 16 + 8;
-    particleRenderer.createDustCloud(tileCenterX, tileCenterY, 25);
+    particleRenderer?.createDustCloud(tileCenterX, tileCenterY, 25);
 
     // Refresh tile inspector
     const chunkX = Math.floor(position.x / CHUNK_SIZE);
@@ -2165,12 +2185,12 @@ function setupVisualEventHandlers(
 
   gameLoop.world.eventBus.subscribe('soil:watered', (event: any) => {
     const { position } = event.data;
-    floatingTextRenderer.add('+Water', position.x * 16, position.y * 16, '#1E90FF', 1500);
+    floatingTextRenderer?.add('+Water', position.x * 16, position.y * 16, '#1E90FF', 1500);
   });
 
   gameLoop.world.eventBus.subscribe('soil:fertilized', (event: any) => {
     const { position, fertilizerType } = event.data;
-    floatingTextRenderer.add(`+${fertilizerType}`, position.x * 16, position.y * 16, '#FFD700', 1500);
+    floatingTextRenderer?.add(`+${fertilizerType}`, position.x * 16, position.y * 16, '#FFD700', 1500);
   });
 
   // Resource gathering events
@@ -2191,7 +2211,7 @@ function setupVisualEventHandlers(
 
     const color = resourceColors[resourceType] || '#FFFFFF';
     const icon = resourceIcons[resourceType] || '';
-    floatingTextRenderer.add(`+${amount} ${icon}`, position.x * 16, position.y * 16, color, 2000);
+    floatingTextRenderer?.add(`+${amount} ${icon}`, position.x * 16, position.y * 16, color, 2000);
   });
 
   // Plant lifecycle events
@@ -2210,7 +2230,7 @@ function setupVisualEventHandlers(
     };
 
     const emoji = stageEmojis[newStage] || '🌿';
-    floatingTextRenderer.add(`${emoji} ${newStage}`, position.x * 16, position.y * 16, '#FFD700', 2000);
+    floatingTextRenderer?.add(`${emoji} ${newStage}`, position.x * 16, position.y * 16, '#FFD700', 2000);
   });
 
   // Seed events
@@ -2224,7 +2244,7 @@ function setupVisualEventHandlers(
       throw new Error(`seed:dispersed event seed missing required genetics for ${speciesId}`);
     }
 
-    floatingTextRenderer.add('🌰 Seed', position.x * 16, position.y * 16, '#8B4513', 1500);
+    floatingTextRenderer?.add('🌰 Seed', position.x * 16, position.y * 16, '#8B4513', 1500);
 
     // Create plant entity from dispersed seed
     const worldMutator = (gameLoop as any)._getWorldMutator();
@@ -2250,7 +2270,7 @@ function setupVisualEventHandlers(
 
   gameLoop.world.eventBus.subscribe('seed:germinated', (event: any) => {
     const { position } = event.data;
-    floatingTextRenderer.add('🌱 Germinated!', position.x * 16, position.y * 16, '#32CD32', 2000);
+    floatingTextRenderer?.add('🌱 Germinated!', position.x * 16, position.y * 16, '#32CD32', 2000);
   });
 
   gameLoop.world.eventBus.subscribe('seed:planted', (event: any) => {
@@ -2281,7 +2301,7 @@ function setupVisualEventHandlers(
     const positionComponent = createPositionComponent({ x: position.x, y: position.y });
     worldMutator.addComponent(plantEntity.id, positionComponent);
 
-    floatingTextRenderer.add('🌱 Planted!', position.x * 16, position.y * 16, '#228B22', 1500);
+    floatingTextRenderer?.add('🌱 Planted!', position.x * 16, position.y * 16, '#228B22', 1500);
   });
 
   gameLoop.world.eventBus.subscribe('seed:gathered', (event: any) => {
@@ -2291,7 +2311,7 @@ function setupVisualEventHandlers(
       if (plant) {
         const position = plant.getComponent('position');
         if (position) {
-          floatingTextRenderer.add(`🌰 +${seedCount}`, (position as any).x * 16, (position as any).y * 16, '#8B4513', 2000);
+          floatingTextRenderer?.add(`🌰 +${seedCount}`, (position as any).x * 16, (position as any).y * 16, '#8B4513', 2000);
         }
       }
     }
@@ -2304,7 +2324,7 @@ function setupVisualEventHandlers(
       if (plant) {
         const position = plant.getComponent('position');
         if (position) {
-          floatingTextRenderer.add(`🌾 +${seedsHarvested} seeds`, (position as any).x * 16, (position as any).y * 16, '#FFD700', 2000);
+          floatingTextRenderer?.add(`🌾 +${seedsHarvested} seeds`, (position as any).x * 16, (position as any).y * 16, '#FFD700', 2000);
         }
       }
     }
@@ -2313,13 +2333,13 @@ function setupVisualEventHandlers(
   gameLoop.world.eventBus.subscribe('plant:healthChanged', (event: any) => {
     const { health, position } = event.data;
     if (health < 30) {
-      floatingTextRenderer.add(`⚠️ Health: ${Math.round(health)}`, position.x * 16, position.y * 16, '#FF4500', 2000);
+      floatingTextRenderer?.add(`⚠️ Health: ${Math.round(health)}`, position.x * 16, position.y * 16, '#FF4500', 2000);
     }
   });
 
   gameLoop.world.eventBus.subscribe('plant:died', (event: any) => {
     const { position } = event.data;
-    floatingTextRenderer.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
+    floatingTextRenderer?.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
   });
 }
 
@@ -2363,7 +2383,9 @@ function setupInputHandlers(
       placementUI.updateCursorPosition(screenX, screenY, gameLoop.world);
 
       // Update hover info with entity under cursor
-      const hoveredEntity = renderer.findEntityAtScreenPosition(screenX, screenY, gameLoop.world);
+      const hoveredEntity = 'findEntityAtScreenPosition' in renderer
+        ? (renderer as any).findEntityAtScreenPosition(screenX, screenY, gameLoop.world)
+        : renderer.getEntityAt?.(screenX, screenY, gameLoop.world) ?? null;
       hoverInfoPanel.update(hoveredEntity, screenX, screenY);
     },
     onWheel: (screenX, screenY, deltaY) => {
@@ -2783,14 +2805,17 @@ function handleMouseClick(
 
   // Left click - select entities
   if (button === 0) {
-    // In 3D mode, forward click to 3D renderer for entity selection
-    if (renderer.is3DActive()) {
-      renderer.forward3DClick(screenX, screenY);
+    // In 3D mode, forward click to 3D renderer for entity selection (Canvas2D only)
+    if ('is3DActive' in renderer && (renderer as any).is3DActive()) {
+      (renderer as any).forward3DClick(screenX, screenY);
       // 3D selection is handled via callback set up in main()
       return true;
     }
 
-    const entity = renderer.findEntityAtScreenPosition(screenX, screenY, gameLoop.world);
+    // Use Canvas2D entity picker or PixiJS entity picking (getEntityAt on IRenderer)
+    const entity = 'findEntityAtScreenPosition' in renderer
+      ? (renderer as any).findEntityAtScreenPosition(screenX, screenY, gameLoop.world)
+      : renderer.getEntityAt?.(screenX, screenY, gameLoop.world) ?? null;
     if (entity) {
       const hasAgent = entity.components.has('agent');
       const hasAnimal = entity.components.has('animal');
@@ -3849,8 +3874,29 @@ async function main() {
     });
   }
 
-  if (browserResult && browserResult.action === 'create_new') {
-    // Show universe configuration screen for new universe
+  if (browserResult && browserResult.action === 'cosmic_start' && browserResult.cosmicConfig) {
+    // Use the cosmic creation flow result
+    const { universe: cosmicUniverse, planet: cosmicPlanet } = browserResult.cosmicConfig;
+    console.log(`[Main] Cosmic creation complete: Universe "${cosmicUniverse.name}", Planet "${cosmicPlanet.name}"`);
+
+    // Convert cosmic config to universe config format
+    universeConfig = {
+      universeName: cosmicUniverse.name,
+      magicParadigmId: cosmicUniverse.magicSpectrum.intensity,
+      magicSpectrum: cosmicUniverse.magicSpectrum,
+      spectrumEffects: cosmicUniverse.spectrumEffects,
+      cosmicDeities: cosmicUniverse.cosmicDeities,
+      planetName: cosmicPlanet.name,
+      planetType: cosmicPlanet.type,
+      artStyle: cosmicPlanet.artStyle,
+      generateBiosphere: cosmicPlanet.generateBiosphere,
+      maxSpecies: cosmicPlanet.maxSpecies,
+      seed: cosmicPlanet.seed,
+    } as any;  // Extended config with cosmic data
+
+    universeSelection = { type: 'new', magicParadigm: cosmicUniverse.magicSpectrum.intensity };
+  } else if (browserResult && browserResult.action === 'create_new') {
+    // Legacy: Show universe configuration screen for new universe
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((config) => {
@@ -4090,10 +4136,15 @@ async function main() {
   console.log('[Main] ChunkSpatialQuery set on world.spatialQuery');
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
-  const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
+  // Uses factory to automatically select WebGPU/WebGL/Canvas2D based on browser support
+  // Override via localStorage.setItem('renderer', 'webgpu'|'webgl'|'canvas2d') or ?renderer= URL param
+  const renderer = await createRenderer(canvas, chunkManager, terrainGenerator);
+  console.log(`[Main] Renderer created with backend: ${renderer.getStats().backend}`);
 
-  // Initialize combat UI renderers
-  renderer.initCombatUI(gameLoop.world, gameLoop.world.eventBus);
+  // Initialize combat UI renderers (optional on IRenderer)
+  if (renderer.initCombatUI) {
+    renderer.initCombatUI(gameLoop.world, gameLoop.world.eventBus);
+  }
 
   // Set up viewport provider for ChunkLoadingSystem (visual mode)
   // This allows the system to load chunks around the camera viewport
@@ -4114,8 +4165,10 @@ async function main() {
     console.log('[Main] FatesCouncilSystem LLM provider configured');
   }
 
-  // Apply render settings from saved settings
-  renderer.set3DDrawDistance(settings.render.drawDistance3D);
+  // Apply render settings from saved settings (if Canvas2D renderer)
+  if ('set3DDrawDistance' in renderer) {
+    (renderer as any).set3DDrawDistance(settings.render.drawDistance3D);
+  }
 
   // Create input handler
   const inputHandler = new InputHandler(canvas, renderer.getCamera());
@@ -4130,9 +4183,13 @@ async function main() {
     description: 'Toggle temperature overlay on tiles',
     category: 'Debug',
     handler: () => {
-      renderer.toggleTemperatureOverlay();
-      const enabled = renderer.isTemperatureOverlayEnabled();
-      showNotification(enabled ? 'Temperature overlay ON' : 'Temperature overlay OFF', '#4FC3F7');
+      if ('toggleTemperatureOverlay' in renderer && 'isTemperatureOverlayEnabled' in renderer) {
+        (renderer as any).toggleTemperatureOverlay();
+        const enabled = (renderer as any).isTemperatureOverlayEnabled();
+        showNotification(enabled ? 'Temperature overlay ON' : 'Temperature overlay OFF', '#4FC3F7');
+      } else {
+        showNotification('Temperature overlay not available in this renderer', '#FFA500');
+      }
       return true;
     },
   });
@@ -4380,7 +4437,14 @@ async function main() {
     if (entity) {
       const pos = entity.components.get('position') as any;
       if (pos) {
-        renderer.centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
+        if ('centerCameraOnWorldPosition' in renderer) {
+          (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
+        } else {
+          // Fallback: directly set camera position
+          const camera = renderer.getCamera();
+          camera.x = pos.x * 16;
+          camera.y = pos.y * 16;
+        }
       }
     }
   });
@@ -4400,7 +4464,14 @@ async function main() {
     if (entity) {
       const pos = entity.components.get('position') as any;
       if (pos) {
-        renderer.centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
+        if ('centerCameraOnWorldPosition' in renderer) {
+          (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
+        } else {
+          // Fallback: directly set camera position
+          const camera = renderer.getCamera();
+          camera.x = pos.x * 16;
+          camera.y = pos.y * 16;
+        }
       }
     }
   });
@@ -4421,10 +4492,12 @@ async function main() {
   // Store reference for 3D entity selection callback
   windowManagerRef = windowManager;
 
-  // Set up 3D entity selection callback
-  renderer.setOnEntitySelected((entityId: string | null) => {
-    handleEntitySelectionById(entityId, gameLoop);
-  });
+  // Set up 3D entity selection callback (Canvas2D only)
+  if ('setOnEntitySelected' in renderer) {
+    (renderer as any).setOnEntitySelected((entityId: string | null) => {
+      handleEntitySelectionById(entityId, gameLoop);
+    });
+  }
 
   // Build UI context
   const uiContext: UIContext = {
@@ -4517,7 +4590,15 @@ async function main() {
 
       const selectedEntity = panels.agentInfoPanel.getSelectedEntity() || panels.animalInfoPanel.getSelectedEntity();
       renderer.render(gameLoop.world, selectedEntity);
-      placementUI.render(renderer.getContext());
+
+      // Get Canvas2D context for UI overlay rendering
+      // PixiJS renderer uses WebGPU/WebGL so we get a separate 2D context for UI
+      const ctx = 'getContext' in renderer
+        ? (renderer as any).getContext()
+        : canvas.getContext('2d');
+      if (ctx) {
+        placementUI.render(ctx);
+      }
 
       const selectedAgentId = panels.agentInfoPanel.getSelectedEntityId();
       if (selectedAgentId) {
@@ -4538,22 +4619,37 @@ async function main() {
         }
       }
 
-      const ctx = renderer.getContext();
+      // Get Canvas2D context for UI overlay rendering
+      // Use getOverlayContext() for WebGL (separate transparent canvas) or Canvas2D (main canvas)
+      const ctx2 = renderer.getOverlayContext ? renderer.getOverlayContext() : null;
 
       // Update city manager panel and widget
       panels.cityManagerPanel.update(gameLoop.world);
       panels.cityStatsWidget.update(gameLoop.world);
 
-      windowManager.render(ctx, gameLoop.world);
-      panels.shopPanel.render(ctx, gameLoop.world);
+      if (ctx2) {
+        // Get overlay canvas dimensions (may be different canvas for WebGL renderer)
+        const overlayCanvas = renderer.overlayCanvas ?? canvas;
+        const overlayWidth = overlayCanvas.width;
+        const overlayHeight = overlayCanvas.height;
 
-      // Render city stats widget
-      panels.cityStatsWidget.render(ctx, canvas.width, canvas.height);
+        // Clear the overlay canvas for WebGL (transparent overlay needs clearing)
+        // For Canvas2D renderer, this is handled by the renderer's clear
+        if (renderer.overlayCanvas && renderer.overlayCanvas !== canvas) {
+          ctx2.clearRect(0, 0, overlayWidth, overlayHeight);
+        }
 
-      menuBar.render(ctx);
+        windowManager.render(ctx2, gameLoop.world);
+        panels.shopPanel.render(ctx2, gameLoop.world);
 
-      // Hover info panel (shows entity tooltips on hover)
-      panels.hoverInfoPanel.render(ctx, canvas.width, canvas.height);
+        // Render city stats widget
+        panels.cityStatsWidget.render(ctx2, overlayWidth, overlayHeight);
+
+        menuBar.render(ctx2);
+
+        // Hover info panel (shows entity tooltips on hover)
+        panels.hoverInfoPanel.render(ctx2, overlayWidth, overlayHeight);
+      }
 
       // Update speech bubble positions when camera moves
       speechBubbleOverlay.updatePositions((agentId) => {
@@ -4822,6 +4918,7 @@ async function main() {
         generateBiosphere: !existingPlanetBiosphere,  // Skip if we have cached biosphere
         queueSprites: true,
         existingBiosphere: existingPlanetBiosphere,   // Use cached biosphere if available
+        artStyle: universeConfig?.artStyle,           // Console-era art style from universe config
         onProgress: (message: string) => {
           if (universeConfigScreen) {
             universeConfigScreen.updateProgress(message);

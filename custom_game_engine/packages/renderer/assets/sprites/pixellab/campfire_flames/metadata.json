@@ -6,6 +6,8 @@
   "fps": 8,
   "loop": true,
   "category": "map_objects",
-  "description": "Small campfire with flickering orange and yellow flames, pixel art style",
-  "generated_at": "2026-01-05T05:39:53.261Z"
+  "description": "flames campfire",
+  "generated_at": "2026-01-05T05:39:53.261Z",
+  "original_description": "Small campfire with flickering orange and yellow flames, pixel art style",
+  "enriched_at": "2026-01-30T00:40:22.556Z"
 }

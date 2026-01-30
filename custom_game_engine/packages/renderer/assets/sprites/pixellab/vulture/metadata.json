@@ -2,8 +2,9 @@
   "id": "vulture",
   "category": "objects",
   "size": 48,
-  "description": "bearded vulture lammergeier with orange-tinted feathers, black beard, red eye ring, pixel art, game sprite, 48x48",
+  "description": "vulture",
   "original_description": "bearded vulture lammergeier with orange-tinted feathers, black beard, red eye ring, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:42:11.489Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.666Z"
 }

@@ -2,8 +2,9 @@
   "id": "clover-flowering",
   "category": "objects",
   "size": 48,
-  "description": "Clover with white or pink round flower heads, pixel art, top-down view, transparent background",
+  "description": "clover-flowering",
   "original_description": "Clover with white or pink round flower heads, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:54:15.034Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.572Z"
 }

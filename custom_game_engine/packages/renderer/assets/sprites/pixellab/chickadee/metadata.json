@@ -2,8 +2,9 @@
   "id": "chickadee",
   "category": "objects",
   "size": 48,
-  "description": "black-capped chickadee with black cap and bib, white cheeks, pixel art, game sprite, 48x48",
+  "description": "chickadee",
   "original_description": "black-capped chickadee with black cap and bib, white cheeks, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T04:51:55.163Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.566Z"
 }

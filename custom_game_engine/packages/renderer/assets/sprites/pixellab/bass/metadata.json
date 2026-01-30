@@ -2,8 +2,9 @@
   "id": "bass",
   "category": "objects",
   "size": 48,
-  "description": "largemouth bass with green scales, dark lateral line, pixel art, game sprite, 48x48",
+  "description": "bass",
   "original_description": "largemouth bass with green scales, dark lateral line, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:06:02.747Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.547Z"
 }

@@ -553,6 +553,17 @@ async function main() {
     }
   });
 
+  // Listen for command execution results
+  baseGameLoop.world.eventBus.on('admin_angel:command_result', (event) => {
+    const data = event.data as { command: string; success: boolean; result?: string; error?: string };
+    if (data.success) {
+      console.log(`\n[System]: ${data.result}`);
+    } else {
+      console.log(`\n[System Error]: ${data.error || 'Command failed'}`);
+    }
+    process.stdout.write('> ');
+  });
+
   // Set up readline for player input
   const readline = await import('readline');
   const rl = readline.createInterface({

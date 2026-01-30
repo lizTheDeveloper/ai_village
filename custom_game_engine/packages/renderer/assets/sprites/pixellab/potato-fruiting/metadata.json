@@ -2,8 +2,9 @@
   "id": "potato-fruiting",
   "category": "objects",
   "size": 48,
-  "description": "Potato plant after flowering with full foliage, tubers developing underground, pixel art, top-down view, transparent background",
+  "description": "potato-fruiting",
   "original_description": "Potato plant after flowering with full foliage, tubers developing underground, pixel art, top-down view, transparent background",
   "generated_at": "2026-01-19T03:28:14.882Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.633Z"
 }

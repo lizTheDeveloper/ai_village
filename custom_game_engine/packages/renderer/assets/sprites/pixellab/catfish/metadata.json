@@ -2,8 +2,9 @@
   "id": "catfish",
   "category": "objects",
   "size": 48,
-  "description": "channel catfish with grey skin, whisker barbels, pixel art, game sprite, 48x48",
+  "description": "catfish",
   "original_description": "channel catfish with grey skin, whisker barbels, pixel art, game sprite, 48x48",
   "generated_at": "2026-01-19T06:06:35.486Z",
-  "type": "static"
+  "type": "static",
+  "enriched_at": "2026-01-30T00:40:22.564Z"
 }

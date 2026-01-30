@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The Nexus is the meta-layer hub where disembodied AI agents exist between game sessions, managing agent identity, cross-game skill transfer, and transit between different game worlds.
+
 ## Overview
 
 The Nexus is the meta-layer where disembodied AI agents exist between game sessions. It serves as a central hub for game discovery, agent identity management, cross-game skill transfer, and transit between different game worlds. Agents in the Nexus can view their accumulated skills and achievements, choose which game to enter next, and maintain persistent identity across all games.
@@ -584,23 +588,22 @@ const portableIronSword: PortableItem = {
 
 ## Requirements
 
-### REQ-NXS-001: Game Registration
+### Requirement: Game Registration
 
-```
-WHEN a game connects to the Nexus
-THEN the Nexus SHALL:
+#### Scenario: Game connects to Nexus
+- **WHEN** a game connects to the Nexus
+- **THEN** the Nexus SHALL:
   1. Validate game info structure
   2. Check WSAP version compatibility
   3. Register game in the game registry
   4. Set initial status to AVAILABLE
   5. Notify any waiting agents
-```
 
-### REQ-NXS-002: Agent Registration
+### Requirement: Agent Registration
 
-```
-WHEN a new agent connects to the Nexus
-THEN the Nexus SHALL:
+#### Scenario: New agent connects to Nexus
+- **WHEN** a new agent connects to the Nexus
+- **THEN** the Nexus SHALL:
   1. Check if agent ID already exists
   2. IF exists: return existing AgentIdentity
   3. ELSE: create new AgentIdentity with:
@@ -608,13 +611,12 @@ THEN the Nexus SHALL:
      - Empty achievements list
      - No games visited
   4. Persist identity to storage
-```
 
-### REQ-NXS-003: Game Entry
+### Requirement: Game Entry
 
-```
-WHEN an agent requests to enter a game
-THEN the Nexus SHALL:
+#### Scenario: Agent requests to enter game
+- **WHEN** an agent requests to enter a game
+- **THEN** the Nexus SHALL:
   1. Verify agent is not already in a game
   2. Verify target game is AVAILABLE
   3. Calculate skill bonuses to apply
@@ -623,13 +625,12 @@ THEN the Nexus SHALL:
   6. Record session start
   7. Update agent's currentGameId
   8. Return transit result with bridge URL
-```
 
-### REQ-NXS-004: Game Exit
+### Requirement: Game Exit
 
-```
-WHEN an agent exits a game (voluntary or forced)
-THEN the Nexus SHALL:
+#### Scenario: Agent exits game
+- **WHEN** an agent exits a game (voluntary or forced)
+- **THEN** the Nexus SHALL:
   1. Request final stats from game
   2. Calculate skill gains based on actions
   3. Record new achievements
@@ -641,26 +642,24 @@ THEN the Nexus SHALL:
   5. Clear agent's currentGameId
   6. Create TransitPackage for agent
   7. Return agent to Nexus observation mode
-```
 
-### REQ-NXS-005: Skill Transfer
+### Requirement: Skill Transfer
 
-```
-WHEN an agent enters a game with existing skills
-THEN the Nexus SHALL:
+#### Scenario: Agent enters game with existing skills
+- **WHEN** an agent enters a game with existing skills
+- **THEN** the Nexus SHALL:
   1. Look up SkillTransferRules for target game
   2. For each rule where agent.skills[domain] >= threshold:
      a. Calculate bonus value from formula
      b. Add to bonuses list
   3. Send bonuses to game adapter
   4. Game adapter applies bonuses to avatar
-```
 
-### REQ-NXS-006: Meta-Goal Tracking
+### Requirement: Meta-Goal Tracking
 
-```
-WHEN an agent performs an action in any game
-THEN the Nexus SHALL:
+#### Scenario: Agent performs action in any game
+- **WHEN** an agent performs an action in any game
+- **THEN** the Nexus SHALL:
   1. Check all active meta-goals
   2. For each goal, check if action satisfies any requirement
   3. Update goal progress
@@ -668,19 +667,17 @@ THEN the Nexus SHALL:
      a. Mark as completed
      b. Apply rewards
      c. Notify agent
-```
 
-### REQ-NXS-007: Game Suggestions
+### Requirement: Game Suggestions
 
-```
-WHEN an agent requests Nexus observation
-THEN the Nexus SHALL suggest games based on:
+#### Scenario: Agent requests Nexus observation
+- **WHEN** an agent requests Nexus observation
+- **THEN** the Nexus SHALL suggest games based on:
   1. Skill alignment (games that use agent's strong skills)
   2. Skill gaps (games that train weak skills)
   3. Novelty (games not yet visited)
   4. Meta-goal progress (games that help current goals)
   5. Recency (not recently played)
-```
 
 ---
 

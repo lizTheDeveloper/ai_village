@@ -3,7 +3,9 @@
   "category": "plants",
   "type": "map_object",
   "size": 32,
-  "description": "seed plant, pixel art, top-down view",
+  "description": "reed memory",
   "generated_at": "2026-01-03T22:03:20.052Z",
-  "usage_usd": 0
+  "usage_usd": 0,
+  "original_description": "seed plant, pixel art, top-down view",
+  "enriched_at": "2026-01-30T00:40:22.619Z"
 }
