@@ -147,12 +147,17 @@ export class DivineChatPanel implements IWindowPanel {
 
   // Auto-scroll tracking
   private lastMessageCount = 0;
+  private autoScrollEnabled = true; // When true, scroll to bottom on new messages
 
   // Local cache of messages for immediate display
   // Used in both SharedWorker mode (forwarded messages) and direct mode (event subscription)
   private localMessageCache: ChatMessage[] = [];
   private chatMessageUnsubscribe: (() => void) | null = null;
   private eventBusUnsubscribe: (() => void) | null = null;
+
+  // Hidden HTML input for speech-to-text support
+  // Canvas-rendered inputs don't work with speech-to-text tools, so we use a real input
+  private hiddenInput: HTMLInputElement | null = null;
 
   constructor() {
     // Subscribe to chat messages from the GameBridge
@@ -434,9 +439,11 @@ export class DivineChatPanel implements IWindowPanel {
 
     // Draw messages and notifications
     // Always render messages - this includes localMessageCache even if chatRoomComponent is null
-    // Reserve space for input area at bottom: inputHeight + padding between messages and input + bottom padding
+    // Reserve space for input area at bottom: inputHeight + extra padding to prevent overlap
     if (world) {
-      const messageAreaMaxHeight = panelHeight - (currentY - panelY) - SIZES.inputHeight - SIZES.padding * 2;
+      // Ensure minimum message area height of 50px to prevent layout issues with negative values
+      // Reserve extra padding (SIZES.padding * 3) to create clear visual separation from input
+      const messageAreaMaxHeight = Math.max(50, panelHeight - (currentY - panelY) - SIZES.inputHeight - SIZES.padding * 3);
       currentY = this.renderMessages(ctx, panelX, currentY, panelWidth, messageAreaMaxHeight, world);
     }
 
@@ -483,8 +490,12 @@ export class DivineChatPanel implements IWindowPanel {
 
   /**
    * Render list of present deities
+   * Constrained to SIZES.deityListHeight maximum to prevent layout overflow
    */
   private renderDeityList(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, world: World): number {
+    const startY = y;
+    const maxHeight = SIZES.deityListHeight; // Maximum height for deity list
+
     ctx.fillStyle = COLORS.textMuted;
     ctx.font = `${SIZES.fontSize}px monospace`;
     ctx.fillText('Present:', x + SIZES.padding, y);
@@ -499,6 +510,7 @@ export class DivineChatPanel implements IWindowPanel {
     });
 
     const maxNameWidth = width - SIZES.padding * 3 - SIZES.scrollbarWidth;
+    let truncated = false;
 
     for (let i = 0; i < deityNames.length; i++) {
       const { name, isPlayer } = deityNames[i]!;
@@ -507,12 +519,25 @@ export class DivineChatPanel implements IWindowPanel {
       // Wrap text instead of truncating
       const lines = this.wrapTextToLines(ctx, displayName, maxNameWidth);
       for (const line of lines) {
+        // Check if we've exceeded max height (with padding for "..." indicator)
+        if (y - startY >= maxHeight - SIZES.lineHeight) {
+          truncated = true;
+          break;
+        }
         ctx.fillText(line, x + SIZES.padding * 2, y);
         y += SIZES.lineHeight;
       }
+      if (truncated) break;
     }
 
-    return y + SIZES.padding;
+    // Show truncation indicator if we couldn't fit all deities
+    if (truncated) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.fillText(`... +${deityNames.length - memberIds.indexOf(deityNames.find(d => d.name)?.name ?? '') - 1} more`, x + SIZES.padding * 2, y);
+      y += SIZES.lineHeight;
+    }
+
+    return startY + Math.min(y - startY, maxHeight) + SIZES.padding;
   }
 
   /**
@@ -585,16 +610,24 @@ export class DivineChatPanel implements IWindowPanel {
       }
     }
 
-    this.contentHeight = totalContentHeight;
+    // Add bottom padding to ensure the last message isn't cut off when scrolled to bottom
+    this.contentHeight = totalContentHeight + SIZES.padding;
     this.visibleHeight = messageAreaHeight;
 
-    // Auto-scroll to bottom when new messages arrive
+    // Auto-scroll to bottom when new messages arrive (if auto-scroll is enabled)
     const currentMessageCount = items.length;
+    const maxScroll = Math.max(0, this.contentHeight - messageAreaHeight);
+
+    // Re-enable auto-scroll when new messages arrive
     if (currentMessageCount > this.lastMessageCount) {
-      // New message(s) arrived - scroll to bottom
-      const maxScroll = Math.max(0, this.contentHeight - messageAreaHeight);
+      this.autoScrollEnabled = true;
+    }
+
+    // Apply auto-scroll if enabled
+    if (this.autoScrollEnabled) {
       this.scrollOffset = maxScroll;
     }
+
     this.lastMessageCount = currentMessageCount;
 
     // Render scrollable messages
@@ -606,10 +639,7 @@ export class DivineChatPanel implements IWindowPanel {
     let itemY = y - this.scrollOffset;
 
     for (const item of items) {
-      if (itemY + SIZES.messageHeight < y) {
-        itemY += SIZES.messageHeight + 4;
-        continue;
-      }
+      // Early exit if we're past the visible area
       if (itemY > y + messageAreaHeight) break;
 
       if (item.type === 'message') {
@@ -708,6 +738,10 @@ export class DivineChatPanel implements IWindowPanel {
    * Wrap text to fit within maxWidth, returning array of lines
    */
   private wrapTextToLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    // Guard against undefined/null text
+    if (!text) {
+      return [''];
+    }
     const words = text.split(' ');
     const lines: string[] = [];
     let currentLine = '';
@@ -855,9 +889,12 @@ export class DivineChatPanel implements IWindowPanel {
     ctx.fillStyle = COLORS.scrollbar;
     ctx.fillRect(x, y, SIZES.scrollbarWidth, height);
 
-    // Thumb
+    // Thumb - ensure it never extends past the track
     const thumbHeight = Math.max(30, height * (height / this.contentHeight));
-    const thumbY = y + (this.scrollOffset / this.contentHeight) * height;
+    // Calculate thumb position, but cap it so thumb doesn't extend past track bottom
+    const maxThumbY = y + height - thumbHeight;
+    const calculatedThumbY = y + (this.scrollOffset / this.contentHeight) * height;
+    const thumbY = Math.min(maxThumbY, calculatedThumbY);
 
     ctx.fillStyle = COLORS.scrollbarThumb;
     ctx.fillRect(x, thumbY, SIZES.scrollbarWidth, thumbHeight);
@@ -916,11 +953,13 @@ export class DivineChatPanel implements IWindowPanel {
           y >= this.inputBounds.y && y <= this.inputBounds.y + this.inputBounds.height) {
         this.inputActive = true;
         this.nameInputActive = false; // Deactivate name input
+        this.focusHiddenInput(); // Focus hidden input for speech-to-text
         return true;
       } else {
         // Clicked elsewhere in panel - deactivate both inputs
         this.inputActive = false;
         this.nameInputActive = false;
+        this.blurHiddenInput();
       }
     }
 
@@ -959,10 +998,22 @@ export class DivineChatPanel implements IWindowPanel {
   handleWheel(deltaY: number): void {
     if (!this.visible) return;
 
+    const maxScroll = Math.max(0, this.contentHeight - this.visibleHeight);
+
     this.scrollOffset = Math.max(0, Math.min(
-      this.contentHeight - this.visibleHeight,
+      maxScroll,
       this.scrollOffset + deltaY
     ));
+
+    // If user scrolls up, disable auto-scroll so they can read history
+    if (deltaY < 0) {
+      this.autoScrollEnabled = false;
+    }
+
+    // Re-enable auto-scroll when scrolled near the bottom (within 50px)
+    if (this.scrollOffset >= maxScroll - 50) {
+      this.autoScrollEnabled = true;
+    }
   }
 
   /**
@@ -1066,6 +1117,7 @@ export class DivineChatPanel implements IWindowPanel {
   activateInput(): void {
     this.inputActive = true;
     this.nameInputActive = false;
+    this.focusHiddenInput();
   }
 
   /**
@@ -1074,5 +1126,99 @@ export class DivineChatPanel implements IWindowPanel {
   deactivateInput(): void {
     this.inputActive = false;
     this.nameInputActive = false;
+    this.blurHiddenInput();
+  }
+
+  /**
+   * Create or get the hidden HTML input element for speech-to-text support
+   */
+  private getOrCreateHiddenInput(): HTMLInputElement | null {
+    // Only works in browser environment
+    if (typeof document === 'undefined') return null;
+
+    if (!this.hiddenInput) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'divine-chat-hidden-input';
+      input.autocomplete = 'off';
+      input.style.cssText = `
+        position: fixed;
+        opacity: 0;
+        pointer-events: none;
+        width: 1px;
+        height: 1px;
+        border: none;
+        padding: 0;
+        margin: 0;
+        z-index: -1;
+      `;
+
+      // Sync input changes to our state (for speech-to-text)
+      input.addEventListener('input', () => {
+        this.inputText = input.value;
+      });
+
+      // Handle Enter to send
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.sendMessage();
+          input.value = '';
+        }
+      });
+
+      // Handle blur to deactivate
+      input.addEventListener('blur', () => {
+        // Small delay to allow click handling to process first
+        setTimeout(() => {
+          if (this.inputActive && document.activeElement !== input) {
+            this.inputActive = false;
+          }
+        }, 100);
+      });
+
+      document.body.appendChild(input);
+      this.hiddenInput = input;
+    }
+
+    return this.hiddenInput;
+  }
+
+  /**
+   * Focus the hidden input for speech-to-text/keyboard input
+   */
+  private focusHiddenInput(): void {
+    const input = this.getOrCreateHiddenInput();
+    if (input) {
+      input.value = this.inputText;
+      input.focus();
+    }
+  }
+
+  /**
+   * Blur the hidden input
+   */
+  private blurHiddenInput(): void {
+    if (this.hiddenInput) {
+      this.hiddenInput.blur();
+    }
+  }
+
+  /**
+   * Cleanup the hidden input when panel is destroyed
+   */
+  destroy(): void {
+    if (this.chatMessageUnsubscribe) {
+      this.chatMessageUnsubscribe();
+      this.chatMessageUnsubscribe = null;
+    }
+    if (this.eventBusUnsubscribe) {
+      this.eventBusUnsubscribe();
+      this.eventBusUnsubscribe = null;
+    }
+    if (this.hiddenInput && this.hiddenInput.parentNode) {
+      this.hiddenInput.parentNode.removeChild(this.hiddenInput);
+      this.hiddenInput = null;
+    }
   }
 }
