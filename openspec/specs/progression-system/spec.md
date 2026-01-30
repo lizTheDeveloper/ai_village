@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The progression system enables emergent complexity through long-term AI agent decisions, inventions, and cultural development, creating unique civilizations that earn scope expansion through accumulated weirdness rather than prescribed unlocks.
+
 ## Overview
 
 This is not a game with an "endgame." This is a **terrarium for AI emergence**. The world starts simple and slowly, organically grows wild and complex through the accumulated decisions, inventions, and stories of AI agents over hundreds of hours.

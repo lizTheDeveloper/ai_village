@@ -272,9 +272,9 @@ interface TradeOffer {
 }
 ```
 
-```
-WHEN an agent makes a trade offer
-THEN the target agent (AI or player) SHALL:
+#### Scenario: Agent makes a trade offer
+- **WHEN** an agent makes a trade offer
+- **THEN** the target agent (AI or player) SHALL:
   1. Evaluate offer fairness:
      - Calculate total value of offering
      - Calculate total value of requesting
@@ -283,28 +283,26 @@ THEN the target agent (AI or player) SHALL:
   2. Accept, reject, or counter
   3. IF player-agent, display UI for decision
   4. IF AI agent, use LLM to decide based on personality
-```
 
-### REQ-ECO-007: Player Trading UI
+### Requirement: Player Trading UI
 
 The player SHALL have a trading interface:
 
-```
-WHEN the player receives a trade offer
-THEN the UI SHALL display:
+#### Scenario: Player receives a trade offer
+- **WHEN** the player receives a trade offer
+- **THEN** the UI SHALL display:
   - Offerer's portrait and name
   - Items/currency offered (with values)
   - Items/currency requested (with values)
   - Fairness indicator
   - Accept/Reject/Counter buttons
   - Relationship status with offerer
-```
 
 ---
 
 ## Economic Events
 
-### REQ-ECO-008: Market Events
+### Requirement: Market Events
 
 The economy SHALL have dynamic events:
 
@@ -348,7 +346,7 @@ interface WanderingMerchant {
 
 Written works (books, newspapers, scrolls) are tradeable goods with unique value dynamics. See `agent-system/chroniclers.md` for how they're created.
 
-### REQ-ECO-013: Written Work Valuation
+### Requirement: Written Work Valuation
 
 Written works SHALL have value based on content and provenance:
 
@@ -390,7 +388,7 @@ interface WrittenWorkValue {
 }
 ```
 
-### REQ-ECO-014: Information as Commodity
+### Requirement: Information as Commodity
 
 Information itself has economic value:
 
@@ -422,13 +420,13 @@ interface InformationEconomy {
 }
 ```
 
-### REQ-ECO-015: Chronicler Economic Role
+### Requirement: Chronicler Economic Role
 
 Chroniclers participate in economy as information producers:
 
-```
-WHEN a chronicler completes a written work
-THEN the system SHALL:
+#### Scenario: Chronicler completes a written work
+- **WHEN** a chronicler completes a written work
+- **THEN** the system SHALL:
   1. Calculate initial value based on content
   2. Chronicler may:
      - Sell to local library
@@ -438,13 +436,12 @@ THEN the system SHALL:
   3. Track sales and distribution
   4. Author reputation affects future work value
   5. Popular works may be copied (with permission or piracy)
-```
 
 ---
 
 ## Village Economy Metrics
 
-### REQ-ECO-009: Economy Tracking
+### Requirement: Economy Tracking
 
 The system SHALL track village economy health:
 
@@ -476,7 +473,7 @@ interface VillageEconomy {
 
 ## Player Economy Features
 
-### REQ-ECO-010: Player Economic Actions
+### Requirement: Player Economic Actions
 
 The player-agent SHALL have full economic capabilities:
 
@@ -509,7 +506,7 @@ interface PlayerEconomicActions {
 
 ## Economic Balance
 
-### REQ-ECO-011: Currency Sinks and Faucets
+### Requirement: Currency Sinks and Faucets
 
 The economy SHALL maintain balance:
 
@@ -526,21 +523,20 @@ The economy SHALL maintain balance:
 - Purchasing from NPC merchants
 - Event participation fees
 
-```
-The system SHALL monitor currency_in vs currency_out
-IF currency_in > currency_out * 1.5 over 30 days
-THEN trigger mild inflation event
-IF currency_out > currency_in * 1.5 over 30 days
-THEN trigger economic stimulus event
-```
+#### Scenario: Currency balance monitoring
+- The system SHALL monitor currency_in vs currency_out
+- **IF** currency_in > currency_out * 1.5 over 30 days
+- **THEN** trigger mild inflation event
+- **IF** currency_out > currency_in * 1.5 over 30 days
+- **THEN** trigger economic stimulus event
 
-### REQ-ECO-012: Generated Item Economic Impact
+### Requirement: Generated Item Economic Impact
 
 Generated items SHALL not destabilize economy:
 
-```
-WHEN a new item is generated
-THEN the system SHALL:
+#### Scenario: New item is generated
+- **WHEN** a new item is generated
+- **THEN** the system SHALL:
   1. Evaluate economic impact:
      - Does it obsolete existing items?
      - What's its production cost?
@@ -551,7 +547,6 @@ THEN the system SHALL:
      - Add special requirements
   3. Track economic metrics post-introduction
   4. Apply corrective adjustments if needed
-```
 
 ---
 

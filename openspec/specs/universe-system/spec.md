@@ -10,6 +10,10 @@
 
 The game world is organized into a hierarchy: **Universes** contain **Planets**, and planets contain all game content (items, agents, buildings). Universes define the fundamental rules (magic vs tech vs hybrid), while planets are themed variations within those rules. Players can travel between planets in the same universe freely, and discover portals to other universes through research. Multiplayer enables visiting friends' universes.
 
+## Purpose
+
+Defines the hierarchical organization of game worlds (multiverse → universe → planet) with distinct rule sets, portal discovery systems, and multiplayer architecture for cross-universe travel and content sharing.
+
 ---
 
 ## Hierarchy

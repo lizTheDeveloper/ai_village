@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The AI Village game engine provides a browser-based simulation platform where LLM-controlled agents inhabit villages, enabling crop cultivation, building construction, crafting, and technology research.
+
 ## Overview
 
 The AI Village game engine is a browser-based simulation where LLM-controlled agents inhabit a forest village, growing crops, constructing buildings, crafting goods, and researching new technologies. The engine runs as a Vite + TypeScript webapp with an 8-bit visual aesthetic.
@@ -52,17 +56,17 @@ game-engine/
 
 ## Requirements
 
-### REQ-ENG-001: Game Loop
+### Requirement: Game Loop
 
-The engine SHALL implement a fixed timestep game loop:
+The engine SHALL implement a fixed timestep game loop.
 
 - **Tick Rate:** 20 ticks per second (50ms intervals)
 - **Render Rate:** 60 FPS (interpolated)
 - **Pause Support:** Game tick can be paused while rendering continues
 
-```
-WHEN the game loop executes a tick
-THEN all systems SHALL update in deterministic order:
+#### Scenario: Game loop executes tick
+- **WHEN** the game loop executes a tick
+- **THEN** all systems SHALL update in deterministic order:
   1. TimeManager (advance in-game clock)
   2. NeedsSystem (decay agent needs - hunger, thirst, etc.)
   3. AbstractionSystem (determine simulation layers per village)
@@ -76,26 +80,24 @@ THEN all systems SHALL update in deterministic order:
   11. MemorySystem (end-of-day reflection, decay)
   12. ChronicleSystem (writers produce content)
   13. EventBus (process queued events)
-```
 
-### REQ-ENG-002: Time System
+### Requirement: Time System
 
-The engine SHALL track in-game time:
+The engine SHALL track in-game time.
 
 - **Day/Night Cycle:** 10 real minutes = 1 in-game day
 - **Seasons:** Spring, Summer, Fall, Winter (7 in-game days each)
 - **Year Tracking:** Years count up from Year 1
 
-```
-WHEN a new day begins
-THEN the engine SHALL:
+#### Scenario: New day begins
+- **WHEN** a new day begins
+- **THEN** the engine SHALL:
   - Emit "day:start" event
   - Reset daily agent energy
   - Update crop growth states
   - Trigger any scheduled events
-```
 
-### REQ-ENG-003: Multi-Timescale Simulation
+### Requirement: Multi-Timescale Simulation
 
 > **Implementation Note:** Multi-timescale simulation is limited by feasibility. See `consciousness-implementation-phases.md` for details. Phase 5 adds dual timescale (standard + slow). Millisecond and geological timescales are deferred indefinitely due to LLM call constraints and perception mismatches.
 
@@ -173,9 +175,9 @@ const TEMPORAL_SCALES: Record<TemporalScale, TemporalConfig> = {
 };
 ```
 
-```
-WHEN processing a game tick
-THEN the engine SHALL:
+#### Scenario: Processing game tick with multi-timescale entities
+- **WHEN** processing a game tick
+- **THEN** the engine SHALL:
   1. For millisecond entities:
      - Process 20 micro-updates per tick
      - Allow interaction slow-down for cross-scale communication
@@ -191,11 +193,10 @@ THEN the engine SHALL:
   5. For geological entities:
      - Accumulate entire seasons/years
      - Process aggregate world changes, not individual events
-```
 
-### REQ-ENG-003a: Hibernation Cycle Engine
+### Requirement: Hibernation Cycle Engine
 
-Hibernation requires special handling:
+Hibernation requires special handling.
 
 ```typescript
 interface HibernationEngine {
@@ -264,9 +265,9 @@ interface SocietalPersistence {
 }
 ```
 
-```
-WHEN a hibernator enters dormancy
-THEN the engine SHALL:
+#### Scenario: Hibernator enters dormancy
+- **WHEN** a hibernator enters dormancy
+- **THEN** the engine SHALL:
   1. Snapshot current entity state
   2. Apply dormancy effects:
      - Stop needs decay (or minimal)
@@ -278,8 +279,9 @@ THEN the engine SHALL:
      - Transition faction to minimal processing
      - Activate caretaker systems if any
 
-WHEN a hibernator wakes
-THEN the engine SHALL:
+#### Scenario: Hibernator wakes
+- **WHEN** a hibernator wakes
+- **THEN** the engine SHALL:
   1. Calculate time debt (ticks spent dormant)
   2. Apply cumulative dormancy effects
   3. Restore from snapshot with modifications
@@ -288,11 +290,10 @@ THEN the engine SHALL:
      - Reduced effectiveness
      - Memory gaps
      - Relationship reconnection needs
-```
 
-### REQ-ENG-003b: Cross-Timescale Interaction
+### Requirement: Cross-Timescale Interaction
 
-Entities on different timescales can interact:
+Entities on different timescales can interact.
 
 ```typescript
 interface CrossScaleInteraction {
@@ -350,13 +351,13 @@ interface GeologicalPattern {
 }
 ```
 
-### REQ-ENG-003c: Save/Load System
+### Requirement: Save/Load System
 
-The engine SHALL support game persistence:
+The engine SHALL support game persistence.
 
-```
-WHEN the player saves the game
-THEN the engine SHALL serialize:
+#### Scenario: Player saves game
+- **WHEN** the player saves the game
+- **THEN** the engine SHALL serialize:
   - Current time state
   - All agent states and memories
   - World tile data
@@ -364,11 +365,10 @@ THEN the engine SHALL serialize:
   - Building states
   - Research progress
   - Economy state
-```
 
-### REQ-ENG-004: Scenario Configuration
+### Requirement: Scenario Configuration
 
-The engine SHALL load scenarios from configuration files:
+The engine SHALL load scenarios from configuration files.
 
 ```typescript
 interface Scenario {
@@ -393,9 +393,9 @@ interface Scenario {
 }
 ```
 
-### REQ-ENG-005: Event System
+### Requirement: Event System
 
-The engine SHALL provide a pub/sub event bus:
+The engine SHALL provide a pub/sub event bus.
 
 ```typescript
 // Core events

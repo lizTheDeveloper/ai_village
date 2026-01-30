@@ -10,6 +10,10 @@
 
 The world system manages the forest village environment: terrain tiles, biomes, vegetation, resources, pathfinding, and environmental effects. The village is nestled in a procedurally generated forest with clearings, rivers, and varied terrain.
 
+## Purpose
+
+Manages the physical game environment including chunk-based terrain generation, biomes, resources, pathfinding, weather, and seasonal effects for the forest village world.
+
 ---
 
 ## World Structure
@@ -88,13 +92,13 @@ type BiomeType =
 
 ## Requirements
 
-### REQ-WLD-001: Procedural Generation
+### Requirement: Procedural Generation
 
-The world SHALL be procedurally generated from a seed:
+The world SHALL be procedurally generated from a seed.
 
-```
-WHEN a new world is created
-THEN the generator SHALL:
+#### Scenario: New World Creation
+- **WHEN** a new world is created
+- **THEN** the generator SHALL:
   1. Initialize noise functions with seed
   2. Generate elevation map (Perlin noise)
   3. Generate moisture map (Perlin noise, river influence)
@@ -104,23 +108,21 @@ THEN the generator SHALL:
   7. Create village clearing at suitable location
   8. Populate with trees, rocks, resources
   9. Ensure connectivity (pathfinding possible)
-```
 
-### REQ-WLD-002: Village Placement
+### Requirement: Village Placement
 
-The initial village SHALL be placed appropriately:
+The initial village SHALL be placed appropriately.
 
-```
-WHEN determining village location
-THEN the generator SHALL find a location that:
+#### Scenario: Determining Village Location
+- **WHEN** determining village location
+- **THEN** the generator SHALL find a location that:
   - Has a large flat clearing (min 20x20 tiles)
   - Is adjacent to water source
   - Has nearby forest for resources
   - Is not in swamp or steep hills
   - Has high average fertility nearby
-```
 
-### REQ-WLD-003: Resource Distribution
+### Requirement: Resource Distribution
 
 Resources SHALL be distributed by biome:
 
@@ -134,7 +136,7 @@ Resources SHALL be distributed by biome:
 | hills | Stone, Ore, Gems | Rare Ores |
 | swamp | Peat, Mud, Frogs | Rare Mushrooms |
 
-### REQ-WLD-004: Seasonal Changes
+### Requirement: Seasonal Changes
 
 The world SHALL change with seasons:
 
@@ -148,15 +150,14 @@ interface SeasonalEffect {
 }
 ```
 
-```
-WHEN a new season begins
-THEN the WorldSystem SHALL:
+#### Scenario: New Season Begins
+- **WHEN** a new season begins
+- **THEN** the WorldSystem SHALL:
   - Update tile appearances
   - Modify resource spawn rates
   - Adjust movement speeds
   - Change available forage items
   - Update ambient lighting/palette
-```
 
 **Seasonal Effects:**
 - **Spring:** Snow melts, mud appears, flowers bloom, planting season
@@ -164,7 +165,7 @@ THEN the WorldSystem SHALL:
 - **Fall:** Harvest season, falling leaves, mushroom peak
 - **Winter:** Snow coverage, frozen water, limited foraging
 
-### REQ-WLD-005: Pathfinding
+### Requirement: Pathfinding
 
 The world SHALL support A* pathfinding:
 
@@ -193,7 +194,7 @@ interface PathfindingConfig {
 | water_deep | ∞ | Blocked |
 | stone | 3 | Slightly slow |
 
-### REQ-WLD-006: Tile Objects
+### Requirement: Tile Objects
 
 Tiles SHALL support placed objects:
 
@@ -208,29 +209,30 @@ type TileObject =
   | { type: "resource_node"; resourceType: string; remaining: number };
 ```
 
-### REQ-WLD-007: Resource Regeneration
+### Requirement: Resource Regeneration
 
-Natural resources SHALL regenerate over time:
+Natural resources SHALL regenerate over time.
 
-```
-WHEN a tree is chopped
-THEN after 7-14 in-game days
-THEN a sapling MAY appear on the tile
+#### Scenario: Tree Chopped
+- **WHEN** a tree is chopped
+- **THEN** after 7-14 in-game days
+- **THEN** a sapling MAY appear on the tile
   - 80% chance in forest biome
   - 30% chance elsewhere
   - 0% chance on buildings/crops
 
-WHEN berries are harvested from a bush
-THEN after 3 in-game days
-THEN berries SHALL regrow
+#### Scenario: Berry Harvest
+- **WHEN** berries are harvested from a bush
+- **THEN** after 3 in-game days
+- **THEN** berries SHALL regrow
 
-WHEN a resource node is depleted
-THEN after 28 in-game days
-THEN the node MAY respawn
+#### Scenario: Resource Node Depleted
+- **WHEN** a resource node is depleted
+- **THEN** after 28 in-game days
+- **THEN** the node MAY respawn
   - Same type: 60% chance
   - Different type: 20% chance
   - No respawn: 20% chance
-```
 
 ---
 
@@ -253,16 +255,15 @@ interface WorldLayers {
 Fog of war is required - agents only know what they've explored.
 See `agent-system/spatial-memory.md` for how agents remember locations.
 
-```
-WHEN an agent has not visited an area
-THEN the area SHALL be:
+#### Scenario: Unexplored Area
+- **WHEN** an agent has not visited an area
+- **THEN** the area SHALL be:
   - Hidden from the agent's spatial memory
   - Displayed as fog to the player
   - Revealed when an agent moves within vision range
   - Remembered in agent's spatial memory when explored
 
 Agent vision range: 5-8 tiles depending on terrain, time of day, weather
-```
 
 ---
 
@@ -296,14 +297,13 @@ interface WeatherEffect {
 
 ### Day/Night Cycle
 
-```
-WHEN the in-game time progresses
-THEN the WorldSystem SHALL:
+#### Scenario: Time Progression
+- **WHEN** the in-game time progresses
+- **THEN** the WorldSystem SHALL:
   - Adjust ambient lighting (dawn, day, dusk, night)
   - Modify agent behavior tendencies
   - Change resource availability (some only at night)
   - Update tile visibility ranges
-```
 
 ---
 

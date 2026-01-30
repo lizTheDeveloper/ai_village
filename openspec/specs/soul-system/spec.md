@@ -2,6 +2,10 @@
 
 > The soul is the eternal thread that passes through mortal lives, accumulating wisdom across incarnations and universes.
 
+## Purpose
+
+The Soul System manages the eternal aspect of agents, preserving their identity, wisdom, and narrative arcs across lifetimes and timeline forks.
+
 ## Overview
 
 The Soul System manages the eternal aspect of agents - their identity that persists beyond individual lives and even across timeline forks. While an agent's body is temporary and their memories fade, the soul carries forward the lessons learned, the wisdom accumulated, and the plots that span lifetimes.

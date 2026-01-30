@@ -19,6 +19,10 @@ This enables:
 - **Eternal persistence**: All created content lives in the multiverse forever
 - **Cross-universe discovery**: Content can be found in any universe
 
+## Purpose
+
+Enables external content creation tools (microgenerators) for legendary items, souls, quests, buildings, alien species, and magic systems that feed into a persistent god-crafted queue, allowing human-LLM collaboration and cross-universe content discovery.
+
 ---
 
 ## Design Philosophy
@@ -83,9 +87,9 @@ This is **fun for humans** because:
 
 ## Core Requirements
 
-### REQ-1: Microgenerator Architecture
+### Requirement: Microgenerator Architecture
 
-**SHALL** provide a framework for creating isolated content generation tools:
+SHALL provide a framework for creating isolated content generation tools:
 
 ```typescript
 interface Microgenerator {
@@ -109,16 +113,17 @@ interface Microgenerator {
 }
 ```
 
-**WHEN** a user interacts with a microgenerator:
+#### Scenario: User Interacts with Microgenerator
+- **WHEN** a user interacts with a microgenerator
 - **THEN** they see a focused creation interface
 - **THEN** they can compose narrative elements or provide descriptions
 - **THEN** they can optionally collaborate with an LLM
 - **THEN** the tool validates the creation
 - **THEN** content is submitted to the God-Crafted Queue
 
-### REQ-2: God-Crafted Queue (Multiverse Persistence)
+### Requirement: God-Crafted Queue (Multiverse Persistence)
 
-**SHALL** maintain a persistent queue of externally-created content:
+SHALL maintain a persistent queue of externally-created content:
 
 ```typescript
 interface GodCraftedQueue {
@@ -139,22 +144,24 @@ interface GodCraftedQueue {
 }
 ```
 
-**WHEN** content is submitted to the queue:
+#### Scenario: Content Submitted to Queue
+- **WHEN** content is submitted to the queue
 - **THEN** it is assigned a unique ID
 - **THEN** it is tagged with creator information
 - **THEN** it is marked as `undiscovered` in all universes
 - **THEN** it is persisted across all saves/loads (Conservation of Matter)
 - **THEN** it can drift into any universe
 
-**WHEN** a universe discovers content:
+#### Scenario: Universe Discovers Content
+- **WHEN** a universe discovers content
 - **THEN** content is spawned as an entity in that universe
 - **THEN** the queue entry is marked as discovered (but NOT removed)
 - **THEN** the same content can be discovered in other universes
 - **THEN** discovery events are logged
 
-### REQ-3: Content Types
+### Requirement: Content Types
 
-**SHALL** support multiple content types with appropriate data structures:
+SHALL support multiple content types with appropriate data structures:
 
 #### Legendary Item
 
@@ -185,7 +192,8 @@ interface LegendaryItemContent extends GodCraftedContent {
 }
 ```
 
-**WHEN** a legendary item is discovered:
+#### Scenario: Legendary Item Discovered
+- **WHEN** a legendary item is discovered
 - **THEN** it spawns as a unique item instance (not stackable)
 - **THEN** lore can be read via inspection
 - **THEN** powers are registered with the magic system
@@ -237,7 +245,8 @@ interface AlienSpeciesContent extends GodCraftedContent {
 }
 ```
 
-**WHEN** an alien species is discovered:
+#### Scenario: Alien Species Discovered
+- **WHEN** an alien species is discovered
 - **THEN** it can spawn as a new species in universe
 - **THEN** agents of this species can be created
 - **THEN** cultural traits affect behavior
@@ -278,7 +287,8 @@ interface MagicParadigmContent extends GodCraftedContent {
 }
 ```
 
-**WHEN** a magic paradigm is discovered:
+#### Scenario: Magic Paradigm Discovered
+- **WHEN** a magic paradigm is discovered
 - **THEN** it can be adopted by a universe
 - **THEN** mages in that universe follow its rules
 - **THEN** spells are constrained by paradigm laws
@@ -359,7 +369,8 @@ interface MaterialDefinition {
 }
 ```
 
-**WHEN** a building blueprint is discovered:
+#### Scenario: Building Blueprint Discovered
+- **WHEN** a building blueprint is discovered
 - **THEN** it is added to the building registry
 - **THEN** new materials are registered if needed
 - **THEN** material effects are applied
@@ -401,7 +412,8 @@ interface SoulContent extends GodCraftedContent {
 }
 ```
 
-**WHEN** a soul is discovered:
+#### Scenario: Soul Discovered
+- **WHEN** a soul is discovered
 - **THEN** it can incarnate as a new agent
 - **THEN** mission objectives are added as long-term goals
 - **THEN** backstory becomes initial memories
@@ -436,9 +448,9 @@ interface QuestContent extends GodCraftedContent {
 }
 ```
 
-### REQ-4: Narrative Component Library
+### Requirement: Narrative Component Library
 
-**SHALL** provide a library of narrative building blocks:
+SHALL provide a library of narrative building blocks:
 
 ```typescript
 interface NarrativeComponent {
@@ -485,15 +497,16 @@ interface NarrativeComponent {
 - `eternal_quest` - Mission never truly ends
 - `transformation` - Becomes something new
 
-**WHEN** composing narrative components:
+#### Scenario: Composing Narrative Components
+- **WHEN** composing narrative components
 - **THEN** tool validates compatibility
 - **THEN** LLM expands components into coherent narrative
 - **THEN** conflicts generate warnings
 - **THEN** final composition is stored with content
 
-### REQ-5: LLM Collaboration Mode
+### Requirement: LLM Collaboration Mode
 
-**SHALL** support LLM-assisted content creation:
+SHALL support LLM-assisted content creation:
 
 ```typescript
 interface LLMCollaborationSession {
@@ -517,16 +530,17 @@ interface LLMCollaborationSession {
 }
 ```
 
-**WHEN** user initiates LLM collaboration:
+#### Scenario: User Initiates LLM Collaboration
+- **WHEN** user initiates LLM collaboration
 - **THEN** they can provide a text prompt
 - **THEN** they can select narrative components as constraints
 - **THEN** LLM generates content respecting components
 - **THEN** user can iteratively refine the output
 - **THEN** final result is validated before submission
 
-### REQ-6: Discovery Mechanics
+### Requirement: Discovery Mechanics
 
-**SHALL** implement discovery of god-crafted content in universes:
+SHALL implement discovery of god-crafted content in universes:
 
 ```typescript
 interface DiscoverySystem {
@@ -549,16 +563,17 @@ type DiscoveryCondition =
   | { type: 'research'; researchId: string };
 ```
 
-**WHEN** universe checks for discoveries:
+#### Scenario: Universe Checks for Discoveries
+- **WHEN** universe checks for discoveries
 - **THEN** query god-crafted queue for eligible content
 - **THEN** apply rarity/spawn rate filters
 - **THEN** check discovery conditions
 - **THEN** spawn content if conditions met
 - **THEN** mark as discovered but keep in queue
 
-### REQ-7: PixelLab Integration for Sprite Generation
+### Requirement: PixelLab Integration for Sprite Generation
 
-**SHALL** integrate with PixelLab API for automatic sprite generation:
+SHALL integrate with PixelLab API for automatic sprite generation:
 
 ```typescript
 interface PixelLabIntegration {
@@ -597,20 +612,22 @@ interface PixelLabTileset {
 }
 ```
 
-**WHEN** user creates content with visual elements:
+#### Scenario: User Creates Content with Visual Elements
+- **WHEN** user creates content with visual elements
 - **THEN** they can provide a text description
 - **THEN** PixelLab API generates pixel art sprites
 - **THEN** sprites are stored with the content
 - **THEN** sprites are used when content spawns in-game
 
-**WHEN** user enters a material name:
-- **IF** material exists in registry:
-  - **THEN** use existing material definition
-- **ELSE**:
-  - **THEN** LLM generates material properties
-  - **THEN** PixelLab generates material texture
-  - **THEN** new material is registered
-  - **THEN** creator is attributed
+#### Scenario: User Enters Material Name
+- **WHEN** user enters a material name
+- **THEN** IF material exists in registry:
+  - Use existing material definition
+- **THEN** ELSE:
+  - LLM generates material properties
+  - PixelLab generates material texture
+  - New material is registered
+  - Creator is attributed
 
 **Example: Building Creator with Material Generation**
 
@@ -655,9 +672,9 @@ Result:
 - All added to god-crafted queue
 ```
 
-### REQ-8: Creator Attribution (Divine Signature)
+### Requirement: Creator Attribution (Divine Signature)
 
-**SHALL** require creators to declare themselves as gods with a domain:
+SHALL require creators to declare themselves as gods with a domain:
 
 ```typescript
 interface GodCraftedContent {
@@ -695,14 +712,16 @@ interface GodCraftedContent {
 }
 ```
 
-**WHEN** user opens a microgenerator:
+#### Scenario: User Opens Microgenerator
+- **WHEN** user opens a microgenerator
 - **THEN** they must enter their name
 - **THEN** they must declare what they are "God of"
 - **THEN** this becomes their divine signature
 - **THEN** signature is saved for future creations
 - **THEN** they can change their domain for each creation
 
-**WHEN** content is inspected in-game:
+#### Scenario: Content Inspected In-Game
+- **WHEN** content is inspected in-game
 - **THEN** divine signature is displayed: "Crafted by Liz, God of Late Night Claude Code Coding Sessions"
 - **THEN** creation date is shown
 - **THEN** discovery history is accessible
@@ -728,7 +747,8 @@ interface GodCraftedContent {
 └──────────────────────────────────────────────┘
 ```
 
-**WHEN** content is discovered in a universe:
+#### Scenario: Content Discovered in Universe
+- **WHEN** content is discovered in a universe
 - **THEN** a lore event is generated: "You have discovered an artifact crafted by Liz, God of Late Night Claude Code Coding Sessions"
 - **THEN** agents can remember and reference the creator
 - **THEN** multiple creations by same god create a pantheon presence

@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The farming system enables agents to cultivate crops following natural life cycles, manage soil fertility, and develop hybrid varieties through experimentation.
+
 ## Overview
 
 The farming system enables agents to cultivate crops, manage soil, and harvest produce. Plants follow **natural life cycles** - they grow, flower, fruit, drop seeds, and die. Agents start with seeds and can gather more from wild and cultivated plants. Crops follow seasonal patterns and can be combined into new hybrid varieties through experimentation.
@@ -978,74 +982,72 @@ interface CropTraits {
 
 ## Requirements
 
-### REQ-FRM-001: Tilling and Planting
+### Requirement: Tilling and Planting
 
-Agents SHALL prepare soil and plant crops:
+Agents SHALL prepare soil and plant crops.
 
-```
-WHEN an agent tills a grass tile
-THEN the tile SHALL:
+#### Scenario: Agent tills grass tile
+- **WHEN** an agent tills a grass tile
+- **THEN** the tile SHALL:
   - Change terrain to "dirt"
   - Set fertility based on biome
   - Become plantable
   - Require replanting after 3 harvests
 
-WHEN an agent plants a seed
-THEN the system SHALL:
+#### Scenario: Agent plants seed
+- **WHEN** an agent plants a seed
+- **THEN** the system SHALL:
   - Check agent has seed in inventory
   - Check tile is tilled and empty
   - Create Crop entity with seed stage
   - Remove seed from inventory
   - Set initial traits based on seed quality
-```
 
-### REQ-FRM-002: Watering
+### Requirement: Watering
 
-Crops SHALL require watering:
+Crops SHALL require watering.
 
-```
-WHEN a new day begins
-THEN for each crop:
-  IF wateredToday == false
+#### Scenario: New day begins for crops
+- **WHEN** a new day begins
+- **THEN** for each crop:
+  - IF wateredToday == false
     - Increment daysWithoutWater
     - IF daysWithoutWater > waterNeed threshold
       - Reduce health by 20
     - IF health <= 0
       - Set stage to "withered"
-  ELSE
+  - ELSE
     - Reset daysWithoutWater to 0
   - Reset wateredToday to false
-```
 
 **Watering Methods:**
 - Manual watering by agent (1 tile)
 - Sprinkler building (radius)
 - Rain weather (all outdoor crops)
 
-### REQ-FRM-003: Growth Progression
+### Requirement: Growth Progression
 
-Crops SHALL grow over time:
+Crops SHALL grow over time.
 
-```
-WHEN a game tick occurs
-THEN for each non-withered crop:
+#### Scenario: Game tick occurs
+- **WHEN** a game tick occurs
+- **THEN** for each non-withered crop:
   - Calculate growth rate:
-    baseRate * seasonMultiplier * fertilizerBonus * traitMultiplier
+    - baseRate * seasonMultiplier * fertilizerBonus * traitMultiplier
   - Add to growthProgress
   - IF growthProgress >= 100
     - Advance to next stage
     - Reset growthProgress to 0
   - IF stage == "harvestable" && daysHarvestable > maxDays
     - Set stage to "withered"
-```
 
-### REQ-FRM-004: Harvesting
+### Requirement: Harvesting
 
-Agents SHALL harvest mature crops:
+Agents SHALL harvest mature crops.
 
-```
-WHEN an agent harvests a crop at "harvestable" stage
-THEN the system SHALL:
+#### Scenario: Agent harvests crop at harvestable stage
+- **WHEN** an agent harvests a crop at "harvestable" stage
+- **THEN** the system SHALL:
   1. Calculate yield based on:
      - Crop definition base yield
      - Quality rating
@@ -1055,14 +1057,13 @@ THEN the system SHALL:
   3. Add items to agent inventory
   4. IF crop.isRepeating (berries, etc.)
      - Reset to "mature" stage
-  ELSE
+  - ELSE
      - Remove crop from tile
      - Decrement tile plantability counter
-```
 
-### REQ-FRM-005: Seasonal Crops
+### Requirement: Seasonal Crops
 
-Crops SHALL follow seasonal patterns:
+Crops SHALL follow seasonal patterns.
 
 ```typescript
 interface CropDefinition {
@@ -1089,14 +1090,14 @@ interface CropDefinition {
 
 ## Crop Breeding & Generation
 
-### REQ-FRM-006: Crop Hybridization
+### Requirement: Crop Hybridization
 
-The farming system SHALL support breeding new crop varieties:
+The farming system SHALL support breeding new crop varieties.
 
-```
-WHEN an agent plants two compatible crops adjacent to each other
-AND both reach harvestable stage together
-THEN there is a chance (10-30%) to produce hybrid seeds:
+#### Scenario: Compatible crops produce hybrids
+- **WHEN** an agent plants two compatible crops adjacent to each other
+- **AND** both reach harvestable stage together
+- **THEN** there is a chance (10-30%) to produce hybrid seeds:
   1. LLM generates hybrid concept based on parents
   2. System creates new CropDefinition with:
      - Blended traits from parents
@@ -1105,11 +1106,10 @@ THEN there is a chance (10-30%) to produce hybrid seeds:
      - New sprite (if image gen available)
   3. Hybrid seeds added to harvest
   4. New crop type persisted to game database
-```
 
-### REQ-FRM-007: Trait Inheritance
+### Requirement: Trait Inheritance
 
-Hybrid crops SHALL inherit and mutate traits:
+Hybrid crops SHALL inherit and mutate traits.
 
 ```typescript
 function generateHybridTraits(parent1: CropTraits, parent2: CropTraits): CropTraits {
@@ -1124,9 +1124,9 @@ function generateHybridTraits(parent1: CropTraits, parent2: CropTraits): CropTra
 }
 ```
 
-### REQ-FRM-008: Crop Discovery Persistence
+### Requirement: Crop Discovery Persistence
 
-Generated crops SHALL be permanently stored:
+Generated crops SHALL be permanently stored.
 
 ```typescript
 interface GeneratedCropRecord {

@@ -11,6 +11,10 @@ A credit-aware, batching scheduler for LLM requests that:
 - Applies deltas incrementally for streaming responses
 - Supports three-layer LLM architecture (Talker + Executor with different priorities)
 
+## Purpose
+
+Provides efficient LLM request scheduling with HTTP batching, lazy prompt rendering, credit tracking, streaming response pipelines, and multi-game capacity distribution to maximize throughput while respecting rate limits.
+
 ## Motivation
 
 ### Current State (Inefficient)

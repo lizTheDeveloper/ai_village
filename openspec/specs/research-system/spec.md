@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The research system enables agents to discover new technologies, recipes, buildings, and item types through both predefined tech trees and procedural invention.
+
 ## Overview
 
 The research system enables agents to discover new technologies, recipes, buildings, and item types. It supports both a predefined tech tree and procedural invention, creating an infinite progression system where agents can invent genuinely new things that persist across the game.
@@ -77,13 +81,13 @@ type ResearchUnlock =
 
 ## Requirements
 
-### REQ-RES-001: Research Execution
+### Requirement: Research Execution
 
-Agents SHALL conduct research at research buildings:
+Agents SHALL conduct research at research buildings.
 
-```
-WHEN an agent researches at a valid building
-THEN the system SHALL:
+#### Scenario: Agent Researches at Valid Building
+- **WHEN** an agent researches at a valid building
+- **THEN** the system SHALL:
   1. Verify research prerequisites met
   2. Verify required items consumed (if any)
   3. Calculate research points per tick:
@@ -95,9 +99,8 @@ THEN the system SHALL:
      - Emit "research:complete" event
      - Grant skill XP
      - IF experimental type, trigger generation
-```
 
-### REQ-RES-002: Research Point Calculation
+### Requirement: Research Point Calculation
 
 Research progress SHALL be calculated:
 
@@ -180,7 +183,7 @@ Infinite Knowledge ────► Meta-research bonuses
 
 ## Procedural Invention System
 
-### REQ-RES-003: Experimental Research
+### Requirement: Experimental Research
 
 The system SHALL support open-ended invention:
 
@@ -211,13 +214,13 @@ type ExperimentApproach =
   | "collaboration";   // Multi-agent research
 ```
 
-### REQ-RES-004: Invention Process
+### Requirement: Invention Process
 
-New inventions SHALL be generated through experimentation:
+New inventions SHALL be generated through experimentation.
 
-```
-WHEN an agent conducts experimental research
-THEN the system SHALL:
+#### Scenario: Agent Conducts Experimental Research
+- **WHEN** an agent conducts experimental research
+- **THEN** the system SHALL:
   1. Gather experiment context:
      - Materials provided
      - Agent's skills and personality
@@ -248,9 +251,8 @@ THEN the system SHALL:
      - "This combination doesn't work because..."
      - Narrows future experiments
      - Contributes to breakthrough chance
-```
 
-### REQ-RES-005: Discovery Generation
+### Requirement: Discovery Generation
 
 Generated discoveries SHALL follow constraints:
 
@@ -289,7 +291,7 @@ interface DiscoveryGenerationPrompt {
 }
 ```
 
-### REQ-RES-006: Crafting Tree Generation
+### Requirement: Crafting Tree Generation
 
 New recipes SHALL be generated with crafting chains:
 
@@ -329,13 +331,13 @@ interface CraftingStep {
 }
 ```
 
-### REQ-RES-007: Recipe Tree Balancing
+### Requirement: Recipe Tree Balancing
 
-Generated recipes SHALL maintain economic balance:
+Generated recipes SHALL maintain economic balance.
 
-```
-WHEN generating a new recipe
-THEN the system SHALL ensure:
+#### Scenario: Generating New Recipe
+- **WHEN** generating a new recipe
+- **THEN** the system SHALL ensure:
   1. Output value >= Sum(input values) * 1.2
      - Crafting should be profitable
   2. Complexity adds value:
@@ -348,13 +350,12 @@ THEN the system SHALL ensure:
      - All ingredients must be obtainable somehow
   6. Tier consistency:
      - Output tier <= max(input tiers) + 1
-```
 
 ---
 
 ## Knowledge System
 
-### REQ-RES-008: Research Knowledge
+### Requirement: Research Knowledge
 
 Research SHALL unlock knowledge and hints:
 
@@ -373,7 +374,7 @@ interface Knowledge {
 }
 ```
 
-### REQ-RES-009: Insight Accumulation
+### Requirement: Insight Accumulation
 
 Failed experiments SHALL provide insights:
 
@@ -397,7 +398,7 @@ interface Insight {
 
 ## Discovery Propagation
 
-### REQ-RES-010: Chronicler Documentation
+### Requirement: Chronicler Documentation
 
 Discoveries SHALL be documented and spread via chroniclers (see `agent-system/chroniclers.md`):
 
@@ -427,13 +428,13 @@ interface DiscoveryDocumentation {
 }
 ```
 
-### REQ-RES-011: Discovery Events
+### Requirement: Discovery Events
 
-When a discovery is made, chroniclers MAY document it:
+When a discovery is made, chroniclers MAY document it.
 
-```
-WHEN a research project completes successfully
-THEN the system SHALL:
+#### Scenario: Research Project Completes Successfully
+- **WHEN** a research project completes successfully
+- **THEN** the system SHALL:
   1. Emit "discovery:complete" event with details
   2. Notify nearby chroniclers (if any)
   3. IF chronicler is interested in topic:
@@ -448,7 +449,6 @@ THEN the system SHALL:
      - They have read documentation
      - They meet skill requirements
      - They have necessary materials
-```
 
 ---
 
@@ -470,26 +470,25 @@ THEN the system SHALL:
 
 ## Collaborative Research
 
-### REQ-RES-010: Multi-Agent Research
+### Requirement: Multi-Agent Research
 
-Multiple agents SHALL collaborate on research:
+Multiple agents SHALL collaborate on research.
 
-```
-WHEN multiple agents research the same project
-THEN the system SHALL:
+#### Scenario: Multiple Agents Research Same Project
+- **WHEN** multiple agents research the same project
+- **THEN** the system SHALL:
   1. Combine research points (diminishing returns):
      total = agent1 + (agent2 * 0.7) + (agent3 * 0.5) + ...
   2. Track individual contributions
   3. Combine personality influences on generation
   4. Share discovery credit
   5. Enable "collaboration" experiment approach
-```
 
 ---
 
 ## Balance Safeguards
 
-### REQ-RES-011: Discovery Rate Limits
+### Requirement: Discovery Rate Limits
 
 The system SHALL limit discovery frequency:
 
@@ -513,20 +512,19 @@ interface DiscoveryRateLimits {
 }
 ```
 
-### REQ-RES-012: Power Creep Prevention
+### Requirement: Power Creep Prevention
 
-The system SHALL prevent power creep:
+The system SHALL prevent power creep.
 
-```
-WHEN a discovery would exceed power limits
-THEN the system SHALL:
+#### Scenario: Discovery Would Exceed Power Limits
+- **WHEN** a discovery would exceed power limits
+- **THEN** the system SHALL:
   1. Cap effect magnitudes to tier-appropriate levels
   2. Add drawbacks to overpowered items
   3. Increase costs/requirements proportionally
   4. Flag for manual review if significantly outlying
   5. Track power trend over time
   6. Apply global dampening if trend is upward
-```
 
 ---
 

@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The governance system manages the organic evolution of leadership, laws, and social order in villages, scaling from informal influence to structured councils as populations grow.
+
 ## Overview
 
 The governance system manages how leadership, laws, and social order emerge in villages. Governance evolves organically from informal influence to structured councils. Leaders make decisions affecting the village, laws emerge from consensus or decree, and governance complexity scales with village size and abstraction layer.
@@ -576,9 +580,9 @@ interface JoiningPolitics {
 
 ## Requirements
 
-### REQ-GOV-001: Leadership Emergence
+### Requirement: Leadership Emergence
 
-Leaders SHALL emerge organically:
+Leaders SHALL emerge organically.
 
 ```typescript
 interface LeadershipEmergence {
@@ -601,9 +605,9 @@ interface LeadershipEmergence {
 }
 ```
 
-```
-WHEN no formal governance exists
-THEN leaders SHALL emerge based on:
+#### Scenario: No formal governance exists
+- **WHEN** no formal governance exists
+- **THEN** leaders SHALL emerge based on:
   1. Calculate influence score per agent:
      - Leadership skill weight: 30%
      - Relationship count weight: 20%
@@ -612,15 +616,13 @@ THEN leaders SHALL emerge based on:
      - Age/experience weight: 15%
   2. Track who others defer to in disputes
   3. Track who others seek for advice
-  4. WHEN influence exceeds threshold AND
-     recognition events occur (others acknowledge leadership)
+  4. WHEN influence exceeds threshold AND recognition events occur (others acknowledge leadership)
      - Agent becomes informal leader
   5. Over time, informal leadership may formalize
-```
 
-### REQ-GOV-002: Council Formation
+### Requirement: Council Formation
 
-Councils SHALL form as villages grow:
+Councils SHALL form as villages grow.
 
 ```typescript
 interface Council {
@@ -665,9 +667,9 @@ type VotingMethod =
   | "leader_tiebreak";   // Leader decides ties
 ```
 
-```
-WHEN village population exceeds threshold (e.g., 20 agents)
-THEN council formation MAY occur:
+#### Scenario: Village population exceeds threshold
+- **WHEN** village population exceeds threshold (e.g., 20 agents)
+- **THEN** council formation MAY occur:
   1. Influential agents propose council
   2. Village votes or consents
   3. Initial members selected by:
@@ -676,11 +678,10 @@ THEN council formation MAY occur:
      - Or appointment by leader
   4. Council begins meeting regularly
   5. Decisions require quorum and voting method
-```
 
-### REQ-GOV-003: Laws and Policies
+### Requirement: Laws and Policies
 
-Governance SHALL create enforceable rules:
+Governance SHALL create enforceable rules.
 
 ```typescript
 interface Law {
@@ -740,9 +741,9 @@ type PunishmentType =
   | "execution";         // Death (extreme, rare)
 ```
 
-```
-WHEN a law is proposed
-THEN the system SHALL:
+#### Scenario: Law is proposed
+- **WHEN** a law is proposed
+- **THEN** the system SHALL:
   1. Proposer (leader or council member) drafts law
   2. Law goes to appropriate body:
      - Leader decree (if chieftain/monarchy)
@@ -756,11 +757,10 @@ THEN the system SHALL:
      - Amended (modify provisions)
      - Repealed (removed)
      - Ignored (if enforcement low)
-```
 
-### REQ-GOV-004: Policy Decisions
+### Requirement: Policy Decisions
 
-Leaders SHALL make policy decisions:
+Leaders SHALL make policy decisions.
 
 ```typescript
 interface Policy {
@@ -816,9 +816,9 @@ const examplePolicies: Policy[] = [
 ];
 ```
 
-### REQ-GOV-005: Succession
+### Requirement: Succession
 
-Leadership SHALL transfer according to rules:
+Leadership SHALL transfer according to rules.
 
 ```typescript
 interface SuccessionRule {
@@ -860,9 +860,9 @@ interface SuccessionCriteria {
 }
 ```
 
-```
-WHEN succession is triggered
-THEN the system SHALL:
+#### Scenario: Succession is triggered
+- **WHEN** succession is triggered
+- **THEN** the system SHALL:
   1. Identify cause (death, resignation, removal, etc.)
   2. Enter interregnum (temporary leadership)
   3. Apply succession rules:
@@ -873,15 +873,14 @@ THEN the system SHALL:
   4. New leader assumes power
   5. Legitimacy affected by process smoothness
   6. Chroniclers document transition
-```
 
 ---
 
 ## Governance Evolution
 
-### REQ-GOV-006: Governance Transitions
+### Requirement: Governance Transitions
 
-Governance type SHALL evolve:
+Governance type SHALL evolve.
 
 ```typescript
 interface GovernanceTransition {
@@ -934,9 +933,9 @@ const typicalTransitions: GovernanceTransition[] = [
 ];
 ```
 
-### REQ-GOV-007: Revolution and Coups
+### Requirement: Revolution and Coups
 
-Power MAY change through conflict:
+Power MAY change through conflict.
 
 ```typescript
 interface Revolution {
@@ -986,10 +985,10 @@ type RevolutionOutcome =
   | "external_intervention";
 ```
 
-```
-WHEN legitimacy falls below threshold (e.g., 20)
-AND grievances accumulate
-THEN revolution MAY begin:
+#### Scenario: Legitimacy falls below threshold
+- **WHEN** legitimacy falls below threshold (e.g., 20)
+- **AND** grievances accumulate
+- **THEN** revolution MAY begin:
   1. Faction forms around grievances
   2. Revolution leader emerges
   3. Phases progress based on:
@@ -1000,15 +999,14 @@ THEN revolution MAY begin:
   4. Resolution determines new governance
   5. Village stability severely affected
   6. Chroniclers document for history
-```
 
 ---
 
 ## Dispute Resolution
 
-### REQ-GOV-008: Justice System
+### Requirement: Justice System
 
-Governance SHALL resolve disputes:
+Governance SHALL resolve disputes.
 
 ```typescript
 interface Dispute {
@@ -1060,9 +1058,9 @@ interface Verdict {
 }
 ```
 
-```
-WHEN a dispute is filed
-THEN the justice system SHALL:
+#### Scenario: Dispute is filed
+- **WHEN** a dispute is filed
+- **THEN** the justice system SHALL:
   1. Assign to appropriate authority:
      - Minor: Elder or respected agent
      - Moderate: Judge or leader
@@ -1073,15 +1071,14 @@ THEN the justice system SHALL:
   5. Apply punishment/restitution
   6. Update relationships affected
   7. Create memory for all involved
-```
 
 ---
 
 ## Inter-Village Governance
 
-### REQ-GOV-009: Diplomatic Relations
+### Requirement: Diplomatic Relations
 
-Villages SHALL have diplomatic relations:
+Villages SHALL have diplomatic relations.
 
 ```typescript
 interface DiplomaticRelation {
@@ -1132,9 +1129,9 @@ type TreatyType =
   | "vassal";            // Submission
 ```
 
-### REQ-GOV-010: Federation and Empire
+### Requirement: Federation and Empire
 
-Multiple villages MAY unite:
+Multiple villages MAY unite.
 
 ```typescript
 interface Federation {
@@ -1170,9 +1167,9 @@ interface FederationMember {
 
 ## Abstraction Layer Integration
 
-### REQ-GOV-011: Governance at Scale
+### Requirement: Governance at Scale
 
-Governance SHALL work across abstraction layers:
+Governance SHALL work across abstraction layers.
 
 ```typescript
 interface GovernanceAbstraction {
@@ -1207,30 +1204,30 @@ type GovernanceDetailLevel =
 // - Laws are historical artifacts
 ```
 
-```
-WHEN village is at abstract layer
-THEN governance SHALL:
+#### Scenario: Village is at abstract layer
+- **WHEN** village is at abstract layer
+- **THEN** governance SHALL:
   - Track stability and legitimacy stats
   - Simulate succession events
   - Apply policy effects to aggregate stats
   - Generate major events (revolutions) probabilistically
   - Preserve key figure (leader) for catch-up
 
-WHEN village upgrades to active layer
-THEN governance SHALL:
+#### Scenario: Village upgrades to active layer
+- **WHEN** village upgrades to active layer
+- **THEN** governance SHALL:
   - Maintain current leadership
   - Expand policy effects to individuals
   - Resume council meetings if applicable
   - Full dispute resolution resumes
-```
 
 ---
 
 ## Player Interaction
 
-### REQ-GOV-012: Player Governance Role
+### Requirement: Player Governance Role
 
-Players MAY participate in governance:
+Players MAY participate in governance.
 
 ```typescript
 interface PlayerGovernanceRole {
@@ -1250,24 +1247,22 @@ interface PlayerGovernanceRole {
 }
 ```
 
-```
-WHEN player-agent has high influence
-THEN player MAY:
+#### Scenario: Player-agent has high influence
+- **WHEN** player-agent has high influence
+- **THEN** player MAY:
   - Stand for election
   - Be appointed to positions
   - Propose laws to council
   - Lead factions
 
-WHEN player is leader
-THEN player SHALL:
+#### Scenario: Player is leader
+- **WHEN** player is leader
+- **THEN** player SHALL:
   - Make policy decisions via UI
   - Approve/reject proposals
   - Appoint officials
   - Handle disputes (or delegate)
-
-Governance continues autonomously when player is absent
-based on autonomy settings and AI advisors.
-```
+  - Note: Governance continues autonomously when player is absent based on autonomy settings and AI advisors
 
 ---
 

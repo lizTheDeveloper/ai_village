@@ -6,6 +6,10 @@
 
 ---
 
+## Purpose
+
+The rendering system displays the game world, agents, items, and UI in a cohesive 8-bit pixel art style while supporting both hand-crafted and procedurally generated visuals.
+
 ## Overview
 
 The rendering system displays the game world, agents, items, and UI in a cohesive 8-bit pixel art style. It supports both hand-crafted sprites and procedurally generated visuals for new items, crops, and buildings, maintaining visual consistency through style constraints.
@@ -85,7 +89,7 @@ const forestPalette: ColorPalette = {
 
 ## Requirements
 
-### REQ-RND-001: Chunk-Based Tile Rendering
+### Requirement: Chunk-Based Tile Rendering
 
 The world uses chunk-based infinite generation.
 See `world-system/procedural-generation.md` for chunk details.
@@ -136,7 +140,7 @@ interface Tileset {
 }
 ```
 
-### REQ-RND-002: Character Sprites
+### Requirement: Character Sprites
 
 Agents SHALL have animated sprites:
 
@@ -165,30 +169,30 @@ interface Animation {
 }
 ```
 
-### REQ-RND-003: Player Control Indicator
+### Requirement: Player Control Indicator
 
-The player-controlled agent SHALL be visually distinct:
+The player-controlled agent SHALL be visually distinct.
 
-```
-WHEN the player is controlling an agent
-THEN the renderer SHALL:
+#### Scenario: Player Controlling Agent
+- **WHEN** the player is controlling an agent
+- **THEN** the renderer SHALL:
   - Display a subtle glow/outline around the agent
   - Show player-specific UI (controls, inventory hotbar)
   - Camera follows the player agent
   - Highlight interactable objects nearby
 
-WHEN the player switches to spectator mode
-THEN the renderer SHALL:
+#### Scenario: Player Switches to Spectator Mode
+- **WHEN** the player switches to spectator mode
+- **THEN** the renderer SHALL:
   - Remove player indicator
   - Enable free camera movement
   - Show overview UI instead
-```
 
 ---
 
 ## Generative Sprite System
 
-### REQ-RND-004: Procedural Sprite Generation
+### Requirement: Procedural Sprite Generation
 
 Generated items/crops/buildings SHALL have procedural sprites:
 
@@ -218,7 +222,7 @@ interface GeneratedSprite {
 }
 ```
 
-### REQ-RND-005: AI Image Generation Integration
+### Requirement: AI Image Generation Integration
 
 The system SHALL support AI image generation:
 
@@ -250,13 +254,13 @@ interface ImagePrompt {
 }
 ```
 
-### REQ-RND-006: Sprite Style Enforcement
+### Requirement: Sprite Style Enforcement
 
-Generated sprites SHALL match the 8-bit style:
+Generated sprites SHALL match the 8-bit style.
 
-```
-WHEN generating a sprite via AI
-THEN the system SHALL:
+#### Scenario: Generating Sprite via AI
+- **WHEN** generating a sprite via AI
+- **THEN** the system SHALL:
   1. Generate base image with style prompt:
      "16x16 pixel art, 8-bit style, limited palette, no anti-aliasing"
   2. Pixelate to target resolution (16x16, 24x24, etc.)
@@ -268,14 +272,14 @@ THEN the system SHALL:
      - Consistent shading direction
   6. Auto-correct or flag for manual review
 
-WHEN style enforcement fails
-THEN the system SHALL:
+#### Scenario: Style Enforcement Fails
+- **WHEN** style enforcement fails
+- **THEN** the system SHALL:
   1. Use fallback procedural generation
   2. Combine existing sprite elements
   3. Use placeholder with category icon
-```
 
-### REQ-RND-007: Procedural Fallback Generation
+### Requirement: Procedural Fallback Generation
 
 The system SHALL have non-AI procedural generation:
 
@@ -313,7 +317,7 @@ interface SpriteTemplate {
 
 ## UI Rendering
 
-### REQ-RND-008: Game UI
+### Requirement: Game UI
 
 The UI SHALL have an 8-bit aesthetic:
 
@@ -347,7 +351,7 @@ interface PixelFont {
 }
 ```
 
-### REQ-RND-009: Player HUD
+### Requirement: Player HUD
 
 The player SHALL see a HUD when controlling an agent.
 Needs display uses the full needs hierarchy from `agent-system/needs.md`.
@@ -374,7 +378,7 @@ Needs Bar Modes:
 - Minimal: Hides needs bar, only shows warnings when critical (<20%)
 ```
 
-### REQ-RND-010: Spectator/Management UI
+### Requirement: Spectator/Management UI
 
 When not controlling an agent, show management UI:
 
@@ -402,7 +406,7 @@ Management View:
 
 ## Camera System
 
-### REQ-RND-011: Camera Control
+### Requirement: Camera Control
 
 The camera SHALL support multiple modes:
 
@@ -428,28 +432,29 @@ interface Camera {
 }
 ```
 
-```
-WHEN in "follow" mode (player control)
-THEN camera SHALL:
+#### Scenario: Follow Mode (Player Control)
+- **WHEN** in "follow" mode (player control)
+- **THEN** camera SHALL:
   - Center on player agent
   - Allow slight lead in movement direction
   - Smooth transitions
   - Allow temporary free look with right-click
 
-WHEN in "free" mode (spectator)
-THEN camera SHALL:
+#### Scenario: Free Mode (Spectator)
+- **WHEN** in "free" mode (spectator)
+- **THEN** camera SHALL:
   - Move with WASD/arrow keys or mouse drag
   - Zoom with scroll wheel
   - Double-click agent to follow
 
-WHEN in "cinematic" mode
-THEN camera SHALL:
+#### Scenario: Cinematic Mode
+- **WHEN** in "cinematic" mode
+- **THEN** camera SHALL:
   - Follow scripted paths
   - Pan to points of interest
   - Used for events, discoveries
-```
 
-### REQ-RND-012: Abstraction Layer Rendering
+### Requirement: Abstraction Layer Rendering
 
 When zoomed out, the renderer switches to abstracted views.
 See `world-system/abstraction-layers.md` for simulation layer details.
@@ -482,27 +487,27 @@ interface VillageIconStyle {
 }
 ```
 
-```
-WHEN camera zoom < tileViewMaxZoom (zooming out)
-THEN renderer SHALL:
+#### Scenario: Zooming Out to Village View
+- **WHEN** camera zoom < tileViewMaxZoom (zooming out)
+- **THEN** renderer SHALL:
   - Transition from tile view to village icons
   - Show village names and basic stats
   - Display trade routes as dotted lines
   - Show caravans as moving dots on routes
 
-WHEN camera zoom < worldViewMinZoom (world view)
-THEN renderer SHALL:
+#### Scenario: World View
+- **WHEN** camera zoom < worldViewMinZoom (world view)
+- **THEN** renderer SHALL:
   - Show simplified world map
   - Villages as small icons
   - Biome regions as colored areas
   - Player's village highlighted
-```
 
 ---
 
 ## Visual Effects
 
-### REQ-RND-013: Particle Effects
+### Requirement: Particle Effects
 
 The system SHALL support 8-bit particle effects:
 
@@ -521,7 +526,7 @@ type ParticleEffect =
   | { type: "exclamation" };                   // Alert
 ```
 
-### REQ-RND-014: Weather Effects
+### Requirement: Weather Effects
 
 Weather SHALL be visually represented:
 
@@ -544,7 +549,7 @@ interface WeatherRenderer {
 
 ## Performance
 
-### REQ-RND-015: Rendering Optimization
+### Requirement: Rendering Optimization
 
 The renderer SHALL be optimized:
 
@@ -580,7 +585,7 @@ interface RenderingOptimization {
 
 ## Sprite Persistence
 
-### REQ-RND-016: Generated Sprite Storage
+### Requirement: Generated Sprite Storage
 
 Generated sprites SHALL be persisted:
 
