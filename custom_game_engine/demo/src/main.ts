@@ -3719,6 +3719,12 @@ async function main() {
     console.log('[Demo] ?fresh=1 detected - forcing new game (ignoring saved checkpoints)');
   }
 
+  // Check for ?action= URL parameter to auto-open specific flows from the hub
+  const hubAction = urlParams.get('action') as 'create' | 'join' | 'sync' | null;
+  if (hubAction) {
+    console.log(`[Demo] ?action=${hubAction} detected - will auto-open ${hubAction} flow`);
+  }
+
   // Check for existing saves and auto-load the most recent one
   // In SharedWorker mode, use the worker to list saves (non-blocking for main thread)
   let existingSaves: any[] = [];
@@ -3867,10 +3873,14 @@ async function main() {
     console.log('[Demo] Showing Universe Browser (no saves found or ?newGame=true in URL)');
     browserResult = await new Promise<UniverseBrowserResult>((resolve) => {
       const browserScreen = new UniverseBrowserScreen();
-      browserScreen.show((result) => {
-        browserScreen.hide();
-        resolve(result);
-      });
+      browserScreen.show(
+        (result) => {
+          browserScreen.hide();
+          resolve(result);
+        },
+        // Pass autoAction from hub URL parameter
+        hubAction ? { autoAction: hubAction } : undefined
+      );
     });
   }
 

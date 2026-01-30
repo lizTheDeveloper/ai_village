@@ -104,7 +104,10 @@ export class UniverseBrowserScreen {
     }
   }
 
-  async show(onSelectCallback: (result: UniverseBrowserResult) => void): Promise<void> {
+  async show(
+    onSelectCallback: (result: UniverseBrowserResult) => void,
+    options?: { autoAction?: 'create' | 'join' | 'sync' }
+  ): Promise<void> {
     this._onSelect = onSelectCallback;
     this.container.style.display = 'flex';
 
@@ -116,6 +119,19 @@ export class UniverseBrowserScreen {
     this.serverAvailable = false;
 
     this.render();
+
+    // Handle auto-action from URL parameter (e.g., from Central Hub links)
+    if (options?.autoAction) {
+      console.log(`[UniverseBrowser] Auto-triggering action: ${options.autoAction}`);
+      // Small delay to let render complete
+      setTimeout(() => {
+        if (options.autoAction === 'create') {
+          this.triggerCosmicCreation();
+        } else if (options.autoAction === 'join' || options.autoAction === 'sync') {
+          this.showUniverseGallery(options.autoAction === 'sync');
+        }
+      }, 100);
+    }
   }
 
   hide(): void {
@@ -341,7 +357,26 @@ export class UniverseBrowserScreen {
     return panel;
   }
 
-  private async showUniverseGallery(): Promise<void> {
+  /**
+   * Trigger the cosmic creation flow directly (used by auto-action from hub)
+   */
+  private async triggerCosmicCreation(): Promise<void> {
+    if (!this._onSelect) return;
+
+    this.hide();
+    const manager = new CosmicHubManager(createLocalStorageCallbacks());
+    try {
+      const cosmicConfig = await manager.showAndWaitForGameStart();
+      this._onSelect({ action: 'cosmic_start', cosmicConfig });
+    } catch (error) {
+      console.error('[UniverseBrowser] Cosmic creation cancelled or failed:', error);
+      this.show(this._onSelect);
+    } finally {
+      manager.destroy();
+    }
+  }
+
+  private async showUniverseGallery(autoSync: boolean = false): Promise<void> {
     this.hide();
 
     const galleryScreen = new UniverseGalleryScreen('universe-gallery-screen', {
@@ -373,6 +408,20 @@ export class UniverseBrowserScreen {
     });
 
     await galleryScreen.show();
+
+    // If autoSync is true, automatically trigger the sync button
+    if (autoSync) {
+      console.log('[UniverseBrowser] Auto-triggering sync from hub action');
+      // Small delay to let the gallery render, then trigger sync
+      setTimeout(() => {
+        const syncBtn = document.querySelector('button');
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const syncButton = buttons.find(b => b.textContent?.includes('Sync Local Saves'));
+        if (syncButton) {
+          syncButton.click();
+        }
+      }, 200);
+    }
   }
 
   private async showPlanetList(universeId: string): Promise<void> {

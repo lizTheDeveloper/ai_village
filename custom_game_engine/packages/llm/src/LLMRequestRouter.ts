@@ -69,7 +69,7 @@ export class LLMRequestRouter {
   private sessionManager: GameSessionManager;
   private cooldownCalculator: CooldownCalculator;
   private providerMappings: Map<string, ProviderMapping>;
-  private defaultModel: string = 'qwen-3-32b';
+  private defaultModel: string = 'qwen/qwen3-32b'; // Groq (1000 RPM) not Cerebras (30 RPM)
 
   // Load balancing: round-robin counter for distributing across available models in a tier
   private requestCounter: number = 0;

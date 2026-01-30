@@ -25,10 +25,13 @@ export interface ModelConfig {
 /**
  * Available models organized by tier
  *
+ * Quotas are PER-MODEL, so using multiple models multiplies capacity!
+ *
  * From Groq (1K RPM each):
  * - qwen/qwen3-32b: default tier
  * - openai/gpt-oss-120b: high tier
  * - openai/gpt-oss-20b: default tier
+ * - google/gemma-2-9b-it: simple tier
  *
  * From Cerebras (30 RPM each):
  * - qwen-3-32b: default tier
@@ -38,6 +41,7 @@ export interface ModelConfig {
  */
 export const MODEL_CONFIGS: ModelConfig[] = [
   // === GROQ MODELS (1K RPM each) ===
+  // Quotas are per-model, so using multiple models multiplies capacity
   {
     id: 'qwen/qwen3-32b',
     provider: 'groq',
@@ -62,8 +66,17 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     contextWindow: 65536,
     description: 'GPT-OSS 20B on Groq - balanced intelligence',
   },
+  {
+    id: 'google/gemma-2-9b-it',
+    provider: 'groq',
+    tier: 'simple',
+    rpm: 1000,
+    contextWindow: 8192,
+    description: 'Gemma 2 9B on Groq - fast simple tier',
+  },
 
   // === CEREBRAS MODELS (30 RPM each) - Fallback only ===
+  // Quotas are per-model, so using multiple models multiplies capacity
   {
     id: 'qwen-3-32b',
     provider: 'cerebras',
@@ -131,11 +144,12 @@ export function getTotalRPMForTier(tier: IntelligenceTier): number {
 
 /**
  * Default model for each tier
+ * Priority: Groq (1000 RPM) > Cerebras (30 RPM) > Local
  */
 export const DEFAULT_MODELS: Record<IntelligenceTier, string> = {
-  simple: 'qwen3:4b',
-  default: 'qwen/qwen3-32b',
-  high: 'openai/gpt-oss-120b',
+  simple: 'google/gemma-2-9b-it', // Groq simple tier (1000 RPM)
+  default: 'qwen/qwen3-32b',      // Groq default tier (1000 RPM)
+  high: 'openai/gpt-oss-120b',   // Groq high tier (1000 RPM)
   agi: 'claude-3-5-sonnet-20241022', // Not configured - requires Anthropic API key
 };
 

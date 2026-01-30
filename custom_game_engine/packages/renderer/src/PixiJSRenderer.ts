@@ -303,16 +303,17 @@ export class PixiJSRenderer implements IRenderer {
   showCityBounds = true;
 
   // Query caching (same intervals as Canvas2D renderer)
+  // NOTE: lastRefresh initialized to -Infinity to ensure first-frame refresh
   private _cachedBuildingEntities: readonly Entity[] = [];
-  private _buildingCacheLastRefresh = 0;
+  private _buildingCacheLastRefresh = -Infinity;
   private readonly BUILDING_CACHE_REFRESH_INTERVAL = 60;
 
   private _cachedRenderableEntities: readonly Entity[] = [];
-  private _renderableCacheLastRefresh = 0;
+  private _renderableCacheLastRefresh = -Infinity;
   private readonly RENDERABLE_CACHE_REFRESH_INTERVAL = 20;
 
   private _cachedAgentEntities: readonly Entity[] = [];
-  private _agentCacheLastRefresh = 0;
+  private _agentCacheLastRefresh = -Infinity;
   private readonly AGENT_CACHE_REFRESH_INTERVAL = 10;
 
   // Reusable arrays
@@ -1311,11 +1312,49 @@ export class PixiJSRenderer implements IRenderer {
     console.log('[PixiJSRenderer] Combat UI initialization placeholder');
   }
 
+  /**
+   * Debug function to log current agent positions and sprite states.
+   * Call from browser console: window.game.renderer.debugAgentPositions()
+   */
+  debugAgentPositions(): void {
+    console.group('[PixiJSRenderer] Agent Debug Info');
+    console.log(`Cached agents: ${this._cachedAgentEntities.length}`);
+    console.log(`Entity sprites: ${this.entitySprites.size}`);
+    console.log(`Visible entities: ${this._visibleEntities.length}`);
+    console.log(`Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
+
+    for (const entity of this._cachedAgentEntities.slice(0, 5)) {
+      const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+      const vel = entity.getComponent('velocity') as { vx: number; vy: number } | undefined;
+      const sprite = this.entitySprites.get(entity.id);
+      console.log(`  Agent ${entity.id.slice(0, 8)}:`, {
+        componentPos: pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'none',
+        velocity: vel ? `(${vel.vx.toFixed(2)}, ${vel.vy.toFixed(2)})` : 'none',
+        spritePos: sprite ? `(${sprite.x.toFixed(2)}, ${sprite.y.toFixed(2)})` : 'no sprite',
+        spriteVisible: sprite ? sprite.visible : false,
+      });
+    }
+    console.log('\nTo check if simulation is running, run: window.game.gameLoop.world.tick');
+    console.groupEnd();
+  }
+
   getEntityAt(screenX: number, screenY: number, world: World): Entity | null {
     // Convert screen to world coordinates
     const worldPos = this._camera.screenToWorld(screenX, screenY);
 
-    // Find entity at position
+    // Find entity at position - check agents first (priority for selection)
+    for (const entity of this._cachedAgentEntities) {
+      const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+      if (pos) {
+        const dx = Math.abs(pos.x - worldPos.x);
+        const dy = Math.abs(pos.y - worldPos.y);
+        if (dx < 0.5 && dy < 0.5) {
+          return entity;
+        }
+      }
+    }
+
+    // Then check other renderable entities
     for (const entity of this._cachedRenderableEntities) {
       const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
       if (pos) {
