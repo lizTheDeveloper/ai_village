@@ -181,6 +181,12 @@ Farming                Crafting              Animals
 
 ### Phase 0: Foundation ✅ COMPLETE
 
+- [x] ECS Architecture
+- [x] Event Bus
+- [x] Action Queue
+- [x] Game Loop (20 TPS)
+- [x] Serialization
+
 **Status:** ✅ Complete
 **Dependencies:** None
 **Parallel Work:** None (must complete first)
@@ -198,6 +204,12 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 1: World Generation ✅ COMPLETE
+
+- [x] Chunk System
+- [x] Terrain Generation
+- [x] Biome System
+- [x] Canvas Renderer
+- [x] Camera Controls
 
 **Status:** ✅ Complete
 **Dependencies:** Phase 0
@@ -217,6 +229,12 @@ Farming                Crafting              Animals
 
 ### Phase 2: First Agent ✅ COMPLETE
 
+- [x] Agent Component
+- [x] Position Component
+- [x] Movement System
+- [x] Random Decisions
+- [x] Agent Rendering
+
 **Status:** ✅ Complete
 **Dependencies:** Phase 1
 **Parallel Work:** None
@@ -235,6 +253,12 @@ Farming                Crafting              Animals
 
 ### Phase 3: Agent Needs ✅ COMPLETE
 
+- [x] Needs Component
+- [x] Needs System
+- [x] Resource Component
+- [x] Foraging Action
+- [x] Item Pickup
+
 **Status:** ✅ Complete
 **Dependencies:** Phase 2
 **Parallel Work:** None
@@ -252,6 +276,12 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 4: Memory & Social Awareness ✅ COMPLETE
+
+- [x] Vision Component
+- [x] Memory Component (Basic)
+- [x] Episodic Memory System
+- [x] Relationship Component
+- [x] Spatial Awareness
 
 **Status:** ✅ Complete
 **Dependencies:** Phase 3
@@ -280,6 +310,11 @@ Farming                Crafting              Animals
 
 ### Phase 5: Communication ✅ COMPLETE
 
+- [x] Conversation Component
+- [x] Communication System
+- [x] Multiple Agents
+- [x] Hearing System
+
 **Status:** ✅ Complete
 **Dependencies:** Phase 3
 **Parallel Work:** 🔀 Can run parallel with Phase 4, 6
@@ -296,6 +331,12 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 6: LLM Integration ✅ COMPLETE
+
+- [x] Ollama Provider
+- [x] Structured Prompts
+- [x] Think/Speak/Act Split
+- [x] Decision Queue
+- [x] Function Calling
 
 **Status:** ✅ Complete
 **Dependencies:** Phase 3
@@ -314,6 +355,14 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 7: Building & Shelter ✅ COMPLETE
+
+- [x] Building Component
+- [x] Building Definitions
+- [x] Resource Gathering
+- [x] Construction Progress
+- [x] Building Placement UI
+- [x] Agent Inventory Display
+- [x] Shelter Need Satisfaction
 
 **Status:** ✅ Complete
 **Dependencies:** Phase 3, 4, 5, 6
@@ -334,6 +383,17 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 8: Temperature & Weather ✅ COMPLETE
+
+- [x] TemperatureComponent
+- [x] TemperatureSystem
+- [x] WeatherComponent
+- [x] WeatherSystem
+- [x] Building Heat/Insulation
+- [x] Remove Shelter Need
+- [x] Add Health to Needs
+- [x] seek_warmth Behavior
+- [x] seek_cooling Behavior
+- [x] Temperature LLM Context
 
 **Status:** ✅ Complete
 **Dependencies:** BuildingComponent exists (✅), Building archetypes exist (✅)
@@ -363,6 +423,17 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 9: Farming ✅ COMPLETE (⚠️ Advanced Features Pending)
+
+- [x] Soil/Tile System
+- [x] Plant Lifecycle
+- [x] Seed System
+- [x] Tilling Action
+- [x] Planting Action
+- [x] Watering Action
+- [x] Harvesting Action
+- [ ] Crop Hybridization
+- [ ] Farming Buildings
+- [ ] Farm Management UI
 
 **Status:** ✅ Complete (core farming loop working, advanced features in spec not yet implemented)
 **Dependencies:** Phase 8 ✅ (weather affects crops)
@@ -402,6 +473,14 @@ Farming                Crafting              Animals
 
 ### Phase 10: Crafting & Items ✅ COMPLETE
 
+- [x] Recipe System
+- [x] Crafting Stations
+- [x] Crafting UI
+- [x] Inventory UI
+- [x] Item System Refactor
+- [ ] Tool Durability
+- [x] Quality System
+
 **Status:** ✅ Complete (core crafting loop working, polish items optional)
 **Dependencies:** Phase 8 ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 9, 11
@@ -428,6 +507,14 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 11: Animals ✅ COMPLETE (⚠️ Advanced Features Pending)
+
+- [x] Animal System Foundation
+- [x] Animal Housing
+- [x] Taming System
+- [x] Animal Products
+- [x] Wild Animal Spawning
+- [ ] Breeding
+- [ ] Animal Husbandry UI
 
 **Status:** ✅ Complete (foundation, housing, and production working; breeding/working animals pending)
 **Dependencies:** Phase 8 ✅ (animals need temperature comfort)
@@ -464,6 +551,14 @@ Farming                Crafting              Animals
 
 ### Phase 12: Economy & Trade ✅ COMPLETE
 
+- [x] Currency System
+- [x] Value Calculation
+- [x] Shop Buildings
+- [x] Trading System
+- [x] Market Events
+- [x] Economy Dashboard UI
+- [x] Trading UI
+
 **Status:** ✅ Complete (2025-12-26)
 **Dependencies:** Phases 9 ✅, 10 ✅, 11 ✅
 **Implementation:** `packages/core/src/economy/`, `packages/core/src/systems/TradingSystem.ts`
@@ -495,6 +590,13 @@ Farming                Crafting              Animals
 
 ### Phase 13: Research & Discovery ✅ COMPLETE
 
+- [x] Research Tree
+- [x] Research Buildings
+- [x] Research Points
+- [x] Discovery System
+- [ ] Procedural Recipes
+- [ ] Research Tree UI
+
 **Status:** ✅ Complete (2025-12-31)
 **Dependencies:** Phase 12 ✅
 **Completion Report:** `/tmp/phase13_completion.md`
@@ -512,6 +614,12 @@ Farming                Crafting              Animals
 
 ### Phase 14: Governance ⏳ READY
 
+- [ ] Government Types
+- [ ] Leadership Roles
+- [ ] Law System
+- [ ] Voting/Decisions
+- [ ] Governance UI
+
 **Status:** ⏳ Ready (Phase 12 ✅ complete)
 **Dependencies:** Phase 12 ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 13, 15
@@ -527,6 +635,13 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 15: Multi-Village ⏳ READY
+
+- [ ] Abstraction Layers
+- [ ] Village Summaries
+- [ ] Trade Routes
+- [ ] Caravans
+- [ ] News Propagation
+- [ ] Map UI
 
 **Status:** ⏳ Ready (Phase 12 ✅ complete)
 **Dependencies:** Phase 12 ✅
@@ -544,6 +659,19 @@ Farming                Crafting              Animals
 ---
 
 ### Phase 16: Polish & Player 🚧 IN PROGRESS
+
+- [ ] Player Avatar
+- [ ] Spectator Mode
+- [ ] Jack-in/Jack-out
+- [ ] Main Menu UI
+- [ ] Time Controls UI
+- [ ] Notifications UI
+- [x] Context Menu UI
+- [ ] Hover Info UI
+- [ ] Agent Roster UI
+- [ ] Relationship Viewer UI
+- [ ] Objectives UI
+- [x] Conflict UI
 
 **Status:** 🚧 In Progress (Context Menu & Conflict UI complete; Phase 13 ✅, blocked on 14, 15)
 **Dependencies:** All previous phases
@@ -572,6 +700,10 @@ These phases extend beyond the core game:
 
 ### Phase 17: Advanced Consciousness 🔒
 
+- [ ] Pack Minds
+- [ ] Hive Minds
+- [ ] Species System
+
 | Task | Spec |
 |------|------|
 | Pack Minds | [consciousness-implementation-phases.md](openspec/specs/consciousness-implementation-phases.md) |
@@ -579,6 +711,11 @@ These phases extend beyond the core game:
 | Species System | [agent-system/species-system.md](openspec/specs/agent-system/species-system.md) |
 
 ### Phase 18: Lifecycle & Generations 🔒
+
+- [ ] Birth/Death
+- [ ] Aging
+- [ ] Family Trees
+- [ ] Inheritance
 
 | Task | Spec |
 |------|------|
@@ -589,6 +726,10 @@ These phases extend beyond the core game:
 
 ### Phase 19: Culture & Society 🔒
 
+- [ ] Culture System
+- [ ] Kinship Systems
+- [ ] Social Norms
+
 | Task | Spec |
 |------|------|
 | Culture System | [agent-system/culture-system.md](openspec/specs/agent-system/culture-system.md) |
@@ -596,6 +737,10 @@ These phases extend beyond the core game:
 | Social Norms | [agent-system/culture-system.md](openspec/specs/agent-system/culture-system.md) |
 
 ### Phase 20: Chroniclers 🔒
+
+- [ ] Written Works
+- [ ] History Recording
+- [ ] Knowledge Propagation
 
 | Task | Spec |
 |------|------|
@@ -605,6 +750,10 @@ These phases extend beyond the core game:
 
 ### Phase 21: Multi-Game (Nexus) 🔒
 
+- [ ] Nexus System
+- [ ] Universe Types
+- [ ] Cross-Game Progression
+
 | Task | Spec |
 |------|------|
 | Nexus System | [nexus-system/spec.md](openspec/specs/nexus-system/spec.md) |
@@ -612,6 +761,12 @@ These phases extend beyond the core game:
 | Cross-Game Progression | [nexus-system/spec.md](openspec/specs/nexus-system/spec.md) |
 
 ### Phase 22: Sociological Metrics - Foundation ✅ COMPLETE
+
+- [x] MetricsCollectionSystem (ECS)
+- [x] Event schemas (Interaction, Behavior, Spatial, Resource)
+- [x] RingBuffer implementation
+- [x] Event emitters in AISystem/World
+- [x] Metrics configuration
 
 **Status:** ✅ Complete (finished 2025-12-26)
 **Dependencies:** Phase 3 (Agent Needs) ✅, Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅
@@ -640,6 +795,12 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 23: Sociological Metrics - Storage & API ✅ COMPLETE
+
+- [x] Tiered file storage (hot/warm/cold)
+- [x] Periodic flush mechanism
+- [x] REST-like API interface
+- [x] Live streaming (pub/sub)
+- [x] CSV/JSON export functionality
 
 **Status:** ✅ Complete
 **Dependencies:** Phase 22 (Foundation)
@@ -670,6 +831,11 @@ These phases extend beyond the core game:
 
 ### Phase 24: Sociological Metrics - Analysis Modules ✅ COMPLETE
 
+- [x] NetworkAnalyzer (graph metrics)
+- [x] SpatialAnalyzer (territory, heatmaps)
+- [x] InequalityAnalyzer (Gini, stratification)
+- [x] CulturalDiffusionAnalyzer
+
 **Status:** ✅ Complete
 **Dependencies:** Phase 22 (Foundation)
 **Parallel Work:** 🔀 All analyzers can be developed in parallel
@@ -699,6 +865,14 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 25: Sociological Metrics - Visualization Dashboard 🚧 IN PROGRESS
+
+- [ ] Dashboard React app setup
+- [ ] Network visualization (force-directed graph)
+- [ ] Behavior timeline view
+- [ ] Spatial heatmap overlay
+- [ ] Inequality dashboard (Lorenz curves)
+- [ ] Cultural diffusion view (Sankey diagrams)
+- [ ] Time series explorer
 
 **Status:** 🚧 In Progress (Claimed by spec-agent-001 on 2026-01-02, handed off to Test Agent)
 **Dependencies:** Phase 23 (Storage & API), Phase 24 (Analysis)
@@ -735,6 +909,13 @@ These phases extend beyond the core game:
 
 ### Phase 26: Sociological Metrics - Advanced Analysis 🔒 BLOCKED
 
+- [ ] Automated insight generation
+- [ ] Anomaly detection algorithms
+- [ ] Pattern recognition (emergent behaviors)
+- [ ] Predictive modeling (social change forecasting)
+- [ ] Historical playback mode
+- [ ] Custom query language
+
 **Status:** 🔒 Blocked on Phase 24, 25
 **Dependencies:** Phase 24 (Analysis Modules), Phase 25 (Visualization)
 **Parallel Work:** 🔀 Can develop features in parallel
@@ -765,6 +946,19 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 27: Divine Communication System ✅ COMPLETE
+
+- [x] SpiritualComponent
+- [x] PrayerSystem
+- [x] PrayerAnsweringSystem
+- [x] PrayBehavior
+- [x] MeditateBehavior
+- [x] GroupPrayBehavior
+- [x] RitualSystem
+- [x] SacredSiteSystem
+- [x] VisionDeliverySystem
+- [x] LLM Vision Generation
+- [x] Faith/Doubt Mechanics
+- [ ] Player Vision UI
 
 **Status:** ✅ Complete (Comprehensive implementation with LLM integration - 2025-12-31)
 **Dependencies:** Phase 3 (Agent Needs) ✅, Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅, Phase 8 (Circadian/Sleep) ✅
@@ -832,6 +1026,13 @@ These phases extend beyond the core game:
 
 ### Phase 29: Item System Refactor ✅ COMPLETE
 
+- [x] MaterialTemplate interface & registry
+- [x] ItemDefinition with traits (refactor)
+- [x] ItemInstance type for runtime items
+- [x] Trait composition (EdibleTrait, WeaponTrait, ArmorTrait, etc.)
+- [x] Material-based property inheritance
+- [ ] ItemQuality system
+
 **Status:** ✅ Complete (Comprehensive materials, traits, and item instances - 2026-01-01)
 **Dependencies:** None
 **Parallel Work:** 🔀 Can run parallel with Phase 30, 31
@@ -868,6 +1069,17 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 30: Magic System ⏳ READY (⚠️ Partially Implemented)
+
+- [ ] MagicSource registry
+- [ ] Technique enum (create, perceive, transform, etc.)
+- [ ] Form enum (fire, water, mind, void, etc.)
+- [ ] ComposedSpell interface
+- [ ] EffectExpression type (universal format)
+- [ ] EffectOperation types (instruction set)
+- [ ] Expression language (safe, side-effect-free)
+- [ ] EffectInterpreter with limits
+- [ ] Initial magic sources (Arcane, Divine, Void)
+- [ ] ComposedSpell → EffectExpression compiler
 
 **Status:** ⏳ Ready (basic framework exists, needs paradigm completion)
 **Dependencies:** None (but benefits from Phase 29)
@@ -922,6 +1134,20 @@ These phases extend beyond the core game:
 
 ### Phase 31: Persistence Layer ✅ COMPLETE
 
+- [x] Schema versioning system
+- [x] Migration registry
+- [x] SerializedWorldState format
+- [x] World.serialize() / deserialize()
+- [x] SaveFile format
+- [x] IndexedDB storage backend
+- [x] FileSystem storage backend
+- [x] Checksum validation
+- [x] Auto-save System
+- [x] Timeline UI
+- [x] GZIP Compression
+- [x] Invariant Checker
+- [x] Passage System
+
 **Status:** ✅ Complete (2026-01-02 - Enhanced with auto-save, checkpoints, Timeline UI)
 **Dependencies:** None
 **Actual LOC:** ~3,500+ (including enhancements)
@@ -969,6 +1195,14 @@ These phases extend beyond the core game:
 
 ### Phase 32: Universe Forking ⏳ READY
 
+- [ ] WorldFork interface
+- [ ] UniverseManager.fork()
+- [ ] UniverseManager.runFork()
+- [x] InvariantChecker
+- [ ] ForkResults collection
+- [ ] WorldDiff utility
+- [ ] Fork execution in Web Worker
+
 **Status:** ⏳ Ready (Phase 31 ✅ complete! Serialization/Invariants ready)
 **Dependencies:** Phase 31 ✅ (World.serialize/deserialize + InvariantChecker available)
 **Parallel Work:** Tasks within phase can be parallelized
@@ -1005,6 +1239,16 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 33: LLM Effect Generation 🔒 BLOCKED
+
+- [ ] EffectGenerationPrompt structure
+- [ ] JSON Schema for EffectExpression
+- [ ] Schema validation
+- [ ] Power level estimation
+- [ ] Infinite loop detection
+- [ ] EffectTestingPipeline
+- [ ] HumanReviewQueue
+- [ ] BlessedEffectRegistry
+- [ ] Feedback loop to LLM
 
 **Status:** 🔒 Blocked on Phase 30 (Magic System) and Phase 32 (Universe Forking)
 **Dependencies:** Phase 30 (EffectExpression), Phase 32 (testing infrastructure)
@@ -1047,6 +1291,16 @@ These phases extend beyond the core game:
 
 ### Phase 34: Cross-Universe Sharing 🔒 BLOCKED
 
+- [ ] EffectPackage format
+- [ ] CreatorIdentity & provenance
+- [ ] EffectLore (narrative history)
+- [ ] TrustPolicy configuration
+- [ ] CrossUniverseImporter
+- [ ] Local validation on import
+- [ ] Export to JSON file
+- [ ] Import from JSON file
+- [ ] UniverseIdentity (multiverse lore)
+
 **Status:** 🔒 Blocked on Phase 31 (Persistence) and Phase 33 (Effect Generation)
 **Dependencies:** Phase 31 (serialization), Phase 33 (blessed effects)
 **Parallel Work:** Tasks within phase can be parallelized
@@ -1088,6 +1342,17 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 28: Angel Delegation System ✅ COMPLETE
+
+- [x] AngelComponent & types
+- [x] Angel AI system (prayer assignment)
+- [x] Angel response generation (LLM)
+- [x] Angel creation system
+- [x] Divine resource management
+- [ ] Angel management UI
+- [ ] Angel progression & leveling
+- [ ] Archangel hierarchy
+- [ ] Angel failure & corruption
+- [ ] Outcome tracking
 
 **Status:** ✅ Complete (Core delegation system implemented with LLM integration - 2025-12-31)
 **Dependencies:** Phase 27 (Divine Communication) ✅
@@ -1144,6 +1409,14 @@ These phases extend beyond the core game:
 
 ### Phase 35: Psychopomp Death Conversation System ✅ COMPLETE
 
+- [x] DeathJudgmentComponent
+- [x] DeathJudgmentSystem
+- [x] DeathTransitionSystem Integration
+- [x] ReincarnationSystem
+- [x] Soul Identity Components
+- [x] Afterlife Memory System
+- [x] Soul Creation Ceremony
+
 **Status:** ✅ Complete (Dramatic death narrative system - 2026-01-01)
 **Dependencies:** Phase 27 (Divine Communication) ✅, Phase 4 (Memory & Social) ✅
 **Parallel Work:** Standalone system, can run independently
@@ -1187,6 +1460,19 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 36: Equipment System 🚧 IN PROGRESS
+
+- [x] EquipmentComponent
+- [x] EquipmentSystem
+- [x] ClothingTrait
+- [ ] Equipment Actions (equip/unequip/repair)
+- [ ] Weapon Definitions
+- [ ] Armor Definitions
+- [ ] Clothing Definitions
+- [ ] Combat Integration (StatBonusTrait + Destiny Luck)
+- [ ] Temperature Integration
+- [ ] Social Effects
+- [x] Set Bonuses
+- [ ] Equipment Durability
 
 **Status:** 🚧 In Progress (Basic system ✅ complete, combat integration ⏳ pending)
 **Dependencies:** Phase 29 (Item System Refactor) ✅, Phase 10 (Crafting) ✅
@@ -1235,6 +1521,12 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 37: Reproduction System ✅ COMPLETE
+
+- [x] Courtship System
+- [x] Pregnancy System
+- [x] Labor & Birth
+- [x] Parenting System
+- [x] Mating Paradigms
 
 **Status:** ✅ Complete (Full courtship → pregnancy → labor → birth → parenting pipeline - 2025-12)
 **Dependencies:** Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅, Phase 29 (Body System) ✅
@@ -1307,6 +1599,14 @@ These phases extend beyond the core game:
 
 ### Phase 38: Realm System ✅ COMPLETE
 
+- [x] Phase 1: Core Types & Components
+- [x] Phase 2: RealmManager System
+- [x] Phase 3: Portal & Transition Systems
+- [x] Phase 4: Time Dilation System
+- [x] Phase 5: Underworld & Death Transitions
+- [x] Phase 6: Documentation & Finalization
+- [x] Cross-Realm Communication
+
 **Status:** ✅ Complete (2026-01-02 - All 6 phases implemented)
 **Dependencies:** Phase 27 (Divine Communication) ✅
 **Actual LOC:** ~4,500+
@@ -1359,6 +1659,17 @@ These phases extend beyond the core game:
 ---
 
 ### Phase 39: Companion System 🚧 IN PROGRESS
+
+- [x] CompanionComponent
+- [x] OphanimimCompanionEntity
+- [x] CompanionSystem (stub)
+- [ ] Evolution Tracking
+- [ ] Emotional System
+- [ ] Memory & Needs
+- [ ] RAG Knowledge System
+- [ ] Chat UI Panel
+- [ ] Governor Visibility
+- [ ] Proactive Advice
 
 **Status:** 🚧 In Progress (Phase 1 started 2026-01-02)
 **Dependencies:** Phase 6 (LLM Integration) ✅, Phase 27 (Divine Communication) ✅
