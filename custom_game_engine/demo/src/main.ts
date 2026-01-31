@@ -3701,16 +3701,33 @@ async function main() {
   let selectedPlanet: PlanetMetadata | null = null;
   let useSharedPlanet = false;
 
-  // Skip server sync in Vite dev mode (ports 3000-3002 are all Vite, not the API server)
-  // The API server on port 3001 would trigger a browser-native 404 error when not running
-  const isViteDevMode = ['3000', '3001', '3002'].includes(window.location.port);
-  if (!isViteDevMode) {
-    saveLoadService.enableServerSync(playerId).then(enabled => {
-      if (enabled) {
-        console.log('[Demo] Multiverse server sync enabled - saves will be uploaded to server');
+  // Enable server sync automatically - all saves go to the multiverse server
+  // This makes everything server-driven: local saves are just a cache
+  saveLoadService.enableServerSync(playerId).then(async (enabled) => {
+    if (enabled) {
+      console.log('[Demo] Multiverse server sync enabled - saves will auto-sync to server');
+
+      // Auto-sync any existing local saves that haven't been uploaded yet
+      // Do this in the background so it doesn't block startup
+      try {
+        const result = await saveLoadService.syncAllLocalSavesToServer({
+          onProgress: (current, total, name) => {
+            console.log(`[Demo] Auto-syncing saves: ${current}/${total} - ${name}`);
+          },
+        });
+        if (result.synced > 0) {
+          console.log(`[Demo] Auto-synced ${result.synced} local saves to server`);
+        }
+        if (result.failed > 0) {
+          console.warn(`[Demo] Failed to sync ${result.failed} saves`);
+        }
+      } catch (error) {
+        console.warn('[Demo] Auto-sync failed (non-critical):', error);
       }
-    }).catch(() => {});
-  }
+    }
+  }).catch(() => {
+    console.log('[Demo] Server sync not available - saves will be local only');
+  });
 
   // Check for ?fresh=1 URL parameter to force a new game (skip loading saves)
   const urlParams = new URLSearchParams(window.location.search);

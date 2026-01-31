@@ -90,7 +90,8 @@ class MultiverseClient {
 
   async isAvailable(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/multiverse/stats`, {
+      // Check if server is available by fetching universes (stats endpoint may not exist)
+      const response = await fetch(`${this.baseUrl}/multiverse/universes?limit=1`, {
         method: 'GET',
         signal: AbortSignal.timeout(2000),
       });

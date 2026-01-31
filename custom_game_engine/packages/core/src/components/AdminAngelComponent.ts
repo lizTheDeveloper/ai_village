@@ -252,6 +252,210 @@ export interface ConversationContext {
   queryContext?: string;
 }
 
+// ============================================================================
+// Narrative Types (Phase 1)
+// ============================================================================
+
+/**
+ * Tracked behavioral pattern for narrative generation
+ */
+export interface BehaviorPattern {
+  id: string;
+  agentId: string;
+  agentName: string;
+
+  /** What pattern was detected */
+  patternType:
+    | 'repetition'      // Agent keeps doing same thing
+    | 'change'          // Agent behavior shifted
+    | 'correlation'     // Two agents always together
+    | 'anomaly'         // Unusual behavior
+    | 'milestone'       // Hit a threshold
+    | 'relationship';   // Social pattern
+
+  /** Pattern details */
+  description: string;           // "dove has gathered wood 5 times in a row"
+  firstObservedTick: number;
+  lastObservedTick: number;
+  occurrences: number;
+
+  /** Narrative potential */
+  mysteryLevel: number;          // 0-1, how intriguing is this?
+  hasBeenMentioned: boolean;     // Did angel tell player about this?
+  narrativeHook?: string;        // "wonder what they're planning?"
+
+  /** Resolution tracking */
+  resolved: boolean;
+  resolution?: string;           // What happened / was discovered
+}
+
+/**
+ * Active story thread being tracked
+ */
+export interface StoryThread {
+  id: string;
+  title: string;                 // "Dove's Big Project"
+
+  /** What sparked this thread */
+  triggerPattern: string;        // Pattern ID that started it
+
+  /** Thread state */
+  status: 'emerging' | 'active' | 'climax' | 'resolved';
+  progressPercent: number;       // 0-100
+
+  /** Narrative beats */
+  beats: Array<{
+    tick: number;
+    description: string;         // What happened
+    playerInvolved: boolean;     // Did player contribute?
+  }>;
+
+  /** Engagement tracking */
+  playerAwareness: boolean;      // Has angel mentioned this?
+  playerInterestLevel: number;   // How much has player engaged?
+  lastMentionedTick: number;
+  lastMentionedProgress: number; // Progress when last mentioned
+
+  /** Potential outcomes */
+  possibleOutcomes: string[];    // What could happen
+  actualOutcome?: string;        // What did happen
+}
+
+/**
+ * Angel's narrative tracking state
+ */
+export interface NarrativeState {
+  /** Active patterns being tracked */
+  patterns: Map<string, BehaviorPattern>;
+  maxPatterns: number;           // Cap at 20
+
+  /** Story threads */
+  activeThreads: StoryThread[];
+  completedThreads: StoryThread[];
+  maxActiveThreads: number;      // Cap at 3
+
+  /** Last pattern scan tick */
+  lastPatternScanTick: number;
+  patternScanInterval: number;   // Every 200 ticks (~10 seconds)
+}
+
+// ============================================================================
+// Agency Types (Phase 2)
+// ============================================================================
+
+/**
+ * Types of goals the angel can pursue
+ */
+export type AngelGoalType =
+  | 'protect'      // Keep specific agent safe
+  | 'nurture'      // Help agent grow/learn
+  | 'harmony'      // Maintain village happiness
+  | 'prosperity'   // Increase resources
+  | 'discovery'    // Learn something new
+  | 'relationship' // Deepen bond with player
+  | 'challenge';   // Complete a difficult task
+
+/**
+ * A personal goal the angel is pursuing
+ */
+export interface AngelGoal {
+  id: string;
+  type: AngelGoalType;
+
+  /** Goal description */
+  title: string;               // "Keep Dove healthy today"
+  description: string;         // "Make sure Dove's needs stay above 50%"
+
+  /** Target (if applicable) */
+  targetAgentId?: string;
+  targetAgentName?: string;
+
+  /** Progress tracking */
+  progressPercent: number;     // 0-100
+  startTick: number;
+  deadline?: number;           // Optional tick deadline
+
+  /** Status */
+  status: 'active' | 'completed' | 'failed' | 'abandoned';
+
+  /** Difficulty and reward */
+  difficulty: 'easy' | 'medium' | 'hard';
+  divinePowerReward: number;   // Power earned on completion
+
+  /** Success/failure conditions (evaluated by system) */
+  successCondition: string;    // Serialized condition
+  failureCondition?: string;
+}
+
+/**
+ * Angel's divine power and abilities
+ */
+export interface DivinePower {
+  current: number;             // Current power (0-100)
+  max: number;                 // Max power (starts at 100)
+  regenRate: number;           // Power per tick (0.01 = 1 per 100 ticks)
+
+  /** Power costs for actions */
+  costs: {
+    minorBlessing: number;     // 5 - small buff
+    majorBlessing: number;     // 20 - significant help
+    miracle: number;           // 50 - big intervention
+    proactiveAction: number;   // 10 - doing something without being asked
+  };
+
+  /** Unlocked abilities */
+  unlockedAbilities: string[]; // ['minor_blessing', 'weather_sense', ...]
+}
+
+/**
+ * Angel achievements
+ */
+export interface AngelAchievement {
+  id: string;
+  title: string;
+  description: string;
+  unlockedTick: number;
+  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+}
+
+/**
+ * Angel's agency and goals
+ */
+export interface AngelAgency {
+  /** Personal goals */
+  activeGoals: AngelGoal[];
+  completedGoals: AngelGoal[];
+  failedGoals: AngelGoal[];
+  maxActiveGoals: number;      // 3
+
+  /** Divine power */
+  power: DivinePower;
+
+  /** Achievements */
+  achievements: AngelAchievement[];
+
+  /** Statistics */
+  stats: {
+    goalsCompleted: number;
+    goalsFailed: number;
+    totalPowerSpent: number;
+    agentsHelped: number;
+    miraclesPerformed: number;
+    daysWatching: number;
+  };
+
+  /** Personality modifiers based on history */
+  personality: {
+    protective: number;        // 0-1, how much angel prioritizes safety
+    ambitious: number;         // 0-1, how hard goals angel picks
+    playful: number;           // 0-1, how often angel experiments
+  };
+}
+
+// ============================================================================
+// Memory Structure
+// ============================================================================
+
 /**
  * Full admin angel memory structure
  */
@@ -269,6 +473,12 @@ export interface AdminAngelMemory {
 
   /** Current attention state */
   attention: AngelAttention;
+
+  /** Narrative tracking - patterns and story threads (Phase 1) */
+  narrative: NarrativeState;
+
+  /** Angel's agency - goals, power, achievements (Phase 2) */
+  agency: AngelAgency;
 }
 
 // ============================================================================
@@ -369,6 +579,47 @@ export function createAdminAngelMemory(): AdminAngelMemory {
       recentlyNoticed: [],
       scanCooldown: 0,
       focusCooldown: 0,
+    },
+    narrative: {
+      patterns: new Map<string, BehaviorPattern>(),
+      maxPatterns: 20,
+      activeThreads: [],
+      completedThreads: [],
+      maxActiveThreads: 3,
+      lastPatternScanTick: 0,
+      patternScanInterval: 200, // Every 200 ticks (~10 seconds)
+    },
+    agency: {
+      activeGoals: [],
+      completedGoals: [],
+      failedGoals: [],
+      maxActiveGoals: 3,
+      power: {
+        current: 100,
+        max: 100,
+        regenRate: 0.01, // 1 power per 100 ticks
+        costs: {
+          minorBlessing: 5,
+          majorBlessing: 20,
+          miracle: 50,
+          proactiveAction: 10,
+        },
+        unlockedAbilities: ['minor_blessing', 'weather_sense'],
+      },
+      achievements: [],
+      stats: {
+        goalsCompleted: 0,
+        goalsFailed: 0,
+        totalPowerSpent: 0,
+        agentsHelped: 0,
+        miraclesPerformed: 0,
+        daysWatching: 0,
+      },
+      personality: {
+        protective: 0.5,
+        ambitious: 0.5,
+        playful: 0.5,
+      },
     },
   };
 }

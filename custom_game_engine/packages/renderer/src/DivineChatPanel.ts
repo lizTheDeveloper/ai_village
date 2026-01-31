@@ -154,6 +154,10 @@ export class DivineChatPanel implements IWindowPanel {
   private localMessageCache: ChatMessage[] = [];
   private chatMessageUnsubscribe: (() => void) | null = null;
   private eventBusUnsubscribe: (() => void) | null = null;
+  private typingIndicatorUnsubscribe: (() => void) | null = null;
+
+  // Typing indicators: Map of senderId -> { name, since }
+  private typingIndicators: Map<string, { name: string; since: number }> = new Map();
 
   // Hidden HTML input for speech-to-text support
   // Canvas-rendered inputs don't work with speech-to-text tools, so we use a real input
@@ -240,6 +244,28 @@ export class DivineChatPanel implements IWindowPanel {
         });
       }
     });
+
+    // Subscribe to typing indicators
+    this.typingIndicatorUnsubscribe = world.eventBus.on('chat:typing_indicator', (event) => {
+      const data = event.data as {
+        roomId: string;
+        senderId: string;
+        senderName: string;
+        isTyping: boolean;
+      };
+
+      // Only track typing for divine_chat room
+      if (data.roomId === 'divine_chat') {
+        if (data.isTyping) {
+          this.typingIndicators.set(data.senderId, {
+            name: data.senderName,
+            since: Date.now(),
+          });
+        } else {
+          this.typingIndicators.delete(data.senderId);
+        }
+      }
+    });
   }
 
   /**
@@ -253,6 +279,10 @@ export class DivineChatPanel implements IWindowPanel {
     if (this.eventBusUnsubscribe) {
       this.eventBusUnsubscribe();
       this.eventBusUnsubscribe = null;
+    }
+    if (this.typingIndicatorUnsubscribe) {
+      this.typingIndicatorUnsubscribe();
+      this.typingIndicatorUnsubscribe = null;
     }
     if (this.hiddenInput && this.hiddenInput.parentNode) {
       this.hiddenInput.parentNode.removeChild(this.hiddenInput);
@@ -449,6 +479,13 @@ export class DivineChatPanel implements IWindowPanel {
       // Reserve extra padding (SIZES.padding * 3) to create clear visual separation from input
       const messageAreaMaxHeight = Math.max(50, panelHeight - (currentY - panelY) - SIZES.inputHeight - SIZES.padding * 3);
       currentY = this.renderMessages(ctx, panelX, currentY, panelWidth, messageAreaMaxHeight, world);
+    }
+
+    // Draw typing indicators above input area
+    const typingIndicatorHeight = this.typingIndicators.size > 0 ? 28 : 0;
+    const typingY = panelY + panelHeight - SIZES.inputHeight - SIZES.padding - typingIndicatorHeight;
+    if (this.typingIndicators.size > 0) {
+      this.renderTypingIndicators(ctx, panelX, typingY, panelWidth);
     }
 
     // Draw input area at the bottom
@@ -883,6 +920,51 @@ export class DivineChatPanel implements IWindowPanel {
       ctx.font = `${SIZES.fontSize - 2}px monospace`;
       ctx.fillText('(press G to toggle chat)', x + SIZES.padding * 2, y + SIZES.inputHeight - 8);
     }
+  }
+
+  /**
+   * Render typing indicators above the input area
+   * Shows animated "X is typing..." with bouncing dots
+   */
+  private renderTypingIndicators(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
+    if (this.typingIndicators.size === 0) return y;
+
+    const indicatorHeight = 24;
+    const contentWidth = width - SIZES.padding * 2;
+
+    // Collect names of people typing
+    const names = Array.from(this.typingIndicators.values()).map(t => t.name);
+    const text = names.length === 1
+      ? `${names[0]} is typing`
+      : names.length === 2
+        ? `${names[0]} and ${names[1]} are typing`
+        : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} are typing`;
+
+    // Background
+    ctx.fillStyle = 'rgba(40, 40, 60, 0.7)';
+    ctx.fillRect(x + SIZES.padding, y, contentWidth, indicatorHeight);
+
+    // Text
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = `italic ${SIZES.fontSize - 1}px monospace`;
+    ctx.fillText(text, x + SIZES.padding * 2, y + indicatorHeight / 2 + 4);
+
+    // Animated dots
+    const textWidth = ctx.measureText(text).width;
+    const dotX = x + SIZES.padding * 2 + textWidth + 4;
+    const dotY = y + indicatorHeight / 2;
+    const time = Date.now() / 200; // Animation speed
+
+    ctx.fillStyle = COLORS.textMuted;
+    for (let i = 0; i < 3; i++) {
+      const phase = time + i * 0.5;
+      const bounce = Math.sin(phase) * 2;
+      ctx.beginPath();
+      ctx.arc(dotX + i * 6, dotY + bounce, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    return y + indicatorHeight + 4;
   }
 
   /**

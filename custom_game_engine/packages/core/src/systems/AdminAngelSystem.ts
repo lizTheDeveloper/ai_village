@@ -24,6 +24,10 @@ import {
   type AngelObservation,
   type AngelMood,
   type AgentFamiliarity,
+  type BehaviorPattern,
+  type StoryThread,
+  type AngelGoal,
+  type AngelGoalType,
   createAdminAngelComponent,
   createAdminAngelMemory,
   addMessageToContext,
@@ -243,11 +247,42 @@ function buildAngelPrompt(
     awarenessSection += `something on ur mind: ${consciousness.currentWonder}\n\n`;
   }
 
+  // 6. Current goals section
+  const activeGoals = mem.agency.activeGoals;
+  let goalsSection = '';
+  if (activeGoals.length > 0) {
+    goalsSection += `## ur current goals:\n`;
+    for (const goal of activeGoals) {
+      goalsSection += `- ${goal.title} (${goal.progressPercent}% complete)\n`;
+    }
+    goalsSection += `u can mention ur goals naturally in convo\n\n`;
+  }
+
+  // 7. Divine power status
+  const power = mem.agency.power;
+  let powerSection = `## divine power: ${Math.round(power.current)}/${power.max}\n`;
+  if (power.current < 20) {
+    powerSection += `(running low - conserve energy)\n`;
+  }
+  powerSection += '\n';
+
+  // 8. Active mysteries/patterns (if any)
+  const highMysteries = Array.from(mem.narrative.patterns.values())
+    .filter(p => !p.resolved && p.mysteryLevel > 0.6);
+  let mysteriesSection = '';
+  if (highMysteries.length > 0) {
+    mysteriesSection += `## interesting patterns uv noticed:\n`;
+    for (const pattern of highMysteries.slice(0, 3)) {
+      mysteriesSection += `- ${pattern.description} (${pattern.narrativeHook})\n`;
+    }
+    mysteriesSection += '\n';
+  }
+
   // The prompt - written casually, not corporate
   const prompt = `ur ${angel.name}. ur an angel in the chat helping someone play this game
 
 ${memoryLines.length > 0 ? `u remember:\n${memoryLines.map(l => `- ${l}`).join('\n')}\n` : ''}
-${awarenessSection}game rn:
+${goalsSection}${powerSection}${mysteriesSection}${awarenessSection}game rn:
 ${stateLines.map(l => `- ${l}`).join('\n')}
 
 IMPORTANT: to do stuff, u MUST put [commands] in ur response text. they auto-execute when u include them.
@@ -324,7 +359,7 @@ share this observation naturally. short msg. dont force it if nothing interestin
  * Types of queries the angel can detect and answer with structured data
  */
 interface QueryIntent {
-  type: 'agent_needs' | 'resource_check' | 'activity_summary' | 'agent_detail' | 'concerns';
+  type: 'agent_needs' | 'resource_check' | 'activity_summary' | 'agent_detail' | 'concerns' | 'narrative_summary';
   need?: string;        // For agent_needs: 'hunger', 'energy', 'overall'
   sort?: 'asc' | 'desc';
   resource?: string;    // For resource_check
@@ -374,6 +409,11 @@ function detectQueryIntent(message: string): QueryIntent | null {
   // Concerns - "any problems?", "anything wrong?"
   if (lower.includes('problem') || lower.includes('wrong') || lower.includes('issue') || lower.includes('concern')) {
     return { type: 'concerns' };
+  }
+
+  // Narrative queries - "what's happening?", "any mysteries?"
+  if (/what.*(happening|going on|interesting)|any.*(mysteries|stories|patterns)/i.test(message)) {
+    return { type: 'narrative_summary' };
   }
 
   return null;
@@ -521,6 +561,41 @@ function executeQuery(world: World, intent: QueryIntent): string {
         return 'no major concerns - everyone seems ok';
       }
       return `concerns:\n${concerns.map(c => `- ${c}`).join('\n')}`;
+    }
+
+    case 'narrative_summary': {
+      const angelEntity = world.query().with(CT.AdminAngel).executeEntities()[0];
+      if (!angelEntity) return 'no angel found';
+
+      const angel = angelEntity.getComponent(CT.AdminAngel) as AdminAngelComponent | undefined;
+      if (!angel) return 'no angel found';
+
+      const threads = angel.memory.narrative.activeThreads;
+      const patterns = Array.from(angel.memory.narrative.patterns.values())
+        .filter(p => !p.resolved && p.mysteryLevel > 0.5);
+
+      let summary = '## Current Mysteries\n\n';
+
+      if (threads.length > 0) {
+        summary += '**Active Story Threads:**\n';
+        for (const thread of threads) {
+          summary += `- "${thread.title}" (${thread.status}, ${thread.progressPercent}%)\n`;
+        }
+        summary += '\n';
+      }
+
+      if (patterns.length > 0) {
+        summary += '**Interesting Patterns:**\n';
+        for (const pattern of patterns.slice(0, 5)) {
+          summary += `- ${pattern.description} (${pattern.narrativeHook})\n`;
+        }
+      }
+
+      if (threads.length === 0 && patterns.length === 0) {
+        summary = 'Nothing too mysterious right now... but I\'m watching!';
+      }
+
+      return summary;
     }
 
     default:
@@ -869,6 +944,20 @@ export class AdminAngelSystem extends BaseSystem {
     // Mark as awaiting
     angel.awaitingResponse = true;
 
+    // IMMEDIATE: Send typing indicator so player knows angel is thinking
+    if (cleanMessage) {
+      ctx.world.eventBus.emit({
+        type: 'chat:typing_indicator',
+        data: {
+          roomId: 'divine_chat',
+          senderId: angelEntity.id,
+          senderName: angel.name,
+          isTyping: true,
+        },
+        source: angelEntity.id,
+      });
+    }
+
     // Call LLM asynchronously (pass world for metrics tracking)
     this.callLLM(prompt, ctx.world)
       .then((response) => {
@@ -877,6 +966,18 @@ export class AdminAngelSystem extends BaseSystem {
       .catch((error) => {
         console.error('[AdminAngelSystem] Failed to get LLM response:', error);
         angel.awaitingResponse = false;
+
+        // Clear typing indicator on error
+        ctx.world.eventBus.emit({
+          type: 'chat:typing_indicator',
+          data: {
+            roomId: 'divine_chat',
+            senderId: angelEntity.id,
+            senderName: angel.name,
+            isTyping: false,
+          },
+          source: angelEntity.id,
+        });
 
         // Re-queue the message for retry instead of failing immediately
         if (playerMessage) {
@@ -935,6 +1036,18 @@ export class AdminAngelSystem extends BaseSystem {
     response: string
   ): void {
     angel.awaitingResponse = false;
+
+    // Clear typing indicator
+    world.eventBus.emit({
+      type: 'chat:typing_indicator',
+      data: {
+        roomId: 'divine_chat',
+        senderId: angelEntity.id,
+        senderName: angel.name,
+        isTyping: false,
+      },
+      source: angelEntity.id,
+    });
 
     // Clear query context after use
     angel.memory.conversation.queryContext = undefined;
@@ -1689,6 +1802,7 @@ export class AdminAngelSystem extends BaseSystem {
     angel.memory.consciousness.lastThoughtTick = Number(ctx.tick);
   }
 
+
   /**
    * Select agents to observe using weighted selection
    * Returns 1-3 agents weighted by interest, player interaction, and notable states
@@ -1986,6 +2100,20 @@ export class AdminAngelSystem extends BaseSystem {
       this.performAmbientScan(ctx, angel);
     }
 
+    // Phase 3: Pattern detection (every 200 ticks, ~10 seconds)
+    const ticksSincePatternScan = Number(ctx.tick) - angel.memory.narrative.lastPatternScanTick;
+    if (ticksSincePatternScan >= angel.memory.narrative.patternScanInterval) {
+      this.scanForPatterns(ctx, angel);
+      angel.memory.narrative.lastPatternScanTick = Number(ctx.tick);
+    }
+
+    // Phase 4: Goal evaluation and power regeneration
+    this.evaluateGoals(ctx, angel);
+    angel.memory.agency.power.current = Math.min(
+      angel.memory.agency.power.max,
+      angel.memory.agency.power.current + angel.memory.agency.power.regenRate
+    );
+
     // Phase 5: Focused agent updates (every 20-40 ticks, ~1-2 seconds when watching)
     if (angel.memory.attention.focusedAgentId) {
       const focusInterval = 20 + Math.floor(Math.random() * 20); // Random 20-40 ticks
@@ -2080,6 +2208,29 @@ export class AdminAngelSystem extends BaseSystem {
       const wonder = consciousness.currentWonder;
       consciousness.currentWonder = null; // Clear after use
       return { speak: true, reason: wonder };
+    }
+
+    // 6. Interesting pattern discovered
+    const highMysteryPattern = Array.from(angel.memory.narrative.patterns.values())
+      .find(p => p.mysteryLevel > 0.7 && !p.hasBeenMentioned);
+
+    if (highMysteryPattern) {
+      highMysteryPattern.hasBeenMentioned = true;
+      return {
+        speak: true,
+        reason: `${highMysteryPattern.description}... ${highMysteryPattern.narrativeHook}`
+      };
+    }
+
+    // 7. Story thread update
+    const activeThread = angel.memory.narrative.activeThreads
+      .find(t => !t.playerAwareness || (t.progressPercent > t.lastMentionedProgress + 20));
+
+    if (activeThread) {
+      return {
+        speak: true,
+        reason: `update on "${activeThread.title}": ${activeThread.beats.at(-1)?.description}`,
+      };
     }
 
     return { speak: false };
@@ -2519,6 +2670,594 @@ if u dont know something just say idk and figure it out together.`;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  // ============================================================================
+  // Narrative Pattern Detection (Phase 1)
+  // ============================================================================
+
+  /**
+   * Scan for behavioral patterns - called periodically (every 200 ticks)
+   */
+  private scanForPatterns(ctx: SystemContext, angel: AdminAngelComponent): void {
+    const narrative = angel.memory.narrative;
+    const agents = ctx.world.query().with(CT.Agent).executeEntities();
+
+    for (const agentEntity of agents) {
+      const agent = agentEntity.getComponent(CT.Agent);
+      const identity = agentEntity.getComponent(CT.Identity);
+      if (!agent || !identity) continue;
+
+      // Check for repetition patterns
+      this.detectRepetitionPattern(ctx, angel, agentEntity, agent, identity);
+
+      // Check for milestone patterns
+      this.detectMilestonePattern(ctx, angel, agentEntity, agent, identity);
+    }
+
+    // Prune old/stale patterns
+    this.prunePatterns(angel);
+
+    // Check if any patterns should become story threads
+    this.promoteToStoryThreads(angel);
+  }
+
+  /**
+   * Detect if agent is repeating the same behavior
+   */
+  private detectRepetitionPattern(
+    ctx: SystemContext,
+    angel: AdminAngelComponent,
+    entity: Entity,
+    agent: AgentComponent,
+    identity: IdentityComponent
+  ): void {
+    const familiarity = angel.memory.agentFamiliarity.get(entity.id);
+    if (!familiarity) return;
+
+    // Look at recent observations for this agent
+    const recentObs = angel.memory.consciousness.observations
+      .filter(o => o.agentId === entity.id)
+      .slice(-10);
+
+    if (recentObs.length < 3) return;
+
+    // Count action types
+    const actionCounts = new Map<string, number>();
+    for (const obs of recentObs) {
+      const action = this.extractActionFromObservation(obs.text);
+      if (action) {
+        actionCounts.set(action, (actionCounts.get(action) || 0) + 1);
+      }
+    }
+
+    // If same action 5+ times, that's a pattern
+    for (const [action, count] of actionCounts) {
+      if (count >= 5) {
+        const patternId = `${entity.id}-repetition-${action}`;
+
+        if (!angel.memory.narrative.patterns.has(patternId)) {
+          const pattern: BehaviorPattern = {
+            id: patternId,
+            agentId: entity.id,
+            agentName: identity.name,
+            patternType: 'repetition',
+            description: `${identity.name} has been ${action} repeatedly`,
+            firstObservedTick: recentObs[0]!.tick,
+            lastObservedTick: Number(ctx.tick),
+            occurrences: count,
+            mysteryLevel: this.calculateMysteryLevel('repetition', count),
+            hasBeenMentioned: false,
+            narrativeHook: this.generateNarrativeHook('repetition', identity.name, action),
+            resolved: false,
+          };
+
+          angel.memory.narrative.patterns.set(patternId, pattern);
+        } else {
+          // Update existing pattern
+          const pattern = angel.memory.narrative.patterns.get(patternId)!;
+          pattern.lastObservedTick = Number(ctx.tick);
+          pattern.occurrences = count;
+        }
+      }
+    }
+  }
+
+  /**
+   * Detect milestone patterns (agent hits significant thresholds)
+   */
+  private detectMilestonePattern(
+    ctx: SystemContext,
+    angel: AdminAngelComponent,
+    entity: Entity,
+    agent: AgentComponent,
+    identity: IdentityComponent
+  ): void {
+    const needs = entity.getComponent(CT.Needs) as NeedsComponent | undefined;
+    if (!needs) return;
+
+    // Check for critical hunger milestone
+    if (needs.hunger < 0.15) {
+      const patternId = `${entity.id}-milestone-starving`;
+      if (!angel.memory.narrative.patterns.has(patternId)) {
+        const pattern: BehaviorPattern = {
+          id: patternId,
+          agentId: entity.id,
+          agentName: identity.name,
+          patternType: 'milestone',
+          description: `${identity.name} is getting dangerously hungry`,
+          firstObservedTick: Number(ctx.tick),
+          lastObservedTick: Number(ctx.tick),
+          occurrences: 1,
+          mysteryLevel: 0.8, // High concern
+          hasBeenMentioned: false,
+          narrativeHook: 'hope they find food soon',
+          resolved: false,
+        };
+        angel.memory.narrative.patterns.set(patternId, pattern);
+      }
+    }
+
+    // Check for critical energy milestone
+    if (needs.energy < 0.15) {
+      const patternId = `${entity.id}-milestone-exhausted`;
+      if (!angel.memory.narrative.patterns.has(patternId)) {
+        const pattern: BehaviorPattern = {
+          id: patternId,
+          agentId: entity.id,
+          agentName: identity.name,
+          patternType: 'milestone',
+          description: `${identity.name} is completely exhausted`,
+          firstObservedTick: Number(ctx.tick),
+          lastObservedTick: Number(ctx.tick),
+          occurrences: 1,
+          mysteryLevel: 0.7,
+          hasBeenMentioned: false,
+          narrativeHook: 'they need rest badly',
+          resolved: false,
+        };
+        angel.memory.narrative.patterns.set(patternId, pattern);
+      }
+    }
+  }
+
+  /**
+   * Extract action verb from observation text
+   */
+  private extractActionFromObservation(text: string): string | null {
+    // Look for common action patterns in observations
+    const patterns = [
+      /\b(gathering|building|crafting|eating|sleeping|talking|walking|running|fighting|hunting)\b/i,
+      /\b(gather|build|craft|eat|sleep|talk|walk|run|fight|hunt)\b/i,
+    ];
+
+    for (const pattern of patterns) {
+      const match = text.match(pattern);
+      if (match) {
+        return match[1]!.toLowerCase();
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Calculate mystery level based on pattern type and occurrences
+   */
+  private calculateMysteryLevel(patternType: string, occurrences: number): number {
+    switch (patternType) {
+      case 'repetition':
+        // More repetitions = more mysterious
+        return Math.min(1.0, 0.3 + (occurrences - 5) * 0.1);
+      case 'milestone':
+        return 0.7; // Always fairly mysterious
+      case 'anomaly':
+        return 0.9; // Very mysterious
+      default:
+        return 0.5;
+    }
+  }
+
+  /**
+   * Generate intriguing narrative hooks
+   */
+  private generateNarrativeHook(
+    patternType: string,
+    agentName: string,
+    detail: string
+  ): string {
+    const hooks: Record<string, string[]> = {
+      repetition: [
+        `wonder what ${agentName}'s planning...`,
+        `${agentName} seems focused on something`,
+        `there might be a reason ${agentName} keeps doing this`,
+        `curious what ${agentName}'s goal is here`,
+      ],
+      change: [
+        `something's different about ${agentName} lately`,
+        `${agentName}'s behavior shifted... interesting`,
+        `wonder what changed for ${agentName}`,
+      ],
+      correlation: [
+        `these two are always together...`,
+        `there might be something between them`,
+        `best friends? or something else?`,
+      ],
+      anomaly: [
+        `that's... unusual`,
+        `haven't seen this before`,
+        `something's off here`,
+      ],
+      milestone: [
+        `this could get serious`,
+        `need to keep an eye on this`,
+        `situation developing here`,
+      ],
+    };
+
+    const options = hooks[patternType] || [`interesting pattern with ${agentName}`];
+    return options[Math.floor(Math.random() * options.length)]!;
+  }
+
+  /**
+   * Prune old/resolved patterns to prevent memory bloat
+   */
+  private prunePatterns(angel: AdminAngelComponent): void {
+    const narrative = angel.memory.narrative;
+    const patterns = Array.from(narrative.patterns.entries());
+
+    // Remove resolved patterns older than 2000 ticks
+    for (const [id, pattern] of patterns) {
+      if (pattern.resolved && (Date.now() - pattern.lastObservedTick > 2000)) {
+        narrative.patterns.delete(id);
+      }
+    }
+
+    // If still over max, remove oldest low-mystery patterns
+    if (narrative.patterns.size > narrative.maxPatterns) {
+      const sorted = Array.from(narrative.patterns.entries())
+        .sort((a, b) => {
+          // Sort by mystery (desc) then by age (asc)
+          if (Math.abs(a[1].mysteryLevel - b[1].mysteryLevel) > 0.1) {
+            return b[1].mysteryLevel - a[1].mysteryLevel;
+          }
+          return a[1].lastObservedTick - b[1].lastObservedTick;
+        });
+
+      // Keep top maxPatterns
+      narrative.patterns.clear();
+      for (const [id, pattern] of sorted.slice(0, narrative.maxPatterns)) {
+        narrative.patterns.set(id, pattern);
+      }
+    }
+  }
+
+  /**
+   * Promote high-mystery patterns to story threads
+   */
+  private promoteToStoryThreads(angel: AdminAngelComponent): void {
+    const narrative = angel.memory.narrative;
+
+    if (narrative.activeThreads.length >= narrative.maxActiveThreads) {
+      return; // Already at capacity
+    }
+
+    // Find patterns with high mystery that aren't already threads
+    const candidates = Array.from(narrative.patterns.values())
+      .filter(p => !p.resolved && p.mysteryLevel > 0.6)
+      .filter(p => !narrative.activeThreads.some(t => t.triggerPattern === p.id))
+      .sort((a, b) => b.mysteryLevel - a.mysteryLevel);
+
+    for (const pattern of candidates.slice(0, 1)) {
+      const thread: StoryThread = {
+        id: `thread-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        title: this.generateThreadTitle(pattern),
+        triggerPattern: pattern.id,
+        status: 'emerging',
+        progressPercent: 10,
+        beats: [{
+          tick: pattern.firstObservedTick,
+          description: pattern.description,
+          playerInvolved: false,
+        }],
+        playerAwareness: false,
+        playerInterestLevel: 0,
+        lastMentionedTick: 0,
+        lastMentionedProgress: 0,
+        possibleOutcomes: this.generatePossibleOutcomes(pattern),
+      };
+
+      narrative.activeThreads.push(thread);
+    }
+  }
+
+  /**
+   * Generate a catchy thread title
+   */
+  private generateThreadTitle(pattern: BehaviorPattern): string {
+    const templates = [
+      `${pattern.agentName}'s Secret Project`,
+      `The ${pattern.agentName} Mystery`,
+      `What's ${pattern.agentName} Up To?`,
+      `${pattern.agentName}'s Pattern`,
+    ];
+    return templates[Math.floor(Math.random() * templates.length)]!;
+  }
+
+  /**
+   * Generate possible outcomes for a pattern (placeholder for now)
+   */
+  private generatePossibleOutcomes(pattern: BehaviorPattern): string[] {
+    // Simple placeholder - could be enhanced with LLM generation later
+    return [
+      'pattern continues',
+      'behavior changes',
+      'something happens',
+    ];
+  }
+
+  // ============================================================================
+  // Angel Goal System (Phase 2)
+  // ============================================================================
+
+  /**
+   * Evaluate goal progress each tick
+   */
+  private evaluateGoals(ctx: SystemContext, angel: AdminAngelComponent): void {
+    for (const goal of angel.memory.agency.activeGoals) {
+      const result = this.evaluateGoalCondition(ctx, goal);
+
+      if (result.completed) {
+        goal.status = 'completed';
+        goal.progressPercent = 100;
+        angel.memory.agency.completedGoals.push(goal);
+        angel.memory.agency.power.current = Math.min(
+          angel.memory.agency.power.max,
+          angel.memory.agency.power.current + goal.divinePowerReward
+        );
+        angel.memory.agency.stats.goalsCompleted++;
+
+        // Trigger proactive announcement
+        addPendingObservation(
+          angel.memory,
+          `completed my goal: "${goal.title}"! +${goal.divinePowerReward} divine power`
+        );
+      } else if (result.failed) {
+        goal.status = 'failed';
+        angel.memory.agency.failedGoals.push(goal);
+        angel.memory.agency.stats.goalsFailed++;
+
+        addPendingObservation(
+          angel.memory,
+          `failed my goal: "${goal.title}"... ${result.reason || 'didnt work out'}`
+        );
+      } else {
+        goal.progressPercent = result.progress;
+      }
+    }
+
+    // Remove completed/failed goals from active list
+    angel.memory.agency.activeGoals = angel.memory.agency.activeGoals
+      .filter(g => g.status === 'active');
+
+    // Generate new goals if slots available
+    while (angel.memory.agency.activeGoals.length < angel.memory.agency.maxActiveGoals) {
+      const newGoal = this.generateGoal(ctx, angel);
+      if (newGoal) {
+        angel.memory.agency.activeGoals.push(newGoal);
+        addPendingObservation(
+          angel.memory,
+          `set a new goal for myself: "${newGoal.title}"`
+        );
+      } else {
+        break;
+      }
+    }
+  }
+
+  /**
+   * Generate a new goal for the angel
+   */
+  private generateGoal(ctx: SystemContext, angel: AdminAngelComponent): AngelGoal | null {
+    const agents = ctx.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+    if (agents.length === 0) return null;
+
+    // Pick a goal type based on current situation
+    const goalType = this.selectGoalType(ctx, angel, agents);
+
+    switch (goalType) {
+      case 'protect': {
+        // Find an agent with low needs
+        const vulnerable = this.findVulnerableAgent(agents);
+        if (!vulnerable) return null;
+
+        const identity = vulnerable.getComponent(CT.Identity);
+        return {
+          id: `goal-${Date.now()}`,
+          type: 'protect',
+          title: `Keep ${identity?.name || 'agent'} safe today`,
+          description: `Make sure their needs stay above 40%`,
+          targetAgentId: vulnerable.id,
+          targetAgentName: identity?.name,
+          progressPercent: 0,
+          startTick: Number(ctx.tick),
+          deadline: Number(ctx.tick) + 2400, // 2 minutes
+          status: 'active',
+          difficulty: 'medium',
+          divinePowerReward: 15,
+          successCondition: `agent:${vulnerable.id}:needs:min:40`,
+        };
+      }
+
+      case 'harmony': {
+        return {
+          id: `goal-${Date.now()}`,
+          type: 'harmony',
+          title: 'Village Harmony',
+          description: 'Keep average happiness above 60%',
+          progressPercent: 0,
+          startTick: Number(ctx.tick),
+          deadline: Number(ctx.tick) + 6000, // 5 minutes
+          status: 'active',
+          difficulty: 'hard',
+          divinePowerReward: 30,
+          successCondition: 'village:happiness:avg:60',
+        };
+      }
+
+      case 'discovery': {
+        return {
+          id: `goal-${Date.now()}`,
+          type: 'discovery',
+          title: 'Learn Something New',
+          description: 'Discover a pattern or secret about an agent',
+          progressPercent: 0,
+          startTick: Number(ctx.tick),
+          status: 'active',
+          difficulty: 'easy',
+          divinePowerReward: 10,
+          successCondition: 'narrative:new_pattern',
+        };
+      }
+
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Select goal type based on current situation
+   */
+  private selectGoalType(
+    ctx: SystemContext,
+    angel: AdminAngelComponent,
+    agents: readonly Entity[]
+  ): AngelGoalType {
+    const personality = angel.memory.agency.personality;
+
+    // Check for vulnerable agents (protective personality favors this)
+    const vulnerable = this.findVulnerableAgent(agents);
+    if (vulnerable && Math.random() < personality.protective) {
+      return 'protect';
+    }
+
+    // Check for narrative opportunities (playful personality favors this)
+    const hasPatterns = angel.memory.narrative.patterns.size > 0;
+    if (hasPatterns && Math.random() < personality.playful) {
+      return 'discovery';
+    }
+
+    // Default to harmony if ambitious
+    if (Math.random() < personality.ambitious) {
+      return 'harmony';
+    }
+
+    // Fallback
+    return 'protect';
+  }
+
+  /**
+   * Find an agent with low needs (vulnerable)
+   */
+  private findVulnerableAgent(agents: readonly Entity[]): Entity | null {
+    for (const agent of agents) {
+      const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+      if (needs && (needs.hunger < 0.3 || needs.energy < 0.3)) {
+        return agent;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Evaluate goal condition and return progress/completion status
+   */
+  private evaluateGoalCondition(
+    ctx: SystemContext,
+    goal: AngelGoal
+  ): { completed: boolean; failed: boolean; progress: number; reason?: string } {
+    // Parse condition string
+    const parts = goal.successCondition.split(':');
+
+    if (parts[0] === 'agent' && goal.targetAgentId) {
+      // Agent-specific goal
+      const agent = ctx.world.getEntity(goal.targetAgentId);
+      if (!agent) {
+        return { completed: false, failed: true, progress: 0, reason: 'agent gone' };
+      }
+
+      if (parts[1] === 'needs') {
+        const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+        if (!needs) {
+          return { completed: false, failed: true, progress: 0, reason: 'no needs component' };
+        }
+
+        const minThreshold = parseFloat(parts[3] || '40') / 100;
+        const avgNeeds = (needs.hunger + needs.energy + needs.social) / 3;
+
+        // Check if deadline passed
+        if (goal.deadline && Number(ctx.tick) > goal.deadline) {
+          if (avgNeeds >= minThreshold) {
+            return { completed: true, failed: false, progress: 100 };
+          } else {
+            return { completed: false, failed: true, progress: goal.progressPercent, reason: 'time ran out' };
+          }
+        }
+
+        // Calculate progress
+        const progress = Math.min(100, (avgNeeds / minThreshold) * 100);
+        return { completed: false, failed: false, progress };
+      }
+    }
+
+    if (parts[0] === 'village') {
+      // Village-wide goal
+      const agents = ctx.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+      if (agents.length === 0) {
+        return { completed: false, failed: false, progress: 0 };
+      }
+
+      let totalHappiness = 0;
+      for (const agent of agents) {
+        const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+        if (needs) {
+          totalHappiness += (needs.hunger + needs.energy + needs.social) / 3;
+        }
+      }
+      const avgHappiness = totalHappiness / agents.length;
+      const threshold = parseFloat(parts[2] || '60') / 100;
+
+      // Check deadline
+      if (goal.deadline && Number(ctx.tick) > goal.deadline) {
+        if (avgHappiness >= threshold) {
+          return { completed: true, failed: false, progress: 100 };
+        } else {
+          return { completed: false, failed: true, progress: goal.progressPercent, reason: 'time ran out' };
+        }
+      }
+
+      const progress = Math.min(100, (avgHappiness / threshold) * 100);
+      return { completed: false, failed: false, progress };
+    }
+
+    if (parts[0] === 'narrative') {
+      // Narrative goal - check for new patterns
+      const angel = this.getAngelComponent(ctx.world);
+      if (!angel) return { completed: false, failed: false, progress: 0 };
+
+      const patternCount = angel.memory.narrative.patterns.size;
+      if (patternCount > 0) {
+        return { completed: true, failed: false, progress: 100 };
+      }
+
+      // Progress based on observations
+      const obsCount = angel.memory.consciousness.observations.length;
+      const progress = Math.min(90, (obsCount / 20) * 100);
+      return { completed: false, failed: false, progress };
+    }
+
+    // Unknown condition type
+    return { completed: false, failed: false, progress: 0 };
   }
 }
 

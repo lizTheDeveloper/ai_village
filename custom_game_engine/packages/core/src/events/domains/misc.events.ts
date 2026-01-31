@@ -833,6 +833,14 @@ export interface MiscEvents {
     error?: string;        // Error message if failed
   };
 
+  /** Angel typing indicator - shows when angel is thinking */
+  'chat:typing_indicator': {
+    roomId: string;
+    senderId: string;
+    senderName: string;
+    isTyping: boolean;
+  };
+
   /** Admin angel weather control */
   'admin_angel:weather_control': {
     weather: string;       // sunny, rain, storm, snow, clear
