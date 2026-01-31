@@ -228,40 +228,49 @@
       <p class="subtitle">Central Hub - Access All Systems</p>
     </header>
 
-    <div class="highlight">
-      <h2><span class="status-indicator"></span>System Status: ONLINE</h2>
-      <p>All services running. Use ./start.sh to manage servers.</p>
-      <div class="quick-links">
-        <a href="/game.html" class="quick-link">🎮 LAUNCH GAME</a>
-        <a href="http://localhost:8766/dashboard" class="quick-link">📊 METRICS</a>
-        <a href="http://localhost:3100/spell-lab" class="quick-link">✨ MICROGENERATORS</a>
-      </div>
-    </div>
-
-    <!-- Multiverse Management - Primary Actions -->
+    <!-- Multiverse Gateway - Primary Entry Point -->
     <div class="highlight" style="background: rgba(102, 126, 234, 0.15); border-color: #667eea;">
       <h2 style="color: #a8b4f0;">🌌 Multiverse Gateway</h2>
-      <p style="color: #8892b0;">Create universes, join existing worlds - all saves auto-sync to the server</p>
+      <p style="color: #8892b0;">Universe → Planet → Settlement. Multiple groups can share the same planet.</p>
       <div class="quick-links">
         <a href="/game.html?action=create" class="quick-link" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">✨ CREATE UNIVERSE</a>
         <a href="/game.html?action=join" class="quick-link" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);">🌌 JOIN UNIVERSE</a>
       </div>
-      <p style="color: #4CAF50; font-size: 0.85rem; margin-top: 1rem;">✓ Auto-sync enabled - local saves upload automatically</p>
+      <p style="color: #6a7; font-size: 0.8rem; margin-top: 0.75rem; line-height: 1.4;">
+        Create or join a universe with unique magic laws → Select or create a planet with shared creatures/sprites → Start or join a settlement on that planet
+      </p>
+      <p style="color: #4CAF50; font-size: 0.75rem; margin-top: 0.5rem;">✓ Auto-sync enabled</p>
+    </div>
+
+    <div class="highlight">
+      <h2><span class="status-indicator"></span>System Status: ONLINE</h2>
+      <p>All services running. Use ./start.sh to manage servers.</p>
+      <div class="quick-links">
+        <a href="http://localhost:8766/dashboard" class="quick-link">📊 METRICS</a>
+        <a href="http://localhost:8766/admin" class="quick-link">🎛️ ADMIN</a>
+        <a href="http://localhost:3100/spell-lab" class="quick-link">✨ MICROGENERATORS</a>
+      </div>
     </div>
 
     <div class="grid">
-      <!-- Main Game -->
+      <!-- Game Structure -->
       <div class="section">
-        <h2 class="section-title">🎮 Main Game</h2>
+        <h2 class="section-title">🎮 Game Structure</h2>
         <p class="section-description">
-          The Multiverse: The End of Eternity simulation - autonomous agents with LLM-powered consciousness,
-          building, farming, and evolving in a living world.
+          Universes contain planets. Planets have shared biospheres (creatures, plants, sprites).
+          Multiple settlements can exist on the same planet, sharing the same species.
         </p>
         <ul class="link-list">
           <li>
-            <a href="/game.html">
-              Main Game Interface
-              <span class="badge port">:3000</span>
+            <a href="/game.html?action=create">
+              Create New Universe
+              <span class="badge">Start Fresh</span>
+            </a>
+          </li>
+          <li>
+            <a href="/game.html?action=join">
+              Browse Universes & Planets
+              <span class="badge">Join Existing</span>
             </a>
           </li>
           <li>
