@@ -287,6 +287,25 @@ export class SimulationScheduler {
   /** Universe physics configuration */
   private physicsConfig: UniversePhysicsConfig = STANDARD_3D_CONFIG;
 
+  // ============================================================================
+  // INCREMENTAL SPATIAL GRID UPDATE OPTIMIZATION
+  // Instead of rebuilding the entire grid every tick (O(n) for all entities),
+  // we only update entities that moved (O(changed entities)).
+  // This is inspired by Factorio's approach of "only update what changed".
+  // ============================================================================
+
+  /** Whether the spatial grid has been initialized with all entities */
+  private spatialGridInitialized: boolean = false;
+
+  /** Cache of entity positions for incremental updates */
+  private entityPositionCache: Map<string, number[]> = new Map();
+
+  /** Entities that need to be added to the grid on next update */
+  private pendingGridAdditions: Set<string> = new Set();
+
+  /** Entities that need to be removed from the grid on next update */
+  private pendingGridRemovals: Set<string> = new Set();
+
   /**
    * Configure universe physics for visibility calculations
    */
@@ -318,21 +337,178 @@ export class SimulationScheduler {
       this.agentPositions.push({ x: position.x, y: position.y, z: position.z });
     }
 
-    // Update spatial grid with current entity positions
+    // Update spatial grid - use incremental updates after initialization
     if (this.useNDSpatialGrid && this.spatialGrid) {
-      this.spatialGrid.clear();
-
-      // Add all entities with positions to the spatial grid
-      for (const entity of world.entities.values()) {
-        const positionComponent = entity.components.get('position');
-        if (!positionComponent || typeof positionComponent !== 'object') continue;
-        if (!('x' in positionComponent) || !('y' in positionComponent)) continue;
-
-        const position = positionComponent as { x: number; y: number; z?: number; w?: number; v?: number; u?: number };
-        const coords = getCoordinates(position, this.physicsConfig.spatialDimensions);
-        this.spatialGrid.add(entity.id, coords);
+      if (!this.spatialGridInitialized) {
+        // First time: full build (O(n) - happens once)
+        this.fullRebuildSpatialGrid(world);
+        this.spatialGridInitialized = true;
+      } else {
+        // Subsequent ticks: incremental update (O(changed entities))
+        this.incrementalUpdateSpatialGrid(world);
       }
     }
+  }
+
+  /**
+   * Full rebuild of spatial grid - only called on initialization or after load
+   * This is the old O(n) approach, but now only happens once.
+   */
+  private fullRebuildSpatialGrid(world: World): void {
+    if (!this.spatialGrid) return;
+
+    this.spatialGrid.clear();
+    this.entityPositionCache.clear();
+    this.pendingGridAdditions.clear();
+    this.pendingGridRemovals.clear();
+
+    // Add all entities with positions to the spatial grid
+    for (const entity of world.entities.values()) {
+      const coords = this.getEntityCoords(entity);
+      if (coords) {
+        this.spatialGrid.add(entity.id, coords);
+        this.entityPositionCache.set(entity.id, coords);
+      }
+    }
+  }
+
+  /**
+   * Incremental update of spatial grid - only processes changed entities
+   * Uses DirtyTracker to find entities with position changes.
+   *
+   * Performance: Instead of O(all entities), this is O(changed + added + removed)
+   * With 4000 entities and ~20 moving per tick, this is 200x faster.
+   */
+  private incrementalUpdateSpatialGrid(world: World): void {
+    if (!this.spatialGrid) return;
+
+    // Process pending removals (from entity destruction)
+    for (const entityId of this.pendingGridRemovals) {
+      const oldCoords = this.entityPositionCache.get(entityId);
+      if (oldCoords) {
+        this.spatialGrid.remove(entityId, oldCoords);
+        this.entityPositionCache.delete(entityId);
+      }
+    }
+    this.pendingGridRemovals.clear();
+
+    // Process pending additions (from entity creation)
+    for (const entityId of this.pendingGridAdditions) {
+      const entity = world.getEntity(entityId);
+      if (entity) {
+        const coords = this.getEntityCoords(entity);
+        if (coords) {
+          this.spatialGrid.add(entityId, coords);
+          this.entityPositionCache.set(entityId, coords);
+        }
+      }
+    }
+    this.pendingGridAdditions.clear();
+
+    // Process moved entities via DirtyTracker
+    const movedEntities = world.dirtyTracker.getDirtyByComponent('position' as ComponentType);
+    for (const entityId of movedEntities) {
+      const entity = world.getEntity(entityId);
+      if (!entity) continue;
+
+      const oldCoords = this.entityPositionCache.get(entityId);
+      const newCoords = this.getEntityCoords(entity);
+
+      // Check if position actually changed (coords are different)
+      if (oldCoords && newCoords && this.coordsEqual(oldCoords, newCoords)) {
+        continue; // Position component was touched but coords didn't change
+      }
+
+      // Remove from old position
+      if (oldCoords) {
+        this.spatialGrid.remove(entityId, oldCoords);
+      }
+
+      // Add to new position
+      if (newCoords) {
+        this.spatialGrid.add(entityId, newCoords);
+        this.entityPositionCache.set(entityId, newCoords);
+      } else {
+        this.entityPositionCache.delete(entityId);
+      }
+    }
+
+    // Also check for newly added entities this tick
+    const addedEntities = world.dirtyTracker.getAddedEntities();
+    for (const entityId of addedEntities) {
+      if (this.entityPositionCache.has(entityId)) continue; // Already processed
+
+      const entity = world.getEntity(entityId);
+      if (entity) {
+        const coords = this.getEntityCoords(entity);
+        if (coords) {
+          this.spatialGrid.add(entityId, coords);
+          this.entityPositionCache.set(entityId, coords);
+        }
+      }
+    }
+
+    // Check for removed entities
+    const removedEntities = world.dirtyTracker.getRemovedEntities();
+    for (const entityId of removedEntities) {
+      const oldCoords = this.entityPositionCache.get(entityId);
+      if (oldCoords) {
+        this.spatialGrid.remove(entityId, oldCoords);
+        this.entityPositionCache.delete(entityId);
+      }
+    }
+  }
+
+  /**
+   * Get entity coordinates for spatial grid
+   */
+  private getEntityCoords(entity: Entity): number[] | null {
+    const positionComponent = entity.components.get('position');
+    if (!positionComponent || typeof positionComponent !== 'object') return null;
+    if (!('x' in positionComponent) || !('y' in positionComponent)) return null;
+
+    const position = positionComponent as { x: number; y: number; z?: number; w?: number; v?: number; u?: number };
+    return getCoordinates(position, this.physicsConfig.spatialDimensions);
+  }
+
+  /**
+   * Check if two coordinate arrays are equal
+   */
+  private coordsEqual(a: number[], b: number[]): boolean {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Notify scheduler that an entity was added (for incremental grid updates)
+   * Call this when creating entities with positions.
+   */
+  notifyEntityAdded(entityId: string): void {
+    this.pendingGridAdditions.add(entityId);
+    this.pendingGridRemovals.delete(entityId);
+  }
+
+  /**
+   * Notify scheduler that an entity was removed (for incremental grid updates)
+   * Call this when destroying entities.
+   */
+  notifyEntityRemoved(entityId: string): void {
+    this.pendingGridRemovals.add(entityId);
+    this.pendingGridAdditions.delete(entityId);
+  }
+
+  /**
+   * Force a full rebuild of the spatial grid
+   * Call after loading a save or major world changes.
+   */
+  invalidateSpatialGrid(): void {
+    this.spatialGridInitialized = false;
+    this.entityPositionCache.clear();
+    this.pendingGridAdditions.clear();
+    this.pendingGridRemovals.clear();
   }
 
   /**
@@ -491,6 +667,8 @@ export class SimulationScheduler {
     proximityFrozenCount: number;
     passiveCount: number;
     totalEntities: number;
+    spatialGridCachedPositions: number;
+    spatialGridInitialized: boolean;
   } {
     let alwaysCount = 0;
     let proximityActiveCount = 0;
@@ -529,6 +707,8 @@ export class SimulationScheduler {
       proximityFrozenCount,
       passiveCount,
       totalEntities: world.entities.size,
+      spatialGridCachedPositions: this.entityPositionCache.size,
+      spatialGridInitialized: this.spatialGridInitialized,
     };
   }
 }

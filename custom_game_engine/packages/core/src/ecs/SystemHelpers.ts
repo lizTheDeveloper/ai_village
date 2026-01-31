@@ -20,6 +20,7 @@ import type { World } from './World.js';
  * - Reduces system execution frequency for slow-changing state
  * - Improves overall game performance by skipping unnecessary updates
  * - Eliminates throttling boilerplate in system implementations
+ * - Supports stagger offsets to spread load across ticks (Dwarf Fortress-style)
  *
  * Common use cases:
  * - Weather updates (every 5 seconds)
@@ -33,6 +34,7 @@ import type { World } from './World.js';
  *   readonly priority = 5;
  *   readonly requiredComponents = [CT.Weather];
  *   readonly throttleInterval = 100; // Every 5 seconds (100 ticks at 20 TPS)
+ *   readonly throttleOffset = 0; // Run on ticks 0, 100, 200...
  *
  *   protected updateThrottled(world: World, entities: Entity[], deltaTime: number): void {
  *     // This only runs every 100 ticks
@@ -40,6 +42,13 @@ import type { World } from './World.js';
  *       // Update weather state
  *     }
  *   }
+ * }
+ *
+ * @example
+ * // Staggered systems to avoid tick spikes
+ * class MetricsSystem extends ThrottledSystem {
+ *   readonly throttleInterval = 100;
+ *   readonly throttleOffset = 25; // Run on ticks 25, 125, 225... (staggered from Weather)
  * }
  *
  * @example
@@ -70,19 +79,38 @@ export abstract class ThrottledSystem implements System {
    */
   abstract readonly throttleInterval: number;
 
-  readonly metadata?: SystemMetadata;
+  /**
+   * Offset for staggered execution (Dwarf Fortress-style tick distribution).
+   *
+   * When multiple systems have the same throttleInterval, they normally all run
+   * on the same tick, causing "tick spikes". Setting different offsets spreads
+   * the load across ticks.
+   *
+   * Example: Two systems with interval=100
+   * - System A: offset=0 → runs on ticks 0, 100, 200...
+   * - System B: offset=50 → runs on ticks 50, 150, 250...
+   *
+   * Formula: (tick % interval) === offset
+   *
+   * Default: 0 (no offset)
+   */
+  readonly throttleOffset: number = 0;
 
-  private lastUpdate = 0;
+  readonly metadata?: SystemMetadata;
 
   /**
    * Standard update method - handles throttling automatically.
    * Do not override this method. Override updateThrottled instead.
    */
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    if (world.tick - this.lastUpdate < this.throttleInterval) {
-      return;
+    // Use modular arithmetic for staggered execution
+    // This is more accurate than tracking lastUpdate for staggered systems
+    if (this.throttleInterval > 0) {
+      const tickInCycle = world.tick % this.throttleInterval;
+      if (tickInCycle !== this.throttleOffset) {
+        return;
+      }
     }
-    this.lastUpdate = world.tick;
     this.updateThrottled(world, entities, deltaTime);
   }
 
@@ -246,20 +274,27 @@ export abstract class ThrottledFilteredSystem implements System {
    */
   abstract readonly throttleInterval: number;
 
-  readonly metadata?: SystemMetadata;
+  /**
+   * Offset for staggered execution (Dwarf Fortress-style tick distribution).
+   * See ThrottledSystem for detailed documentation.
+   * Default: 0 (no offset)
+   */
+  readonly throttleOffset: number = 0;
 
-  private lastUpdate = 0;
+  readonly metadata?: SystemMetadata;
 
   /**
    * Standard update method - handles throttling and filtering automatically.
    * Do not override this method. Override updateThrottledFiltered instead.
    */
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // First check throttle
-    if (world.tick - this.lastUpdate < this.throttleInterval) {
-      return;
+    // Use modular arithmetic for staggered execution
+    if (this.throttleInterval > 0) {
+      const tickInCycle = world.tick % this.throttleInterval;
+      if (tickInCycle !== this.throttleOffset) {
+        return;
+      }
     }
-    this.lastUpdate = world.tick;
 
     // Then filter active entities
     const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);

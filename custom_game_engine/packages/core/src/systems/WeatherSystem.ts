@@ -6,6 +6,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
 import type { WeatherType } from '../components/WeatherComponent.js';
+import { STAGGER } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * WeatherSystem - Weather pattern simulation
@@ -20,6 +21,7 @@ export class WeatherSystem extends BaseSystem {
   // Only run when weather components exist (O(1) activation check)
   public readonly activationComponents = [CT.Weather] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
+  protected readonly throttleOffset = STAGGER.SLOW_GROUP_A; // Stagger group A (tick 0, 100, 200...)
 
   /**
    * Systems that must run before this one.

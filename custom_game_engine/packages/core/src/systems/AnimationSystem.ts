@@ -1,6 +1,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { AnimationComponent } from '../components/AnimationComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
+import { STAGGER } from '../ecs/SystemThrottleConfig.js';
 
 /**
  * AnimationSystem - Updates frame-based animations
@@ -18,6 +19,7 @@ export class AnimationSystem extends BaseSystem {
   // Only run when animation components exist (O(1) activation check)
   readonly activationComponents = ['animation'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
+  protected readonly throttleOffset = STAGGER.SLOW_GROUP_C; // Stagger group C (tick 50, 150, 250...)
 
   protected onUpdate(ctx: SystemContext): void {
     // Query entities with animation and renderable components

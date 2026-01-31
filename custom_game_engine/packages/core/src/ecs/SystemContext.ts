@@ -551,7 +551,6 @@ export abstract class BaseSystem implements System {
   protected events!: SystemEventManager;
   protected world!: WorldMutator;
 
-  private lastUpdateTick = -Infinity;
   private chunkSpatialQuery: ChunkSpatialQuery | null = null;
 
   /**
@@ -559,6 +558,29 @@ export abstract class BaseSystem implements System {
    * Default: 0 (run every tick)
    */
   protected readonly throttleInterval: number = 0;
+
+  /**
+   * Offset for staggered execution (Dwarf Fortress-style tick distribution).
+   *
+   * When multiple systems have the same throttleInterval, they normally all run
+   * on the same tick, causing "tick spikes". Setting different offsets spreads
+   * the load across ticks.
+   *
+   * Example: Two systems with interval=100
+   * - WeatherSystem: offset=0 → runs on ticks 0, 100, 200...
+   * - MetricsSystem: offset=25 → runs on ticks 25, 125, 225...
+   *
+   * Formula: (tick % interval) === offset
+   *
+   * Import stagger constants from SystemThrottleConfig.ts:
+   * ```typescript
+   * import { STAGGER } from './SystemThrottleConfig.js';
+   * protected readonly throttleOffset = STAGGER.SLOW_GROUP_B; // offset 25
+   * ```
+   *
+   * Default: 0 (no offset)
+   */
+  protected readonly throttleOffset: number = 0;
 
   /**
    * Skip SimulationScheduler filtering in SystemContext.
@@ -601,12 +623,15 @@ export abstract class BaseSystem implements System {
       return;
     }
 
-    // Throttling
+    // Throttling with stagger offset support (Dwarf Fortress-style)
+    // Uses modular arithmetic for precise staggering:
+    // - interval=100, offset=0: runs on ticks 0, 100, 200...
+    // - interval=100, offset=25: runs on ticks 25, 125, 225...
     if (this.throttleInterval > 0) {
-      if (world.tick - this.lastUpdateTick < this.throttleInterval) {
+      const tickInCycle = world.tick % this.throttleInterval;
+      if (tickInCycle !== this.throttleOffset) {
         return;
       }
-      this.lastUpdateTick = world.tick;
     }
 
     // Create context

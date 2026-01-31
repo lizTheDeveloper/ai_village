@@ -6,6 +6,7 @@ import type { EventBus } from '../events/EventBus.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import { STAGGER } from '../ecs/SystemThrottleConfig.js';
 
 const SECONDS_PER_DAY = 86400;
 
@@ -49,6 +50,7 @@ export class MemoryConsolidationSystem extends BaseSystem {
   // Only run when episodic_memory components exist (O(1) activation check)
   public readonly activationComponents = ['episodic_memory'] as const;
   protected readonly throttleInterval = 1000; // Update every 1000 ticks (50 seconds)
+  protected readonly throttleOffset = 250; // Stagger: run at tick 250, 1250, 2250... (spread from other 1000-tick systems)
 
   private consolidationTriggers: Set<string> = new Set();
   private recallEvents: Array<{ agentId: string; memoryId: string }> = [];

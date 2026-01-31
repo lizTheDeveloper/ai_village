@@ -45,6 +45,17 @@ export interface NavigationEvents {
     destination: { x: number; y: number };
     target?: EntityId;
   };
+  /**
+   * Entity arrived at movement intention destination (Factorio-style optimization)
+   */
+  'entity:arrived': {
+    entityId: EntityId;
+    x: number;
+    y: number;
+    z?: number;
+    reason?: string;
+    targetEntityId?: string;
+  };
   'spatial:snapshot': {
     agentId: EntityId;
     timestamp: number;

@@ -13,6 +13,7 @@ export enum ComponentType {
   Agent = 'agent',
   Position = 'position',
   Movement = 'movement',
+  MovementIntention = 'movement_intention',  // Factorio-style movement optimization
   Velocity = 'velocity',
   Steering = 'steering',
   Physics = 'physics',

@@ -19,6 +19,7 @@ import { CanonEventRecorder, type CanonEventConfig } from '../metrics/CanonEvent
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
+import { STAGGER } from '../ecs/SystemThrottleConfig.js';
 
 interface MetricsCollectionConfig {
   enabled: boolean;
@@ -45,6 +46,7 @@ export class MetricsCollectionSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
+  protected readonly throttleOffset = STAGGER.SLOW_GROUP_B; // Stagger group B (tick 25, 125, 225...)
 
   private collector!: MetricsCollector;
   private config: MetricsCollectionConfig;

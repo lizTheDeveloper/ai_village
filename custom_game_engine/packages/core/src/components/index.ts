@@ -19,6 +19,15 @@ export * from './AgentComponent.js';
 export { createAgentComponent, derivePrioritiesFromSkills, type AgentComponent } from './AgentComponent.js';
 export * from './MovementComponent.js';
 export { createMovementComponent } from './MovementComponent.js';
+export * from './MovementIntentionComponent.js';
+export {
+  createMovementIntention,
+  interpolatePosition,
+  hasArrived,
+  ticksUntilArrival,
+  mightCollide,
+  type MovementIntentionComponent,
+} from './MovementIntentionComponent.js';
 export * from './NeedsComponent.js';
 export { NeedsComponent } from './NeedsComponent.js';
 export * from './ResourceComponent.js';
