@@ -918,31 +918,183 @@ export {
 // Spell Effects System
 // ============================================================================
 
-export * from './SpellEffect.js';
-export * from './SpellEffectExecutor.js';
-export * from './SpellEffectRegistry.js';
-export * from './EffectAppliers.js';
+export type {
+  EffectCategory,
+  DamageType,
+  TargetType,
+  AreaShape,
+  TargetFilter,
+  EffectScaling,
+  ScaledValue,
+  BaseEffect,
+  DamageEffect,
+  HealingEffect,
+  ProtectionEffect,
+  BuffEffect,
+  DebuffEffect,
+  StatModifier,
+  ControlEffect,
+  SummonEffect,
+  TransformEffect,
+  PerceptionEffect,
+  DispelEffect,
+  TeleportEffect,
+  CreationEffect,
+  EnvironmentalEffect,
+  TemporalEffect,
+  MentalEffect,
+  SoulEffect,
+  ParadigmEffect,
+  SpellEffect,
+  EffectApplicationResult,
+  ActiveEffect,
+  EffectEvent,
+  EffectEventListener,
+} from './SpellEffect.js';
+
+export {
+  createDamageEffect,
+  createHealingEffect,
+  createProtectionEffect,
+  createBuffEffect,
+  createDebuffEffect,
+  calculateScaledValue,
+} from './SpellEffect.js';
+
+export type {
+  EffectApplier,
+  EffectContext,
+} from './SpellEffectExecutor.js';
+
+export {
+  SpellEffectExecutor,
+  getEffectExecutor,
+  registerEffectApplier,
+  executeSpellEffect,
+} from './SpellEffectExecutor.js';
+
+export type {
+  EffectRegistryListener,
+  EffectRegistryEvent,
+} from './SpellEffectRegistry.js';
+
+export {
+  SpellEffectRegistry,
+  getEffectRegistry,
+  registerEffect,
+  getEffect,
+  hasEffect,
+} from './SpellEffectRegistry.js';
+
+export {
+  DamageEffectApplier,
+  HealingEffectApplier,
+  ProtectionEffectApplier,
+  BuffEffectApplier,
+  DebuffEffectApplier,
+  registerStandardAppliers,
+} from './EffectAppliers.js';
 
 // ============================================================================
 // Spell Casting Service
 // ============================================================================
 
-export * from './SpellCastingService.js';
+export type {
+  SpellCastResult,
+  CastOptions,
+} from './SpellCastingService.js';
+
+export {
+  SpellCastingService,
+  getCastingService,
+  castSpell,
+  canCastSpellById,
+} from './SpellCastingService.js';
 
 // ============================================================================
 // Combo System
 // ============================================================================
 
-export * from './ComboDetector.js';
+export type {
+  ComboThreat,
+  ComboAnalysis,
+} from './ComboDetector.js';
+
+export {
+  analyzeCombo,
+  isGameBreaking,
+  getRecommendedParadigmLimit,
+  generateComboWarning,
+} from './ComboDetector.js';
 
 // ============================================================================
 // Expanded Spells & Entities
 // ============================================================================
 
-export * from './ExpandedSpells.js';
-export * from './MaterialCreationSpells.js';
-export * from './TileConstructionSpells.js';
-export * from './SummonableEntities.js';
+export {
+  DIVINE_SPELLS,
+  ACADEMIC_SPELLS,
+  BLOOD_SPELLS,
+  NAME_SPELLS,
+  BREATH_SPELLS,
+  PACT_SPELLS,
+  SPELL_COUNTS,
+  ALL_SPELL_ARRAYS,
+} from './ExpandedSpells.js';
+
+export {
+  MATERIAL_CREATION_SPELLS,
+  DIVINE_MATERIAL_CREATION_SPELLS,
+  CRAFT_MATERIAL_CREATION_SPELLS,
+  BELIEF_MATERIAL_CREATION_SPELLS,
+  ALL_MATERIAL_CREATION_SPELLS,
+  MATERIAL_RARITY_TABLE,
+  calculateMaterialCreationCost,
+} from './MaterialCreationSpells.js';
+
+export {
+  TILE_CONSTRUCTION_SPELLS,
+  DIVINE_TILE_CONSTRUCTION_SPELLS,
+  CRAFT_TILE_CONSTRUCTION_SPELLS,
+  ALL_TILE_CONSTRUCTION_SPELLS,
+  getWallMaterialForProficiency,
+  getDoorMaterialForProficiency,
+  getWindowMaterialForProficiency,
+} from './TileConstructionSpells.js';
+
+export type {
+  SummonableEntity,
+  EntityCategory,
+  EntityRank,
+  EntityPersonality,
+  EntityDemand,
+  DemandType,
+  NegotiationStyle,
+  DemandPattern,
+  EntityService,
+  ServiceTemplate,
+  ContractType,
+  EntityAppearance,
+  AppearancePattern,
+  BreachConsequence,
+  SummoningRequirement,
+  SummoningNegotiation,
+  NegotiationOffer,
+  ActiveContract,
+} from './SummonableEntities.js';
+
+export {
+  PERSONALITY_ARCHETYPES,
+  NEGOTIATION_PATTERNS,
+  DEMAND_PATTERNS,
+  SERVICE_TEMPLATES,
+  CONTRACT_TEMPLATES,
+  ENTITY_QUIRKS,
+  BREACH_PATTERNS,
+  APPEARANCE_PATTERNS,
+  SUMMONING_REQUIREMENT_PATTERNS,
+  EXAMPLE_SUMMONABLE_ENTITIES,
+} from './SummonableEntities.js';
 
 // Building Summoning Spells (Dimensional Magic)
 export { BUILDING_SUMMONING_SPELLS, BUILDING_SPELLS_BY_TIER } from './spells/BuildingSummoningSpells.js';
@@ -951,7 +1103,18 @@ export { BUILDING_SUMMONING_SPELLS, BUILDING_SPELLS_BY_TIER } from './spells/Bui
 // Magic Detection
 // ============================================================================
 
-export * from './MagicDetectionSystem.js';
+export type {
+  DetectionRules,
+} from './MagicDetectionSystem.js';
+
+export {
+  DEFAULT_DETECTION_RULES,
+  calculateDetectionRisk,
+  detectForbiddenCategories,
+  createDetectionMetadata,
+  triggersImmediateIntervention,
+  calculateDetectionChance,
+} from './MagicDetectionSystem.js';
 
 // ============================================================================
 // Organized Submodules (additional groupings and metadata)
