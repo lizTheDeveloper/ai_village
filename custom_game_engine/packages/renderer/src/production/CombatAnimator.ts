@@ -139,9 +139,13 @@ export class CombatAnimator {
   async generateReplay(recording: CombatRecording): Promise<CombatReplay> {
 
     // Step 1: Generate character sprites
-    for (const participant of recording.participants) {
+    for (let i = 0; i < recording.participants.length; i++) {
+      const participant = recording.participants[i];
+      if (!participant) {
+        throw new Error(`Participant at index ${i} is undefined`);
+      }
       if (!this.characterCache.has(participant.id)) {
-        const sprite = await this.generateCharacterSprite(participant);
+        const sprite = await this.generateCharacterSprite(participant, i, recording.participants.length);
         this.characterCache.set(participant.id, sprite);
       } else {
       }
@@ -174,9 +178,22 @@ export class CombatAnimator {
   /**
    * Generate character sprite using PixelLab API
    */
-  async generateCharacterSprite(participant: CombatParticipant): Promise<CharacterSprite> {
+  async generateCharacterSprite(participant: CombatParticipant, participantIndex: number, totalParticipants: number): Promise<CharacterSprite> {
     const description = this.buildCharacterDescription(participant);
 
+    // Calculate direction based on participant position in combat
+    // For typical 2-participant combat: participant 0 faces east (right), participant 1 faces west (left)
+    // For multi-participant: use round-robin pattern (east, west, south, north)
+    let direction: Direction = 'south';
+
+    if (totalParticipants === 2) {
+      // Classic duel: face each other (east vs west)
+      direction = participantIndex === 0 ? 'east' : 'west';
+    } else if (totalParticipants > 2) {
+      // Multi-participant: round-robin through cardinal directions
+      const directions: Direction[] = ['east', 'west', 'south', 'north'];
+      direction = directions[participantIndex % directions.length] ?? 'south';
+    }
 
     const response = await this.api.generateImageBitforge({
       description,
@@ -185,7 +202,7 @@ export class CombatAnimator {
         height: this.config.spriteSize,
       },
       view: this.config.view,
-      direction: 'south',
+      direction,
       detail: 'high detail',
       shading: 'detailed shading',
       outline: 'single color outline',
@@ -265,15 +282,34 @@ export class CombatAnimator {
     operation: NonNullable<CombatLogEvent['renderableOperation']>,
     participants: CombatParticipant[]
   ): Promise<CombatAnimation> {
-    // Find participant to get reference sprite
-    const participant = participants.find((p) => p.name === operation.actor);
-    if (!participant) {
+    // Find participant to get reference sprite and index
+    const participantIndex = participants.findIndex((p) => p.name === operation.actor);
+    if (participantIndex === -1) {
       throw new Error(`Participant not found: ${operation.actor}`);
+    }
+
+    const participant = participants[participantIndex];
+    if (!participant) {
+      throw new Error(`Participant at index ${participantIndex} is undefined`);
     }
 
     const characterSprite = this.characterCache.get(participant.id);
     if (!characterSprite) {
       throw new Error(`Character sprite not found for: ${operation.actor}`);
+    }
+
+    // Calculate direction based on participant position in combat
+    // For typical 2-participant combat: participant 0 faces east (right), participant 1 faces west (left)
+    // For multi-participant: use round-robin pattern (east, west, south, north)
+    let direction: Direction = 'south';
+
+    if (participants.length === 2) {
+      // Classic duel: face each other (east vs west)
+      direction = participantIndex === 0 ? 'east' : 'west';
+    } else if (participants.length > 2) {
+      // Multi-participant: round-robin through cardinal directions
+      const directions: Direction[] = ['east', 'west', 'south', 'north'];
+      direction = directions[participantIndex % directions.length] ?? 'south';
     }
 
     // Build action description
@@ -290,7 +326,7 @@ export class CombatAnimator {
       reference_image: characterSprite.imageBase64,
       n_frames: this.config.frameCount,
       view: this.config.view,
-      direction: 'south',
+      direction,
     });
 
     const hash = this.hashOperation(operation.actor, operation.action, operation.weapon);

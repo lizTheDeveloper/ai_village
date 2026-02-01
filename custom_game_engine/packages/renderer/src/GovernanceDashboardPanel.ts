@@ -349,7 +349,7 @@ export class GovernanceDashboardPanel implements IWindowPanel {
     ctx.font = '14px monospace';
     currentY += this.lineHeight;
 
-    // Age distribution (placeholder - not yet tracked)
+    // Age distribution
     if (data.children + data.adults + data.elders > 0) {
       ctx.fillStyle = '#FFFFFF';
       ctx.fillText(`Children: ${data.children}`, x + this.padding + 10, currentY);
