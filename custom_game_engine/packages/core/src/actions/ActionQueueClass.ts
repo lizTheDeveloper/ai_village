@@ -61,4 +61,13 @@ export class ActionQueue extends ComponentBase {
   clear(): void {
     this.queue = [];
   }
+
+  /**
+   * Remove and return all queued actions
+   */
+  dequeueAll(): QueuedAction[] {
+    const actions = this.queue;
+    this.queue = [];
+    return actions;
+  }
 }
