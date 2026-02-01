@@ -6,6 +6,7 @@
   },
   "include": ["src/**/*", "src/**/*.json", "data/**/*.json"],
   "references": [
+    { "path": "../types" },
     { "path": "../core" },
     { "path": "../agents" },
     { "path": "../hierarchy-simulator" }

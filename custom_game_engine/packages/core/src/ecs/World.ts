@@ -31,6 +31,34 @@ import { UpdatePropagation } from './UpdatePropagation.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createPhysicsComponent } from '../components/PhysicsComponent.js';
 
+// Import shared types from @ai-village/types to avoid circular dependencies
+import type {
+  IChunk,
+  IChunkManager,
+  ITerrainGenerator,
+  IBackgroundChunkGenerator,
+  IPlanet,
+  IWallTile,
+  IDoorTile,
+  IWindowTile,
+  ITile,
+  PerformanceStats,
+} from '@ai-village/types';
+
+// Re-export shared types for backward compatibility
+export type {
+  IChunk,
+  IChunkManager,
+  ITerrainGenerator,
+  IBackgroundChunkGenerator,
+  IPlanet,
+  IWallTile,
+  IDoorTile,
+  IWindowTile,
+  ITile,
+  PerformanceStats,
+};
+
 // Imports for test helper convenience methods
 import { createDominanceRankComponent } from '../components/DominanceRankComponent.js';
 import { createCombatStatsComponent } from '../components/CombatStatsComponent.js';
@@ -45,182 +73,8 @@ import { BeliefComponent } from '../components/BeliefComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
 
-// ChunkManager is defined via IChunkManager interface to avoid circular dependency
-
-/**
- * Performance statistics for the game loop.
- * Updated by GameLoop every tick.
- */
-export interface PerformanceStats {
-  /** Current ticks per second (calculated from avgTickTime) */
-  readonly tps: number;
-  /** Average tick time in milliseconds (exponential moving average) */
-  readonly avgTickTimeMs: number;
-  /** Maximum tick time in milliseconds (decays over time) */
-  readonly maxTickTimeMs: number;
-  /** Total number of ticks executed */
-  readonly tickCount: number;
-}
-
-// Re-export for backwards compatibility
+// Re-export TerrainType/BiomeType for backwards compatibility
 export type { TerrainType, BiomeType };
-
-/**
- * Chunk interface from world package.
- * Defined here to avoid circular dependency.
- */
-export interface IChunk {
-  readonly x: number;
-  readonly y: number;
-  generated: boolean;
-  tiles: unknown[];
-  entities: Set<EntityId>;
-}
-
-/**
- * ChunkManager interface for tile access.
- * Defined here to avoid circular dependency with world package.
- */
-export interface IChunkManager {
-  getChunk(chunkX: number, chunkY: number): IChunk | undefined;
-  hasChunk(chunkX: number, chunkY: number): boolean;
-  getLoadedChunks?(): Array<{ x: number; y: number; tiles: any[] }>;
-}
-
-/**
- * TerrainGenerator interface for generating chunks on-demand.
- * Defined here to avoid circular dependency with world package.
- */
-export interface ITerrainGenerator {
-  generateChunk(chunk: IChunk, world: WorldMutator): void;
-}
-
-/**
- * BackgroundChunkGenerator interface for asynchronous chunk pre-generation.
- * Defined here to avoid circular dependency with world package.
- */
-export interface IBackgroundChunkGenerator {
-  queueChunk(request: {
-    chunkX: number;
-    chunkY: number;
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
-    requestedBy: string;
-  }): void;
-  queueChunkGrid(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    priority: 'HIGH' | 'MEDIUM' | 'LOW',
-    requestedBy: string
-  ): void;
-  processQueue(world: World, currentTick: number): void;
-}
-
-/**
- * Planet interface for multi-planet support.
- * Defined here to avoid circular dependency with world package.
- *
- * Each planet has its own:
- * - ChunkManager for terrain storage
- * - TerrainGenerator with planet-specific parameters
- * - Named locations registry
- * - Entity tracking
- */
-export interface IPlanet {
-  /** Planet configuration */
-  readonly config: {
-    id: string;
-    name: string;
-    type: string;
-    seed: string;
-    gravity?: number;
-    atmosphereDensity?: number;
-    isTidallyLocked?: boolean;
-    isStarless?: boolean;
-    dayLengthHours?: number;
-    skyColor?: string;
-    description?: string;
-  };
-
-  /** Get chunk manager for this planet */
-  readonly chunkManager: IChunkManager;
-
-  /** Get a chunk, generating terrain if needed */
-  getChunk(chunkX: number, chunkY: number, world?: WorldMutator): IChunk;
-
-  /** Get tile at world coordinates */
-  getTileAt(worldX: number, worldY: number): ITile | undefined;
-
-  /** Planet ID shortcut */
-  readonly id: string;
-
-  /** Planet name shortcut */
-  readonly name: string;
-
-  /** Planet type shortcut */
-  readonly type: string;
-
-  /** Add entity to this planet's tracking */
-  addEntity(entityId: string): void;
-
-  /** Remove entity from this planet's tracking */
-  removeEntity(entityId: string): void;
-
-  /** Check if entity is on this planet */
-  hasEntity(entityId: string): boolean;
-
-  /** Get all entity IDs on this planet */
-  readonly entities: ReadonlySet<string>;
-
-  /** Get entity count on this planet */
-  readonly entityCount: number;
-
-  /** Name a location on this planet */
-  nameLocation(
-    chunkX: number,
-    chunkY: number,
-    name: string,
-    namedBy: string,
-    tick: number,
-    description?: string
-  ): void;
-
-  /** Find a named location */
-  findLocation(name: string): { chunkX: number; chunkY: number } | undefined;
-
-  /** Get the name of a location */
-  getLocationName(chunkX: number, chunkY: number): string | undefined;
-}
-
-/**
- * Wall tile structure for voxel buildings.
- */
-export interface IWallTile {
-  material: string;
-  condition: number;
-  insulation: number;
-  constructionProgress?: number;
-}
-
-/**
- * Door tile structure for voxel buildings.
- */
-export interface IDoorTile {
-  material: string;
-  state: 'open' | 'closed' | 'locked';
-  lastOpened?: number;
-  constructionProgress?: number;
-}
-
-/**
- * Window tile structure for voxel buildings.
- */
-export interface IWindowTile {
-  material: string;
-  condition: number;
-  lightsThrough: boolean;
-  constructionProgress?: number;
-}
 
 /**
  * Archetype definition for entity pre-configuration
@@ -320,38 +174,6 @@ const ENTITY_ARCHETYPES: Record<string, ArchetypeDefinition> = {
     },
   },
 };
-
-/**
- * Tile interface for world coordinates.
- * Defined here to avoid circular dependency with world package.
- * Must match the Tile interface in @ai-village/world.
- */
-export interface ITile {
-  terrain: TerrainType;
-  floor?: string;
-  elevation?: number;
-  moisture: number;
-  fertility: number;
-  biome?: BiomeType;
-  tilled: boolean;
-  plantability: number;
-  nutrients: {
-    nitrogen: number;
-    phosphorus: number;
-    potassium: number;
-  };
-  fertilized: boolean;
-  fertilizerDuration: number;
-  lastWatered: number;
-  lastTilled: number;
-  composted: boolean;
-  plantId: string | null;
-
-  // Tile-based voxel building support
-  wall?: IWallTile;
-  door?: IDoorTile;
-  window?: IWindowTile;
-}
 
 /**
  * Read-only view of the world state.

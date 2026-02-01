@@ -24,6 +24,7 @@
   },
   "include": [],
   "references": [
+    { "path": "./packages/types" },
     { "path": "./packages/core" },
     { "path": "./packages/building-designer" },
     { "path": "./packages/deterministic-sprite-generator" },

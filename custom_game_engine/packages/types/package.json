@@ -1,0 +1,26 @@
+{
+  "name": "@ai-village/types",
+  "version": "0.1.0",
+  "description": "Shared type definitions for @ai-village packages - zero dependencies to break circular imports",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "keywords": ["types", "interfaces", "shared"],
+  "author": "",
+  "license": "ISC"
+}

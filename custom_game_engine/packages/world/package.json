@@ -19,6 +19,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ai-village/types": "*",
     "@ai-village/core": "*",
     "@ai-village/hierarchy-simulator": "*",
     "@ai-village/reproduction": "*"
