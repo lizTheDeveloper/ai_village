@@ -154,7 +154,7 @@ export class SoilSystem extends BaseSystem {
       return;
     }
 
-    const chunks = chunkManager.getLoadedChunks();
+    const chunks = chunkManager.getLoadedChunks() as Array<{ x: number; y: number; tiles: Tile[][] }>;
     // Early exit if no chunks loaded
     if (chunks.length === 0) return;
 

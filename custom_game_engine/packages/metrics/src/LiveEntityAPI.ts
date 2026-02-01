@@ -10,10 +10,10 @@
 import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
-import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/core';
+import { pendingApprovalRegistry, type AgentDebugManager, type PendingCreation } from '@ai-village/core';
 import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
-import { DeityComponent, createTagsComponent, createIdentityComponent, createPositionComponent } from '@ai-village/core';
+import { DeityComponent, createTagsComponent, createIdentityComponent, createPositionComponent, EntityImpl } from '@ai-village/core';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -863,7 +863,7 @@ export class LiveEntityAPI {
     }
 
     // Create the entity
-    const entity = this.world.createEntity();
+    const entity = this.world.createEntity() as EntityImpl;
     const entityId = entity.id;
 
     // Add position component with the specified coordinates
@@ -871,7 +871,7 @@ export class LiveEntityAPI {
     entity.addComponent(positionComponent);
 
     // Add type-specific tags
-    const tags = createTagsComponent([type, 'spawned']);
+    const tags = createTagsComponent(type, 'spawned');
     entity.addComponent(tags);
 
     if (!entity) {
@@ -2400,7 +2400,7 @@ export class LiveEntityAPI {
     try {
       const pending = pendingApprovalRegistry.getAll();
 
-      const creations = pending.map(creation => ({
+      const creations = pending.map((creation: PendingCreation) => ({
         id: creation.id,
         creationType: creation.creationType,
         // Recipe-specific
@@ -2419,7 +2419,7 @@ export class LiveEntityAPI {
         creatorName: creation.creatorName,
         creationMessage: creation.creationMessage,
         creativityScore: creation.creativityScore,
-        ingredients: creation.ingredients.map(i => ({
+        ingredients: creation.ingredients.map((i: { itemId: string; quantity: number }) => ({
           itemId: i.itemId,
           quantity: i.quantity,
         })),
@@ -2715,7 +2715,7 @@ export class LiveEntityAPI {
     const trackedAgents = this.agentDebugManager.getTrackedAgents();
 
     // Get agent names for each tracked ID
-    const agentsWithNames = trackedAgents.map(agentId => {
+    const agentsWithNames = trackedAgents.map((agentId: string) => {
       const entity = this.world.getEntity(agentId);
       const identityComp = entity?.getComponent('identity');
       const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
@@ -2861,13 +2861,13 @@ export class LiveEntityAPI {
       .executeEntities();
 
     const normalizedSearch = name.toLowerCase();
-    const matches = agents.filter((entity) => {
+    const matches = agents.filter((entity: Entity) => {
       const identityComp = entity.getComponent('identity');
     const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
       return identity?.name?.toLowerCase().includes(normalizedSearch);
     });
 
-    const results = matches.map((entity) => {
+    const results = matches.map((entity: Entity) => {
       const identityComp = entity.getComponent('identity');
     const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
       const positionComp = entity.getComponent('position');

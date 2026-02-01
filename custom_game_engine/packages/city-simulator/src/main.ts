@@ -6,7 +6,7 @@
 
 import { HeadlessCitySimulator, type SimulatorStats } from './HeadlessCitySimulator.js';
 import { GrandStrategySimulator } from './GrandStrategySimulator.js';
-import type { CityDecision } from '@ai-village/core';
+import type { CityDecision, Entity } from '@ai-village/core';
 
 // CityManager StrategicPriorities type (all fields required)
 type CityManagerPriorities = {
@@ -207,7 +207,7 @@ class UI {
       return;
     }
 
-    content.innerHTML = decisions.slice(0, 5).map(d => {
+    content.innerHTML = decisions.slice(0, 5).map((d: CityDecision) => {
       const day = Math.floor(d.timestamp / 14400);
       return `
         <div class="decision-item">
@@ -247,7 +247,7 @@ class UI {
     const scale = 600 / 200;
 
     // Render agents as dots
-    agents.forEach((agent) => {
+    agents.forEach((agent: Entity) => {
       const pos = agent.getComponent('position') as { x: number; y: number } | undefined;
       if (!pos) return;
 

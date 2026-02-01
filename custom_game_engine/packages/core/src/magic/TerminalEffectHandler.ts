@@ -52,6 +52,13 @@ export class TerminalEffectHandler {
   }
 
   /**
+   * Emit an event through the world's event bus
+   */
+  private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
+    this.world.eventBus.emit({ type, source, data });
+  }
+
+  /**
    * Initialize the handler by subscribing to terminal effect events.
    */
   initialize(eventBus: EventBus): void {

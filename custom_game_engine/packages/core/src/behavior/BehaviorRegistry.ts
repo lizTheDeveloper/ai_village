@@ -32,10 +32,13 @@ export type BehaviorHandler = (entity: EntityImpl, world: World) => void;
  * Modern handler function signature using BehaviorContext.
  * This is the preferred signature for new behaviors.
  *
- * MUST return BehaviorResult - use ctx.complete() or ctx.switchTo()
- * to produce a valid result. Never return void.
+ * Should return BehaviorResult - use ctx.complete() or ctx.switchTo()
+ * to produce a valid result. Void returns are accepted for backwards
+ * compatibility but should be avoided in new code.
+ *
+ * TODO: Tech debt - audit behaviors to ensure all return BehaviorResult
  */
-export type ContextBehaviorHandler = (ctx: BehaviorContext) => BehaviorResult;
+export type ContextBehaviorHandler = (ctx: BehaviorContext) => BehaviorResult | void;
 
 /**
  * Union type for both handler signatures
