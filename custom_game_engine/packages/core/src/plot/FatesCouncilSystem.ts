@@ -1156,6 +1156,7 @@ export class FatesCouncilSystem extends BaseSystem {
     const extractionPrompt = this.generateDecisionExtractionPrompt(council.context, council.transcript);
 
     let plotAssignments: FatesDecision['plotAssignments'] = [];
+    let narrativeConnections: FatesDecision['narrativeConnections'] = [];
     let summary = 'The Fates observed the tapestry but made no changes.';
 
     if (this.llmProvider) {
@@ -1173,6 +1174,17 @@ export class FatesCouncilSystem extends BaseSystem {
           if (parsed.plotAssignments && Array.isArray(parsed.plotAssignments)) {
             plotAssignments = parsed.plotAssignments;
           }
+          if (parsed.narrativeConnections && Array.isArray(parsed.narrativeConnections)) {
+            // Validate each narrative connection has required fields
+            narrativeConnections = parsed.narrativeConnections.filter(
+              (conn: unknown): conn is FatesDecision['narrativeConnections'][number] =>
+                typeof conn === 'object' &&
+                conn !== null &&
+                typeof (conn as Record<string, unknown>).plot1InstanceId === 'string' &&
+                typeof (conn as Record<string, unknown>).plot2InstanceId === 'string' &&
+                typeof (conn as Record<string, unknown>).connection === 'string'
+            );
+          }
           if (parsed.summary && typeof parsed.summary === 'string') {
             summary = parsed.summary;
           }
@@ -1184,7 +1196,7 @@ export class FatesCouncilSystem extends BaseSystem {
 
     return {
       plotAssignments,
-      narrativeConnections: [], // TODO: Implement narrative connections
+      narrativeConnections,
       transcript: council.transcript,
       summary,
     };
@@ -1207,9 +1219,76 @@ export class FatesCouncilSystem extends BaseSystem {
       );
     }
 
-    // TODO: Execute narrative connections
+    // Execute narrative connections
+    if (decision.narrativeConnections.length > 0) {
+      console.warn(`[FatesCouncilSystem] Weaving ${decision.narrativeConnections.length} narrative connections...`);
+      for (const connection of decision.narrativeConnections) {
+        this.weaveNarrativeConnection(connection, world, tick);
+      }
+    }
 
     console.warn(`[FatesCouncilSystem] Council Summary: ${decision.summary}`);
+  }
+
+  /**
+   * Weave a narrative connection between two plots
+   *
+   * This creates a link between two active plots, indicating their fates
+   * are intertwined. The connection is broadcast via the event bus so
+   * other systems (NarrativePressure, PlotProgression, etc.) can respond.
+   */
+  private weaveNarrativeConnection(
+    connection: FatesDecision['narrativeConnections'][number],
+    world: World,
+    tick: number
+  ): void {
+    // Validate both plots exist
+    const plot1Entity = this.findEntityWithPlot(world, connection.plot1InstanceId);
+    const plot2Entity = this.findEntityWithPlot(world, connection.plot2InstanceId);
+
+    if (!plot1Entity) {
+      console.warn(`[FatesCouncilSystem] Cannot weave connection - plot ${connection.plot1InstanceId} not found`);
+      return;
+    }
+    if (!plot2Entity) {
+      console.warn(`[FatesCouncilSystem] Cannot weave connection - plot ${connection.plot2InstanceId} not found`);
+      return;
+    }
+
+    // Emit narrative connection event
+    world.eventBus.emit({
+      type: 'fates:narrative_connection_woven',
+      source: 'fates_council',
+      data: {
+        plot1InstanceId: connection.plot1InstanceId,
+        plot2InstanceId: connection.plot2InstanceId,
+        entity1Id: plot1Entity.id,
+        entity2Id: plot2Entity.id,
+        connection: connection.connection,
+        wovenAtTick: tick,
+      },
+    });
+
+    console.warn(
+      `[FatesCouncilSystem] Narrative threads intertwined: ` +
+      `${connection.plot1InstanceId} ↔ ${connection.plot2InstanceId} - "${connection.connection}"`
+    );
+  }
+
+  /**
+   * Find the entity that has a specific plot instance active
+   */
+  private findEntityWithPlot(world: World, plotInstanceId: string): Entity | null {
+    const entities = world.query().with(CT.PlotLines).executeEntities();
+
+    for (const entity of entities) {
+      const plotLines = entity.getComponent<PlotLinesComponent>(CT.PlotLines);
+      if (plotLines?.active.some(p => p.instance_id === plotInstanceId)) {
+        return entity;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -1565,7 +1644,7 @@ export class FatesCouncilSystem extends BaseSystem {
     context: FatesCouncilContext,
     transcript: ConversationExchange[]
   ): string {
-    let prompt = `Extract plot assignments from this Fates council:\n\n`;
+    let prompt = `Extract plot assignments and narrative connections from this Fates council:\n\n`;
 
     for (const exchange of transcript) {
       const speaker = this.getFateName(exchange.speaker);
@@ -1580,21 +1659,56 @@ export class FatesCouncilSystem extends BaseSystem {
     prompt += `- exotic_prophecy_trap (prophecy given)\n`;
     prompt += `- exotic_burden_being_chosen (champion chosen)\n\n`;
 
+    // Add active plots that could be connected
+    const activePlotsByEntity = this.gatherActivePlots(context);
+    if (activePlotsByEntity.length > 0) {
+      prompt += `Active plots that could be narratively connected:\n`;
+      for (const entry of activePlotsByEntity) {
+        for (const plotId of entry.plotIds) {
+          prompt += `  - ${plotId} (entity: ${entry.entityId}, name: ${entry.entityName})\n`;
+        }
+      }
+      prompt += `\n`;
+    }
+
     prompt += `Based on the conversation, extract:\n`;
     prompt += `1. Which entities should receive exotic plots?\n`;
     prompt += `2. Which plot templates fit their situations?\n`;
-    prompt += `3. Why this assignment is narratively appropriate?\n\n`;
+    prompt += `3. Why this assignment is narratively appropriate?\n`;
+    prompt += `4. Which existing plots should be narratively connected (fates intertwined)?\n\n`;
 
     prompt += `Respond in this exact JSON format:\n`;
     prompt += `{\n`;
     prompt += `  "plotAssignments": [\n`;
     prompt += `    { "entityId": "entity_id", "plotTemplateId": "exotic_...", "reasoning": "why this fits" }\n`;
     prompt += `  ],\n`;
+    prompt += `  "narrativeConnections": [\n`;
+    prompt += `    { "plot1InstanceId": "plot_id_1", "plot2InstanceId": "plot_id_2", "connection": "how their fates intertwine" }\n`;
+    prompt += `  ],\n`;
     prompt += `  "summary": "Brief summary of council decisions"\n`;
     prompt += `}\n\n`;
     prompt += `Only output JSON, nothing else.`;
 
     return prompt;
+  }
+
+  /**
+   * Gather active plots from context for potential narrative connections
+   */
+  private gatherActivePlots(context: FatesCouncilContext): Array<{ entityId: string; entityName: string; plotIds: string[] }> {
+    const result: Array<{ entityId: string; entityName: string; plotIds: string[] }> = [];
+
+    for (const thread of context.allThreads) {
+      if (thread.activePlots.length > 0) {
+        result.push({
+          entityId: thread.entityId,
+          entityName: thread.name,
+          plotIds: thread.activePlots,
+        });
+      }
+    }
+
+    return result;
   }
 
   /**
