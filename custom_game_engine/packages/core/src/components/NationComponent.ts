@@ -93,6 +93,176 @@ export interface NationDiplomaticEvent {
 }
 
 /**
+ * Province tax collection record
+ */
+export interface ProvinceTaxRecord {
+  provinceId: string;
+  provinceName: string;
+  provincialGDP: number;
+  taxablePopulation: number;
+  effectiveTaxRate: number;
+  nationalTaxRate: number;
+  provincialAutonomyRate: number;
+  grossTaxRevenue: number;
+  exemptions: number;
+  evasion: number;
+  netTaxRevenue: number;
+  complianceRate: number;
+  lastCollectionTick: number;
+}
+
+/**
+ * National trade state
+ */
+export interface NationalTradeState {
+  exports: Map<string, number>;
+  imports: Map<string, number>;
+  tradeBalance: number;
+  tradingPartners: Map<string, {
+    volume: number;
+    balance: number;
+    tariffsPaid: number;
+    tariffsPaidToThem: number;
+  }>;
+  transitTrade: number;
+}
+
+/**
+ * Tariff policy
+ */
+export interface TariffPolicy {
+  importTariff: number;
+  exportTariff: number;
+  resourceTariffs: Map<string, {
+    importRate: number;
+    exportRate: number;
+    reason: 'protection' | 'luxury' | 'strategic' | 'embargo';
+  }>;
+  nationTariffs: Map<string, {
+    rate: number;
+    treatyId?: string;
+  }>;
+}
+
+/**
+ * State enterprise
+ */
+export interface StateEnterprise {
+  id: string;
+  name: string;
+  sector: 'mining' | 'manufacturing' | 'agriculture' | 'infrastructure' | 'banking';
+  revenue: number;
+  operatingCost: number;
+  profit: number;
+  efficiency: number;
+  employees: number;
+  wagesBudget: number;
+  provinceId: string;
+  capitalValue: number;
+}
+
+/**
+ * Unrest factor with detailed tracking
+ */
+export interface UnrestFactor {
+  id: string;
+  category: 'economic' | 'political' | 'social' | 'military' | 'religious' | 'ethnic';
+  name: string;
+  description: string;
+  stabilityImpact: number;
+  legitimacyImpact: number;
+  startTick: number;
+  expectedDuration?: number;
+  isPermanent: boolean;
+  canBeResolved: boolean;
+  resolutionCost?: number;
+  resolutionPolicy?: string;
+}
+
+/**
+ * Nation unrest state
+ */
+export interface NationUnrest {
+  factors: UnrestFactor[];
+  totalStabilityModifier: number;
+  totalLegitimacyModifier: number;
+  rebellionRisk: number;
+  coupRisk: number;
+  secessionRisk: number;
+  troubledProvinces: string[];
+}
+
+/**
+ * Tech unlock from research
+ */
+export interface TechUnlock {
+  type: 'building' | 'unit' | 'policy' | 'resource' | 'ability';
+  id: string;
+  name: string;
+  description: string;
+}
+
+/**
+ * National research state
+ */
+export interface NationalResearchState {
+  researchCapacity: number;
+  universitiesCount: number;
+  researcherPopulation: number;
+  completedTechnologies: string[];
+  currentEra: 'ancient' | 'classical' | 'medieval' | 'renaissance' | 'industrial' | 'modern' | 'space';
+}
+
+/**
+ * Policy effect
+ */
+export interface PolicyEffect {
+  target: string;
+  modifierType: 'additive' | 'multiplicative' | 'replacement';
+  value: number;
+  isPermanent: boolean;
+  durationTicks?: number;
+}
+
+/**
+ * Treaty negotiation
+ */
+export interface TreatyNegotiation {
+  id: string;
+  proposingNationId: string;
+  targetNationId: string;
+  proposedTreaty: Treaty;
+  proposedTerms: string[];
+  status: 'proposed' | 'counter_offered' | 'accepted' | 'rejected' | 'expired';
+  roundsOfNegotiation: number;
+  baseAcceptanceChance: number;
+  termModifiers: number;
+  urgencyModifier: number;
+  finalAcceptanceChance: number;
+  proposedTick: number;
+  expirationTick: number;
+}
+
+/**
+ * Opinion modifiers between nations
+ */
+export interface NationOpinionModifiers {
+  sharedBorder: number;
+  distance: number;
+  tradeVolume: number;
+  tradeBalance: number;
+  tariffDisputes: number;
+  recentWars: number;
+  warThreat: number;
+  militarySupport: number;
+  governmentSimilarity: number;
+  ideologicalAlignment: number;
+  pastTreaties: number;
+  treatyViolations: number;
+  leaderRelations: number;
+}
+
+/**
  * Research project
  */
 export interface ResearchProject {
@@ -103,6 +273,11 @@ export interface ResearchProject {
   progress: number; // 0-1
   startedTick: number;
   estimatedCompletionTick?: number;
+  prerequisites?: string[];
+  eraRequirement?: string;
+  totalCost?: number;
+  monthsInvested?: number;
+  unlocks?: TechUnlock[];
 }
 
 /**
@@ -260,6 +435,23 @@ export interface NationComponent extends Component {
 
   // Update tracking
   lastStrategicUpdateTick: number;
+
+  // Enhanced economy (optional for backwards compatibility)
+  trade?: NationalTradeState;
+  tariffPolicy?: TariffPolicy;
+  stateEnterprises?: StateEnterprise[];
+
+  // Enhanced stability
+  unrest?: NationUnrest;
+
+  // Enhanced research
+  research?: NationalResearchState;
+
+  // Policy effects cache
+  policyModifiers?: Record<string, number[]>;
+
+  // Pending negotiations
+  pendingNegotiations?: TreatyNegotiation[];
 }
 
 /**
@@ -360,6 +552,48 @@ export function createNationComponent(
     unrestFactors: [],
     provinceRecords: [],
     lastStrategicUpdateTick: foundedTick,
+
+    // Enhanced economy
+    trade: {
+      exports: new Map(),
+      imports: new Map(),
+      tradeBalance: 0,
+      tradingPartners: new Map(),
+      transitTrade: 0,
+    },
+    tariffPolicy: {
+      importTariff: 0.1,
+      exportTariff: 0.0,
+      resourceTariffs: new Map(),
+      nationTariffs: new Map(),
+    },
+    stateEnterprises: [],
+
+    // Enhanced stability
+    unrest: {
+      factors: [],
+      totalStabilityModifier: 0,
+      totalLegitimacyModifier: 0,
+      rebellionRisk: 0,
+      coupRisk: 0,
+      secessionRisk: 0,
+      troubledProvinces: [],
+    },
+
+    // Enhanced research
+    research: {
+      researchCapacity: 0,
+      universitiesCount: 0,
+      researcherPopulation: 0,
+      completedTechnologies: [],
+      currentEra: 'ancient',
+    },
+
+    // Policy effects cache
+    policyModifiers: {},
+
+    // Pending negotiations
+    pendingNegotiations: [],
   };
 }
 
