@@ -79,6 +79,9 @@ export class PlantSystem extends BaseSystem {
   // Cache time entity ID to avoid repeated queries
   private timeEntityId: string | null = null;
 
+  // Cache time component per frame to avoid repeated queries
+  private cachedTimeComponent: { season?: string; lightLevel?: number } | undefined;
+
   // Event listeners storage
   private weatherRainIntensity: string | null = null;
   private weatherFrostTemperature: number | null = null;
@@ -186,7 +189,8 @@ export class PlantSystem extends BaseSystem {
     // Get current tick for delta update timing
     const currentTick = world.tick;
 
-    // Clear companion planting cache at start of each update
+    // Clear per-frame caches at start of update
+    this.cachedTimeComponent = undefined;
     this.clearCompanionCache();
 
     // Update agent positions in scheduler for proximity-based simulation culling
@@ -421,27 +425,120 @@ export class PlantSystem extends BaseSystem {
    * Get environmental conditions for a plant position
    */
   private getEnvironment(position: { x: number; y: number }, world: World): Environment {
-    const temperature = this.getTemperature(position, world);
+    // PERFORMANCE: Cache tile lookup once per plant (instead of querying twice)
+    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
+    const tile = typeof worldWithTiles.getTileAt === 'function'
+      ? worldWithTiles.getTileAt(position.x, position.y)
+      : null;
+
+    // Get temperature using cached tile
+    const temperature = this.getTemperatureFromTile(tile);
     const moisture = this.getMoisture(position, world);
-    const nutrients = 80; // Default from soil
-    const season = 'spring'; // Default
-    const lightLevel = 100; // Default
+
+    // Get actual soil nutrient data from cached tile
+    let nutrients = 80; // Default fallback
+    if (tile && tile.nutrients) {
+      // Calculate average nutrient level from N-P-K values
+      const avgNutrients = (
+        tile.nutrients.nitrogen +
+        tile.nutrients.phosphorus +
+        tile.nutrients.potassium
+      ) / 3;
+      nutrients = avgNutrients;
+    } else if (tile && tile.fertility !== undefined) {
+      // Fallback to fertility if nutrients not available
+      nutrients = tile.fertility;
+    }
+
+    // PERFORMANCE: Cache time component once per frame (instead of querying twice)
+    if (!this.cachedTimeComponent) {
+      if (this.timeEntityId && world.getEntity(this.timeEntityId)) {
+        const timeEntity = world.getEntity(this.timeEntityId)!;
+        const timeComp = timeEntity.components.get('time') as { season?: string; lightLevel?: number } | undefined;
+        if (timeComp) {
+          this.cachedTimeComponent = {
+            season: timeComp.season,
+            lightLevel: timeComp.lightLevel
+          };
+        }
+      } else {
+        // Query for time entity if not cached
+        const timeEntities = world.query().with(CT.Time).executeEntities();
+        if (timeEntities.length > 0) {
+          const timeEntity = timeEntities[0];
+          if (timeEntity) {
+            this.timeEntityId = timeEntity.id; // Cache the ID
+            const timeComp = timeEntity.components.get('time') as { season?: string; lightLevel?: number } | undefined;
+            if (timeComp) {
+              this.cachedTimeComponent = {
+                season: timeComp.season,
+                lightLevel: timeComp.lightLevel
+              };
+            }
+          }
+        }
+      }
+
+      // Fallback if still not cached
+      if (!this.cachedTimeComponent) {
+        this.cachedTimeComponent = {
+          season: 'spring',
+          lightLevel: 1.0
+        };
+      }
+    }
+
+    // Get season and light level from cached time component
+    const season = this.cachedTimeComponent.season ?? 'spring';
+    const lightLevel = this.cachedTimeComponent.lightLevel ?? 1.0;
+    const lightLevel100 = lightLevel * 100;
 
     return {
       temperature,
       moisture,
       nutrients,
       season,
-      lightLevel
+      lightLevel: lightLevel100
     };
   }
 
   /**
    * Get temperature at position from TemperatureSystem
+   * PERFORMANCE: Accepts cached tile to avoid redundant getTileAt() query
    */
-  private getTemperature(_position: { x: number; y: number }, _world: World): number {
-    // Use weather temperature
-    return this.weatherTemperature;
+  private getTemperatureFromTile(tile: any | null): number {
+    // Start with global weather temperature
+    let temperature = this.weatherTemperature;
+
+    // Apply biome-specific temperature modifiers using passed tile
+    if (tile && tile.biome) {
+      // Apply biome temperature modifiers
+      switch (tile.biome) {
+        case 'tundra':
+        case 'arctic':
+          temperature -= 10; // Very cold biomes
+          break;
+        case 'mountain':
+        case 'snowy_peaks':
+          temperature -= 5; // Cold high-altitude biomes
+          break;
+        case 'desert':
+        case 'savanna':
+          temperature += 8; // Hot dry biomes
+          break;
+        case 'tropical_rainforest':
+        case 'jungle':
+          temperature += 5; // Warm humid biomes
+          break;
+        case 'swamp':
+        case 'wetland':
+          temperature += 2; // Slightly warmer due to moisture
+          break;
+        // forest, plains, grassland use default temperature
+      }
+    }
+
+    return temperature;
   }
 
   /**
