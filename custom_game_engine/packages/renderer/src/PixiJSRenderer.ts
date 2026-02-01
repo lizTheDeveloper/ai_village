@@ -370,12 +370,6 @@ export class PixiJSRenderer implements IRenderer {
     // This will alert us if WebGL gets lost after initialization
     setupContextLostHandlers(this._canvas);
 
-<<<<<<< HEAD
-    // Log initial diagnostics for debugging intermittent failures
-    logWebGLDiagnostics();
-
-=======
->>>>>>> pr-27-review
     // Determine preferred backend
     const preference = this.options.preference ?? 'auto';
     let preferenceForPixi: 'webgpu' | 'webgl' | undefined;
@@ -504,10 +498,7 @@ export class PixiJSRenderer implements IRenderer {
             backgroundColor: 0x1a1a2e,
             autoDensity: false,
           });
-<<<<<<< HEAD
-=======
           console.warn('[PixiJSRenderer] WebGL fallback succeeded after WebGPU failure');
->>>>>>> pr-27-review
         } catch (webglError) {
           console.error('[PixiJSRenderer] ❌ WebGL fallback ALSO FAILED!');
           console.error('WebGL error:', webglError);
