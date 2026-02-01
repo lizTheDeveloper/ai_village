@@ -116,8 +116,14 @@ export class AnimalInfoPanel implements IWindowPanel {
    * Render at a specific position (for WindowManager integration).
    * Does not draw background, border, or close button - WindowManager handles those.
    */
-  renderAt(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, _height: number, world: World | undefined): void {
+  renderAt(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, world: World | undefined): void {
     if (!this.selectedEntityId) {
+      // Draw "no selection" message instead of empty panel
+      ctx.fillStyle = 'rgba(200, 200, 200, 0.7)';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Select an animal to view info', x + width / 2, y + height / 2);
+      ctx.textAlign = 'left'; // Reset
       return;
     }
 

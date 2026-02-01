@@ -322,6 +322,12 @@ export class AgentInfoPanel implements IWindowPanel {
 
     if (!this.selectedEntityId) {
       this.contextSection.hide();
+      // Draw "no selection" message instead of empty panel
+      ctx.fillStyle = 'rgba(200, 200, 200, 0.7)';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Select an agent to view info', x + width / 2, y + height / 2);
+      ctx.textAlign = 'left'; // Reset
       return;
     }
 

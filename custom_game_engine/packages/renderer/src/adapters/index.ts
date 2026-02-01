@@ -207,7 +207,7 @@ export const MEMORY_PANEL_CONFIG: PanelConfig<MemoryPanel> = {
 
 /**
  * Configuration for AgentInfoPanel adapter.
- * Pattern: Conditional visibility - requires entity selection
+ * Pattern: Conditional visibility - panel handles "no selection" state itself
  */
 export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: AgentInfoPanelAdapterState }> = {
   id: 'agent-info',
@@ -216,7 +216,8 @@ export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: 
   defaultHeight: 530,
   getVisible: (panel) => {
     if (!panel._adapter) return false;
-    return panel._adapter.visible && panel.getSelectedEntityId() !== null;
+    // Only check _adapter.visible - the panel handles "no selection" state itself
+    return panel._adapter.visible;
   },
   setVisible: (panel, visible) => {
     if (!panel._adapter) {
@@ -241,7 +242,7 @@ export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: 
 
 /**
  * Configuration for AnimalInfoPanel adapter.
- * Pattern: Conditional visibility - requires entity selection
+ * Pattern: Conditional visibility - panel handles "no selection" state itself
  */
 export const ANIMAL_INFO_PANEL_CONFIG: PanelConfig<AnimalInfoPanel & { _adapter?: AnimalInfoPanelAdapterState }> = {
   id: 'animal-info',
@@ -250,7 +251,8 @@ export const ANIMAL_INFO_PANEL_CONFIG: PanelConfig<AnimalInfoPanel & { _adapter?
   defaultHeight: 450,
   getVisible: (panel) => {
     if (!panel._adapter) return false;
-    return panel._adapter.visible && panel.getSelectedEntityId() !== null;
+    // Only check _adapter.visible - the panel handles "no selection" state itself
+    return panel._adapter.visible;
   },
   setVisible: (panel, visible) => {
     if (!panel._adapter) {
