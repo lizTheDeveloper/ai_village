@@ -17,6 +17,9 @@ import type { UniverseSnapshot } from '../persistence/types.js';
 import { worldSerializer } from '../persistence/WorldSerializer.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { MetricsCollector } from './MetricsCollector.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
+import { globalRecipeRegistry } from '../crafting/RecipeRegistry.js';
+import { buildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 
 /**
  * Types of canon events that trigger state snapshots
@@ -265,26 +268,53 @@ export class CanonEventRecorder {
 
   /**
    * Extract recipes from RecipeRegistry
-   * Note: RecipeRegistry is accessed via CraftingSystem, not directly from World
+   * Uses the global recipe registry singleton
    */
   private extractRecipes(_world: World): RuntimeDefinitions['recipes'] {
-    // RecipeRegistry is not directly accessible from World
-    // It's injected into CraftingSystem via setRecipeRegistry
-    // For now, return empty array - would need system registry access
-    // TODO: Access via world.getSystem('crafting')?.recipeRegistry if exposed
-    return [];
+    const allRecipes = globalRecipeRegistry.getAllRecipes();
+
+    return allRecipes.map(recipe => ({
+      id: recipe.id,
+      name: recipe.name,
+      discoveredBy: undefined, // Recipe discovery tracking could be added later
+      discoveredAt: undefined,
+      definition: {
+        category: recipe.category,
+        description: recipe.description,
+        ingredients: recipe.ingredients,
+        output: recipe.output,
+        craftingTime: recipe.craftingTime,
+        stationRequired: recipe.stationRequired,
+        skillRequirements: recipe.skillRequirements,
+        researchRequirements: recipe.researchRequirements,
+      },
+    }));
   }
 
   /**
-   * Extract custom items from ItemRegistry
-   * Note: ItemRegistry is a global singleton, imported from items package
+   * Extract items from ItemRegistry
+   * Uses the global item registry singleton
    */
   private extractCustomItems(_world: World): RuntimeDefinitions['items'] {
-    // ItemRegistry is a global singleton (itemRegistry)
-    // Would need to import and access it directly
-    // For now, return empty array
-    // TODO: Import itemRegistry from '../items/ItemRegistry.js' and extract custom items
-    return [];
+    const allItems = itemRegistry.getAll();
+
+    return allItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      createdBy: undefined, // Item creation tracking could be added later
+      createdAt: undefined,
+      definition: {
+        category: item.category,
+        description: item.description,
+        weight: item.weight,
+        stackSize: item.stackSize,
+        isEdible: item.isEdible,
+        isStorable: item.isStorable,
+        isGatherable: item.isGatherable,
+        hungerRestored: item.hungerRestored,
+        gatherSources: item.gatherSources,
+      },
+    }));
   }
 
   /**
@@ -419,14 +449,28 @@ export class CanonEventRecorder {
   }
 
   /**
-   * Extract custom buildings from BuildingBlueprintRegistry
+   * Extract buildings from BuildingBlueprintRegistry
+   * Uses the global building blueprint registry singleton
    */
   private extractCustomBuildings(_world: World): RuntimeDefinitions['customBuildings'] {
-    // BuildingBlueprintRegistry is accessible via world.buildingRegistry
-    // But it's private - would need to expose it or access via getter
-    // For now, return empty array
-    // TODO: Access world.buildingRegistry if exposed, filter for custom/player-created buildings
-    return [];
+    const allBlueprints = buildingBlueprintRegistry.getAll();
+
+    return allBlueprints.map(blueprint => ({
+      id: blueprint.id,
+      name: blueprint.name,
+      baseType: blueprint.category,
+      modifications: {
+        description: blueprint.description,
+        width: blueprint.width,
+        height: blueprint.height,
+        tier: blueprint.tier,
+        functionality: blueprint.functionality,
+        resourceCost: blueprint.resourceCost,
+        techRequired: blueprint.techRequired,
+        skillRequired: blueprint.skillRequired,
+        unlocked: blueprint.unlocked,
+      },
+    }));
   }
 
   /**
@@ -445,7 +489,62 @@ export class CanonEventRecorder {
         return rel?.type === 'union' || rel?.isMarried;
       }).length;
 
-    // Track lineages
+    // Build child -> parents mapping from ParentingComponent data
+    const childToParents = new Map<string, Set<string>>();
+    const parentingEntities = world.query().with(CT.Parenting).executeEntities();
+
+    for (const entity of parentingEntities) {
+      const parenting = entity.getComponent(CT.Parenting) as {
+        responsibilities?: Array<{
+          childId: string;
+          otherParents?: string[];
+        }>;
+      } | undefined;
+
+      if (!parenting?.responsibilities) continue;
+
+      for (const resp of parenting.responsibilities) {
+        if (!childToParents.has(resp.childId)) {
+          childToParents.set(resp.childId, new Set());
+        }
+        childToParents.get(resp.childId)!.add(entity.id);
+
+        // Add other parents too
+        if (resp.otherParents) {
+          for (const otherParent of resp.otherParents) {
+            childToParents.get(resp.childId)!.add(otherParent);
+          }
+        }
+      }
+    }
+
+    // Helper to find founder by traversing ancestry
+    const findFounderAndGeneration = (agentId: string, visited = new Set<string>()): { founderId: string; generation: number } => {
+      // Prevent cycles
+      if (visited.has(agentId)) {
+        return { founderId: agentId, generation: 0 };
+      }
+      visited.add(agentId);
+
+      const parents = childToParents.get(agentId);
+      if (!parents || parents.size === 0) {
+        // This agent is a founder (no parents)
+        return { founderId: agentId, generation: 0 };
+      }
+
+      // Traverse to first parent to find founder
+      const firstParent = parents.values().next().value;
+      if (!firstParent) {
+        return { founderId: agentId, generation: 0 };
+      }
+      const parentResult = findFounderAndGeneration(firstParent, visited);
+      return {
+        founderId: parentResult.founderId,
+        generation: parentResult.generation + 1,
+      };
+    };
+
+    // Track lineages by founder
     const lineages = new Map<string, {
       founderId: string;
       founderName: string;
@@ -455,12 +554,21 @@ export class CanonEventRecorder {
 
     for (const agent of ensouledAgents) {
       const agentComp = agent.getComponent(CT.Agent) as { name?: string; generation?: number } | undefined;
-      const generation = agentComp?.generation ?? 0;
 
-      // Find founder (generation 0 ancestor)
-      // TODO: Implement proper lineage tracking
-      const founderId = agent.id;
-      const founderName = agentComp?.name ?? 'Unknown';
+      // Find this agent's founder through ancestry
+      const { founderId, generation } = findFounderAndGeneration(agent.id);
+
+      // Get founder's name
+      let founderName = 'Unknown';
+      if (founderId === agent.id) {
+        founderName = agentComp?.name ?? 'Unknown';
+      } else {
+        const founderEntity = world.getEntity(founderId);
+        if (founderEntity) {
+          const founderAgentComp = founderEntity.getComponent(CT.Agent) as { name?: string } | undefined;
+          founderName = founderAgentComp?.name ?? 'Unknown';
+        }
+      }
 
       if (!lineages.has(founderId)) {
         lineages.set(founderId, {
