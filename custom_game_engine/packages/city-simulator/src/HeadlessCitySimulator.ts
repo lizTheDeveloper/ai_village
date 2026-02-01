@@ -34,6 +34,8 @@ import {
   initializeDefaultRecipes,
   globalRecipeRegistry,
   registerDefaultResearch,
+  // DI Container
+  container,
 } from '@ai-village/core';
 
 // StrategicPriorities type for CityManager (all fields required)
@@ -64,8 +66,27 @@ import {
   WildPlantPopulationSystem,
 } from '@ai-village/botany';
 
-import { createWanderingAgent } from '@ai-village/agents';
+import { createWanderingAgent, createLLMAgent } from '@ai-village/agents';
 import type { Entity } from '@ai-village/core';
+
+// =============================================================================
+// DEPENDENCY INJECTION SETUP
+// =============================================================================
+
+// Register agent factory in DI container (city-simulator only uses wandering agents,
+// but we register both for consistency with demo)
+container.registerAgentFactory({
+  createLLMAgent: (world, x, y, options) => {
+    const speed = 2.0;
+    return createLLMAgent(world, x, y, speed, options?.name, options);
+  },
+  createWanderingAgent: (world, x, y, options) => {
+    const speed = 2.0;
+    return createWanderingAgent(world, x, y, speed, options);
+  },
+});
+
+console.log('[HeadlessCitySimulator] DI container agent factory registered');
 
 // =============================================================================
 // INTERNAL TYPE EXTENSIONS
