@@ -43,19 +43,20 @@ export class MovementIntentionSystem extends BaseSystem {
       // Check if entity has arrived this tick
       if (!intention.arrived && hasArrived(intention, ctx.tick)) {
         // Snap position to destination
-        ctx.world.updateComponent(entity.id, 'position', {
-          ...position,
+        const zFallback = position.z;
+        ctx.world.updateComponent(entity.id, 'position', (current) => ({
+          ...current,
           x: intention.destinationX,
           y: intention.destinationY,
-          z: intention.destinationZ ?? position.z,
-        });
+          z: intention.destinationZ ?? zFallback,
+        }));
 
         // Mark intention as arrived
-        ctx.world.updateComponent(entity.id, 'movement_intention', {
-          ...intention,
+        ctx.world.updateComponent(entity.id, 'movement_intention', (current) => ({
+          ...current,
           arrived: true,
           isMoving: false,
-        });
+        }));
 
         // Emit arrival event
         ctx.events.emit('entity:arrived', {

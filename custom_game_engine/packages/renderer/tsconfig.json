@@ -5,7 +5,8 @@
     "rootDir": "./src",
     "jsx": "react",
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"]
   },
   "include": ["src/**/*", "src/**/*.json"],
   "exclude": ["src/**/__tests__/**/*", "src/**/*.test.ts"],
@@ -15,6 +16,8 @@
     { "path": "../llm" },
     { "path": "../magic" },
     { "path": "../divinity" },
-    { "path": "../language" }
+    { "path": "../language" },
+    { "path": "../introspection" },
+    { "path": "../persistence" }
   ]
 }

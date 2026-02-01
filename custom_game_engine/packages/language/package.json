@@ -20,7 +20,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@ai-village/core": "*"
+    "@ai-village/core": "*",
+    "react": "^18.2.0"
   },
   "keywords": ["language", "phonemes", "translation", "alien", "procedural", "ecs"],
   "license": "MIT"

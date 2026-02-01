@@ -388,7 +388,7 @@ export class SimulationScheduler {
     for (const entityId of this.pendingGridRemovals) {
       const oldCoords = this.entityPositionCache.get(entityId);
       if (oldCoords) {
-        this.spatialGrid.remove(entityId, oldCoords);
+        this.spatialGrid.remove(entityId);
         this.entityPositionCache.delete(entityId);
       }
     }
@@ -423,7 +423,7 @@ export class SimulationScheduler {
 
       // Remove from old position
       if (oldCoords) {
-        this.spatialGrid.remove(entityId, oldCoords);
+        this.spatialGrid.remove(entityId);
       }
 
       // Add to new position
@@ -455,7 +455,7 @@ export class SimulationScheduler {
     for (const entityId of removedEntities) {
       const oldCoords = this.entityPositionCache.get(entityId);
       if (oldCoords) {
-        this.spatialGrid.remove(entityId, oldCoords);
+        this.spatialGrid.remove(entityId);
         this.entityPositionCache.delete(entityId);
       }
     }
