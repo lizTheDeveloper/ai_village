@@ -108,8 +108,7 @@ export class ResearchSystem extends BaseSystem {
     } else {
       this.blueprintRegistry = new BuildingBlueprintRegistry();
       this.blueprintRegistry.registerDefaults();
-      this.blueprintRegistry.registerTier2Stations();
-      this.blueprintRegistry.registerTier3Stations();
+      // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
       this.blueprintRegistry.registerExampleBuildings();
       this.blueprintRegistry.registerResearchBuildings();
     }
