@@ -64,17 +64,30 @@ export class SoilSystem extends BaseSystem {
   private accumulatedTime: number = 0; // Track elapsed time in seconds
   private readonly SECONDS_PER_DAY = SOIL_CONSTANTS.timeConstants.secondsPerDay;
 
+  // PERFORMANCE: Cache time entity ID to avoid repeated queries
+  private timeEntityId: string | null = null;
+
   protected onUpdate(ctx: SystemContext): void {
-    // Get time acceleration from TimeComponent if available
-    const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
+    // Get time acceleration from TimeComponent if available (with caching)
     let timeSpeedMultiplier = 1.0;
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0];
+
+    if (!this.timeEntityId) {
+      const timeEntities = ctx.world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        this.timeEntityId = timeEntities[0]!.id;
+      }
+    }
+
+    if (this.timeEntityId) {
+      const timeEntity = ctx.world.getEntity(this.timeEntityId);
       if (timeEntity) {
         const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
         if (timeComp && timeComp.speedMultiplier) {
           timeSpeedMultiplier = timeComp.speedMultiplier;
         }
+      } else {
+        // Entity no longer exists, clear cache
+        this.timeEntityId = null;
       }
     }
 
@@ -401,9 +414,25 @@ export class SoilSystem extends BaseSystem {
 
   /**
    * Get current season from TimeComponent
+   * PERFORMANCE: Uses cached timeEntityId for O(1) lookup
    * Returns null if no time entity exists (season modifiers won't apply)
    */
   private getCurrentSeason(world: World): 'spring' | 'summer' | 'fall' | 'winter' | null {
+    // Use cached time entity if available
+    if (this.timeEntityId) {
+      const timeEntity = world.getEntity(this.timeEntityId);
+      if (timeEntity) {
+        const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
+        if (timeComp) {
+          return timeComp.season || null;
+        }
+      } else {
+        // Entity no longer exists, clear cache
+        this.timeEntityId = null;
+      }
+    }
+
+    // Fall back to query if no cached ID
     const timeEntities = world.query().with(CT.Time).executeEntities();
     if (timeEntities.length === 0) {
       return null;
@@ -414,12 +443,14 @@ export class SoilSystem extends BaseSystem {
       return null;
     }
 
+    // Cache for future lookups
+    this.timeEntityId = timeEntity.id;
+
     const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
     if (!timeComp) {
       return null;
     }
 
-    // Season field may not exist in older saves or if TimeSystem hasn't updated yet
     return timeComp.season || null;
   }
 

@@ -32,6 +32,32 @@ export class BeltSystem extends BaseSystem {
   public readonly activationComponents = [CT.Belt] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
+  // PERFORMANCE: Cache position-to-entity map to avoid O(n) queries per belt transfer
+  private positionCache: Map<string, Entity> = new Map();
+  private positionCacheTick: number = -1;
+
+  /**
+   * Build position cache for O(1) entity lookups
+   * Only rebuilds if tick has changed
+   */
+  private buildPositionCache(world: World): void {
+    if (this.positionCacheTick === world.tick) return;
+
+    this.positionCache.clear();
+    const entities = world.query().with(CT.Position).executeEntities();
+    for (const entity of entities) {
+      const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+      if (pos) {
+        const key = `${Math.floor(pos.x)},${Math.floor(pos.y)}`;
+        // Store first entity at position (belts/machines shouldn't overlap)
+        if (!this.positionCache.has(key)) {
+          this.positionCache.set(key, entity);
+        }
+      }
+    }
+    this.positionCacheTick = world.tick;
+  }
+
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
 
@@ -45,7 +71,10 @@ export class BeltSystem extends BaseSystem {
       belt.transferProgress += speed;
     }
 
-    // Step 2: Transfer items to adjacent belts/machines
+    // Step 2: Build position cache once for all transfer lookups (O(n) once vs O(n) per belt)
+    this.buildPositionCache(world);
+
+    // Step 3: Transfer items to adjacent belts/machines
     for (const entity of ctx.activeEntities) {
       const belt = (entity as EntityImpl).getComponent<BeltComponent>(CT.Belt);
       const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
@@ -178,16 +207,11 @@ export class BeltSystem extends BaseSystem {
   }
 
   /**
-   * Get entity at position
+   * Get entity at position using cached position map
+   * PERFORMANCE: O(1) lookup instead of O(n) query
    */
-  private getEntityAt(world: World, pos: { x: number; y: number }): Entity | null {
-    const entities = world.query()
-      .with(CT.Position)
-      .executeEntities();
-
-    return entities.find(e => {
-      const p = (e as EntityImpl).getComponent<PositionComponent>(CT.Position);
-      return p && Math.floor(p.x) === Math.floor(pos.x) && Math.floor(p.y) === Math.floor(pos.y);
-    }) ?? null;
+  private getEntityAt(_world: World, pos: { x: number; y: number }): Entity | null {
+    const key = `${Math.floor(pos.x)},${Math.floor(pos.y)}`;
+    return this.positionCache.get(key) ?? null;
   }
 }
