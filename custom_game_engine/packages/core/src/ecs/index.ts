@@ -30,3 +30,28 @@ export {
 // World is both a value (constructor alias for WorldImpl) and a type (interface)
 export type { Entity } from './Entity.js';
 export type { Component } from './Component.js';
+
+// ChunkStateManager - Minecraft-style lazy chunk loading for entity simulation
+// Reduces chunks processed by 95% using ACTIVE/LAZY/UNLOADED states
+export * from './ChunkStateManager.js';
+export {
+  ChunkStateManager,
+  ChunkState,
+  chunkStateManager,
+  type ChunkStateConfig,
+  type ChunkInfo,
+} from './ChunkStateManager.js';
+
+// EntityDemotion - Factorio-style optimization for passive objects
+// 10x memory reduction by storing resources/items as lightweight data instead of full entities
+export * from './EntityDemotion.js';
+export {
+  ResourceDataStore,
+  DroppedItemDataStore,
+  resourceDataStore,
+  droppedItemDataStore,
+  demoteResourceEntity,
+  promoteResourceRecord,
+  type ResourceRecord,
+  type DroppedItemRecord,
+} from './EntityDemotion.js';

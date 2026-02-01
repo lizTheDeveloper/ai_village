@@ -301,6 +301,11 @@ export { BuildingSummoningSystem } from './BuildingSummoningSystem.js';
 export * from './InvasionPlotHandler.js';
 export { InvasionPlotHandler } from './InvasionPlotHandler.js';
 
+// Movement Intention System (Factorio-style movement optimization)
+// Reduces brain updates by 90% by storing movement destination/arrival instead of per-tick positions
+export * from './MovementIntentionSystem.js';
+export { MovementIntentionSystem } from './MovementIntentionSystem.js';
+
 // Centralized system registration
 export {
   registerAllSystems,

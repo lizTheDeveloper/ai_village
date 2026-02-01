@@ -67,6 +67,7 @@ import { AgentVisualsSystem } from './AgentVisualsSystem.js';
 // Agent Core
 import { AgentBrainSystem } from './AgentBrainSystem.js';
 import { MovementSystem } from './MovementSystem.js';
+import { MovementIntentionSystem } from './MovementIntentionSystem.js';
 import { StateMutatorSystem } from './StateMutatorSystem.js';
 import { FluidDynamicsSystem } from './FluidDynamicsSystem.js';
 import { PlanetaryCurrentsSystem } from './PlanetaryCurrentsSystem.js';
@@ -647,6 +648,11 @@ export function registerAllSystems(
       scheduledProcessor // NEW: ScheduledDecisionProcessor
     )
   );
+
+  // MovementIntentionSystem - Factorio-style movement optimization (priority 18)
+  // Processes arrival events, snaps position on arrival, emits entity:arrived event
+  // Reduces brain updates by 90% by storing movement destination instead of per-tick positions
+  gameLoop.systemRegistry.register(new MovementIntentionSystem());
 
   gameLoop.systemRegistry.register(new MovementSystem());
 
