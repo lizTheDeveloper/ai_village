@@ -584,12 +584,18 @@ export class LivePlanetCreationScreen {
     try {
       const response = await fetch(`${this.API_BASE}/multiverse/planet/${this.planetId}/generation-status`);
       if (!response.ok) {
-        // If endpoint doesn't exist, simulate generation
+        // If endpoint doesn't exist or planet not found, simulate generation
         this.simulateGeneration();
         return;
       }
 
       const status = await response.json();
+
+      // Check if server says to use local simulation (no server-side biosphere)
+      if (status.useLocalSimulation) {
+        this.simulateGeneration();
+        return;
+      }
 
       // Update species list
       if (status.species) {
@@ -686,6 +692,61 @@ export class LivePlanetCreationScreen {
       });
     }
     this.biomeGroups.get(species.biome)!.species.push(species);
+
+    // Queue sprite generation so species appears in sprite gallery
+    this.queueSpriteGeneration(species);
+  }
+
+  /**
+   * Queue sprite generation for a species via the metrics server API.
+   * This creates a placeholder folder with metadata.json immediately,
+   * allowing the species to appear in the sprite gallery (with "No preview").
+   */
+  private async queueSpriteGeneration(species: GeneratedSpecies): Promise<void> {
+    const METRICS_API = 'http://localhost:8766';
+    const folderId = this.sanitizeFolderId(species.name);
+
+    // Build a description for PixelLab
+    const artStyleString = this.useCustomArtStyle
+      ? this.customArtStyleInput
+      : `${this.artStyleConfig.bitDepth} ${this.artStyleConfig.era} pixel art`;
+
+    const description = `${species.name}, ${species.type} from ${species.biome} biome, ${artStyleString}, game sprite`;
+
+    try {
+      const response = await fetch(`${METRICS_API}/api/sprites/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          folderId,
+          description,
+          traits: {
+            category: 'planet_species',
+            speciesName: species.name,
+            speciesType: species.type,
+            biome: species.biome,
+            planetId: this.planetId,
+            planetName: this.planetName,
+            artStyle: artStyleString,
+            ...species.traits,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn(`[LivePlanetCreation] Failed to queue sprite for ${species.name}`);
+      }
+    } catch (error) {
+      // Non-fatal - species still appears in local UI even if sprite queue fails
+      console.warn(`[LivePlanetCreation] Error queueing sprite for ${species.name}:`, error);
+    }
+  }
+
+  /**
+   * Convert species name to a valid folder ID (lowercase, underscores)
+   */
+  private sanitizeFolderId(name: string): string {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   }
 
   private addLog(message: string): void {

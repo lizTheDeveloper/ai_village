@@ -26,6 +26,11 @@ import {
   type PassageConnection,
   type PlayerProfile,
 } from './multiverse-storage.js';
+import {
+  planetStorage,
+  type PlanetMetadata,
+  type BiosphereData,
+} from './planet-storage.js';
 import crypto from 'crypto';
 import zlib from 'zlib';
 import { promisify } from 'util';
@@ -443,6 +448,238 @@ export function createUniverseApiRouter(): Router {
       });
     } catch (error: any) {
       console.error('[UniverseAPI] Error listing forks:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================================
+  // PLANET ENDPOINTS
+  // ============================================================
+
+  /**
+   * POST /api/multiverse/universe/:id/planets
+   * Create a planet within a universe
+   */
+  router.post('/universe/:id/planets', async (req: Request, res: Response) => {
+    try {
+      const { id: universeId } = req.params;
+      const {
+        name,
+        type,
+        seed: providedSeed,
+        config,
+        artStyle,
+        createdBy,
+        biomes,
+        generateBiosphere,
+        spriteStrategy,
+      } = req.body;
+
+      if (!name || !type) {
+        return res.status(400).json({
+          error: 'Missing required fields: name, type',
+        });
+      }
+
+      // Auto-generate seed if not provided
+      const seed = providedSeed || `${name}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      // Verify universe exists
+      const universe = await multiverseStorage.getUniverseMetadata(universeId);
+      if (!universe) {
+        return res.status(404).json({ error: 'Universe not found' });
+      }
+
+      // Generate planet ID
+      const planetId = `planet:${type}:${crypto.randomUUID().slice(0, 8)}`;
+
+      const metadata: PlanetMetadata = {
+        id: planetId,
+        name,
+        type: type as PlanetMetadata['type'],
+        seed,
+        createdAt: Date.now(),
+        lastAccessedAt: Date.now(),
+        saveCount: 0,
+        chunkCount: 0,
+        hasBiosphere: false,
+        config: config || { seed, type },
+        universeId,
+        artStyle,
+        createdBy,
+        biomes,
+      };
+
+      await planetStorage.createPlanet(metadata);
+
+      console.log(`[UniverseAPI] Created planet ${planetId} (${name}) in universe ${universeId}`);
+
+      res.status(201).json({
+        success: true,
+        planet: metadata,
+      });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error creating planet:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/multiverse/universe/:id/planets
+   * List all planets for a universe
+   */
+  router.get('/universe/:id/planets', async (req: Request, res: Response) => {
+    try {
+      const { id: universeId } = req.params;
+
+      // Verify universe exists
+      const universe = await multiverseStorage.getUniverseMetadata(universeId);
+      if (!universe) {
+        return res.status(404).json({ error: 'Universe not found' });
+      }
+
+      // Get all planets and filter by universe
+      const allPlanets = await planetStorage.listPlanets();
+      const universePlanets = allPlanets.filter(p => p.universeId === universeId);
+
+      res.json({
+        universeId,
+        planets: universePlanets,
+      });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error listing planets:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/multiverse/planet/:planetId
+   * Get planet metadata
+   */
+  router.get('/planet/:planetId', async (req: Request, res: Response) => {
+    try {
+      const { planetId } = req.params;
+
+      const metadata = await planetStorage.getPlanetMetadata(planetId);
+      if (!metadata) {
+        return res.status(404).json({ error: 'Planet not found' });
+      }
+
+      res.json({ planet: metadata });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error getting planet:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * POST /api/multiverse/planet/:planetId/biosphere
+   * Save biosphere data for a planet
+   */
+  router.post('/planet/:planetId/biosphere', async (req: Request, res: Response) => {
+    try {
+      const { planetId } = req.params;
+      const biosphere = req.body as BiosphereData;
+
+      if (!biosphere || !biosphere.species) {
+        return res.status(400).json({
+          error: 'Missing required biosphere data (species array required)',
+        });
+      }
+
+      // Verify planet exists
+      const metadata = await planetStorage.getPlanetMetadata(planetId);
+      if (!metadata) {
+        return res.status(404).json({ error: 'Planet not found' });
+      }
+
+      await planetStorage.saveBiosphere(planetId, biosphere);
+
+      console.log(`[UniverseAPI] Saved biosphere for planet ${planetId} (${biosphere.species.length} species)`);
+
+      res.json({
+        success: true,
+        message: `Biosphere saved with ${biosphere.species.length} species`,
+      });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error saving biosphere:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/multiverse/planet/:planetId/biosphere
+   * Get biosphere data for a planet
+   */
+  router.get('/planet/:planetId/biosphere', async (req: Request, res: Response) => {
+    try {
+      const { planetId } = req.params;
+
+      const biosphere = await planetStorage.getBiosphere(planetId);
+      if (!biosphere) {
+        return res.status(404).json({ error: 'Biosphere not found' });
+      }
+
+      res.json({ biosphere });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error getting biosphere:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/multiverse/planet/:planetId/generation-status
+   * Get generation status for a planet (used by LivePlanetCreationScreen)
+   * Returns complete: true when biosphere is ready, along with species list
+   * Returns useLocalSimulation: true when no biosphere exists (client should simulate locally)
+   */
+  router.get('/planet/:planetId/generation-status', async (req: Request, res: Response) => {
+    try {
+      const { planetId } = req.params;
+
+      // Check if planet exists
+      const metadata = await planetStorage.getPlanetMetadata(planetId);
+      if (!metadata) {
+        return res.status(404).json({ error: 'Planet not found' });
+      }
+
+      // Check if biosphere exists with species
+      const biosphere = await planetStorage.getBiosphere(planetId);
+
+      if (biosphere && biosphere.species && biosphere.species.length > 0) {
+        // Biosphere is ready - return it
+        res.json({
+          complete: true,
+          species: biosphere.species,
+          ecosystems: biosphere.ecosystems || [],
+          simulationYears: biosphere.simulationYears || 0,
+        });
+      } else {
+        // No biosphere yet - tell client to use local simulation
+        // This returns 200 to avoid console errors, with a flag for local simulation
+        res.json({
+          complete: false,
+          useLocalSimulation: true,
+          species: [],
+          message: 'No server-side biosphere - use client-side simulation',
+        });
+      }
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error getting generation status:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/multiverse/planets
+   * List all planets (global)
+   */
+  router.get('/planets', async (_req: Request, res: Response) => {
+    try {
+      const planets = await planetStorage.listPlanets();
+      res.json({ planets });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error listing all planets:', error);
       res.status(500).json({ error: error.message });
     }
   });

@@ -36,7 +36,7 @@ import { ParticleRenderer } from './ParticleRenderer.js';
 import { BedOwnershipRenderer } from './BedOwnershipRenderer.js';
 import { HealthBarRenderer } from './HealthBarRenderer.js';
 import { ThreatIndicatorRenderer } from './ThreatIndicatorRenderer.js';
-import type { ContextMenuManager } from './ContextMenuManager.js';
+// ContextMenuManager import removed - files deleted
 import { Renderer3D } from './Renderer3D.js';
 import { TerrainRenderer } from './terrain/index.js';
 import { SideViewTerrainRenderer } from './terrain/index.js';
@@ -291,7 +291,7 @@ export class Renderer {
    * not by the Renderer class. This method is kept for backwards compatibility
    * but doesn't do anything.
    */
-  setContextMenuManager(_manager: ContextMenuManager): void {
+  setContextMenuManager(_manager: unknown): void {
     // Context menu is rendered separately in main.ts - no need to store reference
   }
 

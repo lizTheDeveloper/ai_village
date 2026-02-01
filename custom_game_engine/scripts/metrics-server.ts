@@ -645,6 +645,27 @@ function queueSpriteGeneration(
     return;
   }
 
+  // Create folder and metadata.json immediately so it appears in sprite gallery
+  // (with "No preview" status until generation completes)
+  try {
+    fs.mkdirSync(spritePath, { recursive: true });
+    const metadata = {
+      id: folderId,
+      category: traits.category || 'planet_species',
+      size: 48,
+      description: description,
+      original_description: description,
+      generated_at: new Date().toISOString(),
+      type: 'pending',
+      traits: traits,
+      status: 'queued',
+    };
+    fs.writeFileSync(path.join(spritePath, 'metadata.json'), JSON.stringify(metadata, null, 2));
+    console.log(`[SpriteGen] Created placeholder folder: ${folderId}`);
+  } catch (err) {
+    console.error(`[SpriteGen] Failed to create placeholder folder: ${err}`);
+  }
+
   // Queue the request (to be processed manually or automatically)
   const job: SpriteGenerationJob = {
     folderId,

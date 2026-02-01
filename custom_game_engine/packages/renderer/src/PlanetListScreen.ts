@@ -5,7 +5,8 @@
  * Users can join an existing planet or create a new one.
  */
 
-import { planetClient, type PlanetMetadata } from '@ai-village/persistence';
+// Note: Not using planetClient - it connects to port 8766 but planets API is on 3001
+import type { PlanetMetadata } from '@ai-village/persistence';
 
 export interface ServerPlanetInfo {
   id: string;
@@ -107,9 +108,13 @@ export class PlanetListScreen {
         cosmicDeities: universeData.universe.cosmicDeities || [],
       };
 
-      // Load planets from PlanetClient (port 8766)
-      const planetMetadata = await planetClient.listPlanetsByUniverse(this.universeId);
-      this.planets = planetMetadata.map((p: PlanetMetadata) => ({
+      // Load planets from API server (port 3001)
+      const planetsRes = await fetch(`${this.API_BASE}/multiverse/universe/${this.universeId}/planets`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!planetsRes.ok) throw new Error('Failed to load planets');
+      const planetsData = await planetsRes.json();
+      this.planets = (planetsData.planets || []).map((p: PlanetMetadata) => ({
         id: p.id,
         universeId: p.universeId || this.universeId,
         name: p.name,
