@@ -71,8 +71,11 @@ export class PlantDiseaseSystem extends BaseSystem {
    */
   public readonly dependsOn = ['plant'] as const;
 
-  /** Throttle to every 5 seconds (100 ticks at 20 TPS) */
-  protected readonly throttleInterval = 100;
+  /**
+   * PERFORMANCE: Event-driven system - processes once per game day at midnight
+   * instead of every 5 seconds. Set throttle high to skip most ticks.
+   */
+  protected readonly throttleInterval = 1000; // Rarely runs via throttle - mostly event-driven
 
   private config: PlantDiseaseSystemConfig;
   private speciesLookup: ((id: string) => PlantSpecies | undefined) | null = null;
@@ -94,6 +97,19 @@ export class PlantDiseaseSystem extends BaseSystem {
     isNight: false,
     season: 'summer'
   };
+
+  // PERFORMANCE: Track infected plants for efficient processing
+  // Only plants with diseases/pests need full processing each day
+  private infectedPlantIds: Set<string> = new Set();
+
+  // PERFORMANCE: Cache time entity ID
+  private timeEntityId: string | null = null;
+
+  // Track last processed day to avoid double-processing
+  private lastProcessedDay: number = -1;
+
+  // Flag set by midnight event to trigger processing
+  private shouldProcessToday: boolean = false;
 
   constructor(config?: Partial<PlantDiseaseSystemConfig>) {
     super();
@@ -141,6 +157,7 @@ export class PlantDiseaseSystem extends BaseSystem {
 
   /**
    * Setup event listeners
+   * PERFORMANCE: Disease processing is now event-driven, triggered at midnight
    */
   private setupEventListeners(): void {
     // Listen for weather updates
@@ -152,12 +169,17 @@ export class PlantDiseaseSystem extends BaseSystem {
       }
     });
 
-    // Listen for time updates
+    // Listen for time updates - TRIGGER DISEASE PROCESSING AT MIDNIGHT
     this.events.subscribe('world:time:hour', (event: unknown) => {
-      const e = event as { data?: { hour?: number } };
+      const e = event as { data?: { hour?: number; day?: number } };
       if (e.data && typeof e.data.hour === 'number') {
-        const { hour } = e.data;
+        const { hour, day } = e.data;
         this.currentEnvironment.isNight = hour < 6 || hour > 20;
+
+        // Trigger disease processing at midnight (hour 0)
+        if (hour === 0 && day !== undefined && day !== this.lastProcessedDay) {
+          this.shouldProcessToday = true;
+        }
       }
     });
 
@@ -175,6 +197,35 @@ export class PlantDiseaseSystem extends BaseSystem {
       if (e.data && e.data.entityId && e.data.treatmentId && e.data.treatmentType) {
         const { entityId, treatmentId, treatmentType } = e.data;
         this.applyTreatmentFromEvent(entityId, treatmentId, treatmentType);
+      }
+    });
+
+    // Listen for new disease/pest infections to track infected plants
+    this.events.subscribe('plant:diseaseContracted', (event: unknown) => {
+      const e = event as { data?: { entityId?: string } };
+      if (e.data?.entityId) {
+        this.infectedPlantIds.add(e.data.entityId);
+      }
+    });
+
+    this.events.subscribe('plant:pestInfestation', (event: unknown) => {
+      const e = event as { data?: { entityId?: string } };
+      if (e.data?.entityId) {
+        this.infectedPlantIds.add(e.data.entityId);
+      }
+    });
+
+    this.events.subscribe('plant:diseaseSpread', (event: unknown) => {
+      const e = event as { data?: { toEntityId?: string } };
+      if (e.data?.toEntityId) {
+        this.infectedPlantIds.add(e.data.toEntityId);
+      }
+    });
+
+    this.events.subscribe('plant:pestMigrated', (event: unknown) => {
+      const e = event as { data?: { toEntityId?: string } };
+      if (e.data?.toEntityId) {
+        this.infectedPlantIds.add(e.data.toEntityId);
       }
     });
   }
@@ -202,9 +253,8 @@ export class PlantDiseaseSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
-    const activeEntities = ctx.activeEntities;
 
-    // Apply pending treatments from events
+    // Apply pending treatments from events (always process, treatments are time-sensitive)
     if (this.pendingTreatments && this.pendingTreatments.size > 0) {
       for (const [entityId, treatmentId] of this.pendingTreatments) {
         const entity = world.getEntity(entityId);
@@ -219,8 +269,32 @@ export class PlantDiseaseSystem extends BaseSystem {
       this.pendingTreatments.clear();
     }
 
+    // PERFORMANCE: Only process disease/pest logic once per game day at midnight
+    // This is triggered by the world:time:hour event when hour === 0
+    if (!this.shouldProcessToday) {
+      return; // Skip processing - not midnight yet
+    }
+
     // Get current game day for tracking
     const gameDay = this.getCurrentGameDay(world);
+
+    // Prevent double-processing same day
+    if (gameDay === this.lastProcessedDay) {
+      this.shouldProcessToday = false;
+      return;
+    }
+
+    this.lastProcessedDay = gameDay;
+    this.shouldProcessToday = false;
+
+    // Get all plant entities for this daily processing
+    const activeEntities = ctx.activeEntities;
+
+    // PERFORMANCE: Separate infected plants from healthy plants
+    // Infected plants need full processing (disease progression, spread)
+    // Healthy plants only need outbreak checks
+    const infectedPlants: Array<{ plant: PlantComponent; entityId: string }> = [];
+    const healthyPlants: Array<{ plant: PlantComponent; entityId: string }> = [];
 
     for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
@@ -230,34 +304,62 @@ export class PlantDiseaseSystem extends BaseSystem {
       if (plant.stage === 'seed' || plant.stage === 'dead') continue;
 
       const entityId = impl.id;
+      const isInfected = plant.diseases.length > 0 || plant.pests.length > 0;
+
+      if (isInfected) {
+        infectedPlants.push({ plant, entityId });
+        // Ensure it's in our tracking set
+        this.infectedPlantIds.add(entityId);
+      } else {
+        healthyPlants.push({ plant, entityId });
+        // Remove from tracking if it was cured
+        this.infectedPlantIds.delete(entityId);
+      }
+    }
+
+    // Process INFECTED plants - full disease/pest logic
+    for (const { plant, entityId } of infectedPlants) {
       const species = this.speciesLookup?.(plant.speciesId);
       const category = species?.category ?? 'crop';
 
-      // Process existing diseases
+      // Process existing diseases (damage, progression, recovery)
       this.processDiseases(plant, entityId, gameDay);
 
-      // Process existing pests
+      // Process existing pests (damage, population growth)
       this.processPests(plant, entityId, gameDay);
 
-      // Check for new disease outbreaks
-      this.checkDiseaseOutbreak(plant, entityId, category, gameDay);
-
-      // Check for new pest infestations
-      this.checkPestInfestation(plant, entityId, category, gameDay, world);
-
-      // Disease spread
-      if (this.config.enableSpread) {
+      // Disease spread from this plant to nearby plants
+      if (this.config.enableSpread && plant.diseases.some(d => d.spreading)) {
         this.spreadDiseases(plant, entityId, world, gameDay, activeEntities);
       }
 
-      // Pest migration
-      this.migratePests(plant, entityId, world, gameDay, activeEntities);
+      // Pest migration from this plant
+      if (plant.pests.length > 0) {
+        this.migratePests(plant, entityId, world, gameDay, activeEntities);
+      }
+
+      // Infected plants can still get additional diseases/pests
+      this.checkDiseaseOutbreak(plant, entityId, category, gameDay);
+      this.checkPestInfestation(plant, entityId, category, gameDay, world);
+    }
+
+    // Process HEALTHY plants - only check for new outbreaks
+    // These are random chance events, no need for complex processing
+    for (const { plant, entityId } of healthyPlants) {
+      const species = this.speciesLookup?.(plant.speciesId);
+      const category = species?.category ?? 'crop';
+
+      // Check for new disease outbreaks (low probability)
+      this.checkDiseaseOutbreak(plant, entityId, category, gameDay);
+
+      // Check for new pest infestations (low probability)
+      this.checkPestInfestation(plant, entityId, category, gameDay, world);
     }
   }
 
   /**
    * Get current game day from TimeSystem
-   * PERFORMANCE: Caches result per frame to avoid repeated time entity queries
+   * PERFORMANCE: Uses cached time entity ID for O(1) lookup
    */
   private getCurrentGameDay(world: World): number {
     // Check if already cached for this tick
@@ -265,14 +367,31 @@ export class PlantDiseaseSystem extends BaseSystem {
       return this.cachedGameDay;
     }
 
-    // Query TimeSystem for actual game day
+    // Try cached time entity first
+    if (this.timeEntityId) {
+      const timeEntity = world.getEntity(this.timeEntityId);
+      if (timeEntity) {
+        const timeComp = timeEntity.components.get('time') as { day?: number } | undefined;
+        if (timeComp && typeof timeComp.day === 'number') {
+          this.cachedGameDay = timeComp.day;
+          this.cachedGameDayTick = world.tick;
+          return this.cachedGameDay;
+        }
+      } else {
+        // Entity no longer exists, clear cache
+        this.timeEntityId = null;
+      }
+    }
+
+    // Fall back to query if no cached ID
     const timeEntities = world.query().with(CT.Time).executeEntities();
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0];
       if (timeEntity) {
+        // Cache the entity ID for future lookups
+        this.timeEntityId = timeEntity.id;
         const timeComp = timeEntity.components.get('time') as { day?: number } | undefined;
         if (timeComp && typeof timeComp.day === 'number') {
-          // Cache the result
           this.cachedGameDay = timeComp.day;
           this.cachedGameDayTick = world.tick;
           return this.cachedGameDay;
