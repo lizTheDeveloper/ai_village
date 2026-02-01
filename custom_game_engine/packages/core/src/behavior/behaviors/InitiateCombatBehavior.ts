@@ -35,6 +35,51 @@ export interface InitiateCombatState {
   surprise?: boolean;
 }
 
+/** Valid cause values for type guard validation */
+const VALID_COMBAT_CAUSES = [
+  'jealousy_rival', 'jealousy_infidelity', 'jealousy_ex',
+  'honor_duel', 'territory_dispute', 'revenge', 'defense',
+  'courtship_display', 'robbery'
+] as const;
+
+/**
+ * Type guard for InitiateCombatState.
+ * Validates the behavior state has required fields at runtime.
+ */
+function isInitiateCombatState(state: unknown): state is InitiateCombatState {
+  if (typeof state !== 'object' || state === null) {
+    return false;
+  }
+  const obj = state as Record<string, unknown>;
+  if (typeof obj.targetId !== 'string') {
+    return false;
+  }
+  // cause is required and must be a valid value
+  if (typeof obj.cause !== 'string' || !VALID_COMBAT_CAUSES.includes(obj.cause as typeof VALID_COMBAT_CAUSES[number])) {
+    return false;
+  }
+  // Optional boolean fields
+  if (obj.lethal !== undefined && typeof obj.lethal !== 'boolean') {
+    return false;
+  }
+  if (obj.surprise !== undefined && typeof obj.surprise !== 'boolean') {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Partial type guard for InitiateCombatState that allows missing cause.
+ * Used when 'challenge' default is acceptable.
+ */
+function hasRequiredCombatFields(state: unknown): state is { targetId: string; cause?: string; lethal?: boolean; surprise?: boolean } {
+  if (typeof state !== 'object' || state === null) {
+    return false;
+  }
+  const obj = state as Record<string, unknown>;
+  return typeof obj.targetId === 'string';
+}
+
 export class InitiateCombatBehavior extends BaseBehavior {
   public readonly name = 'initiate_combat' as const;
 
@@ -48,20 +93,16 @@ export class InitiateCombatBehavior extends BaseBehavior {
       };
     }
 
-    // Read behavior state from agent component
-    // Type guard: Validate state structure at runtime
-    const state = agent.behaviorState;
-    if (!state || typeof state !== 'object' || !('targetId' in state)) {
+    // Read behavior state from agent component with runtime validation
+    if (!hasRequiredCombatFields(agent.behaviorState)) {
       return {
         complete: true,
         reason: 'Missing combat target in behaviorState',
       };
     }
 
-    // Safe double-cast pattern: unknown intermediary validates type compatibility
-    const typedState = state as unknown as InitiateCombatState;
-
-    const { targetId, cause = 'challenge', lethal = false, surprise = false } = typedState;
+    // After type guard, behaviorState is narrowed to have required fields
+    const { targetId, cause = 'challenge', lethal = false, surprise = false } = agent.behaviorState;
 
     // Validate target exists
     const target = world.getEntity(targetId);
@@ -168,13 +209,12 @@ export function initiateCombatBehavior(entity: EntityImpl, world: World): void {
 export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
   // Read behavior state with runtime type validation
   const state = ctx.getAllState();
-  if (!state || typeof state !== 'object' || !('targetId' in state)) {
+  if (!hasRequiredCombatFields(state)) {
     return ctx.complete('Missing combat target in behaviorState');
   }
 
-  // Cast to typed state - structure validated by runtime checks above
-  const typedState = state as unknown as InitiateCombatState;
-  const { targetId, cause = 'challenge', lethal = false, surprise = false } = typedState;
+  // After type guard, state is narrowed to have required fields
+  const { targetId, cause = 'challenge', lethal = false, surprise = false } = state;
 
   // Validate target exists and is an agent
   const target = ctx.getEntity(targetId);

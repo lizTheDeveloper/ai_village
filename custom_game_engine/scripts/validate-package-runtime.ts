@@ -168,29 +168,104 @@ class PackageValidator {
 
       case 'renderer':
         console.log('🎨 Validating renderer package...');
-        // TODO: Validate sprite assets exist
-        // TODO: Validate animation metadata
-        warnings.push('Renderer-specific validation not yet implemented');
+        {
+          const assetsDir = join(rootDir, 'packages', 'renderer', 'assets');
+          const spritesDir = join(assetsDir, 'sprites');
+
+          if (!fs.existsSync(assetsDir)) {
+            errors.push(`Renderer assets directory not found: ${assetsDir}`);
+          } else if (!fs.existsSync(spritesDir)) {
+            errors.push(`Renderer sprites directory not found: ${spritesDir}`);
+          } else {
+            console.log('  ✓ Sprite assets directory exists');
+          }
+        }
         break;
 
       case 'llm':
         console.log('🤖 Validating LLM package...');
-        // TODO: Validate prompt templates
-        // TODO: Check API key configuration
-        warnings.push('LLM-specific validation not yet implemented');
+        {
+          const llmSrcDir = join(rootDir, 'packages', 'llm', 'src');
+          const requiredPromptBuilders = [
+            'ExecutorPromptBuilder.ts',
+            'TrajectoryPromptBuilder.ts',
+            'GovernorPromptBuilder.ts',
+          ];
+
+          let allPresent = true;
+          for (const builder of requiredPromptBuilders) {
+            const path = join(llmSrcDir, builder);
+            if (!fs.existsSync(path)) {
+              errors.push(`Missing prompt builder: ${builder}`);
+              allPresent = false;
+            }
+          }
+
+          if (allPresent) {
+            console.log('  ✓ All prompt builders present');
+          }
+
+          // Note: API key configuration is runtime-dependent, not validated here
+        }
         break;
 
       case 'world':
         console.log('🌍 Validating world package...');
-        // TODO: Validate entity schemas
-        warnings.push('World-specific validation not yet implemented');
+        {
+          const entitiesDir = join(rootDir, 'packages', 'world', 'src', 'entities');
+          const alienGenDir = join(
+            rootDir,
+            'packages',
+            'world',
+            'src',
+            'alien-generation'
+          );
+
+          if (!fs.existsSync(entitiesDir)) {
+            errors.push(`Entities directory not found: ${entitiesDir}`);
+          } else {
+            const entityFiles = fs
+              .readdirSync(entitiesDir)
+              .filter((f: string) => f.endsWith('.ts'));
+            if (entityFiles.length === 0) {
+              errors.push('No entity schema files found in entities directory');
+            } else {
+              console.log(`  ✓ Found ${entityFiles.length} entity files`);
+            }
+          }
+
+          if (!fs.existsSync(alienGenDir)) {
+            warnings.push(`Alien generation directory not found: ${alienGenDir}`);
+          } else {
+            console.log('  ✓ Alien generation module present');
+          }
+        }
         break;
 
       case 'building-designer':
         console.log('🏗️  Validating building-designer package...');
-        // TODO: Validate voxel layouts
-        // TODO: Check material definitions
-        warnings.push('Building-designer-specific validation not yet implemented');
+        {
+          const srcDir = join(rootDir, 'packages', 'building-designer', 'src');
+          const requiredFiles = [
+            'types.ts',
+            'material-effects.ts',
+            'building-library.ts',
+            'validator.ts',
+          ];
+
+          let allPresent = true;
+          for (const file of requiredFiles) {
+            const path = join(srcDir, file);
+            if (!fs.existsSync(path)) {
+              errors.push(`Missing required file: ${file}`);
+              allPresent = false;
+            }
+          }
+
+          if (allPresent) {
+            console.log('  ✓ All building-designer core files present');
+          }
+        }
         break;
 
       default:

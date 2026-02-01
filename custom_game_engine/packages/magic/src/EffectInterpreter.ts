@@ -14,6 +14,54 @@ import type {
 import { ExpressionEvaluator } from './ExpressionEvaluator.js';
 import type { Entity, World, WorldMutator, NeedsComponent, PositionComponent, Component } from '@ai-village/core';
 
+// ============================================================================
+// Magic Effect Components - Extend Component interface for proper typing
+// ============================================================================
+
+/**
+ * Stat modifier component applied by magic effects.
+ * Uses distinct type literals recognized by the ECS.
+ */
+interface StatModifierComponent extends Component {
+  type: 'stat_modifier' | 'stat_set';
+  stat: string;
+  amount?: number;
+  value?: number;
+  duration?: number;
+  expiresAt?: number;
+}
+
+/**
+ * Status effect component applied by magic effects.
+ */
+interface StatusEffectComponent extends Component {
+  type: 'status_effect';
+  status: string;
+  stacks: number;
+  duration: number;
+  expiresAt: number;
+}
+
+/**
+ * Transformation component applied by magic effects.
+ */
+interface TransformationComponent extends Component {
+  type: 'transformation';
+  toType: string;
+  duration?: number;
+  expiresAt?: number;
+  originalId: string;
+}
+
+/**
+ * Material transformation component applied by magic effects.
+ */
+interface MaterialTransformationComponent extends Component {
+  type: 'material_transformation';
+  from: string;
+  to: string;
+}
+
 export interface EffectContext {
   caster: Entity;
   target: Entity;
@@ -381,8 +429,8 @@ export class EffectInterpreter {
       expiresAt: duration > 0 ? context.tick + duration : undefined,
     };
 
-    const modifierComp = { ...modifier, version: 1 };
-    (context.world as WorldMutator).addComponent(context.target.id, modifierComp as unknown as Component);
+    const modifierComp: StatModifierComponent = { ...modifier, version: 1 };
+    (context.world as WorldMutator).addComponent(context.target.id, modifierComp);
     this.modifications.push(modifier);
   }
 
@@ -402,8 +450,8 @@ export class EffectInterpreter {
       value,
     };
 
-    const modifierComp = { ...modifier, version: 1 };
-    (context.world as WorldMutator).addComponent(context.target.id, modifierComp as unknown as Component);
+    const modifierComp: StatModifierComponent = { ...modifier, version: 1 };
+    (context.world as WorldMutator).addComponent(context.target.id, modifierComp);
   }
 
   // ============================================================================
@@ -426,8 +474,8 @@ export class EffectInterpreter {
       expiresAt: context.tick + duration,
     };
 
-    const statusComp = { ...statusEffect, version: 1 };
-    (context.world as WorldMutator).addComponent(context.target.id, statusComp as unknown as Component);
+    const statusComp: StatusEffectComponent = { ...statusEffect, version: 1 };
+    (context.world as WorldMutator).addComponent(context.target.id, statusComp);
     this.statusesApplied.push(statusEffect);
   }
 
@@ -585,7 +633,7 @@ export class EffectInterpreter {
       throw new Error(`Invalid entity type: ${operation.toType}`);
     }
 
-    const transformation = {
+    const transformation: TransformationComponent = {
       type: 'transformation' as const,
       toType: operation.toType,
       duration: operation.duration,
@@ -594,19 +642,19 @@ export class EffectInterpreter {
       version: 1,
     };
 
-    (context.world as WorldMutator).addComponent(context.target.id, transformation as unknown as Component);
+    (context.world as WorldMutator).addComponent(context.target.id, transformation);
   }
 
   private executeTransformMaterial(operation: TransformMaterialOp, context: EffectContext): void {
     // Material transformation logic
-    const transformation = {
+    const transformation: MaterialTransformationComponent = {
       type: 'material_transformation' as const,
       from: operation.from,
       to: operation.to,
       version: 1,
     };
 
-    (context.world as WorldMutator).addComponent(context.target.id, transformation as unknown as Component);
+    (context.world as WorldMutator).addComponent(context.target.id, transformation);
   }
 
   // ============================================================================

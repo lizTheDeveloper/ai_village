@@ -1,8 +1,11 @@
 /**
  * Behaviors Index
  *
- * Exports all behavior classes and standalone functions for use with
+ * Exports all behavior classes and WithContext functions for use with
  * the BehaviorRegistry and AgentBrainSystem.
+ *
+ * NOTE: Legacy standalone behavior functions (e.g., wanderBehavior) have been removed.
+ * Use the *WithContext versions instead (e.g., wanderBehaviorWithContext).
  *
  * Part of the AISystem decomposition (work-order: ai-system-refactor)
  */
@@ -11,49 +14,45 @@
 export { BaseBehavior, type BehaviorResult, type IBehavior } from './BaseBehavior.js';
 
 // Simple behaviors
-export { WanderBehavior, wanderBehavior, wanderBehaviorWithContext } from './WanderBehavior.js';
-export { IdleBehavior, idleBehavior, idleBehaviorWithContext } from './IdleBehavior.js';
+export { WanderBehavior, wanderBehaviorWithContext } from './WanderBehavior.js';
+export { IdleBehavior, idleBehaviorWithContext } from './IdleBehavior.js';
 
 // Idle & reflection behaviors
-export { ReflectBehavior, reflectBehavior, reflectBehaviorWithContext } from './ReflectBehavior.js';
-export { ObserveBehavior, observeBehavior, observeBehaviorWithContext } from './ObserveBehavior.js';
-export { SitQuietlyBehavior, sitQuietlyBehavior, sitQuietlyBehaviorWithContext } from './SitQuietlyBehavior.js';
-export { AmuseSelfBehavior, amuseSelfBehavior, amuseSelfBehaviorWithContext } from './AmuseSelfBehavior.js';
-export { PracticeSkillBehavior, practiceSkillBehavior, practiceSkillBehaviorWithContext } from './PracticeSkillBehavior.js';
+export { ReflectBehavior, reflectBehaviorWithContext } from './ReflectBehavior.js';
+export { ObserveBehavior, observeBehaviorWithContext } from './ObserveBehavior.js';
+export { SitQuietlyBehavior, sitQuietlyBehaviorWithContext } from './SitQuietlyBehavior.js';
+export { AmuseSelfBehavior, amuseSelfBehaviorWithContext } from './AmuseSelfBehavior.js';
+export { PracticeSkillBehavior, practiceSkillBehaviorWithContext } from './PracticeSkillBehavior.js';
 
 // Sleep behaviors
 export {
   SeekSleepBehavior,
   ForcedSleepBehavior,
-  seekSleepBehavior,
-  forcedSleepBehavior,
   seekSleepBehaviorWithContext,
   forcedSleepBehaviorWithContext,
 } from './SleepBehavior.js';
 
 // Resource behaviors
-export { GatherBehavior, gatherBehavior, gatherBehaviorWithContext } from './GatherBehavior.js';
-export { DepositItemsBehavior, depositItemsBehavior, depositItemsBehaviorWithContext } from './DepositItemsBehavior.js';
-export { SeekFoodBehavior, seekFoodBehavior, seekFoodBehaviorWithContext } from './SeekFoodBehavior.js';
+export { GatherBehavior, gatherBehaviorWithContext } from './GatherBehavior.js';
+export { DepositItemsBehavior, depositItemsBehaviorWithContext } from './DepositItemsBehavior.js';
+export { SeekFoodBehavior, seekFoodBehaviorWithContext } from './SeekFoodBehavior.js';
 
 // Social behaviors
-export { FollowAgentBehavior, followAgentBehavior, followAgentBehaviorWithContext } from './FollowAgentBehavior.js';
-export { TalkBehavior, talkBehavior, talkBehaviorWithContext } from './TalkBehavior.js';
+export { FollowAgentBehavior, followAgentBehaviorWithContext } from './FollowAgentBehavior.js';
+export { TalkBehavior, talkBehaviorWithContext } from './TalkBehavior.js';
 export {
   CallMeetingBehavior,
   AttendMeetingBehavior,
-  callMeetingBehavior,
-  attendMeetingBehavior,
   callMeetingBehaviorWithContext,
   attendMeetingBehaviorWithContext,
 } from './MeetingBehaviors.js';
 
 // Combat behaviors
-export { InitiateCombatBehavior, initiateCombatBehavior, initiateCombatBehaviorWithContext } from './InitiateCombatBehavior.js';
+export { InitiateCombatBehavior, initiateCombatBehaviorWithContext } from './InitiateCombatBehavior.js';
 
 // Hunting behaviors
-export { InitiateHuntBehavior, initiateHuntBehavior, initiateHuntBehaviorWithContext } from './InitiateHuntBehavior.js';
-export { ButcherBehavior, butcherBehavior, butcherBehaviorWithContext } from './ButcherBehavior.js';
+export { InitiateHuntBehavior, initiateHuntBehaviorWithContext } from './InitiateHuntBehavior.js';
+export { ButcherBehavior, butcherBehaviorWithContext } from './ButcherBehavior.js';
 
 // Farm behaviors
 export {
@@ -62,11 +61,6 @@ export {
   PlantBehavior,
   WaterBehavior,
   HarvestBehavior,
-  farmBehavior,
-  tillBehavior,
-  plantBehavior,
-  waterBehavior,
-  harvestBehavior,
   farmBehaviorWithContext,
   tillBehaviorWithContext,
   plantBehaviorWithContext,
@@ -75,24 +69,24 @@ export {
 } from './FarmBehaviors.js';
 
 // Build behaviors
-export { BuildBehavior, buildBehavior, buildBehaviorWithContext } from './BuildBehavior.js';
+export { BuildBehavior, buildBehaviorWithContext } from './BuildBehavior.js';
 
 // Crafting behaviors
-export { CraftBehavior, craftBehavior, craftBehaviorWithContext } from './CraftBehavior.js';
+export { CraftBehavior, craftBehaviorWithContext } from './CraftBehavior.js';
 
 // Research behaviors
-export { ResearchBehavior, researchBehavior, researchBehaviorWithContext } from './ResearchBehavior.js';
+export { ResearchBehavior, researchBehaviorWithContext } from './ResearchBehavior.js';
 
 // Trade behaviors
-export { TradeBehavior, tradeBehavior, tradeBehaviorWithContext } from './TradeBehavior.js';
+export { TradeBehavior, tradeBehaviorWithContext } from './TradeBehavior.js';
 
 // Magic behaviors
-export { CastSpellBehavior, castSpellBehavior, castSpellBehaviorWithContext } from './CastSpellBehavior.js';
+export { CastSpellBehavior, castSpellBehaviorWithContext } from './CastSpellBehavior.js';
 
 // Survival behaviors
-export { SeekWarmthBehavior, seekWarmthBehavior, seekWarmthBehaviorWithContext } from './SeekWarmthBehavior.js';
-export { SeekCoolingBehavior, seekCoolingBehavior, seekCoolingBehaviorWithContext } from './SeekCoolingBehavior.js';
-export { FleeToHomeBehavior, fleeToHomeBehavior, fleeToHomeBehaviorWithContext } from './FleeToHomeBehavior.js';
+export { SeekWarmthBehavior, seekWarmthBehaviorWithContext } from './SeekWarmthBehavior.js';
+export { SeekCoolingBehavior, seekCoolingBehaviorWithContext } from './SeekCoolingBehavior.js';
+export { FleeToHomeBehavior, fleeToHomeBehaviorWithContext } from './FleeToHomeBehavior.js';
 
 // Navigation behaviors
 export {
@@ -100,10 +94,6 @@ export {
   ExploreFrontierBehavior,
   ExploreSpiralBehavior,
   FollowGradientBehavior,
-  navigateBehavior,
-  exploreFrontierBehavior,
-  exploreSpiralBehavior,
-  followGradientBehavior,
   navigateBehaviorWithContext,
   exploreFrontierBehaviorWithContext,
   exploreSpiralBehaviorWithContext,
@@ -114,8 +104,6 @@ export {
 export {
   TameAnimalBehavior,
   HouseAnimalBehavior,
-  tameAnimalBehavior,
-  houseAnimalBehavior,
   tameAnimalBehaviorWithContext,
   houseAnimalBehaviorWithContext,
 } from './AnimalBehaviors.js';
@@ -126,9 +114,9 @@ export * from './GroupPrayBehavior.js';
 export * from './MeditateBehavior.js';
 
 // Building maintenance behaviors
-export { RepairBehavior, repairBehavior, repairBehaviorWithContext } from './RepairBehavior.js';
+export { RepairBehavior, repairBehaviorWithContext } from './RepairBehavior.js';
 export * from './UpgradeBehavior.js';
 
 // Tile-Based Voxel Building Behaviors (Phase 4)
-export { MaterialTransportBehavior, materialTransportBehavior, materialTransportBehaviorWithContext } from './MaterialTransportBehavior.js';
-export { TileBuildBehavior, tileBuildBehavior, tileBuildBehaviorWithContext } from './TileBuildBehavior.js';
+export { MaterialTransportBehavior, materialTransportBehaviorWithContext } from './MaterialTransportBehavior.js';
+export { TileBuildBehavior, tileBuildBehaviorWithContext } from './TileBuildBehavior.js';

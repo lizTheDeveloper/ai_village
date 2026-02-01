@@ -921,7 +921,7 @@ export class LiveEntityAPI {
     };
 
     try {
-      const cityInfo = await spawnCity(this.world as any, config);
+      const cityInfo = await spawnCity(this.world as WorldMutator, config);
 
       return {
         requestId: action.requestId,

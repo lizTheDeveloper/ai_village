@@ -25,6 +25,28 @@ export interface InitiateHuntState {
   reason?: 'food' | 'practice' | 'resources';
 }
 
+/**
+ * Type guard for InitiateHuntState.
+ * Validates the behavior state has required fields at runtime.
+ */
+function isInitiateHuntState(state: unknown): state is InitiateHuntState {
+  if (typeof state !== 'object' || state === null) {
+    return false;
+  }
+  const obj = state as Record<string, unknown>;
+  if (typeof obj.targetId !== 'string') {
+    return false;
+  }
+  // Optional reason field must be one of the valid values if present
+  if (obj.reason !== undefined &&
+      obj.reason !== 'food' &&
+      obj.reason !== 'practice' &&
+      obj.reason !== 'resources') {
+    return false;
+  }
+  return true;
+}
+
 export class InitiateHuntBehavior extends BaseBehavior {
   public readonly name = 'hunt' as const;
 
@@ -38,16 +60,15 @@ export class InitiateHuntBehavior extends BaseBehavior {
       };
     }
 
-    // Read behavior state from agent component
-    const state = agent.behaviorState as unknown as InitiateHuntState | undefined;
-    if (!state || !state.targetId) {
+    // Read behavior state from agent component with runtime validation
+    if (!isInitiateHuntState(agent.behaviorState)) {
       return {
         complete: true,
         reason: 'Missing hunt target in behaviorState',
       };
     }
 
-    const { targetId, reason = 'food' } = state;
+    const { targetId, reason = 'food' } = agent.behaviorState;
 
     // Validate target exists
     const target = world.getEntity(targetId);
@@ -126,9 +147,9 @@ export function initiateHuntBehavior(entity: EntityImpl, world: World): void {
  * @example registerBehaviorWithContext('hunt', initiateHuntBehaviorWithContext);
  */
 export function initiateHuntBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  // Read behavior state
-  const state = ctx.getAllState() as unknown as InitiateHuntState | undefined;
-  if (!state || !state.targetId) {
+  // Read behavior state with runtime validation
+  const state = ctx.getAllState();
+  if (!isInitiateHuntState(state)) {
     return ctx.complete('Missing hunt target in behaviorState');
   }
 

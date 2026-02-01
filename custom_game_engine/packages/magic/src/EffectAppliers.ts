@@ -38,6 +38,37 @@ import { SoulEffectApplier } from './appliers/SoulEffectApplier.js';
 import { ParadigmEffectApplier } from './appliers/ParadigmEffectApplier.js';
 
 // ============================================================================
+// Magic Component Extended Interface for Protection Effects
+// ============================================================================
+
+/**
+ * Protection shield data stored in magic component
+ */
+interface ProtectionShieldData {
+  id: string;
+  effectId: string;
+  spellId: string;
+  casterId: string;
+  absorption: number;
+  remainingAbsorption: number;
+  damageReduction: number;
+  protectsAgainst?: string[];
+  appliedAt: number;
+  expiresAt?: number;
+}
+
+/**
+ * Extended magic component interface that includes protection shields.
+ * Used for type-safe access to protection-related magic component data.
+ */
+interface MagicComponentWithProtection {
+  type: 'magic';
+  version: number;
+  protectionShields?: ProtectionShieldData[];
+  activeEffects?: string[];
+}
+
+// ============================================================================
 // Damage Applier
 // ============================================================================
 
@@ -246,26 +277,24 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
 
     // Apply shield/ward to target's magic component
     // Create magic component if it doesn't exist (defensive programming)
-    let magic = target.components.get('magic');
+    let magic = target.components.get('magic') as MagicComponentWithProtection | undefined;
     if (!magic || magic.type !== 'magic') {
-      const newMagic = {
+      const newMagic: MagicComponentWithProtection = {
         type: 'magic' as const,
         version: 1,
         protectionShields: [],
         activeEffects: [],
       };
       (world as WorldMutator).addComponent(target.id, newMagic);
-      magic = target.components.get('magic')!;
+      magic = target.components.get('magic') as MagicComponentWithProtection;
     }
 
     // Store protection shield data
-    const magicRecord = magic as unknown as Record<string, unknown>;
-    const shields = magicRecord.protectionShields as Array<Record<string, unknown>> | undefined;
-    if (!shields) {
-      magicRecord.protectionShields = [];
+    if (!magic.protectionShields) {
+      magic.protectionShields = [];
     }
 
-    const shieldData = {
+    const shieldData: ProtectionShieldData = {
       id: `${effect.id}_${context.tick}`,
       effectId: effect.id,
       spellId: context.spell.id,
@@ -278,14 +307,13 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       expiresAt: context.spell.duration ? context.tick + context.spell.duration : undefined,
     };
 
-    (magicRecord.protectionShields as Array<Record<string, unknown>>).push(shieldData);
+    magic.protectionShields.push(shieldData);
 
     // Add to active effects list for tracking
-    const activeEffects = magicRecord.activeEffects as string[] | undefined;
-    if (activeEffects && !activeEffects.includes(effect.id)) {
-      activeEffects.push(effect.id);
-    } else if (!activeEffects) {
-      magicRecord.activeEffects = [effect.id];
+    if (magic.activeEffects && !magic.activeEffects.includes(effect.id)) {
+      magic.activeEffects.push(effect.id);
+    } else if (!magic.activeEffects) {
+      magic.activeEffects = [effect.id];
     }
 
     return {

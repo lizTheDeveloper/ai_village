@@ -96,7 +96,7 @@ export class PlantSystem extends BaseSystem {
   private readonly HOUR_THRESHOLD = PLANT_CONSTANTS.HOUR_THRESHOLD; // Update plants once per day
   private lastUpdateLog: number = 0;
 
-  // Track entity IDs for plants (to avoid using 'as any')
+  // Track entity IDs for plants (for cross-reference in events)
   private plantEntityIds: WeakMap<PlantComponent, string> = new WeakMap();
 
   protected onInitialize(world: World, eventBus: EventBus): void {
@@ -254,7 +254,7 @@ export class PlantSystem extends BaseSystem {
     // Filter entities using SimulationScheduler - only process visible plants (if we have hours to process)
     // Note: Planted crops are handled specially below (always simulate)
     const visibleEntities = shouldUpdate && hoursToProcess > 0
-      ? world.simulationScheduler.filterActiveEntities(entities as unknown as Entity[], world.tick)
+      ? world.simulationScheduler.filterActiveEntities(entities, world.tick)
       : [];
 
     // Build set of visible entity IDs for quick lookup

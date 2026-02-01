@@ -179,16 +179,6 @@ export class VisionDeliverySystem {
     this.llmGenerator = generator;
   }
 
-  /**
-   * Emit an event using generic type to avoid strict type checking
-   */
-  private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
-    this.world.eventBus.emit({
-      type: type as any,
-      source,
-      data,
-    });
-  }
 
   /**
    * Calculate the cost of sending a vision
@@ -265,7 +255,18 @@ export class VisionDeliverySystem {
       wasReceived: false,
     });
 
-    this.emitEvent('divinity:vision_queued', deityEntity.id, { vision });
+    this.world.eventBus.emit<'divinity:vision_queued'>({
+      type: 'divinity:vision_queued',
+      source: deityEntity.id,
+      data: {
+        visionId,
+        deityId: deityEntity.id,
+        targetId,
+        visionType: method,
+        purpose,
+        beliefCost: cost,
+      },
+    });
 
     return { success: true, visionId };
   }

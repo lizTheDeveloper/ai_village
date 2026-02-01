@@ -34,6 +34,28 @@ export interface ButcherState {
   reason?: 'food' | 'culling' | 'mercy';
 }
 
+/**
+ * Type guard for ButcherState.
+ * Validates the behavior state has required fields at runtime.
+ */
+function isButcherState(state: unknown): state is ButcherState {
+  if (typeof state !== 'object' || state === null) {
+    return false;
+  }
+  const obj = state as Record<string, unknown>;
+  if (typeof obj.targetId !== 'string') {
+    return false;
+  }
+  // Optional reason field must be one of the valid values if present
+  if (obj.reason !== undefined &&
+      obj.reason !== 'food' &&
+      obj.reason !== 'culling' &&
+      obj.reason !== 'mercy') {
+    return false;
+  }
+  return true;
+}
+
 export class ButcherBehavior extends BaseBehavior {
   public readonly name = 'butcher' as const;
 
@@ -47,16 +69,15 @@ export class ButcherBehavior extends BaseBehavior {
       };
     }
 
-    // Read behavior state from agent component
-    const state = agent.behaviorState as unknown as ButcherState | undefined;
-    if (!state || !state.targetId) {
+    // Read behavior state from agent component with runtime validation
+    if (!isButcherState(agent.behaviorState)) {
       return {
         complete: true,
         reason: 'Missing butcher target in behaviorState',
       };
     }
 
-    const { targetId, reason = 'food' } = state;
+    const { targetId, reason = 'food' } = agent.behaviorState;
 
     // Check for nearby butchering table
     const buildingTargeting = new BuildingTargeting();
@@ -271,9 +292,9 @@ function calculateButcheringQuality(
  * BehaviorContext doesn't expose these APIs yet, so we use internal access as a temporary measure.
  */
 export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
-  // Read behavior state
-  const state = ctx.getAllState() as unknown as ButcherState | undefined;
-  if (!state || !state.targetId) {
+  // Read behavior state with runtime validation
+  const state = ctx.getAllState();
+  if (!isButcherState(state)) {
     return ctx.complete('Missing butcher target in behaviorState');
   }
 
