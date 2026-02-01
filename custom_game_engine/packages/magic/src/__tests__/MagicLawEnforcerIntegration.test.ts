@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MagicLawEnforcer } from '../MagicLawEnforcer.js';
-import { ACADEMIC_PARADIGM } from '../CoreParadigms.js';
+import { ACADEMIC_PARADIGM, getCoreParadigm } from '../CoreParadigms.js';
 import { costCalculatorRegistry } from '../costs/CostCalculatorRegistry.js';
 import type { ComposedSpell, MagicComponent, CastingContext } from '@ai-village/core';
 import { registerAllCostCalculators } from '../costs/index.js';
@@ -265,8 +265,8 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
     expect(mishapRisk?.probability).toBeGreaterThan(0);
   });
 
-  it.skip('should assess corruption risks for dark magic', () => {
-    // TODO: Debug why pact paradigm has empty risks array in test environment
+  it('should assess corruption risks for dark magic', () => {
+    // Fixed: Now uses real getCoreParadigm import from CoreParadigms.js
     const mockCaster: MagicComponent = {
       knownParadigmIds: ['pact'],
       activeParadigms: ['pact'],
@@ -279,11 +279,6 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
     } as unknown;
 
     const pactParadigm = getCoreParadigm('pact');
-    console.log('Pact paradigm:', JSON.stringify({
-      id: pactParadigm.id,
-      risksCount: pactParadigm.risks?.length ?? 'undefined',
-      risks: pactParadigm.risks,
-    }, null, 2));
     const pactEnforcer = new MagicLawEnforcer(pactParadigm);
     const darkSpell: ComposedSpell = {
       id: 'drain_soul',
@@ -306,13 +301,6 @@ describe('MagicLawEnforcer - Risk Assessment', () => {
     });
 
     // Should have risks evaluated (pact paradigm has multiple risks)
-    console.log('Result validity:', result.valid);
-    console.log('Result errors:', result.errors);
-    console.log('Result risks count:', result.risks.length);
-    if (result.risks.length > 0) {
-      console.log('Risks:', result.risks.map(r => ({ trigger: r.risk.trigger, consequence: r.risk.consequence })));
-    }
-
     expect(result.risks).toBeDefined();
     expect(result.risks.length).toBeGreaterThan(0);
 
@@ -400,63 +388,5 @@ describe('MagicLawEnforcer - Spell Modification', () => {
   });
 });
 
-// Helper function
-function getCoreParadigm(id: string): any {
-  const paradigms: any = {
-    blood: {
-      id: 'blood',
-      name: 'Blood Magic',
-      costs: [
-        { type: 'blood', canBeTerminal: true },
-        { type: 'health', canBeTerminal: true },
-        { type: 'corruption', canBeTerminal: true, cumulative: true },
-      ],
-      laws: [],
-      sources: [],
-      channels: [],
-      risks: [],
-      acquisitionMethods: [],
-    },
-    names: {
-      id: 'names',
-      name: 'True Names',
-      costs: [
-        { type: 'sanity', canBeTerminal: true },
-        { type: 'attention', cumulative: true },
-      ],
-      laws: [],
-      sources: [],
-      channels: [],
-      risks: [],
-      acquisitionMethods: [],
-    },
-    pact: {
-      id: 'pact',
-      name: 'Pact Magic',
-      costs: [
-        { type: 'favor', canBeTerminal: true },
-        { type: 'corruption', canBeTerminal: true, cumulative: true },
-        { type: 'soul_fragment', canBeTerminal: true },
-      ],
-      laws: [],
-      sources: [],
-      channels: [],
-      risks: [],
-      acquisitionMethods: [],
-    },
-    divine: {
-      id: 'divine',
-      name: 'Divine Magic',
-      costs: [
-        { type: 'favor', canBeTerminal: true },
-        { type: 'karma' },
-      ],
-      laws: [],
-      sources: [],
-      channels: [],
-      risks: [],
-      acquisitionMethods: [],
-    },
-  };
-  return paradigms[id];
-}
+// Note: getCoreParadigm is now imported from '../CoreParadigms.js'
+// The previously local helper function with empty mock data has been removed.

@@ -706,10 +706,17 @@ export function getVictoryMultiplier(
 
 /**
  * Check if a challenge can be declined.
+ * Certain special abilities allow declining even compulsory challenges:
+ * - loophole-finder: Find exploitable gaps in challenge rules to decline
+ * - game-master: As arbiter of games, can refuse to participate
  */
-export function canDeclineChallenge(_unlockedNodes: Set<string>, isCompulsory: boolean): boolean {
+export function canDeclineChallenge(unlockedNodes: Set<string>, isCompulsory: boolean): boolean {
   if (!isCompulsory) return true;
-  // TODO: Compulsory challenges can be declined with special abilities (check _unlockedNodes)
+
+  // Special abilities that allow declining compulsory challenges
+  if (unlockedNodes.has('loophole-finder')) return true;  // Find a loophole to escape
+  if (unlockedNodes.has('game-master')) return true;      // Master of games can refuse
+
   return false;
 }
 

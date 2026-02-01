@@ -651,6 +651,9 @@ export interface ActiveEffect {
 
   /** Power level of the effect (used for dispel resistance) */
   power?: number;
+
+  /** Summoned entity IDs (for summon effects - used for tracking and cleanup) */
+  summonedEntities?: string[];
 }
 
 // ============================================================================

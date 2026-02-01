@@ -262,15 +262,9 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     }
   }
 
-  private extractSummonedEntityIds(_activeEffect: ActiveEffect): string[] {
-    // TODO: Summon tracking needs proper implementation
-    // ActiveEffect.appliedValues is Record<string, number>, so we cannot store entity IDs
-    // Options:
-    // 1. Add summonedEntities?: string[] field to ActiveEffect interface
-    // 2. Create a separate SummonTracker component on the caster
-    // 3. Use a world-level registry to track summons by effect instance ID
-    // For now, return empty array - summons won't be auto-despawned on effect expiry
-    return [];
+  private extractSummonedEntityIds(activeEffect: ActiveEffect): string[] {
+    // Use the summonedEntities field added to ActiveEffect interface
+    return activeEffect.summonedEntities ?? [];
   }
 }
 

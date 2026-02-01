@@ -247,6 +247,8 @@ export class SpellEffectExecutor {
 
     // If successful and has duration, track as active effect
     if (result.success && effect.duration !== undefined) {
+      // Extract summonedEntities if present (from SummonEffectApplier)
+      const summonedEntities = (result as EffectApplicationResult & { summonedEntities?: string[] }).summonedEntities;
       this.addActiveEffect(target.id, {
         instanceId: this.generateInstanceId(),
         effectId: effect.id,
@@ -258,6 +260,7 @@ export class SpellEffectExecutor {
         appliedValues: result.appliedValues,
         paused: false,
         paradigmId: casterMagic.activeParadigmId,
+        summonedEntities,
       });
     }
 

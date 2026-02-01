@@ -148,11 +148,11 @@ You can identify any note, any voice, any rhythm with perfect accuracy. This
 is the first sign that you are no longer quite baseline.`,
     prerequisites: ['breath-sense'],
     unlockConditions: [
-      // TODO: Implement resource_accumulated condition type
-      // createUnlockCondition(
-      //   'resource_accumulated',
-      //   'Must possess at least 50 Breaths'
-      // ),
+      createUnlockCondition(
+        'resource_accumulated',
+        { resourceType: 'breath', resourceAmountRequired: 50 },
+        'Must possess at least 50 Breaths'
+      ),
     ],
     conditionMode: 'all',
     icon: '🎵',
