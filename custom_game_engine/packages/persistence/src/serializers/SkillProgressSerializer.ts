@@ -19,6 +19,12 @@ export class SkillProgressSerializer extends BaseComponentSerializer<SkillProgre
 
   protected deserializeData(data: unknown): SkillProgressComponent {
     const d = data as Record<string, unknown>;
+
+    // Validate required fields - throw on missing data per CLAUDE.md
+    if (typeof d.skillTreeState !== 'object' || d.skillTreeState === null) {
+      throw new Error('SkillProgressSerializer: missing required field "skillTreeState"');
+    }
+
     const comp = createSkillProgressComponent();
     // Validation already ensures skillTreeState exists as object - no fallback needed
     comp.skillTreeState = d.skillTreeState as Partial<Record<string, SkillTreeParadigmState>>;

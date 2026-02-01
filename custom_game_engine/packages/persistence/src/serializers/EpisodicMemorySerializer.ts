@@ -29,6 +29,14 @@ export class EpisodicMemorySerializer extends BaseComponentSerializer<EpisodicMe
   protected deserializeData(data: unknown): EpisodicMemoryComponent {
     const serialized = data as SerializedEpisodicMemory;
 
+    // Validate required fields - throw on missing data per CLAUDE.md
+    if (typeof serialized.maxMemories !== 'number') {
+      throw new Error('EpisodicMemorySerializer: missing required field "maxMemories"');
+    }
+    if (!Array.isArray(serialized.memories)) {
+      throw new Error('EpisodicMemorySerializer: missing required field "memories"');
+    }
+
     // Create new component instance
     const component = new EpisodicMemoryComponent({
       maxMemories: serialized.maxMemories,

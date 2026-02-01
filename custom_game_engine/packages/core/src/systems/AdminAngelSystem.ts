@@ -3274,7 +3274,7 @@ if u dont know something just say idk and figure it out together.`;
    * Download the export file (browser only)
    */
   private downloadExport(jsonContent: string, name: string): void {
-    // Only works in browser
+    // Only works in browser - no-op in headless environments
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       return;
     }

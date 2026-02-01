@@ -67,7 +67,7 @@ describe('PlantSystem', () => {
   let stateMutator: StateMutatorSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
@@ -75,7 +75,9 @@ describe('PlantSystem', () => {
     // Note: World doesn't have addSystem - we call system.update directly in tests
     stateMutator = new StateMutatorSystem();
 
-    system = new PlantSystem(eventBus);
+    system = new PlantSystem();
+    // Initialize system to set up event subscriptions
+    await system.initialize(world, eventBus);
     // Configure species lookup for all tests
     system.setSpeciesLookup(createMockSpeciesLookup());
   });
@@ -93,28 +95,31 @@ describe('PlantSystem', () => {
       expect(system.id).toBe('plant');
     });
 
-    it('should subscribe to weather events', () => {
+    it('should subscribe to weather events', async () => {
       const subscribeSpy = vi.spyOn(eventBus, 'subscribe');
-      new PlantSystem(eventBus);
+      const testSystem = new PlantSystem();
+      await testSystem.initialize(world, eventBus);
 
-      expect(subscribeSpy).toHaveBeenCalledWith('weather:rain', expect.any(Function));
-      expect(subscribeSpy).toHaveBeenCalledWith('weather:frost', expect.any(Function));
-      expect(subscribeSpy).toHaveBeenCalledWith('weather:changed', expect.any(Function));
+      expect(subscribeSpy).toHaveBeenCalledWith('weather:rain', expect.any(Function), undefined);
+      expect(subscribeSpy).toHaveBeenCalledWith('weather:frost', expect.any(Function), undefined);
+      expect(subscribeSpy).toHaveBeenCalledWith('weather:changed', expect.any(Function), undefined);
     });
 
-    it('should subscribe to soil events', () => {
+    it('should subscribe to soil events', async () => {
       const subscribeSpy = vi.spyOn(eventBus, 'subscribe');
-      new PlantSystem(eventBus);
+      const testSystem = new PlantSystem();
+      await testSystem.initialize(world, eventBus);
 
-      expect(subscribeSpy).toHaveBeenCalledWith('soil:moistureChanged', expect.any(Function));
-      expect(subscribeSpy).toHaveBeenCalledWith('soil:depleted', expect.any(Function));
+      expect(subscribeSpy).toHaveBeenCalledWith('soil:moistureChanged', expect.any(Function), undefined);
+      expect(subscribeSpy).toHaveBeenCalledWith('soil:depleted', expect.any(Function), undefined);
     });
 
-    it('should subscribe to time events', () => {
+    it('should subscribe to time events', async () => {
       const subscribeSpy = vi.spyOn(eventBus, 'subscribe');
-      new PlantSystem(eventBus);
+      const testSystem = new PlantSystem();
+      await testSystem.initialize(world, eventBus);
 
-      expect(subscribeSpy).toHaveBeenCalledWith('time:day_changed', expect.any(Function));
+      expect(subscribeSpy).toHaveBeenCalledWith('time:day_changed', expect.any(Function), undefined);
     });
   });
 

@@ -185,9 +185,6 @@ export class MemoryProfiler {
     // Record baseline heap usage
     const baseline = this.measureMemory();
     this.baselineHeap = baseline.heapUsed;
-
-    console.log('[MemoryProfiler] Started profiling at tick', world.tick);
-    console.log('[MemoryProfiler] Baseline heap usage:', this.formatBytes(this.baselineHeap));
   }
 
   /**
@@ -199,10 +196,6 @@ export class MemoryProfiler {
     }
 
     this.isProfiling = false;
-
-    const duration = Date.now() - this.startTime;
-    console.log('[MemoryProfiler] Stopped profiling after', this.formatDuration(duration));
-    console.log('[MemoryProfiler] Collected', this.sampleBufferIndex, 'samples');
   }
 
   /**

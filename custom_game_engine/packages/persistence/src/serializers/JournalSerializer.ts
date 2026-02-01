@@ -29,6 +29,11 @@ export class JournalSerializer extends BaseComponentSerializer<JournalComponent>
   protected deserializeData(data: unknown): JournalComponent {
     const serialized = data as SerializedJournal;
 
+    // Validate required fields - throw on missing data per CLAUDE.md
+    if (!Array.isArray(serialized.entries)) {
+      throw new Error('JournalSerializer: missing required field "entries"');
+    }
+
     // Create new component instance
     const component = new JournalComponent();
 

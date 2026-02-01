@@ -26,6 +26,12 @@ export class ParadigmStateSerializer extends BaseComponentSerializer<ParadigmSta
 
   protected deserializeData(data: unknown): ParadigmStateComponent {
     const d = data as Record<string, unknown>;
+
+    // Validate required fields - throw on missing data per CLAUDE.md
+    if (typeof d.paradigmState !== 'object' || d.paradigmState === null) {
+      throw new Error('ParadigmStateSerializer: missing required field "paradigmState"');
+    }
+
     const comp = createParadigmStateComponent();
     // Validation already ensures paradigmState exists as object - no fallback needed
     comp.homeParadigmId = d.homeParadigmId as string | undefined;

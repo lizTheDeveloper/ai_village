@@ -401,7 +401,7 @@ export class AgentBrainSystem extends BaseSystem {
       }
     }
 
-    // Performance tracking removed - use metrics dashboard for monitoring
+    // Performance tracking (silent - metrics system handles logging)
   }
 
   /**
@@ -485,7 +485,6 @@ export class AgentBrainSystem extends BaseSystem {
   ): { behavior: string; execute: boolean } {
     // Layer 1: Autonomic check
     const autonomicResult = this.decision.processAutonomic(entity);
-    // console.log(`[AgentBrainSystem] processDecision for ${entity.id.substring(0, 8)}: autonomicResult=${JSON.stringify(autonomicResult)}`);
 
     if (autonomicResult) {
       const temperature = entity.getComponent(CT.Temperature) as TemperatureComponent | undefined;
@@ -630,6 +629,10 @@ export class AgentBrainSystem extends BaseSystem {
 
       // Emit behavior:change event for metrics with timing
       if (fromBehavior !== toBehavior) {
+        const previousChangedAt = agent.behaviorChangedAt;
+        const durationTicks = previousChangedAt ? currentTick - previousChangedAt : 0;
+        const durationSeconds = durationTicks / 20; // 20 TPS
+
         world.eventBus.emit({
           type: 'behavior:change',
           source: entity.id,

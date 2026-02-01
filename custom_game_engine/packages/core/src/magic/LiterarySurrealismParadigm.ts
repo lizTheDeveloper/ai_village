@@ -18,7 +18,6 @@
  * Types like MagicAcquisition, extended MagicCostType values, and additional
  * MagicForm variants need to be added to the base types.
  */
-// @ts-nocheck - awaiting MagicParadigm.ts type extensions
 
 import type { MagicParadigm, MagicSource, MagicCost, MagicChannel, MagicLaw, MagicRisk, AcquisitionDefinition } from './MagicParadigm.js';
 import type { MagicSkillTree, MagicSkillNode, MagicXPSource } from './MagicSkillTree.js';
@@ -734,7 +733,7 @@ const POETIC_RISKS: MagicRisk[] = [
   },
 ];
 
-const POETIC_ACQUISITION: MagicAcquisition[] = [
+const POETIC_ACQUISITION: AcquisitionDefinition[] = [
   {
     method: 'study',
     rarity: 'common',

@@ -26,7 +26,14 @@ export class TrustNetworkSerializer extends BaseComponentSerializer<TrustNetwork
   protected deserializeData(data: unknown): TrustNetworkComponent {
     const serialized = data as SerializedTrustNetwork;
 
-    // Validation already ensures arrays exist - no fallbacks needed
+    // Validate required fields - throw on missing data per CLAUDE.md
+    if (!Array.isArray(serialized.scores)) {
+      throw new Error('TrustNetworkSerializer: missing required field "scores"');
+    }
+    if (!Array.isArray(serialized.verificationHistory)) {
+      throw new Error('TrustNetworkSerializer: missing required field "verificationHistory"');
+    }
+
     // Reconstruct Maps from arrays
     const scores = new Map(serialized.scores);
 

@@ -310,4 +310,9 @@ export enum ComponentType {
 
   // Settlement (multi-player groups on shared planets)
   Settlement = 'settlement',                 // Tracks which settlement an entity belongs to
+
+  // God-Crafted Content (Microgenerators)
+  GeneratedContent = 'generated_content',     // LLM-generated content (riddles, spells, recipes, etc.)
+  GodCraftedArtifact = 'god_crafted_artifact', // Metadata for god-crafted discoveries
+  DiscoveryMarker = 'discovery_marker',       // Marks discovered content locations
 }

@@ -306,7 +306,6 @@ export class ChatRoomSystem extends BaseSystem {
 
     // Update active state immediately when member joins
     const threshold = room.config.activationThreshold ?? 1;
-    const wasActive = room.isActive;
     room.isActive = room.config.membership.members.length >= threshold;
 
     // Create notification
@@ -324,7 +323,6 @@ export class ChatRoomSystem extends BaseSystem {
 
       // Update active state immediately when member leaves
       const threshold = room.config.activationThreshold ?? 1;
-      const wasActive = room.isActive;
       room.isActive = room.config.membership.members.length >= threshold;
 
       // Try to get name from world (entity might be gone)
