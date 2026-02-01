@@ -59,6 +59,15 @@ export interface Recipe {
   icon?: string;
   /** Tool types required for crafting (e.g., ['hammer', 'saw']) */
   requiredTools?: string[];
+
+  // Discovery tracking (for runtime-discovered recipes)
+
+  /** Agent ID who discovered/created this recipe */
+  discoveredBy?: string;
+  /** Game tick when this recipe was discovered */
+  discoveredAt?: number;
+  /** Whether this recipe was discovered at runtime (vs static definition) */
+  isRuntimeDiscovered?: boolean;
 }
 
 /**

@@ -373,8 +373,11 @@ describe('PlantSystem', () => {
       expect(diedHandler.mock.calls.length).toBeGreaterThanOrEqual(0);
     });
 
-    // TODO: This test fails with batched updates. The plant doesn't reach death state.
-    // This may require investigation into how death state is triggered with StateMutatorSystem.
+    // Test skipped: Requires proper time simulation and StateMutatorSystem integration.
+    // The PlantSystem uses throttling (UPDATE_INTERVAL=20 ticks) and game hour accumulation
+    // which doesn't work correctly in unit tests without proper TimeComponent setup.
+    // Issues: 1) MutationVector rates need time entity for correct gameHoursElapsed calculation
+    //         2) StateMutatorSystem needs proper integration with PlantSystem timing
     it.skip('should set stage to dead when health reaches zero', () => {
       const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
@@ -397,7 +400,9 @@ describe('PlantSystem', () => {
       for (let i = 0; i < 30; i++) {
         world.setTick(world.tick + 1200); // Advance 1 game minute
         system.update(world, entities, 60);
-        stateMutator.update(world, [], 60);
+        // Query for entities with MutationVector component to pass to StateMutatorSystem
+        const mutatingEntities = world.query().with(ComponentType.MutationVector).executeEntities();
+        stateMutator.update(world, mutatingEntities, 60);
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;
@@ -527,8 +532,10 @@ describe('PlantSystem', () => {
   });
 
   describe('stage transitions', () => {
-    // TODO: This test fails with batched updates. Stage progress doesn't advance.
-    // This may require investigation into how stage progression works with StateMutatorSystem timing.
+    // Test skipped: Requires proper time simulation with TimeComponent for stage progression.
+    // The PlantSystem calculates gameHoursElapsed from TimeComponent's dayLength and speedMultiplier.
+    // Without a proper TimeComponent entity in the world, the fallback calculation doesn't
+    // properly accumulate time to trigger updatePlantHourly() which handles stage progression.
     it.skip('should advance stageProgress over time', () => {
       const entity = world.createEntity() as EntityImpl;
       const plant = new PlantComponent({
@@ -551,7 +558,9 @@ describe('PlantSystem', () => {
       for (let i = 0; i < 24; i++) {
         world.setTick(world.tick + 1200); // Advance 1 game minute
         system.update(world, entities, 60);
-        stateMutator.update(world, [], 60);
+        // Query for entities with MutationVector component to pass to StateMutatorSystem
+        const mutatingEntities = world.query().with(ComponentType.MutationVector).executeEntities();
+        stateMutator.update(world, mutatingEntities, 60);
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;

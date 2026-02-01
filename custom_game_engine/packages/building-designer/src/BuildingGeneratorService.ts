@@ -5,8 +5,7 @@
  * Integrates with alien world generation pipeline
  */
 
-// Note: LLM integration temporarily disabled - needs proper provider setup
-// import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '@ai-village/llm';
 
 export interface GeneratedBuilding {
   id: string;
@@ -102,10 +101,33 @@ const ARCHITECTURAL_STYLES: Record<string, SpeciesArchitecturalStyle> = {
 };
 
 export class BuildingGeneratorService {
-  // private llm: LLMProvider; // TODO: Re-enable when LLM integration is set up
+  private llmProvider: LLMProvider | null = null;
 
-  constructor() {
-    // this.llm = ...; // TODO: Initialize LLM provider
+  /**
+   * Create a BuildingGeneratorService.
+   * LLM provider can be set later via setLLMProvider() for deferred initialization.
+   *
+   * @param llmProvider - Optional LLM provider for building generation
+   */
+  constructor(llmProvider?: LLMProvider) {
+    if (llmProvider) {
+      this.llmProvider = llmProvider;
+    }
+  }
+
+  /**
+   * Set the LLM provider for deferred initialization.
+   * Useful when the provider isn't available at construction time.
+   */
+  setLLMProvider(provider: LLMProvider): void {
+    this.llmProvider = provider;
+  }
+
+  /**
+   * Check if LLM provider is available.
+   */
+  hasLLMProvider(): boolean {
+    return this.llmProvider !== null;
   }
 
   /**
@@ -130,27 +152,27 @@ export class BuildingGeneratorService {
 
     const prompt = this.buildPrompt(style, buildingType, tier, sizeSpec, options.specialFeatures);
 
-    // TODO: Re-enable LLM integration
-    console.error('BuildingGeneratorService: LLM integration not yet implemented');
-    return null;
+    // Check if LLM provider is available
+    if (!this.llmProvider) {
+      console.warn('BuildingGeneratorService: No LLM provider configured. Use setLLMProvider() to enable generation.');
+      return null;
+    }
 
-    // try {
-    //   const response = await this.llm.chat({
-    //     provider: 'groq',
-    //     model: 'qwen/qwen3-32b',
-    //     messages: [
-    //       { role: 'system', content: this.getSystemPrompt() },
-    //       { role: 'user', content: prompt }
-    //     ],
-    //     temperature: 0.7,
-    //     max_tokens: 4000
-    //   });
-    //
-    //   return this.parseResponse(response.content, species);
-    // } catch (error) {
-    //   console.error('Failed to generate building:', error);
-    //   return null;
-    // }
+    try {
+      // Build the full prompt with system context
+      const fullPrompt = `${this.getSystemPrompt()}\n\n${prompt}`;
+
+      const response = await this.llmProvider.generate({
+        prompt: fullPrompt,
+        temperature: 0.7,
+        maxTokens: 4000,
+      });
+
+      return this.parseResponse(response.text, species);
+    } catch (error) {
+      console.error('Failed to generate building:', error);
+      return null;
+    }
   }
 
   /**

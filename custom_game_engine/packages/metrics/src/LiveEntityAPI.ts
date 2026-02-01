@@ -13,7 +13,7 @@ import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, A
 import { pendingApprovalRegistry, type AgentDebugManager } from '@ai-village/core';
 import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
-import { DeityComponent, createTagsComponent, createIdentityComponent } from '@ai-village/core';
+import { DeityComponent, createTagsComponent, createIdentityComponent, createPositionComponent } from '@ai-village/core';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -866,8 +866,13 @@ export class LiveEntityAPI {
     const entity = this.world.createEntity();
     const entityId = entity.id;
 
-    // Set position via component (assuming PositionComponent exists)
-    // TODO: Add proper position component initialization
+    // Add position component with the specified coordinates
+    const positionComponent = createPositionComponent(x, y);
+    entity.addComponent(positionComponent);
+
+    // Add type-specific tags
+    const tags = createTagsComponent([type, 'spawned']);
+    entity.addComponent(tags);
 
     if (!entity) {
       return {

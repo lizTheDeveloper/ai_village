@@ -89,6 +89,16 @@ const progressText = document.getElementById('progress-text')!;
 const progressBar = document.getElementById('progress-bar')!;
 const progressPercent = document.getElementById('progress-percent')!;
 
+// Version Modal Elements
+const versionModal = document.getElementById('version-modal')!;
+const modalPartName = document.getElementById('modal-part-name')!;
+const versionGrid = document.getElementById('version-grid')!;
+const btnCloseModal = document.getElementById('btn-close-modal') as HTMLButtonElement;
+const btnRegeneratePart = document.getElementById('btn-regenerate-part') as HTMLButtonElement;
+
+// Track currently open part in modal
+let modalCurrentPartId: string | null = null;
+
 // =======================
 // API Integration
 // =======================
@@ -739,10 +749,154 @@ function getActiveReferenceImage(): string | undefined {
   return undefined;
 }
 
-function jumpToPartRegeneration(partId: string) {
-  // TODO: Implement regeneration UI
-  alert(`Regeneration for ${partId} - coming soon!`);
+// =======================
+// Version Modal Functions
+// =======================
+
+function showVersionModal(partId: string) {
+  const part = state.parts.find(p => p.id === partId);
+  if (!part) return;
+
+  modalCurrentPartId = partId;
+  modalPartName.textContent = partId;
+
+  renderVersionGrid(partId);
+
+  versionModal.classList.add('active');
 }
+
+function hideVersionModal() {
+  versionModal.classList.remove('active');
+  modalCurrentPartId = null;
+}
+
+function renderVersionGrid(partId: string) {
+  const versions = state.completedParts.get(partId) || [];
+  versionGrid.innerHTML = '';
+
+  if (versions.length === 0) {
+    versionGrid.innerHTML = '<p class="no-versions">No versions generated yet.</p>';
+    return;
+  }
+
+  versions.forEach((version, index) => {
+    const div = document.createElement('div');
+    div.className = `version-item ${version.active ? 'active' : ''}`;
+    div.innerHTML = `
+      <img src="${version.imageData}" alt="Version ${index + 1}" />
+      <div class="version-info">
+        <span class="version-number">V${index + 1}</span>
+        <span class="version-time">${new Date(version.timestamp).toLocaleTimeString()}</span>
+        ${version.active ? '<span class="version-active">✓ Active</span>' : ''}
+      </div>
+    `;
+
+    div.addEventListener('click', () => {
+      selectVersion(partId, index);
+    });
+
+    versionGrid.appendChild(div);
+  });
+}
+
+function selectVersion(partId: string, versionIndex: number) {
+  const versions = state.completedParts.get(partId);
+  if (!versions || versionIndex >= versions.length) return;
+
+  // Mark all versions as inactive, then activate the selected one
+  versions.forEach((v, i) => {
+    v.active = i === versionIndex;
+  });
+
+  // Update sprite sheet with the selected version
+  updateSpriteSheet(partId, versions[versionIndex].imageData);
+
+  // Re-render the version grid to show the new active state
+  renderVersionGrid(partId);
+}
+
+async function regeneratePartInModal() {
+  if (!modalCurrentPartId) return;
+
+  const part = state.parts.find(p => p.id === modalCurrentPartId);
+  if (!part) return;
+
+  btnRegeneratePart.textContent = '🔄 Regenerating...';
+  btnRegeneratePart.disabled = true;
+
+  try {
+    const referenceImage = getActiveReferenceImage();
+
+    const base64 = await generateImagePixflux(
+      part.description,
+      part.width,
+      part.height,
+      referenceImage
+    );
+
+    const version: PartVersion = {
+      imageData: `data:image/png;base64,${base64}`,
+      timestamp: Date.now(),
+      active: true,
+    };
+
+    // Add new version and mark it as active
+    const versions = state.completedParts.get(part.id) || [];
+    versions.forEach(v => v.active = false);
+    versions.push(version);
+    state.completedParts.set(part.id, versions);
+
+    // Update sprite sheet with new version
+    updateSpriteSheet(part.id, version.imageData);
+
+    // Re-render version grid
+    renderVersionGrid(part.id);
+
+    // Update part queue to reflect changes
+    renderPartQueue();
+
+    btnRegeneratePart.textContent = '🔄 Regenerate';
+    btnRegeneratePart.disabled = false;
+
+  } catch (error) {
+    console.error(`Failed to regenerate ${part.id}:`, error);
+    alert(`Failed to regenerate: ${error}`);
+    btnRegeneratePart.textContent = '🔄 Regenerate';
+    btnRegeneratePart.disabled = false;
+  }
+}
+
+function jumpToPartRegeneration(partId: string) {
+  // Pause generation if running
+  if (state.isGenerating) {
+    state.isPaused = true;
+    btnStartGeneration.style.display = 'inline-block';
+    btnStartGeneration.textContent = '▶ Continue';
+    btnPauseGeneration.style.display = 'none';
+  }
+
+  // Open the version modal for this part
+  showVersionModal(partId);
+}
+
+// Modal event listeners
+btnCloseModal.addEventListener('click', hideVersionModal);
+
+btnRegeneratePart.addEventListener('click', regeneratePartInModal);
+
+// Close modal when clicking outside
+versionModal.addEventListener('click', (e) => {
+  if (e.target === versionModal) {
+    hideVersionModal();
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && versionModal.classList.contains('active')) {
+    hideVersionModal();
+  }
+});
 
 btnExportSheet.addEventListener('click', () => {
   // Export sprite sheet as PNG

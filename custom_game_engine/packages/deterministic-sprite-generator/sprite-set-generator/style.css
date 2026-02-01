@@ -434,6 +434,52 @@ h1 {
   margin-top: 5px;
 }
 
+.version-item.active {
+  border-color: #00ff88;
+  background: #1a2e4a;
+}
+
+.version-item img {
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+.version-info {
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.version-number {
+  color: #00d4ff;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.version-time {
+  color: #888;
+  font-size: 0.75em;
+}
+
+.version-active {
+  color: #00ff88;
+  font-size: 0.75em;
+  font-weight: bold;
+}
+
+.no-versions {
+  color: #888;
+  text-align: center;
+  padding: 40px;
+  grid-column: 1 / -1;
+}
+
 .modal-controls {
   display: flex;
   gap: 15px;

@@ -15,7 +15,7 @@ import type { World, WorldMutator } from '@ai-village/core';
 import type { Entity } from '@ai-village/core';
 import type { UniverseSnapshot } from '@ai-village/persistence';
 import { worldSerializer } from '@ai-village/persistence';
-import { ComponentType as CT } from '@ai-village/core';
+import { ComponentType as CT, globalRecipeRegistry } from '@ai-village/core';
 
 /**
  * Types of canon events that trigger state snapshots
@@ -237,18 +237,39 @@ export class CanonEventRecorder {
    */
   private extractRuntimeDefinitions(world: World): RuntimeDefinitions {
     // Extract runtime-generated/discovered content
-    // Note: Static registries (RecipeRegistry, ItemRegistry, ResearchRegistry) are populated
-    // at startup and don't track "discovery" metadata. Future enhancement would be to track
-    // when agents discover/create recipes, items, research in separate discovery tracking.
-    // For now, we capture what's registered but can't distinguish runtime-generated from static.
-
+    // Extract recipes from the global recipe registry
+    // Recipes now support discovery tracking via discoveredBy, discoveredAt, isRuntimeDiscovered fields
     const recipes: RuntimeDefinitions['recipes'] = [];
     const items: RuntimeDefinitions['items'] = [];
 
-    // RecipeRegistry and ItemRegistry are global singletons, but they don't track
-    // discovery metadata (discoveredBy, discoveredAt). This would require enhancement
-    // to those systems to track when agents discover/create recipes.
-    // TODO: Add discovery tracking to RecipeRegistry/ItemRegistry for proper runtime extraction
+    try {
+      const allRecipes = globalRecipeRegistry.getAllRecipes();
+      for (const recipe of allRecipes) {
+        // Only include runtime-discovered recipes (skip static definitions)
+        if (recipe.isRuntimeDiscovered) {
+          recipes.push({
+            id: recipe.id,
+            name: recipe.name,
+            discoveredBy: recipe.discoveredBy, // Agent who discovered
+            discoveredAt: recipe.discoveredAt, // Tick when discovered
+            definition: {
+              category: recipe.category,
+              description: recipe.description,
+              ingredients: recipe.ingredients,
+              output: recipe.output,
+              craftingTime: recipe.craftingTime,
+              stationRequired: recipe.stationRequired,
+              skillRequirements: recipe.skillRequirements,
+            },
+          });
+        }
+      }
+    } catch {
+      // Recipe registry may not be initialized in some test scenarios
+    }
+
+    // Note: ItemRegistry extraction would follow same pattern once discovery tracking is added
+    // Items are currently static definitions without discovery metadata
 
     // Extract sacred sites (from relevant components if they exist)
     // Sacred sites may be stored in various ways - as tagged buildings, special entities, etc.
