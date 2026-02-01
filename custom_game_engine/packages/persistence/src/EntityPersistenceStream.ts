@@ -64,8 +64,6 @@ export class EntityPersistenceStream {
         console.warn('[EntityPersistenceStream] Flush error:', err);
       });
     }, this.options.flushInterval);
-
-    console.log(`[EntityPersistenceStream] Attached to world, planetId=${planetId}, flush every ${this.options.flushInterval}ms`);
   }
 
   /**

@@ -63,8 +63,6 @@ function getRendererPreference(): 'webgpu' | 'webgl' | 'canvas2d' | 'auto' {
  */
 async function detectBestBackend(): Promise<'webgpu' | 'webgl' | 'canvas2d'> {
   // Default to WebGL for better performance
-  console.log('[RendererFactory] Using WebGL (default)');
-  console.log('[RendererFactory] Canvas2D available via ?renderer=canvas2d');
   return 'webgl';
 }
 
@@ -93,8 +91,6 @@ export async function createRenderer(
   } else {
     backend = preference;
   }
-
-  console.log(`[RendererFactory] Creating renderer with backend: ${backend}`);
 
   // Create the appropriate renderer
   if (backend === 'canvas2d') {

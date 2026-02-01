@@ -1029,12 +1029,6 @@ export function escalateCrisis(
       // Request LLM crisis response asynchronously (non-blocking)
       requestGovernorCrisisResponse(higherGovernor, crisis, nextTier, world)
         .then(response => {
-          // Log the LLM's recommended response
-          console.log(
-            `[DecisionProtocols] Governor ${higherGovernor.id} LLM response to crisis ${crisis.id}: ` +
-            `${response.action} - ${response.reasoning}`
-          );
-
           // Emit event with LLM response for systems to react
           world.eventBus.emit({
             type: 'governance:crisis_response_received',
@@ -1059,10 +1053,7 @@ export function escalateCrisis(
           // Crisis remains in queue for manual/rule-based handling
         });
     } else {
-      console.log(
-        `[DecisionProtocols] Crisis ${crisis.id} added to non-soul governor ${higherGovernor.id} queue ` +
-        `for rule-based handling`
-      );
+      // Non-soul governor will handle crisis via rule-based system
     }
   } else {
     console.warn(

@@ -401,11 +401,7 @@ export class AgentBrainSystem extends BaseSystem {
       }
     }
 
-    // Only log performance on slow frames (>10ms) to reduce console spam
-    const totalTime = performance.now() - startTime;
-    if (totalTime > 10 && thinkingAgents > 0) {
-      console.log(`[AgentBrainSystem] ${totalTime.toFixed(1)}ms total | ${thinkingAgents} agents | perception:${perceptionTime.toFixed(1)}ms decision:${decisionTime.toFixed(1)}ms execution:${executionTime.toFixed(1)}ms`);
-    }
+    // Performance tracking removed - use metrics dashboard for monitoring
   }
 
   /**
@@ -584,10 +580,6 @@ export class AgentBrainSystem extends BaseSystem {
     // When a productive behavior completes (sets behaviorCompleted: true) outside of a queue,
     // we need to reset to idle so the LLM can choose a new behavior
     if (agent.behaviorCompleted && !hasBehaviorQueue(agent)) {
-      const identity = entity.getComponent<IdentityComponent>(CT.Identity);
-      const agentName = identity?.name || entity.id.slice(0, 8);
-      console.log(`[AgentBrainSystem] ${agentName}: behavior '${agent.behavior}' completed, requesting new decision`);
-
       // Clear the flag and reset to idle - this will trigger a new LLM decision
       entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
@@ -638,20 +630,6 @@ export class AgentBrainSystem extends BaseSystem {
 
       // Emit behavior:change event for metrics with timing
       if (fromBehavior !== toBehavior) {
-        const previousChangedAt = agent.behaviorChangedAt;
-        const durationTicks = previousChangedAt ? currentTick - previousChangedAt : 0;
-        const durationSeconds = durationTicks / 20; // 20 TPS
-
-        // Get agent name for readable logging
-        const identity = entity.getComponent<IdentityComponent>(CT.Identity);
-        const agentName = identity?.name || entity.id.slice(0, 8);
-
-        // Log behavior transitions for validation
-        console.log(
-          `[BehaviorTiming] ${agentName}: ${fromBehavior} → ${toBehavior} ` +
-          `(held ${fromBehavior} for ${Math.round(durationSeconds * 10) / 10}s / ${durationTicks} ticks)`
-        );
-
         world.eventBus.emit({
           type: 'behavior:change',
           source: entity.id,
@@ -839,11 +817,6 @@ export class AgentBrainSystem extends BaseSystem {
           excludeIds: new Set([entity.id]), // Exclude self
         }
       );
-
-      const elapsed = performance.now() - startTime;
-      if (elapsed > 5) {
-        console.log(`[AgentBrainSystem] getNearbyAgents took ${elapsed.toFixed(1)}ms (chunk query, ${agentsInRadius.length} agents found)`);
-      }
 
       return agentsInRadius.map(({ entity }: any) => entity);
     }

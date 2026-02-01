@@ -200,10 +200,6 @@ export class BackgroundUniverseManager {
     this.backgroundUniverses.set(universeId, backgroundUniverse);
     this.stats.totalSpawned++;
 
-    console.log(
-      `[BackgroundUniverseManager] Spawned ${params.type}: ${params.description} (ID: ${universeId})`
-    );
-
     return universeId;
   }
 
@@ -237,8 +233,6 @@ export class BackgroundUniverseManager {
       // Handle decision
       if (decision.type === 'invade') {
         await this.triggerInvasion(bg, decision);
-      } else if (decision.type === 'discovered_player') {
-        console.log(`[BackgroundUniverseManager] ${bg.id} discovered player's world!`);
       }
 
       // Check stop conditions
@@ -298,7 +292,6 @@ export class BackgroundUniverseManager {
     if (bg) {
       this.coordinator.unregisterUniverse(id);
       this.backgroundUniverses.delete(id);
-      console.log(`[BackgroundUniverseManager] Removed ${id}`);
     }
   }
 
@@ -360,8 +353,6 @@ export class BackgroundUniverseManager {
    * Trigger invasion from background universe
    */
   private async triggerInvasion(bg: BackgroundUniverse, decision: any): Promise<void> {
-    console.log(`[BackgroundUniverseManager] Invasion triggered from ${bg.id}!`);
-
     const invasionEvent: InvasionTriggeredEvent = {
       invaderUniverse: bg.id,
       invaderFaction: decision.factionId,
@@ -434,8 +425,6 @@ export class BackgroundUniverseManager {
     const bg = this.backgroundUniverses.get(universeId);
     if (!bg || bg.visible) return;
 
-    console.log(`[BackgroundUniverseManager] Instantiating full ECS for ${universeId}...`);
-
     // Get instantiation constraints from renormalization engine
     const constraints = this.getInstantiationConstraints(bg.planet);
 
@@ -457,10 +446,6 @@ export class BackgroundUniverseManager {
 
     this.eventBus.emit('multiverse:universe_discovered', discoveryEvent);
     this.stats.totalDiscovered++;
-
-    console.log(
-      `[BackgroundUniverseManager] ${universeId} instantiated with ${constraints.targetPopulation} agents`
-    );
   }
 
   /**

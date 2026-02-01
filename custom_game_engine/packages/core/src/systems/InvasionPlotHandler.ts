@@ -152,10 +152,6 @@ export class InvasionPlotHandler extends BaseSystem {
         // Also register with the global plot registry so they're available to the plot system
         plotLineRegistry.register(template);
       }
-
-      console.log(
-        `[InvasionPlotHandler] Loaded ${this.invasionPlotTemplates.size} invasion plot templates`
-      );
     } catch (error) {
       console.error('[InvasionPlotHandler] Failed to load invasion plot templates:', error);
       // Fall back to empty templates - system will log warnings when it can't find templates
@@ -177,10 +173,6 @@ export class InvasionPlotHandler extends BaseSystem {
     if (this.processedInvasions.has(invasionId)) {
       return;
     }
-
-    console.log(
-      `[InvasionPlotHandler] Processing invasion from ${event.invaderUniverse} of type ${event.invasionType}`
-    );
 
     // Find the player's empire or nation entity
     const defenderEntity = this.findDefenderEntity(this.world);
@@ -346,10 +338,6 @@ export class InvasionPlotHandler extends BaseSystem {
       };
 
       world.addComponent(leader.id, updatedPlotLines);
-
-      console.log(
-        `[InvasionPlotHandler] Assigned plot ${template.id} to leader ${soul.true_name} for invasion ${invasionId}`
-      );
     }
   }
 
@@ -570,10 +558,6 @@ export class InvasionPlotHandler extends BaseSystem {
 
         // Award wisdom to souls who participated
         this.awardWisdomToParticipants(invasion, outcome);
-
-        console.log(
-          `[InvasionPlotHandler] Invasion ${invasionId} resolved with outcome: ${outcome}`
-        );
       }
     }
   }

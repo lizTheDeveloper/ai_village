@@ -590,7 +590,7 @@ export class ArtifactSystem extends BaseSystem {
   }
 
   /**
-   * Log the current skill distribution to show emergent progression.
+   * Calculate skill distribution stats (for future use in metrics/UI).
    */
   private logSkillDistribution(): void {
     const total = Object.values(this.skillLevelStats).reduce((a, b) => a + b, 0);
@@ -605,15 +605,6 @@ export class ArtifactSystem extends BaseSystem {
       this.skillLevelStats.master * 0.05 +
       this.skillLevelStats.legendary * 0.10;
 
-    console.log(
-      `[ArtifactSystem] Skill distribution - ` +
-      `Novice: ${this.skillLevelStats.novice}, ` +
-      `Competent: ${this.skillLevelStats.competent}, ` +
-      `Skilled: ${this.skillLevelStats.skilled}, ` +
-      `Expert: ${this.skillLevelStats.expert}, ` +
-      `Master: ${this.skillLevelStats.master}, ` +
-      `Legendary: ${this.skillLevelStats.legendary} | ` +
-      `Expected strange moods per day: ${expectedMoods.toFixed(2)}`
-    );
+    // Stats calculated but not logged - available for metrics system
   }
 }

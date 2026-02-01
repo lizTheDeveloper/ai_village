@@ -52,7 +52,6 @@ function loadDivineChatMessages(): ChatMessage[] {
     if (!stored) return [];
 
     const messages = JSON.parse(stored) as ChatMessage[];
-    console.log(`[ChatRoomSystem] Loaded ${messages.length} divine chat messages from localStorage`);
     return messages;
   } catch (e) {
     console.warn('[ChatRoomSystem] Failed to load divine chat from localStorage:', e);
@@ -117,14 +116,7 @@ export class ChatRoomSystem extends BaseSystem {
 
       // Update active state
       const threshold = room.config.activationThreshold ?? 1;
-      const wasActive = room.isActive;
       room.isActive = room.config.membership.members.length >= threshold;
-
-      if (room.isActive && !wasActive) {
-        console.log(`[ChatRoomSystem] ${room.config.name} activated with ${room.config.membership.members.length} members`);
-      } else if (!room.isActive && wasActive) {
-        console.log(`[ChatRoomSystem] ${room.config.name} deactivated - not enough members`);
-      }
 
       room.lastActivityTick = ctx.tick;
     }
@@ -150,7 +142,6 @@ export class ChatRoomSystem extends BaseSystem {
     const savedMessages = loadDivineChatMessages();
     if (savedMessages.length > 0) {
       divineChat.messages = savedMessages;
-      console.log(`[ChatRoomSystem] Restored ${savedMessages.length} divine chat messages`);
     }
   }
 
@@ -177,7 +168,6 @@ export class ChatRoomSystem extends BaseSystem {
         // Found existing room from save - register it in our map and return
         this.roomEntities.set(config.id, existingEntity.id);
         this.knownMembers.set(config.id, new Set(existingRoom.config.membership.members));
-        console.log(`[ChatRoomSystem] Found existing room from save: ${config.name} (${existingRoom.messages.length} messages)`);
         return existingRoom;
       }
     }
@@ -191,8 +181,6 @@ export class ChatRoomSystem extends BaseSystem {
 
     this.roomEntities.set(config.id, entity.id);
     this.knownMembers.set(config.id, new Set());
-
-    console.log(`[ChatRoomSystem] Created room: ${config.name}`);
 
     return room;
   }
@@ -324,13 +312,6 @@ export class ChatRoomSystem extends BaseSystem {
     // Create notification
     const notification = createJoinNotification(room.config.id, entity.id, name);
     room.pendingNotifications.push(notification);
-
-    console.log(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
-
-    // Log activation state change
-    if (room.isActive && !wasActive) {
-      console.log(`[ChatRoomSystem] ${room.config.name} activated with ${room.config.membership.members.length} members`);
-    }
   }
 
   /**
@@ -354,13 +335,6 @@ export class ChatRoomSystem extends BaseSystem {
       // Create notification
       const notification = createLeaveNotification(room.config.id, entityId, name);
       room.pendingNotifications.push(notification);
-
-      console.log(`[ChatRoomSystem] ${formatNotification(notification)} (${room.config.name})`);
-
-      // Log activation state change
-      if (!room.isActive && wasActive) {
-        console.log(`[ChatRoomSystem] ${room.config.name} deactivated - not enough members`);
-      }
     }
   }
 
@@ -477,8 +451,6 @@ export class ChatRoomSystem extends BaseSystem {
     if (roomId === 'divine_chat') {
       saveDivineChatMessages(room.messages);
     }
-
-    console.log(`[ChatRoomSystem] [${room.config.name}] ${senderName}: ${content}`);
 
     // Emit event for UI and other systems (e.g., AdminAngelSystem)
     // Must use world.eventBus so other systems can receive it

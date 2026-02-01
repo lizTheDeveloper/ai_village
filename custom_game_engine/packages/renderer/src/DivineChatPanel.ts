@@ -167,12 +167,6 @@ export class DivineChatPanel implements IWindowPanel {
     // Subscribe to chat messages from the GameBridge
     // These are forwarded from the SharedWorker when path prediction is enabled
     this.chatMessageUnsubscribe = gameBridge.onChatMessage((msg) => {
-      console.log('[DivineChatPanel] Received chat message from gameBridge:', {
-        roomId: msg.roomId,
-        senderId: msg.senderId,
-        senderName: msg.senderName,
-        content: msg.content?.substring(0, 50),
-      });
       // Only add divine_chat messages to this panel
       if (msg.roomId === 'divine_chat') {
         this.addMessageToCache({
@@ -196,12 +190,6 @@ export class DivineChatPanel implements IWindowPanel {
     // Check if message already exists
     const exists = this.localMessageCache.some(m => m.id === msg.id);
     if (!exists) {
-      console.log('[DivineChatPanel] Adding message to cache:', {
-        id: msg.id,
-        senderName: msg.senderName,
-        content: msg.content?.substring(0, 50),
-        cacheSize: this.localMessageCache.length + 1,
-      });
       this.localMessageCache.push(msg);
       // Keep messages sorted by timestamp
       this.localMessageCache.sort((a, b) => a.timestamp - b.timestamp);

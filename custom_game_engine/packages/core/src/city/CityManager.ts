@@ -273,7 +273,6 @@ export class CityManager {
         ));
         tentEntity.addComponent(createRenderableComponent('tent', 'object'));
         world.addEntity(tentEntity);
-        console.log('[CityManager] Built tent for growing population');
       }
     } else if (focus === 'survival' && stats.woodSupply >= 5) {
       // Build food production if food is critically low
@@ -288,7 +287,6 @@ export class CityManager {
         ));
         farmEntity.addComponent(createRenderableComponent('farm-plot', 'object'));
         world.addEntity(farmEntity);
-        console.log('[CityManager] Built farm-plot for survival');
       }
     }
   }

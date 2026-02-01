@@ -47,8 +47,6 @@ export class RoofRepairSystem extends BaseSystem {
     if (this.hasRun) return;
     this.hasRun = true;
 
-    console.log('[RoofRepair] Checking for buildings missing roofs...');
-
     // Get chunk manager for generation checks
     const worldWithChunks = world as {
       getChunkManager?: () => {
@@ -84,14 +82,7 @@ export class RoofRepairSystem extends BaseSystem {
       if (repaired > 0) {
         buildingsRepaired++;
         tilesRepaired += repaired;
-        console.log(`[RoofRepair] Added ${roofMaterial} roof to ${buildingComp.type} at (${position.x}, ${position.y}) - ${repaired} tiles`);
       }
-    }
-
-    if (buildingsRepaired > 0) {
-      console.log(`[RoofRepair] ✅ Repaired ${buildingsRepaired} buildings (${tilesRepaired} tiles)`);
-    } else {
-      console.log('[RoofRepair] All buildings already have roofs!');
     }
   }
 

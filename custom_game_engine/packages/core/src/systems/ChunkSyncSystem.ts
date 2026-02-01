@@ -49,7 +49,7 @@ export class ChunkSyncSystem extends BaseSystem {
   private flushing: boolean = false;
 
   protected onInitialize(_world: World, _eventBus: EventBus): void {
-    console.log('[ChunkSyncSystem] Initialized - will sync dirty chunks every 5 seconds');
+    // Initialized - will sync dirty chunks every 5 seconds
   }
 
   protected async onUpdate(ctx: SystemContext): Promise<void> {
@@ -92,10 +92,6 @@ export class ChunkSyncSystem extends BaseSystem {
 
       this.stats.totalChunksFlushed += flushed;
       this.stats.lastFlushCount = flushed;
-
-      if (flushed > 0) {
-        console.log(`[ChunkSyncSystem] Synced ${flushed} chunks to server`);
-      }
     } catch (error) {
       this.stats.failedSyncs++;
       console.warn('[ChunkSyncSystem] Failed to sync chunks:', error);

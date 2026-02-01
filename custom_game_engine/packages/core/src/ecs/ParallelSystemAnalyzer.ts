@@ -297,5 +297,5 @@ export class ParallelSystemAnalyzer {
  */
 export function analyzeSystemParallelism(systems: System[]): void {
   const analyzer = new ParallelSystemAnalyzer(systems);
-  console.log(analyzer.generateReport());
+  // Report generation available via analyzer.generateReport()
 }

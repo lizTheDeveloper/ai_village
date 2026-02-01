@@ -527,13 +527,6 @@ export class UniverseClient {
         break;
 
       case 'chat-message':
-        console.log('[UniverseClient] Received chat-message from worker:', {
-          roomId: message.roomId,
-          senderId: message.senderId,
-          senderName: message.senderName,
-          content: message.content?.substring(0, 50),
-          listenerCount: this.chatMessageListeners.size,
-        });
         this.notifyChatMessageListeners({
           roomId: message.roomId,
           messageId: message.messageId,

@@ -80,8 +80,6 @@ class UniverseWorker {
    * This allows the main thread to show a universe browser first.
    */
   async init(): Promise<void> {
-    console.log('[UniverseWorker] Initializing systems...');
-
     // Set up all game systems using shared setup logic
     // This matches the initialization in demo/headless.ts
     this.gameSetup = await setupGameSystems(this.gameLoop, {
@@ -116,13 +114,6 @@ class UniverseWorker {
         content?: string;
         timestamp?: number;
       };
-      console.log('[UniverseWorker] chat:message_sent received, forwarding to windows:', {
-        roomId: data.roomId,
-        senderId: data.senderId,
-        senderName: data.senderName,
-        content: data.content?.substring(0, 50),
-        connections: this.connections.size,
-      });
       this.broadcastChatMessage({
         roomId: data.roomId,
         messageId: data.messageId || crypto.randomUUID(),
@@ -135,7 +126,6 @@ class UniverseWorker {
     });
 
     this.initialized = true;
-    console.log('[UniverseWorker] Systems initialized, waiting for load-save or create-new-universe command');
 
     // NOTE: We do NOT start the simulation loop here
     // The main thread will tell us to load a save or create a new universe
@@ -163,8 +153,6 @@ class UniverseWorker {
    * Sends progress updates to all connected windows
    */
   async loadSave(saveKey: string, requestingPort?: MessagePort): Promise<boolean> {
-    console.log(`[UniverseWorker] Loading save: ${saveKey}`);
-
     try {
       // Phase 1: Reading from storage
       this.broadcastLoadingProgress({
@@ -229,12 +217,10 @@ class UniverseWorker {
 
       // Initialize all systems (this is what GameLoop.start() normally does)
       // This sets up event listeners, spawns the admin angel if not in save, etc.
-      console.log('[UniverseWorker] Initializing systems after load...');
       const systems = this.gameLoop.systemRegistry.getSorted();
       for (const system of systems) {
         system.initialize?.(this.gameLoop.world, this.gameLoop.world.eventBus);
       }
-      console.log(`[UniverseWorker] Initialized ${systems.length} systems`);
 
       this.currentSaveKey = saveKey;
 
@@ -259,7 +245,6 @@ class UniverseWorker {
 
       this.broadcastLoadComplete(true, undefined, this.gameLoop.universeId, this.tick);
 
-      console.log(`[UniverseWorker] Save loaded successfully: ${saveKey}, ${world.entities.size} entities`);
       return true;
     } catch (error) {
       console.error('[UniverseWorker] Failed to load save:', error);
@@ -797,8 +782,6 @@ class UniverseWorker {
    * Starts a fresh simulation without loading a save
    */
   private handleCreateNewUniverse(config: { name?: string; magicParadigm?: string; scenario?: string }, port: MessagePort): void {
-    console.log('[UniverseWorker] Creating new universe:', config);
-
     this.broadcastLoadingProgress({
       phase: 'initializing',
       progress: 50,
@@ -816,12 +799,10 @@ class UniverseWorker {
 
     // Initialize all systems (this is what GameLoop.start() normally does)
     // This spawns the admin angel, creates chat rooms, etc.
-    console.log('[UniverseWorker] Initializing systems...');
     const systems = this.gameLoop.systemRegistry.getSorted();
     for (const system of systems) {
       system.initialize?.(this.gameLoop.world, this.gameLoop.world.eventBus);
     }
-    console.log(`[UniverseWorker] Initialized ${systems.length} systems`);
 
     // Start simulation loop if not already running
     if (!this.running) {

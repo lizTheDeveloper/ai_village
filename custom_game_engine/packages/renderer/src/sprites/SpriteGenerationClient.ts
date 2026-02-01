@@ -200,8 +200,6 @@ export async function requestMapObjectGeneration(spriteId: string): Promise<void
       requestedMapObjects.delete(spriteId);
       return;
     }
-
-    console.log(`[SpriteGen] Queued map object sprite: ${spriteId}`);
   } catch (error) {
     console.error(`[SpriteGen] Error queuing ${spriteId}:`, error);
     requestedMapObjects.delete(spriteId);

@@ -727,7 +727,6 @@ export class AdminAngelSystem extends BaseSystem {
     super();
     if (config?.llmQueue) {
       this.llmQueue = config.llmQueue;
-      console.log('[AdminAngelSystem] Using shared LLM queue');
     }
   }
 
@@ -905,7 +904,6 @@ export class AdminAngelSystem extends BaseSystem {
     const angelName = getStableAngelName();
     const angelId = spawnAdminAngel(world, angelName);
     this.angelEntityId = angelId;
-    console.log(`[AdminAngelSystem] Auto-spawned admin angel '${angelName}' (${angelId})`);
     return world.getEntity(angelId) ?? null;
   }
 
@@ -1113,7 +1111,6 @@ export class AdminAngelSystem extends BaseSystem {
             // Re-queue with incremented retry count
             const retryMessage = `__retry:${retryCount + 1}__${originalMessage}`;
             angel.pendingPlayerMessages.push(retryMessage);
-            console.log(`[AdminAngelSystem] Requeueing message for retry ${retryCount + 1}/${maxRetries}`);
           } else {
             // Max retries reached - silently fail, don't show error to player
             // (A real person would just not respond rather than say "I'm having trouble thinking")
@@ -1274,7 +1271,6 @@ export class AdminAngelSystem extends BaseSystem {
     ];
     for (const pattern of genericResponsePatterns) {
       if (pattern.test(cleanedResponse)) {
-        console.log(`[AdminAngelSystem] Suppressing generic response: "${cleanedResponse.substring(0, 50)}"`);
         cleanedResponse = ''; // Suppress boring responses - angel just stays silent
         break;
       }
@@ -2874,7 +2870,6 @@ export class AdminAngelSystem extends BaseSystem {
     for (const entity of entitiesWithIdentity) {
       const identity = entity.getComponent(CT.Identity) as { name?: string } | undefined;
       if (identity?.name === angelName && !entity.hasComponent(CT.AdminAngel)) {
-        console.log(`[AdminAngelSystem] Cleaning up orphan angel entity: ${entity.id}`);
         // Also remove from divine_chat room if present
         const divineChatRooms = world.query().with(CT.ChatRoom).executeEntities();
         for (const roomEntity of divineChatRooms) {
@@ -2895,7 +2890,6 @@ export class AdminAngelSystem extends BaseSystem {
     if (existingAngels.length === 0) {
       const angelId = spawnAdminAngel(world, angelName);
       this.angelEntityId = angelId;
-      console.log(`[AdminAngelSystem] Spawned admin angel '${angelName}' (${angelId})`);
     } else {
       this.angelEntityId = existingAngels[0]!.id;
     }
@@ -3282,7 +3276,6 @@ if u dont know something just say idk and figure it out together.`;
   private downloadExport(jsonContent: string, name: string): void {
     // Only works in browser
     if (typeof window === 'undefined' || typeof document === 'undefined') {
-      console.log('[AdminAngelSystem] Export JSON:', jsonContent);
       return;
     }
 

@@ -100,16 +100,10 @@ export async function initializePlanet(
 
       planet.setBiosphere(biosphere);
 
-      console.log(
-        `[PlanetInitializer] Cached biosphere: ${biosphere.species.length} species, ` +
-        `${biosphere.sapientSpecies.length} sapient`
-      );
-
       // Still queue sprites for cached biosphere if needed
       if (queueSprites) {
         reportProgress(`🖼️ Preparing sprites...`);
         await queueBiosphereSprites(biosphere, spriteQueuePath);
-        console.log(`[PlanetInitializer] Sprites queued`);
       }
     } catch (error) {
       console.error(`[PlanetInitializer] Failed to use cached biosphere:`, error);
@@ -127,18 +121,11 @@ export async function initializePlanet(
 
       planet.setBiosphere(biosphere);
 
-      console.log(
-        `[PlanetInitializer] Biosphere stats: ${biosphere.species.length} species, ` +
-        `${biosphere.sapientSpecies.length} sapient, ${biosphere.artStyle} style`
-      );
-
       // Step 3: Queue sprites if requested
       if (queueSprites) {
         reportProgress(`🖼️ Preparing sprites...`);
 
         await queueBiosphereSprites(biosphere, spriteQueuePath);
-
-        console.log(`[PlanetInitializer] Sprites queued`);
       }
     } catch (error) {
       console.error(`[PlanetInitializer] Failed to generate biosphere for ${config.name}:`, error);

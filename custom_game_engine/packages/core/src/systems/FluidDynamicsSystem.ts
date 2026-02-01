@@ -411,8 +411,6 @@ export class FluidDynamicsSystem extends BaseSystem {
         }
       }
     }
-
-    console.log(`[FluidDynamics] Initialized ${this.dirtyTiles.size} water tiles`);
   }
 }
 

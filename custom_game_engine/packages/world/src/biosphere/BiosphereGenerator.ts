@@ -132,7 +132,6 @@ export class BiosphereGenerator {
     };
 
     this.reportProgress(`✅ Biosphere complete! ${biosphere.metadata.totalSpecies} species thriving`);
-    console.log(`[BiosphereGenerator] Generation time: ${generationTimeMs}ms | ${biosphere.metadata.trophicLevels} trophic levels`);
 
     return biosphere;
   }

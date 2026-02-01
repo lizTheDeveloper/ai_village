@@ -188,12 +188,6 @@ export class GovernanceArchivalSystem extends BaseSystem {
 
     // Update last archival tick in history
     history.lastArchivalTick = tick;
-
-    // Log archival summary
-    console.log(
-      `[GovernanceArchival] Archived ${archivedCount} entries from entity ${entity.id}. ` +
-      `Total archived: ${archive.totalArchivedEntries}, Remaining in memory: ${history.entries.length}`
-    );
   }
 
   // ========================================================================

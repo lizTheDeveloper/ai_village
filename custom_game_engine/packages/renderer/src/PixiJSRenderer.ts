@@ -48,7 +48,6 @@ let _globalPixiRenderer: PixiJSRenderer | null = null;
  */
 export function cleanupExistingRenderer(): void {
   if (_globalPixiRenderer) {
-    console.log('[PixiJSRenderer] Cleaning up existing renderer before creating new one');
     try {
       _globalPixiRenderer.destroy();
     } catch (e) {
@@ -67,8 +66,7 @@ if (typeof window !== 'undefined') {
   // Also cleanup on visibility change (tab backgrounded) to help with context limits
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && _globalPixiRenderer) {
-      console.log('[PixiJSRenderer] Tab backgrounded - renderer still active');
-      // Don't destroy on background, but log for debugging context issues
+      // Don't destroy on background, but monitor for context issues
     }
   });
 }
@@ -374,7 +372,6 @@ export class PixiJSRenderer implements IRenderer {
     setupContextLostHandlers(this._canvas);
 
     // Log initial diagnostics for debugging intermittent failures
-    console.log('[PixiJSRenderer] Initializing...');
     logWebGLDiagnostics();
 
     // Determine preferred backend
@@ -400,7 +397,6 @@ export class PixiJSRenderer implements IRenderer {
                 // Full WebGPU pipeline verified
                 preferenceForPixi = 'webgpu';
                 this.backend = 'webgpu';
-                console.log('[PixiJSRenderer] WebGPU fully verified, using WebGPU backend');
               } else {
                 console.warn('[PixiJSRenderer] WebGPU context unavailable, falling back to WebGL');
               }
@@ -427,7 +423,6 @@ export class PixiJSRenderer implements IRenderer {
 
           preferenceForPixi = 'webgl';
           this.backend = 'webgl';
-          console.log('[PixiJSRenderer] WebGL verified, using WebGL backend');
         } else {
           throw new Error('WebGL not available - cannot create context');
         }
@@ -507,7 +502,6 @@ export class PixiJSRenderer implements IRenderer {
             backgroundColor: 0x1a1a2e,
             autoDensity: false,
           });
-          console.log('[PixiJSRenderer] ✓ WebGL fallback succeeded');
         } catch (webglError) {
           console.error('[PixiJSRenderer] ❌ WebGL fallback ALSO FAILED!');
           console.error('WebGL error:', webglError);
@@ -594,7 +588,6 @@ export class PixiJSRenderer implements IRenderer {
         parent.style.position = 'relative';
       }
       this._canvas.parentElement.appendChild(this._overlayCanvas);
-      console.log('[PixiJSRenderer] Created Canvas2D UI overlay');
     }
 
     // Set initial size from parent element (critical for proper viewport)
@@ -604,8 +597,6 @@ export class PixiJSRenderer implements IRenderer {
 
     // Register as global renderer for cleanup on HMR/reload
     _globalPixiRenderer = this;
-
-    console.log(`[PixiJSRenderer] Initialized with ${this.backend.toUpperCase()} backend`);
   }
 
   private handleResize = (): void => {
@@ -638,8 +629,6 @@ export class PixiJSRenderer implements IRenderer {
         this._overlayCanvas.width = width;
         this._overlayCanvas.height = height;
       }
-
-      console.log(`[PixiJSRenderer] Resized to ${width}x${height}`);
     }
   };
 
@@ -1608,6 +1597,5 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     this.initialized = false;
-    console.log('[PixiJSRenderer] Destroyed');
   }
 }

@@ -272,7 +272,5 @@ export const ALL_PLOT_TEMPLATES: PlotLineTemplate[] = [
  * Registers all plot templates from all scales (micro, small, medium, large, exotic, epic, isekai)
  */
 export function initializePlotTemplates(): void {
-  console.log(`[PlotTemplates] Registering ${ALL_PLOT_TEMPLATES.length} plot templates...`);
   plotLineRegistry.registerMany(ALL_PLOT_TEMPLATES);
-  console.log(`[PlotTemplates] Registration complete - ${plotLineRegistry.getAllTemplates().length} templates available`);
 }

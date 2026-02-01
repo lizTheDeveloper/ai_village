@@ -364,10 +364,6 @@ export class CompanionSystem extends BaseSystem {
         },
       });
     }
-
-    console.log(
-      `[CompanionSystem] Ophanim evolved from Tier ${previousTier} to Tier ${companionComp.evolutionTier} (${triggerMilestone})`
-    );
   }
 
   // ========================================================================

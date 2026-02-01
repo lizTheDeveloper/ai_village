@@ -92,11 +92,6 @@ export class PerceptionProcessor {
     const meeting = this.meetingDetector.process(entity, world);
     const meetingTime = performance.now() - m1;
 
-    const totalTime = performance.now() - startTime;
-    if (totalTime > 5) {
-      console.log(`[PerceptionProcessor] ${totalTime.toFixed(1)}ms total | vision:${visionTime.toFixed(1)}ms hearing:${hearingTime.toFixed(1)}ms meeting:${meetingTime.toFixed(1)}ms`);
-    }
-
     return { vision, hearing, meeting };
   }
 

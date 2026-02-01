@@ -153,8 +153,6 @@ export class BuildingSummoningSystem extends BaseSystem {
         isComplete: true
       }
     });
-
-    console.log(`✨ ${caster.id} summoned ${blueprint.name} at (${spawnPos.x}, ${spawnPos.y})`);
   }
 
   private handleRiftCreation(world: World, event: SpellCastData): void {
@@ -220,8 +218,6 @@ export class BuildingSummoningSystem extends BaseSystem {
         position: { x: spawnPos.x, y: spawnPos.y }
       }
     });
-
-    console.log(`🌀 ${caster.id} tore a rift at (${spawnPos.x}, ${spawnPos.y})`);
   }
 
   /**

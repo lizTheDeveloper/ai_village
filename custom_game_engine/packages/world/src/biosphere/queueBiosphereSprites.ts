@@ -53,8 +53,6 @@ export async function queueBiosphereSprites(
     biosphere.artStyle
   );
 
-  console.log(`[queueBiosphereSprites] Processing ${biosphere.species.length} species sprites...`);
-
   // Build manifest entries for all species
   for (const species of biosphere.species) {
     // Find which niche this species fills
@@ -88,7 +86,6 @@ export async function queueBiosphereSprites(
 
   // Browser compatibility: Skip file system operations in browser
   if (typeof window !== 'undefined') {
-    console.log('[queueBiosphereSprites] Browser mode - returning manifest without file writes');
     return manifest;
   }
 
@@ -116,7 +113,6 @@ export async function queueBiosphereSprites(
   for (const species of biosphere.species) {
     // Skip if already in queue
     if (existingIds.has(species.id)) {
-      console.log(`[queueBiosphereSprites] Skipping ${species.id} (already in queue)`);
       continue;
     }
 
@@ -165,10 +161,6 @@ export async function queueBiosphereSprites(
   const manifestPath = path.join(path.dirname(finalPath), `planet-sprites-${biosphere.planet.id}.json`);
   fs.writeFileSync(manifestPath, serializeManifest(manifest));
 
-  console.log(`[queueBiosphereSprites] Added ${addedCount} new species to sprite queue`);
-  console.log(`[queueBiosphereSprites] Total queue size: ${queue.sprites.length}`);
-  console.log(`[queueBiosphereSprites] Manifest saved: ${manifestPath}`);
-
   return manifest;
 }
 
@@ -197,7 +189,6 @@ export async function loadPlanetSpriteManifest(
 ): Promise<PlanetSpriteManifest | null> {
   // Browser compatibility: Return null in browser
   if (typeof window !== 'undefined') {
-    console.log('[loadPlanetSpriteManifest] Not available in browser mode');
     return null;
   }
 
@@ -212,7 +203,6 @@ export async function loadPlanetSpriteManifest(
     const { deserializeManifest } = await import('../planet/PlanetSpriteManifest.js');
     return deserializeManifest(data);
   } catch (error) {
-    console.log(`[loadPlanetSpriteManifest] No manifest found for planet ${planetId}`);
     return null;
   }
 }

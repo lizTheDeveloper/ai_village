@@ -259,10 +259,6 @@ export function addGovernanceAuditEntry(
   if (component.entries.length > component.maxEntries) {
     // Mark for archival - actual archival handled by GovernanceArchivalSystem
     // This is a signal that entries should be archived
-    console.log(
-      `[GovernanceHistory] Entry count (${component.entries.length}) exceeds max (${component.maxEntries}). ` +
-      `Entries will be archived by GovernanceArchivalSystem.`
-    );
   }
 }
 

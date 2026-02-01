@@ -159,7 +159,6 @@ export class MetricsStreamClient {
     }
 
     this.connectionState = 'connecting';
-    console.log(`[MetricsStreamClient] Connecting to ${this.config.serverUrl} (sessionId: ${this.config.gameSessionId})`);
 
     try {
       this.ws = new WebSocket(this.config.serverUrl);
@@ -167,7 +166,6 @@ export class MetricsStreamClient {
       this.ws.onopen = () => {
         this.connectionState = 'connected';
         this.lastError = null;
-        console.log(`[MetricsStreamClient] Connected to ${this.config.serverUrl}`);
 
         // Send client info including test status and game session ID
         this.ws!.send(JSON.stringify({

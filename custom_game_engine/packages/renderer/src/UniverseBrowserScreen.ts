@@ -122,7 +122,6 @@ export class UniverseBrowserScreen {
 
     // Handle auto-action from URL parameter (e.g., from Central Hub links)
     if (options?.autoAction) {
-      console.log(`[UniverseBrowser] Auto-triggering action: ${options.autoAction}`);
       // Small delay to let render complete
       setTimeout(() => {
         if (options.autoAction === 'create') {
@@ -411,7 +410,6 @@ export class UniverseBrowserScreen {
 
     // If autoSync is true, automatically trigger the sync button
     if (autoSync) {
-      console.log('[UniverseBrowser] Auto-triggering sync from hub action');
       // Small delay to let the gallery render, then trigger sync
       setTimeout(() => {
         const syncBtn = document.querySelector('button');

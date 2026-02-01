@@ -372,7 +372,7 @@ export class CityBuildingGenerationSystem extends BaseSystem {
 
     // Get the TileConstructionSystem and stamp the layout
     const tileSystem = getTileConstructionSystem();
-    const tilesPlaced = tileSystem.stampLayoutInstantly(
+    tileSystem.stampLayoutInstantly(
       world,
       blueprint.layout,
       position.x,
@@ -380,10 +380,6 @@ export class CityBuildingGenerationSystem extends BaseSystem {
       materials,
       buildingId
     );
-
-    if (tilesPlaced > 0) {
-      console.log(`[CityBuildingGen] Stamped ${tilesPlaced} tiles for ${blueprint.name} at (${position.x}, ${position.y})`);
-    }
   }
 
   /**

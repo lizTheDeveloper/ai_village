@@ -46,7 +46,6 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   protected onInitialize(world: World): void {
     // Skip in browser mode - sprite generation is handled by the daemon
     if (typeof window !== 'undefined') {
-      console.log('[PixelLabSprite] System disabled in browser mode - daemon handles sprite generation');
       return;
     }
 

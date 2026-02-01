@@ -134,13 +134,11 @@ export class SoulAnimationProgressionSystem extends BaseSystem {
 
     // Check if animation already exists
     if (this.animationExists(spriteFolderId, 'walking-8-frames')) {
-      console.log(`[SoulAnimation] Walking animation already exists for ${spriteFolderId}`);
       return;
     }
 
     // Check if job already queued
     if (this.animationJobs.has(soulId)) {
-      console.log(`[SoulAnimation] Animation job already queued for soul ${soulId}`);
       return;
     }
 
@@ -156,11 +154,6 @@ export class SoulAnimationProgressionSystem extends BaseSystem {
     };
 
     this.animationJobs.set(soulId, job);
-
-    console.log(
-      `[SoulAnimation] Queued walking animation for soul ${soulIdentity.soulName} ` +
-      `(${incarnationCount} incarnations) - sprite: ${spriteFolderId}`
-    );
 
     // Emit event for external animation generation (daemon or manual process)
     world.eventBus.emit<'soul:animation_requested'>({

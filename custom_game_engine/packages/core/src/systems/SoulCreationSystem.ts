@@ -703,8 +703,6 @@ export class SoulCreationSystem extends BaseSystem {
       // Add complementary interests based on archetype
       const complementary = this.getComplementaryInterests(archetype, baseInterests);
       parsed.interests = [...baseInterests, ...complementary].slice(0, 3); // Max 3
-
-      console.log(`[SoulCreationSystem] Updated interests to: ${parsed.interests.join(', ')}`);
     }
 
     // Create soul entity

@@ -247,7 +247,6 @@ export class TechnologyUnlockSystem extends BaseSystem {
   private enableSystemsForTechnology(_world: World, buildingType: string): void {
     // Uplift systems - enabled when research_lab is built
     if (buildingType === 'research_lab') {
-      console.log('[TechnologyUnlock] Enabling Uplift systems (research_lab unlocked)');
       this.systemRegistry.enable('UpliftCandidateDetectionSystem');
       this.systemRegistry.enable('ProtoSapienceObservationSystem');
       this.systemRegistry.enable('ConsciousnessEmergenceSystem');
@@ -256,26 +255,22 @@ export class TechnologyUnlockSystem extends BaseSystem {
 
     // VR systems - enabled when vr_center or research_lab is built
     if (buildingType === 'vr_center' || buildingType === 'research_lab') {
-      console.log('[TechnologyUnlock] Enabling VR systems');
       this.systemRegistry.enable('VRSystem');
     }
 
     // Parasitic Reproduction - enabled when biology_lab is built
     if (buildingType === 'biology_lab' || buildingType === 'research_lab') {
-      console.log('[TechnologyUnlock] Enabling Parasitic Reproduction systems');
       this.systemRegistry.enable('ParasiticReproductionSystem');
     }
 
     // Neural Interface systems - enabled when research_lab is built
     if (buildingType === 'research_lab' || buildingType === 'neural_lab') {
-      console.log('[TechnologyUnlock] Enabling Neural Interface systems');
       this.systemRegistry.enable('NeuralInterfaceSystem');
       this.systemRegistry.enable('VRTrainingSystem');
     }
 
     // Television systems - enabled when television_station is built
     if (buildingType === 'television_station' || buildingType === 'broadcast_tower') {
-      console.log('[TechnologyUnlock] Enabling Television systems (TV industry unlocked)');
       // TV Show Formats
       this.systemRegistry.enable('GameShowSystem');
       this.systemRegistry.enable('NewsroomSystem');
@@ -295,13 +290,11 @@ export class TechnologyUnlockSystem extends BaseSystem {
 
     // Plot & Narrative systems - enabled when library or university is built
     if (buildingType === 'library' || buildingType === 'university') {
-      console.log('[TechnologyUnlock] Enabling Plot & Narrative systems (storytelling unlocked)');
       this.systemRegistry.enable('PlotAssignmentSystem');
       this.systemRegistry.enable('PlotProgressionSystem');
       this.systemRegistry.enable('NarrativePressureSystem');
       // Fates Council - Exotic/Epic plot weaving
       this.systemRegistry.enable('fates_council');
-      console.log('[TechnologyUnlock] The Three Fates now observe the narrative tapestry');
     }
   }
 }

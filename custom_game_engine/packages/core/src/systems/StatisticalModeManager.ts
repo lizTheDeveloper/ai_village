@@ -210,12 +210,6 @@ export class StatisticalModeManager extends BaseSystem {
       soulAgents: this.headlessSoulCount,
       tick: Number(tick),
     }, this.timeCompressionEntityId ?? 'world');
-
-    console.log(
-      `[StatisticalModeManager] Entered statistical mode: ` +
-      `${this.preservedEntityCount} entities preserved, ` +
-      `${this.headlessSoulCount} soul agents headless`
-    );
   }
 
   /**
@@ -295,11 +289,6 @@ export class StatisticalModeManager extends BaseSystem {
       soulAgentsResumed,
       tick: Number(tick),
     }, this.timeCompressionEntityId ?? 'world');
-
-    console.log(
-      `[StatisticalModeManager] Exited statistical mode: ` +
-      `${entitiesRestored} entities restored`
-    );
   }
 
   /**
@@ -400,12 +389,7 @@ export class StatisticalModeManager extends BaseSystem {
 
     // Add skills gained (simplified - skills system is complex)
     // In full implementation, would integrate with SkillsComponent properly
-    if (trajectory.skillsGained.length > 0) {
-      // Log skill gains for now
-      console.log(
-        `[StatisticalModeManager] Soul ${trajectory.soulName} gained skills: ${trajectory.skillsGained.join(', ')}`
-      );
-    }
+    // Skills are tracked through trajectory.skillsGained
 
     // Mark if agent died during trajectory
     if (!trajectory.survived) {

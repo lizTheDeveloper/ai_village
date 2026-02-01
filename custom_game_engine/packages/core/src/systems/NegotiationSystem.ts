@@ -244,9 +244,7 @@ export class NegotiationSystem extends BaseSystem {
   private implementGoldTransfer(world: World, term: NegotiationTerm): void {
     // Find entities and transfer resources
     // This would integrate with economy systems
-    console.log(
-      `[NegotiationSystem] Implementing gold transfer: ${term.value} from ${term.offeredBy} to ${term.beneficiary}`
-    );
+    // Implementation: transfer term.value from term.offeredBy to term.beneficiary
   }
 
   /**
@@ -254,10 +252,7 @@ export class NegotiationSystem extends BaseSystem {
    */
   private implementTerritoryTransfer(world: World, term: NegotiationTerm): void {
     // This would integrate with territory management systems
-    console.log(
-      `[NegotiationSystem] Implementing territory transfer: ${term.affectedEntityIds?.join(', ')} ` +
-      `from ${term.offeredBy} to ${term.beneficiary}`
-    );
+    // Implementation: transfer term.affectedEntityIds from term.offeredBy to term.beneficiary
   }
 
   /**
@@ -265,9 +260,7 @@ export class NegotiationSystem extends BaseSystem {
    */
   private implementMilitaryAgreement(world: World, term: NegotiationTerm): void {
     // This would integrate with military systems
-    console.log(
-      `[NegotiationSystem] Implementing military agreement: ${term.description}`
-    );
+    // Implementation: establish military agreement per term.description
   }
 
   // ========================================================================

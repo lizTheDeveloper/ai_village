@@ -104,7 +104,6 @@ export class SaveLoadService {
 
     if (this.serverAvailable) {
       this.serverSyncEnabled = true;
-      console.log('[SaveLoad] Server sync ENABLED - saves will be uploaded');
 
       // Register player with server
       try {
@@ -301,7 +300,6 @@ export class SaveLoadService {
     // Wait for pending server sync initialization before deciding whether to sync
     // This prevents race condition where save() is called before enableServerSync() completes
     if (this.serverSyncPendingPromise) {
-      console.log('[SaveLoad] Waiting for server sync initialization before syncing save...');
       await this.serverSyncPendingPromise;
     }
 
@@ -309,8 +307,6 @@ export class SaveLoadService {
     const shouldSync = this.serverSyncEnabled &&
       options.syncToServer !== false &&
       await this.checkServerAvailable();
-
-    console.log(`[SaveLoad] Sync decision: serverSyncEnabled=${this.serverSyncEnabled}, syncToServer=${options.syncToServer !== false}, shouldSync=${shouldSync}`);
 
     if (shouldSync) {
       try {
@@ -339,7 +335,6 @@ export class SaveLoadService {
             canonEvent: options.canonEvent,
           }
         );
-        console.log(`[SaveLoad] Successfully synced save to server as timeline entry (universe: ${serverUniverseId})`);
       } catch (error) {
         // Log but don't fail - local save succeeded
         console.error('[SaveLoad] Failed to sync to server:', error);

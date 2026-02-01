@@ -848,12 +848,6 @@ export class GovernorDecisionSystem extends BaseSystem {
       return;
     }
 
-    // Log successful execution
-    console.log(
-      `[GovernorDecisionSystem] Executed decision for governor ${governor.id} (${govComp.tier}): ` +
-      `${decision.action.type} - ${result.stateChanges.join(', ')}`
-    );
-
     // Emit decision executed event
     world.eventBus.emit({
       type: 'governor:decision_executed',

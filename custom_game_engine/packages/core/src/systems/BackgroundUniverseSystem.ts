@@ -46,8 +46,6 @@ export class BackgroundUniverseSystem extends BaseSystem {
     );
 
     this.initialized = true;
-
-    console.log('[BackgroundUniverseSystem] Initialized');
   }
 
   protected onUpdate(ctx: SystemContext): void {
@@ -72,6 +70,5 @@ export class BackgroundUniverseSystem extends BaseSystem {
 
   protected onCleanup(): void {
     // Cleanup handled by MultiverseCoordinator
-    console.log('[BackgroundUniverseSystem] Cleaned up');
   }
 }
