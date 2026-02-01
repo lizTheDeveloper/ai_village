@@ -337,13 +337,12 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
     target: Entity,
     _world: World
   ): void {
-    const magic = target.components.get('magic');
+    const magic = target.components.get('magic') as MagicComponentWithProtection | undefined;
     if (!magic || magic.type !== 'magic') {
       return;
     }
 
-    const magicRecord = magic as unknown as Record<string, unknown>;
-    const shields = magicRecord.protectionShields as Array<Record<string, unknown>> | undefined;
+    const shields = magic.protectionShields;
     if (!shields) {
       return;
     }
@@ -364,7 +363,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       (shield) => shield.effectId === activeEffect.effectId
     );
     if (!hasMore) {
-      const activeEffects = magicRecord.activeEffects as string[] | undefined;
+      const activeEffects = magic.activeEffects;
       if (activeEffects) {
         const effectIndex = activeEffects.indexOf(activeEffect.effectId);
         if (effectIndex !== -1) {

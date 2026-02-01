@@ -485,11 +485,7 @@ export class ReincarnationSystem extends BaseSystem {
     // These memories persist across ALL reincarnations, contributing to the soul's wisdom
     // The God of Death can see these when evaluating for ascension to angelhood
     if (soul.preserved.suppressedMemories && soul.preserved.suppressedMemories.length > 0) {
-      for (const suppressedMemory of soul.preserved.suppressedMemories) {
-        // Add directly to suppressed storage (bypassing active memory)
-        // Access private field through bracket notation (necessary for reincarnation system)
-        (episodicMemory as unknown as { _suppressedMemories: EpisodicMemory[] })._suppressedMemories.push(suppressedMemory);
-      }
+      episodicMemory.restoreSuppressedFromPastLife(soul.preserved.suppressedMemories);
     }
 
     // Add AfterlifeMemoryComponent if any afterlife memories were transferred

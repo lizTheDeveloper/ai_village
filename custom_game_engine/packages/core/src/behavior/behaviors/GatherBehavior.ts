@@ -1568,15 +1568,6 @@ export class GatherBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
- * @deprecated Use gatherBehaviorWithContext for better performance
- */
-export function gatherBehavior(entity: EntityImpl, world: World): void {
-  const behavior = new GatherBehavior();
-  behavior.execute(entity, world);
-}
-
-/**
  * Modern version using BehaviorContext.
  * Provides optimized spatial queries and pre-fetched components.
  * @example registerBehaviorWithContext('gather', gatherBehaviorWithContext);

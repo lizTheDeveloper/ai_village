@@ -620,15 +620,6 @@ export class BuildBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
- * @deprecated Use buildBehaviorWithContext for better performance
- */
-export function buildBehavior(entity: EntityImpl, world: World): void {
-  const behavior = new BuildBehavior();
-  behavior.execute(entity, world);
-}
-
-/**
  * Minimal World interface for delegating to BuildBehavior from BehaviorContext
  */
 interface MinimalWorldAdapter {

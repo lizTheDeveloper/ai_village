@@ -30,20 +30,26 @@ export interface ResearchPaper {
   activeSpecialists: Record<number, number>;  // Current specialist tiers working on it
 }
 
-export type ResearchField =
-  | 'physics'
-  | 'transcendent_physics'
-  | 'chemistry'
-  | 'exotic_matter_theory'
-  | 'dimensional_engineering'
-  | 'temporal_mechanics'
-  | 'consciousness_studies'
-  | 'cultural_synthesis'
-  | 'megastructure_architecture'
-  | 'energy_systems'
-  | 'biological_augmentation'
-  | 'artificial_intelligence'
-  | 'reality_manipulation';
+/**
+ * All research fields as a const array for type-safe iteration
+ */
+export const RESEARCH_FIELDS = [
+  'physics',
+  'transcendent_physics',
+  'chemistry',
+  'exotic_matter_theory',
+  'dimensional_engineering',
+  'temporal_mechanics',
+  'consciousness_studies',
+  'cultural_synthesis',
+  'megastructure_architecture',
+  'energy_systems',
+  'biological_augmentation',
+  'artificial_intelligence',
+  'reality_manipulation',
+] as const;
+
+export type ResearchField = typeof RESEARCH_FIELDS[number];
 
 export interface Scientist {
   id: string;
@@ -232,11 +238,11 @@ export class PaperTitleGenerator {
   }
 
   private getRandomFields(count: number): ResearchField[] {
-    const fields: ResearchField[] = Object.keys(this.topics) as ResearchField[];
+    // Use RESEARCH_FIELDS const array for type-safe iteration
     const selected: ResearchField[] = [];
 
-    while (selected.length < count && selected.length < fields.length) {
-      const field = fields[Math.floor(Math.random() * fields.length)]!;
+    while (selected.length < count && selected.length < RESEARCH_FIELDS.length) {
+      const field = RESEARCH_FIELDS[Math.floor(Math.random() * RESEARCH_FIELDS.length)]!;
       if (!selected.includes(field)) {
         selected.push(field);
       }

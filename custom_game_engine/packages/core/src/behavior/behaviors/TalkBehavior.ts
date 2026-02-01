@@ -593,15 +593,6 @@ export class TalkBehavior extends BaseBehavior {
   }
 }
 
-/**
- * Standalone function for use with BehaviorRegistry (legacy).
- * @deprecated Use talkBehaviorWithContext for new code
- */
-export function talkBehavior(entity: EntityImpl, world: World): void {
-  const behavior = new TalkBehavior();
-  behavior.execute(entity, world);
-}
-
 // ============================================================================
 // Modern BehaviorContext Version
 // ============================================================================

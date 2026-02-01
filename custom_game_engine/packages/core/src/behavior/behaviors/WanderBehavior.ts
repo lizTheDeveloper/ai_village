@@ -229,15 +229,6 @@ export class WanderBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
- * @deprecated Use wanderBehaviorWithContext instead
- */
-export function wanderBehavior(entity: EntityImpl, world: World): void {
-  const behavior = new WanderBehavior();
-  behavior.execute(entity, world);
-}
-
-/**
  * Modern version using BehaviorContext.
  * @example registerBehaviorWithContext('wander', wanderBehaviorWithContext);
  */

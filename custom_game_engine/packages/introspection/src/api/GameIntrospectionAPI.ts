@@ -94,6 +94,16 @@ interface BlueprintLike {
 }
 
 /**
+ * Entity interface compatible with MutationService requirements
+ */
+interface MutableEntityLike {
+  readonly id: string;
+  hasComponent(type: string): boolean;
+  getComponent<T>(type: string): T | undefined;
+  updateComponent<T>(type: string, updater: (current: T) => T): void;
+}
+
+/**
  * UndoStack interface for mutation history access
  */
 interface UndoStackLike {
@@ -224,6 +234,14 @@ interface CurrencyComponentLike {
  */
 interface ChunkSystemLike {
   getTile?: (x: number, y: number) => TileLike | undefined;
+}
+
+/**
+ * Entity mutator interface for add/remove component operations
+ */
+interface EntityMutatorLike {
+  removeComponent(componentType: string): void;
+  addComponent(component: Component): void;
 }
 
 interface TileLike {
@@ -1586,9 +1604,22 @@ export class GameIntrospectionAPI {
       const cacheStatsBefore = this.cache.getStats();
 
       // Apply mutation via MutationService (handles validation, undo, events)
-      // Note: MutationService defines its own Entity interface which is compatible
+      // Verify entity has the required interface for mutation
+      if (!this.isMutableEntity(entity)) {
+        return {
+          success: false,
+          oldValue: undefined,
+          newValue: undefined,
+          validationErrors: ['Entity does not support mutation interface'],
+          metrics: {
+            latency: performance.now() - startTime,
+            cacheInvalidations: 0,
+          },
+        };
+      }
+
       const mutationResult = MutationService.mutate(
-        entity as unknown as Parameters<typeof MutationService.mutate>[0],
+        entity,
         mutation.componentType,
         mutation.field,
         mutation.value,
@@ -2021,13 +2052,11 @@ export class GameIntrospectionAPI {
           continue;
         }
 
-        // Type-safe entity mutation interface
-        interface EntityMutator {
-          removeComponent(componentType: string): void;
-          addComponent(component: Component): void;
+        // Verify entity supports component mutation methods
+        if (!this.isEntityMutator(entity)) {
+          console.warn(`[Snapshot] Entity ${entityId} does not support component mutation, skipping restore`);
+          continue;
         }
-
-        const entityImpl = entity as unknown as EntityMutator;
 
         // Remove all current components
         const currentComponentTypes = Array.from(entity.components.keys());
@@ -2757,6 +2786,25 @@ export class GameIntrospectionAPI {
       system !== null &&
       'getTile' in system &&
       typeof system.getTile === 'function'
+    );
+  }
+
+  /**
+   * Type guard for MutableEntityLike
+   * Verifies entity has the required interface for mutation operations
+   */
+  private isMutableEntity(entity: unknown): entity is MutableEntityLike {
+    return (
+      typeof entity === 'object' &&
+      entity !== null &&
+      'id' in entity &&
+      typeof (entity as MutableEntityLike).id === 'string' &&
+      'hasComponent' in entity &&
+      typeof (entity as MutableEntityLike).hasComponent === 'function' &&
+      'getComponent' in entity &&
+      typeof (entity as MutableEntityLike).getComponent === 'function' &&
+      'updateComponent' in entity &&
+      typeof (entity as MutableEntityLike).updateComponent === 'function'
     );
   }
 

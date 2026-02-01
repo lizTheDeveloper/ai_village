@@ -50,9 +50,8 @@ export class ExplorationSystem extends BaseSystem {
     }
   }
 
-  private _updateExploration(entity: Entity, world: SystemContext['world'], currentTick: number): void {
-    const impl = entity as EntityImpl;
-    if (!impl.hasComponent(CT.ExplorationState)) {
+  private _updateExploration(entity: EntityImpl, world: SystemContext['world'], currentTick: number): void {
+    if (!entity.hasComponent(CT.ExplorationState)) {
       throw new Error('ExplorationSystem requires ExplorationState component');
     }
 
@@ -62,7 +61,7 @@ export class ExplorationSystem extends BaseSystem {
       return;
     }
 
-    const explorationState = this.getExplorationState(impl);
+    const explorationState = this.getExplorationState(entity);
     if (!explorationState) {
       throw new Error('ExplorationState component missing');
     }
@@ -100,9 +99,8 @@ export class ExplorationSystem extends BaseSystem {
   /**
    * Frontier exploration - explore edges of known territory
    */
-  private _frontierExploration(entity: Entity, _currentTick: number): void {
-    const impl = entity as EntityImpl;
-    const explorationState = this.getExplorationState(impl);
+  private _frontierExploration(entity: EntityImpl, _currentTick: number): void {
+    const explorationState = this.getExplorationState(entity);
     if (!explorationState) {
       throw new Error('ExplorationState component missing');
     }
@@ -143,8 +141,8 @@ export class ExplorationSystem extends BaseSystem {
         explorationState.currentTarget = targetWorld;
 
         // Update steering if component exists
-        if (impl.hasComponent(CT.Steering)) {
-          impl.updateComponent(CT.Steering, (state) => ({
+        if (entity.hasComponent(CT.Steering)) {
+          entity.updateComponent(CT.Steering, (state) => ({
             ...state,
             behavior: 'arrive',
             target: targetWorld,
@@ -157,9 +155,8 @@ export class ExplorationSystem extends BaseSystem {
   /**
    * Spiral exploration - spiral outward from home base
    */
-  private _spiralExploration(entity: Entity, _currentTick: number): void {
-    const impl = entity as EntityImpl;
-    const explorationState = this.getExplorationState(impl);
+  private _spiralExploration(entity: EntityImpl, _currentTick: number): void {
+    const explorationState = this.getExplorationState(entity);
     if (!explorationState) {
       throw new Error('ExplorationState component missing');
     }
@@ -185,8 +182,8 @@ export class ExplorationSystem extends BaseSystem {
         const nextPos = this._getNextSpiralPosition(explorationState);
         explorationState.currentTarget = nextPos;
 
-        if (impl.hasComponent(CT.Steering)) {
-          impl.updateComponent(CT.Steering, (state) => ({
+        if (entity.hasComponent(CT.Steering)) {
+          entity.updateComponent(CT.Steering, (state) => ({
             ...state,
             behavior: 'arrive',
             target: nextPos,
@@ -199,8 +196,8 @@ export class ExplorationSystem extends BaseSystem {
       explorationState.spiralStep = (explorationState.spiralStep ?? 0) + 1;
       explorationState.currentTarget = firstPos;
 
-      if (impl.hasComponent(CT.Steering)) {
-        impl.updateComponent(CT.Steering, (state) => ({
+      if (entity.hasComponent(CT.Steering)) {
+        entity.updateComponent(CT.Steering, (state) => ({
           ...state,
           behavior: 'arrive',
           target: firstPos,
@@ -326,9 +323,8 @@ export class ExplorationSystem extends BaseSystem {
   /**
    * Calculate exploration coverage (0-1)
    */
-  calculateCoverage(entity: Entity): number {
-    const impl = entity as EntityImpl;
-    const explorationState = this.getExplorationState(impl);
+  calculateCoverage(entity: EntityImpl): number {
+    const explorationState = this.getExplorationState(entity);
     if (!explorationState) {
       throw new Error('ExplorationState component missing');
     }

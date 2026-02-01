@@ -353,15 +353,6 @@ export class CraftBehavior extends BaseBehavior {
 }
 
 /**
- * Standalone function for use with BehaviorRegistry.
- * @deprecated Use craftBehaviorWithContext for better performance
- */
-export function craftBehavior(entity: EntityImpl, world: World): void {
-  const behavior = new CraftBehavior();
-  behavior.execute(entity, world);
-}
-
-/**
  * Modern version using BehaviorContext.
  * @example registerBehaviorWithContext('craft', craftBehaviorWithContext);
  */

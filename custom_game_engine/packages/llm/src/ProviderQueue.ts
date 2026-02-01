@@ -170,7 +170,7 @@ export class ProviderQueue {
       try {
         const response = await this.provider.generate(queuedRequest.request);
         queuedRequest.resolve(response);
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Check for 429 rate limit
         if (this.isRateLimitError(error)) {
           console.warn(
@@ -186,7 +186,8 @@ export class ProviderQueue {
           this.queue.unshift(queuedRequest);
         } else {
           // Non-rate-limit error, reject
-          queuedRequest.reject(error);
+          const rejectionError = error instanceof Error ? error : new Error(String(error));
+          queuedRequest.reject(rejectionError);
         }
       } finally {
         this.semaphore.release();
@@ -209,34 +210,44 @@ export class ProviderQueue {
   /**
    * Check if error is a rate limit error (429)
    */
-  private isRateLimitError(error: any): boolean {
+  private isRateLimitError(error: unknown): error is RateLimitError {
+    if (typeof error !== 'object' || error === null) {
+      return false;
+    }
+    const err = error as Partial<RateLimitError>;
+    const message = err.message?.toLowerCase() ?? '';
     return (
-      error?.status === 429 ||
-      error?.code === 'rate_limit_exceeded' ||
-      error?.code === 'RATE_LIMIT_EXCEEDED' ||
-      error?.message?.toLowerCase().includes('rate limit') ||
-      error?.message?.toLowerCase().includes('too many requests')
+      err.status === 429 ||
+      err.code === 'rate_limit_exceeded' ||
+      err.code === 'RATE_LIMIT_EXCEEDED' ||
+      message.includes('rate limit') ||
+      message.includes('too many requests')
     );
   }
 
   /**
    * Extract retry-after duration from error
    *
-   * @param error - Error object from LLM provider
+   * @param error - Error object from LLM provider (must be a RateLimitError)
    * @returns Retry-after duration in milliseconds, or null if not available
    */
-  private extractRetryAfter(error: any): number | null {
+  private extractRetryAfter(error: RateLimitError): number | null {
+    const headers = error.headers;
+    if (!headers) {
+      return null;
+    }
+
     // Check for Retry-After header (in seconds)
-    if (error.headers?.['retry-after']) {
-      const retryAfter = parseInt(error.headers['retry-after'], 10);
+    if (headers['retry-after']) {
+      const retryAfter = parseInt(headers['retry-after'], 10);
       if (!isNaN(retryAfter)) {
         return retryAfter * 1000; // Convert to ms
       }
     }
 
     // Check for X-RateLimit-Reset header (unix timestamp)
-    if (error.headers?.['x-ratelimit-reset']) {
-      const resetTime = parseInt(error.headers['x-ratelimit-reset'], 10);
+    if (headers['x-ratelimit-reset']) {
+      const resetTime = parseInt(headers['x-ratelimit-reset'], 10);
       if (!isNaN(resetTime)) {
         const resetMs = resetTime * 1000;
         return Math.max(0, resetMs - Date.now());
@@ -244,8 +255,8 @@ export class ProviderQueue {
     }
 
     // Check for x-ratelimit-reset-requests (Groq-specific, timestamp in seconds with decimal)
-    if (error.headers?.['x-ratelimit-reset-requests']) {
-      const resetTime = parseFloat(error.headers['x-ratelimit-reset-requests']);
+    if (headers['x-ratelimit-reset-requests']) {
+      const resetTime = parseFloat(headers['x-ratelimit-reset-requests']);
       if (!isNaN(resetTime)) {
         const resetMs = resetTime * 1000;
         return Math.max(0, resetMs - Date.now());

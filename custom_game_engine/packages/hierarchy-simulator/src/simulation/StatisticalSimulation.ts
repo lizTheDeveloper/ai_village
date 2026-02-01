@@ -24,7 +24,7 @@ import type { AbstractPlanet } from '../abstraction/AbstractPlanet.js';
 import type { AbstractSystem } from '../abstraction/AbstractSystem.js';
 import type { AbstractSector } from '../abstraction/AbstractSector.js';
 import type { AbstractGalaxy } from '../abstraction/AbstractGalaxy.js';
-import type { ResourceType } from '../abstraction/types.js';
+// ResourceType not needed here - economy maps use string keys
 import { TIME_SCALE } from '../renormalization/TierConstants.js';
 
 // ============================================================================
@@ -392,8 +392,9 @@ export function simulateSystemTier(system: AbstractSystem, deltaTime: number): v
     if (belt.miningStations > 0) {
       const extractionMult = belt.miningStations * dt * 0.01;
       for (const [resource, yield_] of belt.resourceYield) {
-        const currentStock = system.economy.stockpiles.get(resource as ResourceType) ?? 0;
-        system.economy.stockpiles.set(resource as ResourceType, currentStock + yield_ * extractionMult);
+        // Belt resourceYield and economy.stockpiles are both Map<string, number>
+        const currentStock = system.economy.stockpiles.get(resource) ?? 0;
+        system.economy.stockpiles.set(resource, currentStock + yield_ * extractionMult);
       }
     }
   }

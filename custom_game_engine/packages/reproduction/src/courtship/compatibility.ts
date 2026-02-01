@@ -5,7 +5,6 @@
  */
 
 import type { Entity } from '@ai-village/core';
-import { EntityImpl } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { SexualityComponent } from '../SexualityComponent';
 import type { RelationshipComponent } from '@ai-village/core';
@@ -17,8 +16,8 @@ import type { StrategicPriorities } from '@ai-village/core';
 // ============================================================================
 
 export function calculateSexualCompatibility(agent1: Entity, agent2: Entity): number {
-  const sex1 = (agent1 as EntityImpl).getComponent<SexualityComponent>('sexuality');
-  const sex2 = (agent2 as EntityImpl).getComponent<SexualityComponent>('sexuality');
+  const sex1 = agent1.getComponent<SexualityComponent>('sexuality');
+  const sex2 = agent2.getComponent<SexualityComponent>('sexuality');
 
   if (!sex1 || !sex2) {
     throw new Error('Both agents must have SexualityComponent for compatibility calculation');

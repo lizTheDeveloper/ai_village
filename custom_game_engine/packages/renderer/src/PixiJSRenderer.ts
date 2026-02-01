@@ -38,6 +38,22 @@ import { lookupSprite } from './sprites/SpriteService.js';
 import type { SpriteTraits, ClothingType } from './sprites/SpriteRegistry.js';
 import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 
+/**
+ * Extended Sprite type with entity metadata for texture updates.
+ * Used to tag sprites with their source entity/sprite info for later lookup.
+ */
+interface EntitySprite extends Sprite {
+  _entityId: string;
+  _spriteId: string;
+}
+
+/**
+ * Type guard to check if a Sprite has entity metadata attached.
+ */
+function isEntitySprite(sprite: Sprite): sprite is EntitySprite {
+  return '_entityId' in sprite && '_spriteId' in sprite;
+}
+
 // Global renderer instance for cleanup on HMR/reload
 // This prevents WebGL context leaks that cause "CanvasRenderer is not yet implemented" errors
 let _globalPixiRenderer: PixiJSRenderer | null = null;
@@ -1026,12 +1042,12 @@ export class PixiJSRenderer implements IRenderer {
     const texture = this.app.renderer.generateTexture(graphics);
     graphics.destroy();
 
-    const sprite = new Sprite(texture);
+    const sprite = new Sprite(texture) as EntitySprite;
     sprite.anchor.set(0.5, 1);
 
     // Tag sprite with entity info for texture updates
-    (sprite as any)._entityId = entity.id;
-    (sprite as any)._spriteId = spriteId;
+    sprite._entityId = entity.id;
+    sprite._spriteId = spriteId;
 
     return sprite;
   }
@@ -1143,7 +1159,7 @@ export class PixiJSRenderer implements IRenderer {
    */
   private updateSpritesWithTexture(spriteId: string, texture: Texture): void {
     for (const [entityId, sprite] of this.entitySprites) {
-      if ((sprite as any)._spriteId === spriteId) {
+      if (isEntitySprite(sprite) && sprite._spriteId === spriteId) {
         sprite.texture = texture;
       }
     }

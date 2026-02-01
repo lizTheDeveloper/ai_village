@@ -17,6 +17,24 @@ import { ComponentType as CT } from '@ai-village/core';
 import type { MagicComponent } from '@ai-village/core';
 
 /**
+ * Generic event structure for magic system events.
+ * Used to emit events without strict typing for custom event types.
+ */
+interface MagicEvent {
+  type: string;
+  source: string;
+  data: Record<string, unknown>;
+}
+
+/**
+ * Event bus interface that allows generic event emission.
+ * Used when emitting custom magic events that aren't in the EventMap.
+ */
+interface GenericEventBus {
+  emit(event: MagicEvent): void;
+}
+
+/**
  * Terminal effect event data as emitted by MagicSystem
  */
 export interface TerminalEffectEvent {
@@ -65,9 +83,10 @@ export class TerminalEffectHandler {
       const result = this.handleTerminalEffect(caster as EntityImpl, effect, spellId);
 
       // Emit result event using generic emit
-      (eventBus as unknown as { emit: (event: Record<string, unknown>) => void }).emit({
+      // Cast to GenericEventBus for magic-specific events not in EventMap
+      (eventBus as GenericEventBus).emit({
         type: 'magic:terminal_effect_applied',
-        source: casterId,
+        source: casterId as string,
         data: { effect, result },
       });
     });
@@ -133,7 +152,8 @@ export class TerminalEffectHandler {
    * Emit a generic event
    */
   private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
-    (this.world.eventBus as unknown as { emit: (event: Record<string, unknown>) => void }).emit({
+    // Cast to GenericEventBus for magic-specific events not in EventMap
+    (this.world.eventBus as GenericEventBus).emit({
       type,
       source,
       data,

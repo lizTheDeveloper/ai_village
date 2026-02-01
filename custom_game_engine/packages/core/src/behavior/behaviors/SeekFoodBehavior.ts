@@ -549,15 +549,6 @@ export class SeekFoodBehavior extends BaseBehavior {
   }
 }
 
-/**
- * Standalone function for use with BehaviorRegistry (legacy).
- * @deprecated Use seekFoodBehaviorWithContext for new code
- */
-export function seekFoodBehavior(entity: EntityImpl, world: World): void {
-  const behavior = new SeekFoodBehavior();
-  behavior.execute(entity, world);
-}
-
 // ============================================================================
 // Modern BehaviorContext Version
 // ============================================================================

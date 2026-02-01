@@ -335,10 +335,9 @@ export class SteeringSystem extends BaseSystem {
 
           // Check if entity is a solid obstacle (physics or building)
           let obstacleRadius = 0;
-          const impl = e as EntityImpl;
 
           // Check PhysicsComponent first (trees, rocks, solid objects)
-          const physics = impl.getComponent<PhysicsComponent>(CT.Physics);
+          const physics = e.getComponent<PhysicsComponent>(CT.Physics);
           if (physics && physics.solid) {
             // Use average of width/height as radius, minimum from config
             obstacleRadius = Math.max(
@@ -348,7 +347,7 @@ export class SteeringSystem extends BaseSystem {
           }
 
           // Check BuildingComponent (chests, beds, furniture)
-          const building = impl.getComponent<BuildingComponent>(CT.Building);
+          const building = e.getComponent<BuildingComponent>(CT.Building);
           if (building && building.blocksMovement) {
             // Buildings are typically 1x1 tiles
             obstacleRadius = Math.max(

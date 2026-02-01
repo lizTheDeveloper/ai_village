@@ -442,15 +442,16 @@ export class WaterBehavior extends BaseBehavior {
       return { complete: true, reason: 'No plants need watering' };
     }
 
-    // Check if agent is adjacent to the plant
+    // Check if agent is adjacent to the plant (use squared distance for comparison)
     const dx = nearestDryPlant.x - position.x;
     const dy = nearestDryPlant.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const MAX_WATER_DISTANCE = Math.sqrt(2);
+    const distanceSq = dx * dx + dy * dy;
+    const MAX_WATER_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 
-    if (distance > MAX_WATER_DISTANCE) {
+    if (distanceSq > MAX_WATER_DISTANCE_SQ) {
       // Agent is too far - move towards plant
-
+      // Only compute sqrt when needed for velocity normalization
+      const distance = Math.sqrt(distanceSq);
       const speed = 1.0;
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
@@ -565,11 +566,13 @@ export class WaterBehavior extends BaseBehavior {
 
       const dx = plantPos.x - position.x;
       const dy = plantPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSq = dx * dx + dy * dy;
+      const WATER_SEARCH_RADIUS_SQ = WATER_SEARCH_RADIUS * WATER_SEARCH_RADIUS;
 
-      if (distance > WATER_SEARCH_RADIUS) continue;
+      if (distanceSq > WATER_SEARCH_RADIUS_SQ) continue;
 
-      // Prefer driest plants that are closest
+      // Prefer driest plants that are closest (use actual distance for priority scoring)
+      const distance = Math.sqrt(distanceSq);
       const priority = distance + (hydration / 10); // Lower is better
       const currentPriority = nearestDryPlant
         ? nearestDryPlant.distance + (nearestDryPlant.hydration / 10)
@@ -621,15 +624,16 @@ export class HarvestBehavior extends BaseBehavior {
       return { complete: true, reason: 'No harvestable plants' };
     }
 
-    // Check if agent is adjacent to the plant
+    // Check if agent is adjacent to the plant (use squared distance for comparison)
     const dx = nearestHarvestable.x - position.x;
     const dy = nearestHarvestable.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const MAX_HARVEST_DISTANCE = Math.sqrt(2);
+    const distanceSq = dx * dx + dy * dy;
+    const MAX_HARVEST_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 
-    if (distance > MAX_HARVEST_DISTANCE) {
+    if (distanceSq > MAX_HARVEST_DISTANCE_SQ) {
       // Agent is too far - move towards plant
-
+      // Only compute sqrt when needed for velocity normalization
+      const distance = Math.sqrt(distanceSq);
       const speed = 1.0;
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
@@ -723,17 +727,19 @@ export class HarvestBehavior extends BaseBehavior {
 
       const dx = plantPos.x - position.x;
       const dy = plantPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+      const distanceSq = dx * dx + dy * dy;
+      const HARVEST_SEARCH_RADIUS_SQ = HARVEST_SEARCH_RADIUS * HARVEST_SEARCH_RADIUS;
 
-      if (distance > HARVEST_SEARCH_RADIUS) continue;
+      if (distanceSq > HARVEST_SEARCH_RADIUS_SQ) continue;
 
-      if (!nearestHarvestable || distance < nearestHarvestable.distance) {
+      // Use squared distance for comparison (avoid sqrt in hot path)
+      if (!nearestHarvestable || distanceSq < nearestHarvestable.distance * nearestHarvestable.distance) {
         nearestHarvestable = {
           plantId: plantEntity.id,
           x: plantPos.x,
           y: plantPos.y,
           speciesId: plant.speciesId,
-          distance,
+          distance: Math.sqrt(distanceSq), // Only compute sqrt for the best candidate
         };
       }
     }
@@ -905,10 +911,12 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   const dx = nearestDryPlant.x - ctx.position.x;
   const dy = nearestDryPlant.y - ctx.position.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  const MAX_WATER_DISTANCE = Math.sqrt(2);
+  const distanceSq = dx * dx + dy * dy;
+  const MAX_WATER_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 
-  if (distance > MAX_WATER_DISTANCE) {
+  if (distanceSq > MAX_WATER_DISTANCE_SQ) {
+    // Only compute sqrt when needed for velocity normalization
+    const distance = Math.sqrt(distanceSq);
     ctx.setVelocity((dx / distance) * 1.0, (dy / distance) * 1.0);
     return;
   }
@@ -993,10 +1001,12 @@ export function harvestBehaviorWithContext(ctx: import('../BehaviorContext.js').
 
   const dx = nearestHarvestable.x - ctx.position.x;
   const dy = nearestHarvestable.y - ctx.position.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  const MAX_HARVEST_DISTANCE = Math.sqrt(2);
+  const distanceSq = dx * dx + dy * dy;
+  const MAX_HARVEST_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 
-  if (distance > MAX_HARVEST_DISTANCE) {
+  if (distanceSq > MAX_HARVEST_DISTANCE_SQ) {
+    // Only compute sqrt when needed for velocity normalization
+    const distance = Math.sqrt(distanceSq);
     ctx.setVelocity((dx / distance) * 1.0, (dy / distance) * 1.0);
     return;
   }

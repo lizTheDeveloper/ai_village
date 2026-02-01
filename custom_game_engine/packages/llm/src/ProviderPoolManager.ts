@@ -88,7 +88,7 @@ export class ProviderPoolManager {
       // Try primary provider
       const response = await queue.enqueue(request, agentId, sessionId);
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Check if this was a rate limit error
       const isRateLimit = this.isRateLimitError(error);
 
@@ -125,10 +125,11 @@ export class ProviderPoolManager {
               sessionId
             );
             return response;
-          } catch (fallbackError: any) {
+          } catch (fallbackError: unknown) {
+            const errorMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
             console.warn(
               `[ProviderPoolManager] Fallback ${fallbackProvider} failed:`,
-              fallbackError.message
+              errorMessage
             );
             continue;
           }
@@ -155,13 +156,18 @@ export class ProviderPoolManager {
   /**
    * Check if error is a rate limit error
    */
-  private isRateLimitError(error: any): boolean {
+  private isRateLimitError(error: unknown): error is RateLimitError {
+    if (typeof error !== 'object' || error === null) {
+      return false;
+    }
+    const err = error as Partial<RateLimitError>;
+    const message = err.message?.toLowerCase() ?? '';
     return (
-      error?.status === 429 ||
-      error?.code === 'rate_limit_exceeded' ||
-      error?.code === 'RATE_LIMIT_EXCEEDED' ||
-      error?.message?.toLowerCase().includes('rate limit') ||
-      error?.message?.toLowerCase().includes('too many requests')
+      err.status === 429 ||
+      err.code === 'rate_limit_exceeded' ||
+      err.code === 'RATE_LIMIT_EXCEEDED' ||
+      message.includes('rate limit') ||
+      message.includes('too many requests')
     );
   }
 

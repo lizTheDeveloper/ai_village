@@ -504,6 +504,39 @@ export class EpisodicMemoryComponent extends ComponentBase {
   }
 
   /**
+   * Restore suppressed memories from past lives during reincarnation.
+   * These memories are added directly to the suppressed storage (bypassing active memory).
+   * Used exclusively by the ReincarnationSystem to transfer soul wisdom across lives.
+   *
+   * @param memories - Array of suppressed memories from previous incarnations
+   */
+  restoreSuppressedFromPastLife(memories: readonly EpisodicMemory[]): void {
+    for (const memory of memories) {
+      // Validate memory has required fields
+      if (!memory.id || !memory.eventType || !memory.summary) {
+        throw new Error('Invalid memory: missing required fields (id, eventType, summary)');
+      }
+
+      // Add to suppressed storage
+      this._suppressedMemories.push(memory);
+    }
+
+    // Enforce suppressed memory limit (keep most important)
+    if (this._suppressedMemories.length > this._maxSuppressedMemories) {
+      this._suppressedMemories.sort((a, b) => {
+        const importanceDiff = b.importance - a.importance;
+        if (Math.abs(importanceDiff) > 0.01) return importanceDiff;
+
+        const emotionDiff = b.emotionalIntensity - a.emotionalIntensity;
+        if (Math.abs(emotionDiff) > 0.01) return emotionDiff;
+
+        return b.timestamp - a.timestamp;
+      });
+      this._suppressedMemories = this._suppressedMemories.slice(0, this._maxSuppressedMemories);
+    }
+  }
+
+  /**
    * Calculate importance from weighted factors with boosts
    * Weights normalized to sum to 100%:
    * - Emotional intensity: 30%

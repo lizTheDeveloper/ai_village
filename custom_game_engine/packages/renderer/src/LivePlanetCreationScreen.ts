@@ -482,7 +482,7 @@ export class LivePlanetCreationScreen {
     return this.getArtStyleValidation().valid;
   }
 
-  private getArtStyleValidation(): { valid: boolean; bitDepth?: string; era?: string; error?: string } {
+  private getArtStyleValidation(): { valid: boolean; bitDepth?: '8-bit' | '16-bit' | '32-bit' | '64-bit'; era?: string; error?: string } {
     const input = this.customArtStyleInput.toLowerCase();
     if (!input) return { valid: false, error: 'Please enter a custom art style' };
 
@@ -502,20 +502,23 @@ export class LivePlanetCreationScreen {
       return { valid: false, error: 'Must include a specific era or console (e.g., NES, SNES, Genesis, GBA, PS1)' };
     }
 
+    // Normalize bit depth to standard format
+    const normalizedBitDepth = bitDepthMatch[0].toLowerCase() as '8-bit' | '16-bit' | '32-bit' | '64-bit';
+
     return {
       valid: true,
-      bitDepth: bitDepthMatch[0],
+      bitDepth: normalizedBitDepth,
       era: foundEra.toUpperCase(),
     };
   }
 
   private updateCustomArtStyleConfig(): void {
     const validation = this.getArtStyleValidation();
-    if (validation.valid) {
+    if (validation.valid && validation.bitDepth) {
       this.artStyleConfig = {
         preset: null,
         custom: this.customArtStyleInput,
-        bitDepth: validation.bitDepth as any,
+        bitDepth: validation.bitDepth,
         era: validation.era!,
       };
     }

@@ -20,7 +20,7 @@ import type { Entity, World } from '@ai-village/core';
 // Import types - these need to be exported from @ai-village/core governance module
 // For now, define locally to avoid circular dependency
 import type { Proposal, DelegationChain, Crisis, PoliticalTier } from '../../core/src/governance/DecisionProtocols.js';
-import type { NationContext } from '../../core/src/governance/GovernorContextBuilders.js';
+import type { NationContext, ProvinceGovernorContext, EmpireContext } from '../../core/src/governance/GovernorContextBuilders.js';
 import {
   buildProvinceGovernorContext,
   buildNationContext,
@@ -377,7 +377,7 @@ Be specific and realistic about what can be achieved.`;
   /**
    * Summarize province context for prompts
    */
-  private summarizeProvinceContext(context: any): string {
+  private summarizeProvinceContext(context: ProvinceGovernorContext): string {
     return `Province: ${context.provinceData.name}
 Population: ${context.population.toLocaleString()}
 Food supply: ${context.foodDaysRemaining.toFixed(1)} days remaining

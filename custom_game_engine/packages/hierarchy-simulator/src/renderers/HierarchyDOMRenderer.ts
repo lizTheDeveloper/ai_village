@@ -11,7 +11,7 @@ import type { SimulationController } from '../simulation/SimulationController.js
 import type { AbstractTier, GameEvent } from '../abstraction/types.js';
 import { TIER_SCALES } from '../abstraction/types.js';
 import { TIME_SCALE } from '../renormalization/index.js';
-import { Chart } from 'chart.js';
+import { Chart, type ChartDataset } from 'chart.js';
 
 export class HierarchyDOMRenderer {
   private controller: SimulationController;
@@ -421,10 +421,10 @@ export class HierarchyDOMRenderer {
   }
 
   private createChart(canvasId: string, label: string, color1: string, color2?: string): Chart | null {
-    const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-    if (!canvas) return null;
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) return null;
 
-    const datasets: any[] = [
+    const datasets: ChartDataset<'line', number[]>[] = [
       {
         label,
         data: [],

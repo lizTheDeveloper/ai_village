@@ -487,10 +487,17 @@ export class VisionDeliverySystem {
       }
     }
 
-    this.emitEvent('divinity:vision_delivered', vision.deityId, {
-      vision,
-      targetId: vision.targetId,
-      targetName: this.getTargetName(vision.targetId),
+    this.world.eventBus.emit<'divinity:vision_delivered'>({
+      type: 'divinity:vision_delivered',
+      source: vision.deityId,
+      data: {
+        visionId: vision.id,
+        deityId: vision.deityId,
+        targetId: vision.targetId,
+        visionType: vision.method,
+        content: vision.content.subject,
+        clarity: vision.clarity,
+      },
     });
   }
 
@@ -516,10 +523,16 @@ export class VisionDeliverySystem {
       }
     }
 
-    this.emitEvent('divinity:vision_interpreted', vision.targetId, {
-      visionId,
-      interpretation,
-      matchesIntent: this.interpretationMatchesIntent(vision, interpretation),
+    const matchesIntent = this.interpretationMatchesIntent(vision, interpretation);
+    this.world.eventBus.emit<'divinity:vision_interpreted'>({
+      type: 'divinity:vision_interpreted',
+      source: vision.targetId,
+      data: {
+        visionId,
+        targetId: vision.targetId,
+        interpretation,
+        accuracy: matchesIntent ? 1.0 : 0.3, // Convert boolean to accuracy score
+      },
     });
   }
 
@@ -544,7 +557,16 @@ export class VisionDeliverySystem {
       }
     }
 
-    this.emitEvent('divinity:prophecy_fulfilled', vision.deityId, { visionId, vision });
+    this.world.eventBus.emit<'divinity:prophecy_fulfilled'>({
+      type: 'divinity:prophecy_fulfilled',
+      source: vision.deityId,
+      data: {
+        visionId,
+        deityId: vision.deityId,
+        prophecyContent: vision.content.subject,
+        fulfillmentEvent: 'vision_marked_fulfilled',
+      },
+    });
   }
 
   /**

@@ -6,7 +6,9 @@ import type {
   PositionComponent,
   NeedsComponent,
   BuildingComponent,
-  WeatherComponent
+  WeatherComponent,
+  World,
+  Entity,
 } from '@ai-village/core';
 import {
   ComponentType as CT,
@@ -19,6 +21,7 @@ import {
   TEMP_DAILY_VARIATION,
   THERMAL_CHANGE_RATE,
   HEALTH_CRITICAL,
+  type TimeComponent,
 } from '@ai-village/core';
 import { type Tile } from '@ai-village/world';
 
@@ -36,6 +39,21 @@ const WALL_INSULATION: Record<string, number> = {
 /** Extended world interface with tile access */
 interface WorldWithTiles {
   getTileAt(x: number, y: number): ITile | undefined;
+}
+
+/** Interface for chunk manager access */
+interface ChunkManager {
+  getChunk(x: number, y: number): { generated?: boolean } | undefined;
+}
+
+/** Extended world interface that may have chunk manager */
+interface WorldWithChunkManager {
+  getChunkManager?: () => ChunkManager | undefined;
+}
+
+/** Type guard to check if world has chunk manager method */
+function hasChunkManager(world: World): world is World & Required<WorldWithChunkManager> {
+  return typeof (world as WorldWithChunkManager).getChunkManager === 'function';
 }
 
 
@@ -251,7 +269,7 @@ export class TemperatureSystem extends BaseSystem {
   /**
    * Calculate world ambient temperature based on time and season
    */
-  private calculateWorldTemperature(world: any): number {
+  private calculateWorldTemperature(world: World): number {
     // Use cached time entity ID (performance optimization)
     let timeOfDay = 12; // Default noon if no time entity
 
@@ -266,7 +284,7 @@ export class TemperatureSystem extends BaseSystem {
     if (this.timeEntityId) {
       const timeEntity = world.getEntity(this.timeEntityId);
       if (timeEntity) {
-        const timeComp = (timeEntity as EntityImpl).getComponent<any>('time');
+        const timeComp = (timeEntity as EntityImpl).getComponent<TimeComponent>(CT.Time);
         if (timeComp) {
           timeOfDay = timeComp.timeOfDay;
         }
@@ -288,7 +306,7 @@ export class TemperatureSystem extends BaseSystem {
   /**
    * Get temperature modifier from current weather
    */
-  private getWeatherModifier(world: any): number {
+  private getWeatherModifier(world: World): number {
     // Use cached weather entity ID (performance optimization)
     if (!this.weatherEntityId) {
       // Find and cache weather entity
