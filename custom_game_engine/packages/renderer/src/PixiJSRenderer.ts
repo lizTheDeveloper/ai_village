@@ -259,6 +259,45 @@ export class PixiJSRenderer implements IRenderer {
   // Speech bubble tracking - tracks shown speech to avoid duplicates
   private shownSpeech: Map<string, string> = new Map(); // entityId -> lastSpeechText
 
+  // Health bar graphics pool - reuse Graphics objects for performance
+  private healthBarGraphics: Map<string, Graphics> = new Map();
+
+  // Threat indicator tracking
+  private threats: Map<string, { entityId: string; severity: string; timestamp: number }> = new Map();
+  private threatIndicators: Map<string, Graphics> = new Map();
+
+  // Event handler references for cleanup
+  private conflictStartedHandler: ((event: any) => void) | null = null;
+  private conflictResolvedHandler: ((event: any) => void) | null = null;
+  private deathHandler: ((event: any) => void) | null = null;
+  private eventBus: EventBus | null = null;
+
+  // Health bar configuration
+  private readonly HEALTH_BAR_WIDTH = 32;
+  private readonly HEALTH_BAR_HEIGHT = 4;
+  private readonly HEALTH_BAR_OFFSET_Y = -12;
+  private readonly HEALTH_GOOD = 0.66;
+  private readonly HEALTH_MODERATE = 0.33;
+
+  // Threat indicator configuration
+  private readonly THREAT_INDICATOR_SIZE = 16;
+  private readonly PULSE_SPEED = 0.003;
+  private readonly SEVERITY_COLORS: Record<string, number> = {
+    low: 0xffff00,
+    medium: 0xff9900,
+    high: 0xff0000,
+    critical: 0xcc0033,
+  };
+
+  // Debug overlay state
+  private showDebugOverlay = false;
+  private debugText: Text | null = null;
+  private cityBoundaryGraphics: Graphics | null = null;
+
+  // Temperature overlay state
+  private showTemperatureOverlay = false;
+  private temperatureTexts: Map<string, Text> = new Map();
+
   // Canvas2D overlay for UI rendering (windows, menus, etc.)
   private _overlayCanvas: HTMLCanvasElement | null = null;
   private _overlayContext: CanvasRenderingContext2D | null = null;
@@ -707,7 +746,15 @@ export class PixiJSRenderer implements IRenderer {
     // 7. Update particles
     this.updateParticles();
 
-    // 8. Update FPS counter
+    // 8. Render health bars and threat indicators (combat UI)
+    this.renderHealthBars();
+    this.renderThreatIndicators(world);
+
+    // 9. Render debug and temperature overlays
+    this.renderDebugOverlay(world);
+    this.renderTemperatureOverlay(world);
+
+    // 10. Update FPS counter
     this.updateFps();
 
     // PixiJS handles actual GPU rendering automatically via the ticker
@@ -1403,8 +1450,229 @@ export class PixiJSRenderer implements IRenderer {
   }
 
   initCombatUI(world: World, eventBus: EventBus): void {
-    // TODO: Port health bar and threat indicator renderers
-    console.log('[PixiJSRenderer] Combat UI initialization placeholder');
+    this.eventBus = eventBus;
+
+    // Set up event handlers for threat tracking
+    this.conflictStartedHandler = (event: any) => {
+      const data = event.data || event;
+      if (!data.conflictId || !data.participants || !data.type) return;
+      const threatLevel = data.threatLevel || 'medium';
+      const attacker = data.participants[0];
+      this.threats.set(data.conflictId, {
+        entityId: attacker,
+        severity: threatLevel,
+        timestamp: Date.now(),
+      });
+    };
+
+    this.conflictResolvedHandler = (event: any) => {
+      const data = event.data || event;
+      if (!data.conflictId) return;
+      this.threats.delete(data.conflictId);
+      // Remove threat indicator
+      const indicator = this.threatIndicators.get(data.conflictId);
+      if (indicator) {
+        this.overlayContainer.removeChild(indicator);
+        indicator.destroy();
+        this.threatIndicators.delete(data.conflictId);
+      }
+    };
+
+    this.deathHandler = (event: any) => {
+      const data = event.data || event;
+      if (!data.entityId) return;
+      // Remove all threats for this entity
+      for (const [id, threat] of this.threats.entries()) {
+        if (threat.entityId === data.entityId) {
+          this.threats.delete(id);
+          const indicator = this.threatIndicators.get(id);
+          if (indicator) {
+            this.overlayContainer.removeChild(indicator);
+            indicator.destroy();
+            this.threatIndicators.delete(id);
+          }
+        }
+      }
+    };
+
+    eventBus.on('conflict:started', this.conflictStartedHandler);
+    eventBus.on('conflict:resolved', this.conflictResolvedHandler);
+    eventBus.on('death:occurred', this.deathHandler);
+
+    console.log('[PixiJSRenderer] Combat UI initialized with health bars and threat indicators');
+  }
+
+  /**
+   * Render health bars for entities that need them.
+   * Called from render() each frame.
+   */
+  private renderHealthBars(): void {
+    const activeEntities = new Set<string>();
+
+    // Check all cached agent entities for health display
+    for (const entity of this._cachedAgentEntities) {
+      const needs = entity.getComponent('needs') as { health?: number } | undefined;
+      const combatStats = entity.getComponent('combat_stats') as object | undefined;
+      const conflict = entity.getComponent('conflict') as object | undefined;
+      const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+
+      // Skip if no needs or combat stats
+      if (!needs || !combatStats || !pos) continue;
+
+      // Only show health bar if damaged or in combat
+      const health = needs.health ?? 1.0;
+      if (health >= 1.0 && !conflict) continue;
+
+      activeEntities.add(entity.id);
+
+      let graphics = this.healthBarGraphics.get(entity.id);
+      if (!graphics) {
+        graphics = new Graphics();
+        this.overlayContainer.addChild(graphics);
+        this.healthBarGraphics.set(entity.id, graphics);
+      }
+
+      // Position in world space
+      const worldX = pos.x * this._tileSize;
+      const worldY = pos.y * this._tileSize + this.HEALTH_BAR_OFFSET_Y;
+
+      graphics.x = worldX - this.HEALTH_BAR_WIDTH / 2;
+      graphics.y = worldY;
+
+      // Clear and redraw
+      graphics.clear();
+
+      // Background (black)
+      graphics.rect(0, 0, this.HEALTH_BAR_WIDTH, this.HEALTH_BAR_HEIGHT);
+      graphics.fill(0x000000);
+
+      // Border (white)
+      graphics.rect(0, 0, this.HEALTH_BAR_WIDTH, this.HEALTH_BAR_HEIGHT);
+      graphics.stroke({ color: 0xffffff, width: 1 });
+
+      // Health fill
+      const fillWidth = Math.max(0, Math.min(1, health)) * this.HEALTH_BAR_WIDTH;
+      let fillColor: number;
+      if (health >= this.HEALTH_GOOD) {
+        fillColor = 0x00ff00; // Green
+      } else if (health >= this.HEALTH_MODERATE) {
+        fillColor = 0xffff00; // Yellow
+      } else {
+        fillColor = 0xff0000; // Red
+      }
+      graphics.rect(0, 0, fillWidth, this.HEALTH_BAR_HEIGHT);
+      graphics.fill(fillColor);
+
+      graphics.visible = true;
+    }
+
+    // Remove health bars for entities that no longer need them
+    for (const [entityId, graphics] of this.healthBarGraphics) {
+      if (!activeEntities.has(entityId)) {
+        this.overlayContainer.removeChild(graphics);
+        graphics.destroy();
+        this.healthBarGraphics.delete(entityId);
+      }
+    }
+  }
+
+  /**
+   * Render threat indicators for active threats.
+   * Called from render() each frame.
+   */
+  private renderThreatIndicators(world: World): void {
+    const bounds = this._camera.getVisibleBounds();
+    const viewWidth = this._canvas.width;
+    const viewHeight = this._canvas.height;
+
+    for (const [conflictId, threat] of this.threats) {
+      const entity = world.getEntity(threat.entityId);
+      if (!entity) {
+        this.threats.delete(conflictId);
+        continue;
+      }
+
+      const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+      if (!pos) continue;
+
+      let graphics = this.threatIndicators.get(conflictId);
+      if (!graphics) {
+        graphics = new Graphics();
+        this.overlayContainer.addChild(graphics);
+        this.threatIndicators.set(conflictId, graphics);
+      }
+
+      // Check if threat is on screen
+      const screenX = (pos.x - bounds.left) * this._camera.zoom;
+      const screenY = (pos.y - bounds.top) * this._camera.zoom;
+      const isOnScreen = screenX >= 0 && screenX <= viewWidth && screenY >= 0 && screenY <= viewHeight;
+
+      const color = this.SEVERITY_COLORS[threat.severity] ?? this.SEVERITY_COLORS['medium']!;
+
+      // Pulsing for high/critical severity
+      const pulseOffset = (threat.severity === 'high' || threat.severity === 'critical')
+        ? Math.sin(Date.now() * this.PULSE_SPEED) * 3
+        : 0;
+
+      graphics.clear();
+
+      if (isOnScreen) {
+        // Draw in-world indicator (exclamation mark in circle)
+        const size = this.THREAT_INDICATOR_SIZE + pulseOffset;
+        const indicatorX = pos.x * this._tileSize;
+        const indicatorY = pos.y * this._tileSize - 20;
+
+        graphics.x = indicatorX;
+        graphics.y = indicatorY;
+
+        // Background circle
+        graphics.circle(0, 0, size / 2);
+        graphics.fill({ color, alpha: 0.8 });
+
+        // No text in Graphics - just the indicator is enough
+      } else {
+        // Draw off-screen arrow pointing to threat
+        const centerX = viewWidth / 2;
+        const centerY = viewHeight / 2;
+        const dx = screenX - centerX;
+        const dy = screenY - centerY;
+        const angle = Math.atan2(dy, dx);
+
+        // Calculate arrow position on screen edge
+        const arrowMargin = 20;
+        let arrowX: number, arrowY: number;
+
+        const absAngle = Math.abs(angle);
+        const tanAngle = Math.tan(absAngle);
+
+        if (absAngle < Math.atan2(viewHeight / 2, viewWidth / 2)) {
+          arrowX = dx > 0 ? viewWidth - arrowMargin : arrowMargin;
+          arrowY = centerY + (arrowX - centerX) * tanAngle * Math.sign(dy);
+        } else {
+          arrowY = dy > 0 ? viewHeight - arrowMargin : arrowMargin;
+          arrowX = centerX + (arrowY - centerY) / tanAngle * Math.sign(dx);
+        }
+
+        arrowX = Math.max(arrowMargin, Math.min(viewWidth - arrowMargin, arrowX));
+        arrowY = Math.max(arrowMargin, Math.min(viewHeight - arrowMargin, arrowY));
+
+        // Position in screen space (convert to world space for container)
+        // For off-screen arrows, we need screen coordinates relative to world container
+        graphics.x = (arrowX + this._camera.x * this._camera.zoom - this._canvas.width / 2) / this._camera.zoom;
+        graphics.y = (arrowY + this._camera.y * this._camera.zoom - this._canvas.height / 2) / this._camera.zoom;
+
+        // Draw arrow shape
+        const arrowSize = 12;
+        graphics.moveTo(arrowSize * Math.cos(angle), arrowSize * Math.sin(angle));
+        graphics.lineTo(-arrowSize / 2 * Math.cos(angle + Math.PI / 2), -arrowSize / 2 * Math.sin(angle + Math.PI / 2));
+        graphics.lineTo(-arrowSize / 2 * Math.cos(angle - Math.PI / 2), -arrowSize / 2 * Math.sin(angle - Math.PI / 2));
+        graphics.closePath();
+        graphics.fill({ color, alpha: 0.9 });
+        graphics.stroke({ color: 0x000000, width: 2 });
+      }
+
+      graphics.visible = true;
+    }
   }
 
   /**
@@ -1558,18 +1826,234 @@ export class PixiJSRenderer implements IRenderer {
   }
 
   toggleDebugOverlay(): void {
-    // TODO: Implement debug overlay
-    console.log('[PixiJSRenderer] Debug overlay toggle placeholder');
+    this.showDebugOverlay = !this.showDebugOverlay;
+
+    if (this.showDebugOverlay) {
+      // Create debug text if it doesn't exist
+      if (!this.debugText) {
+        const style = new TextStyle({
+          fontFamily: 'monospace',
+          fontSize: 12,
+          fill: '#ffffff',
+          stroke: { color: '#000000', width: 2 },
+        });
+        this.debugText = new Text({ text: '', style });
+        this.debugText.x = 10;
+        this.debugText.y = 10;
+        // Add to stage (not world container) so it stays fixed on screen
+        this.app.stage.addChild(this.debugText);
+      }
+
+      // Create city boundary graphics if it doesn't exist
+      if (!this.cityBoundaryGraphics) {
+        this.cityBoundaryGraphics = new Graphics();
+        this.overlayContainer.addChild(this.cityBoundaryGraphics);
+      }
+    } else {
+      // Hide debug elements
+      if (this.debugText) {
+        this.debugText.visible = false;
+      }
+      if (this.cityBoundaryGraphics) {
+        this.cityBoundaryGraphics.visible = false;
+      }
+    }
+
+    console.log(`[PixiJSRenderer] Debug overlay ${this.showDebugOverlay ? 'enabled' : 'disabled'}`);
   }
 
   toggleTemperatureOverlay(): void {
-    // TODO: Implement temperature overlay
-    console.log('[PixiJSRenderer] Temperature overlay toggle placeholder');
+    this.showTemperatureOverlay = !this.showTemperatureOverlay;
+
+    if (!this.showTemperatureOverlay) {
+      // Clean up temperature texts
+      for (const text of this.temperatureTexts.values()) {
+        this.overlayContainer.removeChild(text);
+        text.destroy();
+      }
+      this.temperatureTexts.clear();
+    }
+
+    console.log(`[PixiJSRenderer] Temperature overlay ${this.showTemperatureOverlay ? 'enabled' : 'disabled'}`);
+  }
+
+  /**
+   * Get current temperature overlay state.
+   */
+  isTemperatureOverlayEnabled(): boolean {
+    return this.showTemperatureOverlay;
+  }
+
+  /**
+   * Render debug overlay information.
+   * Called from render() when showDebugOverlay is true.
+   */
+  private renderDebugOverlay(world: World): void {
+    if (!this.showDebugOverlay) return;
+
+    // Update debug text
+    if (this.debugText) {
+      // Get time component
+      const timeEntities = world.query().with('time').executeEntities();
+      let timeOfDayStr = 'N/A';
+      let phaseStr = 'N/A';
+      let lightLevelStr = 'N/A';
+
+      if (timeEntities.length > 0 && timeEntities[0]) {
+        const timeComp = timeEntities[0].components.get('time') as
+          | { timeOfDay: number; phase: string; lightLevel: number }
+          | undefined;
+        if (timeComp) {
+          const hours = Math.floor(timeComp.timeOfDay);
+          const minutes = Math.floor((timeComp.timeOfDay - hours) * 60);
+          timeOfDayStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+          phaseStr = timeComp.phase;
+          lightLevelStr = (timeComp.lightLevel * 100).toFixed(0) + '%';
+        }
+      }
+
+      const lines = [
+        `Tick: ${world.tick}`,
+        `Time: ${timeOfDayStr} (${phaseStr}) Light: ${lightLevelStr}`,
+        `Camera: (${this._camera.x.toFixed(1)}, ${this._camera.y.toFixed(1)}) zoom: ${this._camera.zoom.toFixed(2)}`,
+        `Backend: ${this.backend.toUpperCase()}`,
+        `Entities: ${world.entities.size}`,
+        `Sprites: ${this.entitySprites.size}`,
+        `FPS: ${this.currentFps}`,
+      ];
+
+      this.debugText.text = lines.join('\n');
+      this.debugText.visible = true;
+    }
+
+    // Update city boundary graphics
+    if (this.cityBoundaryGraphics) {
+      this.cityBoundaryGraphics.clear();
+      this.cityBoundaryGraphics.visible = true;
+
+      const cityDirectors = world.query().with('city_director').executeEntities();
+      for (const entity of cityDirectors) {
+        const director = entity.getComponent('city_director') as
+          | { bounds: { minX: number; minY: number; maxX: number; maxY: number }; cityName: string }
+          | undefined;
+        if (!director) continue;
+
+        const bounds = director.bounds;
+        const minX = bounds.minX * this._tileSize;
+        const minY = bounds.minY * this._tileSize;
+        const maxX = (bounds.maxX + 1) * this._tileSize;
+        const maxY = (bounds.maxY + 1) * this._tileSize;
+
+        // Draw dashed rectangle (PixiJS doesn't have setLineDash, so use solid)
+        this.cityBoundaryGraphics.rect(minX, minY, maxX - minX, maxY - minY);
+        this.cityBoundaryGraphics.stroke({ color: 0xffd700, width: 2, alpha: 0.8 });
+      }
+    }
+  }
+
+  /**
+   * Render temperature overlay on terrain.
+   * Called from render() when showTemperatureOverlay is true.
+   */
+  private renderTemperatureOverlay(world: World): void {
+    if (!this.showTemperatureOverlay) return;
+
+    const bounds = this._camera.getVisibleBounds();
+    const activeKeys = new Set<string>();
+
+    // Get visible tiles and show temperature
+    for (let y = Math.floor(bounds.top); y <= Math.ceil(bounds.bottom); y++) {
+      for (let x = Math.floor(bounds.left); x <= Math.ceil(bounds.right); x++) {
+        const tile = world.getTileAt?.(x, y);
+        if (!tile) continue;
+
+        // Check if tile has temperature (from weather system)
+        const temp = (tile as { temperature?: number }).temperature;
+        if (temp === undefined) continue;
+
+        const key = `${x},${y}`;
+        activeKeys.add(key);
+
+        let text = this.temperatureTexts.get(key);
+        if (!text) {
+          const style = new TextStyle({
+            fontFamily: 'monospace',
+            fontSize: 8,
+            fill: '#ffffff',
+            stroke: { color: '#000000', width: 1 },
+          });
+          text = new Text({ text: '', style });
+          text.anchor.set(0.5, 0.5);
+          this.overlayContainer.addChild(text);
+          this.temperatureTexts.set(key, text);
+        }
+
+        text.text = `${temp.toFixed(0)}°`;
+        text.x = x * this._tileSize + this._tileSize / 2;
+        text.y = y * this._tileSize + this._tileSize / 2;
+        text.visible = true;
+      }
+    }
+
+    // Remove texts for tiles no longer visible
+    for (const [key, text] of this.temperatureTexts) {
+      if (!activeKeys.has(key)) {
+        this.overlayContainer.removeChild(text);
+        text.destroy();
+        this.temperatureTexts.delete(key);
+      }
+    }
   }
 
   destroy(): void {
     // Remove resize listener
     window.removeEventListener('resize', this.handleResize);
+
+    // Remove combat UI event handlers
+    if (this.eventBus) {
+      if (this.conflictStartedHandler) {
+        this.eventBus.off('conflict:started', this.conflictStartedHandler);
+      }
+      if (this.conflictResolvedHandler) {
+        this.eventBus.off('conflict:resolved', this.conflictResolvedHandler);
+      }
+      if (this.deathHandler) {
+        this.eventBus.off('death:occurred', this.deathHandler);
+      }
+    }
+    this.eventBus = null;
+    this.conflictStartedHandler = null;
+    this.conflictResolvedHandler = null;
+    this.deathHandler = null;
+
+    // Clean up health bar graphics
+    for (const graphics of this.healthBarGraphics.values()) {
+      graphics.destroy();
+    }
+    this.healthBarGraphics.clear();
+
+    // Clean up threat indicators
+    for (const graphics of this.threatIndicators.values()) {
+      graphics.destroy();
+    }
+    this.threatIndicators.clear();
+    this.threats.clear();
+
+    // Clean up debug overlay
+    if (this.debugText) {
+      this.debugText.destroy();
+      this.debugText = null;
+    }
+    if (this.cityBoundaryGraphics) {
+      this.cityBoundaryGraphics.destroy();
+      this.cityBoundaryGraphics = null;
+    }
+
+    // Clean up temperature overlay
+    for (const text of this.temperatureTexts.values()) {
+      text.destroy();
+    }
+    this.temperatureTexts.clear();
 
     // Remove overlay canvas
     if (this._overlayCanvas && this._overlayCanvas.parentElement) {
