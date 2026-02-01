@@ -304,10 +304,29 @@ export class GovernanceDataSystem extends BaseSystem {
       // Use pre-queried agents instead of querying again
       const agentCount = agents.length;
 
-      // Age distribution - simplified placeholder (would need age component)
-      const children = 0;
-      const adults = agentCount; // Assume all adults for now
-      const elders = 0;
+      // Age distribution - calculate from birth ticks
+      let children = 0;
+      let adults = 0;
+      let elders = 0;
+      const currentTick = world.tick;
+
+      for (const agentEntity of agents) {
+        const agentEntityImpl = agentEntity as EntityImpl;
+        const agentComp = agentEntityImpl.getComponent<AgentComponent>(CT.Agent);
+        const ageDays = this.calculateAgeDays(agentComp?.birthTick, currentTick);
+
+        // Age categories based on days (assuming 1 game day = 1 real day)
+        // Children: 0-18 years = 0-6570 days
+        // Adults: 18-60 years = 6570-21900 days
+        // Elders: 60+ years = 21900+ days
+        if (ageDays < 6570) {
+          children++;
+        } else if (ageDays < 21900) {
+          adults++;
+        } else {
+          elders++;
+        }
+      }
 
       // Calculate rates (per game-day)
       // This is simplified - in production would track over time window
