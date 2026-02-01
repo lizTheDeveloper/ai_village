@@ -96,6 +96,10 @@ export class GovernanceArchivalSystem extends BaseSystem {
   // Track last archival tick
   private lastArchivalTick: number = 0;
 
+  // Cache governance history entity IDs for fast lookup
+  private cachedHistoryEntityIds: string[] | null = null;
+  private cacheValidUntilTick: number = 0;
+
   // ========================================================================
   // Main Update Loop
   // ========================================================================
@@ -193,6 +197,41 @@ export class GovernanceArchivalSystem extends BaseSystem {
   }
 
   // ========================================================================
+  // Cached Lookups
+  // ========================================================================
+
+  /**
+   * Get history entities with caching (cache valid for 1000 ticks)
+   */
+  private getHistoryEntities(world: World): EntityImpl[] {
+    const tick = world.tick;
+
+    // Check cache validity
+    if (this.cachedHistoryEntityIds && tick < this.cacheValidUntilTick) {
+      // Fast path: resolve cached IDs to entities
+      const entities: EntityImpl[] = [];
+      for (const id of this.cachedHistoryEntityIds) {
+        const entity = world.getEntity(id);
+        if (entity) {
+          entities.push(entity as EntityImpl);
+        }
+      }
+      // If all cached entities still exist, return them
+      if (entities.length === this.cachedHistoryEntityIds.length) {
+        return entities;
+      }
+      // Cache partially stale, refresh
+    }
+
+    // Slow path: query and cache
+    const entities = world.query().with(CT.GovernanceHistory).executeEntities() as EntityImpl[];
+    this.cachedHistoryEntityIds = entities.map(e => e.id);
+    this.cacheValidUntilTick = tick + 1000; // Cache for 1000 ticks (50 seconds)
+
+    return entities;
+  }
+
+  // ========================================================================
   // Public API
   // ========================================================================
 
@@ -209,7 +248,8 @@ export class GovernanceArchivalSystem extends BaseSystem {
   public forceArchival(world: World): number {
     let totalArchived = 0;
 
-    const historyEntities = world.query().with(CT.GovernanceHistory).executeEntities();
+    // Use cached lookup
+    const historyEntities = this.getHistoryEntities(world);
 
     for (const entity of historyEntities) {
       const history = entity.getComponent<GovernanceHistoryComponent>(CT.GovernanceHistory);
@@ -217,7 +257,7 @@ export class GovernanceArchivalSystem extends BaseSystem {
 
       if (history.entries.length >= this.config.preserveRecentEntries) {
         const beforeCount = history.entries.length;
-        this.performArchival(world, entity as EntityImpl, history, world.tick);
+        this.performArchival(world, entity, history, world.tick);
         totalArchived += beforeCount - history.entries.length;
       }
     }
@@ -239,7 +279,8 @@ export class GovernanceArchivalSystem extends BaseSystem {
       archiveStats: ReturnType<typeof getArchiveStatistics> | null;
     }[] = [];
 
-    const historyEntities = world.query().with(CT.GovernanceHistory).executeEntities();
+    // Use cached lookup
+    const historyEntities = this.getHistoryEntities(world);
 
     for (const entity of historyEntities) {
       const history = entity.getComponent<GovernanceHistoryComponent>(CT.GovernanceHistory);

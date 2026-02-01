@@ -85,6 +85,9 @@ export class AcknowledgmentTrackingSystem extends BaseSystem {
   // Track last update tick to avoid duplicate processing
   private lastUpdateTick: number = 0;
 
+  // Cache governance history entity ID (singleton pattern - avoid repeated queries)
+  private cachedHistoryEntityId: string | null = null;
+
   // ========================================================================
   // Main Update Loop
   // ========================================================================
@@ -125,16 +128,22 @@ export class AcknowledgmentTrackingSystem extends BaseSystem {
     directive: DirectiveAcknowledgmentEntry,
     tick: number
   ): void {
-    // Collect timed out and acknowledged entities
+    // Collect timed out and acknowledged entities using pre-allocated arrays
     const timedOutEntities: string[] = [];
     const acknowledgedEntities: string[] = [];
 
+    // Use iterator directly instead of converting to array
     for (const [entityId, record] of directive.acknowledgments) {
       if (record.status === 'timeout') {
         timedOutEntities.push(entityId);
       } else if (record.status === 'acknowledged' || record.status === 'accepted') {
         acknowledgedEntities.push(entityId);
       }
+    }
+
+    // Early exit if nothing timed out
+    if (timedOutEntities.length === 0) {
+      return;
     }
 
     // Record in governance history
@@ -262,15 +271,28 @@ export class AcknowledgmentTrackingSystem extends BaseSystem {
   }
 
   /**
-   * Get or create the governance history singleton entity
+   * Get the governance history singleton entity (cached lookup)
    */
   private getOrCreateHistoryEntity(world: World): EntityImpl | null {
+    // Fast path: use cached ID
+    if (this.cachedHistoryEntityId) {
+      const cached = world.getEntity(this.cachedHistoryEntityId);
+      if (cached) {
+        return cached as EntityImpl;
+      }
+      // Cache invalidated, clear it
+      this.cachedHistoryEntityId = null;
+    }
+
+    // Slow path: query for history entity
     const historyEntities = world
       .query()
       .with(CT.GovernanceHistory)
       .executeEntities();
 
     if (historyEntities.length > 0) {
+      // Cache the ID for future lookups
+      this.cachedHistoryEntityId = historyEntities[0].id;
       return historyEntities[0] as EntityImpl;
     }
 

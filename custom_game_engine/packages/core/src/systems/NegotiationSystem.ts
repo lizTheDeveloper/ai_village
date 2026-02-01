@@ -90,6 +90,12 @@ export class NegotiationSystem extends BaseSystem {
   // Last update tick
   private lastUpdateTick: number = 0;
 
+  // Cache governance history entity ID (singleton pattern - avoid repeated queries)
+  private cachedHistoryEntityId: string | null = null;
+
+  // Cache negotiation ID -> entity ID mapping for O(1) lookups
+  private negotiationEntityIndex: Map<string, string> = new Map();
+
   // ========================================================================
   // Main Update Loop
   // ========================================================================
@@ -126,6 +132,11 @@ export class NegotiationSystem extends BaseSystem {
     component: NegotiationComponent,
     tick: number
   ): void {
+    // Early exit if no active negotiations
+    if (component.activeNegotiations.length === 0) {
+      return;
+    }
+
     const negotiationsToComplete: Negotiation[] = [];
 
     for (const negotiation of component.activeNegotiations) {
@@ -308,11 +319,40 @@ export class NegotiationSystem extends BaseSystem {
   }
 
   /**
-   * Get the governance history singleton entity
+   * Get the governance history singleton entity (cached lookup)
    */
   private getHistoryEntity(world: World): EntityImpl | null {
+    // Fast path: use cached ID
+    if (this.cachedHistoryEntityId) {
+      const cached = world.getEntity(this.cachedHistoryEntityId);
+      if (cached) {
+        return cached as EntityImpl;
+      }
+      // Cache invalidated, clear it
+      this.cachedHistoryEntityId = null;
+    }
+
+    // Slow path: query for history entity
     const historyEntities = world.query().with(CT.GovernanceHistory).executeEntities();
-    return historyEntities.length > 0 ? historyEntities[0] as EntityImpl : null;
+    if (historyEntities.length > 0) {
+      this.cachedHistoryEntityId = historyEntities[0].id;
+      return historyEntities[0] as EntityImpl;
+    }
+    return null;
+  }
+
+  /**
+   * Index a negotiation for fast lookup
+   */
+  private indexNegotiation(negotiationId: string, entityId: string): void {
+    this.negotiationEntityIndex.set(negotiationId, entityId);
+  }
+
+  /**
+   * Remove negotiation from index
+   */
+  private unindexNegotiation(negotiationId: string): void {
+    this.negotiationEntityIndex.delete(negotiationId);
   }
 
   // ========================================================================
@@ -389,6 +429,9 @@ export class NegotiationSystem extends BaseSystem {
     // Add negotiation to initiator's component
     initiatorComponent.activeNegotiations.push(negotiation);
     initiatorComponent.stats.totalNegotiationsInitiated++;
+
+    // Index for fast lookup
+    this.indexNegotiation(negotiationId, initiatorId);
 
     // Add negotiation reference to target entities
     for (const targetId of targetIds) {
@@ -532,13 +575,31 @@ export class NegotiationSystem extends BaseSystem {
   }
 
   /**
-   * Get negotiation by ID
+   * Get negotiation by ID (O(1) indexed lookup)
    */
   public getNegotiationById(
     world: World,
     negotiationId: string
   ): Negotiation | null {
-    // Search all negotiation components
+    // Fast path: use index
+    const indexedEntityId = this.negotiationEntityIndex.get(negotiationId);
+    if (indexedEntityId) {
+      const entity = world.getEntity(indexedEntityId);
+      if (entity) {
+        const component = entity.getComponent<NegotiationComponent>(CT.Negotiation);
+        if (component) {
+          const active = component.activeNegotiations.find(n => n.id === negotiationId);
+          if (active) return active;
+
+          const completed = component.completedNegotiations.find(n => n.id === negotiationId);
+          if (completed) return completed;
+        }
+      }
+      // Index stale, remove it
+      this.negotiationEntityIndex.delete(negotiationId);
+    }
+
+    // Slow path: search all negotiation components
     const entities = world.query().with(CT.Negotiation).executeEntities();
 
     for (const entity of entities) {
@@ -546,10 +607,17 @@ export class NegotiationSystem extends BaseSystem {
       if (!component) continue;
 
       const active = component.activeNegotiations.find(n => n.id === negotiationId);
-      if (active) return active;
+      if (active) {
+        // Cache for future lookups
+        this.indexNegotiation(negotiationId, entity.id);
+        return active;
+      }
 
       const completed = component.completedNegotiations.find(n => n.id === negotiationId);
-      if (completed) return completed;
+      if (completed) {
+        this.indexNegotiation(negotiationId, entity.id);
+        return completed;
+      }
     }
 
     return null;
