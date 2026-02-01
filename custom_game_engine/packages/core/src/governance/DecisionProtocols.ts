@@ -544,12 +544,29 @@ export function delegateDirective(
 
   // Set up acknowledgment tracking if requiresAcknowledgment is true
   if (directive.requiresAcknowledgment) {
-    // TODO: Create acknowledgment tracking component/system in future phase
-    // For now, just log the requirement
-    console.warn(
-      `[DecisionProtocols] Directive ${directive.id} requires acknowledgment from ${toEntities.length} entities. ` +
-      `Acknowledgment tracking not yet implemented.`
-    );
+    // Use AcknowledgmentTrackingSystem to track acknowledgments
+    // The system will monitor timeouts and escalate as needed
+    try {
+      // Import is deferred to avoid circular dependencies
+      const { getAcknowledgmentTrackingSystem } = await import('../systems/AcknowledgmentTrackingSystem.js');
+      const ackSystem = getAcknowledgmentTrackingSystem();
+      ackSystem.trackDirective(
+        world,
+        fromGovernor.id,
+        directive.id || `directive-${uuidv4()}`,
+        directive.directive,
+        directive.origin,
+        directive.targetTier,
+        toEntities.map(e => e.id),
+        directive.priority
+      );
+    } catch (error) {
+      // Fallback: log warning if system not available
+      console.warn(
+        `[DecisionProtocols] Directive ${directive.id} requires acknowledgment from ${toEntities.length} entities. ` +
+        `AcknowledgmentTrackingSystem not available: ${error}`
+      );
+    }
   }
 
   // Emit event for directive issued

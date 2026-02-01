@@ -67,6 +67,9 @@ export * from './EmpireSystem.js';  // Empire-level governance (multi-planet)
 export * from './EmpireDiplomacySystem.js';  // Inter-empire diplomatic AI
 export * from './EmpireWarSystem.js';  // Imperial war resolution and peace treaties
 export * from './FederationGovernanceSystem.js';  // Federation governance (multi-empire)
+export * from './AcknowledgmentTrackingSystem.js';  // Directive acknowledgment tracking
+export * from './GovernanceArchivalSystem.js';  // Governance history archival to persistence
+export * from './NegotiationSystem.js';  // Empire/Nation diplomatic negotiations
 export * from './GalacticCouncilSystem.js';  // Galactic Council governance (multi-species)
 // Civilization Collapse System
 export * from './CollapseSystem.js';  // Civilization collapse and dark ages

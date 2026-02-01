@@ -1176,6 +1176,63 @@ export {
   getGovernanceStatistics,
 } from './GovernanceHistoryComponent.js';
 
+// Directive Acknowledgment Component (Phase 6: Governance tracking)
+export * from './DirectiveAcknowledgmentComponent.js';
+export type {
+  DirectiveAcknowledgmentComponent,
+  DirectiveAcknowledgmentEntry,
+  AcknowledgmentRecord,
+  AcknowledgmentStatus,
+  AcknowledgmentTimeoutConfig,
+} from './DirectiveAcknowledgmentComponent.js';
+export {
+  createDirectiveAcknowledgmentComponent,
+  startDirectiveAcknowledgmentTracking,
+  recordAcknowledgment,
+  processAcknowledgmentTimeouts,
+  queryDirectiveAcknowledgmentStatus,
+  getPendingDirectivesForEntity,
+  DEFAULT_TIMEOUT_CONFIG,
+  getTimeoutForPriority,
+} from './DirectiveAcknowledgmentComponent.js';
+
+// Governance Archive Component (Phase 6: Long-term history storage)
+export * from './GovernanceArchiveComponent.js';
+export type {
+  GovernanceArchiveComponent,
+  ArchiveBatch,
+  ArchiveBatchSummary,
+  ArchivedGovernanceEntry,
+} from './GovernanceArchiveComponent.js';
+export {
+  createGovernanceArchiveComponent,
+  archiveEntries,
+  compressEntry,
+  queryArchiveBatches,
+  getArchiveStatistics,
+} from './GovernanceArchiveComponent.js';
+
+// Negotiation Component (Phase 6: Empire/Nation negotiations)
+export * from './NegotiationComponent.js';
+export type {
+  NegotiationComponent,
+  Negotiation,
+  NegotiationOffer,
+  NegotiationTerm,
+  NegotiationType,
+  NegotiationStatus,
+} from './NegotiationComponent.js';
+export {
+  createNegotiationComponent,
+  createNegotiation,
+  createNegotiationOffer,
+  addOfferToNegotiation,
+  recordOfferResponse,
+  checkNegotiationExpiry,
+  completeNegotiation,
+  getDefaultDeadlineTicks,
+} from './NegotiationComponent.js';
+
 // Nation Component (06-POLITICAL-HIERARCHY.md - Tier 3)
 export * from './NationComponent.js';
 export type {
