@@ -255,12 +255,92 @@ export function addGovernanceAuditEntry(
   }
   component.tickIndex.get(entry.tick)!.push(entry.id);
 
-  // Check if archival needed (TODO: implement archival to persistence layer)
+  // Check if archival needed
   if (component.entries.length > component.maxEntries) {
-    console.warn(
+    // Mark for archival - actual archival handled by GovernanceArchivalSystem
+    // This is a signal that entries should be archived
+    console.log(
       `[GovernanceHistory] Entry count (${component.entries.length}) exceeds max (${component.maxEntries}). ` +
-      `Archival not yet implemented - consider increasing maxEntries.`
+      `Entries will be archived by GovernanceArchivalSystem.`
     );
+  }
+}
+
+/**
+ * Extract entries for archival and clear them from the component
+ *
+ * Returns entries that should be archived and clears them from the in-memory list.
+ * Call this from GovernanceArchivalSystem to move old entries to archive.
+ *
+ * @param component The governance history component
+ * @param preserveRecent Number of recent entries to keep (default: 1000)
+ * @returns Entries to be archived
+ */
+export function extractEntriesForArchival(
+  component: GovernanceHistoryComponent,
+  preserveRecent: number = 1000
+): GovernanceAuditEntry[] {
+  if (component.entries.length <= preserveRecent) {
+    return []; // Nothing to archive
+  }
+
+  // Calculate how many to archive
+  const archiveCount = component.entries.length - preserveRecent;
+
+  // Extract oldest entries for archival
+  const toArchive = component.entries.slice(0, archiveCount);
+
+  // Keep only recent entries
+  component.entries = component.entries.slice(archiveCount);
+
+  // Update archived count
+  component.archivedCount += archiveCount;
+
+  // Rebuild indexes for remaining entries
+  rebuildIndexes(component);
+
+  return toArchive;
+}
+
+/**
+ * Rebuild all indexes after archival
+ */
+function rebuildIndexes(component: GovernanceHistoryComponent): void {
+  component.actionTypeIndex.clear();
+  component.sourceAgentIndex.clear();
+  component.targetAgentIndex.clear();
+  component.tickIndex.clear();
+
+  for (const entry of component.entries) {
+    // Action type index
+    if (!component.actionTypeIndex.has(entry.actionType)) {
+      component.actionTypeIndex.set(entry.actionType, []);
+    }
+    component.actionTypeIndex.get(entry.actionType)!.push(entry.id);
+
+    // Source agent index
+    if (entry.sourceAgentId) {
+      if (!component.sourceAgentIndex.has(entry.sourceAgentId)) {
+        component.sourceAgentIndex.set(entry.sourceAgentId, []);
+      }
+      component.sourceAgentIndex.get(entry.sourceAgentId)!.push(entry.id);
+    }
+
+    // Target agent index
+    if (entry.targetAgentIds) {
+      for (const targetId of entry.targetAgentIds) {
+        if (!component.targetAgentIndex.has(targetId)) {
+          component.targetAgentIndex.set(targetId, []);
+        }
+        component.targetAgentIndex.get(targetId)!.push(entry.id);
+      }
+    }
+
+    // Tick index
+    if (!component.tickIndex.has(entry.tick)) {
+      component.tickIndex.set(entry.tick, []);
+    }
+    component.tickIndex.get(entry.tick)!.push(entry.id);
   }
 }
 

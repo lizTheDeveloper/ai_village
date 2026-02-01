@@ -30,6 +30,7 @@ import type {
   FederalRepresentative,
   JointOperation,
   FederationRelation,
+  FederalProposal,
 } from '../components/FederationGovernanceComponent.ts';
 import type { EmpireComponent } from '../components/EmpireComponent.js';
 import type { NationComponent } from '../components/NationComponent.js';
@@ -39,30 +40,7 @@ import type { NavyComponent } from '../components/NavyComponent.js';
 // Types
 // ============================================================================
 
-/**
- * Federal proposal with voting tracking
- */
-interface FederalProposal {
-  id: string;
-  name: string;
-  description: string;
-  type: 'law' | 'treaty' | 'budget' | 'military' | 'tariff';
-  scope: 'trade' | 'military' | 'justice' | 'rights' | 'environment';
-
-  // Voting
-  proposerId: string; // Member empire/nation ID
-  debateStartTick: number;
-  debateDuration: number; // Ticks (usually 3)
-  votingStartTick?: number;
-
-  votes: Map<string, 'for' | 'against' | 'abstain'>; // Member ID -> vote
-  votingPowerFor: number; // 0-1
-  votingPowerAgainst: number; // 0-1
-  votingPowerAbstained: number; // 0-1
-
-  status: 'debating' | 'voting' | 'passed' | 'failed' | 'vetoed';
-  requiresSupermajority: boolean; // 66% for constitutional changes
-}
+// FederalProposal is now imported from FederationGovernanceComponent
 
 /**
  * Member satisfaction breakdown
@@ -118,9 +96,6 @@ export class FederationGovernanceSystem extends BaseSystem {
 
   // Cached satisfaction calculations (avoid recomputing every tick)
   private memberSatisfactionCache: Map<string, Map<string, MemberSatisfaction>> = new Map();
-
-  // Pending proposals (in-memory, will be persisted to component later)
-  private activeProposals: Map<string, FederalProposal[]> = new Map();
 
   // Last update tick per federation
   private federationLastUpdateTick: Map<string, number> = new Map();
@@ -754,7 +729,8 @@ export class FederationGovernanceSystem extends BaseSystem {
     const federation = federationEntity.getComponent<FederationGovernanceComponent>(CT.FederationGovernance);
     if (!federation) return;
 
-    const proposals = this.activeProposals.get(federation.name) || [];
+    // Use pendingProposals from component (persisted) instead of in-memory Map
+    const proposals = federation.pendingProposals;
     if (proposals.length === 0) return;
 
     for (const proposal of proposals) {
@@ -882,11 +858,14 @@ export class FederationGovernanceSystem extends BaseSystem {
       }
     }
 
-    // Clean up completed proposals
-    this.activeProposals.set(
-      federation.name,
-      proposals.filter((p) => p.status === 'debating' || p.status === 'voting')
-    );
+    // Clean up completed proposals by updating the component
+    const activeProposals = proposals.filter((p) => p.status === 'debating' || p.status === 'voting');
+    if (activeProposals.length !== proposals.length) {
+      federationEntity.updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
+        ...f,
+        pendingProposals: activeProposals,
+      }));
+    }
   }
 
   /**
@@ -1050,10 +1029,11 @@ export class FederationGovernanceSystem extends BaseSystem {
       requiresSupermajority,
     };
 
-    // Add to active proposals
-    const proposals = this.activeProposals.get(federation.name) || [];
-    proposals.push(proposal);
-    this.activeProposals.set(federation.name, proposals);
+    // Add to pendingProposals on the component (persisted)
+    (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
+      ...f,
+      pendingProposals: [...f.pendingProposals, proposal],
+    }));
 
     // Emit proposal event
     world.eventBus.emit({
@@ -1093,8 +1073,8 @@ export class FederationGovernanceSystem extends BaseSystem {
       throw new Error('Entity is not a federation');
     }
 
-    const proposals = this.activeProposals.get(federation.name) || [];
-    const proposal = proposals.find((p) => p.id === proposalId);
+    // Find proposal in component's pendingProposals
+    const proposal = federation.pendingProposals.find((p) => p.id === proposalId);
     if (!proposal) {
       throw new Error(`Proposal ${proposalId} not found`);
     }
@@ -1103,8 +1083,16 @@ export class FederationGovernanceSystem extends BaseSystem {
       throw new Error(`Proposal ${proposalId} is not in voting status`);
     }
 
-    // Cast vote
+    // Cast vote and update the component
     proposal.votes.set(memberId, vote);
+
+    // Update the component with the modified proposal
+    (federationEntity as EntityImpl).updateComponent<FederationGovernanceComponent>(CT.FederationGovernance, (f) => ({
+      ...f,
+      pendingProposals: f.pendingProposals.map((p) =>
+        p.id === proposalId ? { ...p, votes: proposal.votes } : p
+      ),
+    }));
 
     // Emit vote event
     world.eventBus.emit({

@@ -54,6 +54,31 @@ export interface FederalLaw {
 }
 
 /**
+ * Pending federal proposal (persisted to component for save/load)
+ */
+export interface FederalProposal {
+  id: string;
+  name: string;
+  description: string;
+  type: 'law' | 'treaty' | 'budget' | 'military' | 'tariff';
+  scope: 'trade' | 'military' | 'justice' | 'rights' | 'environment';
+
+  // Voting
+  proposerId: string; // Member empire/nation ID
+  debateStartTick: number;
+  debateDuration: number; // Ticks (usually 3)
+  votingStartTick?: number;
+
+  votes: Map<string, 'for' | 'against' | 'abstain'>; // Member ID -> vote
+  votingPowerFor: number; // 0-1
+  votingPowerAgainst: number; // 0-1
+  votingPowerAbstained: number; // 0-1
+
+  status: 'debating' | 'voting' | 'passed' | 'failed' | 'vetoed';
+  requiresSupermajority: boolean; // 66% for constitutional changes
+}
+
+/**
  * Diplomatic relation with another federation/empire (spec lines 2300-2309)
  */
 export interface FederationRelation {
@@ -164,6 +189,9 @@ export interface FederationGovernanceComponent extends Component {
   // Federal laws (supersede member laws) (spec lines 2237)
   federalLaws: FederalLaw[];
 
+  // Pending proposals (persisted for save/load)
+  pendingProposals: FederalProposal[];
+
   // Foreign policy (spec lines 2242-2251)
   foreignPolicy: {
     // Relations with other federations/empires
@@ -230,6 +258,7 @@ export function createFederationGovernanceComponent(
       externalTradeVolume: 0,
     },
     federalLaws: [],
+    pendingProposals: [],
     foreignPolicy: {
       diplomaticRelations: new Map(),
       federalTreaties: [],

@@ -115,6 +115,116 @@ export interface GovernanceEvents {
     tick: number;
   };
 
+  'governance:directive_accepted': {
+    directiveId: string;
+    entityId: EntityId;
+    tick: number;
+  };
+
+  // === Acknowledgment Events ===
+  'governance:directive_timeout': {
+    directiveId: string;
+    directiveContent: string;
+    originTier: PoliticalTier;
+    targetTier: PoliticalTier;
+    timedOutEntities: EntityId[];
+    acknowledgedEntities: EntityId[];
+    tick: number;
+  };
+
+  'governance:directive_escalated': {
+    directiveId: string;
+    fromTier: PoliticalTier;
+    toTier: PoliticalTier;
+    reason: string;
+    timedOutEntities: EntityId[];
+    tick: number;
+  };
+
+  'governance:acknowledgment_tracking_started': {
+    directiveId: string;
+    targetEntityIds: EntityId[];
+    priority: 'routine' | 'urgent' | 'critical';
+    tick: number;
+  };
+
+  'governance:directive_acknowledged': {
+    directiveId: string;
+    entityId: EntityId;
+    status: string;
+    reasoning?: string;
+    tick: number;
+  };
+
+  'governance:history_archived': {
+    batchId: string;
+    entriesArchived: number;
+    tickRange: { start: number; end: number };
+    totalArchivedEntries: number;
+    tick: number;
+  };
+
+  // === Negotiation Events ===
+  'negotiation:started': {
+    negotiationId: string;
+    type: string;
+    initiatorId: EntityId;
+    targetIds: EntityId[];
+    priority: 'routine' | 'urgent' | 'critical';
+    deadlineTick: number;
+    tick: number;
+  };
+
+  'negotiation:expired': {
+    negotiationId: string;
+    type: string;
+    participantIds: EntityId[];
+    status: string;
+    tick: number;
+  };
+
+  'negotiation:accepted': {
+    negotiationId: string;
+    type: string;
+    participantIds: EntityId[];
+    status: string;
+    tick: number;
+  };
+
+  'negotiation:rejected': {
+    negotiationId: string;
+    type: string;
+    participantIds: EntityId[];
+    status: string;
+    tick: number;
+  };
+
+  'negotiation:term_implemented': {
+    negotiationId: string;
+    termId: string;
+    termType: string;
+    category: string;
+    offeredBy: EntityId;
+    beneficiary: EntityId;
+    tick: number;
+  };
+
+  'negotiation:response': {
+    negotiationId: string;
+    offerId: string;
+    responderId: EntityId;
+    response: string;
+    tick: number;
+  };
+
+  'negotiation:withdrawn': {
+    negotiationId: string;
+    type: string;
+    participantIds: EntityId[];
+    status: string;
+    tick: number;
+  };
+
   // === Crisis Events ===
   'governance:crisis_escalated': {
     crisisId: string;
