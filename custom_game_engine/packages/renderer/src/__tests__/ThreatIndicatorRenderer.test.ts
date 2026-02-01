@@ -20,12 +20,13 @@ type WorldWithMethods = Record<string, unknown> & {
 
 describe('ThreatIndicatorRenderer', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let canvas: HTMLCanvasElement;
   let renderer: ThreatIndicatorRenderer;
   let mockCtx: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
 
     // Create mock canvas context
     mockCtx = {
@@ -59,7 +60,7 @@ describe('ThreatIndicatorRenderer', () => {
     vi.spyOn(canvas, 'getContext').mockReturnValue(mockCtx);
 
     // Use the world's eventBus so events are received by the renderer
-    renderer = new ThreatIndicatorRenderer(world, world.eventBus, canvas);
+    renderer = new ThreatIndicatorRenderer(world, eventBus, canvas);
 
     // Clear mock call counts but preserve listeners
     Object.values(mockCtx).forEach(mock => {
@@ -129,7 +130,7 @@ describe('ThreatIndicatorRenderer', () => {
       const wolf = world.createEntity();
       wolf.addComponent('position', { x: 100, y: 100 });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
         source: 'test',
@@ -140,7 +141,7 @@ describe('ThreatIndicatorRenderer', () => {
           threatLevel: 'high',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify threat was tracked and rendered
       // Direct test:  call render method
@@ -159,7 +160,7 @@ describe('ThreatIndicatorRenderer', () => {
       const raider = world.createEntity();
       raider.addComponent('position', { x: 200, y: 200 });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
         source: 'test',
@@ -170,7 +171,7 @@ describe('ThreatIndicatorRenderer', () => {
           threatLevel: 'medium',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify threat was tracked
       renderer.render(0, 0, 800, 600);
@@ -188,7 +189,7 @@ describe('ThreatIndicatorRenderer', () => {
         startTime: 0,
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
         source: 'test',
@@ -199,7 +200,7 @@ describe('ThreatIndicatorRenderer', () => {
           threatLevel: 'high',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       renderer.render(0, 0, 800, 600);
       // Indicator should render at 150, 250 in world space
@@ -342,7 +343,7 @@ describe('ThreatIndicatorRenderer', () => {
         threats.push(threat);
 
         // Emit event to track threat
-        world.eventBus.emit({
+        eventBus.emit({
           type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
           source: 'test',
@@ -354,7 +355,7 @@ describe('ThreatIndicatorRenderer', () => {
           },
         });
       }
-      world.eventBus.flush();
+      eventBus.flush();
 
       renderer.render(0, 0, 800, 600);
       // Should only render indicators for visible or nearby threats
@@ -377,7 +378,7 @@ describe('ThreatIndicatorRenderer', () => {
         threats.push(threat);
 
         // Emit event to track threat
-        world.eventBus.emit({
+        eventBus.emit({
           type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
           source: 'test',
@@ -389,7 +390,7 @@ describe('ThreatIndicatorRenderer', () => {
           },
         });
       }
-      world.eventBus.flush();
+      eventBus.flush();
 
       const startTime = performance.now();
       renderer.render(0, 0, 800, 600);
@@ -403,7 +404,7 @@ describe('ThreatIndicatorRenderer', () => {
     it('should throw when World is missing', () => {
       expect(() => {
         // @ts-expect-error Testing missing parameter
-        new ThreatIndicatorRenderer(null, world.eventBus, canvas);
+        new ThreatIndicatorRenderer(null, eventBus, canvas);
       }).toThrow('ThreatIndicatorRenderer requires World parameter');
     });
 
@@ -417,7 +418,7 @@ describe('ThreatIndicatorRenderer', () => {
     it('should throw when Canvas is missing', () => {
       expect(() => {
         // @ts-expect-error Testing missing parameter
-        new ThreatIndicatorRenderer(world, world.eventBus, null);
+        new ThreatIndicatorRenderer(world, eventBus, null);
       }).toThrow('ThreatIndicatorRenderer requires Canvas parameter');
     });
 
@@ -427,7 +428,7 @@ describe('ThreatIndicatorRenderer', () => {
       } as Partial<HTMLCanvasElement> as HTMLCanvasElement;
 
       expect(() => {
-        new ThreatIndicatorRenderer(world, world.eventBus, badCanvas);
+        new ThreatIndicatorRenderer(world, eventBus, badCanvas);
       }).toThrow('Failed to get 2D context');
     });
 
@@ -453,7 +454,7 @@ describe('ThreatIndicatorRenderer', () => {
       const wolf = world.createEntity();
       wolf.addComponent('position', { x: 100, y: 100 });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
         source: 'test',
@@ -463,12 +464,12 @@ describe('ThreatIndicatorRenderer', () => {
           participants: [wolf.id, 'villager'],
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Reset mock to verify next render doesn't include resolved threats
       mockCtx.arc.mockClear();
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:resolved',
         source: 'test',
@@ -477,7 +478,7 @@ describe('ThreatIndicatorRenderer', () => {
           outcome: 'victory',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       renderer.render(0, 0, 800, 600);
       // Threat indicator should be removed - no arc calls
@@ -495,7 +496,7 @@ describe('ThreatIndicatorRenderer', () => {
         startTime: 0,
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
         source: 'test',
@@ -505,11 +506,11 @@ describe('ThreatIndicatorRenderer', () => {
           participants: [threat.id],
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       mockCtx.arc.mockClear();
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'death:occurred',
         source: 'test',
@@ -518,7 +519,7 @@ describe('ThreatIndicatorRenderer', () => {
           cause: 'combat',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       renderer.render(0, 0, 800, 600);
       // Threat indicator should be removed
@@ -536,7 +537,7 @@ describe('ThreatIndicatorRenderer', () => {
         startTime: 0,
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: // @ts-expect-error Testing invalid value validation
       'conflict:started',
         source: 'test',
@@ -546,7 +547,7 @@ describe('ThreatIndicatorRenderer', () => {
           participants: [threat.id],
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Move threat far away
       const position = threat.getComponent('position');

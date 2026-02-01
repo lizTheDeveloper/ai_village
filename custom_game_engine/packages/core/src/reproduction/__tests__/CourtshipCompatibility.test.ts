@@ -15,14 +15,16 @@ import type { SexualityComponent } from '../SexualityComponent.js';
 import type { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
 import { updateRelationship } from '../../components/RelationshipComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Courtship Compatibility Calculations', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let agent1: Entity;
   let agent2: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     agent1 = world.createEntity();
     agent2 = world.createEntity();
   });

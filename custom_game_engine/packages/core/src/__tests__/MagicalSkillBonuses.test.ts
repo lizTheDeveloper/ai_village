@@ -18,13 +18,15 @@ import type { BodyComponent } from '../components/BodyComponent.js';
 import { itemRegistry } from '../items/index.js';
 import { defineItem } from '../items/ItemDefinition.js';
 import type { StatBonusTrait } from '../items/traits/StatBonusTrait.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('MagicalSkillBonuses', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let equipmentSystem: EquipmentSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     equipmentSystem = new EquipmentSystem();
 
     // Register test items with skill bonuses

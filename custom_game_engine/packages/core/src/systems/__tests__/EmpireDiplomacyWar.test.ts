@@ -16,13 +16,15 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { createEmpireComponent, type EmpireRelation } from '../../components/EmpireComponent.js';
 import { EmpireDiplomacySystem } from '../EmpireDiplomacySystem.js';
 import { EmpireWarSystem } from '../EmpireWarSystem.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Empire Diplomacy System', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let diplomacySystem: EmpireDiplomacySystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     diplomacySystem = new EmpireDiplomacySystem();
   });
 
@@ -145,7 +147,7 @@ describe('Empire War System', () => {
   let warSystem: EmpireWarSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     warSystem = new EmpireWarSystem();
   });
 
@@ -278,7 +280,7 @@ describe('Treaty Execution', () => {
   let world: World;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
   });
 
   describe('Defense Pact', () => {

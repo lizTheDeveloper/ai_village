@@ -10,14 +10,16 @@ import type {
   MatingBehavior,
 } from '../courtship/types';
 import type { CourtshipStateMachine } from '../courtship';
+import { EventBusImpl } from '@ai-village/core';
 
 describe('CourtshipSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let agent1: Entity;
   let agent2: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     agent1 = world.createEntity();
     agent2 = world.createEntity();
   });

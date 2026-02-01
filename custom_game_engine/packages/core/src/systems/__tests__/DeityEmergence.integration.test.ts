@@ -22,13 +22,15 @@ import {
   calculateDomainSynergy,
 } from '../../divinity/DeityRelations.js';
 import type { DivineDomain } from '../../divinity/DeityTypes.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Phase 4: Deity Emergence Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let emergenceSystem: DeityEmergenceSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     emergenceSystem = new DeityEmergenceSystem({
       minBelievers: 3,
       minAverageStrength: 0.6,

@@ -10,15 +10,17 @@ import {
   type CourtshipParadigm,
 } from '../courtship/index.js';
 import { type SexualityComponent } from '../SexualityComponent.js';
+import { EventBusImpl } from '@ai-village/core';
 
 describe('CourtshipStateMachine', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let stateMachine: CourtshipStateMachine;
   let agent1: Entity;
   let agent2: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     stateMachine = new CourtshipStateMachine();
     agent1 = world.createEntity();
     agent2 = world.createEntity();
@@ -634,13 +636,13 @@ describe('CourtshipStateMachine', () => {
       let eventEmitted = false;
       let eventData: any = null;
 
-      world.eventBus.on('courtship:consent', (event) => {
+      eventBus.on('courtship:consent', (event) => {
         eventEmitted = true;
         eventData = event.data;
       });
 
       stateMachine.transitionToMating(agent1, agent2, world);
-      world.eventBus.flush(); // Process queued events
+      eventBus.flush(); // Process queued events
 
       expect(eventEmitted).toBe(true);
       expect(eventData).toBeDefined();

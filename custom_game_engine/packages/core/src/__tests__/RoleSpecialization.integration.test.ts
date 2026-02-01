@@ -14,12 +14,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { World } from '../World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { SkillId, SkillLevel } from '../components/SkillsComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Role Specialization Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
   });
 
   // ============================================

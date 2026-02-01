@@ -30,13 +30,14 @@ import { MagicSystem } from '../../../core/src/systems/MagicSystem.js';
 
 // Import specific effect interfaces for type narrowing
 import type { DamageEffect as DamageEffectType, HealingEffect as HealingEffectType, ProtectionEffect as ProtectionEffectType } from '../SpellEffect.js';
+import { EventBusImpl } from '@ai-village/core';
 
 // ============================================================================
 // Test Setup Helpers
 // ============================================================================
 
 function createTestWorld(): { world: World; magicSystem: MagicSystem } {
-  const world = new World();
+  const eventBus = new EventBusImpl(); world = new World(eventBus);
   const magicSystem = new MagicSystem();
 
   // Reset singletons before each test to ensure clean state
@@ -46,7 +47,7 @@ function createTestWorld(): { world: World; magicSystem: MagicSystem } {
 
   // Initialize the system with the world
   // This will call initMagicInfrastructure() which registers appliers and example spells
-  magicSystem.initialize(world, world.eventBus);
+  magicSystem.initialize(world, eventBus);
 
   return { world, magicSystem };
 }
@@ -251,6 +252,7 @@ function registerTestEffect(effect: SpellEffect): void {
 
 describe('Complete Spell Casting Pipeline', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let magicSystem: MagicSystem;
 
   beforeEach(() => {
@@ -893,7 +895,7 @@ describe('Event System', () => {
 
     // Subscribe BEFORE casting
     let eventEmitted = false;
-    const unsubscribe = world.eventBus.subscribe('magic:spell_cast', (event) => {
+    const unsubscribe = eventBus.subscribe('magic:spell_cast', (event) => {
       eventEmitted = true;
       expect(event.data.spellId).toBe('event_test_spell');
     });
@@ -904,7 +906,7 @@ describe('Event System', () => {
     expect(castSuccess).toBe(true);
 
     // Flush event bus to process queued events
-    world.eventBus.flush();
+    eventBus.flush();
 
     // Then verify event was emitted
     expect(eventEmitted).toBe(true);

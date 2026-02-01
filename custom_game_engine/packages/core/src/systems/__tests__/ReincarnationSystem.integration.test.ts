@@ -28,10 +28,12 @@ import { generateRandomStartingSkills } from '../../components/SkillsComponent.j
 import { createDeedLedgerComponent, recordDeed } from '../../components/DeedLedgerComponent.js';
 import type { Deity } from '../../divinity/DeityTypes.js';
 import type { AfterlifePolicy } from '../../divinity/AfterlifePolicy.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('ReincarnationSystem Integration', () => {
   let harness: IntegrationTestHarness;
   let world: World;
+  let eventBus: EventBusImpl;
   let reincarnationSystem: ReincarnationSystem;
   let deathSystem: DeathTransitionSystem;
 
@@ -89,15 +91,15 @@ describe('ReincarnationSystem Integration', () => {
 
       // Track events
       const events: string[] = [];
-      world.eventBus.subscribe('soul:reincarnation_queued', () => {
+      eventBus.subscribe('soul:reincarnation_queued', () => {
         events.push('queued');
       });
-      world.eventBus.subscribe('soul:reincarnated', () => {
+      eventBus.subscribe('soul:reincarnated', () => {
         events.push('reincarnated');
       });
 
       // Manually queue the soul (normally DeathTransitionSystem would do this)
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -111,7 +113,7 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(events).toContain('queued');
       expect(reincarnationSystem.getQueuedSoulCount()).toBe(1);
@@ -120,7 +122,7 @@ describe('ReincarnationSystem Integration', () => {
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify reincarnation occurred
       expect(events).toContain('reincarnated');
@@ -171,11 +173,11 @@ describe('ReincarnationSystem Integration', () => {
       world.addEntity(entity);
 
       let preservedMemoryCount = 0;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         preservedMemoryCount = event.data.preservedMemoryCount;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -188,12 +190,12 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Full retention should preserve all memories
       expect(preservedMemoryCount).toBeGreaterThan(0);
@@ -231,11 +233,11 @@ describe('ReincarnationSystem Integration', () => {
       world.addEntity(entity);
 
       let preservedMemoryCount = 0;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         preservedMemoryCount = event.data.preservedMemoryCount;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -248,12 +250,12 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Fragments retention should preserve only some memories (top 20)
       expect(preservedMemoryCount).toBeLessThanOrEqual(20);
@@ -269,11 +271,11 @@ describe('ReincarnationSystem Integration', () => {
       world.addEntity(entity);
 
       let preservedMemoryCount = -1;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         preservedMemoryCount = event.data.preservedMemoryCount;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -286,12 +288,12 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // None retention should preserve no memories
       expect(preservedMemoryCount).toBe(0);
@@ -311,11 +313,11 @@ describe('ReincarnationSystem Integration', () => {
       world.addEntity(entity);
 
       let newEntityId: string | undefined;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         newEntityId = event.data.newEntityId;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -328,12 +330,12 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(newEntityId).toBeDefined();
 
@@ -365,11 +367,11 @@ describe('ReincarnationSystem Integration', () => {
 
       const deityId = 'reincarnation-goddess';
       let newEntityId: string | undefined;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         newEntityId = event.data.newEntityId;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -383,12 +385,12 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(newEntityId).toBeDefined();
 
@@ -411,7 +413,7 @@ describe('ReincarnationSystem Integration', () => {
         entity.addComponent(createPositionComponent(Math.random() * 100, Math.random() * 100));
         world.addEntity(entity);
 
-        world.eventBus.emit({
+        eventBus.emit({
           type: 'soul:reincarnation_queued',
           source: soulId,
           data: {
@@ -425,12 +427,12 @@ describe('ReincarnationSystem Integration', () => {
         });
       }
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(reincarnationSystem.getQueuedSoulCount()).toBe(3);
 
       const reincarnatedIds: string[] = [];
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         reincarnatedIds.push(event.data.originalEntityId);
       });
 
@@ -438,7 +440,7 @@ describe('ReincarnationSystem Integration', () => {
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(reincarnatedIds.length).toBe(3);
       expect(reincarnationSystem.getQueuedSoulCount()).toBe(0);
@@ -458,7 +460,7 @@ describe('ReincarnationSystem Integration', () => {
       // Verify entity exists
       expect(world.getEntity(entityId)).toBeDefined();
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -471,12 +473,12 @@ describe('ReincarnationSystem Integration', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       (world as WorldImpl)._tick = 100;
       reincarnationSystem.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Original entity should be removed
       expect(world.getEntity(entityId)).toBeUndefined();

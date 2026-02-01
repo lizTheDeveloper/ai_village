@@ -28,7 +28,7 @@ describe('ConsciousnessEmergenceSystem - Initialization', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -51,7 +51,7 @@ describe('ConsciousnessEmergenceSystem - Readiness Detection', () => {
   let proto: ProtoSapienceComponent;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -92,7 +92,7 @@ describe('ConsciousnessEmergenceSystem - Awakening Moment Generation', () => {
   let entity: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -144,7 +144,7 @@ describe('ConsciousnessEmergenceSystem - Animal to Agent Transformation', () => 
   let entity: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -276,7 +276,7 @@ describe('ConsciousnessEmergenceSystem - Attitude Determination', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -347,7 +347,7 @@ describe('ConsciousnessEmergenceSystem - Witness Tracking', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -397,7 +397,7 @@ describe('ConsciousnessEmergenceSystem - Event Emission', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ConsciousnessEmergenceSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);

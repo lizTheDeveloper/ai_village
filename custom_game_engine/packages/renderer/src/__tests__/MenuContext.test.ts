@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MenuContext } from '../context-menu/MenuContext';
 import { World as World } from '@ai-village/core';
 import { Camera } from '../Camera';
+import { EventBusImpl } from '@ai-village/core';
 
 // TODO: Not implemented - tests skipped
 describe.skip('MenuContext', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let camera: Camera;
   let canvas: HTMLCanvasElement;
 
@@ -20,7 +22,7 @@ describe.skip('MenuContext', () => {
   }
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;

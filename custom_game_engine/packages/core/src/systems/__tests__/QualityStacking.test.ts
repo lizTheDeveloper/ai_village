@@ -8,13 +8,15 @@ import {
   getItemCount
 } from '../../components/InventoryComponent';
 import type { InventoryComponent, InventorySlot } from '../../components/InventoryComponent';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Quality-Based Stacking Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let inventory: InventoryComponent;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     inventory = createInventoryComponent(24, 1000); // 24 slots, 1000 weight capacity
   });
 

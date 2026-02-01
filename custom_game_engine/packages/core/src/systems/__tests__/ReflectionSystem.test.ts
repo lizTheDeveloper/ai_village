@@ -5,6 +5,7 @@ import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponen
 import { SemanticMemoryComponent } from '../../components/SemanticMemoryComponent';
 import { ReflectionComponent } from '../../components/ReflectionComponent';
 import { EventBus } from '../../EventBus';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('ReflectionSystem', () => {
   let world: World;
@@ -13,7 +14,7 @@ describe('ReflectionSystem', () => {
   let agent: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBus();
     system = new ReflectionSystem(eventBus);
     agent = world.createEntity();

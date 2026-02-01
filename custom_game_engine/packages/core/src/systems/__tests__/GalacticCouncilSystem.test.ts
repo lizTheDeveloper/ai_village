@@ -21,6 +21,7 @@ import type {
 } from '../../components/GalacticCouncilComponent.js';
 import type { SpeciesComponent } from '../../components/SpeciesComponent.js';
 import type { NavyComponent } from '../../components/NavyComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -38,6 +39,7 @@ type WorldWithMethods = Record<string, unknown> & {
 
 describe('GalacticCouncilSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: GalacticCouncilSystem;
   let councilEntity: EntityImpl;
   let councilComp: GalacticCouncilComponent;
@@ -426,7 +428,7 @@ describe('GalacticCouncilSystem', () => {
 
     it('should emit crisis declared event', () => {
       const events: any[] = [];
-      world.eventBus.on('galactic_council:crisis_declared', (event) => {
+      eventBus.on('galactic_council:crisis_declared', (event) => {
         events.push(event);
       });
 

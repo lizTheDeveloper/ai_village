@@ -27,6 +27,7 @@ function advanceTime(world: World, ticks: number): void {
 
 describe('InterestEvolutionSystem - Phase 7.1', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: InterestEvolutionSystem;
   let agent: EntityImpl;
 
@@ -194,7 +195,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should create new interest when skill increases', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'skill:level_up',
         source: agent.id,
         data: {
@@ -204,7 +205,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           newLevel: 2,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const farming = interests.getInterest('farming');
       expect(farming).toBeTruthy();
@@ -224,7 +225,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         knownEnthusiasts: [],
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'skill:level_up',
         source: agent.id,
         data: {
@@ -234,7 +235,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           newLevel: 6,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const farming = interests.getInterest('farming');
       expect(farming?.intensity).toBe(0.51); // 0.5 + 0.01
@@ -252,7 +253,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         knownEnthusiasts: [],
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'skill:level_up',
         source: agent.id,
         data: {
@@ -262,7 +263,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           newLevel: 11,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const farming = interests.getInterest('farming');
       expect(farming?.intensity).toBe(1.0); // Capped at 1.0
@@ -284,7 +285,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
 
       // Emit 30 skill increase events to reach 0.5 + (0.01 * 30) = 0.8
       for (let i = 0; i < 30; i++) {
-        world.eventBus.emit({
+        eventBus.emit({
           type: 'skill:level_up',
           source: agent.id,
           data: {
@@ -294,7 +295,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
             newLevel: i + 1,
           },
         });
-        world.eventBus.flush();
+        eventBus.flush();
       }
 
       const farming = interests.getInterest('farming');
@@ -304,7 +305,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should not create interests for unmapped skills', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'skill:level_up',
         source: agent.id,
         data: {
@@ -314,7 +315,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           newLevel: 2,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(interests.interests.length).toBe(0);
     });
@@ -324,7 +325,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should create mortality interest when witnessing death', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'agent:death',
         source: agent.id,
         data: {
@@ -332,7 +333,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           cause: 'starvation',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const mortality = interests.getInterest('mortality');
       expect(mortality).toBeTruthy();
@@ -344,7 +345,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should create the_gods interest when witnessing miracle', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'deity:miracle',
         source: agent.id,
         data: {
@@ -352,7 +353,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           miracleType: 'healing',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const gods = interests.getInterest('the_gods');
       expect(gods).toBeTruthy();
@@ -363,7 +364,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should create building interest when completing a building', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:completed',
         source: agent.id,
         data: {
@@ -371,7 +372,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           buildingType: 'house',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const building = interests.getInterest('building');
       expect(building).toBeTruthy();
@@ -381,7 +382,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should not create building interest if agent did not build it', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:completed',
         source: agent.id,
         data: {
@@ -389,7 +390,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           buildingType: 'house',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const building = interests.getInterest('building');
       expect(building).toBeUndefined();
@@ -398,7 +399,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
     it('should create family interest when becoming a parent', () => {
       const interests = agent.getComponent<InterestsComponent>(CT.Interests)!;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'agent:born',
         source: agent.id,
         data: {
@@ -406,7 +407,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           parentIds: [agent.id],
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const family = interests.getInterest('family');
       expect(family).toBeTruthy();
@@ -425,7 +426,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         knownEnthusiasts: [],
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'deity:miracle',
         source: agent.id,
         data: {
@@ -433,7 +434,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           miracleType: 'healing',
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const gods = interests.getInterest('the_gods');
       // Strengthens by trigger.intensity * 0.3 = 0.7 * 0.3 = 0.21
@@ -504,7 +505,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       const studentAgent = student.getComponent<AgentComponent>(CT.Agent)!;
       studentAgent.ageCategory = 'child'; // High receptivity (0.8)
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: student.id,
         data: {
@@ -514,7 +515,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.7,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const studentInterests = student.getComponent<InterestsComponent>(CT.Interests)!;
       const philosophy = studentInterests.getInterest('philosophy');
@@ -538,7 +539,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         knownEnthusiasts: [],
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: student.id,
         data: {
@@ -548,7 +549,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.5, // Below 0.6 threshold
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const studentInterests = student.getComponent<InterestsComponent>(CT.Interests)!;
       const philosophy = studentInterests.getInterest('philosophy');
@@ -571,7 +572,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       const studentAgent = student.getComponent<AgentComponent>(CT.Agent)!;
       studentAgent.ageCategory = 'child';
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: student.id,
         data: {
@@ -581,7 +582,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.7,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const studentInterests = student.getComponent<InterestsComponent>(CT.Interests)!;
       const philosophy = studentInterests.getInterest('philosophy');
@@ -621,7 +622,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         lastUpdate: 0,
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: child.id,
         data: {
@@ -631,7 +632,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.7,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const childInterests = child.getComponent<InterestsComponent>(CT.Interests)!;
       const childPhilosophy = childInterests.getInterest('philosophy');
@@ -656,7 +657,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         lastUpdate: 0,
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: elder.id,
         data: {
@@ -666,7 +667,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.7,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const elderInterests = elder.getComponent<InterestsComponent>(CT.Interests)!;
       const elderPhilosophy = elderInterests.getInterest('philosophy');
@@ -701,7 +702,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       teacher.getComponent<AgentComponent>(CT.Agent)!.ageCategory = 'adult';
       student.getComponent<AgentComponent>(CT.Agent)!.ageCategory = 'adult';
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: teacher.id,
         data: {
@@ -711,7 +712,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.7,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Teacher should learn farming
       const teacherFarming = interests1.getInterest('farming');
@@ -749,7 +750,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
 
       student.getComponent<AgentComponent>(CT.Agent)!.ageCategory = 'child';
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: student.id,
         data: {
@@ -759,7 +760,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
           quality: 0.7,
         },
       });
-      world.eventBus.flush();
+      eventBus.flush();
 
       const philosophy = studentInterests.getInterest('philosophy');
       expect(philosophy?.intensity).toBeGreaterThan(0.3);
@@ -808,7 +809,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
         lastUpdate: 0,
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'conversation:ended',
         source: agent.id,
         data: {
@@ -820,12 +821,12 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       });
 
       expect(() => {
-        world.eventBus.flush();
+        eventBus.flush();
       }).not.toThrow();
     });
 
     it('should handle events with missing entities', () => {
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'skill:level_up',
         source: 'non-existent-agent',
         data: {
@@ -837,7 +838,7 @@ describe('InterestEvolutionSystem - Phase 7.1', () => {
       });
 
       expect(() => {
-        world.eventBus.flush();
+        eventBus.flush();
       }).not.toThrow();
     });
 

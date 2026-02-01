@@ -2,13 +2,15 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../../ecs/World.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import { EpisodicMemoryComponent } from '../EpisodicMemoryComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('EpisodicMemoryComponent', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let entity: EntityImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     entity = world.createEntity() as EntityImpl;
   });
 

@@ -8,12 +8,14 @@ import { createAgentComponent } from '../../components/AgentComponent';
 import type { EntityImpl } from '../../ecs/Entity';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 describe('ExplorationSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: ExplorationSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ExplorationSystem();
   });
 
@@ -341,7 +343,7 @@ describe('ExplorationSystem', () => {
       entityImpl.addComponent(explorationState);
 
       // Initialize system with eventBus
-      const eventBus = world.eventBus;
+      const eventBus = eventBus;
       system.initialize(world, eventBus);
 
       const events: any[] = [];

@@ -14,12 +14,14 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { createDynastyComponent } from '../../components/DynastyComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { selectHeir, type HeirCandidate } from '../EmpireDynastyManager.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('EmpireDynastyManager', () => {
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
   });
 
   describe('Heir Selection - Primogeniture', () => {

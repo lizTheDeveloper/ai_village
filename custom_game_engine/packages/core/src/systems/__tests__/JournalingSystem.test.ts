@@ -8,6 +8,7 @@ import { JournalComponent } from '../../components/JournalComponent';
 import { createAgentComponent } from '../../components/AgentComponent';
 import { PersonalityComponent } from '../../components/PersonalityComponent';
 import { EventBus } from '../../EventBus';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('JournalingSystem', () => {
   let world: World;
@@ -16,7 +17,7 @@ describe('JournalingSystem', () => {
   let agent: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBus();
     system = new JournalingSystem(eventBus);
     agent = world.createEntity();

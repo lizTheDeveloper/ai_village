@@ -4,13 +4,15 @@ import { World } from '../../World.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import { setMutationRate, clearMutationRate, createMutationVectorComponent } from '../../components/MutationVectorComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('StateMutatorSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: StateMutatorSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new StateMutatorSystem();
     // Initialize events (BaseSystem requires this for SystemContext)
     system['events'] = { cleanup: () => {}, emit: () => {} } as unknown;

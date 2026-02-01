@@ -7,6 +7,7 @@ import { BuildingSystem } from '../BuildingSystem.js';
 import { StateMutatorSystem } from '../StateMutatorSystem.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for AnimalHousingSystem + AnimalSystem + BuildingSystem
  *
@@ -213,7 +214,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     const buildingSystem = new BuildingSystem();
     const housingSystem = new AnimalHousingSystem();
 
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
 
     harness.registerSystem('BuildingSystem', buildingSystem);
     harness.registerSystem('AnimalHousingSystem', housingSystem);

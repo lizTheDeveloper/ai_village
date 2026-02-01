@@ -5,6 +5,7 @@ import { CommunicationSystem } from '../CommunicationSystem.js';
 import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { TrustNetworkComponent } from '../../components/TrustNetworkComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Integration tests for CommunicationSystem + Social Network
@@ -26,7 +27,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
   });
 
   it('should communication system process agents', () => {
-    const commSystem = new CommunicationSystem(harness.world.eventBus);
+    const commSystem = new CommunicationSystem(harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -45,7 +46,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
   });
 
   it('should conversations start between nearby agents', () => {
-    const commSystem = new CommunicationSystem(harness.world.eventBus);
+    const commSystem = new CommunicationSystem(harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -73,7 +74,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
   });
 
   it('should distant agents not start conversations', () => {
-    const commSystem = new CommunicationSystem(harness.world.eventBus);
+    const commSystem = new CommunicationSystem(harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -113,7 +114,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
   });
 
   it('should information sharing update trust', () => {
-    const commSystem = new CommunicationSystem(harness.world.eventBus);
+    const commSystem = new CommunicationSystem(harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -131,7 +132,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
     harness.clearEvents();
 
     // Emit information sharing event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'information:shared',
       source: agent1.id,
       data: {
@@ -154,7 +155,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
   });
 
   it('should conversation system handle multiple agents', () => {
-    const commSystem = new CommunicationSystem(harness.world.eventBus);
+    const commSystem = new CommunicationSystem(harness.eventBus);
     harness.registerSystem('CommunicationSystem', commSystem);
 
     // Create 5 agents in proximity

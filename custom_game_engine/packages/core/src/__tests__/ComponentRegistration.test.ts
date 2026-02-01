@@ -60,15 +60,17 @@ import {
   type TimelineMergerOperationComponent,
 } from '../components/TimelineMergerOperationComponent.js';
 import {
+import { EventBusImpl } from '../events/EventBus.js';
   createInvasionComponent,
   type InvasionComponent,
 } from '../components/InvasionComponent.js';
 
 describe('Component Registration - Phase 1-4', () => {
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
   });
 
   describe('Phase 1: City Governance', () => {

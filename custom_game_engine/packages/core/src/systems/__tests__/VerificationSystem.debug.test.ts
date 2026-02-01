@@ -3,14 +3,16 @@ import { World } from '../../World';
 import { VerificationSystem } from '../VerificationSystem';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 describe('VerificationSystem Debug', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: VerificationSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new VerificationSystem();
-    system.initialize(world, world.eventBus);
+    system.initialize(world, eventBus);
   });
 
   it('should find verifiers with correct component names', () => {

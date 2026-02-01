@@ -168,7 +168,7 @@ describe('Wild Animal Spawning System', () => {
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
       // Flush event queue to dispatch queued events
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(eventHandler).toHaveBeenCalled();
 

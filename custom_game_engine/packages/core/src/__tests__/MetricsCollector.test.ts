@@ -1,13 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MetricsCollector } from '../metrics/MetricsCollector';
 import { World } from '../World';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('MetricsCollector', () => {
   let collector: MetricsCollector;
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     collector = new MetricsCollector(world);
   });
 

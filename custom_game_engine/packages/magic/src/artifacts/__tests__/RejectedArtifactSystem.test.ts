@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../../../../core/src/World.js';
 import {
+import { EventBusImpl } from '@ai-village/core';
   RejectedArtifactSystem,
   type RejectedArtifactComponent,
   type CorruptedEffectComponent,
@@ -15,10 +16,11 @@ import {
 
 describe('RejectedArtifactSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: RejectedArtifactSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new RejectedArtifactSystem(world);
   });
 

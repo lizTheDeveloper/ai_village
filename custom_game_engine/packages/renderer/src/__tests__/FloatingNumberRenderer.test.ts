@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { World } from '@ai-village/core/ecs/World';
 import { EventBus } from '@ai-village/core/events/EventBus';
+import { EventBusImpl } from '@ai-village/core';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -63,7 +64,7 @@ describe.skip('FloatingNumberRenderer', () => {
   let renderer: FloatingNumberRenderer;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBus();
     canvas = document.createElement('canvas');
     canvas.width = 800;

@@ -11,6 +11,7 @@ import { createCircadianComponent } from '../../components/CircadianComponent.js
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for Complete Game Day Cycle
  *
@@ -166,7 +167,7 @@ describe('Complete Game Day Cycle Integration', () => {
   it.skip('should weather change during day', () => {
     // SKIP: Test requires weather entity to be created, which isn't done in setupTestWorld
     // Also doesn't test anything meaningful (expect(true).toBe(true))
-    const weatherSystem = new WeatherSystem(harness.world.eventBus);
+    const weatherSystem = new WeatherSystem(harness.eventBus);
     harness.registerSystem('WeatherSystem', weatherSystem);
 
     harness.clearEvents();
@@ -278,7 +279,7 @@ describe('Complete Game Day Cycle Integration', () => {
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
-    const tempSystem = new TemperatureSystem(harness.world.eventBus);
+    const tempSystem = new TemperatureSystem(harness.eventBus);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     const needsSystem = new NeedsSystem();

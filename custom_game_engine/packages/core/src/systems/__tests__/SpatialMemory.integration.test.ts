@@ -9,6 +9,7 @@ import { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.
 import { ExplorationStateComponent } from '../../components/ExplorationStateComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem
  *
@@ -44,7 +45,7 @@ describe('SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem Integratio
   });
 
   it('should exploration system integrate with memory', () => {
-    const explorationSystem = new ExplorationSystem(harness.world.eventBus);
+    const explorationSystem = new ExplorationSystem(harness.eventBus);
     const memorySystem = new MemorySystem();
 
     harness.registerSystem('ExplorationSystem', explorationSystem);

@@ -8,6 +8,7 @@ import { SpatialMemoryComponent, type SpatialMemory } from '../../components/Spa
 import { createEpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for MemoryFormationSystem + MemorySystem + EventBus
  *
@@ -28,7 +29,7 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
   });
 
   it('should memory formation system listen to events', () => {
-    const memoryFormation = new MemoryFormationSystem(harness.world.eventBus);
+    const memoryFormation = new MemoryFormationSystem(harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memoryFormation);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -37,7 +38,7 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
     harness.clearEvents();
 
     // Emit a memory-triggering event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'resource:gathered',
       source: agent.id,
       data: {
@@ -155,14 +156,14 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
   });
 
   it('should test event trigger memory formation', () => {
-    const memoryFormation = new MemoryFormationSystem(harness.world.eventBus);
+    const memoryFormation = new MemoryFormationSystem(harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memoryFormation);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createEpisodicMemoryComponent());
 
     // Emit test event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:event',
       source: agent.id,
       data: {
@@ -181,7 +182,7 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
   });
 
   it('should conversation events create memories for both participants', () => {
-    const memoryFormation = new MemoryFormationSystem(harness.world.eventBus);
+    const memoryFormation = new MemoryFormationSystem(harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memoryFormation);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -191,7 +192,7 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
     agent2.addComponent(createEpisodicMemoryComponent());
 
     // Emit conversation event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'conversation:utterance',
       source: agent1.id,
       data: {
@@ -210,11 +211,11 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
   });
 
   it('should memory formation throw on missing agentId (CLAUDE.md: no silent fallbacks)', () => {
-    const memoryFormation = new MemoryFormationSystem(harness.world.eventBus);
+    const memoryFormation = new MemoryFormationSystem(harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memoryFormation);
 
     // Emit event without agentId
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'resource:gathered',
       source: 'system',
       data: {
@@ -293,14 +294,14 @@ describe('MemoryFormationSystem + MemorySystem + EventBus Integration', () => {
   });
 
   it('should survival events create memories', () => {
-    const memoryFormation = new MemoryFormationSystem(harness.world.eventBus);
+    const memoryFormation = new MemoryFormationSystem(harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memoryFormation);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createEpisodicMemoryComponent());
 
     // Emit survival event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'agent:starved',
       source: agent.id,
       data: {

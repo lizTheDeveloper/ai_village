@@ -371,7 +371,7 @@ describe('NeedsSystem', () => {
     // Hunger critical events come from GatherBehavior.ts.
     it('should NOT emit need:critical for hunger from NeedsSystem (hunger critical is from GatherBehavior)', () => {
       const criticalHandler = vi.fn();
-      world.eventBus.subscribe('need:critical', criticalHandler);
+      eventBus.subscribe('need:critical', criticalHandler);
 
       const entity = world.createEntity();
       const needs = new NeedsComponent({
@@ -387,7 +387,7 @@ describe('NeedsSystem', () => {
 
       // Run the system
       system.update(world, entities, 60.0);
-      world.eventBus.flush();
+      eventBus.flush();
 
       // NeedsSystem should NOT emit hunger critical events
       const hungerCriticalCalls = criticalHandler.mock.calls.filter(
@@ -398,7 +398,7 @@ describe('NeedsSystem', () => {
 
     it('should emit need:critical event when energy crosses below 10% threshold', () => {
       const criticalHandler = vi.fn();
-      world.eventBus.subscribe('need:critical', criticalHandler);
+      eventBus.subscribe('need:critical', criticalHandler);
 
       const entity = world.createEntity();
       // Start with energy ABOVE threshold
@@ -415,7 +415,7 @@ describe('NeedsSystem', () => {
 
       // First update - energy still above threshold, should not emit
       system.update(world, entities, 60.0);
-      world.eventBus.flush();
+      eventBus.flush();
       expect(criticalHandler.mock.calls.length).toBe(0);
 
       // Manually drop energy below threshold to simulate decay
@@ -423,7 +423,7 @@ describe('NeedsSystem', () => {
 
       // Second update - energy now below threshold, should emit
       system.update(world, entities, 60.0);
-      world.eventBus.flush();
+      eventBus.flush();
 
       const energyCriticalCalls = criticalHandler.mock.calls.filter(
         call => call[0].data.needType === 'energy'
@@ -433,7 +433,7 @@ describe('NeedsSystem', () => {
 
     it('should include survival relevance in critical event', () => {
       const criticalHandler = vi.fn();
-      world.eventBus.subscribe('need:critical', criticalHandler);
+      eventBus.subscribe('need:critical', criticalHandler);
 
       const entity = world.createEntity();
       // Start above threshold, then drop below
@@ -450,14 +450,14 @@ describe('NeedsSystem', () => {
 
       // First update to establish "was" state
       system.update(world, entities, 60.0);
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Drop below threshold
       needs.energy = 0.05;
 
       // Second update should emit critical event
       system.update(world, entities, 60.0);
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(criticalHandler.mock.calls.length).toBeGreaterThan(0);
       const event = criticalHandler.mock.calls[0][0];
@@ -469,7 +469,7 @@ describe('NeedsSystem', () => {
   describe('starvation', () => {
     it('should emit agent:starved event when both hunger and energy reach zero', () => {
       const starvedHandler = vi.fn();
-      world.eventBus.subscribe('agent:starved', starvedHandler);
+      eventBus.subscribe('agent:starved', starvedHandler);
 
       const entity = world.createEntity();
       const needs = new NeedsComponent({
@@ -489,13 +489,13 @@ describe('NeedsSystem', () => {
         system.update(world, entities, 60.0); // 60s = 1 game minute each
       }
 
-      world.eventBus.flush();
+      eventBus.flush();
       expect(starvedHandler).toHaveBeenCalled();
     });
 
     it('should include agent id in starved event', () => {
       const starvedHandler = vi.fn();
-      world.eventBus.subscribe('agent:starved', starvedHandler);
+      eventBus.subscribe('agent:starved', starvedHandler);
 
       const entity = world.createEntity();
       const needs = new NeedsComponent({
@@ -514,7 +514,7 @@ describe('NeedsSystem', () => {
         system.update(world, entities, 60.0);
       }
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       if (starvedHandler.mock.calls.length > 0) {
         const event = starvedHandler.mock.calls[0][0];

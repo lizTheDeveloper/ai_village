@@ -76,7 +76,7 @@ describe('Animal Production System', () => {
       productionSystem.update(world, entities, 86400);
 
       // Flush event queue to dispatch queued events
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Should have produced at least one egg
       expect(eventHandler).toHaveBeenCalled();
@@ -117,7 +117,7 @@ describe('Animal Production System', () => {
       productionSystem.update(world, entities, 86400);
 
       // Flush event queue
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(eventHandler).toHaveBeenCalled();
       const eventCall = eventHandler.mock.calls[0][0];

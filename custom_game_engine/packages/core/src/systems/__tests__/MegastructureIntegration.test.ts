@@ -12,15 +12,17 @@ import { MegastructureConstructionSystem } from '../MegastructureConstructionSys
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import type { MegastructureComponent } from '../../components/MegastructureComponent.js';
 import type { WarehouseComponent } from '../../components/WarehouseComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('MegastructureMaintenanceSystem Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let maintenanceSystem: MegastructureMaintenanceSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     maintenanceSystem = new MegastructureMaintenanceSystem();
-    maintenanceSystem.initialize(world, world.eventBus);
+    maintenanceSystem.initialize(world, eventBus);
   });
 
   describe('Component Integration', () => {
@@ -276,7 +278,7 @@ describe('MegastructureMaintenanceSystem Integration', () => {
   describe('Event Emissions', () => {
     it('should emit maintenance_performed event when maintenance succeeds', () => {
       let eventEmitted = false;
-      world.eventBus.on('maintenance_performed', () => {
+      eventBus.on('maintenance_performed', () => {
         eventEmitted = true;
       });
 

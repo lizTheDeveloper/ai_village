@@ -28,7 +28,7 @@ describe('Uplift Integration - Full Wolf Uplift Flow', () => {
   let programEntity: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
 
     breedingSystem = new UpliftBreedingProgramSystem();
@@ -174,7 +174,7 @@ describe('Uplift Integration - Technology Effects', () => {
   let breedingSystem: UpliftBreedingProgramSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     breedingSystem = new UpliftBreedingProgramSystem();
     breedingSystem.initialize(world, eventBus);
@@ -261,7 +261,7 @@ describe('Uplift Integration - Edge Cases', () => {
   let breedingSystem: UpliftBreedingProgramSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     breedingSystem = new UpliftBreedingProgramSystem();
     breedingSystem.initialize(world, eventBus);
@@ -391,7 +391,7 @@ describe('Uplift Integration - Proto-Sapience to Sapience Transition', () => {
   let emergenceSystem: ConsciousnessEmergenceSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
 
     observationSystem = new ProtoSapienceObservationSystem();

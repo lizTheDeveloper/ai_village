@@ -5,6 +5,7 @@ import { VerificationSystem } from '../VerificationSystem.js';
 import { TrustNetworkComponent } from '../../components/TrustNetworkComponent.js';
 import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { BeliefComponent } from '../../components/BeliefComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Integration tests for VerificationSystem + TrustNetwork
@@ -26,7 +27,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
   });
 
   it('should verification system process agents', () => {
-    const verificationSystem = new VerificationSystem(harness.world.eventBus);
+    const verificationSystem = new VerificationSystem(harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -55,7 +56,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
   });
 
   it('should trust levels update after verification', () => {
-    const verificationSystem = new VerificationSystem(harness.world.eventBus);
+    const verificationSystem = new VerificationSystem(harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -75,7 +76,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     harness.clearEvents();
 
     // Emit information shared event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'information:shared',
       source: agent2.id,
       data: {
@@ -94,7 +95,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
   });
 
   it('should verification events be emitted', () => {
-    const verificationSystem = new VerificationSystem(harness.world.eventBus);
+    const verificationSystem = new VerificationSystem(harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
@@ -108,7 +109,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     harness.clearEvents();
 
     // Emit information shared event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'information:shared',
       source: agent2.id,
       data: {
@@ -149,7 +150,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
   });
 
   it('should beliefs integrate with verification', () => {
-    const verificationSystem = new VerificationSystem(harness.world.eventBus);
+    const verificationSystem = new VerificationSystem(harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -166,7 +167,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
   });
 
   it('should verification handle missing trust networks', () => {
-    const verificationSystem = new VerificationSystem(harness.world.eventBus);
+    const verificationSystem = new VerificationSystem(harness.eventBus);
     harness.registerSystem('VerificationSystem', verificationSystem);
 
     // Agent without trust network

@@ -3,6 +3,7 @@ import { World, type World } from '@ai-village/core/ecs/World';
 import type { Entity } from '@ai-village/core/ecs/Entity';
 import { NeedsComponent } from '@ai-village/core/components/NeedsComponent';
 import { HealthBarRenderer } from '../HealthBarRenderer.js';
+import { EventBusImpl } from '@ai-village/core';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -53,11 +54,12 @@ const createCombatStats = (health: number, maxHealth: number = 100, combatSkill:
 
 describe('HealthBarRenderer', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let canvas: HTMLCanvasElement;
   let renderer: HealthBarRenderer;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;

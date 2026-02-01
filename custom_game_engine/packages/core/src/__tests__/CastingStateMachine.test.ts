@@ -12,6 +12,7 @@ import type { MagicComponent } from '../components/MagicComponent.js';
 import { SpellRegistry } from '../magic/SpellRegistry.js';
 import { initializeMagicSystem } from '../magic/InitializeMagicSystem.js';
 import { costCalculatorRegistry } from '../magic/costs/CostCalculatorRegistry.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -29,6 +30,7 @@ type WorldWithMethods = Record<string, unknown> & {
 
 describe('Multi-Tick Casting State Machine', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let magicSystem: MagicSystem;
   let spellRegistry: SpellRegistry;
 
@@ -112,10 +114,10 @@ describe('Multi-Tick Casting State Machine', () => {
     SpellRegistry.instance = null;
 
     // Create world and initialize systems
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     magicSystem = new MagicSystem();
     // MagicSystem.initialize() calls initializeMagicSystem() internally
-    magicSystem.initialize(world, world.eventBus);
+    magicSystem.initialize(world, eventBus);
 
     spellRegistry = SpellRegistry.getInstance();
   });

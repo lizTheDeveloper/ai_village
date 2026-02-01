@@ -3,6 +3,7 @@ import { World } from '../ecs/World';
 import { DeathTransitionSystem } from '../systems/DeathTransitionSystem';
 import { EventBus } from '../events/EventBus';
 import type { KnowledgeLossComponent } from '../components/KnowledgeLossComponent';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Simple test for knowledge loss tracking
@@ -13,7 +14,7 @@ describe('KnowledgeLoss', () => {
   let eventBus: EventBus;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBus();
     system = new DeathTransitionSystem(eventBus);
   });

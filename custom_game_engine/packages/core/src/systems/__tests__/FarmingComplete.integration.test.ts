@@ -7,6 +7,7 @@ import { WeatherSystem } from '../WeatherSystem.js';
 import type { Tile } from '../SoilSystem.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for SoilSystem + PlantSystem + WeatherSystem
  *
@@ -186,13 +187,13 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
   });
 
   it('should plant system subscribe to weather events', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
 
     // Emit a rain event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'weather:rain',
       source: 'test',
       data: { intensity: 'heavy' },
@@ -206,7 +207,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
   });
 
   it('should frost weather damage plants', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     // Create a plant
@@ -227,7 +228,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     });
 
     // Emit frost event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'weather:frost',
       source: 'weather',
       data: { temperature: -5 },
@@ -239,13 +240,13 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
   });
 
   it('should soil moisture changes propagate to plant system', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
 
     // Emit soil moisture change
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'soil:moistureChanged',
       source: 'soil',
       data: {
@@ -263,13 +264,13 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
   });
 
   it('should soil depletion affect plant nutrients', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
 
     // Emit soil depletion event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'soil:depleted',
       source: 'soil',
       data: {
@@ -285,13 +286,13 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
   });
 
   it('should plants respond to day change events', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
 
     // Emit day change event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'time:day_changed',
       source: 'time',
       data: { day: 2 },
@@ -336,13 +337,13 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
       movementModifier: 1.0,
     });
 
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     harness.registerSystem('PlantSystem', plantSystem);
 
     harness.clearEvents();
 
     // Emit weather change with temperature
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'weather:changed',
       source: 'weather',
       data: { temperature: 25 },

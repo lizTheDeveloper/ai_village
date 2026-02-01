@@ -25,6 +25,7 @@ type QueryMock = ReturnType<typeof vi.fn> & {
 };
 import type { Component } from '../types/index.js';
 import type {
+import { EventBusImpl } from '@ai-village/core';
   PlaceBuildingRequest,
   PlaceBuildingResult,
   BuildingInfo,
@@ -428,8 +429,8 @@ class MockGameIntrospectionAPI {
     this.world.addEntity?.(buildingEntity);
 
     // Emit placement event
-    if (this.world.eventBus && typeof this.world.eventBus.emit === 'function') {
-      this.world.eventBus.emit('building_placed', {
+    if (this.eventBus && typeof this.eventBus.emit === 'function') {
+      this.eventBus.emit('building_placed', {
         buildingId: buildingEntity.id,
         blueprintId: request.blueprintId,
         position: request.position,
@@ -818,7 +819,7 @@ describe('GameIntrospectionAPI Phase 2 - Building Management', () => {
     });
 
     it('should emit building placement event', async () => {
-      const emitSpy = vi.spyOn(world.eventBus!, 'emit');
+      const emitSpy = vi.spyOn(eventBus!, 'emit');
 
       const result = await api.placeBuilding({
         blueprintId: 'workbench',

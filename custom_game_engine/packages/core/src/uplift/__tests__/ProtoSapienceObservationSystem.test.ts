@@ -21,7 +21,7 @@ describe('ProtoSapienceObservationSystem - Initialization', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -45,7 +45,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   let program: UpliftProgramComponent;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -156,7 +156,7 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -231,7 +231,7 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -308,7 +308,7 @@ describe('ProtoSapienceObservationSystem - Communication Patterns', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -351,7 +351,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -487,7 +487,7 @@ describe('ProtoSapienceObservationSystem - Only Monitors Active Programs', () =>
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ProtoSapienceObservationSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);

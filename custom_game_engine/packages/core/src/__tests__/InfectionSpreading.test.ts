@@ -8,6 +8,7 @@ import { BodySystem } from '../systems/BodySystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { createBodyComponentFromPlan } from '../components/BodyPlanRegistry.js';
 import type { BodyComponent } from '../components/BodyComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -25,10 +26,11 @@ type WorldWithMethods = Record<string, unknown> & {
 
 describe('BodySystem - Infection Spreading', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let bodySystem: BodySystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     bodySystem = new BodySystem();
   });
 

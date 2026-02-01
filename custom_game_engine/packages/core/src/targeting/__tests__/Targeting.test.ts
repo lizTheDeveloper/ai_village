@@ -19,6 +19,7 @@ import { PlantTargeting, findNearestPlant, findNearestEdiblePlant } from '../Pla
 import { BuildingTargeting, findNearestBuilding, findNearestStorageBuilding } from '../BuildingTargeting.js';
 import { AgentTargeting, findNearestAgent, findConversationPartner } from '../AgentTargeting.js';
 import { ThreatTargeting, assessThreats, findNearestThreat } from '../ThreatTargeting.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -36,9 +37,10 @@ type WorldWithMethods = Record<string, unknown> & {
 
 describe('Targeting Module', () => {
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
   });
 
   /**
