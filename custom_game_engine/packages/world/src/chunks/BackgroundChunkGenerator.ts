@@ -219,20 +219,18 @@ export class BackgroundChunkGenerator {
       return;
     }
 
-    // Performance safety: check TPS (if available)
+    // Performance safety: check TPS
     const currentTPS = this.getCurrentTPS(world);
-    if (currentTPS !== null) {
-      if (currentTPS < this.minTPS) {
-        if (!this.isPaused) {
-          console.warn(
-            `[BackgroundChunkGenerator] Pausing generation - TPS below ${this.minTPS} (current: ${currentTPS.toFixed(1)})`
-          );
-          this.isPaused = true;
-        }
-        return;
-      } else if (currentTPS >= this.resumeTPS && this.isPaused) {
-        this.isPaused = false;
+    if (currentTPS < this.minTPS) {
+      if (!this.isPaused) {
+        console.warn(
+          `[BackgroundChunkGenerator] Pausing generation - TPS below ${this.minTPS} (current: ${currentTPS.toFixed(1)})`
+        );
+        this.isPaused = true;
       }
+      return;
+    } else if (currentTPS >= this.resumeTPS && this.isPaused) {
+      this.isPaused = false;
     }
 
     // If paused, don't process
@@ -431,25 +429,16 @@ export class BackgroundChunkGenerator {
   }
 
   /**
-   * Get current TPS from world (if available).
+   * Get current TPS from world.
    *
-   * NOTE: This is a placeholder implementation. In practice, you would:
-   * 1. Access world.metricsCollector or world.performanceMonitor
-   * 2. Get current TPS from performance metrics
-   * 3. Return null if metrics unavailable
-   *
-   * Current implementation always returns null (no TPS throttling).
+   * Accesses world.performanceStats which is updated by GameLoop every tick.
+   * TPS is calculated as 1000ms / avgTickTime (e.g., 50ms avg = 20 TPS).
    *
    * @param world - World instance
-   * @returns Current TPS or null if unavailable
+   * @returns Current TPS (always available via performanceStats)
    */
-  private getCurrentTPS(world: WorldMutator): number | null {
-    // TODO: Implement TPS access when performance monitoring API is available
-    // Example:
-    // if (world.performanceMonitor) {
-    //   return world.performanceMonitor.getCurrentTPS();
-    // }
-    return null;
+  private getCurrentTPS(world: WorldMutator): number {
+    return world.performanceStats.tps;
   }
 }
 

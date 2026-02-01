@@ -20,6 +20,7 @@ import {
   TextStyle,
   Assets,
   Texture,
+  ParticleContainer,
   type Renderer as PixiRenderer,
 } from 'pixi.js';
 import type { World, Entity, EventBus } from '@ai-village/core';
@@ -235,6 +236,17 @@ export class PixiJSRenderer implements IRenderer {
   private terrainContainer!: Container;
   private entityContainer!: Container;
   private overlayContainer!: Container;
+
+  // Particle system for effects (dust, sparks, etc.)
+  private particleContainer!: ParticleContainer;
+  private particleTexture!: Texture;
+  private activeParticles: Array<{
+    sprite: Sprite;
+    startTime: number;
+    lifetime: number;
+    velocityX: number;
+    velocityY: number;
+  }> = [];
 
   // Sprite management
   private entitySprites: Map<string, Sprite> = new Map();
@@ -531,6 +543,20 @@ export class PixiJSRenderer implements IRenderer {
     this.worldContainer.addChild(this.entityContainer);
     this.worldContainer.addChild(this.overlayContainer);
 
+    // Create particle container for high-performance particle effects
+    // ParticleContainer uses WebGL batching for 10-100x better performance than Graphics
+    this.particleContainer = new ParticleContainer(1000, {
+      scale: true,
+      position: true,
+      rotation: false,
+      uvs: false,
+      alpha: true,
+    });
+    this.overlayContainer.addChild(this.particleContainer);
+
+    // Create shared particle texture (simple white circle)
+    this.particleTexture = this.createParticleTexture();
+
     this.app.stage.addChild(this.worldContainer);
 
     // Enable sorting for depth ordering
@@ -678,7 +704,10 @@ export class PixiJSRenderer implements IRenderer {
     // 6. Update floating texts
     this.updateFloatingTexts();
 
-    // 7. Update FPS counter
+    // 7. Update particles
+    this.updateParticles();
+
+    // 8. Update FPS counter
     this.updateFps();
 
     // PixiJS handles actual GPU rendering automatically via the ticker
@@ -1218,40 +1247,100 @@ export class PixiJSRenderer implements IRenderer {
     });
   }
 
+  /**
+   * Create a reusable particle texture.
+   * Creates a simple white circle that can be tinted to any color.
+   * @returns Texture for particle sprites
+   */
+  private createParticleTexture(): Texture {
+    const size = 8;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    if (ctx) {
+      // Draw white circle with soft edge
+      const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+    }
+
+    return Texture.from(canvas);
+  }
+
   createDustCloud(worldX: number, worldY: number, options: ParticleOptions = {}): void {
-    // TODO: Implement using PixiJS ParticleContainer for better performance
-    // For now, create simple graphics
+    // Use ParticleContainer for better performance (10-100x faster than Graphics)
     const count = options.count ?? 10;
-    const color = options.color ? parseInt(options.color.replace('#', ''), 16) : 0xaa8866;
+    const lifetime = options.lifetime ?? 500;
+    const colorHex = options.color ? parseInt(options.color.replace('#', ''), 16) : 0xaa8866;
+    const startTime = performance.now();
 
     for (let i = 0; i < count; i++) {
-      const graphics = new Graphics();
-      graphics.circle(0, 0, 2 + Math.random() * 3);
-      graphics.fill({ color, alpha: 0.6 });
+      // Create sprite from shared particle texture
+      const sprite = new Sprite(this.particleTexture);
+      sprite.tint = colorHex;
+      sprite.alpha = 0.6;
+      sprite.anchor.set(0.5);
+      sprite.scale.set(0.5 + Math.random() * 0.5);
 
-      graphics.x = worldX * this._tileSize + (Math.random() - 0.5) * 20;
-      graphics.y = worldY * this._tileSize + (Math.random() - 0.5) * 20;
+      // Position with random spread
+      sprite.x = worldX * this._tileSize + (Math.random() - 0.5) * 20;
+      sprite.y = worldY * this._tileSize + (Math.random() - 0.5) * 20;
 
-      this.overlayContainer.addChild(graphics);
+      // Add to particle container (WebGL batching)
+      this.particleContainer.addChild(sprite);
 
-      // Animate and remove
-      const startTime = performance.now();
-      const lifetime = options.lifetime ?? 500;
+      // Track particle for animation
+      this.activeParticles.push({
+        sprite,
+        startTime,
+        lifetime,
+        velocityX: (Math.random() - 0.5) * 0.5,
+        velocityY: -0.5 - Math.random() * 0.5,
+      });
+    }
+  }
 
-      const animate = (): void => {
-        const progress = (performance.now() - startTime) / lifetime;
-        if (progress >= 1) {
-          this.overlayContainer.removeChild(graphics);
-          graphics.destroy();
-          return;
-        }
+  /**
+   * Update all active particles.
+   * Called from render() every frame to animate particles.
+   */
+  private updateParticles(): void {
+    const now = performance.now();
+    const particlesToRemove: number[] = [];
 
-        graphics.alpha = 1 - progress;
-        graphics.y -= 0.5;
-        requestAnimationFrame(animate);
-      };
+    for (let i = 0; i < this.activeParticles.length; i++) {
+      const particle = this.activeParticles[i];
+      if (!particle) continue;
 
-      requestAnimationFrame(animate);
+      const elapsed = now - particle.startTime;
+      const progress = elapsed / particle.lifetime;
+
+      if (progress >= 1) {
+        // Particle expired - mark for removal
+        particlesToRemove.push(i);
+        this.particleContainer.removeChild(particle.sprite);
+        particle.sprite.destroy();
+        continue;
+      }
+
+      // Animate particle
+      particle.sprite.alpha = 0.6 * (1 - progress); // Fade out
+      particle.sprite.x += particle.velocityX;
+      particle.sprite.y += particle.velocityY;
+    }
+
+    // Remove expired particles (reverse order to maintain indices)
+    for (let i = particlesToRemove.length - 1; i >= 0; i--) {
+      const idx = particlesToRemove[i];
+      if (idx !== undefined) {
+        this.activeParticles.splice(idx, 1);
+      }
     }
   }
 

@@ -390,6 +390,16 @@ export class GameLoop {
       : this.EMA_ALPHA * tickTime + (1 - this.EMA_ALPHA) * this.avgTickTime;
     this.maxTickTime = Math.max(this.maxTickTime, tickTime);
 
+    // Update world performance stats (for performance-aware systems)
+    // TPS = 1000ms / avgTickTime (e.g., 50ms avg = 20 TPS, 100ms avg = 10 TPS)
+    const currentTPS = this.avgTickTime > 0 ? 1000 / this.avgTickTime : this.ticksPerSecond;
+    this._world.updatePerformanceStats({
+      tps: currentTPS,
+      avgTickTimeMs: this.avgTickTime,
+      maxTickTimeMs: this.maxTickTime,
+      tickCount: this.tickCount,
+    });
+
     // Record tick time in profiler if enabled
     if (this.profilingEnabled && this.profiler) {
       this.profiler.recordTickTime(this._world.tick, tickTime);
