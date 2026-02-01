@@ -26,12 +26,13 @@ export class TrustNetworkSerializer extends BaseComponentSerializer<TrustNetwork
   protected deserializeData(data: unknown): TrustNetworkComponent {
     const serialized = data as SerializedTrustNetwork;
 
+    // Validation already ensures arrays exist - no fallbacks needed
     // Reconstruct Maps from arrays
-    const scores = new Map(serialized.scores ?? []);
+    const scores = new Map(serialized.scores);
 
     // Convert readonly arrays to mutable arrays
     const verificationHistory = new Map(
-      (serialized.verificationHistory ?? []).map(([key, records]) => [key, [...records]] as [string, VerificationRecord[]])
+      serialized.verificationHistory.map(([key, records]) => [key, [...records]] as [string, VerificationRecord[]])
     );
 
     // Use constructor to properly initialize the component
@@ -44,6 +45,13 @@ export class TrustNetworkSerializer extends BaseComponentSerializer<TrustNetwork
   validate(data: unknown): data is TrustNetworkComponent {
     if (typeof data !== 'object' || data === null) {
       throw new Error('TrustNetworkComponent data must be object');
+    }
+    const d = data as Record<string, unknown>;
+    if (!Array.isArray(d.scores)) {
+      throw new Error('TrustNetworkComponent must have scores array');
+    }
+    if (!Array.isArray(d.verificationHistory)) {
+      throw new Error('TrustNetworkComponent must have verificationHistory array');
     }
     return true;
   }

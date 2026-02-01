@@ -17,8 +17,12 @@ export class JournalSerializer extends BaseComponentSerializer<JournalComponent>
   protected serializeData(component: JournalComponent): SerializedJournal {
     // Access private _entries field
     const componentAny = component as { _entries: JournalEntry[] };
+    const entries = componentAny._entries;
+    if (!Array.isArray(entries)) {
+      throw new Error('JournalComponent missing _entries array during serialization');
+    }
     return {
-      entries: componentAny._entries ?? [],
+      entries,
     };
   }
 
@@ -29,8 +33,9 @@ export class JournalSerializer extends BaseComponentSerializer<JournalComponent>
     const component = new JournalComponent();
 
     // Restore entries by accessing private field
+    // Validation already ensures entries array exists - no fallback needed
     const componentAny = component as { _entries: JournalEntry[] };
-    componentAny._entries = serialized.entries ?? [];
+    componentAny._entries = serialized.entries;
 
     return component;
   }
@@ -38,6 +43,10 @@ export class JournalSerializer extends BaseComponentSerializer<JournalComponent>
   validate(data: unknown): data is JournalComponent {
     if (typeof data !== 'object' || data === null) {
       throw new Error('JournalComponent data must be object');
+    }
+    const d = data as Record<string, unknown>;
+    if (!Array.isArray(d.entries)) {
+      throw new Error('JournalComponent missing required entries array');
     }
     return true;
   }

@@ -399,7 +399,14 @@ export class SaveLoadService {
       coordinatorInternal.passages.clear();
 
       // Restore god-crafted queue
-      if (saveFile.godCraftedQueue) {
+      // Validate: undefined is OK (old save format), but if present must be valid object
+      if (saveFile.godCraftedQueue !== undefined) {
+        if (!saveFile.godCraftedQueue || typeof saveFile.godCraftedQueue !== 'object' || !('entries' in saveFile.godCraftedQueue)) {
+          throw new Error(
+            '[SaveLoad] Save file corruption: godCraftedQueue is invalid. ' +
+            `Expected object with version and entries, got ${typeof saveFile.godCraftedQueue}`
+          );
+        }
         godCraftedQueue.deserialize(saveFile.godCraftedQueue as { version: number; entries: QueueEntry[] });
       }
 
@@ -408,8 +415,16 @@ export class SaveLoadService {
         await worldSerializer.deserializeWorld(universeSnapshot, world);
       }
 
+      // Validate passages array exists (empty array is valid, but field must exist)
+      if (!Array.isArray(saveFile.passages)) {
+        throw new Error(
+          '[SaveLoad] Save file corruption: passages field missing or invalid. ' +
+          `Expected array, got ${typeof saveFile.passages}`
+        );
+      }
+
       // Restore passages after universes are loaded
-      if (saveFile.passages && saveFile.passages.length > 0) {
+      if (saveFile.passages.length > 0) {
         for (const passageSnapshot of saveFile.passages) {
           // Verify both universes exist before creating passage
           const sourceUniverse = multiverseCoordinator.getUniverse(passageSnapshot.sourceUniverseId);
@@ -587,7 +602,15 @@ export class SaveLoadService {
       const coordinatorInternal = multiverseCoordinator as unknown as MultiverseCoordinatorInternal;
       coordinatorInternal.passages.clear();
 
-      if (saveFile.godCraftedQueue) {
+      // Restore god-crafted queue
+      // Validate: undefined is OK (old save format), but if present must be valid object
+      if (saveFile.godCraftedQueue !== undefined) {
+        if (!saveFile.godCraftedQueue || typeof saveFile.godCraftedQueue !== 'object' || !('entries' in saveFile.godCraftedQueue)) {
+          throw new Error(
+            '[SaveLoad] Save file corruption: godCraftedQueue is invalid. ' +
+            `Expected object with version and entries, got ${typeof saveFile.godCraftedQueue}`
+          );
+        }
         godCraftedQueue.deserialize(saveFile.godCraftedQueue as { version: number; entries: QueueEntry[] });
       }
 
@@ -596,8 +619,16 @@ export class SaveLoadService {
         await worldSerializer.deserializeWorld(universeSnapshot, world);
       }
 
+      // Validate passages array exists (empty array is valid, but field must exist)
+      if (!Array.isArray(saveFile.passages)) {
+        throw new Error(
+          '[SaveLoad] Save file corruption: passages field missing or invalid. ' +
+          `Expected array, got ${typeof saveFile.passages}`
+        );
+      }
+
       // Restore passages after universes are loaded
-      if (saveFile.passages && saveFile.passages.length > 0) {
+      if (saveFile.passages.length > 0) {
         for (const passageSnapshot of saveFile.passages) {
           // Verify both universes exist before creating passage
           const sourceUniverse = multiverseCoordinator.getUniverse(passageSnapshot.sourceUniverseId);

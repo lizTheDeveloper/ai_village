@@ -20,7 +20,8 @@ export class SkillProgressSerializer extends BaseComponentSerializer<SkillProgre
   protected deserializeData(data: unknown): SkillProgressComponent {
     const d = data as Record<string, unknown>;
     const comp = createSkillProgressComponent();
-    comp.skillTreeState = (d.skillTreeState as Partial<Record<string, SkillTreeParadigmState>>) ?? {};
+    // Validation already ensures skillTreeState exists as object - no fallback needed
+    comp.skillTreeState = d.skillTreeState as Partial<Record<string, SkillTreeParadigmState>>;
     return comp;
   }
 
